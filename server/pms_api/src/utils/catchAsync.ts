@@ -1,9 +1,9 @@
 import { Request as BaseRequest, NextFunction, Response } from "express";
 
 export interface Request<User = unknown, Role = unknown> extends BaseRequest {
-  jwt?: string;
-  user?: User;
-  role?: Role;
+  jwt: string;
+  user: User;
+  role: Role;
 }
 
 type CatchAsyncFN<User, Role> = (
