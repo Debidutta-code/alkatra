@@ -1,0 +1,40 @@
+"use client";
+import React, { useState, useEffect } from "react";
+import Navbar from "../../components/navbar/navbar";
+import CheckAuthentication from "../../components/CheckAuthentication/CheckAuthentication";
+import { Triangle } from "react-loader-spinner";
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate authentication check completion
+    const timeout = setTimeout(() => setLoading(false), 1000);
+    return () => clearTimeout(timeout);
+  }, []);
+
+  return (
+    <CheckAuthentication setLoading={setLoading}>
+      {loading ? (
+        <div className="h-screen w-screen flex justify-center items-center overflow-hidden">
+          <Triangle
+            visible={true}
+            height={100}
+            width={100}
+            color="#282D4D"
+            ariaLabel="triangle-loading"
+          />
+        </div>
+      ) : (
+        <div className="h-screen w-screen overflow-y-auto overflow-x-hidden">
+          <Navbar />
+          {children}
+        </div>
+      )}
+    </CheckAuthentication>
+  );
+}

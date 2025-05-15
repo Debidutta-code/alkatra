@@ -1,0 +1,192 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --main-color: #fff;
+  --second-color: #21092f;
+  --font-color: #21092f;
+  --second-font-color: #8f8694;
+  --gradient: linear-gradient(163.95deg, #6348fe 4.74%, #610595 88.83%);
+  --font-family: "Space Grotesk", sans-serif;
+  --shadow: 0px 39px 60px 0px #00000024;
+}
+
+::-webkit-scrollbar {
+  height: 1px;
+  width: 2px;
+}
+
+/* ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+} */
+::-webkit-scrollbar-thumb {
+  background: #d6d6d6;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b3b1b1;
+  cursor: pointer;
+}
+
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+/* 
+@media (prefers-color-scheme: light) {
+  :root {
+  }
+} */
+
+.App {
+  height: 100vh;
+}
+
+/* typography */
+html {
+  font-family: var(--font-family);
+  font-weight: 500;
+}
+h1 {
+  font-size: 28px;
+  line-height: 36px;
+  letter-spacing: 3.42px;
+}
+
+h2 {
+  font-size: 12px;
+  line-height: 15px;
+  letter-spacing: 2px;
+  color: var(--second-font-color);
+}
+
+input:placeholder-shown {
+  font-size: 18px;
+  line-height: 23px;
+  letter-spacing: 0px;
+  text-indent: 16px;
+}
+
+label {
+  font-size: 12px;
+  line-height: 15px;
+  letter-spacing: 2px;
+  color: var(--font-color);
+  text-transform: uppercase;
+}
+
+header h1 {
+  font-size: 18px;
+  line-height: 23px;
+  letter-spacing: 2.200000047683716px;
+  color: var(--main-color);
+}
+
+header p {
+  font-size: 9px;
+  line-height: 11px;
+  letter-spacing: 1.2857142686843872px;
+  color: var(--main-color);
+}
+
+/* typography media query */
+@media (min-width: 1000px) {
+  h2 {
+    font-size: 18px;
+    line-height: 23px;
+    letter-spacing: 0px;
+  }
+
+  header h1 {
+    font-size: 28px;
+    line-height: 36px;
+    letter-spacing: 3.422222137451172px;
+  }
+
+  header p {
+    font-size: 14px;
+    line-height: 18px;
+    letter-spacing: 2px;
+  }
+}
+
+/* Head styles */
+
+.header--image_container_front {
+  box-shadow: var(--shadow);
+}
+
+/* Form styles */
+
+label {
+  margin-bottom: 9px;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
