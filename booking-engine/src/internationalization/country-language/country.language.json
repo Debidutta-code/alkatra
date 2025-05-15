@@ -1,0 +1,17 @@
+{
+    "en": {
+        "name": "English",
+        "code": "en",
+        "flag": "🇬🇧"
+    },
+    "ar": {
+        "name": "Arabic",
+        "code": "ar",
+        "flag": "🇸🇦"
+    },
+    "hi": {
+        "name": "Hindi",
+        "code": "hi",
+        "flag": "🇮🇳"
+    }
+}

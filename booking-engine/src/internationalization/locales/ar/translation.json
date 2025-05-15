@@ -1,0 +1,13 @@
+{
+  "Navbar": {
+    "pleaseLogin": "يرجى تسجيل الدخول لعرض رحلاتك",
+    "logoutSuccess": "تم تسجيل الخروج بنجاح",
+    "becomeHost": "كن مضيفًا",
+    "myTrip": "رحلتي",
+    "profileSettings": "إعدادات الملف الشخصي",
+    "helpFeedback": "المساعدة والتعليقات",
+    "logout": "تسجيل الخروج",
+    "signUp": "اشترك",
+    "login": "تسجيل الدخول"
+  }
+}
