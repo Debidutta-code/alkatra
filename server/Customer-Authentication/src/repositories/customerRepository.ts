@@ -36,7 +36,8 @@ class CustomerRepository {
             }
             customer.email = updateData.email;
         }
-        if (updateData.name) customer.name = updateData.name;
+        if (updateData.firstName) customer.firstName = updateData.firstName;
+        if (updateData.lastName) customer.lastName = updateData.lastName;
         if (updateData.phone) customer.phone = updateData.phone;
         if (updateData.password) {
             customer.password = await bcrypt.hash(updateData.password, 10);
