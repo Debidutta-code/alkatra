@@ -295,41 +295,41 @@ const getRoomsByPropertyId = catchAsync(async (req: Request<unknown, unknown>, r
   });
 })
 
-// const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-//   const propertyInfoId = req.params.id;
+const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const propertyInfoId = req.params.id;
 
-//   const rooms = await Room.find({ propertyInfo_id: propertyInfoId }).exec();
-//   const ratePlanList = await PropertyPrice.find({ property_id: propertyInfoId });
+  const rooms = await Room.find({ propertyInfo_id: propertyInfoId }).exec();
+  const ratePlanList = await PropertyPrice.find({ property_id: propertyInfoId });
 
-//   if (!rooms) {
-//     return next(
-//       new AppError(`No property found with this id ${propertyInfoId}`, 404)
-//     );
-//   }
-//   if (!ratePlanList || ratePlanList.length === 0) {
-//     return next(
-//       new AppError(`No rate plans found for property with id ${propertyInfoId}`, 404)
-//     );
-//   }
+  if (!rooms) {
+    return next(
+      new AppError(`No property found with this id ${propertyInfoId}`, 404)
+    );
+  }
+  if (!ratePlanList || ratePlanList.length === 0) {
+    return next(
+      new AppError(`No rate plans found for property with id ${propertyInfoId}`, 404)
+    );
+  }
 
-//   const roomsWithPrices = rooms.map((room) => {
-//     const ratePlan = ratePlanList.find((ratePlan) => ratePlan.property_id.toString() === room.propertyInfo_id.toString());
+  const roomsWithPrices = rooms.map((room) => {
+    const ratePlan = ratePlanList.find((ratePlan) => ratePlan.propertyId.toString() === room.propertyInfo_id.toString());
 
-//     return {
-//       ...room.toObject(),
-//       room_price: ratePlan ? ratePlan.room_price : null,
-//       meal_plan: ratePlan ? ratePlan.meal_plan : null,
-//       rateplan_id: ratePlan ? ratePlan._id : null
-//     };
-//   });
-//   console.log("Rooms with Prices: ", roomsWithPrices);
-//   res.status(200).json({
-//     status: "success",
-//     error: false,
-//     message: "Rooms fetched by property id with rate plan successfully",
-//     data: roomsWithPrices,
-//   });
-// });
+    return {
+      ...room.toObject(),
+      room_price: ratePlan ? ratePlan.room_price : null,
+      meal_plan: ratePlan ? ratePlan.meal_plan : null,
+      rateplan_id: ratePlan ? ratePlan._id : null
+    };
+  });
+  console.log("Rooms with Prices: ", roomsWithPrices);
+  res.status(200).json({
+    status: "success",
+    error: false,
+    message: "Rooms fetched by property id with rate plan successfully",
+    data: roomsWithPrices,
+  });
+});
 
 
 export const getRoomsForBooking = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -484,4 +484,4 @@ export const assignRatePlansToRooms = async (req: Request, res: Response, next: 
 };
 
 
-export { createRoom, updateRoom, deleteRoom, getRoomById, getRooms, getRoomsByPropertyId };
+export { createRoom, updateRoom, deleteRoom, getRoomById, getRooms, getRoomsByPropertyId, getRoomsByPropertyId2 };

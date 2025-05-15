@@ -12,6 +12,7 @@ export interface RatePlan extends Document {
   rate_plan_code: string;
   rate_plan_name: string;
   description?: string;
+  room_price?: number;
   meal_plan: 'RO' | 'BB' | 'HB' | 'FB';
   max_occupancy: number;
   adult_occupancy: number;
@@ -71,6 +72,7 @@ const ratePlanSchema = new Schema<RatePlan>(
       required: false,
       default: 'RO',
     },
+    room_price: {type: Number, required: true},
     max_occupancy: { type: Number, required: true },
     adult_occupancy: { type: Number, required: true },
     min_length_stay: { type: Number, required: true },

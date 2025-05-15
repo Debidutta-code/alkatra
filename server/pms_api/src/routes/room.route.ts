@@ -6,11 +6,14 @@ import {
   getRoomById,
   getRooms,
   getRoomsByPropertyId,
+  getRoomsByPropertyId2,
 } from "../controller/room.controller";
 
 const router = Router();
 
-router.route("/rooms_by_propertyId/:id").get( getRoomsByPropertyId as any);
+router.route("/rooms_by_propertyId/:id").get(getRoomsByPropertyId as any);
+router.route("/rooms_by_propertyId2/:id").get(getRoomsByPropertyId2 as any);
+
 
 router
   .route("/")
