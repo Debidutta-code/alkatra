@@ -274,11 +274,9 @@ const getRooms = catchAsync(async (req: Request, res: Response, next: NextFuncti
 }
 );
 
-const getRoomsByPropertyId = catchAsync(async (req: Request<unknown, unknown>, res: Response, next: NextFunction) => {
+const getRoomsByPropertyId = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const propertyInfoId = req.params.id;
-  const userId = req.user;
-  const userRole = req.role;
-  console.log("#################ROOM: The user id and role is: ", {userId, userRole});
+
   const rooms = await Room.find({ propertyInfo_id: propertyInfoId }).exec();
   console.log("Rooms: ", rooms)
   if (!rooms) {

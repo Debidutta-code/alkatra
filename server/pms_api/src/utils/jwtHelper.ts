@@ -1,9 +1,6 @@
 import jwt from "jsonwebtoken";
 import { Types } from "mongoose";
 
-
-
-
 export type Role = "user" | "admin" | "superadmin";
 
 export type Payload = {
