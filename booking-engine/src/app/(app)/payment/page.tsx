@@ -2,6 +2,8 @@
 
 import CheckAuthentication from "@/components/check_authentication/CheckAuth";
 import CheckoutPage from "@/components/Stripe/checkoutPage";
+import PayAtHotelFunction from "@/components/paymentComponents/PayAtHotelFunction";
+import PaymentOptionSelector from "@/components/paymentComponents/PaymentOptionSelector";
 import convertToSubcurrency from "@/lib/convertToSubcurrency";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
@@ -13,6 +15,7 @@ import { useSelector } from "react-redux";
 interface RootState {
   auth: {
     user: UserType | null;
+    token?: string;
   };
 }
 
@@ -22,6 +25,7 @@ interface UserType {
   lastName: string;
   email: string;
   phone?: string;
+  _id?: string;
 }
 
 if (process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY === undefined) {
@@ -31,15 +35,36 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
 
 function PaymentPageContent() {
   const [loading, setLoading] = useState(true);
+  const [paymentOption, setPaymentOption] = useState<string>("payNow");
   const searchParams = useSearchParams();
   const authUser = useSelector((state: RootState) => state.auth.user);
   
   const amount = parseInt(searchParams.get("amount") || "0", 10);
-  const currency = searchParams.get("currency")?.toLowerCase();
-  const firstName = searchParams.get('firstName');
-  const lastName = searchParams.get('lastName');
-  const email = searchParams.get('email');
-  const phone = searchParams.get('phone') || '';
+  const currency = searchParams.get("currency")?.toLowerCase() || "inr";
+  const firstName = searchParams.get('firstName') || authUser?.firstName || '';
+  const lastName = searchParams.get('lastName') || authUser?.lastName || '';
+  const email = searchParams.get('email') || authUser?.email || '';
+  const phone = searchParams.get('phone') || authUser?.phone || '';
+  const roomId = searchParams.get('roomId') || '';
+  const propertyId = searchParams.get('propertyId') || '';
+  const checkIn = searchParams.get('checkIn') || '';
+  const checkOut = searchParams.get('checkOut') || '';
+  const userId = authUser?._id || searchParams.get('userId') || '';
+
+  // Compile all booking details in one object to pass to payment components
+  const bookingDetails = {
+    roomId,
+    propertyId,
+    amount: amount.toString(),
+    currency,
+    checkIn,
+    checkOut,
+    firstName,
+    lastName,
+    email,
+    phone,
+    userId
+  };
 
   // Add a loading or error state handler
   if (!searchParams || !amount) {
@@ -103,22 +128,37 @@ function PaymentPageContent() {
             </div>
             <div className="backdrop-blur-lg bg-white/10 p-8 rounded-3xl border border-white/20">
               <h2 className="text-2xl font-medium text-white mb-6">Payment Details</h2>
+              
+              {/* Add the Payment Option Selector */}
+              <div className="mb-6">
+                <PaymentOptionSelector 
+                  selectedOption={paymentOption}
+                  onChange={setPaymentOption}
+                />
+              </div>
+              
               <Elements
                 stripe={stripePromise}
                 options={{
                   mode: "payment",
                   amount: convertToSubcurrency(amount),
-                  currency: `${currency || "INR"}`,
+                  currency: currency,
                 }}
               >
-                <CheckoutPage 
-                  amount={amount} 
-                  currency={currency as string}
-                  firstName={firstName as string}
-                  lastName={lastName as string}
-                  email={email as string}
-                  phone={phone as string}
-                />
+                {paymentOption === 'payNow' ? (
+                  <CheckoutPage 
+                    amount={amount} 
+                    currency={currency}
+                    firstName={firstName}
+                    lastName={lastName}
+                    email={email}
+                    phone={phone as string}
+                  />
+                ) : (
+                  <PayAtHotelFunction 
+                    bookingDetails={bookingDetails}
+                  />
+                )}
               </Elements>
             </div>
           </div>

@@ -1,18 +1,21 @@
-"use client";
+'use client';
 
-import React, { useState, useCallback, useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "@/Redux/store";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import GuestBox from "./GuestBox";
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from '@/Redux/store';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import GuestBox from './GuestBox';
 import { getHotelsByCity } from '@/api/hotel';
 import { Search, MapPin, Calendar, Users, Loader2 } from 'lucide-react';
-import Home from "@/components/assets/popular/Home.jpg";
-import toast from "react-hot-toast";
-import DateRange from "./DateRange";
+import Home from '@/components/assets/popular/Home.jpg';
+import toast from 'react-hot-toast';
+import DateRange from './DateRange';
+import { useTranslation } from 'react-i18next';
+import i18next from '../../internationalization/i18n'; // Import i18n configuration
 
 const HotelCard = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const { t } = useTranslation(); // Initialize translation hook
+  const [searchQuery, setSearchQuery] = useState('');
   const [dates, setDates] = useState<string[] | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +40,18 @@ const HotelCard = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Ensure document direction is set (though already handled in Navbar/LanguageSwitcher)
+  useEffect(() => {
+    document.documentElement.dir = i18next.language === 'ar' ? 'rtl' : 'ltr';
+    const handleLanguageChange = () => {
+      document.documentElement.dir = i18next.language === 'ar' ? 'rtl' : 'ltr';
+    };
+    i18next.on('languageChanged', handleLanguageChange);
+    return () => {
+      i18next.off('languageChanged', handleLanguageChange);
+    };
+  }, []);
+
   const fetchSearchedProperties = useCallback(async (location: string) => {
     if (!location) return;
     setLoading(true);
@@ -50,12 +65,12 @@ const HotelCard = () => {
       
       router.push(`/destination?location=${searchQuery}&${dateRangeQueryString}`);
     } catch (error) {
-      setError("No hotels available for the selected location.");
-      toast.error("No hotels available for the selected location.");
+      setError(t('HotelCard.errorNoHotels'));
+      toast.error(t('HotelCard.errorNoHotels'));
     } finally {
       setLoading(false);
     }
-  }, [dates, router, searchQuery]);
+  }, [dates, router, searchQuery, t]);
 
   // Explicit search button handler, separate from form submission
   const handleSearchButtonClick = (e: React.MouseEvent) => {
@@ -65,12 +80,12 @@ const HotelCard = () => {
     
     // Validation logic
     if (!searchQuery || searchQuery.length < 3) {
-      toast.error("Please enter a valid location.");
+      toast.error(t('HotelCard.errorInvalidLocation'));
       return;
     }
 
     if (!dates || dates.length !== 2 || !dates[0] || !dates[1]) {
-      toast.error("Please select both check-in and check-out dates.");
+      toast.error(t('HotelCard.errorSelectDates'));
       return;
     }
 
@@ -117,10 +132,10 @@ const HotelCard = () => {
         {/* Hero Text */}
         <div className="max-w-3xl text-center mb-8">
           <h1 className="text-3xl md:text-5xl font-bold text-white mb-3 leading-tight tracking-tight drop-shadow-lg">
-            Find the Perfect Stay for Your Journey
+            {t('HotelCard.heroTitle')}
           </h1>
           <p className="text-lg md:text-xl text-white/90 font-light max-w-2xl mx-auto drop-shadow">
-            Discover amazing accommodations at exclusive prices
+            {t('HotelCard.heroSubtitle')}
           </p>
         </div>
         
@@ -140,7 +155,7 @@ const HotelCard = () => {
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Where are you going?"
+                      placeholder={t('HotelCard.locationPlaceholder')}
                       className="block w-full h-12 pl-10 pr-3 py-2 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-gray-700 transition duration-200 ease-in-out group-hover:border-blue-300"
                     />
                   </div>
@@ -189,7 +204,7 @@ const HotelCard = () => {
                     ) : (
                       <>
                         <Search className="w-5 h-5" />
-                        <span>Search</span>
+                        <span>{t('HotelCard.searchButton')}</span>
                       </>
                     )}
                   </button>
@@ -213,7 +228,7 @@ const HotelCard = () => {
             <div className="bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm flex items-center space-x-2">
               <span className="inline-block w-2 h-2 bg-blue-600 rounded-full animate-pulse"></span>
               <p className="text-sm font-medium text-gray-700">
-                Special offer: Get up to 25% off on your first booking!
+                {t('HotelCard.specialOffer')}
               </p>
             </div>
           </div>

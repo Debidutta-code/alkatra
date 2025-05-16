@@ -139,26 +139,36 @@ const RoomsPage: React.FC = () => {
     dispatch(setAmount(room.room_price.toString()));
   };
 
+  // In the parent component (RoomsPage.tsx or similar)
   const confirmBooking = (formData: {
     firstName: string;
     lastName: string;
     email: string;
     phone: string;
+    propertyId: string;
+    roomId: string;
+    checkIn: string;
+    checkOut: string;
+    amount: string;
+    userId?: string;
   }) => {
-    if (selectedRoom) {
-      const queryParams = new URLSearchParams({
-        amount: selectedRoom.room_price.toString(),
-        currency: "INR",
-        checkIn: checkInDate,
-        checkOut: checkOutDate,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phone: formData.phone,
-      }).toString();
+    // Create the URL query params with all necessary data
+    const queryParams = new URLSearchParams({
+      roomId: formData.roomId,
+      propertyId: formData.propertyId,
+      amount: formData.amount,
+      currency: "INR",
+      checkIn: formData.checkIn,
+      checkOut: formData.checkOut,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      phone: formData.phone,
+      userId: formData.userId || ""
+    }).toString();
 
-      router.push(`/payment?${queryParams}`);
-    }
+    // Navigate to the payment page with all parameters
+    router.push(`/payment?${queryParams}`);
   };
 
   return (
@@ -199,10 +209,12 @@ const RoomsPage: React.FC = () => {
       </div>
 
       {/* Using the new GuestInformationModal component */}
-      <GuestInformationModal 
+      <GuestInformationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         selectedRoom={selectedRoom}
+        checkInDate={checkInDate}
+        checkOutDate={checkOutDate}
         onConfirmBooking={confirmBooking}
       />
     </div>
