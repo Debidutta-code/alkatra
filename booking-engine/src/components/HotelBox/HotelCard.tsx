@@ -50,7 +50,7 @@ const HotelCard = () => {
       
       router.push(`/destination?location=${searchQuery}&${dateRangeQueryString}`);
     } catch (error) {
-      setError("No hotels available for the selected location.");
+      // setError("No hotels available for the selected location.");
       toast.error("No hotels available for the selected location.");
     } finally {
       setLoading(false);

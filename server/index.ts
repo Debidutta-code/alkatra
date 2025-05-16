@@ -30,8 +30,8 @@ initializeExpressRoutes({ app }).then(async () => {
     });
 
     // call these functions only when database connection successful
-    checkElasticClient();
-    createPropertyIndexAndDoc();
+    // checkElasticClient();
+    // createPropertyIndexAndDoc();
   }
   catch (err) {
     console.log(`Error: ${err}`);

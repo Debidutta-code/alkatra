@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Modal from "@/components/ui/modal/Modal";
-import GuestBox from "../AppComponent/guestBox";
+import GuestBox from "../HotelBox/GuestBox";
 import PhoneInput from 'react-phone-number-input';
 import "react-phone-number-input/style.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,12 +14,14 @@ interface UserType {
   lastName: string;
   email: string;
   phone?: string;
+  _id?: string; // Add user ID if available
 }
 
 // Root state interface
 interface RootState {
   auth: {
     user: UserType | null;
+    token?: string;
   };
 }
 
@@ -29,6 +31,8 @@ interface Room {
   room_name: string;
   room_type: string;
   room_price: number;
+  propertyInfo_id?: string; // Property ID field
+  property_id?: string; // Alternative property ID field
   [key: string]: any; // For other properties
 }
 
@@ -36,11 +40,19 @@ interface GuestInformationModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedRoom: Room | null;
+  checkInDate: string; // Add check-in date
+  checkOutDate: string; // Add check-out date
   onConfirmBooking: (formData: {
     firstName: string;
     lastName: string;
     email: string;
     phone: string;
+    propertyId: string; // Add property ID
+    roomId: string; // Add room ID
+    checkIn: string; // Add check-in date
+    checkOut: string; // Add check-out date
+    amount: string; // Add amount
+    userId?: string; // Add user ID if available
   }) => void;
 }
 
@@ -48,6 +60,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   isOpen,
   onClose,
   selectedRoom,
+  checkInDate,
+  checkOutDate,
   onConfirmBooking
 }) => {
   const authUser = useSelector((state: RootState) => state.auth.user);
@@ -112,12 +126,30 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   };
 
   const handleConfirmBooking = () => {
-    if (isFormUpdated) {
+    if (isFormUpdated && selectedRoom) {
+      // Determine property ID from the room object
+      const propertyId = selectedRoom.propertyInfo_id || 
+                         selectedRoom.property_id || 
+                         selectedRoom.propertyId || 
+                         "";
+      
+      // If propertyId is missing, show an error
+      if (!propertyId) {
+        setErrorMessage("Property information is missing. Please try again.");
+        return;
+      }
+      
       onConfirmBooking({
         firstName,
         lastName,
         email,
-        phone: phone || ''
+        phone: phone || '',
+        propertyId,
+        roomId: selectedRoom._id,
+        checkIn: checkInDate,
+        checkOut: checkOutDate,
+        amount: selectedRoom.room_price.toString(),
+        userId: authUser?._id // Pass user ID if available
       });
     }
   };
@@ -226,6 +258,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                 <p className="text-gray-700"><span className="font-medium">Room:</span> {selectedRoom.room_name}</p>
                 <p className="text-gray-700"><span className="font-medium">Type:</span> {selectedRoom.room_type}</p>
                 <p className="text-gray-700"><span className="font-medium">Amount:</span> ₹{selectedRoom.room_price}</p>
+                <p className="text-gray-700"><span className="font-medium">Check-in:</span> {checkInDate}</p>
+                <p className="text-gray-700"><span className="font-medium">Check-out:</span> {checkOutDate}</p>
               </div>
             </div>
           </div>
