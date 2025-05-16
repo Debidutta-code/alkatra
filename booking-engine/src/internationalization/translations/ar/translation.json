@@ -1,0 +1,23 @@
+{
+  "Navbar": {
+    "pleaseLogin": "يرجى تسجيل الدخول لعرض رحلاتك",
+    "logoutSuccess": "تم تسجيل الخروج بنجاح",
+    "becomeHost": "كن مضيفًا",
+    "myTrip": "رحلتي",
+    "profileSettings": "إعدادات الملف الشخصي",
+    "helpFeedback": "المساعدة والتعليقات",
+    "logout": "تسجيل الخروج",
+    "signUp": "اشترك",
+    "login": "تسجيل الدخول"
+  },
+  "HotelCard": {
+    "heroTitle": "ابحث عن الإقامة المثالية لرحلتك",
+    "heroSubtitle": "اكتشف أماكن إقامة رائعة بأسعار حصرية",
+    "locationPlaceholder": "إلى أين أنت ذاهب؟",
+    "searchButton": "بحث",
+    "specialOffer": "عرض خاص: احصل على خصم يصل إلى 25% على الحجز الأول الخاص بك!",
+    "errorNoHotels": "لا توجد فنادق متاحة للموقع المحدد.",
+    "errorInvalidLocation": "يرجى إدخال موقع صالح.",
+    "errorSelectDates": "يرجى تحديد تاريخي الوصول والمغادرة."
+  }
+}
