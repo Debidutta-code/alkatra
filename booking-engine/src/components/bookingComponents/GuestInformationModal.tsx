@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Modal from "@/components/ui/modal/Modal";
-import GuestBox from "../AppComponent/guestBox";
+import GuestBox from "../HotelBox/GuestBox";
 import PhoneInput from 'react-phone-number-input';
 import "react-phone-number-input/style.css";
 import { useDispatch, useSelector } from "react-redux";
