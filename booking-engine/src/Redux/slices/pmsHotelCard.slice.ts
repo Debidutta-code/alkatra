@@ -72,13 +72,12 @@ export const getUser =
     async (dispatch: typeof store.dispatch, getState: typeof store.getState) => {
       const accessToken = Cookies.get("accessToken");
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/me`, {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/me`, {
           headers: {
             Authorization: "Bearer " + accessToken,
           },
         });
-
-        const user = res?.data?.data?.user;
+        const user = res?.data?.data;
         console.log("API response user:", user);
         dispatch(setUserId(user._id));
         console.log("2 setUserId called with:", user._id);
@@ -86,5 +85,6 @@ export const getUser =
         console.error("Error fetching user data:", error);
       }
     };
+
 
 export default pmsHotelCardSlice.reducer;

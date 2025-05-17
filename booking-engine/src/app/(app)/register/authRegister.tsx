@@ -18,21 +18,21 @@ import { useFormValidation } from "@/components/auth/hooks/useFormValidation";
 const Register: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  
-  const { 
-    values, 
-    errors, 
-    formFocus, 
-    handleChange, 
-    handleFocus, 
+
+  const {
+    values,
+    errors,
+    formFocus,
+    handleChange,
+    handleFocus,
     handleBlur,
-    validateForm 
+    validateForm
   } = useFormValidation(
-    { 
+    {
       firstName: "",
       lastName: "",
       email: "",
-      password: "" 
+      password: ""
     },
     {
       firstName: { required: true },
@@ -44,23 +44,19 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!validateForm()) {
       return;
     }
-
     setLoading(true);
-
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/register`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/register`,
         {
           ...values,
-          role: "user",
           bookings: []
         }
       );
-      if (response.data && response.data.status === "success") {
+      if (response.status === 201) {
         setLoading(false);
         toast.success("Registration successful! Please sign in.");
         router.push("/login");
@@ -73,6 +69,7 @@ const Register: React.FC = () => {
       toast.error(error.response?.data?.message || "Registration failed");
     }
   };
+
 
   return (
     <AuthLayout
@@ -88,8 +85,8 @@ const Register: React.FC = () => {
       footerContent={
         <p className="text-center text-gray-600">
           Already have an account?{" "}
-          <Link 
-            href="/login" 
+          <Link
+            href="/login"
             className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
           >
             Sign in
