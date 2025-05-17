@@ -1,8 +1,6 @@
-'use client';
-
 import React, { useState, useEffect } from 'react';
-import i18next from '../../internationalization/i18n'; // Import i18n configuration
-import countryLanguages from '../../internationalization/country-language/country.language.json'; // Import country language data
+import i18next from '../../i18n/Index';
+import flags from '../../i18n/flags.json';
 
 interface LanguageOption {
   code: string;
@@ -10,8 +8,7 @@ interface LanguageOption {
   flag: string;
 }
 
-// Transform JSON data into LanguageOption array
-const languageOptions: LanguageOption[] = Object.values(countryLanguages).map((lang) => ({
+const languageOptions: LanguageOption[] = Object.values(flags).map((lang) => ({
   code: lang.code,
   name: lang.name,
   flag: lang.flag,
@@ -19,47 +16,74 @@ const languageOptions: LanguageOption[] = Object.values(countryLanguages).map((l
 
 const LanguageSwitcher: React.FC = () => {
   const [selectedLanguage, setSelectedLanguage] = useState<string>(i18next.language || 'en');
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    // Sync state with i18next language on mount
     setSelectedLanguage(i18next.language);
-    // Set initial document direction for RTL support
     document.documentElement.dir = i18next.language === 'ar' ? 'rtl' : 'ltr';
-    // Update direction on language change
+
     const handleLanguageChange = () => {
       document.documentElement.dir = i18next.language === 'ar' ? 'rtl' : 'ltr';
+      setSelectedLanguage(i18next.language);
     };
+
     i18next.on('languageChanged', handleLanguageChange);
     return () => {
       i18next.off('languageChanged', handleLanguageChange);
     };
   }, []);
 
-  const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newLang = event.target.value;
-    setSelectedLanguage(newLang);
-    i18next.changeLanguage(newLang); // Update language
+  const handleLanguageChange = (code: string) => {
+    setSelectedLanguage(code);
+    i18next.changeLanguage(code);
+    setIsOpen(false);
   };
 
+  const selectedOption = languageOptions.find((l) => l.code === selectedLanguage);
+
   return (
-    <div className="language-switcher">
-      <select
-        value={selectedLanguage}
-        onChange={handleLanguageChange}
-        className="border rounded-md px-2 py-2 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none pr-8 text-sm"
-        style={{
-          backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'right 0.5rem center',
-          backgroundSize: '1rem',
-        }}
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 p-2 border rounded-lg hover:border-gray-500 transition cursor-pointer h-[40px]"
       >
-        {languageOptions.map((option) => (
-          <option key={option.code} value={option.code}>
-            {option.flag} {option.name}
-          </option>
-        ))}
-      </select>
+        {selectedOption && (
+          <img
+            src={selectedOption.flag}
+            alt={`${selectedOption.name} flag`}
+            className="w-5 h-5 rounded-sm"
+          />
+        )}
+        <span className="text-black text-sm font-medium">{selectedOption?.name || 'Select Language'}</span>
+        <svg
+          className="w-4 h-4 ml-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+
+      {isOpen && (
+        <ul className="absolute top-full mt-1 w-full bg-white border rounded-lg shadow-lg z-10">
+          {languageOptions.map((option) => (
+            <li
+              key={option.code}
+              onClick={() => handleLanguageChange(option.code)}
+              className="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer"
+            >
+              <img
+                src={option.flag}
+                alt={`${option.name} flag`}
+                className="w-5 h-5 rounded-sm"
+              />
+              <span className="text-black text-sm font-medium">{option.name}</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

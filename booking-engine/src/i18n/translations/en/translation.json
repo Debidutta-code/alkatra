@@ -19,5 +19,11 @@
     "errorNoHotels": "No hotels available for the selected location.",
     "errorInvalidLocation": "Please enter a valid location.",
     "errorSelectDates": "Please select both check-in and check-out dates."
+  },
+  "HotelBox": {
+    "DateRange": {
+      "checkInPlaceholder": "Check-in Date",
+      "checkOutPlaceholder": "Check-out Date"
+    }
   }
 }

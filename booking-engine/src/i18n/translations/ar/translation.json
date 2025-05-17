@@ -19,5 +19,11 @@
     "errorNoHotels": "لا توجد فنادق متاحة للموقع المحدد.",
     "errorInvalidLocation": "يرجى إدخال موقع صالح.",
     "errorSelectDates": "يرجى تحديد تاريخي الوصول والمغادرة."
+  },
+  "HotelBox": {
+    "DateRange": {
+      "checkInPlaceholder": "تاريخ الوصول",
+      "checkOutPlaceholder": "تاريخ المغادرة"
+    }
   }
 }

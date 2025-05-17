@@ -18,7 +18,7 @@ import {
 import { logout, getUser } from '@/Redux/slices/auth.slice';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import i18next from '../../internationalization/i18n'; // Adjust path if i18n.js is in a different folder
+import i18next from '../../i18n/Index';
 
 import Home from '@/components/assets/modern-house.png';
 import Globe from '@/components/assets/globe.png';
