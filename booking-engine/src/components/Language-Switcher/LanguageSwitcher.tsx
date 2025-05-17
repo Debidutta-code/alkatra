@@ -15,16 +15,23 @@ const languageOptions: LanguageOption[] = Object.values(flags).map((lang) => ({
 }));
 
 const LanguageSwitcher: React.FC = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState<string>(i18next.language || 'en');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('');
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    setSelectedLanguage(i18next.language);
-    document.documentElement.dir = i18next.language === 'ar' ? 'rtl' : 'ltr';
+    const initialLang = i18next.language || 'en';
+
+    // Ensure fallback is also reflected in state
+    const fallbackLang =
+      languageOptions.find((l) => l.code === initialLang) ? initialLang : 'en';
+
+    setSelectedLanguage(fallbackLang);
+    document.documentElement.dir = fallbackLang === 'ar' ? 'rtl' : 'ltr';
 
     const handleLanguageChange = () => {
-      document.documentElement.dir = i18next.language === 'ar' ? 'rtl' : 'ltr';
-      setSelectedLanguage(i18next.language);
+      const newLang = i18next.language;
+      setSelectedLanguage(newLang);
+      document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr';
     };
 
     i18next.on('languageChanged', handleLanguageChange);
@@ -54,7 +61,9 @@ const LanguageSwitcher: React.FC = () => {
             className="w-5 h-5 rounded-sm"
           />
         )}
-        <span className="text-black text-sm font-medium">{selectedOption?.name || 'Select Language'}</span>
+        <span className="text-black text-sm font-medium">
+          {selectedOption?.name || 'English'}
+        </span>
         <svg
           className="w-4 h-4 ml-1"
           fill="none"
