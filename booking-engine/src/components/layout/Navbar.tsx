@@ -195,6 +195,7 @@ const Navbar: React.FC = () => {
             </div>
 
             <ul className="flex flex-col mt-5 space-y-4">
+              <LanguageSwitcher />
               <li className="flex items-center p-3 border-2 rounded-lg hover:border-gray-500 transition">
                 <Link href="/become-host">
                   <Image src={Globe} width={24} height={24} alt={t('Navbar.becomeHost')} />
