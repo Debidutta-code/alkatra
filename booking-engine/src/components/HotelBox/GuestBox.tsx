@@ -4,11 +4,9 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "@/Redux/store";
 import { setGuestDetails } from "@/Redux/slices/hotelcard.slice";
 import { createPortal } from "react-dom";
-
 const GuestBox: React.FC = () => {
   const dispatch = useDispatch();
   const { guestDetails } = useSelector((state) => state.hotel);
-
   const [modalOpen, setModalOpen] = useState(false);
   const [rooms, setRooms] = useState(1);
   const [guests, setGuests] = useState(1);
@@ -16,28 +14,23 @@ const GuestBox: React.FC = () => {
   const [childAges, setChildAges] = useState(Array.from({ length: 0 }, () => 0));
   const [displayText, setDisplayText] = useState(`${rooms} Rooms ${guests} Guests`);
   const [error, setError] = useState<string | null>(null);
-
   useEffect(() => {
     if (modalOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
     }
-
     return () => {
       document.body.style.overflow = "unset";
     };
   }, [modalOpen]);
-
   const openModal = () => {
     setModalOpen(true);
   };
-
   const closeModal = () => {
     setModalOpen(false);
     setError(null);
   };
-
   const incDecHandler = (
     setter: React.Dispatch<React.SetStateAction<number>>,
     delta: number,
@@ -45,7 +38,6 @@ const GuestBox: React.FC = () => {
   ) => {
     setter((prevValue) => Math.max(prevValue + delta, minValue));
   };
-
   const handleChildrenChange = (value: number) => {
     setChildren((prevChildren) => {
       const newValue = Math.max(value, 0);
@@ -53,17 +45,14 @@ const GuestBox: React.FC = () => {
       return newValue;
     });
   };
-
   const handleChildAgeChange = (index: number, age: number) => {
     const newChildAges = [...childAges];
     newChildAges[index] = age;
     setChildAges(newChildAges);
   };
-
   const isChildAgeValid = () => {
     return childAges.every((age) => age > 0 && age < 14);
   };
-
   const handleApplyChanges = () => {
     if (children === 0 || isChildAgeValid()) {
       setDisplayText(
@@ -84,7 +73,6 @@ const GuestBox: React.FC = () => {
       setError("Please select the child's age");
     }
   };
-
   const modalContent = modalOpen ? (
     <>
       {/* Backdrop */}
@@ -92,7 +80,6 @@ const GuestBox: React.FC = () => {
         className="fixed top-0 left-0 w-full h-full bg-black/30 backdrop-blur-sm z-[999]"
         onClick={closeModal}
       />
-
       {/* Modal */}
       <div className="fixed top-0 left-0 w-full h-full z-[1000] flex items-center justify-center p-4">
         <div className="w-full max-w-md bg-tripswift-off-white rounded-xl shadow-xl p-6 overflow-y-auto max-h-[80vh] animate-fadeIn">
@@ -100,7 +87,6 @@ const GuestBox: React.FC = () => {
             <h3 className="text-lg font-tripswift-extrabold text-tripswift-black pb-2 border-b border-tripswift-black/10">
               Select guests
             </h3>
-
             {/* Rooms Section */}
             <div className="flex items-center justify-between">
               <label className="text-tripswift-black font-tripswift-medium uppercase">
@@ -125,7 +111,6 @@ const GuestBox: React.FC = () => {
                 </button>
               </div>
             </div>
-
             {/* Guests Section */}
             <div className="flex items-center justify-between">
               <label className="text-tripswift-black font-tripswift-medium uppercase">
@@ -150,7 +135,6 @@ const GuestBox: React.FC = () => {
                 </button>
               </div>
             </div>
-
             {/* Children Section */}
             <div className="space-y-3 pt-2 border-t border-tripswift-black/10">
               <div className="flex items-center justify-between">
@@ -182,7 +166,6 @@ const GuestBox: React.FC = () => {
                   </button>
                 </div>
               </div>
-
               {/* Child Age Selectors */}
               {children > 0 && (
                 <div className="space-y-3 mt-4 pl-4">
@@ -221,14 +204,12 @@ const GuestBox: React.FC = () => {
                 </div>
               )}
             </div>
-
             {/* Error Message */}
             {error && (
               <div className="text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg">
                 {error}
               </div>
             )}
-
             {/* Action Buttons */}
             <div className="flex items-center justify-end gap-4 pt-4 border-t border-tripswift-black/10">
               <button
@@ -249,7 +230,6 @@ const GuestBox: React.FC = () => {
       </div>
     </>
   ) : null;
-
   return (
     <div className="relative">
       {/* Trigger Button */}
@@ -263,11 +243,9 @@ const GuestBox: React.FC = () => {
           </span>
         </div>
       </div>
-
       {/* Render the modal using a portal */}
       {modalOpen && createPortal(modalContent, document.body)}
     </div>
   );
 };
-
 export default GuestBox;

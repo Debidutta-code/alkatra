@@ -20,10 +20,86 @@
     "errorInvalidLocation": "Please enter a valid location.",
     "errorSelectDates": "Please select both check-in and check-out dates."
   },
+  "HotelListing": {
+    "CompactSearchBar": {
+      "locationPlaceholder": "Where are you going?",
+      "checkInPlaceholder": "Check-in",
+      "checkOutPlaceholder": "Check-out",
+      "searchButton": "Search",
+      "errorInvalidLocation": "Please enter a valid location.",
+      "errorSelectDates": "Please select both check-in and check-out dates.",
+      "errorNoHotels": "No hotels available for the selected location.",
+      "ariaClearSearch": "Clear search",
+      "ariaSearchHotels": "Search hotels",
+      "ariaSearching": "Searching..."
+    },
+    "heroTitle": "Find Your Perfect Stay",
+    "heroSubtitle": "Book accommodations at the best prices",
+    "hotelsIn": "Hotels in",
+    "yourDestination": "your destination",
+    "selectDates": "Select dates",
+    "propertiesFound": "properties found",
+    "nights": "nights",
+    "filters": "Filters",
+    "activeFilter": "active filter",
+    "activeFilters": "active filters",
+    "clearAll": "Clear all",
+    "popularFilters": "Popular Filters",
+    "freeWifi": "Free WiFi",
+    "parking": "Parking",
+    "breakfast": "Breakfast",
+    "searchPropertyName": "Search property name",
+    "sortBy": "Sort by",
+    "recommended": "Recommended",
+    "highestRating": "Highest Rating",
+    "lowestRating": "Lowest Rating",
+    "whyBookWithTripSwift": "Why Book With TripSwift",
+    "freeCancellation": "Free Cancellation",
+    "freeCancellationDesc": "Most of our properties offer free cancellation up to 24 hours before check-in.",
+    "bestPriceGuarantee": "Best Price Guarantee",
+    "bestPriceGuaranteeDesc": "Find a lower price? We'll match it and give you an additional 10% off.",
+    "secureBooking": "Secure Booking",
+    "secureBookingDesc": "We use industry-standard encryption to protect your personal information.",
+    "noHotelsError": "No hotels found for the given search criteria.",
+    "tryModifyingSearch": "Please try modifying the search"
+  },
   "HotelBox": {
     "DateRange": {
       "checkInPlaceholder": "Check-in Date",
       "checkOutPlaceholder": "Check-out Date"
+    },
+    "FilterModal": {
+      "title": "Filters",
+      "propertyRating": "Property Rating",
+      "amenities": "Amenities",
+      "sortBy": "Sort By",
+      "cancel": "Cancel",
+      "applyFilters": "Apply Filters",
+      "ariaCloseModal": "Close modal",
+      "ariaSortOrder": "Sort order",
+      "ratingUp": "& Up",
+      "amenitiesList": {
+        "wifi": "Free Wifi",
+        "swimming_pool": "Swimming Pool",
+        "fitness_center": "Fitness Center",
+        "spa_and_wellness": "Spa and Wellness",
+        "restaurant": "Restaurant",
+        "room_service": "Room Service",
+        "bar_and_lounge": "Bar and Lounge",
+        "parking": "Parking",
+        "concierge_services": "Concierge Services",
+        "pet_friendly": "Pet Friendly",
+        "business_facilities": "Business Facilities",
+        "laundry_services": "Laundry Services",
+        "child_friendly_facilities": "Child Friendly Facilities"
+      },
+      "sortOptions": {
+        "recommended": "Recommended",
+        "rating_desc": "Rating: High to Low",
+        "rating_asc": "Rating: Low to High",
+        "price_desc": "Price: High to Low",
+        "price_asc": "Price: Low to High"
+      }
     }
   },
   "HomeSections": {

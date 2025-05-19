@@ -1,6 +1,7 @@
 // src/components/hotelListingComponents/HotelCardItem.tsx
 import React from "react";
 import { MapPin, Star, Coffee, Wifi, Car, Waves, Droplets, Briefcase, Utensils, BellRing, Dog, Bath } from "lucide-react";
+import { t } from "i18next";
 
 export interface Hotel {
     _id: string;
@@ -13,6 +14,22 @@ export interface Hotel {
     image: string[];
     amenities: { [key: string]: boolean };
 }
+
+const amenities = {
+    wifi: t('HotelBox.FilterModal.amenitiesList.wifi'),
+    swimming_pool: t('HotelBox.FilterModal.amenitiesList.swimming_pool'),
+    fitness_center: t('HotelBox.FilterModal.amenitiesList.fitness_center'),
+    spa_and_wellness: t('HotelBox.FilterModal.amenitiesList.spa_and_wellness'),
+    restaurant: t('HotelBox.FilterModal.amenitiesList.restaurant'),
+    room_service: t('HotelBox.FilterModal.amenitiesList.room_service'),
+    bar_and_lounge: t('HotelBox.FilterModal.amenitiesList.bar_and_lounge'),
+    parking: t('HotelBox.FilterModal.amenitiesList.parking'),
+    concierge_services: t('HotelBox.FilterModal.amenitiesList.concierge_services'),
+    pet_friendly: t('HotelBox.FilterModal.amenitiesList.pet_friendly'),
+    business_facilities: t('HotelBox.FilterModal.amenitiesList.business_facilities'),
+    laundry_services: t('HotelBox.FilterModal.amenitiesList.laundry_services'),
+    child_friendly_facilities: t('HotelBox.FilterModal.amenitiesList.child_friendly_facilities')
+};
 
 export interface HotelCardItemProps {
     hotel: Hotel;
@@ -139,7 +156,7 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
                                 .map(([amenity]) => (
                                     <div key={amenity} className="flex items-center text-xs font-tripswift-medium text-tripswift-blue bg-tripswift-blue/5 border border-tripswift-blue/20 px-2 py-1 rounded-md">
                                         {getAmenityIcon(amenity)}
-                                        <span className="capitalize ml-1">{amenity.replace(/_/g, ' ')}</span>
+                                        <span className="capitalize ml-1">{amenities[amenity as keyof typeof amenities]}</span>
                                     </div>
                                 ))}
                         </div>
