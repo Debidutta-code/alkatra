@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import i18next from '../../i18n/Index';
 import flags from '../../i18n/flags.json';
-import i18next from '../../internationalization/i18n';
-import countryLanguages from '../../internationalization/country-language/country.language.json';
 import { ChevronDown } from 'lucide-react';
 
 interface LanguageOption {
@@ -19,7 +17,6 @@ const languageOptions: LanguageOption[] = Object.values(flags).map((lang) => ({
 
 const LanguageSwitcher: React.FC = () => {
   const [selectedLanguage, setSelectedLanguage] = useState<string>('');
-  const [isOpen, setIsOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -44,11 +41,6 @@ const LanguageSwitcher: React.FC = () => {
     };
   }, []);
 
-  const handleLanguageChange = (code: string) => {
-    setSelectedLanguage(code);
-    i18next.changeLanguage(code);
-    setIsOpen(false);
-  };
 
   const selectedOption = languageOptions.find((l) => l.code === selectedLanguage);
   const handleLanguageChange = (langCode: string) => {
@@ -113,36 +105,6 @@ const LanguageSwitcher: React.FC = () => {
             </li>
           ))}
         </ul>
-      )}
-    <div className="relative">
-      <div 
-        className="flex items-center gap-1 cursor-pointer text-gray-700 hover:text-tripswift-blue text-sm p-2 rounded-md"
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsOpen(!isOpen);
-        }}
-      >
-        <span>{currentLanguage.flag} {currentLanguage.name}</span>
-        <ChevronDown size={16} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </div>
-      
-      {isOpen && (
-        <div className="absolute top-full left-0 mt-1 bg-white shadow-md rounded-md overflow-hidden z-50 min-w-[150px]">
-          {languageOptions.map((option) => (
-            <div
-              key={option.code}
-              onClick={() => handleLanguageChange(option.code)}
-              className={`px-4 py-2 cursor-pointer flex items-center gap-2 ${
-                option.code === selectedLanguage 
-                  ? 'bg-gray-100 text-tripswift-blue' 
-                  : 'hover:bg-gray-50 text-gray-700'
-              }`}
-            >
-              <span>{option.flag}</span>
-              <span>{option.name}</span>
-            </div>
-          ))}
-        </div>
       )}
     </div>
   );

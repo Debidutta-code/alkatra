@@ -17,16 +17,6 @@ import {
 import { logout, getUser } from '@/Redux/slices/auth.slice';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import i18next from '../../i18n/Index';
-
-import Home from '@/components/assets/modern-house.png';
-import Globe from '@/components/assets/globe.png';
-import MTrip from '@/components/assets/traveling.png';
-import Logo from '../assets/TRIP-1-Copy.png';
-import LanguageSwitcher from '../Language-Switcher/LanguageSwitcher';
-
-// Define RootState type based on your store's state shape
-import i18next from '../../internationalization/i18n';
 
 // Define types
 import { ThunkDispatch } from 'redux-thunk';
@@ -49,6 +39,7 @@ type AppDispatch = ThunkDispatch<RootState, unknown, AnyAction>;
 import MTrip from '@/components/assets/traveling.png';
 import Logo from '../assets/TRIP-1.png';
 import LanguageSwitcher from '../Language-Switcher/LanguageSwitcher';
+import i18next from 'i18next';
 
 const Navbar: React.FC = () => {
   const { t } = useTranslation();

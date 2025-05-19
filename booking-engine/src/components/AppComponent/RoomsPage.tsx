@@ -143,7 +143,7 @@ const RoomsPage: React.FC = () => {
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`
         );
 
-        setRooms(roomsResponse.data);
+        setRooms(response.data);
 
         // Handle different response formats
         const propDetails = propertyResponse.data.property || propertyResponse.data.data || propertyResponse.data;
