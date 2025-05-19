@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Star, Check } from 'lucide-react';
 import { AMENITIES } from "@/components/HotelBox/FilterModal";
+import { t } from 'i18next';
 
 interface FilterSidebarProps {
   amenities: { [key: string]: boolean };
@@ -118,7 +119,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
                 className="ml-2 text-xs text-gray-700 normal-case cursor-pointer font-tripswift-regular"
                 onClick={() => toggleAmenityFilter(amenity.key)}
               >
-                {amenity.label}
+                {t(`HotelBox.FilterModal.amenitiesList.${amenity.labelKey}`, { defaultValue: amenity.labelKey })}
               </label>
             </div>
           ))}

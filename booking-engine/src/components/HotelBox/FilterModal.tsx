@@ -39,11 +39,12 @@ export const FilterModal: React.FC<FilterModalProps> = ({
   onSave,
   initialFilters,
 }) => {
-  const { t, ready } = useTranslation();
   const [selectedAmenities, setSelectedAmenities] = useState<{ [key: string]: boolean }>(initialFilters.amenities);
   const [sortOrder, setSortOrder] = useState(initialFilters.sortOrder);
   const [ratingFilter, setRatingFilter] = useState<number | null>(initialFilters.rating);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  const { t, ready } = useTranslation();
 
   useEffect(() => {
     setSelectedAmenities(initialFilters.amenities);
@@ -135,11 +136,10 @@ export const FilterModal: React.FC<FilterModalProps> = ({
               <button
                 key={`rating-${rating}`}
                 onClick={() => handleRatingChange(rating)}
-                className={`px-4 py-2 rounded-lg text-sm font-tripswift-medium transition-colors flex items-center gap-1 ${
-                  ratingFilter === rating
+                className={`px-4 py-2 rounded-lg text-sm font-tripswift-medium transition-colors flex items-center gap-1 ${ratingFilter === rating
                     ? "bg-tripswift-blue bg-opacity-10 text-tripswift-blue border border-tripswift-blue hover:bg-opacity-20"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-transparent"
-                }`}
+                  }`}
                 aria-pressed={ratingFilter === rating}
               >
                 <div className="flex">
@@ -167,11 +167,10 @@ export const FilterModal: React.FC<FilterModalProps> = ({
               <button
                 key={key}
                 onClick={() => toggleAmenity(key)}
-                className={`px-4 py-2 rounded-lg text-sm font-tripswift-medium transition-colors ${
-                  selectedAmenities[key]
+                className={`px-4 py-2 rounded-lg text-sm font-tripswift-medium transition-colors ${selectedAmenities[key]
                     ? "bg-tripswift-blue bg-opacity-10 text-tripswift-blue border border-tripswift-blue hover:bg-opacity-20"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-transparent"
-                }`}
+                  }`}
                 aria-pressed={selectedAmenities[key]}
               >
                 {t(`HotelBox.FilterModal.amenitiesList.${labelKey}`, { defaultValue: labelKey })}

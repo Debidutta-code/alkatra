@@ -94,14 +94,31 @@ const HotelListing: React.FC = () => {
     }
   }, [destination, location]);
 
-  // Fetch hotels when params change
+  // Fetch hotels when params change or language changes
   useEffect(() => {
+    // Fetch hotels based on initial params
     if (params.location) {
       fetchHotels(params.location);
     } else if (params.destination) {
       fetchHotels(params.destination);
     }
-  }, [params]);
+
+    // Listen for language changes and refetch hotels
+    const handleLanguageChange = () => {
+      if (params.location) {
+        fetchHotels(params.location);
+      } else if (params.destination) {
+        fetchHotels(params.destination);
+      }
+    };
+
+    i18n.on("languageChanged", handleLanguageChange);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      i18n.off("languageChanged", handleLanguageChange);
+    };
+  }, [params, i18n.language]);
 
   // Fetch hotels data
   const fetchHotels = async (searchTerm: string) => {
@@ -265,7 +282,7 @@ const HotelListing: React.FC = () => {
 
   // Show loading state if translations are not ready
   if (!ready) {
-    return <div>Loading translations...</div>;
+    return <div>{t("HotelListing.loadingTranslations", { defaultValue: "Loading translations..." })}</div>;
   }
 
   return (
@@ -301,7 +318,9 @@ const HotelListing: React.FC = () => {
             <div className="flex items-center">
               <MapPin className="h-5 w-5 mr-2 text-tripswift-blue" />
               <h1 className="text-xl font-tripswift-bold text-tripswift-black">
-                {t("HotelListing.hotelsInLocation", { location: params.location || params.destination || t("HotelListing.yourDestination", { defaultValue: "your destination" }) })}
+                {t("HotelListing.hotelsIn", {
+                  location: params.location || params.destination || t("HotelListing.yourDestination", { defaultValue: "your destination" }),
+                })}
               </h1>
             </div>
 
@@ -395,30 +414,33 @@ const HotelListing: React.FC = () => {
               <div className="space-y-2">
                 <button
                   onClick={() => toggleAmenityFilter("free_wifi")}
-                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${filters.amenities["free_wifi"]
+                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${
+                    filters.amenities["free_wifi"]
                       ? "bg-tripswift-blue/10 text-tripswift-blue"
                       : "hover:bg-gray-50 text-tripswift-black/70"
-                    }`}
+                  }`}
                 >
                   <span>{t("HotelListing.freeWifi", { defaultValue: "Free WiFi" })}</span>
                   {filters.amenities["free_wifi"] && <Check className="h-4 w-4" />}
                 </button>
                 <button
                   onClick={() => toggleAmenityFilter("parking")}
-                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${filters.amenities["parking"]
+                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${
+                    filters.amenities["parking"]
                       ? "bg-tripswift-blue/10 text-tripswift-blue"
                       : "hover:bg-gray-50 text-tripswift-black/70"
-                    }`}
+                  }`}
                 >
                   <span>{t("HotelListing.parking", { defaultValue: "Parking" })}</span>
                   {filters.amenities["parking"] && <Check className="h-4 w-4" />}
                 </button>
                 <button
                   onClick={() => toggleAmenityFilter("breakfast")}
-                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${filters.amenities["breakfast"]
+                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${
+                    filters.amenities["breakfast"]
                       ? "bg-tripswift-blue/10 text-tripswift-blue"
                       : "hover:bg-gray-50 text-tripswift-black/70"
-                    }`}
+                  }`}
                 >
                   <span>{t("HotelListing.breakfast", { defaultValue: "Breakfast" })}</span>
                   {filters.amenities["breakfast"] && <Check className="h-4 w-4" />}
