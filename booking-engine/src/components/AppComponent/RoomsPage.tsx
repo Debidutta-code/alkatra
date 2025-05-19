@@ -90,7 +90,7 @@ const RoomsPage: React.FC = () => {
       setIsLoading(true);
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId/${propertyId}`
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}`
         );
         setRooms(response.data);
       } catch (error) {

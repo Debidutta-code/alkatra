@@ -24,9 +24,9 @@
 	"include": [
 		"index.ts",
         "./authentication/**/*",
-        "./booking_engine/**/*",
+        "Booking_Engine/**/*",
         "./payment/**/*",
-        "./common/**/*",
+        "Common_API's/**/*",
         "./pms_api/**/*",
         "./price_pref/**/*",
         "./search-engine/**/*",

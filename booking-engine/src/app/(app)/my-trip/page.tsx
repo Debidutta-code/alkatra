@@ -87,7 +87,7 @@ export default function BookingTabs() {
 
       try {
         const response = await axios.get<PaginationResponse>(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/booking/user/booking/details/${authUser?._id}`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/booking/customers/booking/details/${authUser?._id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

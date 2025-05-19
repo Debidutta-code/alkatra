@@ -61,7 +61,7 @@ class CustomerService {
         const token = jwt.sign(
             { id: customer._id, email: customer.email, role: customer.role },
             process.env.JWT_SECRET_KEY || "your-secret-key",
-            { expiresIn: "1h" }
+            { expiresIn: "7d" }
         );
         return { token, customer };
     }
