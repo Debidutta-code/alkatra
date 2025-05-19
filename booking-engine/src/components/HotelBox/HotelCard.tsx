@@ -11,7 +11,7 @@ import Home from '@/components/assets/popular/Home.jpg';
 import toast from 'react-hot-toast';
 import DateRange from './DateRange';
 import { useTranslation } from 'react-i18next';
-import i18next from '../../internationalization/i18n'; // Import i18n configuration
+import i18next from '../../i18n/Index'; // Import i18n configuration
 
 const HotelCard = () => {
   const { t } = useTranslation(); // Initialize translation hook

@@ -19,5 +19,33 @@
     "errorNoHotels": "لا توجد فنادق متاحة للموقع المحدد.",
     "errorInvalidLocation": "يرجى إدخال موقع صالح.",
     "errorSelectDates": "يرجى تحديد تاريخي الوصول والمغادرة."
+  },
+  "HotelBox": {
+    "DateRange": {
+      "checkInPlaceholder": "تاريخ الوصول",
+      "checkOutPlaceholder": "تاريخ المغادرة"
+    }
+  },
+  "HomeSections": {
+    "FeaturedOffers": {
+      "title": "العروض المميزة",
+      "limitedTime": "لفترة محدودة",
+      "endsIn": "ينتهي في",
+      "summerSpecial": {
+        "title": "عرض الصيف الخاص",
+        "description": "خصم يصل إلى 50% على حجوزات الفنادق",
+        "validTill": "2 ساعة 45 دقيقة"
+      },
+      "flightDeal": {
+        "title": "عرض الطيران",
+        "description": "استرداد نقدي ₹2000 على الرحلات الجوية",
+        "validTill": "5 ساعات 30 دقيقة"
+      },
+      "weekendGetaway": {
+        "title": "عطلة نهاية الأسبوع",
+        "description": "احجز الآن وادفع لاحقًا في فنادق مختارة",
+        "validTill": "3 ساعات 15 دقيقة"
+      }
+    }
   }
 }

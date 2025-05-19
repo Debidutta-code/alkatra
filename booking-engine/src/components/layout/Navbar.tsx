@@ -18,7 +18,7 @@ import {
 import { logout, getUser } from '@/Redux/slices/auth.slice';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import i18next from '../../internationalization/i18n'; // Adjust path if i18n.js is in a different folder
+import i18next from '../../i18n/Index';
 
 import Home from '@/components/assets/modern-house.png';
 import Globe from '@/components/assets/globe.png';
@@ -195,6 +195,7 @@ const Navbar: React.FC = () => {
             </div>
 
             <ul className="flex flex-col mt-5 space-y-4">
+              <LanguageSwitcher />
               <li className="flex items-center p-3 border-2 rounded-lg hover:border-gray-500 transition">
                 <Link href="/become-host">
                   <Image src={Globe} width={24} height={24} alt={t('Navbar.becomeHost')} />

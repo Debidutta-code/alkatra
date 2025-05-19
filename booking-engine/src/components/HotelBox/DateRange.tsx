@@ -3,6 +3,7 @@ import { DatePicker } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import { useDispatch } from "@/Redux/store";
 import { setDateRangeDetails } from "@/Redux/slices/hotelcard.slice";
+import { useTranslation } from "react-i18next";
 
 // Type for date range values
 type DateRange = [Dayjs | null, Dayjs | null] | null;
@@ -15,6 +16,7 @@ type Props = {
 };
 
 const DateRange: React.FC<Props> = ({ dates, setDates }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
 
   // Disable dates before today
@@ -50,7 +52,10 @@ const DateRange: React.FC<Props> = ({ dates, setDates }) => {
         picker="date"
         separator=" - "
         allowClear={false}
-        placeholder={["Check-in Date", "Check-out Date"]}
+        placeholder={[
+          t("HotelBox.DateRange.checkInPlaceholder"),
+          t("HotelBox.DateRange.checkOutPlaceholder")
+        ]}
         style={{ border: "none" }}
       />
     </div>

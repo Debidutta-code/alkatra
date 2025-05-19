@@ -19,5 +19,33 @@
     "errorNoHotels": "No hotels available for the selected location.",
     "errorInvalidLocation": "Please enter a valid location.",
     "errorSelectDates": "Please select both check-in and check-out dates."
+  },
+  "HotelBox": {
+    "DateRange": {
+      "checkInPlaceholder": "Check-in Date",
+      "checkOutPlaceholder": "Check-out Date"
+    }
+  },
+  "HomeSections": {
+    "FeaturedOffers": {
+      "title": "Featured Offers",
+      "limitedTime": "Limited Time",
+      "endsIn": "Ends in",
+      "summerSpecial": {
+        "title": "Summer Special",
+        "description": "Up to 50% off on Hotel Bookings",
+        "validTill": "2h 45m"
+      },
+      "flightDeal": {
+        "title": "Flight Deal",
+        "description": "Flat ₹2000 Cashback on Flights",
+        "validTill": "5h 30m"
+      },
+      "weekendGetaway": {
+        "title": "Weekend Getaway",
+        "description": "Book Now Pay Later on Select Hotels",
+        "validTill": "3h 15m"
+      }
+    }
   }
 }
