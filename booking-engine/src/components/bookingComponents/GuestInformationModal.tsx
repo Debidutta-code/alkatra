@@ -407,13 +407,13 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-tripswift-black/70">Room Rate</span>
-                      <span className="font-tripswift-medium">₹{(selectedRoom.room_size)}</span>
+                      <span className="font-tripswift-medium">₹{(selectedRoom.room_price)}</span>
                     </div>
                     <div className="border-t border-tripswift-black/10 my-3 pt-3"></div>
                     <div className="flex justify-between items-center">
                       <span className="font-tripswift-bold text-lg">Total Amount</span>
                       <span className="font-tripswift-bold text-xl text-tripswift-blue">
-                        ₹{(selectedRoom.room_size)}
+                        ₹{(selectedRoom.room_price)}
                       </span>
                     </div>
                   </div>
