@@ -1,9 +1,9 @@
 import { connect } from "mongoose";
-import config from "./common/index";
+import config from "./Common_API's/index";
 import { app } from "./app";
-import { initializeExpressRoutes } from "./common/express";
+import { initializeExpressRoutes } from "./Common_API's/express";
 import { createPropertyIndexAndDoc } from "./search-engine/src/sync_controllers/syncData";
-import { Room } from "./pms_api/src/model/room.model";
+import { Room } from "./Property_Management/src/model/room.model";
 import elasticClient from "./search-engine/src/service/elasticsearch";
 
 async function checkElasticClient() {

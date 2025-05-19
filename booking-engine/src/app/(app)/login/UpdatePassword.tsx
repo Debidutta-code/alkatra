@@ -98,7 +98,7 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack }) => {
     setMessage("");
 
     try {
-      const response = await axios.patch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/update/password`, {
+      const response = await axios.patch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/reset-password`, {
         email,
         newPassword,
       });

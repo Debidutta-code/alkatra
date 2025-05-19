@@ -4,7 +4,7 @@ import axios from 'axios';
 import { parseStringPromise } from 'xml2js';
 import { ThirdPartyAmendReservationRepository } from '../repository/amendReservationRepository';
 import { ThirdPartyAmendReservationData } from '../interface/amendReservationInterface';
-import { PropertyInfo } from '../../../pms_api/src/model/property.info.model';
+import { PropertyInfo } from '../../../Property_Management/src/model/property.info.model';
 
 interface AmendReservationInput {
     reservationId: string;

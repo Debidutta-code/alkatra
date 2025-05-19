@@ -45,34 +45,30 @@ export const { setAccessToken, logout, setUser } = authSlice.actions;
 export const login =
   (data: { email: string; password: string }) =>
     async (dispatch: typeof store.dispatch) => {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`, {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/login`, {
         ...data,
       });
-
-      const { accessToken } = res.data.data;
-      Cookies.set("accessToken", accessToken);
-
-      dispatch(setAccessToken(res.data.data?.accessToken));
+      const token = res.data.token;
+      Cookies.set("accessToken", token);
+      dispatch(setAccessToken(token));
       dispatch(getUser());
-      // console.log(res.data.data.accessToken, "access token");
-
-      return res.data.data?.accessToken;
+      return token;
     };
 
 export const getUser =
   () =>
-    async (dispatch: typeof store.dispatch, getState: typeof store.getState) => {
-      // const { accessToken } = getState().authReducer;
+    async (dispatch: typeof store.dispatch) => {
       const accessToken = Cookies.get("accessToken");
-      // console.log(accessToken, "\naccess token");
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/me`, {
+
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/me`, {
         headers: {
-          Authorization: "Bearer " + accessToken,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
-      dispatch(setUser(res?.data?.data?.user));
-      localStorage.setItem("user", JSON.stringify(res?.data?.data?.user));
+      dispatch(setUser(res.data.data));
+      localStorage.setItem("user", JSON.stringify(res.data.data));
     };
+
 
 export default authSlice.reducer;

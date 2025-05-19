@@ -134,9 +134,8 @@ const RoomsPage: React.FC = () => {
       if (!propertyId) return;
       setIsLoading(true);
       try {
-        // Fetch rooms
-        const roomsResponse = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId/${propertyId}`
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}`
         );
 
         // Fetch property details
