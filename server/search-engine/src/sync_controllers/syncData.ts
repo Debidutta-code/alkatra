@@ -1,4 +1,4 @@
-import { PropertyInfo } from "../../../pms_api/src/model/property.info.model";
+import { PropertyInfo } from "../../../Property_Management/src/model/property.info.model";
 import elasticClient from "../service/elasticsearch";
 
 export async function createPropertyIndexAndDoc() {

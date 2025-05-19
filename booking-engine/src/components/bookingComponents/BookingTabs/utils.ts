@@ -1,0 +1,144 @@
+import React from 'react';
+import { format, parseISO, differenceInDays } from "date-fns";
+import { Booking } from "./types";
+import { 
+  FaRegCalendarCheck, 
+  FaRegClock, 
+  FaRegTimesCircle, 
+  FaRegCalendarAlt, 
+  FaMoneyBillWave, 
+  FaCreditCard,
+  FaBed,
+  FaConciergeBell,
+  FaStar
+} from "react-icons/fa";
+
+export const formatDateString = (dateString: string): string => {
+  try {
+    const date = parseISO(dateString);
+    return format(date, "EEE, MMM d, yyyy");
+  } catch (error) {
+    return "Invalid Date";
+  }
+};
+
+export const calculateNights = (checkIn: string, checkOut: string): number => {
+  try {
+    const startDate = parseISO(checkIn);
+    const endDate = parseISO(checkOut);
+    return differenceInDays(endDate, startDate);
+  } catch (error) {
+    return 1; // Default to 1 night if calculation fails
+  }
+};
+
+export const getStatusClass = (status: string): string => {
+  switch (status) {
+    case "Confirmed":
+      return "bg-green-100 text-green-800 border-green-300";
+    case "Pending":
+      return "bg-yellow-100 text-yellow-800 border-yellow-300";
+    case "Cancelled":
+      return "bg-red-100 text-red-800 border-red-300";
+    default:
+      return "bg-gray-100 text-gray-800 border-gray-300";
+  }
+};
+
+export const getStatusIcon = (status: string): JSX.Element => {
+    switch (status) {
+      case "Confirmed":
+        return React.createElement(FaRegCalendarCheck, { className: "mr-1.5 text-green-600" });
+      case "Pending":
+        return React.createElement(FaRegClock, { className: "mr-1.5 text-yellow-600" });
+      case "Cancelled":
+        return React.createElement(FaRegTimesCircle, { className: "mr-1.5 text-red-600" });
+      default:
+        return React.createElement(FaRegCalendarAlt, { className: "mr-1.5 text-gray-600" });
+    }
+};
+
+export const getRoomTypeStyle = (roomType: string = ""): string => {
+  const type = roomType?.toLowerCase() || "";
+    
+  if (type.includes("deluxe") || type.includes("premium")) {
+    return "bg-tripswift-blue/10 text-tripswift-blue border border-tripswift-blue/30";
+  } else if (type.includes("suite")) {
+    return "bg-tripswift-blue/20 text-tripswift-blue border border-tripswift-blue/40";
+  } else if (type.includes("executive") || type.includes("business")) {
+    return "bg-tripswift-blue/15 text-tripswift-blue border border-tripswift-blue/35";
+  } else {
+    return "bg-tripswift-blue/5 text-tripswift-blue border border-tripswift-blue/20";
+  }
+};
+
+// Added the missing getRoomTypeIcon function
+export const getRoomTypeIcon = (roomType: string = ""): JSX.Element => {
+  const type = roomType?.toLowerCase() || "";
+  
+  if (type.includes("deluxe") || type.includes("premium")) {
+    return React.createElement(FaConciergeBell, { className: "mr-1.5 text-tripswift-blue" });
+  } else if (type.includes("suite")) {
+    return React.createElement(FaStar, { className: "mr-1.5 text-tripswift-blue" });
+  } else {
+    return React.createElement(FaBed, { className: "mr-1.5 text-tripswift-blue" });
+  }
+};
+
+export const getPaymentMethodText = (booking: Booking): string => {
+  if (booking.payment === "payAtHotel" || booking.paymentType === "payAtHotel") {
+    return "Pay at Hotel";
+  }
+  if (booking.payment === "CREDIT_CARD" || booking.payment === "card") {
+    return "Credit Card (Prepaid)";
+  }
+  if (booking.payment === "cash") {
+    return "Cash";
+  }
+  if (booking.payment === "payNow") {
+    return "Paid Online";
+  }
+  if (booking.payment === "other") {
+    return "Other Payment Method";
+  }
+  
+  if (booking.payment) {
+    const formatted = booking.payment
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/_/g, ' ')
+      .replace(/^\w/, c => c.toUpperCase());
+    return formatted;
+  }
+  
+  if (booking.paymentType) {
+    const formatted = booking.paymentType
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/_/g, ' ')
+      .replace(/^\w/, c => c.toUpperCase());
+    return formatted;
+  }
+  
+  return "Payment Method Not Specified";
+};
+
+export const getPaymentMethodIcon = (booking: Booking): JSX.Element => {
+  if (booking.payment === "payAtHotel" || booking.paymentType === "payAtHotel") {
+    return React.createElement(FaMoneyBillWave, { className: "mr-1.5" });
+  }
+  
+  if (booking.payment === "CREDIT_CARD" || booking.payment === "card" || booking.payment === "payNow") {
+    return React.createElement(FaCreditCard, { className: "mr-1.5" });
+  }
+  
+  return React.createElement(FaCreditCard, { className: "mr-1.5" });
+};
+
+export const getBookingId = (booking: Booking): string => {
+  if (booking.bookingId) return booking.bookingId;
+  
+  const id = booking._id || "";
+  if (id.length >= 8) {
+    return `${id.substring(0, 4)}...${id.substring(id.length - 4)}`.toUpperCase();
+  }
+  return (id).toUpperCase();
+};

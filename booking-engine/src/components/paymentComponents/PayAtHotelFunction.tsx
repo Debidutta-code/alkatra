@@ -1,5 +1,3 @@
-// components/paymentComponents/PayAtHotelFunction.tsx
-
 import React, { useState } from 'react';
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
 import { createSetupIntent, confirmBookingWithStoredCard } from '../../api/booking';
@@ -40,7 +38,6 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
 
     try {
       // 1. Create a SetupIntent to securely store card details
-      // Update endpoint to use /booking/ since that's where you added it
       const setupIntentResponse = await createSetupIntent({
         firstName: bookingDetails.firstName,
         lastName: bookingDetails.lastName,
@@ -103,9 +100,6 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
           }
         }
       };
-
-      console.log("Sending booking payload:", bookingPayload);
-      console.log("Token available:", !!token);
       
       const bookingResponse = await confirmBookingWithStoredCard(bookingPayload, token);
 
@@ -121,31 +115,38 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="mb-6 p-4 bg-blue-600/20 rounded-lg border border-blue-400/30">
-        <p className="text-white font-medium mb-2">Pay at Hotel Information</p>
-        <p className="text-sm text-white/80">
+      <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
+        <p className="text-tripswift-black font-tripswift-medium mb-2">Pay at Hotel Information</p>
+        <p className="text-sm text-tripswift-black/70">
           Your credit card details will be securely stored but not charged now.
           Payment will be processed during your stay at the hotel.
         </p>
       </div>
 
       <div className="mb-4">
-        <label htmlFor="card-element" className="block text-sm font-medium text-white mb-2">
+        <label htmlFor="card-element" className="block text-sm font-tripswift-medium text-tripswift-black mb-2">
           Card Details
         </label>
-        <div className="p-4 border border-white/30 rounded-lg bg-white/10">
+        <div className="p-4 border border-gray-300 rounded-lg bg-white">
           <CardElement
             options={{
               style: {
                 base: {
                   fontSize: '16px',
-                  color: 'white',
+                  color: '#000000', // Black text for light background
+                  fontFamily: 'Arial, sans-serif',
                   '::placeholder': {
-                    color: 'rgba(255, 255, 255, 0.7)',
+                    color: 'rgba(0, 0, 0, 0.6)', // Dark gray placeholder text
+                  },
+                  ':-webkit-autofill': {
+                    color: '#000000',
                   },
                 },
                 invalid: {
-                  color: '#FFC7EE',
+                  color: '#EF4444', // Red color for errors
+                  '::placeholder': {
+                    color: '#EF4444',
+                  },
                 },
               },
             }}
@@ -154,7 +155,7 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
       </div>
 
       {errorMessage && (
-        <div className="bg-red-500/20 text-red-200 p-3 rounded-md mb-4 border border-red-400/30">
+        <div className="bg-red-50 text-red-600 p-3 rounded-md mb-4 border border-red-200 font-tripswift-regular">
           {errorMessage}
         </div>
       )}
@@ -164,9 +165,9 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
         disabled={!stripe || isLoading}
         className={`w-full py-3 px-4 rounded-md transition ${
           isLoading || !stripe
-            ? 'bg-gray-400/50 cursor-not-allowed text-white/50'
-            : 'bg-green-600 hover:bg-green-500 text-white'
-        }`}
+            ? 'bg-gray-300 cursor-not-allowed text-tripswift-black/50'
+            : 'bg-tripswift-blue hover:bg-[#054B8F] text-tripswift-off-white'
+        } font-tripswift-medium`}
       >
         {isLoading ? (
           <span className="flex items-center justify-center">

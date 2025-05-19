@@ -26,18 +26,18 @@ const Login: React.FC = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isUpdatePassword, setIsUpdatePassword] = useState(false);
   const [verifiedEmail, setVerifiedEmail] = useState("");
-  
+
   const dispatch = useDispatch();
   const router = useRouter();
-  
-  const { 
-    values, 
-    errors, 
-    formFocus, 
-    handleChange, 
-    handleFocus, 
+
+  const {
+    values,
+    errors,
+    formFocus,
+    handleChange,
+    handleFocus,
     handleBlur,
-    validateForm 
+    validateForm
   } = useFormValidation(
     { email: "", password: "" },
     {
@@ -48,36 +48,43 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setLoading(true);
-  
+
     try {
-      await dispatch(login({ email: values.email, password: values.password }));
+      // Wait for login to complete and store the result
+      const loginResult = await dispatch(login({ email: values.email, password: values.password }));
       
+      // Check if login was successful - this is the key fix
+      // If loginResult is undefined or null, it means login failed
+      if (!loginResult) {
+        throw new Error("Login failed");
+      }
+
+      // Only if we get here, login was successful
       if (rememberMe) {
         Cookies.set("rememberMe", "true", { expires: 14 });
       }
-      
+
       toast.success("Login successful! Welcome back.", {
         icon: '👋',
         duration: 3000,
       });
-      
-      setLoading(false);
-  
+
       const redirectUrl = Cookies.get("redirectAfterLogin") || "/";
       await dispatch(getUser());
       Cookies.remove("redirectAfterLogin");
-  
+
       router.replace(redirectUrl);
     } catch (error: any) {
       toast.error("Incorrect email or password. Please try again.", {
         icon: '❌',
       });
+    } finally {
       setLoading(false);
     }
   };
@@ -95,12 +102,12 @@ const Login: React.FC = () => {
       />
     );
   }
-  
+
   if (isUpdatePassword) {
     return (
-      <UpdatePassword 
-        email={verifiedEmail} 
-        onBack={() => setIsUpdatePassword(false)} 
+      <UpdatePassword
+        email={verifiedEmail}
+        onBack={() => setIsUpdatePassword(false)}
       />
     );
   }
@@ -109,7 +116,7 @@ const Login: React.FC = () => {
     <AuthLayout
       title="Sign in to your account"
       subtitle="Welcome back! Please enter your credentials."
-      heroTitle={<>Welcome <span className="text-blue-200">Back</span></>}
+      heroTitle={<>Welcome <span className="text-tripswift-blue">Back</span></>}
       heroSubtitle="Sign in to access exclusive deals and manage your upcoming adventures with ease."
       benefits={[
         "Access to exclusive member-only rates and offers",
@@ -117,11 +124,11 @@ const Login: React.FC = () => {
         "Priority customer service and travel support"
       ]}
       footerContent={
-        <p className="text-center text-gray-600">
+        <p className="text-center text-tripswift-black/60">
           Don&#39;t have an account yet?{" "}
-          <Link 
-            href="/register" 
-            className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
+          <Link
+            href="/register"
+            className="font-tripswift-medium text-tripswift-blue hover:text-[#054B8F] transition-colors"
           >
             Create an account
           </Link>
@@ -139,7 +146,7 @@ const Login: React.FC = () => {
           onChange={handleChange}
           placeholder="you@example.com"
           error={errors.email}
-          icon={<Mail />}
+          icon={<Mail className="text-tripswift-blue" />}
           isFocused={formFocus === 'email'}
           onFocus={() => handleFocus('email')}
           onBlur={() => handleBlur('email')}
@@ -167,15 +174,15 @@ const Login: React.FC = () => {
             id="remember"
             checked={rememberMe}
             onChange={() => setRememberMe(!rememberMe)}
-            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            className="w-4 h-4 rounded border-gray-300 text-tripswift-blue focus:ring-tripswift-blue"
           />
-          <label htmlFor="remember" className="ml-2 text-sm text-gray-600">
+          <label htmlFor="remember" className="ml-2 text-sm text-tripswift-black/70 font-tripswift-medium">
             Remember me
           </label>
         </div>
 
         {/* Submit Button */}
-        <AuthButton loading={loading} text="Sign in" />
+        <AuthButton loading={loading} text="Sign in" />      
       </form>
     </AuthLayout>
   );

@@ -29,7 +29,7 @@ interface HotelCardDetailsProps {
     message: string;
     data: Hotel[];
   };
-  onBookNow?: (hotelId: string) => void; // Add this prop for handling Book Now clicks
+  onBookNow?: (hotelId: string) => void;
 }
 
 const HotelCardDetails: React.FC<HotelCardDetailsProps> = ({ hotelData, onBookNow }) => {
@@ -45,7 +45,7 @@ const HotelCardDetails: React.FC<HotelCardDetailsProps> = ({ hotelData, onBookNo
   const fallbackImageUrl = "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 
   const toggleDescription = (hotelId: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent event bubbling
+    e.stopPropagation();
     setShowFullDescription(prevState => ({
       ...prevState,
       [hotelId]: !prevState[hotelId]
@@ -63,7 +63,7 @@ const HotelCardDetails: React.FC<HotelCardDetailsProps> = ({ hotelData, onBookNo
         <>
           {description}
           <span 
-            className="text-blue-500 cursor-pointer" 
+            className="text-tripswift-blue cursor-pointer font-tripswift-medium ml-1" 
             onClick={(e) => toggleDescription(hotelId, e)}
           > See Less</span>
         </>
@@ -74,21 +74,17 @@ const HotelCardDetails: React.FC<HotelCardDetailsProps> = ({ hotelData, onBookNo
       <>
         {words.slice(0, 5).join(' ')}...
         <span 
-          className="text-blue-500 cursor-pointer" 
+          className="text-tripswift-blue cursor-pointer font-tripswift-medium ml-1" 
           onClick={(e) => toggleDescription(hotelId, e)}
         > See More</span>
       </>
     );
   };
 
-  // Handle the Book Now button click
   const handleBookNowClick = (hotelId: string, e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent default link behavior
-    
-    // Store in localStorage
+    e.preventDefault();
     localStorage.setItem('property_id', hotelId);
     
-    // Use the callback if provided, otherwise use default behavior
     if (onBookNow) {
       onBookNow(hotelId);
     }
@@ -100,7 +96,7 @@ const HotelCardDetails: React.FC<HotelCardDetailsProps> = ({ hotelData, onBookNo
         hotels.map((hotel) => (
           <Card
             key={hotel._id}
-            className="w-full max-w-[800px] min-w-[300px] shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg overflow-hidden"
+            className="w-full max-w-[800px] min-w-[300px] shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg overflow-hidden bg-tripswift-off-white"
           >
             <div className="flex flex-col md:flex-row items-start justify-between">
               {/* Image Section */}
@@ -112,7 +108,7 @@ const HotelCardDetails: React.FC<HotelCardDetailsProps> = ({ hotelData, onBookNo
                     layout="fill"
                     objectFit="cover"
                     priority
-                    className="rounded-t-lg"
+                    className="rounded-t-lg md:rounded-l-lg md:rounded-tr-none"
                   />
                 ) : (
                   <Image
@@ -121,7 +117,7 @@ const HotelCardDetails: React.FC<HotelCardDetailsProps> = ({ hotelData, onBookNo
                     layout="fill"
                     objectFit="cover"
                     priority
-                    className="rounded-t-lg"
+                    className="rounded-t-lg md:rounded-l-lg md:rounded-tr-none"
                   />
                 )}
               </div>
@@ -131,12 +127,12 @@ const HotelCardDetails: React.FC<HotelCardDetailsProps> = ({ hotelData, onBookNo
                 {/* Header */}
                 <CardHeader className="p-0 mb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg md:text-xl font-bold text-gray-800">
+                    <CardTitle className="text-lg md:text-xl font-tripswift-bold text-tripswift-black">
                       {hotel.property_name}
                     </CardTitle>
-                    <div className="flex items-center bg-blue-50 px-2 py-1 rounded-full">
-                      <Star className="w-4 h-4 text-yellow-500 mr-1" />
-                      <span className="text-sm font-semibold text-blue-900">
+                    <div className="flex items-center bg-tripswift-blue/10 px-2 py-1 rounded-full">
+                      <Star className="w-4 h-4 text-yellow-500 fill-current mr-1" />
+                      <span className="text-sm font-tripswift-medium text-tripswift-blue">
                         {hotel.star_rating || "N/A"}
                       </span>
                     </div>
@@ -144,31 +140,31 @@ const HotelCardDetails: React.FC<HotelCardDetailsProps> = ({ hotelData, onBookNo
                 </CardHeader>
 
                 {/* Description */}
-                <CardContent className="p-0 text-gray-600 text-sm space-y-2">
+                <CardContent className="p-0 text-gray-600 text-sm space-y-2 font-tripswift-regular">
                   <p>{renderDescription(hotel.description, hotel._id)}</p>
                   <p>
-                    <strong>Email:</strong> {hotel.property_email}
+                    <span className="font-tripswift-medium">Email:</span> {hotel.property_email}
                   </p>
                   <p>
-                    <strong>Contact:</strong> {hotel.property_contact}
+                    <span className="font-tripswift-medium">Contact:</span> {hotel.property_contact}
                   </p>
                   <p>
-                    <strong>Property Code:</strong> {hotel.property_code}
+                    <span className="font-tripswift-medium">Property Code:</span> {hotel.property_code}
                   </p>
                 </CardContent>
 
                 {/* Footer */}
-                <CardFooter className="p-4 mt-auto flex justify-between items-center border-t border-gray-200 bg-white">
+                <CardFooter className="p-4 mt-auto flex justify-between items-center border-t border-gray-200 bg-tripswift-off-white">
                   {/* Updated Recently Section */}
-                  <div className="flex items-center text-xs text-gray-500">
-                    <Clock className="w-4 h-4 mr-1 text-gray-400" />
+                  <div className="flex items-center text-xs text-gray-500 font-tripswift-regular">
+                    <Clock className="w-4 h-4 mr-1 text-tripswift-blue/60" />
                     <span>Updated Recently</span>
                   </div>
 
                   {/* Book Now Button */}
                   {onBookNow ? (
                     <button 
-                      className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-6 py-2 rounded-lg shadow-md transition-all duration-200"
+                      className="btn-tripswift-primary text-sm font-tripswift-medium px-6 py-2 rounded-lg shadow-sm transition-all duration-200"
                       onClick={(e) => handleBookNowClick(hotel._id, e)}
                     >
                       Book Now
@@ -176,7 +172,7 @@ const HotelCardDetails: React.FC<HotelCardDetailsProps> = ({ hotelData, onBookNo
                   ) : (
                     <Link href={`/hotel?id=${hotel._id}`} passHref>
                       <button 
-                        className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-6 py-2 rounded-lg shadow-md transition-all duration-200"
+                        className="btn-tripswift-primary text-sm font-tripswift-medium px-6 py-2 rounded-lg shadow-sm transition-all duration-200"
                         onClick={() => {
                           localStorage.setItem('property_id', hotel._id);
                         }}
@@ -191,7 +187,7 @@ const HotelCardDetails: React.FC<HotelCardDetailsProps> = ({ hotelData, onBookNo
           </Card>
         ))
       ) : (
-        <p className="text-gray-600 text-center w-full">No hotels available.</p>
+        <p className="text-gray-600 text-center w-full font-tripswift-regular">No hotels available.</p>
       )}
     </div>
   );

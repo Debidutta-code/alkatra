@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import i18next from '../../i18n/Index';
 import flags from '../../i18n/flags.json';
+import { ChevronDown } from 'lucide-react';
 
 interface LanguageOption {
   code: string;
@@ -40,19 +41,31 @@ const LanguageSwitcher: React.FC = () => {
     };
   }, []);
 
-  const handleLanguageChange = (code: string) => {
-    setSelectedLanguage(code);
-    i18next.changeLanguage(code);
+
+  const selectedOption = languageOptions.find((l) => l.code === selectedLanguage);
+  const handleLanguageChange = (langCode: string) => {
+    setSelectedLanguage(langCode);
+    i18next.changeLanguage(langCode); // Update language
     setIsOpen(false);
   };
 
-  const selectedOption = languageOptions.find((l) => l.code === selectedLanguage);
+  // Get current language option
+  const currentLanguage = languageOptions.find(lang => lang.code === selectedLanguage) || languageOptions[0];
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setIsOpen(false);
+    if (isOpen) {
+      document.addEventListener('click', handleClickOutside);
+    }
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [isOpen]);
 
   return (
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 p-2 border rounded-lg hover:border-gray-500 transition cursor-pointer h-[40px]"
+        className="flex items-center gap-2 p-2 rounded-lg hover:border-gray-500 transition cursor-pointer h-[40px]"
       >
         {selectedOption && (
           <img
@@ -64,15 +77,7 @@ const LanguageSwitcher: React.FC = () => {
         <span className="text-black text-sm font-medium">
           {selectedOption?.name || 'English'}
         </span>
-        <svg
-          className="w-4 h-4 ml-1"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
+        <ChevronDown size={16} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (

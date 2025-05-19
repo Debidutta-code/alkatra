@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import axios from "axios";
-import { Mail, ArrowLeft, AlertTriangle } from "lucide-react";
+import { Mail, ArrowLeft, AlertTriangle, CheckCircle } from "lucide-react";
 import FormInput from "@/components/auth/FormInput";
 import AuthButton from "@/components/auth/AuthButton";
 import AuthLayout from "@/components/auth/AuthLayout";
@@ -56,7 +56,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, onEmailVerified
     setMessage("");
 
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/verify/email`, { email });
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/verify-email`, { email });
 
       if (response.data.status === "success") {
         setMessage(response.data.message);
@@ -87,7 +87,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, onEmailVerified
     <AuthLayout
       title="Forgot Password?"
       subtitle="Enter your registered email address to reset your password."
-      heroTitle={<>Reset <span className="text-blue-200">Password</span></>}
+      heroTitle={<>Reset <span className="text-tripswift-blue">Password</span></>}
       heroSubtitle="We'll help you get back into your account safely and securely."
       benefits={[
         "Quick and easy password recovery process",
@@ -97,7 +97,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, onEmailVerified
       footerContent={
         <button 
           onClick={onBack} 
-          className="w-full text-center text-blue-600 text-sm hover:text-blue-800 font-medium flex items-center justify-center"
+          className="w-full text-center text-tripswift-blue text-sm hover:text-[#054B8F] font-tripswift-medium flex items-center justify-center"
         >
           <ArrowLeft size={16} className="mr-2" />
           Back to Login
@@ -114,7 +114,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, onEmailVerified
           onChange={handleEmailChange}
           placeholder="you@example.com"
           error={validationError}
-          icon={<Mail />}
+          icon={<Mail className="text-tripswift-blue" />}
           isFocused={formFocus === 'email'}
           onFocus={() => setFormFocus('email')}
           onBlur={() => setFormFocus(null)}
@@ -125,8 +125,9 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, onEmailVerified
         
         {/* Success Message */}
         {message && (
-          <div className="mt-4 text-sm text-green-600 bg-green-50 p-3 rounded-lg border border-green-200">
-            {message}
+          <div className="mt-4 text-sm text-green-600 bg-green-50 p-3 rounded-lg border border-green-200 flex items-center">
+            <CheckCircle size={16} className="mr-2 flex-shrink-0 text-green-500" />
+            <span className="font-tripswift-medium">{message}</span>
           </div>
         )}
         
@@ -134,7 +135,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, onEmailVerified
         {error && (
           <div className="mt-4 text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200 flex items-center">
             <AlertTriangle size={16} className="mr-2 flex-shrink-0" />
-            <span>{error}</span>
+            <span className="font-tripswift-medium">{error}</span>
           </div>
         )}
       </form>

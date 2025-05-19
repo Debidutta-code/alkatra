@@ -5,10 +5,10 @@ import { AMENITIES } from "@/components/HotelBox/FilterModal";
 interface FilterSidebarProps {
   amenities: { [key: string]: boolean };
   sortOrder: string;
-  ratingFilter: number | null; // Added for rating filter
+  ratingFilter: number | null;
   toggleAmenityFilter: (key: string) => void;
   handleSortChange: (sortOrder: string) => void;
-  handleRatingChange: (rating: number | null) => void; // Added for rating filter
+  handleRatingChange: (rating: number | null) => void;
   resetFilters: () => void;
   activeFilterCount: number;
 }
@@ -24,30 +24,30 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
   activeFilterCount
 }) => {
   const [showAllAmenities, setShowAllAmenities] = useState(false);
-  
+
   // Decide how many amenities to show
-  const initialAmenityCount = 6;
-  const amenitiesToShow = showAllAmenities 
-    ? AMENITIES 
-    : AMENITIES.slice(0, initialAmenityCount);
+  // const initialAmenityCount = 6;
+  // const amenitiesToShow = showAllAmenities 
+  //   ? AMENITIES 
+  //   : AMENITIES.slice(0, initialAmenityCount);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sticky top-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="font-semibold text-gray-800">Filters</h2>
+    <div className="bg-tripswift-off-white rounded-lg shadow-sm border border-gray-200 p-4 sticky top-4">
+      {/* <div className="flex justify-between items-center mb-4">
+        <h2 className="text-sm font-tripswift-medium text-tripswift-black">Filters</h2>
         {activeFilterCount > 0 && (
           <button
             onClick={resetFilters}
-            className="text-blue-500 text-sm hover:underline"
+            className="text-xs text-tripswift-blue font-tripswift-medium hover:underline"
           >
             Clear all
           </button>
         )}
-      </div>
+      </div> */}
 
       {/* Sort by */}
-      <div className="mb-6">
-        <h3 className="text-sm font-medium text-gray-800 mb-3">Sort by</h3>
+      {/* <div className="mb-6">
+        <h3 className="text-xs font-tripswift-medium text-tripswift-black mb-3">Sort by</h3>
         <div className="space-y-2">
           {[
             { id: "", label: "Recommended" },
@@ -58,21 +58,21 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
               key={option.id}
               onClick={() => handleSortChange(option.id)}
               className={`flex items-center cursor-pointer px-2 py-1.5 rounded-md ${
-                sortOrder === option.id ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50"
+                sortOrder === option.id ? "bg-tripswift-blue/10 text-tripswift-blue" : "hover:bg-gray-50"
               }`}
             >
               {sortOrder === option.id && (
-                <Check className="h-4 w-4 text-blue-500 mr-2" />
+                <Check className="h-4 w-4 text-tripswift-blue mr-2" />
               )}
-              <span className="text-sm">{option.label}</span>
+              <span className="text-xs font-tripswift-regular">{option.label}</span>
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
 
-      {/* Property rating - Updated with working checkboxes */}
+      {/* Property rating */}
       <div className="mb-6">
-        <h3 className="text-sm font-medium text-gray-800 mb-3">Property rating</h3>
+        <h3 className="text-xs font-tripswift-medium text-tripswift-black mb-3">Property rating</h3>
         <div className="space-y-2">
           {[5, 4, 3, 2, 1].map((rating) => (
             <div key={rating} className="flex items-center">
@@ -81,11 +81,11 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
                 type="checkbox"
                 checked={ratingFilter === rating}
                 onChange={() => handleRatingChange(ratingFilter === rating ? null : rating)}
-                className="h-4 w-4 text-blue-500 rounded border-gray-300"
+                className="h-4 w-4 text-tripswift-blue rounded border-gray-300 focus:ring-tripswift-blue"
               />
-              <label 
-                htmlFor={`star-${rating}`} 
-                className="ml-2 text-sm text-gray-700 flex items-center cursor-pointer"
+              <label
+                htmlFor={`star-${rating}`}
+                className="ml-2 text-xs text-gray-700 flex items-center cursor-pointer"
                 onClick={() => handleRatingChange(ratingFilter === rating ? null : rating)}
               >
                 {Array.from({ length: rating }).map((_, i) => (
@@ -102,20 +102,20 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
       {/* Amenities */}
       <div>
-        <h3 className="text-sm font-medium text-gray-800 mb-3">Amenities</h3>
+        <h3 className="text-xs font-tripswift-medium text-tripswift-black mb-3">Amenities</h3>
         <div className="space-y-2">
-          {amenitiesToShow.map((amenity) => (
+          {AMENITIES.map((amenity) => (
             <div key={amenity.key} className="flex items-center">
               <input
                 id={`amenity-${amenity.key}`}
                 type="checkbox"
                 checked={!!amenities[amenity.key]}
                 onChange={() => toggleAmenityFilter(amenity.key)}
-                className="h-4 w-4 text-blue-500 rounded border-gray-300"
+                className="h-4 w-4 text-tripswift-blue rounded border-gray-300 focus:ring-tripswift-blue"
               />
-              <label 
-                htmlFor={`amenity-${amenity.key}`} 
-                className="ml-2 text-sm text-gray-700 cursor-pointer"
+              <label
+                htmlFor={`amenity-${amenity.key}`}
+                className="ml-2 text-xs text-gray-700 normal-case cursor-pointer font-tripswift-regular"
                 onClick={() => toggleAmenityFilter(amenity.key)}
               >
                 {amenity.label}
@@ -123,16 +123,16 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
             </div>
           ))}
         </div>
-        
+
         {/* Toggle button for showing all amenities */}
-        {AMENITIES.length > initialAmenityCount && (
+        {/* {AMENITIES.length > initialAmenityCount && (
           <button
             onClick={() => setShowAllAmenities(!showAllAmenities)}
-            className="mt-4 w-full py-2 text-sm text-blue-600 hover:text-blue-800 hover:underline"
+            className="mt-4 w-full py-2 text-xs text-tripswift-blue hover:underline font-tripswift-medium"
           >
             {showAllAmenities ? "Show less" : "Show more"}
           </button>
-        )}
+        )} */}
       </div>
     </div>
   );

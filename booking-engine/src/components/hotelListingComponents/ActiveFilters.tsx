@@ -1,5 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import { AMENITIES } from "@/components/HotelBox/FilterModal";
 
 interface ActiveFiltersProps {
   amenities: { [key: string]: boolean };
@@ -23,23 +24,30 @@ const ActiveFilters: React.FC<ActiveFiltersProps> = ({
   const activeFilterCount = Object.values(amenities).filter(Boolean).length +
     (sortOrder ? 1 : 0) + (searchQuery ? 1 : 0);
 
+  // Function to find the label for an amenity key
+  const getAmenityLabel = (key: string) => {
+    const amenity = AMENITIES.find(a => a.key === key);
+    return amenity ? amenity.label : key.replace(/_/g, ' ');
+  };
+
   if (activeFilterCount === 0) return null;
 
   return (
     <div className="mb-4 flex flex-wrap items-center gap-2 py-2">
-      <span className="text-sm text-gray-600">Active filters:</span>
+      <span className="text-xs text-gray-600 font-tripswift-medium">Active filters:</span>
 
       {Object.entries(amenities)
         .filter(([_, isSelected]) => isSelected)
-        .map(([amenity]) => (
+        .map(([amenityKey]) => (
           <div
-            key={amenity}
-            className="flex items-center bg-blue-50 border border-blue-100 rounded-full px-3 py-1 text-xs text-blue-700"
+            key={amenityKey}
+            className="flex items-center bg-tripswift-blue/5 border border-tripswift-blue/20 rounded-full px-3 py-1 text-xs text-tripswift-blue font-tripswift-regular"
           >
-            <span className="capitalize">{amenity.replace('_', ' ')}</span>
+            <span>{getAmenityLabel(amenityKey)}</span>
             <button
-              onClick={() => toggleAmenityFilter(amenity)}
-              className="ml-1.5 text-blue-500 hover:text-blue-700"
+              onClick={() => toggleAmenityFilter(amenityKey)}
+              className="ml-1.5 text-tripswift-blue/80 hover:text-tripswift-blue"
+              aria-label={`Remove ${getAmenityLabel(amenityKey)} filter`}
             >
               <X className="h-3 w-3" />
             </button>
@@ -47,7 +55,7 @@ const ActiveFilters: React.FC<ActiveFiltersProps> = ({
         ))}
 
       {sortOrder && (
-        <div className="flex items-center bg-blue-50 border border-blue-100 rounded-full px-3 py-1 text-xs text-blue-700">
+        <div className="flex items-center bg-tripswift-blue/5 border border-tripswift-blue/20 rounded-full px-3 py-1 text-xs text-tripswift-blue font-tripswift-regular">
           <span>
             {sortOrder === 'rating_desc'
               ? 'Highest Rating'
@@ -57,7 +65,8 @@ const ActiveFilters: React.FC<ActiveFiltersProps> = ({
           </span>
           <button
             onClick={() => handleSortChange('')}
-            className="ml-1.5 text-blue-500 hover:text-blue-700"
+            className="ml-1.5 text-tripswift-blue/80 hover:text-tripswift-blue"
+            aria-label="Remove sort filter"
           >
             <X className="h-3 w-3" />
           </button>
@@ -65,23 +74,24 @@ const ActiveFilters: React.FC<ActiveFiltersProps> = ({
       )}
 
       {searchQuery && (
-        <div className="flex items-center bg-blue-50 border border-blue-100 rounded-full px-3 py-1 text-xs text-blue-700">
+        <div className="flex items-center bg-tripswift-blue/5 border border-tripswift-blue/20 rounded-full px-3 py-1 text-xs text-tripswift-blue font-tripswift-regular">
           <span>Name: {searchQuery}</span>
           <button
             onClick={() => setSearchQuery('')}
-            className="ml-1.5 text-blue-500 hover:text-blue-700"
+            className="ml-1.5 text-tripswift-blue/80 hover:text-tripswift-blue"
+            aria-label="Remove search filter"
           >
             <X className="h-3 w-3" />
           </button>
         </div>
       )}
 
-      <button
+      {/* <button
         onClick={resetFilters}
-        className="text-xs text-blue-600 hover:underline ml-1"
+        className="text-xs text-tripswift-blue font-tripswift-medium hover:underline ml-1"
       >
         Clear all
-      </button>
+      </button> */}
     </div>
   );
 };

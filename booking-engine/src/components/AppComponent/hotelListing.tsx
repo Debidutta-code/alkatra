@@ -1,5 +1,3 @@
-// File: src/components/AppComponent/hotelListing.tsx
-
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -8,8 +6,9 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { getHotelsByCity } from '@/api/hotel';
 import { FilterState } from "@/components/HotelBox/FilterModal";
 import { setPropertyId, setCheckInDate, setCheckOutDate } from "@/Redux/slices/pmsHotelCard.slice";
-import { Filter, Calendar } from 'lucide-react';
+import { Filter, Calendar, MapPin, Search, CreditCard, Check, Star, Shield, ChevronRight, MapIcon } from 'lucide-react';
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 // Import refactored components
 import CompactSearchBar from "@/components/HotelBox/CompactSearchBar";
@@ -47,10 +46,14 @@ const hotelListing: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const [errorToastShown, setErrorToastShown] = useState<boolean>(false);
-  const [filters, setFilters] = useState<FilterState>({ amenities: {}, sortOrder: "" });
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [ratingFilter, setRatingFilter] = useState<number | null>(null); // Added for rating filter
+  const [filters, setFilters] = useState<FilterState>({ 
+    amenities: {}, 
+    sortOrder: "",
+    rating: null
+  });  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [ratingFilter, setRatingFilter] = useState<number | null>(null);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   const destination = searchParams.get("destination");
@@ -135,7 +138,6 @@ const hotelListing: React.FC = () => {
       dispatch(setCheckOutDate(checkoutDate));
       localStorage.setItem('checkout_date', checkoutDate);
     }
-    // Navigate programmatically
     window.location.href = `/hotel?id=${hotelId}&checkin=${checkinDate}&checkout=${checkoutDate}`;
   };
 
@@ -202,9 +204,9 @@ const hotelListing: React.FC = () => {
 
   // Reset all filters
   const resetFilters = () => {
-    setFilters({ amenities: {}, sortOrder: "" });
+    setFilters({ amenities: {}, sortOrder: "", rating: null });
     setSearchQuery("");
-    setRatingFilter(null); // Reset rating filter as well
+    setRatingFilter(null);
   };
 
   // Format date helper
@@ -222,9 +224,22 @@ const hotelListing: React.FC = () => {
     }
   };
 
+  // Calculate nights between dates
+  const calculateNights = () => {
+    if (!checkinDate || !checkoutDate) return 0;
+
+    const checkIn = new Date(checkinDate);
+    const checkOut = new Date(checkoutDate);
+
+    if (isNaN(checkIn.getTime()) || isNaN(checkOut.getTime())) return 0;
+
+    const diffTime = checkOut.getTime() - checkIn.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
   // Get filtered hotels
   const filteredHotels = applyFilters(hotelData.data);
-  
+
   // Update activeFilterCount to include the rating filter
   const activeFilterCount = Object.values(filters.amenities).filter(Boolean).length +
     (filters.sortOrder ? 1 : 0) +
@@ -232,50 +247,128 @@ const hotelListing: React.FC = () => {
     (ratingFilter !== null ? 1 : 0);
 
   return (
-    <div className="bg-gray-100 min-h-screen">
-      {/* Search bar at the top - removed bg-white class */}
-      <div className="">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <CompactSearchBar 
-            initialLocation={location || destination || ""}
-            initialCheckin={checkinDate || ""}
-            initialCheckout={checkoutDate || ""}
-            onSearch={handleSearch}
-          />
+    <div className="bg-[#F5F7FA] min-h-screen">
+      {/* Hero section with search */}
+      <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] relative">
+        <div className="absolute inset-0 opacity-10">
+          <div className="h-full w-full bg-pattern-dots"></div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
+          <div className="text-tripswift-off-white mb-6">
+            <h1 className="text-2xl md:text-3xl font-tripswift-bold">Find Your Perfect Stay</h1>
+            <p className="mt-2 font-tripswift-regular opacity-90">
+              Book accommodations at the best prices
+            </p>
+          </div>
+
+          <div className="">
+            <CompactSearchBar
+              initialLocation={location || destination || ""}
+              initialCheckin={checkinDate || ""}
+              initialCheckout={checkoutDate || ""}
+              onSearch={handleSearch}
+            />
+          </div>
         </div>
       </div>
 
-      {/* Main content */}
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        {/* Search information */}
-        <div className="mb-4">
-          <h1 className="text-xl font-bold text-gray-800">
-            Hotels in {params.location || params.destination || "your destination"}
-          </h1>
-          <div className="flex flex-wrap items-center text-sm text-gray-500 mt-1">
-            <div className="flex items-center mr-4">
-              <Calendar className="h-4 w-4 mr-1" />
-              {checkinDate && checkoutDate ? (
-                <span>{formatDate(checkinDate)} - {formatDate(checkoutDate)}</span>
-              ) : (
-                <span>Select dates</span>
-              )}
+      {/* Booking benefits bar */}
+      {/* <div className="bg-white border-b border-gray-200 pt-14 pb-4">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div className="flex flex-col items-center justify-center">
+              <div className="w-10 h-10 bg-tripswift-blue/10 rounded-full flex items-center justify-center mb-2">
+                <CreditCard className="h-5 w-5 text-tripswift-blue" />
+              </div>
+              <span className="text-sm font-tripswift-medium text-tripswift-black">Free cancellation</span>
             </div>
-            <span className="mr-4">•</span>
-            <span>{filteredHotels.length} properties found</span>
+            <div className="flex flex-col items-center justify-center">
+              <div className="w-10 h-10 bg-tripswift-blue/10 rounded-full flex items-center justify-center mb-2">
+                <Check className="h-5 w-5 text-tripswift-blue" />
+              </div>
+              <span className="text-sm font-tripswift-medium text-tripswift-black">Verified properties</span>
+            </div>
+            <div className="flex flex-col items-center justify-center">
+              <div className="w-10 h-10 bg-tripswift-blue/10 rounded-full flex items-center justify-center mb-2">
+                <Star className="h-5 w-5 text-tripswift-blue" />
+              </div>
+              <span className="text-sm font-tripswift-medium text-tripswift-black">Best price guarantee</span>
+            </div>
+            <div className="flex flex-col items-center justify-center">
+              <div className="w-10 h-10 bg-tripswift-blue/10 rounded-full flex items-center justify-center mb-2">
+                <Shield className="h-5 w-5 text-tripswift-blue" />
+              </div>
+              <span className="text-sm font-tripswift-medium text-tripswift-black">Secure booking</span>
+            </div>
           </div>
+        </div>
+      </div> */}
+
+      {/* Main content */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Search information */}
+        <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
+          <div>
+            <div className="flex items-center">
+              <MapPin className="h-5 w-5 mr-2 text-tripswift-blue" />
+              <h1 className="text-xl font-tripswift-bold text-tripswift-black">
+                Hotels in {params.location || params.destination || "your destination"}
+              </h1>
+            </div>
+
+            <div className="flex flex-wrap items-center text-sm font-tripswift-regular text-tripswift-black/70 mt-2 ml-7">
+              <div className="flex items-center mr-4">
+                <Calendar className="h-4 w-4 mr-1 text-tripswift-blue" />
+                {checkinDate && checkoutDate ? (
+                  <span>{formatDate(checkinDate)} - {formatDate(checkoutDate)}</span>
+                ) : (
+                  <span>Select dates</span>
+                )}
+              </div>
+              {/* <span className="mr-4 text-tripswift-black/40">•</span> */}
+              {/* <span>{calculateNights() > 0 ? `${calculateNights()} nights` : "Select dates"}</span> */}
+              <span className="mx-4 text-tripswift-black/40">•</span>
+              <span>{filteredHotels.length} properties found</span>
+            </div>
+          </div>
+
+          {/* View toggle buttons */}
+          {/* <div className="mt-4 md:mt-0 hidden md:flex">
+            <div className="bg-white rounded-lg border border-gray-200 p-1 flex">
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-4 py-2 rounded-md flex items-center text-sm font-tripswift-medium ${viewMode === 'list'
+                    ? 'bg-tripswift-blue text-tripswift-off-white'
+                    : 'text-tripswift-black hover:bg-gray-50'
+                  }`}
+              >
+                <Search className="h-4 w-4 mr-2" />
+                List View
+              </button>
+              <button
+                onClick={() => setViewMode('map')}
+                className={`px-4 py-2 rounded-md flex items-center text-sm font-tripswift-medium ${viewMode === 'map'
+                    ? 'bg-tripswift-blue text-tripswift-off-white'
+                    : 'text-tripswift-black hover:bg-gray-50'
+                  }`}
+              >
+                <MapIcon className="h-4 w-4 mr-2" />
+                Map View
+              </button>
+            </div>
+          </div> */}
         </div>
 
         {/* Mobile filter button */}
-        <div className="lg:hidden mb-4">
+        <div className="lg:hidden mb-5">
           <button
             onClick={() => setMobileFiltersOpen(true)}
-            className="w-full py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center justify-center"
+            className="w-full py-2.5 bg-white border border-gray-200 rounded-lg shadow-sm text-sm font-tripswift-medium text-tripswift-black hover:bg-gray-50 transition-colors flex items-center justify-center"
           >
-            <Filter className="h-4 w-4 mr-2" />
+            <Filter className="h-4 w-4 mr-2 text-tripswift-blue" />
             <span>Filters</span>
             {activeFilterCount > 0 && (
-              <span className="ml-2 bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs">
+              <span className="ml-2 bg-tripswift-blue text-tripswift-off-white px-2 py-0.5 rounded-full text-xs font-tripswift-medium">
                 {activeFilterCount}
               </span>
             )}
@@ -297,42 +390,129 @@ const hotelListing: React.FC = () => {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar filters - Desktop */}
           <div className="hidden lg:block lg:w-1/4">
-            <FilterSidebar 
-              amenities={filters.amenities}
-              sortOrder={filters.sortOrder}
-              ratingFilter={ratingFilter} // Pass the rating filter
-              toggleAmenityFilter={toggleAmenityFilter}
-              handleSortChange={handleSortChange}
-              handleRatingChange={handleRatingChange} // Pass the rating change handler
-              resetFilters={resetFilters}
-              activeFilterCount={activeFilterCount}
-            />
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden sticky top-6">
+              <div className="p-4 bg-tripswift-blue/5 border-b border-gray-200">
+                <h3 className="font-tripswift-bold text-tripswift-black text-lg">Filters</h3>
+                {activeFilterCount > 0 && (
+                  <div className="mt-1 text-sm text-tripswift-black/60 flex items-center">
+                    <span>{activeFilterCount} active filter{activeFilterCount !== 1 ? 's' : ''}</span>
+                    <button
+                      onClick={resetFilters}
+                      className="ml-2 text-tripswift-blue hover:underline font-tripswift-medium"
+                    >
+                      Clear all
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="p-4">
+                <FilterSidebar
+                  amenities={filters.amenities}
+                  sortOrder={filters.sortOrder}
+                  ratingFilter={ratingFilter}
+                  toggleAmenityFilter={toggleAmenityFilter}
+                  handleSortChange={handleSortChange}
+                  handleRatingChange={handleRatingChange}
+                  resetFilters={resetFilters}
+                  activeFilterCount={activeFilterCount}
+                />
+              </div>
+            </div>
+
+            {/* Popular Filters */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mt-4 p-4">
+              <h3 className="font-tripswift-bold text-tripswift-black mb-3">Popular Filters</h3>
+              <div className="space-y-2">
+                <button
+                  onClick={() => toggleAmenityFilter('free_wifi')}
+                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${filters.amenities['free_wifi']
+                      ? 'bg-tripswift-blue/10 text-tripswift-blue'
+                      : 'hover:bg-gray-50 text-tripswift-black/70'
+                    }`}
+                >
+                  <span>Free WiFi</span>
+                  {filters.amenities['free_wifi'] && <Check className="h-4 w-4" />}
+                </button>
+                <button
+                  onClick={() => toggleAmenityFilter('parking')}
+                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${filters.amenities['parking']
+                      ? 'bg-tripswift-blue/10 text-tripswift-blue'
+                      : 'hover:bg-gray-50 text-tripswift-black/70'
+                    }`}
+                >
+                  <span>Parking</span>
+                  {filters.amenities['parking'] && <Check className="h-4 w-4" />}
+                </button>
+                <button
+                  onClick={() => toggleAmenityFilter('breakfast')}
+                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${filters.amenities['breakfast']
+                      ? 'bg-tripswift-blue/10 text-tripswift-blue'
+                      : 'hover:bg-gray-50 text-tripswift-black/70'
+                    }`}
+                >
+                  <span>Breakfast</span>
+                  {filters.amenities['breakfast'] && <Check className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
           </div>
 
-          {/* Mobile sidebar - should also be updated to support rating filter */}
-          <MobileFilterDrawer 
-            isOpen={mobileFiltersOpen}
-            onClose={() => setMobileFiltersOpen(false)}
-            sidebarRef={sidebarRef}
-            amenities={filters.amenities}
-            sortOrder={filters.sortOrder}
-            toggleAmenityFilter={toggleAmenityFilter}
-            handleSortChange={handleSortChange}
-            resetFilters={resetFilters}
-            filteredHotelsCount={filteredHotels.length}
-          />
+{/* Mobile sidebar */}
+<MobileFilterDrawer
+  isOpen={mobileFiltersOpen}
+  onClose={() => setMobileFiltersOpen(false)}
+  sidebarRef={sidebarRef}
+  amenities={filters.amenities}
+  sortOrder={filters.sortOrder}
+  ratingFilter={ratingFilter}
+  toggleAmenityFilter={toggleAmenityFilter}
+  handleSortChange={handleSortChange}
+  handleRatingChange={handleRatingChange}
+  resetFilters={resetFilters}
+  filteredHotelsCount={filteredHotels.length}
+/>
 
           {/* Main content - Hotel listings */}
           <div className="lg:w-3/4">
+            {/* Sort section */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div className="relative flex-grow max-w-xs">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-4 w-4 text-tripswift-black/50" />
+                </div>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search property name"
+                  className="pl-10 w-full border border-gray-200 rounded-md px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue"
+                />
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <span className="text-sm font-tripswift-medium text-tripswift-black/70">Sort by:</span>
+                <select
+                  value={filters.sortOrder}
+                  onChange={(e) => handleSortChange(e.target.value)}
+                  className="border border-gray-200 rounded-md px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue"
+                >
+                  <option value="">Recommended</option>
+                  <option value="rating_desc">Highest Rating</option>
+                  <option value="rating_asc">Lowest Rating</option>
+                </select>
+              </div>
+            </div>
+
             {/* Hotel results */}
             {isLoading ? (
               <LoadingSkeleton />
             ) : filteredHotels.length === 0 ? (
               <EmptyState resetFilters={resetFilters} />
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {filteredHotels.map((hotel) => (
-                  <div key={hotel._id} className="hotel-card-container">
+                  <div key={hotel._id} className="hotel-card-container transition-all duration-300 hover:shadow-md hover:translate-y-[-2px]">
                     <HotelCardItem
                       hotel={hotel}
                       location={params.location || params.destination || ""}
@@ -342,6 +522,51 @@ const hotelListing: React.FC = () => {
                     />
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* Features highlight section */}
+            {filteredHotels.length > 0 && !isLoading && (
+              <div className="mt-10 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h3 className="font-tripswift-bold text-lg text-tripswift-black mb-4">Why Book With TripSwift</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="flex items-start">
+                    <div className="bg-tripswift-blue/10 p-2 rounded-full mr-3">
+                      <CreditCard className="h-5 w-5 text-tripswift-blue" />
+                    </div>
+                    <div>
+                      <h4 className="font-tripswift-medium text-tripswift-black">Free Cancellation</h4>
+                      <p className="text-sm text-tripswift-black/60 mt-1">
+                        Most of our properties offer free cancellation up to 24 hours before check-in.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start">
+                    <div className="bg-tripswift-blue/10 p-2 rounded-full mr-3">
+                      <Star className="h-5 w-5 text-tripswift-blue" />
+                    </div>
+                    <div>
+                      <h4 className="font-tripswift-medium text-tripswift-black">Best Price Guarantee</h4>
+                      <p className="text-sm text-tripswift-black/60 mt-1">
+                        Find a lower price? We'll match it and give you an additional 10% off.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start">
+                    <div className="bg-tripswift-blue/10 p-2 rounded-full mr-3">
+                      <Shield className="h-5 w-5 text-tripswift-blue" />
+                    </div>
+                    <div>
+                      <h4 className="font-tripswift-medium text-tripswift-black">Secure Booking</h4>
+                      <p className="text-sm text-tripswift-black/60 mt-1">
+                        We use industry-standard encryption to protect your personal information.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>
