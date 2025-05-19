@@ -1,12 +1,14 @@
+"use client";
+
 import React, { useState } from "react";
 import Image from "next/image";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import {
   FaStar, FaRegStar, FaWifi, FaSnowflake, FaSmokingBan, FaBed, FaChild, FaUser, FaTree,
-  FaCheckCircle, FaShoppingCart, FaPercent, FaTimes, FaInfoCircle
+  FaCheckCircle, FaShoppingCart, FaPercent, FaTimes, FaInfoCircle, FaRulerCombined
 } from "react-icons/fa";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getPolicyType, getPolicyStyling, getPolicyBulletPoints } from "@/utils/cancellationPolicies";
 
 interface RoomData {
@@ -46,24 +48,18 @@ interface RoomCardProps {
 }
 
 export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) => {
-  // State for policy modal
   const [showPolicyModal, setShowPolicyModal] = useState(false);
 
-  // Default image URL - use from data or fall back to default
   const DEFAULT_IMAGE = data.default_image_url || "https://images.unsplash.com/photo-1617104678098-de229db51175?q=80&w=1514&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
-
-  // Safely get the image URL, checking for undefined or empty array
   const selectedImage = data.image && data.image.length > 0 ? data.image[0] : DEFAULT_IMAGE;
 
   const router = useRouter();
 
-  // Get cancellation policy information
   const policyType = getPolicyType(data.cancellation_policy);
   const policyStyling = getPolicyStyling(policyType);
   const policyBulletPoints = getPolicyBulletPoints(policyType);
 
-  // Format price for display
-  const numericPrice = parseFloat(price.replace(/[^0-9.]/g, ''));
+  const numericPrice = parseFloat(price.replace(/[^0-9.]/g, ""));
   const hasOriginalPrice = !!data.original_price;
   const originalPrice = data.original_price || 0;
   const discountPercentage = data.discount_percentage || (
@@ -71,19 +67,16 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
   );
   const hasDiscount = discountPercentage > 0 && hasOriginalPrice;
 
-  // Determine star rating (default to 5 if not provided)
   const rating = data.rating !== undefined ? data.rating : 5;
   const maxRating = 5;
 
-  // Function to truncate description to 5 words
-  const truncateDescription = (text: string, wordLimit: number = 5) => {
+  const truncateDescription = (text: string, wordLimit: number = 8) => {
     if (!text) return "";
     const words = text.trim().split(/\s+/);
     if (words.length <= wordLimit) return text;
     return words.slice(0, wordLimit).join(" ") + "...";
   };
 
-  // Truncated description
   const truncatedDescription = truncateDescription(data.description);
 
   const handleBookNow = () => {
@@ -98,57 +91,47 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
   };
 
   const getRoomAmenities = () => {
-    // Use provided amenities if available
     if (data.amenities && data.amenities.length > 0) {
-      return data.amenities.map(amenity => ({
-        // Convert string icon names to actual icon components
+      return data.amenities.slice(0, 3).map(amenity => ({
         icon: getIconComponent(amenity.icon),
         name: amenity.name
       }));
     }
 
-    // Fallback to default amenities
     const defaultAmenities = [
-      { icon: <FaWifi />, name: "Free WiFi" },
-      { icon: <FaSnowflake />, name: "Air Conditioning" },
-      { icon: <FaSmokingBan />, name: data.smoking_policy === "Non-Smoking" ? "Non-Smoking" : "Smoking Allowed" },
-      { icon: <FaBed />, name: `${data.number_of_bedrooms} Bedrooms` },
+      { icon: <FaWifi className="text-tripswift-blue" />, name: "Free WiFi" },
+      { icon: <FaSnowflake className="text-tripswift-blue" />, name: "Air Conditioning" },
+      { icon: <FaBed className="text-tripswift-blue" />, name: "King Bed" },
     ];
     return defaultAmenities;
   };
 
-  // Helper to convert string icon names to components
   const getIconComponent = (iconName: string) => {
+    const iconClass = "text-tripswift-blue";
     switch (iconName) {
-      case 'wifi': return <FaWifi />;
-      case 'snowflake': return <FaSnowflake />;
-      case 'smoking-ban': return <FaSmokingBan />;
-      case 'bed': return <FaBed />;
-      case 'tree': return <FaTree />;
-      case 'user': return <FaUser />;
-      case 'child': return <FaChild />;
-      default: return <FaCheckCircle />;
+      case 'wifi': return <FaWifi className={iconClass} />;
+      case 'snowflake': return <FaSnowflake className={iconClass} />;
+      case 'smoking-ban': return <FaSmokingBan className={iconClass} />;
+      case 'bed': return <FaBed className={iconClass} />;
+      case 'tree': return <FaTree className={iconClass} />;
+      case 'user': return <FaUser className={iconClass} />;
+      case 'child': return <FaChild className={iconClass} />;
+      default: return <FaCheckCircle className={iconClass} />;
     }
   };
 
   return (
     <>
-      <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group bg-white">
-        {/* Room label and discount tag */}
-        {hasDiscount && (
-          <div className="absolute top-0 right-0 z-10 bg-red-600 text-white text-sm font-bold py-1 px-3 rounded-bl-lg">
-            {discountPercentage}% OFF
-          </div>
-        )}
-
-        {/* Room image */}
-        <div className="relative w-full h-52">
+      <Card className="w-full min-h-48 shadow-sm hover:shadow-md transition-shadow duration-300 group bg-tripswift-off-white border border-gray-200 rounded-lg flex flex-col sm:flex-row overflow-hidden">
+        {/* Image Section */}
+        <div className="relative w-full sm:w-[45%] h-48 sm:h-auto flex-shrink-0 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10"></div>
           <Image
             src={selectedImage}
-            alt={`${data.room_name || 'Room'} image`}
+            alt={`${data.room_name || "Room"} image`}
             layout="fill"
             objectFit="cover"
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.onerror = null;
@@ -156,148 +139,144 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
             }}
           />
 
-          {/* Room capacity indicator overlay */}
-          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white px-4 py-2 flex items-center justify-between">
-            <div className="flex items-center">
-              <FaUser className="mr-1" />
-              <span className="text-sm">{data.max_number_of_adults} adults</span>
-              {data.max_number_of_children > 0 && (
-                <>
-                  <FaChild className="ml-2 mr-1" />
-                  <span className="text-sm">{data.max_number_of_children} children</span>
-                </>
-              )}
+          {/* Discount tag */}
+          {hasDiscount && (
+            <div className="absolute top-3 left-3 z-20 bg-red-600 text-tripswift-off-white text-xs font-tripswift-bold py-1 px-2.5 rounded-full flex items-center shadow-md">
+              <FaPercent className="h-2.5 w-2.5 mr-1" /> {discountPercentage}% OFF
             </div>
-            <span className="text-sm">{data.room_size} {data.room_unit}</span>
-          </div>
+          )}
         </div>
 
-        <CardHeader className="pb-2">
-          <div className="flex justify-between items-start">
-            <CardTitle className="text-xl text-blue-700 font-bold">
-              {data.room_name}
-            </CardTitle>
-            <div className="flex items-center text-yellow-400 gap-0.5">
-              {/* Dynamic star rating */}
-              {Array.from({ length: maxRating }).map((_, i) => (
-                i < Math.floor(rating) ? (
-                  <FaStar key={i} />
-                ) : i < rating ? (
-                  // Handle half stars if needed
-                  <FaStar key={i} className="opacity-60" />
-                ) : (
-                  <FaRegStar key={i} />
-                )
+        {/* Details Section */}
+        <div className="w-full sm:w-[55%] flex flex-col p-3 sm:p-4">
+          {/* Header */}
+          <CardHeader className="p-0 pb-2 flex-shrink-0">
+            <div className="flex justify-between items-start">
+              <CardTitle className="text-lg text-tripswift-blue font-tripswift-bold leading-tight truncate">
+                {data.room_name} - {data.room_type}
+              </CardTitle>
+              <div className="flex items-center text-yellow-400 gap-0.5">
+                {Array.from({ length: maxRating }).map((_, i) => (
+                  i < Math.floor(rating) ? (
+                    <FaStar key={i} className="h-3.5 w-3.5" />
+                  ) : i < rating ? (
+                    <FaStar key={i} className="h-3.5 w-3.5 opacity-60" />
+                  ) : (
+                    <FaRegStar key={i} className="h-3.5 w-3.5" />
+                  )
+                ))}
+              </div>
+            </div>
+            <p className="text-tripswift-black/70 mt-1 font-tripswift-regular text-sm line-clamp-2">
+              {truncatedDescription}
+            </p>
+          </CardHeader>
+
+          {/* Content */}
+          <CardContent className="p-0 pt-1 flex-grow flex flex-col gap-2">
+            {/* Room specs section */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 p-1.5 rounded-md">
+              <div className="flex items-center text-xs text-tripswift-black/80 font-tripswift-medium">
+                <FaUser className="mr-1.5 h-3 w-3 text-tripswift-blue" />
+                <span>{data.max_number_of_adults} adults</span>
+              </div>
+              {data.max_number_of_children > 0 && (
+                <div className="flex items-center text-xs text-tripswift-black/80 font-tripswift-medium">
+                  <FaChild className="mr-1.5 h-3 w-3 text-tripswift-blue" />
+                  <span>{data.max_number_of_children} children</span>
+                </div>
+              )}
+              {data.room_size > 0 && (
+                <div className="flex items-center text-xs text-tripswift-black/80 font-tripswift-medium">
+                  <FaRulerCombined className="mr-1.5 h-3 w-3 text-tripswift-blue" />
+                  <span>{data.room_size} {data.room_unit || "m²"}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Enhanced Amenities Display */}
+            <div className="flex flex-wrap gap-x-2 gap-y-1.5">
+              {getRoomAmenities().map((amenity, index) => (
+                <div key={index} className="flex items-center text-xs bg-blue-50 text-tripswift-blue/80 font-tripswift-medium px-2 py-1 rounded-full">
+                  {React.cloneElement(amenity.icon, { className: "h-3 w-3 mr-1.5" })}
+                  <span className="truncate">{amenity.name}</span>
+                </div>
               ))}
             </div>
-          </div>
-          
-          {/* Updated description with 5-word limit */}
-          <p className="text-gray-600 mt-1">
-            {truncatedDescription}
-          </p>
-        </CardHeader>
 
-        <CardContent className="pt-0 pb-3">
-          {/* Room type and view */}
-          <div className="mb-3 flex flex-wrap gap-2">
-            <span className="inline-block bg-gray-100 text-gray-800 text-xs font-medium px-2 py-1 rounded">
-              {data.room_type}
-            </span>
-            {data.room_view && (
-              <span className="inline-block bg-gray-100 text-gray-800 text-xs font-medium px-2 py-1 rounded">
-                <FaTree className="inline mr-1" /> {data.room_view} view
-              </span>
-            )}
-          </div>
-
-          {/* Amenities */}
-          <div className="grid grid-cols-2 gap-y-2 gap-x-4 mb-4">
-            {getRoomAmenities().map((amenity, index) => (
-              <div key={index} className="flex items-center text-sm text-gray-600">
-                <span className="text-blue-500 mr-2">{amenity.icon}</span>
-                <span>{amenity.name}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Cancellation policy summary */}
-          <div className={`flex items-center text-xs font-medium ${policyType === "Flexible" ? "text-green-700" : "text-amber-700"} mt-1 mb-2`}>
-            {policyType === "Flexible" ? (
-              <>
-                <FaCheckCircle className="mr-1.5" />
-                <span>Free cancellation</span>
-              </>
-            ) : (
-              <>
-                <FaInfoCircle className="mr-1.5" />
-                <span>Non-refundable</span>
-              </>
-            )}
-            <button
-              onClick={() => setShowPolicyModal(true)}
-              className="ml-2 underline hover:text-blue-600 transition-colors"
-            >
-              Details
-            </button>
-          </div>
-
-          {/* Price information */}
-          <div className="flex flex-col">
-            {hasDiscount && (
-              <div className="flex items-center mb-1">
-                <span className="text-gray-500 line-through text-sm">${originalPrice.toFixed(2)}</span>
-                <span className="ml-2 bg-red-100 text-red-800 text-xs font-semibold px-1.5 py-0.5 rounded flex items-center">
-                  <FaPercent className="mr-1" size={10} /> {discountPercentage}% OFF
-                </span>
-              </div>
-            )}
-            <div className="flex items-baseline">
-              <span className="text-2xl font-bold text-blue-700">{price}</span>
-              <span className="text-gray-500 text-sm ml-1">per night</span>
+            {/* Enhanced Cancellation Policy Indicator */}
+            <div className={`flex items-center text-xs font-tripswift-medium px-2 py-1.5 rounded-md ${policyType === "Flexible"
+                ? " text-green-700 "
+                : " text-amber-700 "
+              }`}>
+              {policyType === "Flexible" ? (
+                <>
+                  <FaCheckCircle className="mr-1.5 h-3 w-3" />
+                  <span>Free cancellation</span>
+                </>
+              ) : (
+                <>
+                  <FaInfoCircle className="mr-1.5 h-3 w-3" />
+                  <span>Non-refundable</span>
+                </>
+              )}
+              <button
+                onClick={() => setShowPolicyModal(true)}
+                className="ml-1.5 underline hover:text-tripswift-blue transition-colors text-xs"
+              >
+                Details
+              </button>
             </div>
-          </div>
-        </CardContent>
 
-        <CardFooter className="bg-gray-50 border-t border-gray-100 pt-4 pb-4 flex flex-col">
-          <div className="flex space-x-2 w-full">
-            <button
-              onClick={handleBookNow}
-              className="flex-grow bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded flex items-center justify-center transition-colors"
-            >
-              <FaShoppingCart className="mr-2" /> Book Now
-            </button>
-          </div>
-        </CardFooter>
+            {/* Price and Button */}
+            <div className="mt-auto pt-2 border-t border-gray-100 flex items-center justify-between">
+              <div className="flex flex-col">
+                {hasDiscount && (
+                  <span className="text-xs line-through text-tripswift-black/50">₹{originalPrice}</span>
+                )}
+                <div className="flex items-baseline">
+                  <span className="text-xl font-tripswift-bold text-tripswift-blue">{price}</span>
+                  {/* <span className="text-tripswift-black/60 text-xs ml-1 font-tripswift-regular">/night</span> */}
+                </div>
+              </div>
+              <button
+                onClick={handleBookNow}
+                className="bg-tripswift-blue hover:bg-[#054B8F] active:bg-[#03315c] text-tripswift-off-white font-tripswift-medium py-2 px-4 rounded-md text-sm flex items-center transition-colors duration-300 shadow-sm hover:shadow-md"
+              >
+                <FaShoppingCart className="mr-1.5 h-3 w-3" /> Book Now
+              </button>
+            </div>
+          </CardContent>
+        </div>
       </Card>
 
       {/* Policy Modal */}
       {showPolicyModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
-            <div className="flex items-center justify-between bg-blue-600 text-white px-4 py-3">
-              <h3 className="text-lg font-medium">Booking Policies</h3>
+          <div className="bg-tripswift-off-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+            <div className="flex items-center justify-between bg-tripswift-blue text-tripswift-off-white px-4 py-3">
+              <h3 className="text-lg font-tripswift-medium">Booking Policies</h3>
               <button
                 onClick={() => setShowPolicyModal(false)}
-                className="text-white hover:bg-blue-700 rounded-full p-1"
+                className="text-tripswift-off-white hover:bg-[#054B8F] active:bg-[#03315c] rounded-full p-1 transition-colors"
+                aria-label="Close modal"
               >
                 <FaTimes />
               </button>
             </div>
 
             <div className="p-5">
-              {/* Cancellation Policy Section */}
               <div className="mb-6">
-                <h4 className="text-lg font-medium text-gray-800 flex items-center mb-3">
+                <h4 className="text-lg font-tripswift-medium text-tripswift-black flex items-center mb-3">
                   <span className={`inline-block w-3 h-3 rounded-full mr-2 bg-${policyStyling.color}-500`}></span>
                   Cancellation Policy
-                  <span className={`ml-2 text-xs px-2 py-0.5 rounded ${policyStyling.bgColor} ${policyStyling.textColor}`}>
+                  <span className={`ml-2 text-xs px-2 py-0.5 rounded ${policyStyling.bgColor} ${policyStyling.textColor} font-tripswift-medium`}>
                     {policyType}
                   </span>
                 </h4>
 
                 <div className="mb-4 text-sm">
-                  <ul className="list-disc pl-5 space-y-1 text-gray-700">
+                  <ul className="list-disc pl-5 space-y-1 text-tripswift-black/70 font-tripswift-regular">
                     {policyBulletPoints.map((point, idx) => (
                       <li key={idx}>
                         <span className={point.color}>{point.text.split(':')[0]}:</span>
@@ -310,13 +289,13 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
 
               {/* Amendment Policy Section */}
               <div>
-                <h4 className="text-lg font-medium text-gray-800 flex items-center mb-3">
-                  <FaInfoCircle className="mr-2 text-blue-500" />
+                <h4 className="text-lg font-tripswift-medium text-tripswift-black flex items-center mb-3">
+                  <FaInfoCircle className="mr-2 text-tripswift-blue" />
                   Amendment Policy
                 </h4>
 
                 <div className="mb-4 text-sm">
-                  <ul className="list-disc pl-5 space-y-1 text-gray-700">
+                  <ul className="list-disc pl-5 space-y-1 text-tripswift-black/70 font-tripswift-regular">
                     <li>Date changes are subject to availability</li>
                     <li>Changes within 72 hours of check-in may incur additional fees</li>
                     <li>Room upgrades are subject to availability and additional charges</li>
@@ -327,7 +306,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
 
               <button
                 onClick={() => setShowPolicyModal(false)}
-                className="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors"
+                className="mt-2 w-full bg-tripswift-blue hover:bg-[#054B8F] active:bg-[#03315c] text-tripswift-off-white font-tripswift-medium py-2 px-4 rounded transition-colors duration-300 shadow-sm"
               >
                 Got it
               </button>

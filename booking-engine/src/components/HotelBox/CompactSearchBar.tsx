@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Search, MapPin, Calendar, Users, Loader2, X } from 'lucide-react';
+import { Search, MapPin, Calendar, Users, Loader2, X, ChevronRight } from 'lucide-react';
 import toast from "react-hot-toast";
 import DateRange from "../HotelBox/DateRange";
 import GuestBox from "../HotelBox/GuestBox";
 import { getHotelsByCity } from '@/api/hotel';
+import { format, addDays } from 'date-fns';
 
 interface CompactSearchBarProps {
   initialLocation?: string;
@@ -14,7 +15,7 @@ interface CompactSearchBarProps {
 }
 
 const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
-  initialLocation = "",
+  initialLocation = "Bhubaneswar", // Default location set to Bhubaneswar
   initialCheckin = "",
   initialCheckout = "",
   onSearch
@@ -23,19 +24,20 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
   const router = useRouter();
   const searchContainerRef = useRef<HTMLDivElement>(null);
   
-  // Get current search parameters from URL or props
-  const currentLocation = initialLocation || searchParams.get("location") || searchParams.get("destination") || "";
-  const checkinDate = initialCheckin || searchParams.get("checkin") || "";
-  const checkoutDate = initialCheckout || searchParams.get("checkout") || "";
+  // Set default dates (tomorrow and day after tomorrow)
+  const tomorrow = format(addDays(new Date(), 1), 'yyyy-MM-dd');
+  const dayAfterTomorrow = format(addDays(new Date(), 2), 'yyyy-MM-dd');
+  
+  // Get current search parameters from URL or props or defaults
+  const currentLocation = initialLocation || searchParams.get("location") || searchParams.get("destination") || "Bhubaneswar";
+  const checkinDate = initialCheckin || searchParams.get("checkin") || tomorrow;
+  const checkoutDate = initialCheckout || searchParams.get("checkout") || dayAfterTomorrow;
   
   // Set initial states with current search parameters
   const [searchQuery, setSearchQuery] = useState(currentLocation);
-  const [dates, setDates] = useState<string[] | undefined>(
-    checkinDate && checkoutDate ? [checkinDate, checkoutDate] : undefined
-  );
+  const [dates, setDates] = useState<string[] | undefined>([checkinDate, checkoutDate]);
   const [loading, setLoading] = useState(false);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   
   // Update state when props change
   useEffect(() => {
@@ -45,52 +47,8 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
     }
   }, [initialLocation, initialCheckin, initialCheckout]);
   
-  // Close suggestions when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
-        setShowSuggestions(false);
-      }
-    }
-    
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-  
-  // Handle search input change with location suggestions
-  const handleSearchInputChange = (value: string) => {
-    setSearchQuery(value);
-    
-    if (value.length >= 2) {
-      // Mock suggestions - in real app would come from API
-      const mockSuggestions = [
-        "New York, USA",
-        "London, UK",
-        "Paris, France",
-        "Tokyo, Japan",
-        "Sydney, Australia",
-        "Dubai, UAE",
-        "Rome, Italy",
-        "Singapore"
-      ].filter(loc => loc.toLowerCase().includes(value.toLowerCase()));
-      
-      setSuggestions(mockSuggestions);
-      setShowSuggestions(mockSuggestions.length > 0);
-    } else {
-      setSuggestions([]);
-      setShowSuggestions(false);
-    }
-  };
-  
-  const handleSuggestionClick = (suggestion: string) => {
-    setSearchQuery(suggestion);
-    setShowSuggestions(false);
-  };
-  
   const clearSearch = () => {
     setSearchQuery("");
-    setSuggestions([]);
-    setShowSuggestions(false);
   };
   
   const handleSearchButtonClick = async (e: React.MouseEvent) => {
@@ -129,55 +87,53 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-3">
-      <div className="flex flex-col sm:flex-row items-center gap-3">
-        {/* Location Input with Suggestions */}
+    <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-tripswift-black/5 p-3.5 font-['Arial']">
+      <div className="flex flex-col sm:flex-row items-center gap-3.5">
+        {/* Location Input */}
         <div className="w-full sm:w-auto sm:flex-1" ref={searchContainerRef}>
           <div className="relative group">
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-              <MapPin className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" />
+            <div className={`absolute inset-y-0 left-3 flex items-center pointer-events-none transition-colors duration-200 ${isSearchFocused ? 'text-tripswift-blue' : 'text-tripswift-black/40'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-300 ${isSearchFocused ? 'bg-tripswift-blue/10' : 'bg-transparent'}`}>
+                <MapPin className="h-4 w-4" />
+              </div>
             </div>
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => handleSearchInputChange(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)}
               placeholder="Where are you going?"
-              className="block w-full h-12 pl-10 pr-10 py-2 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-gray-700 transition duration-200 ease-in-out group-hover:border-blue-300"
+              className={`block w-full h-14 pl-12 pr-10 py-2 rounded-xl border ${
+                isSearchFocused 
+                  ? 'border-tripswift-blue ring-2 ring-tripswift-blue/10'
+                  : 'border-tripswift-black/10 hover:border-tripswift-blue/30'
+              } outline-none text-tripswift-black transition duration-200 ease-in-out shadow-sm font-tripswift-medium text-[15px]`}
+              aria-label="Search destination"
             />
             {searchQuery && (
               <button
                 onClick={clearSearch}
-                className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
+                className="absolute inset-y-0 right-3 flex items-center text-tripswift-black/40 hover:text-tripswift-black transition-colors"
+                aria-label="Clear search"
               >
-                <X className="h-5 w-5" />
+                <div className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-gray-100">
+                  <X className="h-4 w-4" />
+                </div>
               </button>
-            )}
-            
-            {/* Location Suggestions Dropdown */}
-            {showSuggestions && (
-              <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                {suggestions.map((suggestion, index) => (
-                  <div
-                    key={index}
-                    className="px-4 py-2 hover:bg-gray-50 cursor-pointer flex items-center"
-                    onClick={() => handleSuggestionClick(suggestion)}
-                  >
-                    <MapPin className="h-4 w-4 text-gray-400 mr-2" />
-                    <span className="text-gray-700">{suggestion}</span>
-                  </div>
-                ))}
-              </div>
             )}
           </div>
         </div>
         
         {/* Date Range */}
         <div className="w-full sm:w-auto sm:flex-1">
-          <div className="relative group border border-gray-200 rounded-lg focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 hover:border-blue-300 transition duration-200">
+          <div className="relative group">
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-              <Calendar className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" />
+              <div className="w-8 h-8 rounded-full flex items-center justify-center group-hover:bg-tripswift-blue/10 transition-colors duration-300">
+                <Calendar className="h-4 w-4 text-tripswift-black/40 group-hover:text-tripswift-blue transition-colors duration-200" />
+              </div>
             </div>
-            <div className="pl-10 h-12 flex items-center">
+            <div className="bg-white border border-tripswift-black/10 hover:border-tripswift-blue/30 rounded-xl shadow-sm transition-all duration-200 h-14 pl-12 flex items-center">
               <DateRange dates={dates} setDates={setDates} />
             </div>
           </div>
@@ -185,11 +141,13 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
         
         {/* Guest Selection */}
         <div className="w-full sm:w-auto sm:flex-[0.7]">
-          <div className="relative group border border-gray-200 rounded-lg focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 hover:border-blue-300 transition duration-200 h-12">
+          <div className="relative group">
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-              <Users className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" />
+              <div className="w-8 h-8 rounded-full flex items-center justify-center group-hover:bg-tripswift-blue/10 transition-colors duration-300">
+                <Users className="h-4 w-4 text-tripswift-black/40 group-hover:text-tripswift-blue transition-colors duration-200" />
+              </div>
             </div>
-            <div className="pl-10 h-full">
+            <div className="bg-white border border-tripswift-black/10 hover:border-tripswift-blue/30 rounded-xl shadow-sm transition-all duration-200 h-14 pl-12 flex items-center">
               <GuestBox />
             </div>
           </div>
@@ -201,16 +159,21 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
             type="button"
             disabled={loading}
             onClick={handleSearchButtonClick}
-            className="w-full sm:w-auto h-12 px-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg flex items-center justify-center gap-2 transition-all duration-300 font-medium"
+            className="w-full sm:w-auto h-14 px-6 bg-gradient-to-r from-tripswift-blue to-[#054B8F] hover:from-[#054B8F] hover:to-tripswift-blue disabled:from-tripswift-black/30 disabled:to-tripswift-black/40 text-tripswift-off-white rounded-xl flex items-center justify-center gap-2 transition-all duration-300 font-tripswift-medium text-[14px] shadow-md hover:shadow-lg relative overflow-hidden group"
+            aria-label={loading ? "Searching..." : "Search hotels"}
           >
-            {loading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <>
-                <Search className="w-5 h-5" />
-                <span>Search</span>
-              </>
-            )}
+            <div className="absolute inset-0 bg-gradient-to-r from-tripswift-blue to-[#054B8F] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <span className="relative z-10 flex items-center gap-2.5">
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>
+                  <Search className="w-5 h-5" />
+                  <span className="font-tripswift-medium">Search</span>
+                  <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" />
+                </>
+              )}
+            </span>
           </button>
         </div>
       </div>

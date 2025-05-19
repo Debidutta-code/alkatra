@@ -4,27 +4,25 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from '@/Redux/store';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import GuestBox from './GuestBox';
 import { getHotelsByCity } from '@/api/hotel';
-import { Search, MapPin, Calendar, Users, Loader2 } from 'lucide-react';
-import Home from '@/components/assets/popular/Home.jpg';
 import toast from 'react-hot-toast';
-import DateRange from './DateRange';
 import { useTranslation } from 'react-i18next';
 import i18next from '../../internationalization/i18n'; // Import i18n configuration
+import Home from '@/components/assets/popular/Home.jpg';
+import CompactSearchBar from '../HotelBox/CompactSearchBar'; // Update with correct path
+import { format, addDays } from 'date-fns';
 
 const HotelCard = () => {
-  const { t } = useTranslation(); // Initialize translation hook
-  const [searchQuery, setSearchQuery] = useState('');
-  const [dates, setDates] = useState<string[] | undefined>(undefined);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
   const [isScrolled, setIsScrolled] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const dispatch = useDispatch();
   const router = useRouter();
-  const { guestDetails } = useSelector((state) => state.hotel);
+
+  // Set default dates (tomorrow and day after tomorrow)
+  const tomorrow = format(addDays(new Date(), 1), 'yyyy-MM-dd');
+  const dayAfterTomorrow = format(addDays(new Date(), 2), 'yyyy-MM-dd');
 
   // Monitor scroll position for subtle parallax effect
   useEffect(() => {
@@ -40,7 +38,12 @@ const HotelCard = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Ensure document direction is set (though already handled in Navbar/LanguageSwitcher)
+  // Add animation class after component mount
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
+
+  // Ensure document direction is set
   useEffect(() => {
     document.documentElement.dir = i18next.language === 'ar' ? 'rtl' : 'ltr';
     const handleLanguageChange = () => {
@@ -52,62 +55,15 @@ const HotelCard = () => {
     };
   }, []);
 
-  const fetchSearchedProperties = useCallback(async (location: string) => {
-    if (!location) return;
-    setLoading(true);
-    setError(null);
+  // Handle search from CompactSearchBar
+  const handleSearch = useCallback(async (location: string, checkin: string, checkout: string) => {
     try {
-      const hotelData = await getHotelsByCity(location);
-      // If search is successful, proceed to destination page
-      const checkinDate = encodeURIComponent(dates?.[0] || '');
-      const checkoutDate = encodeURIComponent(dates?.[1] || '');
-      const dateRangeQueryString = `checkin=${checkinDate}&checkout=${checkoutDate}`;
-      
-      router.push(`/destination?location=${searchQuery}&${dateRangeQueryString}`);
+      await getHotelsByCity(location);
+      router.push(`/destination?location=${encodeURIComponent(location)}&checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(checkout)}`);
     } catch (error) {
-      setError(t('HotelCard.errorNoHotels'));
       toast.error(t('HotelCard.errorNoHotels'));
-    } finally {
-      setLoading(false);
     }
-  }, [dates, router, searchQuery, t]);
-
-  // Explicit search button handler, separate from form submission
-  const handleSearchButtonClick = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent form submission
-    
-    if (loading) return; // Don't do anything if already loading
-    
-    // Validation logic
-    if (!searchQuery || searchQuery.length < 3) {
-      toast.error(t('HotelCard.errorInvalidLocation'));
-      return;
-    }
-
-    if (!dates || dates.length !== 2 || !dates[0] || !dates[1]) {
-      toast.error(t('HotelCard.errorSelectDates'));
-      return;
-    }
-
-    // *** UPDATED CHILD AGE VALIDATION ***
-    // Only perform this check if the children count is set and > 0
-    if (guestDetails && guestDetails.children > 0) {
-      // Skip the validation if the GuestBox hasn't completed its setup
-      // This assumes that valid ages have been selected when the GuestBox's Apply button is clicked
-      
-      // All validations passed, proceed with search
-      fetchSearchedProperties(searchQuery);
-    } else {
-      // No children or children count is 0, proceed with search
-      fetchSearchedProperties(searchQuery);
-    }
-  };
-
-  // Form submission handler - we'll prevent default and defer to the button click handler
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // Always prevent default form submission
-    // The actual search logic is in handleSearchButtonClick
-  };
+  }, [router, t]);
 
   return (
     <div className="relative w-full h-[400px] sm:h-[500px] overflow-hidden">
@@ -118,118 +74,64 @@ const HotelCard = () => {
       >
         <Image
           src={Home}
-          alt="Luxury Accommodation"
+          alt="Luxury Accommodation - TripSwift"
           className="object-cover w-full h-full"
           priority
           quality={95}
         />
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-tripswift-black/50 via-tripswift-black/30 to-tripswift-black/60" />
       </div>
       
-      {/* Main Content */}
-      <div className="relative z-10 h-full flex flex-col items-center justify-center px-4">
+     {/* Main Content */}
+     <div className={`relative z-10 h-full flex flex-col items-center justify-center px-4 transition-all duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0 translate-y-10'}`}>
         {/* Hero Text */}
-        <div className="max-w-3xl text-center mb-8">
-          <h1 className="text-3xl md:text-5xl font-bold text-white mb-3 leading-tight tracking-tight drop-shadow-lg">
+        <div className="max-w-3xl text-center mb-10 animate-in slide-in-from-bottom duration-700">
+          <div className="bg-tripswift-blue/20 backdrop-blur-sm text-tripswift-off-white/90 text-sm font-tripswift-medium px-4 py-1.5 rounded-full inline-flex items-center mb-6 shadow-lg">
+            <span className="inline-block w-2 h-2 bg-tripswift-blue rounded-full mr-2 animate-pulse"></span>
+            <span>Exclusive Offers Available</span>
+          </div>
+          
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-tripswift-extrabold text-tripswift-off-white mb-5 leading-tight tracking-tight drop-shadow-lg">
             {t('HotelCard.heroTitle')}
           </h1>
-          <p className="text-lg md:text-xl text-white/90 font-light max-w-2xl mx-auto drop-shadow">
+          
+          <p className="text-lg md:text-xl text-tripswift-off-white font-tripswift-regular max-w-2xl mx-auto drop-shadow-md">
             {t('HotelCard.heroSubtitle')}
           </p>
         </div>
         
         {/* Search Container */}
-        <div className="w-full max-w-5xl">
+        <div className="w-full max-w-5xl animate-in slide-in-from-bottom duration-700 delay-200">
           {/* Search Box */}
-          <div className="bg-white rounded-xl shadow-lg p-4 sm:p-5">
-            <form ref={formRef} onSubmit={handleSubmit} noValidate>
-              <div className="flex flex-col lg:flex-row items-center gap-3">
-                {/* Location Input */}
-                <div className="w-full lg:w-auto lg:flex-1">
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                      <MapPin className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" />
-                    </div>
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder={t('HotelCard.locationPlaceholder')}
-                      className="block w-full h-12 pl-10 pr-3 py-2 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-gray-700 transition duration-200 ease-in-out group-hover:border-blue-300"
-                    />
-                  </div>
-                </div>
-                
-                {/* Date Range */}
-                <div className="w-full lg:w-auto">
-                  <div className="relative group border border-gray-200 rounded-lg focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 hover:border-blue-300 transition duration-200">
-                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                      <Calendar className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" />
-                    </div>
-                    <div className="pl-10 h-12 flex items-center">
-                      <DateRange dates={dates} setDates={setDates} />
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Guest Selection */}
-                <div className="w-full lg:w-auto">
-                  <div className="relative group border border-gray-200 rounded-lg focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 hover:border-blue-300 transition duration-200 h-12">
-                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                      <Users className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" />
-                    </div>
-                    <div 
-                      className="pl-10 h-full"
-                      onClick={(e) => {
-                        // Prevent click from propagating to parent form
-                        e.stopPropagation();
-                      }}
-                    >
-                      <GuestBox />
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Search Button */}
-                <div className="w-full lg:w-auto">
-                  <button
-                    type="button" // Important: Not "submit"
-                    disabled={loading}
-                    onClick={handleSearchButtonClick}
-                    className="w-full lg:w-auto h-12 px-6 bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-800 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-400 text-white rounded-lg flex items-center justify-center gap-2 transition-all duration-300 font-medium shadow-md hover:shadow-lg disabled:shadow-none"
-                  >
-                    {loading ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : (
-                      <>
-                        <Search className="w-5 h-5" />
-                        <span>{t('HotelCard.searchButton')}</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-              
-              {/* Error Message */}
-              {error && (
-                <div className="text-red-500 text-sm mt-2 flex items-center justify-center lg:justify-start">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  {error}
-                </div>
-              )}
-            </form>
-          </div>
+          <CompactSearchBar 
+            initialLocation="Bhubaneswar" 
+            initialCheckin={tomorrow} 
+            initialCheckout={dayAfterTomorrow}
+            onSearch={handleSearch}
+          />
           
           {/* Special Offers Bar */}
-          <div className="mt-3 flex items-center justify-center">
-            <div className="bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm flex items-center space-x-2">
-              <span className="inline-block w-2 h-2 bg-blue-600 rounded-full animate-pulse"></span>
-              <p className="text-sm font-medium text-gray-700">
-                {t('HotelCard.specialOffer')}
-              </p>
+          <div className="mt-5 flex items-center justify-center animate-in slide-in-from-bottom duration-700 delay-300">
+            <div className="bg-white/20 backdrop-blur-lg px-5 py-2.5 rounded-full shadow-lg flex items-center gap-4">
+              <div className="flex items-center">
+                <span className="inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse mr-2"></span>
+                <span className="text-sm font-tripswift-medium text-white">Free Cancellation</span>
+              </div>
+              
+              <div className="w-1 h-1 rounded-full bg-white/40"></div>
+              
+              <div className="flex items-center">
+                <span className="inline-block w-2 h-2 bg-yellow-400 rounded-full animate-pulse mr-2"></span>
+                <span className="text-sm font-tripswift-medium text-white">Best Price Guarantee</span>
+              </div>
+              
+              <div className="w-1 h-1 rounded-full bg-white/40 hidden sm:block"></div>
+              
+              <div className="hidden sm:flex items-center">
+                <span className="inline-block w-2 h-2 bg-tripswift-blue rounded-full animate-pulse mr-2"></span>
+                <span className="text-sm font-tripswift-medium text-white">{t('HotelCard.specialOffer')}</span>
+              </div>
             </div>
           </div>
         </div>

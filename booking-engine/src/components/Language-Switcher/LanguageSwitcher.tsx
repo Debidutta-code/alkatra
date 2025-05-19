@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import i18next from '../../internationalization/i18n'; // Import i18n configuration
-import countryLanguages from '../../internationalization/country-language/country.language.json'; // Import country language data
+import i18next from '../../internationalization/i18n';
+import countryLanguages from '../../internationalization/country-language/country.language.json';
+import { ChevronDown } from 'lucide-react';
 
 interface LanguageOption {
   code: string;
@@ -19,6 +20,7 @@ const languageOptions: LanguageOption[] = Object.values(countryLanguages).map((l
 
 const LanguageSwitcher: React.FC = () => {
   const [selectedLanguage, setSelectedLanguage] = useState<string>(i18next.language || 'en');
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     // Sync state with i18next language on mount
@@ -35,31 +37,55 @@ const LanguageSwitcher: React.FC = () => {
     };
   }, []);
 
-  const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newLang = event.target.value;
-    setSelectedLanguage(newLang);
-    i18next.changeLanguage(newLang); // Update language
+  const handleLanguageChange = (langCode: string) => {
+    setSelectedLanguage(langCode);
+    i18next.changeLanguage(langCode); // Update language
+    setIsOpen(false);
   };
 
+  // Get current language option
+  const currentLanguage = languageOptions.find(lang => lang.code === selectedLanguage) || languageOptions[0];
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setIsOpen(false);
+    if (isOpen) {
+      document.addEventListener('click', handleClickOutside);
+    }
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [isOpen]);
+
   return (
-    <div className="language-switcher">
-      <select
-        value={selectedLanguage}
-        onChange={handleLanguageChange}
-        className="border rounded-md px-2 py-2 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none pr-8 text-sm"
-        style={{
-          backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'right 0.5rem center',
-          backgroundSize: '1rem',
+    <div className="relative">
+      <div 
+        className="flex items-center gap-1 cursor-pointer text-gray-700 hover:text-tripswift-blue text-sm p-2 rounded-md"
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(!isOpen);
         }}
       >
-        {languageOptions.map((option) => (
-          <option key={option.code} value={option.code}>
-            {option.flag} {option.name}
-          </option>
-        ))}
-      </select>
+        <span>{currentLanguage.flag} {currentLanguage.name}</span>
+        <ChevronDown size={16} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </div>
+      
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-1 bg-white shadow-md rounded-md overflow-hidden z-50 min-w-[150px]">
+          {languageOptions.map((option) => (
+            <div
+              key={option.code}
+              onClick={() => handleLanguageChange(option.code)}
+              className={`px-4 py-2 cursor-pointer flex items-center gap-2 ${
+                option.code === selectedLanguage 
+                  ? 'bg-gray-100 text-tripswift-blue' 
+                  : 'hover:bg-gray-50 text-gray-700'
+              }`}
+            >
+              <span>{option.flag}</span>
+              <span>{option.name}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -4,7 +4,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, AlertTriangle } from "lucide-react";
+import { ArrowLeft, AlertTriangle, CheckCircle } from "lucide-react";
 
 // Import shared auth components
 import AuthLayout from "@/components/auth/AuthLayout";
@@ -132,7 +132,7 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack }) => {
     <AuthLayout
       title="Reset Password"
       subtitle={`Enter a new password for ${email}`}
-      heroTitle={<>Create <span className="text-blue-200">New Password</span></>}
+      heroTitle={<>Create <span className="text-tripswift-blue">New Password</span></>}
       heroSubtitle="Set a strong, secure password for your account to keep your travel plans safe."
       benefits={[
         "Create a stronger password to enhance security",
@@ -142,7 +142,7 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack }) => {
       footerContent={
         <button 
           onClick={onBack} 
-          className="w-full text-center text-blue-600 text-sm hover:text-blue-800 font-medium flex items-center justify-center"
+          className="w-full text-center text-tripswift-blue text-sm hover:text-[#054B8F] font-tripswift-medium flex items-center justify-center"
         >
           <ArrowLeft size={16} className="mr-2" />
           Back to Login
@@ -182,8 +182,9 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack }) => {
         
         {/* Success Message */}
         {message && (
-          <div className="mt-4 text-sm text-green-600 bg-green-50 p-3 rounded-lg border border-green-200">
-            {message}
+          <div className="mt-4 text-sm text-green-600 bg-green-50 p-3 rounded-lg border border-green-200 flex items-center">
+            <CheckCircle size={16} className="mr-2 flex-shrink-0 text-green-500" />
+            <span className="font-tripswift-medium">{message}</span>
           </div>
         )}
         
@@ -191,7 +192,7 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack }) => {
         {error && (
           <div className="mt-4 text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200 flex items-center">
             <AlertTriangle size={16} className="mr-2 flex-shrink-0" />
-            <span>{error}</span>
+            <span className="font-tripswift-medium">{error}</span>
           </div>
         )}
       </form>

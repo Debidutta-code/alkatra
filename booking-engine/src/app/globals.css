@@ -3,12 +3,27 @@
 @tailwind utilities;
 
 :root {
-  --main-color: #fff;
-  --second-color: #21092f;
-  --font-color: #21092f;
-  --second-font-color: #8f8694;
-  --gradient: linear-gradient(163.95deg, #6348fe 4.74%, #610595 88.83%);
-  --font-family: "Space Grotesk", sans-serif;
+  /* TripSwift Brand Colors */
+  --color-primary-blue: #076DB3; /* Matches style guide */
+  --color-primary-off-white: #FFFDFF; /* Matches style guide */
+  --color-primary-black: #000000; /* Matches style guide */
+  --color-secondary-off-white: #FFFDFF; /* Matches style guide */
+  --color-secondary-black: #000000; /* Matches style guide */
+  
+  /* Typography */
+  --font-primary: Arial, sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  
+  /* Legacy variables for compatibility */
+  --main-color: var(--color-primary-off-white);
+  --second-color: var(--color-secondary-black);
+  --font-color: var(--color-secondary-black);
+  --second-font-color: var(--color-primary-blue);
+  --gradient: linear-gradient(163.95deg, var(--color-primary-blue) 4.74%, #054B8F 88.83%);
+  --font-family: var(--font-primary);
   --shadow: 0px 39px 60px 0px #00000024;
 }
 
@@ -17,9 +32,6 @@
   width: 2px;
 }
 
-/* ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-} */
 ::-webkit-scrollbar-thumb {
   background: #d6d6d6;
 }
@@ -36,32 +48,33 @@
   padding: 0;
   box-sizing: border-box;
 }
-/* 
-@media (prefers-color-scheme: light) {
-  :root {
-  }
-} */
 
 .App {
   height: 100vh;
 }
 
-/* typography */
+/* Typography */
 html {
-  font-family: var(--font-family);
-  font-weight: 500;
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-medium);
 }
+
 h1 {
   font-size: 28px;
   line-height: 36px;
   letter-spacing: 3.42px;
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-secondary-black);
 }
 
 h2 {
   font-size: 12px;
   line-height: 15px;
   letter-spacing: 2px;
-  color: var(--second-font-color);
+  color: var(--color-secondary-black);
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-medium);
 }
 
 input:placeholder-shown {
@@ -69,31 +82,34 @@ input:placeholder-shown {
   line-height: 23px;
   letter-spacing: 0px;
   text-indent: 16px;
+  font-family: var(--font-primary);
 }
 
 label {
   font-size: 12px;
   line-height: 15px;
   letter-spacing: 2px;
-  color: var(--font-color);
+  color: var(--color-secondary-black);
   text-transform: uppercase;
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-medium);
 }
 
 header h1 {
   font-size: 18px;
   line-height: 23px;
   letter-spacing: 2.200000047683716px;
-  color: var(--main-color);
+  color: var(--color-primary-off-white);
 }
 
 header p {
   font-size: 9px;
   line-height: 11px;
   letter-spacing: 1.2857142686843872px;
-  color: var(--main-color);
+  color: var(--color-primary-off-white);
 }
 
-/* typography media query */
+/* Typography media query */
 @media (min-width: 1000px) {
   h2 {
     font-size: 18px;
@@ -115,70 +131,79 @@ header p {
 }
 
 /* Head styles */
-
 .header--image_container_front {
   box-shadow: var(--shadow);
 }
 
 /* Form styles */
-
 label {
   margin-bottom: 9px;
 }
 
 @layer base {
   :root {
+    /* Base colors in HSL format for Tailwind */
     --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    --foreground: 0 0% 0%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
+    --popover-foreground: 0 0% 0%;
+    
+    /* Primary is mapped to TripSwift blue */
+    --primary: 216 43% 46%; /* HSL for #076DB3 */
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary is mapped to TripSwift black */
+    --secondary: 0 0% 0%;
+    --secondary-foreground: 0 0% 100%;
+    
+    /* Other UI colors */
+    --muted: 216 20% 90%;
+    --muted-foreground: 216 20% 30%;
+    --accent: 216 40% 87%;
+    --accent-foreground: 216 43% 46%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --border: 216 20% 85%;
+    --input: 216 20% 85%;
+    --ring: 216 43% 46%;
+    
+    /* Chart colors */
+    --chart-1: 216 43% 46%;
+    --chart-2: 0 0% 0%;
+    --chart-3: 216 70% 35%;
+    --chart-4: 216 50% 45%;
+    --chart-5: 216 30% 55%;
+    
     --radius: 0.5rem;
   }
+  
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
+    --background: 0 0% 0%;
+    --foreground: 60 2% 99%;
+    --card: 0 0% 0%;
+    --card-foreground: 60 2% 99%;
+    --popover: 0 0% 0%;
+    --popover-foreground: 60 2% 99%;
+    --primary: 216 43% 46%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 60 2% 99%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 216 20% 20%;
+    --muted-foreground: 216 20% 70%;
+    --accent: 216 40% 20%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --destructive-foreground: 60 2% 99%;
+    --border: 216 20% 30%;
+    --input: 216 20% 30%;
+    --ring: 216 43% 70%;
+    --chart-1: 216 43% 50%;
+    --chart-2: 216 70% 60%;
+    --chart-3: 216 50% 50%;
+    --chart-4: 216 30% 60%;
+    --chart-5: 216 10% 70%;
   }
 }
 
@@ -187,6 +212,129 @@ label {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-['Arial'];
   }
+}
+
+/* Create utility classes specifically for TripSwift colors */
+@layer utilities {
+  /* Text colors */
+  .text-tripswift-blue {
+    color: var(--color-primary-blue);
+  }
+  .text-tripswift-black {
+    color: var(--color-primary-black);
+  }
+  .text-tripswift-off-white {
+    color: var(--color-primary-off-white);
+  }
+  
+  /* Background colors */
+  .bg-tripswift-blue {
+    background-color: var(--color-primary-blue);
+  }
+  .bg-tripswift-black {
+    background-color: var(--color-primary-black);
+  }
+  .bg-tripswift-off-white {
+    background-color: var(--color-primary-off-white);
+  }
+  
+  /* Border colors */
+  .border-tripswift-blue {
+    border-color: var(--color-primary-blue);
+  }
+  .border-tripswift-black {
+    border-color: var(--color-primary-black);
+  }
+  .border-tripswift-off-white {
+    border-color: var(--color-primary-off-white);
+  }
+  
+  /* Hover states */
+  .hover\:text-tripswift-blue:hover {
+    color: var(--color-primary-blue);
+  }
+  .hover\:text-tripswift-black:hover {
+    color: var(--color-primary-black);
+  }
+  .hover\:text-tripswift-off-white:hover {
+    color: var(--color-primary-off-white);
+  }
+  
+  .hover\:bg-tripswift-blue:hover {
+    background-color: var(--color-primary-blue);
+  }
+  .hover\:bg-tripswift-black:hover {
+    background-color: var(--color-primary-black);
+  }
+  .hover\:bg-tripswift-off-white:hover {
+    background-color: var(--color-primary-off-white);
+  }
+  
+  .hover\:border-tripswift-blue:hover {
+    border-color: var(--color-primary-blue);
+  }
+  .hover\:border-tripswift-black:hover {
+    border-color: var(--color-primary-black);
+  }
+  .hover\:border-tripswift-off-white:hover {
+    border-color: var(--color-primary-off-white);
+  }
+  
+  /* Font weights */
+  .font-tripswift-regular {
+    font-weight: var(--font-weight-regular);
+  }
+  .font-tripswift-medium {
+    font-weight: var(--font-weight-medium);
+  }
+  .font-tripswift-bold {
+    font-weight: var(--font-weight-bold);
+  }
+  .font-tripswift-extrabold {
+    font-weight: var(--font-weight-extrabold);
+  }
+}
+
+/* Button styling */
+.btn-tripswift-primary {
+  background-color: var(--color-primary-blue);
+  color: var(--color-primary-off-white);
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.btn-tripswift-primary:hover {
+  background-color: #054B8F;
+}
+
+.btn-tripswift-secondary {
+  background-color: var(--color-primary-off-white);
+  color: var(--color-primary-blue);
+  border: 1px solid var(--color-primary-blue);
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-tripswift-secondary:hover {
+  background-color: var(--color-primary-blue);
+  color: var(--color-primary-off-white);
+}
+
+/* Override NextUI styles for consistency */
+.nextui-button {
+  background-color: var(--color-primary-blue) !important;
+  color: var(--color-primary-off-white) !important;
+}
+
+.nextui-card {
+  background-color: var(--color-primary-off-white) !important;
+  color: var(--color-secondary-black) !important;
 }

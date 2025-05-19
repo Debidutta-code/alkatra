@@ -1,10 +1,12 @@
+"use client";
 import React, { useEffect, useRef, useState } from "react";
-import { X } from "lucide-react";
+import { X, Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 export interface FilterState {
   amenities: { [key: string]: boolean };
   sortOrder: string;
+  rating: number | null;
 }
 
 export interface FilterModalProps {
@@ -20,7 +22,7 @@ export const AMENITIES = [
   { key: "fitness_center", label: "Fitness Center" },
   { key: "spa_and_wellness", label: "Spa and Wellness" },
   { key: "restaurant", label: "Restaurant" },
-  { key: "room_service", label: "Room service" },
+  { key: "room_service", label: "Room Service" },
   { key: "bar_and_lounge", label: "Bar and Lounge" },
   { key: "parking", label: "Parking" },
   { key: "concierge_services", label: "Concierge Services" },
@@ -38,17 +40,20 @@ export const FilterModal: React.FC<FilterModalProps> = ({
 }) => {
   const [selectedAmenities, setSelectedAmenities] = useState<{ [key: string]: boolean }>(initialFilters.amenities);
   const [sortOrder, setSortOrder] = useState(initialFilters.sortOrder);
+  const [ratingFilter, setRatingFilter] = useState<number | null>(initialFilters.rating); // Add rating state
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setSelectedAmenities(initialFilters.amenities);
     setSortOrder(initialFilters.sortOrder);
+    setRatingFilter(initialFilters.rating); // Update from initialFilters
   }, [initialFilters]);
 
   const handleSave = () => {
     onSave({
       amenities: selectedAmenities,
       sortOrder,
+      rating: ratingFilter, // Include rating in saved filters
     });
     onClose();
   };
@@ -58,6 +63,10 @@ export const FilterModal: React.FC<FilterModalProps> = ({
       ...prev,
       [amenityKey]: !prev[amenityKey],
     }));
+  };
+
+  const handleRatingChange = (rating: number | null) => {
+    setRatingFilter(prevRating => prevRating === rating ? null : rating);
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -76,45 +85,80 @@ export const FilterModal: React.FC<FilterModalProps> = ({
     if (isOpen) {
       document.addEventListener("keydown", handleKeyDown);
       document.addEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "hidden"; // Prevent scrolling when modal is open
     } else {
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = ""; // Re-enable scrolling when modal closes
     }
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = ""; // Ensure scrolling is re-enabled when component unmounts
     };
   }, [isOpen]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <Card ref={modalRef} className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-xl p-6">
+    <div className="fixed inset-0 bg-tripswift-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <Card 
+        ref={modalRef} 
+        className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-tripswift-off-white rounded-xl p-6 shadow-lg"
+      >
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold">Filters</h2>
+          <h2 className="text-sm font-tripswift-bold text-tripswift-black">Filters</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             aria-label="Close modal"
           >
-            <X className="h-6 w-6" />
+            <X className="h-6 w-6 text-tripswift-black" />
           </button>
+        </div>
+
+        {/* Property Rating Section */}
+        <div className="mb-8">
+          <h3 className="text-sm font-tripswift-medium mb-4 text-tripswift-black">Property Rating</h3>
+          <div className="flex flex-wrap gap-3">
+            {[5, 4, 3, 2, 1].map((rating) => (
+              <button
+                key={`rating-${rating}`}
+                onClick={() => handleRatingChange(rating)}
+                className={`px-4 py-2 rounded-lg text-sm font-tripswift-medium transition-colors flex items-center gap-1 ${
+                  ratingFilter === rating
+                    ? "bg-tripswift-blue bg-opacity-10 text-tripswift-blue border border-tripswift-blue hover:bg-opacity-20"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-transparent"
+                }`}
+                aria-pressed={ratingFilter === rating}
+              >
+                <div className="flex">
+                  {Array.from({ length: rating }).map((_, i) => (
+                    <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+                  ))}
+                  {Array.from({ length: 5 - rating }).map((_, i) => (
+                    <Star key={i} className="h-4 w-4 text-gray-300" />
+                  ))}
+                </div>
+                <span className="ml-1">& Up</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Amenities Section */}
         <div className="mb-8">
-          <h3 className="text-lg font-medium mb-4">Amenities</h3>
+          <h3 className="text-sm font-tripswift-medium mb-4 text-tripswift-black">Amenities</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {AMENITIES.map(({ key, label }) => (
               <button
                 key={key}
                 onClick={() => toggleAmenity(key)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-lg text-sm font-tripswift-medium transition-colors ${
                   selectedAmenities[key]
-                    ? "bg-blue-100 text-blue-800 hover:bg-blue-200"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    ? "bg-tripswift-blue bg-opacity-10 text-tripswift-blue border border-tripswift-blue hover:bg-opacity-20"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-transparent"
                 }`}
                 aria-pressed={selectedAmenities[key]}
               >
@@ -126,16 +170,18 @@ export const FilterModal: React.FC<FilterModalProps> = ({
 
         {/* Sort Order Section */}
         <div className="mb-8">
-          <h3 className="text-lg font-medium mb-4">Sort By</h3>
+          <h3 className="text-sm font-tripswift-medium mb-4 text-tripswift-black">Sort By</h3>
           <select
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-tripswift-blue focus:ring-1 focus:ring-tripswift-blue font-tripswift-regular text-tripswift-black"
             aria-label="Sort order"
           >
             <option value="">Recommended</option>
             <option value="rating_desc">Rating: High to Low</option>
             <option value="rating_asc">Rating: Low to High</option>
+            <option value="price_desc">Price: High to Low</option>
+            <option value="price_asc">Price: Low to High</option>
           </select>
         </div>
 
@@ -143,13 +189,13 @@ export const FilterModal: React.FC<FilterModalProps> = ({
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            className="px-6 py-2.5 border border-gray-300 rounded-lg text-tripswift-black font-tripswift-medium hover:bg-gray-50 transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="btn-tripswift-primary px-6 py-2.5 rounded-lg"
           >
             Apply Filters
           </button>

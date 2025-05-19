@@ -77,10 +77,10 @@ export const getPolicyStyling = (policyType: PolicyType): PolicyStyling => {
       };
     case "Moderate":
       return { 
-        color: "blue", 
-        bgColor: "bg-blue-50", 
-        borderColor: "border-blue-200",
-        textColor: "text-blue-800",
+        color: "tripswift-blue", 
+        bgColor: "bg-tripswift-blue/10", 
+        borderColor: "border-tripswift-blue/20",
+        textColor: "text-tripswift-blue",
         icon: FaInfoCircle 
       };
     case "Strict":
@@ -115,7 +115,7 @@ export const getPolicyBulletPoints = (policyType: PolicyType): { text: string, c
     case "Moderate":
       return [
         { text: "Full refund: If cancelled 5+ days before check-in", color: "text-green-600" },
-        { text: "50% refund: If cancelled 1-5 days before check-in", color: "text-yellow-600" },
+        { text: "50% refund: If cancelled 1-5 days before check-in", color: "text-tripswift-blue" },
         { text: "No refund: If cancelled within 24 hours of check-in", color: "text-red-600" }
       ];
     case "Strict":
@@ -127,7 +127,7 @@ export const getPolicyBulletPoints = (policyType: PolicyType): { text: string, c
     case "NonRefundable":
       return [
         { text: "No refund: This booking is non-refundable at any time", color: "text-red-600" },
-        { text: "Non-refundable bookings typically come with a discounted rate", color: "text-gray-600" }
+        { text: "Non-refundable bookings typically come with a discounted rate", color: "text-tripswift-black/60" }
       ];
   }
 };

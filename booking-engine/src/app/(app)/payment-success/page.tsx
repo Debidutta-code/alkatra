@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSelector } from "react-redux";
 import Link from "next/link";
+import { Calendar, CreditCard, User, CheckCircle, Home } from "lucide-react";
 
 export default function PaymentSuccess() {
   const searchParams = useSearchParams();
@@ -19,16 +20,16 @@ export default function PaymentSuccess() {
   const paymentMethod = searchParams.get("method") || "CREDIT_CARD";
   
   // URL params for property/room details
-  const propertyNameParam = searchParams.get("propertyName") || "";
-  const roomTypeParam = searchParams.get("roomType") || "";
-  const roomNameParam = searchParams.get("roomName") || "";
+  // const propertyNameParam = searchParams.get("propertyName") || "";
+  // const roomTypeParam = searchParams.get("roomType") || "";
+  // const roomNameParam = searchParams.get("roomName") || "";
 
   const [booking, setBooking] = useState<any>(null);
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("Failed to complete booking. Please try again.");
   const [isLoading, setIsLoading] = useState(true);
-  const [propertyDetails, setPropertyDetails] = useState<any>(null);
-  const [roomDetails, setRoomDetails] = useState<any>(null);
+  // const [propertyDetails, setPropertyDetails] = useState<any>(null);
+  // const [roomDetails, setRoomDetails] = useState<any>(null);
   const isRequestSent = useRef(false);
   const router = useRouter();
 
@@ -41,9 +42,9 @@ export default function PaymentSuccess() {
     checkOutDate, 
     guestDetails, 
     amount: reduxAmount, 
-    propertyName: reduxPropertyName, 
-    roomType: reduxRoomType,
-    roomName: reduxRoomName 
+    // propertyName: reduxPropertyName, 
+    // roomType: reduxRoomType,
+    // roomName: reduxRoomName 
   } = useSelector((state: any) => state.pmsHotelCard);
 
   // Combine data sources with priority order: Booking API > URL params > Redux > Default
@@ -72,13 +73,13 @@ export default function PaymentSuccess() {
             setBooking(bookingData);
             
             // Fetch property and room details if IDs are available
-            if (bookingData.property) {
-              fetchPropertyDetails(bookingData.property);
-            }
+            // if (bookingData.property) {
+            //   fetchPropertyDetails(bookingData.property);
+            // }
             
-            if (bookingData.room) {
-              fetchRoomDetails(bookingData.room);
-            }
+            // if (bookingData.room) {
+            //   fetchRoomDetails(bookingData.room);
+            // }
             
             toast.success("Booking confirmed!");
           } else {
@@ -120,7 +121,7 @@ export default function PaymentSuccess() {
       // Your existing booking code...
       const token = Cookies.get("accessToken");
       const payload = {
-        // Existing payload
+        // Existing payload structure
         data: {
           type: "hotel-order",
           guests: [
@@ -174,8 +175,8 @@ export default function PaymentSuccess() {
         setBooking(response);
         
         // Fetch property and room details
-        if (property_id) fetchPropertyDetails(property_id);
-        if (room_id) fetchRoomDetails(room_id);
+        // if (property_id) fetchPropertyDetails(property_id);
+        // if (room_id) fetchRoomDetails(room_id);
         
         toast.success("Booking confirmed!");
       } catch (error: any) {
@@ -194,45 +195,6 @@ export default function PaymentSuccess() {
 
     handleBooking();
   }, [amount, firstName, lastName, email, property_id, room_id, checkInDate, checkOutDate, authUser, guestDetails, phone, paymentMethod, reference, router]);
-
-  // New functions to fetch property and room details
-  const fetchPropertyDetails = async (propertyId: string) => {
-    try {
-      const token = Cookies.get("accessToken");
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/property/${propertyId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Property data:", data);
-        setPropertyDetails(data.property || data);
-      }
-    } catch (error) {
-      console.error("Error fetching property details:", error);
-    }
-  };
-
-  const fetchRoomDetails = async (roomId: string) => {
-    try {
-      const token = Cookies.get("accessToken");
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/room/${roomId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Room data:", data);
-        setRoomDetails(data.room || data);
-      }
-    } catch (error) {
-      console.error("Error fetching room details:", error);
-    }
-  };
 
   // Helper functions
   const formatDate = (dateString: string) => {
@@ -271,154 +233,180 @@ export default function PaymentSuccess() {
     return `${firstName || ''} ${lastName || ''}`.trim() || "Guest";
   };
 
-  // Determine property and room display values with fallback hierarchy
-  const getPropertyName = () => {
-    // Priority: API data > URL param > Redux store > Default
-    if (propertyDetails?.property_name) return propertyDetails.property_name;
-    if (booking?.property?.property_name) return booking.property.property_name;
-    if (propertyNameParam) return propertyNameParam;
-    if (reduxPropertyName) return reduxPropertyName;
-    return "Your Selected Property";
+  const getBookingId = () => {
+    return booking?._id || reference || "TRS" + Math.floor(Math.random() * 10000000);
   };
 
-  const getRoomType = () => {
-    // Priority: API data > URL param > Redux store > Default
-    if (roomDetails?.room_type) return roomDetails.room_type;
-    if (booking?.room?.room_type) return booking.room.room_type;
-    if (roomTypeParam) return roomTypeParam;
-    if (reduxRoomType) return reduxRoomType;
-    return "Standard Room";
+  const calculateNights = () => {
+    if (!checkInDate || !checkOutDate) return 1;
+    
+    const checkIn = new Date(booking?.checkInDate || checkInDate);
+    const checkOut = new Date(booking?.checkOutDate || checkOutDate);
+    
+    const diffTime = Math.abs(checkOut.getTime() - checkIn.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays || 1;
   };
 
-  const getRoomName = () => {
-    // Priority: API data > URL param > Redux store > Default
-    if (roomDetails?.room_name) return roomDetails.room_name;
-    if (booking?.room?.room_name) return booking.room.room_name;
-    if (roomNameParam) return roomNameParam;
-    if (reduxRoomName) return reduxRoomName;
-    return "Your Selected Room";
-  };
-
-  // Rest of your render code...
+  // Rest of your render code - significantly improved UI
   return (
-    <main className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 relative overflow-hidden">
-      {/* Background effect */}
-      <div className="absolute w-80 h-80 bg-white opacity-10 rounded-full blur-3xl top-20 left-10 animate-blob"></div>
-      <div className="absolute w-96 h-96 bg-white opacity-10 rounded-full blur-3xl bottom-10 right-10 animate-blob animation-delay-2000"></div>
-      
-      {!isLoading && (booking || error) ? (
-        <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-4xl mx-auto p-4">
-          {!error ? (
-            <div className="bg-white/20 backdrop-blur-lg rounded-lg shadow-lg w-full md:w-2/3 p-8 text-white">
-              {/* Success header */}
-              <div className="flex flex-col items-center mb-8">
-                <div className="bg-green-500/20 p-4 rounded-full">
-                  <svg className="w-16 h-16 text-green-500" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                    <path stroke="white" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" />
-                  </svg>
-                </div>
-                <h1 className="text-2xl md:text-3xl font-bold mt-4 text-center">Thank you for your booking!</h1>
-                <p className="text-lg text-center mt-2">
-                  {getPaymentMethodText() === "Pay at Hotel" ? (
-                    <>Your card details have been securely stored.<br />Payment of <span className="font-semibold">${amount}</span> will be processed at the hotel.</>
-                  ) : (
-                    <>We've received your payment of <span className="font-semibold">${amount}</span></>
-                  )}
-                </p>
-              </div>
-              
-              {/* Booking details */}
-              <div className="border-t border-white/20 pt-6 mt-6">
-                <h2 className="text-xl font-semibold mb-4">Booking Details</h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Guest Name */}
-                  <div className="bg-white/10 p-4 rounded-lg">
-                    <p className="text-gray-300 text-sm">Guest Name</p>
-                    <p className="font-medium text-lg">{getGuestName()}</p>
+    <div className="min-h-screen bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8]">
+      <div className="container mx-auto px-4 pt-10 pb-20 relative z-10">
+        {isLoading ? (
+          <div className="bg-tripswift-off-white rounded-xl shadow-xl p-12 text-center animate-pulse max-w-lg mx-auto mt-16">
+            <div className="w-20 h-20 border-t-4 border-b-4 border-tripswift-blue rounded-full animate-spin mx-auto mb-8"></div>
+            <h2 className="text-xl font-tripswift-medium text-tripswift-black mb-3">Processing your booking...</h2>
+            <p className="text-tripswift-black/60">We're confirming your reservation. This should only take a moment.</p>
+          </div>
+        ) : error ? (
+          <div className="bg-tripswift-off-white rounded-xl shadow-xl p-12 text-center max-w-lg mx-auto mt-16">
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-10 h-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-tripswift-bold text-tripswift-black mb-4">Booking Failed</h2>
+            <p className="text-tripswift-black/70 mb-6">{errorMessage}</p>
+            <Link href="/" className="btn-tripswift-primary py-3 px-8 rounded-lg inline-block transition-all duration-300 hover:shadow-lg">
+              Return to Homepage
+            </Link>
+          </div>
+        ) : (
+          <>
+            {/* Success Card */}
+            <div className="max-w-4xl mx-auto bg-tripswift-off-white rounded-xl shadow-xl overflow-hidden">
+              {/* Top success banner */}
+              <div className="bg-gradient-to-r from-green-500 to-emerald-600 py-10 px-8 text-white">
+                <div className="flex items-center">
+                  <div className="bg-white/20 p-3 rounded-full">
+                    <CheckCircle size={32} />
                   </div>
-                  
-                  {/* Payment Method */}
-                  <div className="bg-white/10 p-4 rounded-lg">
-                    <p className="text-gray-300 text-sm">Payment Method</p>
-                    <p className="font-medium text-lg">{getPaymentMethodText()}</p>
+                  <div className="ml-4">
+                    <h1 className="text-3xl font-tripswift-bold">Booking Confirmed!</h1>
+                    <p className="opacity-90 mt-1">Your reservation has been successfully completed</p>
                   </div>
-                  
-                  {/* Check-in Date */}
-                  <div className="bg-white/10 p-4 rounded-lg">
-                    <p className="text-gray-300 text-sm">Check-in Date</p>
-                    <p className="font-medium text-lg">{formatDate(booking?.checkInDate || checkInDate)}</p>
-                  </div>
-                  
-                  {/* Check-out Date */}
-                  <div className="bg-white/10 p-4 rounded-lg">
-                    <p className="text-gray-300 text-sm">Check-out Date</p>
-                    <p className="font-medium text-lg">{formatDate(booking?.checkOutDate || checkOutDate)}</p>
-                  </div>
-                  
-                  {/* Property Name */}
-                  {/* <div className="bg-white/10 p-4 rounded-lg">
-                    <p className="text-gray-300 text-sm">Property</p>
-                    <p className="font-medium text-lg">{getPropertyName()}</p>
-                  </div> */}
-                  
-                  {/* Room Type */}
-                  {/* <div className="bg-white/10 p-4 rounded-lg">
-                    <p className="text-gray-300 text-sm">Room Type</p>
-                    <p className="font-medium text-lg">{getRoomType()}</p>
-                  </div> */}
-                  
-                  {/* Room Name */}
-                  {/* <div className="bg-white/10 p-4 rounded-lg col-span-2">
-                    <p className="text-gray-300 text-sm">Room Name</p>
-                    <p className="font-medium text-lg">{getRoomName()}</p>
-                  </div> */}
                 </div>
               </div>
+
+              {/* Booking Details */}
+              <div className="p-8">
+                {/* Summary Section */}
+                <div className="flex flex-col md:flex-row gap-6 border-b border-gray-200 pb-8">
+                  <div className="flex-1">
+                    <h2 className="text-xl font-tripswift-bold text-tripswift-black mb-4">Booking Summary</h2>
+                    <div className="space-y-3">
+                      <div className="flex items-center">
+                        <Calendar className="text-tripswift-blue mr-3 flex-shrink-0" size={20} />
+                        <div>
+                          <p className="text-sm text-tripswift-black/60">Check-in</p>
+                          <p className="font-tripswift-medium">{formatDate(booking?.checkInDate || checkInDate)}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <Calendar className="text-tripswift-blue mr-3 flex-shrink-0" size={20} />
+                        <div>
+                          <p className="text-sm text-tripswift-black/60">Check-out</p>
+                          <p className="font-tripswift-medium">{formatDate(booking?.checkOutDate || checkOutDate)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex-1">
+                    <h2 className="text-xl font-tripswift-bold text-tripswift-black mb-4">Guest Information</h2>
+                    <div className="space-y-3">
+                      <div className="flex items-center">
+                        <User className="text-tripswift-blue mr-3 flex-shrink-0" size={20} />
+                        <div>
+                          <p className="text-sm text-tripswift-black/60">Guest Name</p>
+                          <p className="font-tripswift-medium">{getGuestName()}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <CreditCard className="text-tripswift-blue mr-3 flex-shrink-0" size={20} />
+                        <div>
+                          <p className="text-sm text-tripswift-black/60">Payment Method</p>
+                          <p className="font-tripswift-medium">{getPaymentMethodText()}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Price Details Section */}
+                <div className="py-6 border-b border-gray-200">
+                  <h2 className="text-xl font-tripswift-bold text-tripswift-black mb-4">Payment Details</h2>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="flex justify-between mb-2">
+                      <span className="text-tripswift-black/70">Room Charge</span>
+                      <span className="font-tripswift-medium">₹{(amount)}</span>
+                    </div>
+                    <div className="border-t border-gray-200 my-2 pt-2"></div>
+                    <div className="flex justify-between">
+                      <span className="font-tripswift-bold text-lg text-tripswift-black">Total</span>
+                      <span className="font-tripswift-bold text-lg text-tripswift-blue">₹{amount}</span>
+                    </div>
+                    <div className="text-xs text-tripswift-black/50 text-right mt-1">
+                      {getPaymentMethodText() === "Pay at Hotel" ? 
+                        "Payment will be collected at the hotel" : 
+                        "Payment has been processed"
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="pt-6 flex flex-col sm:flex-row gap-4">
+                  <Link href="/my-trip" className="btn-tripswift-primary py-3 px-6 rounded-lg flex-1 flex items-center justify-center gap-2 text-center font-tripswift-medium transition-all duration-300 hover:shadow-md">
+                    <CheckCircle size={18} />
+                    <span>View My Bookings</span>
+                  </Link>
+                  <Link href="/" className="bg-gray-100 text-tripswift-black py-3 px-6 rounded-lg flex-1 flex items-center justify-center gap-2 text-center font-tripswift-medium transition-colors duration-300 hover:bg-gray-200">
+                    <Home size={18} />
+                    <span>Return Home</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Additional Info Cards */}
+            <div className="max-w-4xl mx-auto mt-8 grid md:grid-cols-2 gap-6">
+              <div className="bg-tripswift-off-white rounded-xl shadow-md p-6">
+                <h3 className="text-lg font-tripswift-bold text-tripswift-black mb-3">What's Next?</h3>
+                <ul className="space-y-2 text-tripswift-black/70">
+                  <li className="flex items-start">
+                    <span className="inline-block bg-green-100 rounded-full p-1 mr-2 mt-0.5">
+                      <CheckCircle size={14} className="text-green-600" />
+                    </span>
+                    A confirmation email has been sent to your inbox
+                  </li>
+                  <li className="flex items-start">
+                    <span className="inline-block bg-green-100 rounded-full p-1 mr-2 mt-0.5">
+                      <CheckCircle size={14} className="text-green-600" />
+                    </span>
+                    You can view booking details in your account anytime
+                  </li>
+                  <li className="flex items-start">
+                    <span className="inline-block bg-green-100 rounded-full p-1 mr-2 mt-0.5">
+                      <CheckCircle size={14} className="text-green-600" />
+                    </span>
+                    Need to make changes? Contact us 24/7 for support
+                  </li>
+                </ul>
+              </div>
               
-              {/* Actions */}
-              <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8">
-                <Link href="/my-trip" className="bg-white text-purple-900 py-3 px-6 rounded-md font-semibold text-center hover:bg-gray-100 transition-colors duration-300">
-                  View My Bookings
-                </Link>
-                <Link href="/" className="bg-transparent border border-white text-white py-3 px-6 rounded-md font-semibold text-center hover:bg-white/10 transition-colors duration-300">
-                  Return to Home
-                </Link>
+              <div className="bg-tripswift-off-white rounded-xl shadow-md p-6">
+                <h3 className="text-lg font-tripswift-bold text-tripswift-black mb-3">Need Help?</h3>
+                <p className="text-tripswift-black/70 mb-4">Our customer service team is available 24/7 to assist you with any questions.</p>
+                <button className="btn-tripswift-primary py-2 px-4 rounded-lg w-full flex items-center justify-center gap-2 text-center font-tripswift-medium transition-all duration-300">
+                  Contact Support
+                </button>
               </div>
             </div>
-          ) : (
-            <div className="bg-white/20 backdrop-blur-lg p-8 rounded-lg shadow-lg w-11/12 sm:w-2/3 md:w-1/3 mx-auto text-center">
-              <div className="bg-red-500/20 p-4 rounded-full mx-auto w-fit">
-                <svg className="w-14 h-14 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 6l12 12M6 18L18 6" />
-                </svg>
-              </div>
-              <p className="text-xl text-white mt-6 font-medium">{errorMessage}</p>
-              <p className="text-sm text-gray-300 mt-3">Redirecting to home page...</p>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="bg-white/20 backdrop-blur-lg p-8 rounded-lg shadow-lg w-11/12 sm:w-2/3 md:w-1/3 mx-auto text-center">
-          <div className="w-16 h-16 border-t-4 border-b-4 border-white rounded-full animate-spin mx-auto mb-6"></div>
-          <p className="text-xl text-white font-medium">Processing your booking...</p>
-          <p className="text-sm text-gray-300 mt-3">This may take a few moments.</p>
-        </div>
-      )}
-      
-      {/* Animation styles */}
-      <style jsx global>{`
-        @keyframes blob {
-          0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-          100% { transform: translate(0px, 0px) scale(1); }
-        }
-        .animate-blob { animation: blob 7s infinite; }
-        .animation-delay-2000 { animation-delay: 2s; }
-      `}</style>
-    </main>
+          </>
+        )}
+      </div>
+    </div>
   );
 }

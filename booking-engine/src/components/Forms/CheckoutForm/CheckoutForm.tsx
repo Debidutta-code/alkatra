@@ -7,7 +7,6 @@ import Details from "@/components/Forms/CheckoutForm/Details";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@radix-ui/react-separator";
 import Extras from "./Extras";
-// import FlightItinerary from "@/components/FlightItinerary/FlightItinerary";
 import { useFlightOffersStore } from "@/components/context/flight-offers-provider";
 import format from "date-fns/format";
 import { useRouter } from "next/navigation";
@@ -76,29 +75,29 @@ export default function CheckoutForm() {
   }
 
   return (
-    <div className="w-full mx-auto p-6">
+    <div className="w-full mx-auto p-6 bg-tripswift-off-white">
       <div className="mb-8">
         <div className="flex justify-between mb-2">
           {steps.map((step) => (
             <div key={step.id} className="flex flex-col items-center">
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-tripswift-medium ${
                   step.id === currentStep
-                    ? "bg-blue-600 text-white"
+                    ? "bg-tripswift-blue text-tripswift-off-white"
                     : step.id < currentStep
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-600"
+                    ? "bg-tripswift-blue text-tripswift-off-white"
+                    : "bg-tripswift-black/10 text-tripswift-black/60"
                 }`}
               >
                 {step.id}
               </div>
-              <span className="text-xs mt-1">{step.title}</span>
+              <span className="text-xs mt-1 font-tripswift-medium">{step.title}</span>
             </div>
           ))}
         </div>
-        <div className="h-1 bg-gray-200">
+        <div className="h-1 bg-tripswift-black/10">
           <div
-            className="h-1 bg-blue-600 transition-all duration-300 ease-in-out"
+            className="h-1 bg-tripswift-blue transition-all duration-300 ease-in-out"
             style={{
               width: `${((currentStep - 1) / (steps.length - 1)) * 100}%`,
             }}
@@ -107,7 +106,7 @@ export default function CheckoutForm() {
       </div>
 
       <div className="mb-4">
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-tripswift-black/70 font-tripswift-regular">
           Round trip · 1 traveller ·{" "}
           {format(
             new Date(
@@ -125,7 +124,7 @@ export default function CheckoutForm() {
             "dd MMM"
           )}
         </p>
-        <h1 className="text-2xl font-bold">
+        <h1 className="text-2xl font-tripswift-bold text-tripswift-blue">
           {
             selectedFlight?.itineraries.at(0)?.segments?.at(0)?.departure
               ?.iataCode
@@ -138,7 +137,7 @@ export default function CheckoutForm() {
         </h1>
       </div>
 
-      <div className="w-full flex flex-col gap-4 md:flex-row  justify-between">
+      <div className="w-full flex flex-col gap-4 md:flex-row justify-between">
         <div className="w-full md:w-[60%]">
           {steps[currentStep - 1].title === "Your details" && (
             <Details form={form} setForm={setForm} />
@@ -151,26 +150,26 @@ export default function CheckoutForm() {
           )} */}
         </div>
         <div className="">
-          <Card>
+          <Card className="border border-tripswift-black/10 shadow-sm bg-tripswift-off-white">
             <CardContent className="p-6">
-              <h3 className="font-semibold mb-4">
+              <h3 className="font-tripswift-bold text-tripswift-black mb-4">
                 Ticket {selectedFlight.travelerPricings.length} traveller
               </h3>
               <div className="space-y-2">
-                <div className="flex justify-between">
+                <div className="flex justify-between font-tripswift-regular text-tripswift-black/80">
                   <span>Flight fare</span>
-                  <span>
+                  <span className="font-tripswift-medium">
                     {selectedFlight.price.currency +
                       " " +
                       selectedFlight.price.total}
                   </span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between font-tripswift-regular text-tripswift-black/80">
                   <span>Taxes and charges</span>
-                  <span>{selectedFlight.price.currency} 00.00</span>
+                  <span className="font-tripswift-medium">{selectedFlight.price.currency} 00.00</span>
                 </div>
-                <Separator />
-                <div className="flex justify-between font-semibold text-lg">
+                <div className="border-t border-tripswift-black/10 my-2 pt-2"></div>
+                <div className="flex justify-between font-tripswift-bold text-lg text-tripswift-blue">
                   <span>Total</span>
                   <span>
                     {selectedFlight.price.currency +
@@ -178,16 +177,16 @@ export default function CheckoutForm() {
                       selectedFlight.price.total}
                   </span>
                 </div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-tripswift-black/60 font-tripswift-regular">
                   Includes taxes and charges
                 </p>
               </div>
             </CardContent>
           </Card>
-          <Card className="mt-4">
+          <Card className="mt-4 border border-tripswift-black/10 shadow-sm bg-tripswift-off-white">
             <CardContent className="p-6">
-              <h3 className="font-semibold mb-2">Give feedback</h3>
-              <p className="text-sm text-gray-500">
+              <h3 className="font-tripswift-bold text-tripswift-black mb-2">Give feedback</h3>
+              <p className="text-sm text-tripswift-black/60 font-tripswift-regular">
                 Tell us how we&apos;re doing and what could be better
               </p>
             </CardContent>
@@ -197,12 +196,13 @@ export default function CheckoutForm() {
 
       <div className="flex justify-between mt-6">
         <Button
-          variant="outline"
+          className="btn-tripswift-secondary transition-colors duration-300"
           onClick={handleBack}
         >
           <ArrowLeft className="mr-2 h-4 w-4" /> Back
         </Button>
         <Button
+          className="btn-tripswift-primary transition-colors duration-300 hover:bg-[#054B8F]"
           onClick={() =>
             steps[currentStep - 1].title === "Check and pay"
               ? document.dispatchEvent(new Event("PAY"))
@@ -220,10 +220,13 @@ export default function CheckoutForm() {
       </div>
 
       <div className="mt-6 text-center">
-        <Button variant="link" className="text-gray-600">
+        <Button 
+          variant="link" 
+          className="text-tripswift-blue hover:text-[#054B8F] font-tripswift-medium transition-colors duration-300"
+        >
           Give feedback
         </Button>
-        <p className="text-xs text-gray-600">
+        <p className="text-xs text-tripswift-black/60 font-tripswift-regular">
           Tell us how we&apos;re doing and what could be better
         </p>
       </div>

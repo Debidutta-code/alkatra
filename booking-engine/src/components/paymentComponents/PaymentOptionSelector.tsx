@@ -1,4 +1,3 @@
-// components/paymentComponents/PaymentOptionSelector.tsx
 "use client";
 
 import React from 'react';
@@ -14,12 +13,12 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
 }) => {
   return (
     <div className="payment-options">
-      <h3 className="text-lg font-semibold mb-3 text-white">Payment Options</h3>
+      <h3 className="text-lg font-tripswift-medium mb-3 text-tripswift-black">Payment Options</h3>
       <div className="flex flex-col sm:flex-row gap-4">
         <label className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all ${
           selectedOption === 'payNow' 
-            ? 'border-blue-400 bg-blue-500/30 text-white' 
-            : 'border-white/30 hover:bg-white/5 text-white/80'
+            ? 'border-tripswift-blue bg-tripswift-blue/10 text-tripswift-black' 
+            : 'border-gray-200 hover:bg-gray-50 text-tripswift-black/70'
         }`}>
           <input
             type="radio"
@@ -27,18 +26,18 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
             value="payNow"
             checked={selectedOption === 'payNow'}
             onChange={() => onChange('payNow')}
-            className="mr-3"
+            className="mr-3 text-tripswift-blue"
           />
           <div className="flex flex-col">
-            <span className="font-medium">Pay Now</span>
-            <span className="text-sm opacity-80">Complete payment immediately</span>
+            <span className="font-tripswift-medium text-tripswift-black">Pay Now</span>
+            <span className="text-sm text-tripswift-black/70">Complete payment immediately</span>
           </div>
         </label>
 
         <label className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all ${
           selectedOption === 'payAtHotel' 
-            ? 'border-blue-400 bg-blue-500/30 text-white' 
-            : 'border-white/30 hover:bg-white/5 text-white/80'
+            ? 'border-tripswift-blue bg-tripswift-blue/10 text-tripswift-black' 
+            : 'border-gray-200 hover:bg-gray-50 text-tripswift-black/70'
         }`}>
           <input
             type="radio"
@@ -46,11 +45,11 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
             value="payAtHotel"
             checked={selectedOption === 'payAtHotel'}
             onChange={() => onChange('payAtHotel')}
-            className="mr-3"
+            className="mr-3 text-tripswift-blue"
           />
           <div className="flex flex-col">
-            <span className="font-medium">Pay at Hotel</span>
-            <span className="text-sm opacity-80">Securely save card for hotel payment</span>
+            <span className="font-tripswift-medium text-tripswift-black">Pay at Hotel</span>
+            <span className="text-sm text-tripswift-black/70">Securely save card for hotel payment</span>
           </div>
         </label>
       </div>
