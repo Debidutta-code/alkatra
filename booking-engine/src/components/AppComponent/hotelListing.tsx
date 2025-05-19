@@ -126,6 +126,13 @@ const HotelListing: React.FC = () => {
     setError(null);
     setErrorToastShown(false);
 
+    const destination = searchParams.get("destination");
+    const location = searchParams.get("location");
+    const checkinDate = searchParams.get("checkin");
+    const checkoutDate = searchParams.get("checkout");
+
+    console.log("Search Params:", { destination, location, checkinDate, checkoutDate });
+
     try {
       const hotelsResponse = await getHotelsByCity(searchTerm);
       setHotelData(hotelsResponse);
@@ -319,7 +326,10 @@ const HotelListing: React.FC = () => {
               <MapPin className="h-5 w-5 mr-2 text-tripswift-blue" />
               <h1 className="text-xl font-tripswift-bold text-tripswift-black">
                 {t("HotelListing.hotelsIn", {
-                  location: params.location || params.destination || t("HotelListing.yourDestination", { defaultValue: "your destination" }),
+                  location:
+                    params.location ||
+                    params.destination ||
+                    t("HotelListing.yourDestination", { defaultValue: "your destination" }),
                 })}
               </h1>
             </div>
@@ -414,33 +424,30 @@ const HotelListing: React.FC = () => {
               <div className="space-y-2">
                 <button
                   onClick={() => toggleAmenityFilter("free_wifi")}
-                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${
-                    filters.amenities["free_wifi"]
-                      ? "bg-tripswift-blue/10 text-tripswift-blue"
-                      : "hover:bg-gray-50 text-tripswift-black/70"
-                  }`}
+                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${filters.amenities["free_wifi"]
+                    ? "bg-tripswift-blue/10 text-tripswift-blue"
+                    : "hover:bg-gray-50 text-tripswift-black/70"
+                    }`}
                 >
                   <span>{t("HotelListing.freeWifi", { defaultValue: "Free WiFi" })}</span>
                   {filters.amenities["free_wifi"] && <Check className="h-4 w-4" />}
                 </button>
                 <button
                   onClick={() => toggleAmenityFilter("parking")}
-                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${
-                    filters.amenities["parking"]
-                      ? "bg-tripswift-blue/10 text-tripswift-blue"
-                      : "hover:bg-gray-50 text-tripswift-black/70"
-                  }`}
+                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${filters.amenities["parking"]
+                    ? "bg-tripswift-blue/10 text-tripswift-blue"
+                    : "hover:bg-gray-50 text-tripswift-black/70"
+                    }`}
                 >
                   <span>{t("HotelListing.parking", { defaultValue: "Parking" })}</span>
                   {filters.amenities["parking"] && <Check className="h-4 w-4" />}
                 </button>
                 <button
                   onClick={() => toggleAmenityFilter("breakfast")}
-                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${
-                    filters.amenities["breakfast"]
-                      ? "bg-tripswift-blue/10 text-tripswift-blue"
-                      : "hover:bg-gray-50 text-tripswift-black/70"
-                  }`}
+                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${filters.amenities["breakfast"]
+                    ? "bg-tripswift-blue/10 text-tripswift-blue"
+                    : "hover:bg-gray-50 text-tripswift-black/70"
+                    }`}
                 >
                   <span>{t("HotelListing.breakfast", { defaultValue: "Breakfast" })}</span>
                   {filters.amenities["breakfast"] && <Check className="h-4 w-4" />}
