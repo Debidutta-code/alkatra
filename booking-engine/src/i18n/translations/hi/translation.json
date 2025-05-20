@@ -33,6 +33,27 @@
       "ariaSearchHotels": "होटल खोजें",
       "ariaSearching": "खोज रहा है..."
     },
+    "HotelCardItem": {
+      "noImage": "कोई छवि नहीं",
+      "descriptionFallback": "इस अद्भुत संपत्ति में आरामदायक प्रवास का अनुभव करें।",
+      "contactLabel": "संपर्क करें",
+      "viewRoomButton": "कमरा देखें",
+      "amenitiesList": {
+        "wifi": "मुफ्त वाईफाई",
+        "swimming_pool": "स्विमिंग पूल",
+        "fitness_center": "फिटनेस सेंटर",
+        "spa_and_wellness": "स्पा और वेलनेस",
+        "restaurant": "रेस्तरां",
+        "room_service": "रूम सर्विस",
+        "bar_and_lounge": "बार और लाउंज",
+        "parking": "पार्किंग",
+        "concierge_services": "कंसीयज सेवाएँ",
+        "pet_friendly": "पेट फ्रेंडली",
+        "business_facilities": "व्यावसायिक सुविधाएँ",
+        "laundry_services": "लॉन्ड्री सेवाएँ",
+        "child_friendly_facilities": "बच्चों के अनुकूल सुविधाएँ"
+      }
+    },
     "heroTitle": "अपना सही ठहराव खोजें",
     "heroSubtitle": "सबसे अच्छी कीमतों पर आवास बुक करें",
     "hotelsIn": "में होटल",

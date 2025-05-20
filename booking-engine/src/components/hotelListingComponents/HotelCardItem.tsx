@@ -30,7 +30,7 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
     checkinDate,
     checkoutDate
 }) => {
-    
+
     // Translation hook
     const { t } = useTranslation();
 
@@ -68,22 +68,6 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
         }
     };
 
-    const amenities = {
-        wifi: t('HotelBox.FilterModal.amenitiesList.wifi'),
-        swimming_pool: t('HotelBox.FilterModal.amenitiesList.swimming_pool'),
-        fitness_center: t('HotelBox.FilterModal.amenitiesList.fitness_center'),
-        spa_and_wellness: t('HotelBox.FilterModal.amenitiesList.spa_and_wellness'),
-        restaurant: t('HotelBox.FilterModal.amenitiesList.restaurant'),
-        room_service: t('HotelBox.FilterModal.amenitiesList.room_service'),
-        bar_and_lounge: t('HotelBox.FilterModal.amenitiesList.bar_and_lounge'),
-        parking: t('HotelBox.FilterModal.amenitiesList.parking'),
-        concierge_services: t('HotelBox.FilterModal.amenitiesList.concierge_services'),
-        pet_friendly: t('HotelBox.FilterModal.amenitiesList.pet_friendly'),
-        business_facilities: t('HotelBox.FilterModal.amenitiesList.business_facilities'),
-        laundry_services: t('HotelBox.FilterModal.amenitiesList.laundry_services'),
-        child_friendly_facilities: t('HotelBox.FilterModal.amenitiesList.child_friendly_facilities')
-    };
-
     // Format star rating
     const formatRating = (rating: string) => {
         const numRating = parseFloat(rating);
@@ -117,7 +101,7 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
                         />
                     ) : (
                         <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-gray-400 font-tripswift-regular">No image</span>
+                            <span className="text-gray-400 font-tripswift-regular">{t('HotelListing.HotelCardItem.noImage')}</span>
                         </div>
                     )}
 
@@ -149,7 +133,7 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
 
                         {/* Description */}
                         <p className="text-sm text-tripswift-black/70 mb-3 line-clamp-2 font-tripswift-regular">
-                            {hotel.description || "Experience a comfortable stay at this wonderful property."}
+                            {hotel.description || t('HotelListing.HotelCardItem.descriptionFallback')}
                         </p>
 
                         {/* Amenities */}
@@ -160,7 +144,7 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
                                 .map(([amenity]) => (
                                     <div key={amenity} className="flex items-center text-xs font-tripswift-medium text-tripswift-blue bg-tripswift-blue/5 border border-tripswift-blue/20 px-2 py-1 rounded-md">
                                         {getAmenityIcon(amenity)}
-                                        <span className="capitalize ml-1">{amenities[amenity as keyof typeof amenities]}</span>
+                                        <span className="capitalize ml-1">{t(`HotelListing.HotelCardItem.amenitiesList.${amenity}`)}</span>
                                     </div>
                                 ))}
                         </div>
@@ -177,16 +161,16 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
                     {/* Contact and button */}
                     <div className="flex items-end justify-between mt-2 pt-3 border-t border-gray-100">
                         <div>
-                            <div className="text-xs text-tripswift-black/50">Contact</div>
+                            <div className="text-xs text-tripswift-black/50">{t('HotelListing.HotelCardItem.contactLabel')}</div>
                             <div className="text-sm text-tripswift-black/80 font-tripswift-medium">{hotel.property_contact}</div>
                         </div>
 
                         <button
                             onClick={() => onViewRoom(hotel._id)}
                             className="btn-tripswift-primary px-6 py-2 rounded-md text-sm transition-all duration-300 hover:shadow-md"
-                            aria-label={`View rooms at ${hotel.property_name}`}
+                            aria-label={t('HotelListing.HotelCardItem.viewRoomButton')}
                         >
-                            View Room
+                            {t('HotelListing.HotelCardItem.viewRoomButton')}
                         </button>
                     </div>
                 </div>

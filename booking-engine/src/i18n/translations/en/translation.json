@@ -33,6 +33,27 @@
       "ariaSearchHotels": "Search hotels",
       "ariaSearching": "Searching..."
     },
+    "HotelCardItem": {
+      "noImage": "No image",
+      "descriptionFallback": "Experience a comfortable stay at this wonderful property.",
+      "contactLabel": "Contact",
+      "viewRoomButton": "View Room",
+      "amenitiesList": {
+        "wifi": "Free Wifi",
+        "swimming_pool": "Swimming Pool",
+        "fitness_center": "Fitness Center",
+        "spa_and_wellness": "Spa and Wellness",
+        "restaurant": "Restaurant",
+        "room_service": "Room Service",
+        "bar_and_lounge": "Bar and Lounge",
+        "parking": "Parking",
+        "concierge_services": "Concierge Services",
+        "pet_friendly": "Pet Friendly",
+        "business_facilities": "Business Facilities",
+        "laundry_services": "Laundry Services",
+        "child_friendly_facilities": "Child Friendly Facilities"
+      }
+    },
     "heroTitle": "Find Your Perfect Stay",
     "heroSubtitle": "Book accommodations at the best prices",
     "hotelsIn": "Hotels in",

@@ -33,6 +33,27 @@
       "ariaSearchHotels": "البحث عن فنادق",
       "ariaSearching": "جارٍ البحث..."
     },
+    "HotelCardItem": {
+      "noImage": "لا توجد صورة",
+      "descriptionFallback": "استمتع بإقامة مريحة في هذا الفندق الرائع.",
+      "contactLabel": "اتصال",
+      "viewRoomButton": "عرض الغرفة",
+      "amenitiesList": {
+        "wifi": "واي فاي مجاني",
+        "swimming_pool": "حمام سباحة",
+        "fitness_center": "مركز لياقة بدنية",
+        "spa_and_wellness": "سبا وصحة",
+        "restaurant": "مطعم",
+        "room_service": "خدمة الغرف",
+        "bar_and_lounge": "بار وصالة",
+        "parking": "موقف سيارات",
+        "concierge_services": "خدمات الكونسيرج",
+        "pet_friendly": "صديق للحيوانات الأليفة",
+        "business_facilities": "مرافق الأعمال",
+        "laundry_services": "خدمات الغسيل",
+        "child_friendly_facilities": "مرافق صديقة للأطفال"
+      }
+    },
     "heroTitle": "ابحث عن إقامتك المثالية",
     "heroSubtitle": "احجز أماكن إقامة بأفضل الأسعار",
     "hotelsIn": "فنادق في",
