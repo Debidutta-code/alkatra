@@ -23,7 +23,10 @@ import {
   MapIcon,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useSelector } from '@/Redux/store';
+import { formatDate, calculateNights } from "@/utils/dateUtils";
 import { useTranslation } from "react-i18next";
+
 
 import CompactSearchBar from "@/components/HotelBox/CompactSearchBar";
 import HotelCardItem from "@/components/hotelListingComponents/HotelCardItem";
@@ -72,13 +75,14 @@ const HotelListing: React.FC = () => {
   const [filters, setFilters] = useState<FilterState>({
     amenities: {},
     sortOrder: "",
-    rating: null,
+    rating: null
   });
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [ratingFilter, setRatingFilter] = useState<number | null>(null);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<"list" | "map">("list");
+  // const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const { guestDetails } = useSelector((state) => state.hotel);
 
   const destination = searchParams.get("destination");
   const location = searchParams.get("location");
@@ -113,6 +117,10 @@ const HotelListing: React.FC = () => {
     };
   }, [params]);
 
+  const handleGuestChange = (guestData: any) => {
+    // If you need to handle guest details changes from the search bar
+    console.log("Guest details updated:", guestData);
+  };
   // Fetch hotels data
   const fetchHotels = async (searchTerm: string) => {
     setIsLoading(true);
@@ -139,13 +147,12 @@ const HotelListing: React.FC = () => {
     }
   };
 
-  // Handle new search from the search bar
-  const handleSearch = (newLocation: string, checkin: string, checkout: string) => {
-    router.push(
-      `/destination?location=${encodeURIComponent(newLocation)}&checkin=${encodeURIComponent(
-        checkin
-      )}&checkout=${encodeURIComponent(checkout)}`
-    );
+  const handleSearch = (newLocation: string, checkin: string, checkout: string, guestData?: any) => {
+    const guestToUse = guestData || guestDetails;
+    const guestParams = guestToUse ?
+      `&rooms=${guestToUse.rooms || 1}&adults=${guestToUse.guests || 1}&children=${guestToUse.children || 0}` :
+      '';
+    router.push(`/destination?location=${encodeURIComponent(newLocation)}&checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(checkout)}${guestParams}`);
   };
 
   // Function to handle filters
@@ -176,8 +183,19 @@ const HotelListing: React.FC = () => {
       dispatch(setCheckOutDate(checkoutDate));
       localStorage.setItem("checkout_date", checkoutDate);
     }
-    window.location.href = `/hotel?id=${hotelId}&checkin=${checkinDate}&checkout=${checkoutDate}`;
-  };
+
+    // Store guest details in localStorage for consistency
+    if (guestDetails && Object.keys(guestDetails).length > 0) {
+      localStorage.setItem('guest_details', JSON.stringify(guestDetails));
+    }
+
+    // Pass guest details in the URL
+    const guestParams = guestDetails ?
+      `&rooms=${guestDetails.rooms || 1}&adults=${guestDetails.guests || 1}&children=${guestDetails.children || 0}` :
+      '';
+
+    window.location.href = `/hotel?id=${hotelId}&checkin=${checkinDate}&checkout=${checkoutDate}${guestParams}`;
+  }
 
   // Apply filters to hotel data
   const applyFilters = (hotels: Hotel[]): Hotel[] => {
@@ -239,31 +257,6 @@ const HotelListing: React.FC = () => {
     setRatingFilter(null);
   };
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "";
-
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString(i18n.language, {
-        month: "short",
-        day: "numeric",
-      });
-    } catch (e) {
-      return dateString;
-    }
-  };
-
-  const calculateNights = () => {
-    if (!checkinDate || !checkoutDate) return 0;
-
-    const checkIn = new Date(checkinDate);
-    const checkOut = new Date(checkoutDate);
-
-    if (isNaN(checkIn.getTime()) || isNaN(checkOut.getTime())) return 0;
-
-    const diffTime = checkOut.getTime() - checkIn.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  };
 
   const filteredHotels = applyFilters(hotelData.data);
 
@@ -295,11 +288,13 @@ const HotelListing: React.FC = () => {
               initialCheckin={checkinDate || ""}
               initialCheckout={checkoutDate || ""}
               onSearch={handleSearch}
+              onGuestChange={handleGuestChange}
             />
           </div>
         </div>
       </div>
 
+      {/* Main content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
@@ -316,13 +311,17 @@ const HotelListing: React.FC = () => {
               <div className="flex items-center mr-4">
                 <Calendar className="h-4 w-4 mr-1 text-tripswift-blue" />
                 {checkinDate && checkoutDate ? (
-                  <span>
-                    {formatDate(checkinDate)} - {formatDate(checkoutDate)}
-                  </span>
+                  <span>{formatDate(checkinDate, { month: "short", day: "numeric" })} - {formatDate(checkoutDate, { month: "short", day: "numeric" })}</span>
                 ) : (
                   <span>{t("HotelListing.selectDates", { defaultValue: "Select dates" })}</span>
                 )}
               </div>
+              <span className="mr-4 text-tripswift-black/40">•</span>
+              {checkinDate && checkoutDate ? (
+                <span>{calculateNights(checkinDate, checkoutDate)} nights</span>
+              ) : (
+                <span>Select dates</span>
+              )}
               <span className="mx-4 text-tripswift-black/40">•</span>
               <span>
                 {filteredHotels.length} {t("HotelListing.propertiesFound", { defaultValue: "properties found" })}
@@ -346,6 +345,7 @@ const HotelListing: React.FC = () => {
           </button>
         </div>
 
+        {/* Active filters display */}
         <ActiveFilters
           amenities={filters.amenities}
           sortOrder={filters.sortOrder}
@@ -401,30 +401,30 @@ const HotelListing: React.FC = () => {
               </h3>
               <div className="space-y-2">
                 <button
-                  onClick={() => toggleAmenityFilter("free_wifi")}
-                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${filters.amenities["free_wifi"]
-                    ? "bg-tripswift-blue/10 text-tripswift-blue"
-                    : "hover:bg-gray-50 text-tripswift-black/70"
+                  onClick={() => toggleAmenityFilter('free_wifi')}
+                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${filters.amenities['free_wifi']
+                    ? 'bg-tripswift-blue/10 text-tripswift-blue'
+                    : 'hover:bg-gray-50 text-tripswift-black/70'
                     }`}
                 >
                   <span>{t("HotelListing.freeWifi", { defaultValue: "Free WiFi" })}</span>
                   {filters.amenities["free_wifi"] && <Check className="h-4 w-4" />}
                 </button>
                 <button
-                  onClick={() => toggleAmenityFilter("parking")}
-                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${filters.amenities["parking"]
-                    ? "bg-tripswift-blue/10 text-tripswift-blue"
-                    : "hover:bg-gray-50 text-tripswift-black/70"
+                  onClick={() => toggleAmenityFilter('parking')}
+                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${filters.amenities['parking']
+                    ? 'bg-tripswift-blue/10 text-tripswift-blue'
+                    : 'hover:bg-gray-50 text-tripswift-black/70'
                     }`}
                 >
                   <span>{t("HotelListing.parking", { defaultValue: "Parking" })}</span>
                   {filters.amenities["parking"] && <Check className="h-4 w-4" />}
                 </button>
                 <button
-                  onClick={() => toggleAmenityFilter("breakfast")}
-                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${filters.amenities["breakfast"]
-                    ? "bg-tripswift-blue/10 text-tripswift-blue"
-                    : "hover:bg-gray-50 text-tripswift-black/70"
+                  onClick={() => toggleAmenityFilter('breakfast')}
+                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${filters.amenities['breakfast']
+                    ? 'bg-tripswift-blue/10 text-tripswift-blue'
+                    : 'hover:bg-gray-50 text-tripswift-black/70'
                     }`}
                 >
                   <span>{t("HotelListing.breakfast", { defaultValue: "Breakfast" })}</span>
@@ -434,6 +434,7 @@ const HotelListing: React.FC = () => {
             </div>
           </div>
 
+          {/* Mobile sidebar */}
           <MobileFilterDrawer
             isOpen={mobileFiltersOpen}
             onClose={() => setMobileFiltersOpen(false)}

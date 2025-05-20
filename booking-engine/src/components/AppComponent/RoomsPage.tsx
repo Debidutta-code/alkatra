@@ -5,16 +5,19 @@ import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import { RoomCard } from "@/components/AppComponent/RoomCard";
 import GuestInformationModal from "@/components/bookingComponents/GuestInformationModal";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "@/Redux/store";
 import { setAmount, setRoomId } from "@/Redux/slices/pmsHotelCard.slice";
+import { setGuestDetails } from "@/Redux/slices/hotelcard.slice"; // Added correct import
 import {
   Calendar, Search, Bed, ChevronRight, ChevronLeft, ChevronDown,
   MapPin, Star, Coffee, Wifi, Car, Waves, Droplets, Briefcase, Utensils, BellRing, CheckCircle,
-  Bath, Dog, ImageIcon
+  Bath, Dog, ImageIcon, Users
 } from "lucide-react";
 import LoadingSkeleton from "../hotelListingComponents/LoadingSkeleton";
+import { formatDate, calculateNights } from "@/utils/dateUtils";
+
 import { useTranslation } from "react-i18next"; // Import useTranslation
-import i18next from "i18next";
+import i18next, { t } from "i18next";
 
 interface Room {
   _id: string;
@@ -112,9 +115,29 @@ const RoomsPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showPropertyDetails, setShowPropertyDetails] = useState(true);
   const [selectedImage, setSelectedImage] = useState<number>(0);
-
+  
+  // Get guest details from Redux
+  const { guestDetails } = useSelector((state) => state.hotel);
+  
   const dispatch = useDispatch();
-  const { t } = useTranslation(); // Initialize useTranslation
+  
+  // Initialize Redux with URL parameters
+  useEffect(() => {
+    // Get guest details from URL parameters
+    const rooms = searchParams.get('rooms');
+    const adults = searchParams.get('adults');
+    const children = searchParams.get('children');
+    
+    if (rooms || adults || children) {
+      // Initialize Redux with URL parameters
+      dispatch(setGuestDetails({
+        rooms: Number(rooms) || 1,
+        guests: Number(adults) || 1,
+        children: Number(children) || 0,
+        childAges: Array(Number(children) || 0).fill(0)
+      }));
+    }
+  }, [searchParams, dispatch]);
 
   // Helper function to format address
   const getFormattedAddress = (addressObj: any): string => {
@@ -130,6 +153,19 @@ const RoomsPage: React.FC = () => {
     ].filter(Boolean);
 
     return parts.join(', ');
+  };
+  
+  // Helper function to display guest count information
+  const getGuestCountDisplay = () => {
+    if (!guestDetails) return "1 Room · 1 Adult · 0 Children";
+    
+    const rooms = guestDetails.rooms || 1;
+    const adults = guestDetails.guests || 1;
+    const children = guestDetails.children || 0;
+    
+    return `${rooms} ${rooms === 1 ? 'Room' : 'Rooms'} · ${adults} ${adults === 1 ? 'Adult' : 'Adults'}${
+      children > 0 ? ` · ${children} ${children === 1 ? 'Child' : 'Children'}` : ''
+    }`;
   };
 
   useEffect(() => {
@@ -212,6 +248,9 @@ const RoomsPage: React.FC = () => {
     checkOut: string;
     amount: string;
     userId?: string;
+    rooms?: number;
+    adults?: number;
+    children?: number;
   }) => {
     // Create the URL query params with all necessary data
     const queryParams = new URLSearchParams({
@@ -225,24 +264,18 @@ const RoomsPage: React.FC = () => {
       lastName: formData.lastName,
       email: formData.email,
       phone: formData.phone,
-      userId: formData.userId || ""
+      userId: formData.userId || "",
+      
+      // Add guest counts if available
+      ...(formData.rooms ? { rooms: formData.rooms.toString() } : {}),
+      ...(formData.adults ? { adults: formData.adults.toString() } : {}),
+      ...(formData.children ? { children: formData.children.toString() } : {})
     }).toString();
 
     // Navigate to the payment page with all parameters
     router.push(`/payment?${queryParams}`);
   };
 
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
 
   // Get unique room types from all rooms
   const roomTypes = React.useMemo(() => {
@@ -318,7 +351,6 @@ const RoomsPage: React.FC = () => {
             </button>
           </div>
 
-
           <div className="flex flex-wrap gap-4 mt-2 items-center">
             <div className="flex items-center bg-tripswift-off-white/10 pl-3 pr-4 py-2 rounded-lg">
               <Calendar className="h-5 w-5 mr-2 text-tripswift-off-white/70" />
@@ -326,17 +358,28 @@ const RoomsPage: React.FC = () => {
                 <div className="text-sm font-tripswift-medium">
                   {formatDate(checkInDate)} - {formatDate(checkOutDate)}
                 </div>
+                <div className="text-xs text-tripswift-off-white/60 mt-0.5">
+                  {calculateNights(checkInDate, checkOutDate)} {calculateNights(checkInDate, checkOutDate) === 1 ? 'night' : 'nights'} stay
+                </div>
               </div>
             </div>
+            
+            {/* Add Guest Information Display */}
+            <div className="flex items-center bg-tripswift-off-white/10 pl-3 pr-4 py-2 rounded-lg">
+              <Users className="h-5 w-5 mr-2 text-tripswift-off-white/70" />
+              <div>
+                <div className="text-sm font-tripswift-medium">
+                  {getGuestCountDisplay()}
+                </div>
+              </div>
+            </div>
+            
             {propertyDetails?.star_rating && (
               <div className="flex items-center bg-tripswift-off-white/10 pl-3 pr-4 py-2 rounded-lg">
                 <Star className="h-5 w-5 mr-2 text-yellow-400" />
                 <div>
                   <div className="text-sm font-tripswift-medium">
-                    <span className="mr-1">
-                      {propertyDetails.star_rating}
-                    </span>
-                    {t('RoomsPage.starHotelRating')}
+                    {propertyDetails.star_rating} Star Hotel Rating
                   </div>
                 </div>
               </div>
@@ -634,6 +677,7 @@ const RoomsPage: React.FC = () => {
         checkInDate={checkInDate}
         checkOutDate={checkOutDate}
         onConfirmBooking={confirmBooking}
+        guestData={guestDetails}
       />
     </div>
   );

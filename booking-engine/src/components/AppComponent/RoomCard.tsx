@@ -206,8 +206,8 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
 
             {/* Enhanced Cancellation Policy Indicator */}
             <div className={`flex items-center text-xs font-tripswift-medium px-2 py-1.5 rounded-md ${policyType === "Flexible"
-                ? " text-green-700 "
-                : " text-amber-700 "
+              ? " text-green-700 "
+              : " text-amber-700 "
               }`}>
               {policyType === "Flexible" ? (
                 <>
@@ -268,8 +268,14 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
             <div className="p-5">
               <div className="mb-6">
                 <h4 className="text-lg font-tripswift-medium text-tripswift-black flex items-center mb-3">
-                  <span className={`inline-block w-3 h-3 rounded-full mr-2 bg-${policyStyling.color}-500`}></span>
-                  Cancellation Policy
+                  <span className={`inline-block w-3 h-3 rounded-full mr-2 ${policyType === "Flexible"
+                      ? "bg-green-500"
+                      : policyType === "Moderate"
+                        ? "bg-tripswift-blue"
+                        : policyType === "Strict"
+                          ? "bg-amber-500"
+                          : "bg-red-500"
+                    }`}></span>                  Cancellation Policy
                   <span className={`ml-2 text-xs px-2 py-0.5 rounded ${policyStyling.bgColor} ${policyStyling.textColor} font-tripswift-medium`}>
                     {policyType}
                   </span>
