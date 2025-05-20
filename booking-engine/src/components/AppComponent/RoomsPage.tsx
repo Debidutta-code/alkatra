@@ -17,7 +17,7 @@ import LoadingSkeleton from "../hotelListingComponents/LoadingSkeleton";
 import { formatDate, calculateNights } from "@/utils/dateUtils";
 
 import { useTranslation } from "react-i18next"; // Import useTranslation
-import i18next, { t } from "i18next";
+import i18next from "i18next";
 
 interface Room {
   _id: string;
@@ -118,6 +118,8 @@ const RoomsPage: React.FC = () => {
   
   // Get guest details from Redux
   const { guestDetails } = useSelector((state) => state.hotel);
+
+  const { t } = useTranslation();
   
   const dispatch = useDispatch();
   
