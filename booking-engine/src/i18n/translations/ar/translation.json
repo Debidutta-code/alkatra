@@ -10,6 +10,26 @@
     "signUp": "اشترك",
     "login": "تسجيل الدخول"
   },
+  "Footer": {
+    "companyTitle": "الشركة",
+    "aboutUs": "معلومات عنا",
+    "whyChooseUs": "لماذا تختارنا",
+    "pricing": "التسعير",
+    "testimonials": "الشهادات",
+    "resourcesTitle": "الموارد",
+    "privacyPolicy": "سياسة الخصوصية",
+    "termsAndConditions": "الشروط والأحكام",
+    "blog": "المدونة",
+    "contactUs": "اتصل بنا",
+    "productTitle": "المنتج",
+    "projectManagement": "إدارة المشاريع",
+    "timeTracker": "متتبع الوقت",
+    "timeSchedule": "جدول الوقت",
+    "leadGeneration": "توليد العملاء المحتملين",
+    "emailPlaceholder": "أدخل بريدك الإلكتروني",
+    "subscribeButton": "اشترك",
+    "copyright": "© {year} تريبسويفت - جميع الحقوق محفوظة"
+  },
   "HotelCard": {
     "heroTitle": "ابحث عن الإقامة المثالية لرحلتك",
     "heroSubtitle": "اكتشف أماكن إقامة رائعة بأسعار حصرية",

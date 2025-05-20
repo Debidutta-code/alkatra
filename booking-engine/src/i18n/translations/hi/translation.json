@@ -10,6 +10,26 @@
     "signUp": "साइन अप करें",
     "login": "लॉग इन करें"
   },
+  "Footer": {
+    "companyTitle": "कंपनी",
+    "aboutUs": "हमारे बारे में",
+    "whyChooseUs": "हमें क्यों चुनें",
+    "pricing": "मूल्य निर्धारण",
+    "testimonials": "प्रशंसापत्र",
+    "resourcesTitle": "संसाधन",
+    "privacyPolicy": "गोपनीयता नीति",
+    "termsAndConditions": "नियम और शर्तें",
+    "blog": "ब्लॉग",
+    "contactUs": "हमसे संपर्क करें",
+    "productTitle": "उत्पाद",
+    "projectManagement": "परियोजना प्रबंधन",
+    "timeTracker": "समय ट्रैकर",
+    "timeSchedule": "समय अनुसूची",
+    "leadGeneration": "लीड जनरेशन",
+    "emailPlaceholder": "अपना ईमेल दर्ज करें",
+    "subscribeButton": "सदस्यता लें",
+    "copyright": "© {year} ट्रिपस्विफ्ट - सर्वाधिकार सुरक्षित"
+  },
   "HotelCard": {
     "heroTitle": "अपनी यात्रा के लिए सही ठहरने की जगह खोजें",
     "heroSubtitle": "विशेष कीमतों पर शानदार आवास खोजें",

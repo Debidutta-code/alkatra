@@ -10,6 +10,26 @@
     "signUp": "Sign Up",
     "login": "Log In"
   },
+  "Footer": {
+    "companyTitle": "Company",
+    "aboutUs": "About Us",
+    "whyChooseUs": "Why Choose Us",
+    "pricing": "Pricing",
+    "testimonials": "Testimonials",
+    "resourcesTitle": "Resources",
+    "privacyPolicy": "Privacy Policy",
+    "termsAndConditions": "Terms and Conditions",
+    "blog": "Blog",
+    "contactUs": "Contact Us",
+    "productTitle": "Product",
+    "projectManagement": "Project Management",
+    "timeTracker": "Time Tracker",
+    "timeSchedule": "Time Schedule",
+    "leadGeneration": "Lead Generation",
+    "emailPlaceholder": "Enter your email",
+    "subscribeButton": "Subscribe",
+    "copyright": "© {year} TripSwift - All rights reserved"
+  },
   "HotelCard": {
     "heroTitle": "Find the Perfect Stay for Your Journey",
     "heroSubtitle": "Discover amazing accommodations at exclusive prices",
