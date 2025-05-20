@@ -1,28 +1,36 @@
+"use client";
+
 import React, { useState, useRef, useEffect } from "react";
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Search, MapPin, Calendar, Users, Loader2, X, ChevronRight } from 'lucide-react';
+import { Search, MapPin, Calendar, Loader2, X, ChevronRight } from 'lucide-react';
 import toast from "react-hot-toast";
 import DateRange from "../HotelBox/DateRange";
 import GuestBox from "../HotelBox/GuestBox";
 import { getHotelsByCity } from '@/api/hotel';
 import { format, addDays } from 'date-fns';
+import { useSelector } from "@/Redux/store";
 
 interface CompactSearchBarProps {
   initialLocation?: string;
   initialCheckin?: string;
   initialCheckout?: string;
-  onSearch?: (location: string, checkin: string, checkout: string) => void;
+  onSearch?: (location: string, checkin: string, checkout: string, guestDetails?: any) => void;
+  onGuestChange?: (guestDetails: any) => void;
 }
 
 const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
-  initialLocation = "Bhubaneswar", // Default location set to Bhubaneswar
+  initialLocation = "Bhubaneswar",
   initialCheckin = "",
   initialCheckout = "",
-  onSearch
+  onSearch,
+  onGuestChange
 }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const searchContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Get guest details from Redux store
+  const { guestDetails } = useSelector((state) => state.hotel);
   
   // Set default dates (tomorrow and day after tomorrow)
   const tomorrow = format(addDays(new Date(), 1), 'yyyy-MM-dd');
@@ -51,6 +59,13 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
     setSearchQuery("");
   };
   
+  // Handler for when guest details change
+  const handleGuestDetailsChange = (details: any) => {
+    if (onGuestChange) {
+      onGuestChange(details);
+    }
+  };
+  
   const handleSearchButtonClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     
@@ -75,9 +90,14 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
       
       // Use the onSearch callback if provided, otherwise use router
       if (onSearch) {
-        onSearch(searchQuery, dates[0], dates[1]);
+        onSearch(searchQuery, dates[0], dates[1], guestDetails);
       } else {
-        router.push(`/destination?location=${encodeURIComponent(searchQuery)}&checkin=${checkinDate}&checkout=${checkoutDate}`);
+        // Build guest details query parameters
+        const guestParams = guestDetails ? 
+          `&rooms=${guestDetails.rooms || 1}&adults=${guestDetails.guests || 1}&children=${guestDetails.children || 0}` : 
+          '';
+        
+        router.push(`/destination?location=${encodeURIComponent(searchQuery)}&checkin=${checkinDate}&checkout=${checkoutDate}${guestParams}`);
       }
     } catch (error) {
       toast.error("No hotels available for the selected location.");
@@ -140,17 +160,8 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
         </div>
         
         {/* Guest Selection */}
-        <div className="w-full sm:w-auto sm:flex-[0.7]">
-          <div className="relative group">
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center group-hover:bg-tripswift-blue/10 transition-colors duration-300">
-                <Users className="h-4 w-4 text-tripswift-black/40 group-hover:text-tripswift-blue transition-colors duration-200" />
-              </div>
-            </div>
-            <div className="bg-white border border-tripswift-black/10 hover:border-tripswift-blue/30 rounded-xl shadow-sm transition-all duration-200 h-14 pl-12 flex items-center">
-              <GuestBox />
-            </div>
-          </div>
+        <div className="w-full sm:w-auto sm:flex-1">
+          <GuestBox onChange={handleGuestDetailsChange} />
         </div>
         
         {/* Search Button */}

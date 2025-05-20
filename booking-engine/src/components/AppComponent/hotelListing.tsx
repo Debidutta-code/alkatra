@@ -8,7 +8,8 @@ import { FilterState } from "@/components/HotelBox/FilterModal";
 import { setPropertyId, setCheckInDate, setCheckOutDate } from "@/Redux/slices/pmsHotelCard.slice";
 import { Filter, Calendar, MapPin, Search, CreditCard, Check, Star, Shield, ChevronRight, MapIcon } from 'lucide-react';
 import toast from "react-hot-toast";
-import Image from "next/image";
+import { useSelector } from '@/Redux/store';
+import { formatDate, calculateNights } from "@/utils/dateUtils";
 
 // Import refactored components
 import CompactSearchBar from "@/components/HotelBox/CompactSearchBar";
@@ -46,15 +47,17 @@ const hotelListing: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const [errorToastShown, setErrorToastShown] = useState<boolean>(false);
-  const [filters, setFilters] = useState<FilterState>({ 
-    amenities: {}, 
+  const [filters, setFilters] = useState<FilterState>({
+    amenities: {},
     sortOrder: "",
     rating: null
-  });  const [searchQuery, setSearchQuery] = useState<string>("");
+  });
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [ratingFilter, setRatingFilter] = useState<number | null>(null);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  // const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const { guestDetails } = useSelector((state) => state.hotel);
 
   const destination = searchParams.get("destination");
   const location = searchParams.get("location");
@@ -79,6 +82,10 @@ const hotelListing: React.FC = () => {
     }
   }, [params]);
 
+  const handleGuestChange = (guestData: any) => {
+    // If you need to handle guest details changes from the search bar
+    console.log("Guest details updated:", guestData);
+  };
   // Fetch hotels data
   const fetchHotels = async (searchTerm: string) => {
     setIsLoading(true);
@@ -105,9 +112,12 @@ const hotelListing: React.FC = () => {
     }
   };
 
-  // Handle new search from the search bar
-  const handleSearch = (newLocation: string, checkin: string, checkout: string) => {
-    router.push(`/destination?location=${encodeURIComponent(newLocation)}&checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(checkout)}`);
+  const handleSearch = (newLocation: string, checkin: string, checkout: string, guestData?: any) => {
+    const guestToUse = guestData || guestDetails;
+    const guestParams = guestToUse ?
+      `&rooms=${guestToUse.rooms || 1}&adults=${guestToUse.guests || 1}&children=${guestToUse.children || 0}` :
+      '';
+    router.push(`/destination?location=${encodeURIComponent(newLocation)}&checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(checkout)}${guestParams}`);
   };
 
   // Function to handle filters
@@ -138,8 +148,19 @@ const hotelListing: React.FC = () => {
       dispatch(setCheckOutDate(checkoutDate));
       localStorage.setItem('checkout_date', checkoutDate);
     }
-    window.location.href = `/hotel?id=${hotelId}&checkin=${checkinDate}&checkout=${checkoutDate}`;
-  };
+
+    // Store guest details in localStorage for consistency
+    if (guestDetails && Object.keys(guestDetails).length > 0) {
+      localStorage.setItem('guest_details', JSON.stringify(guestDetails));
+    }
+
+    // Pass guest details in the URL
+    const guestParams = guestDetails ?
+      `&rooms=${guestDetails.rooms || 1}&adults=${guestDetails.guests || 1}&children=${guestDetails.children || 0}` :
+      '';
+
+    window.location.href = `/hotel?id=${hotelId}&checkin=${checkinDate}&checkout=${checkoutDate}${guestParams}`;
+  }
 
   // Apply filters to hotel data
   const applyFilters = (hotels: Hotel[]): Hotel[] => {
@@ -209,33 +230,6 @@ const hotelListing: React.FC = () => {
     setRatingFilter(null);
   };
 
-  // Format date helper
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "";
-
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric"
-      });
-    } catch (e) {
-      return dateString;
-    }
-  };
-
-  // Calculate nights between dates
-  const calculateNights = () => {
-    if (!checkinDate || !checkoutDate) return 0;
-
-    const checkIn = new Date(checkinDate);
-    const checkOut = new Date(checkoutDate);
-
-    if (isNaN(checkIn.getTime()) || isNaN(checkOut.getTime())) return 0;
-
-    const diffTime = checkOut.getTime() - checkIn.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  };
 
   // Get filtered hotels
   const filteredHotels = applyFilters(hotelData.data);
@@ -267,42 +261,11 @@ const hotelListing: React.FC = () => {
               initialCheckin={checkinDate || ""}
               initialCheckout={checkoutDate || ""}
               onSearch={handleSearch}
+              onGuestChange={handleGuestChange}
             />
           </div>
         </div>
       </div>
-
-      {/* Booking benefits bar */}
-      {/* <div className="bg-white border-b border-gray-200 pt-14 pb-4">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div className="flex flex-col items-center justify-center">
-              <div className="w-10 h-10 bg-tripswift-blue/10 rounded-full flex items-center justify-center mb-2">
-                <CreditCard className="h-5 w-5 text-tripswift-blue" />
-              </div>
-              <span className="text-sm font-tripswift-medium text-tripswift-black">Free cancellation</span>
-            </div>
-            <div className="flex flex-col items-center justify-center">
-              <div className="w-10 h-10 bg-tripswift-blue/10 rounded-full flex items-center justify-center mb-2">
-                <Check className="h-5 w-5 text-tripswift-blue" />
-              </div>
-              <span className="text-sm font-tripswift-medium text-tripswift-black">Verified properties</span>
-            </div>
-            <div className="flex flex-col items-center justify-center">
-              <div className="w-10 h-10 bg-tripswift-blue/10 rounded-full flex items-center justify-center mb-2">
-                <Star className="h-5 w-5 text-tripswift-blue" />
-              </div>
-              <span className="text-sm font-tripswift-medium text-tripswift-black">Best price guarantee</span>
-            </div>
-            <div className="flex flex-col items-center justify-center">
-              <div className="w-10 h-10 bg-tripswift-blue/10 rounded-full flex items-center justify-center mb-2">
-                <Shield className="h-5 w-5 text-tripswift-blue" />
-              </div>
-              <span className="text-sm font-tripswift-medium text-tripswift-black">Secure booking</span>
-            </div>
-          </div>
-        </div>
-      </div> */}
 
       {/* Main content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -320,13 +283,17 @@ const hotelListing: React.FC = () => {
               <div className="flex items-center mr-4">
                 <Calendar className="h-4 w-4 mr-1 text-tripswift-blue" />
                 {checkinDate && checkoutDate ? (
-                  <span>{formatDate(checkinDate)} - {formatDate(checkoutDate)}</span>
+                  <span>{formatDate(checkinDate, { month: "short", day: "numeric" })} - {formatDate(checkoutDate, { month: "short", day: "numeric" })}</span>
                 ) : (
                   <span>Select dates</span>
                 )}
               </div>
-              {/* <span className="mr-4 text-tripswift-black/40">•</span> */}
-              {/* <span>{calculateNights() > 0 ? `${calculateNights()} nights` : "Select dates"}</span> */}
+              <span className="mr-4 text-tripswift-black/40">•</span>
+              {checkinDate && checkoutDate ? (
+                <span>{calculateNights(checkinDate, checkoutDate)} nights</span>
+              ) : (
+                <span>Select dates</span>
+              )}
               <span className="mx-4 text-tripswift-black/40">•</span>
               <span>{filteredHotels.length} properties found</span>
             </div>
@@ -376,7 +343,7 @@ const hotelListing: React.FC = () => {
         </div>
 
         {/* Active filters display */}
-        <ActiveFilters 
+        <ActiveFilters
           amenities={filters.amenities}
           sortOrder={filters.sortOrder}
           searchQuery={searchQuery}
@@ -427,8 +394,8 @@ const hotelListing: React.FC = () => {
                 <button
                   onClick={() => toggleAmenityFilter('free_wifi')}
                   className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${filters.amenities['free_wifi']
-                      ? 'bg-tripswift-blue/10 text-tripswift-blue'
-                      : 'hover:bg-gray-50 text-tripswift-black/70'
+                    ? 'bg-tripswift-blue/10 text-tripswift-blue'
+                    : 'hover:bg-gray-50 text-tripswift-black/70'
                     }`}
                 >
                   <span>Free WiFi</span>
@@ -437,8 +404,8 @@ const hotelListing: React.FC = () => {
                 <button
                   onClick={() => toggleAmenityFilter('parking')}
                   className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${filters.amenities['parking']
-                      ? 'bg-tripswift-blue/10 text-tripswift-blue'
-                      : 'hover:bg-gray-50 text-tripswift-black/70'
+                    ? 'bg-tripswift-blue/10 text-tripswift-blue'
+                    : 'hover:bg-gray-50 text-tripswift-black/70'
                     }`}
                 >
                   <span>Parking</span>
@@ -447,8 +414,8 @@ const hotelListing: React.FC = () => {
                 <button
                   onClick={() => toggleAmenityFilter('breakfast')}
                   className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${filters.amenities['breakfast']
-                      ? 'bg-tripswift-blue/10 text-tripswift-blue'
-                      : 'hover:bg-gray-50 text-tripswift-black/70'
+                    ? 'bg-tripswift-blue/10 text-tripswift-blue'
+                    : 'hover:bg-gray-50 text-tripswift-black/70'
                     }`}
                 >
                   <span>Breakfast</span>
@@ -458,20 +425,20 @@ const hotelListing: React.FC = () => {
             </div>
           </div>
 
-{/* Mobile sidebar */}
-<MobileFilterDrawer
-  isOpen={mobileFiltersOpen}
-  onClose={() => setMobileFiltersOpen(false)}
-  sidebarRef={sidebarRef}
-  amenities={filters.amenities}
-  sortOrder={filters.sortOrder}
-  ratingFilter={ratingFilter}
-  toggleAmenityFilter={toggleAmenityFilter}
-  handleSortChange={handleSortChange}
-  handleRatingChange={handleRatingChange}
-  resetFilters={resetFilters}
-  filteredHotelsCount={filteredHotels.length}
-/>
+          {/* Mobile sidebar */}
+          <MobileFilterDrawer
+            isOpen={mobileFiltersOpen}
+            onClose={() => setMobileFiltersOpen(false)}
+            sidebarRef={sidebarRef}
+            amenities={filters.amenities}
+            sortOrder={filters.sortOrder}
+            ratingFilter={ratingFilter}
+            toggleAmenityFilter={toggleAmenityFilter}
+            handleSortChange={handleSortChange}
+            handleRatingChange={handleRatingChange}
+            resetFilters={resetFilters}
+            filteredHotelsCount={filteredHotels.length}
+          />
 
           {/* Main content - Hotel listings */}
           <div className="lg:w-3/4">

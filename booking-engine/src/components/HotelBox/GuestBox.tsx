@@ -3,16 +3,57 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "@/Redux/store";
 import { setGuestDetails } from "@/Redux/slices/hotelcard.slice";
 import { createPortal } from "react-dom";
-const GuestBox: React.FC = () => {
+import { Users } from "lucide-react";
+
+// Define props interface
+interface GuestBoxProps {
+  onChange?: (guestDetails: {
+    rooms: number;
+    guests: number;
+    children: number;
+    childAges: number[];
+  }) => void;
+}
+
+const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
   const dispatch = useDispatch();
   const { guestDetails } = useSelector((state) => state.hotel);
   const [modalOpen, setModalOpen] = useState(false);
-  const [rooms, setRooms] = useState(1);
-  const [guests, setGuests] = useState(1);
-  const [children, setChildren] = useState(0);
-  const [childAges, setChildAges] = useState(Array.from({ length: 0 }, () => 0));
-  const [displayText, setDisplayText] = useState(`${rooms} Rooms ${guests} Guests`);
+  const [rooms, setRooms] = useState(guestDetails?.rooms || 1);
+  const [guests, setGuests] = useState(guestDetails?.guests || 1);
+  const [children, setChildren] = useState(guestDetails?.children || 0);
+  const [childAges, setChildAges] = useState(guestDetails?.childAges || Array.from({ length: 0 }, () => 0));
+  const [displayText, setDisplayText] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  // Update display text when component mounts or guestDetails changes
+  useEffect(() => {
+    updateDisplayText();
+  }, [guestDetails]);
+
+  // Function to update display text in OTA style
+  const updateDisplayText = () => {
+    const roomsToUse = guestDetails?.rooms || rooms || 1;
+    const guestsToUse = guestDetails?.guests || guests || 1;
+    const childrenToUse = guestDetails?.children || children || 0;
+
+    setDisplayText(
+      `${roomsToUse} ${roomsToUse === 1 ? "Room" : "Rooms"} · ${guestsToUse} ${guestsToUse === 1 ? "Adult" : "Adults"
+      }${childrenToUse > 0 ? ` · ${childrenToUse} ${childrenToUse === 1 ? "Child" : "Children"}` : ""}`
+    );
+  };
+
+  // Sync state with Redux when guestDetails changes
+  useEffect(() => {
+    if (guestDetails) {
+      setRooms(guestDetails.rooms || 1);
+      setGuests(guestDetails.guests || 1);
+      setChildren(guestDetails.children || 0);
+      setChildAges(guestDetails.childAges || []);
+      updateDisplayText();
+    }
+  }, [guestDetails]);
+
   useEffect(() => {
     if (modalOpen) {
       document.body.style.overflow = "hidden";
@@ -23,13 +64,16 @@ const GuestBox: React.FC = () => {
       document.body.style.overflow = "unset";
     };
   }, [modalOpen]);
+
   const openModal = () => {
     setModalOpen(true);
   };
+
   const closeModal = () => {
     setModalOpen(false);
     setError(null);
   };
+
   const incDecHandler = (
     setter: React.Dispatch<React.SetStateAction<number>>,
     delta: number,
@@ -37,41 +81,77 @@ const GuestBox: React.FC = () => {
   ) => {
     setter((prevValue) => Math.max(prevValue + delta, minValue));
   };
+
   const handleChildrenChange = (value: number) => {
-    setChildren((prevChildren) => {
+    setChildren(() => {
       const newValue = Math.max(value, 0);
       setChildAges(Array.from({ length: newValue }, () => 0));
       return newValue;
     });
   };
+
   const handleChildAgeChange = (index: number, age: number) => {
     const newChildAges = [...childAges];
     newChildAges[index] = age;
     setChildAges(newChildAges);
   };
+
   const isChildAgeValid = () => {
-    return childAges.every((age) => age > 0 && age < 14);
+    return childAges.every((age: number) => age > 0 && age < 14);
   };
+
+  const validateGuestCount = () => {
+    // Typical max guests per room - 4 is standard for most hotels
+    const maxGuestsPerRoom = 4;
+
+    // Total guests including children
+    const totalGuests = guests + children;
+
+    // Maximum allowed guests based on room count
+    const maxAllowedGuests = rooms * maxGuestsPerRoom;
+
+    if (totalGuests > maxAllowedGuests) {
+      setError(`Maximum ${maxGuestsPerRoom} guests allowed per room. Please add more rooms or reduce guests.`);
+      return false;
+    }
+
+    return true;
+  };
+
   const handleApplyChanges = () => {
+    if (!validateGuestCount()) {
+      return;
+    }
+
     if (children === 0 || isChildAgeValid()) {
+      // Create guest data object
+      const guestData = {
+        rooms,
+        guests,
+        children,
+        childAges,
+      };
+
+      // Update display text in OTA style
       setDisplayText(
-        `${rooms} ${rooms === 1 ? "Room" : "Rooms"} ${guests} ${
-          guests === 1 ? "Guest" : "Guests"
-        }`
+        `${rooms} ${rooms === 1 ? "Room" : "Rooms"} · ${guests} ${guests === 1 ? "Adult" : "Adults"
+        }${children > 0 ? ` · ${children} ${children === 1 ? "Child" : "Children"}` : ""}`
       );
-      dispatch(
-        setGuestDetails({
-          rooms,
-          guests,
-          children,
-          childAges,
-        })
-      );
+
+      // Dispatch to Redux
+      dispatch(setGuestDetails(guestData));
+
+      // Call onChange callback if provided
+      if (onChange) {
+        onChange(guestData);
+      }
+
       closeModal();
     } else {
       setError("Please select the child's age");
     }
   };
+
   const modalContent = modalOpen ? (
     <>
       {/* Backdrop */}
@@ -113,7 +193,7 @@ const GuestBox: React.FC = () => {
             {/* Guests Section */}
             <div className="flex items-center justify-between">
               <label className="text-tripswift-black font-tripswift-medium uppercase">
-                Guests
+                Adults
               </label>
               <div className="flex items-center gap-3">
                 <button
@@ -149,7 +229,7 @@ const GuestBox: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <button
                     className="w-9 h-9 rounded-full border border-tripswift-black/20 text-tripswift-black/60 flex items-center justify-center transition-colors hover:bg-tripswift-blue/10 disabled:opacity-50"
-                    onClick={() => incDecHandler(setChildren, -1, 0)}
+                    onClick={() => handleChildrenChange(children - 1)}
                     disabled={children <= 0}
                   >
                     <span className="text-lg">-</span>
@@ -159,7 +239,7 @@ const GuestBox: React.FC = () => {
                   </span>
                   <button
                     className="w-9 h-9 rounded-full border border-tripswift-black/20 text-tripswift-black/60 flex items-center justify-center transition-colors hover:bg-tripswift-blue/10"
-                    onClick={() => incDecHandler(setChildren, 1, 0)}
+                    onClick={() => handleChildrenChange(children + 1)}
                   >
                     <span className="text-lg">+</span>
                   </button>
@@ -229,22 +309,38 @@ const GuestBox: React.FC = () => {
       </div>
     </>
   ) : null;
+
   return (
     <div className="relative">
-      {/* Trigger Button */}
+      {/* Trigger Button - OTA Style */}
       <div
-        className="w-full px-3 py-2.5 flex items-center cursor-pointer transition-colors"
         onClick={openModal}
       >
-        <div className="flex items-center space-x-2.5">
-          <span className="text-tripswift-black/70 text-sm font-tripswift-medium">
-            {displayText || "Select guests"}
-          </span>
+        <div className="w-full sm:w-auto sm:flex-[0.7]">
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center group-hover:bg-tripswift-blue/10 transition-colors duration-300">
+                <Users className="h-4 w-4 text-tripswift-black/40 group-hover:text-tripswift-blue transition-colors duration-200" />
+              </div>
+            </div>
+            <div className="bg-white border border-tripswift-black/10 hover:border-tripswift-blue/30 rounded-xl shadow-sm transition-all duration-200 h-14 pl-12 flex items-center">
+              <span className="text-tripswift-black/70 text-sm font-tripswift-medium">
+                {displayText || "1 Room · 1 Adult · 0 Children"}
+              </span>
+            </div>
+          </div>
         </div>
+
+        {/* Indicator for custom selection */}
+        {/* {(rooms > 1 || guests > 1 || children > 0) && (
+          <div className="w-2 h-2 bg-tripswift-blue rounded-full mr-2"></div>
+        )} */}
       </div>
+
       {/* Render the modal using a portal */}
       {modalOpen && createPortal(modalContent, document.body)}
     </div>
   );
 };
+
 export default GuestBox;
