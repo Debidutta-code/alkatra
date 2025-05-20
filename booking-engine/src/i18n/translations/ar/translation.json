@@ -144,5 +144,38 @@
         "validTill": "3 ساعات 15 دقيقة"
       }
     }
+  },
+  "RoomsPage": {
+    "backToSearch": "العودة إلى البحث",
+    "starHotelRating": "فندق نجوم",
+    "viewPropertyDetails": "عرض تفاصيل العقار",
+    "aboutThisProperty": "عن هذا العقار",
+    "noImagesAvailable": "لا توجد صور متاحة",
+    "propertyAmenities": "مرافق العقار",
+    "amenitiesList": {
+      "wifi": "واي فاي مجاني",
+      "swimming_pool": "حمام سباحة",
+      "fitness_center": "مركز لياقة بدنية",
+      "spa_and_wellness": "سبا وصحة",
+      "restaurant": "مطعم",
+      "room_service": "خدمة الغرف",
+      "bar_and_lounge": "بار وصالة",
+      "parking": "موقف سيارات",
+      "concierge_services": "خدمات الكونسيرج",
+      "pet_friendly": "صديق للحيوانات الأليفة",
+      "business_facilities": "مرافق الأعمال",
+      "laundry_services": "خدمات الغسيل",
+      "child_friendly_facilities": "مرافق صديقة للأطفال"
+    },
+    "noAmenitiesSpecified": "لم يتم تحديد أي مرافق لهذا العقار.",
+    "contactInformation": "معلومات الاتصال",
+    "allRooms": "جميع الغرف",
+    "searchRoomName": "البحث عن اسم الغرفة",
+    "availableRooms": "الغرف المتاحة",
+    "showingRooms_one": "عرض {count} غرفة",
+    "showingRooms_other": "عرض {count} غرف",
+    "noRoomsAvailableTitle": "لا توجد غرف متاحة",
+    "noRoomsAvailableMessage": "لم نتمكن من العثور على أي غرف مطابقة لمعايير البحث الخاصة بك. حاول تعديل فلاتر البحث أو التواريخ.",
+    "clearFilters": "مسح الفلاتر"
   }
 }

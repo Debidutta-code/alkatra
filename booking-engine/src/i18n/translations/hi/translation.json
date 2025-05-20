@@ -144,5 +144,38 @@
         "validTill": "3 घंटे 15 मिनट"
       }
     }
+  },
+  "RoomsPage": {
+    "backToSearch": "खोज पर वापस जाएं",
+    "starHotelRating": "सितारा होटल रेटिंग",
+    "viewPropertyDetails": "संपत्ति विवरण देखें",
+    "aboutThisProperty": "इस संपत्ति के बारे में",
+    "noImagesAvailable": "कोई छवि उपलब्ध नहीं है",
+    "propertyAmenities": "संपत्ति की सुविधाएँ",
+    "amenitiesList": {
+      "wifi": "मुफ्त वाईफाई",
+      "swimming_pool": "स्विमिंग पूल",
+      "fitness_center": "फिटनेस सेंटर",
+      "spa_and_wellness": "स्पा और वेलनेस",
+      "restaurant": "रेस्तरां",
+      "room_service": "रूम सर्विस",
+      "bar_and_lounge": "बार और लाउंज",
+      "parking": "पार्किंग",
+      "concierge_services": "कंसीयज सेवाएँ",
+      "pet_friendly": "पेट फ्रेंडली",
+      "business_facilities": "व्यावसायिक सुविधाएँ",
+      "laundry_services": "लॉन्ड्री सेवाएँ",
+      "child_friendly_facilities": "बच्चों के अनुकूल सुविधाएँ"
+    },
+    "noAmenitiesSpecified": "इस संपत्ति के लिए कोई सुविधाएँ निर्दिष्ट नहीं हैं।",
+    "contactInformation": "संपर्क जानकारी",
+    "allRooms": "सभी कमरे",
+    "searchRoomName": "कमरे का नाम खोजें",
+    "availableRooms": "उपलब्ध कमरे",
+    "showingRooms_one": "कमरा दिखा रहा है",
+    "showingRooms_other": "कमरे दिखा रहा है",
+    "noRoomsAvailableTitle": "कोई कमरा उपलब्ध नहीं है",
+    "noRoomsAvailableMessage": "हमें आपके मानदंडों से मेल खाने वाले कोई कमरे नहीं मिले। कृपया अपने खोज फ़िल्टर या तारीखें समायोजित करने का प्रयास करें।",
+    "clearFilters": "फ़िल्टर साफ़ करें"
   }
 }

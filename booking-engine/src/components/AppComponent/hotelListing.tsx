@@ -306,7 +306,9 @@ const HotelListing: React.FC = () => {
             <div className="flex items-center">
               <MapPin className="h-5 w-5 mr-2 text-tripswift-blue" />
               <h1 className="text-xl font-tripswift-bold text-tripswift-black">
-                {t('HotelListing.hotelsIn')} {params.location || params.destination}
+                {i18n.language === 'hi'
+                  ? `${params.location || params.destination} ${t('HotelListing.hotelsIn')}`
+                  : `${t('HotelListing.hotelsIn')} ${params.location || params.destination}`}
               </h1>
             </div>
 

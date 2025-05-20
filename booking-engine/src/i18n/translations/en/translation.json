@@ -144,5 +144,38 @@
         "validTill": "3h 15m"
       }
     }
+  },
+  "RoomsPage": {
+    "backToSearch": "Back to Search",
+    "starHotelRating": "Star Hotel Rating",
+    "viewPropertyDetails": "View Property Details",
+    "aboutThisProperty": "About this property",
+    "noImagesAvailable": "No images available",
+    "propertyAmenities": "Property Amenities",
+    "amenitiesList": {
+      "wifi": "Free Wifi",
+      "swimming_pool": "Swimming Pool",
+      "fitness_center": "Fitness Center",
+      "spa_and_wellness": "Spa and Wellness",
+      "restaurant": "Restaurant",
+      "room_service": "Room Service",
+      "bar_and_lounge": "Bar and Lounge",
+      "parking": "Parking",
+      "concierge_services": "Concierge Services",
+      "pet_friendly": "Pet Friendly",
+      "business_facilities": "Business Facilities",
+      "laundry_services": "Laundry Services",
+      "child_friendly_facilities": "Child Friendly Facilities"
+    },
+    "noAmenitiesSpecified": "No amenities specified for this property.",
+    "contactInformation": "Contact Information",
+    "allRooms": "All Rooms",
+    "searchRoomName": "Search room name",
+    "availableRooms": "Available Rooms",
+    "showingRooms_one": "Showing {count} room",
+    "showingRooms_other": "Showing {count} rooms",
+    "noRoomsAvailableTitle": "No Rooms Available",
+    "noRoomsAvailableMessage": "We couldn't find any rooms matching your criteria. Try adjusting your search filters or dates.",
+    "clearFilters": "Clear Filters"
   }
 }
