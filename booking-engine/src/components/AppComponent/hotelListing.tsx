@@ -52,7 +52,7 @@ interface HotelData {
 }
 
 const HotelListing: React.FC = () => {
-  const { t, i18n, ready } = useTranslation();
+  const { t, i18n } = useTranslation();
   const searchParams = useSearchParams();
   const router = useRouter();
   const dispatch = useDispatch();
@@ -111,27 +111,13 @@ const HotelListing: React.FC = () => {
         fetchHotels(params.destination);
       }
     };
-
-    i18n.on("languageChanged", handleLanguageChange);
-
-    // Cleanup the event listener on component unmount
-    return () => {
-      i18n.off("languageChanged", handleLanguageChange);
-    };
-  }, [params, i18n.language]);
+  }, [params]);
 
   // Fetch hotels data
   const fetchHotels = async (searchTerm: string) => {
     setIsLoading(true);
     setError(null);
     setErrorToastShown(false);
-
-    const destination = searchParams.get("destination");
-    const location = searchParams.get("location");
-    const checkinDate = searchParams.get("checkin");
-    const checkoutDate = searchParams.get("checkout");
-
-    console.log("Search Params:", { destination, location, checkinDate, checkoutDate });
 
     try {
       const hotelsResponse = await getHotelsByCity(searchTerm);
@@ -287,11 +273,6 @@ const HotelListing: React.FC = () => {
     (searchQuery ? 1 : 0) +
     (ratingFilter !== null ? 1 : 0);
 
-  // Show loading state if translations are not ready
-  if (!ready) {
-    return <div>{t("HotelListing.loadingTranslations", { defaultValue: "Loading translations..." })}</div>;
-  }
-
   return (
     <div className="bg-[#F5F7FA] min-h-screen">
       <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] relative">
@@ -325,12 +306,7 @@ const HotelListing: React.FC = () => {
             <div className="flex items-center">
               <MapPin className="h-5 w-5 mr-2 text-tripswift-blue" />
               <h1 className="text-xl font-tripswift-bold text-tripswift-black">
-                {t("HotelListing.hotelsIn", {
-                  location:
-                    params.location ||
-                    params.destination ||
-                    t("HotelListing.yourDestination", { defaultValue: "your destination" }),
-                })}
+                {t('HotelListing.hotelsIn')} {params.location || params.destination}
               </h1>
             </div>
 
