@@ -11,6 +11,7 @@ import inventoryRouter from "../wincloud/src/api/route";
 import customerRouter from "../Customer-Authentication/src/api/routes/customerRoutes";
 import bookingRouter from "../Booking_Engine/src/routes/booking.routes";
 import paymentRouter from "../Booking_Engine/src/routes/payment.routes";
+import ratePlaneRoute from "../rate-plan/src/routes/ratePlan.route";
 
 export async function initializeExpressRoutes({ app }: { app: Express }) {
   app.head("/status", (_, res: Response) => res.status(200).end());
@@ -27,6 +28,8 @@ export async function initializeExpressRoutes({ app }: { app: Express }) {
   
   app.use("/api/v1/booking", bookingRouter);
   app.use("/api/v1/payment", paymentRouter);
+
+  app.use("/api/v1/rate-plan", ratePlaneRoute);
   
 
   app.all("*", (req: Request, _res: Response, next: NextFunction) => {

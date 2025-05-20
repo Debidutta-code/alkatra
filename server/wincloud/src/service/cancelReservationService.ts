@@ -4,7 +4,7 @@ import axios from 'axios';
 import { parseStringPromise } from 'xml2js';
 import { ThirdPartyCancelReservationRepository } from '../repository/cancelReservationRepository';
 import { ThirdPartyCancelReservationData } from '../interface/cancelReservationInterface';
-import { PropertyInfo } from '../../../pms_api/src/model/property.info.model';
+import { PropertyInfo } from '../../../Property_Management/src/model/property.info.model';
 
 interface CancelReservationInput {
   reservationId: string;
