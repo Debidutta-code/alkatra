@@ -207,8 +207,8 @@
       "roomType": "Room Type",
       "checkIn": "Check-in",
       "checkOut": "Check-out",
-      "nights": "night",
-      "nights_plural": "{count} nights",
+      "nights": "Night",
+      "nightsPlural": "Nights",
       "guestInformation": "Guest Information",
       "firstNameLabel": "First Name",
       "firstNamePlaceholder": "Enter your first name",
@@ -231,8 +231,8 @@
       "adultsPlural": "Adults",
       "childSingular": "Child",
       "childrenPlural": "Children",
-      "guestDisplayFormat": "{{roomsCount}} {{roomText}} · {{adultsCount}} {{adultText}}{{childrenText}}",
-      "childrenPartFormat": " · {{childrenCount}} {{childText}}",
+      "guestDisplayFormat": "Rooms and Guests",
+      "childrenPartFormat": "Children",
       "informationVerified": "Information verified successfully!",
       "propertyInfoMissing": "Property information is missing. Please try again.",
       "bookingSummary": "Booking Summary",
@@ -246,7 +246,70 @@
       "backToDetails": "Back to Details",
       "cancel": "Cancel",
       "continueToReview": "Continue to Review",
-      "proceedToPayment" : "Proceed to Payment"
+      "proceedToPayment": "Proceed to Payment"
     }
+  },
+  "BookingTabs": {
+    "userNotLoggedIn": "User not logged in",
+    "noBooking": "There is no booking",
+    "BookingHeader": {
+      "yourBookings": "Your Bookings",
+      "viewManageTrack": "View, manage, and track all your hotel reservations in one place"
+    },
+    "BookingTabsNavigation": {
+      "allBookings": "All Bookings",
+      "upcoming": "Upcoming",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "LoadingState": {
+      "retrievingBookings": "Retrieving your bookings",
+      "fetchingDetails": "Just a moment while we fetch your reservation details..."
+    },
+    "ErrorState": {
+      "noBookingsFound": "We couldn't find any bookings associated with your account.",
+      "startBookingNow": "Start Booking Now"
+    },
+    "EmptyState": {
+      "heading": {
+        "all": "No bookings found",
+        "upcoming": "No upcoming bookings",
+        "completed": "No completed stays",
+        "cancelled": "No cancelled bookings"
+      },
+      "paragraph": {
+        "all": "Start planning your next trip!",
+        "upcoming": "You don't have any upcoming hotel reservations.",
+        "completed": "You haven't completed any stays yet.",
+        "cancelled": "You don't have any cancelled reservations."
+      },
+      "bookHotelButton": "Book a Hotel"
+    },
+    "BookingCard": {
+      "bookingId": "Booking ID",
+      "nightSingular": "Night",
+      "nightsPlural": "Nights",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "roomType": "Room Type",
+      "standardRoom": "Standard Room",
+      "paymentMethod": "Payment Method",
+      "primaryGuest": "Primary Guest",
+      "rateBreakdown": "Rate Breakdown",
+      "viewBookingDetails": "View Booking Details",
+      "modify": "Modify",
+      "cancel": "Cancel"
+    },
+    "BookingPagination": {
+      "show": "Show",
+      "perPage": "per page",
+      "showing": "Showing",
+      "of": "of",
+      "bookings": "bookings",
+      "noBookingsToShow": "No bookings to show"
+    },
+    "CancellationModal": {},
+    "AmendReservationModal": {},
+    "BookingDetailsModal": {}
   }
 }

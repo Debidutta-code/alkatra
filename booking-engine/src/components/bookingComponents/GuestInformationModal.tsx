@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setGuestDetails } from "@/Redux/slices/pmsHotelCard.slice";
 import { User, Mail, Phone, Calendar, CreditCard, CheckCircle, Users, X } from "lucide-react";
 import { formatDate, calculateNights } from "@/utils/dateUtils";
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
 
 // User type definition
 interface UserType {
@@ -60,10 +60,9 @@ interface GuestInformationModalProps {
     adults?: number;
     children?: number;
   }) => void;
-  // Add guestData prop
   guestData?: {
     rooms?: number;
-    guests?: number; // Corresponds to adults
+    guests?: number;
     children?: number;
     childAges?: number[];
     firstName?: string;
@@ -93,34 +92,27 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   const [activeSection, setActiveSection] = useState<'details' | 'review'>('details');
 
   const dispatch = useDispatch();
-  const { t } = useTranslation(); // Initialize useTranslation hook
+  const { t } = useTranslation();
 
   // Helper function to get guest count display
   const getGuestCountDisplay = () => {
-    // Default values if guestData is not provided or incomplete
     const rooms = guestData?.rooms || 1;
-    const adults = guestData?.guests || 1; // 'guests' in guestData means adults
+    const adults = guestData?.guests || 1;
     const children = guestData?.children || 0;
 
-    const roomText = t('BookingComponents.GuestInformationModal.roomSingular', { count: rooms });
-    const adultText = t('BookingComponents.GuestInformationModal.adultSingular', { count: adults });
-    const childText = t('BookingComponents.GuestInformationModal.childSingular', { count: children });
+    const roomText = rooms === 1 ? t('BookingComponents.GuestInformationModal.roomSingular') : t('BookingComponents.GuestInformationModal.roomsPlural');
+    const adultText = adults === 1 ? t('BookingComponents.GuestInformationModal.adultSingular') : t('BookingComponents.GuestInformationModal.adultsPlural');
+    const childText = children === 1 ? t('BookingComponents.GuestInformationModal.childSingular') : t('BookingComponents.GuestInformationModal.childrenPlural');
 
-    const childrenPart = children > 0
-      ? t('BookingComponents.GuestInformationModal.childrenPartFormat', { childrenCount: children, childText: childText })
-      : '';
+    let display = `${rooms} ${roomText} · ${adults} ${adultText}`;
+    if (children > 0) {
+      display += ` · ${children} ${childText}`;
+    }
 
-    return t('BookingComponents.GuestInformationModal.guestDisplayFormat', {
-      roomsCount: rooms,
-      roomText: roomText,
-      adultsCount: adults,
-      adultText: adultText,
-      childrenText: childrenPart
-    });
+    return display;
   };
 
   useEffect(() => {
-    // Prioritize guestData from props
     if (guestData) {
       setFirstName(guestData.firstName || "");
       setLastName(guestData.lastName || "");
@@ -130,9 +122,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       } else {
         setPhone("");
       }
-    }
-    // Fall back to auth user if available and guestData wasn't provided or didn't have contact info
-    else if (authUser) {
+    } else if (authUser) {
       setFirstName(authUser.firstName);
       setLastName(authUser.lastName);
       setEmail(authUser.email);
@@ -149,7 +139,6 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       }
     }
   }, [authUser, guestData]);
-
 
   const handleUpdate = () => {
     let valid = true;
@@ -179,7 +168,6 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       setIsFormUpdated(true);
       setUpdateMessage(t('BookingComponents.GuestInformationModal.informationVerified'));
 
-      // Include guest count details from guestData when saving to Redux
       dispatch(setGuestDetails({
         firstName,
         lastName,
@@ -191,7 +179,6 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         childAges: guestData?.childAges || []
       }));
 
-      // Auto-advance to review section after successful update
       setTimeout(() => {
         setActiveSection('review');
       }, 800);
@@ -200,19 +187,12 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
 
   const handleConfirmBooking = () => {
     if (isFormUpdated && selectedRoom) {
-      // Determine property ID from the room object
-      const propertyId = selectedRoom.propertyInfo_id ||
-                         selectedRoom.property_id ||
-                         selectedRoom.propertyId ||
-                         "";
-
-      // If propertyId is missing, show an error
+      const propertyId = selectedRoom.propertyInfo_id || selectedRoom.property_id || selectedRoom.propertyId || "";
       if (!propertyId) {
         setErrorMessage(t('BookingComponents.GuestInformationModal.propertyInfoMissing'));
         return;
       }
 
-      // Calculate total price based on number of nights
       const nightsCount = calculateNights(checkInDate, checkOutDate);
       const totalPrice = selectedRoom.room_price * nightsCount;
 
@@ -226,10 +206,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         checkIn: checkInDate,
         checkOut: checkOutDate,
         amount: totalPrice.toString(),
-        userId: authUser?._id, // Pass user ID if available
-        // Add guest counts
+        userId: authUser?._id,
         rooms: guestData?.rooms || 1,
-        adults: guestData?.guests || 1, // 'guests' in guestData corresponds to adults
+        adults: guestData?.guests || 1,
         children: guestData?.children || 0
       });
     }
@@ -237,8 +216,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
 
   if (!isOpen || !selectedRoom) return null;
 
-  // Calculate number of nights using the utility function
   const nightsCount = calculateNights(checkInDate, checkOutDate);
+  const nightsText = nightsCount === 1 ? t('BookingComponents.GuestInformationModal.nights') : t('BookingComponents.GuestInformationModal.nightsPlural');
 
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
@@ -301,7 +280,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         {formatDate(checkInDate)} - {formatDate(checkOutDate)}
                       </span>
                       <span className="text-xs bg-tripswift-blue/5 text-tripswift-black/70 px-2 py-1 rounded font-tripswift-medium">
-                        {t('BookingComponents.GuestInformationModal.nights', { count: nightsCount })}
+                        {nightsCount} {nightsText}
                       </span>
                     </div>
                   </div>
@@ -391,8 +370,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       {t('BookingComponents.GuestInformationModal.guestDetailsSection')}
                     </label>
 
-                    {/* Guest count display */}
-                     <div className="bg-tripswift-blue/5 border border-tripswift-blue/10 rounded-lg p-3 mb-3">
+                    <div className="bg-tripswift-blue/5 border border-tripswift-blue/10 rounded-lg p-3 mb-3">
                       <p className="text-sm font-tripswift-medium text-tripswift-blue/80">
                         {getGuestCountDisplay()}
                       </p>
@@ -445,11 +423,11 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                           <p className="font-tripswift-medium">{formatDate(checkOutDate)}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-tripswift-black/60">{t('BookingComponents.GuestInformationModal.duration')}</p>
-                          <p className="font-tripswift-medium">{t('BookingComponents.GuestInformationModal.nights', { count: nightsCount })}</p>
+                          <p className="text-sm text-tripswift-black/60">{t('BookingComponents.GuestInformationModal.nights')}</p>
+                          <p className="font-tripswift-medium">{nightsCount} {nightsText}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-tripswift-black/60">{t('BookingComponents.GuestInformationModal.guests')}</p>
+                          <p className="text-sm text-tripswift-black/60">{t('BookingComponents.GuestInformationModal.guestDetailsSection')}</p>
                           <p className="font-tripswift-medium">{getGuestCountDisplay()}</p>
                         </div>
                       </div>
@@ -489,7 +467,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-tripswift-black/70">
-                        {t('BookingComponents.GuestInformationModal.roomRate')} ({t('BookingComponents.GuestInformationModal.nights', { count: nightsCount })})
+                        {t('BookingComponents.GuestInformationModal.roomRate')} ({nightsCount} {nightsText})
                       </span>
                       <span className="font-tripswift-medium">₹{selectedRoom.room_price} × {nightsCount}</span>
                     </div>

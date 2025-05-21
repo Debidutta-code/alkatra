@@ -201,15 +201,15 @@
   "BookingComponents": {
     "GuestInformationModal": {
       "completeYourBooking": "अपनी बुकिंग पूरी करें",
-      "guestDetailsStep": "मेहमान विवरण",
-      "reviewAndPayStep": "समीक्षा करें और भुगतान करें",
-      "roomSummary": "कमरे का सारांश",
+      "guestDetailsStep": "अतिथि विवरण",
+      "reviewAndPayStep": "समीक्षा और भुगतान",
+      "roomSummary": "कमरा सारांश",
       "roomType": "कमरे का प्रकार",
       "checkIn": "चेक-इन",
       "checkOut": "चेक-आउट",
-      "nights": "{count} रात",
-      "nights_plural": "{count} रातें",
-      "guestInformation": "मेहमान जानकारी",
+      "nights": "रात",
+      "nightsPlural": "रातें",
+      "guestInformation": "अतिथि जानकारी",
       "firstNameLabel": "पहला नाम",
       "firstNamePlaceholder": "अपना पहला नाम दर्ज करें",
       "firstNameError": "पहला नाम आवश्यक है और इसमें केवल अक्षर और रिक्त स्थान होने चाहिए।",
@@ -217,36 +217,99 @@
       "lastNamePlaceholder": "अपना अंतिम नाम दर्ज करें",
       "lastNameError": "अंतिम नाम आवश्यक है और इसमें केवल अक्षर और रिक्त स्थान होने चाहिए।",
       "emailLabel": "ईमेल पता",
-      "emailPlaceholder": "आपका.ईमेल@उदाहरण.कॉम",
+      "emailPlaceholder": "your.email@example.com",
       "emailInfo": "आपकी बुकिंग की पुष्टि इस ईमेल पते पर भेजी जाएगी",
-      "emailError": "कृपया एक वैध ईमेल पता दर्ज करें।",
-      "phoneLabel": "फ़ोन नंबर",
-      "phonePlaceholder": "फ़ोन नंबर दर्ज करें",
-      "phoneInfo": "बुकिंग संबंधी सूचनाओं के लिए",
-      "phoneError": "फ़ोन नंबर आवश्यक है",
-      "guestDetailsSection": "मेहमान विवरण",
+      "emailError": "कृपया एक मान्य ईमेल पता दर्ज करें।",
+      "phoneLabel": "फोन नंबर",
+      "phonePlaceholder": "फोन नंबर दर्ज करें",
+      "phoneInfo": "बुकिंग से संबंधित सूचनाओं के लिए",
+      "phoneError": "फोन नंबर आवश्यक है",
+      "guestDetailsSection": "अतिथि विवरण",
       "roomSingular": "कमरा",
       "roomsPlural": "कमरे",
       "adultSingular": "वयस्क",
       "adultsPlural": "वयस्क",
       "childSingular": "बच्चा",
       "childrenPlural": "बच्चे",
-      "guestDisplayFormat": "{{roomsCount}} {{roomText}} · {{adultsCount}} {{adultText}}{{childrenText}}",
-      "childrenPartFormat": " · {{childrenCount}} {{childText}}",
+      "guestDisplayFormat": "कमरे और अतिथि",
+      "childrenPartFormat": "बच्चे",
       "informationVerified": "जानकारी सफलतापूर्वक सत्यापित!",
-      "propertyInfoMissing": "संपत्ति की जानकारी गायब है। कृपया पुनः प्रयास करें।",
+      "propertyInfoMissing": "प्रॉपर्टी जानकारी अनुपस्थित है। कृपया पुनः प्रयास करें।",
       "bookingSummary": "बुकिंग सारांश",
       "stayDetails": "ठहरने का विवरण",
-      "primaryGuest": "प्राथमिक मेहमान",
+      "primaryGuest": "प्राथमिक अतिथि",
       "priceDetails": "मूल्य विवरण",
-      "roomRate": "कमरे का किराया",
+      "roomRate": "कमरे की दर",
       "totalAmount": "कुल राशि",
       "paymentNoticeTitle": "भुगतान सुरक्षित रूप से संसाधित किया जाएगा",
-      "paymentNoticeDescription": "आगे बढ़ने पर, आप हमारी नियम और शर्तों और गोपनीयता नीति से सहमत होते हैं।",
+      "paymentNoticeDescription": "आगे बढ़ने से, आप हमारी शर्तों और गोपनीयता नीति से सहमत होते हैं।",
       "backToDetails": "विवरण पर वापस",
       "cancel": "रद्द करें",
-      "continueToReview": "समीक्षा जारी रखें",
-      "proceedToPayment" : "भुगतान करने के लिए आगे बढ़ें"
+      "continueToReview": "समीक्षा के लिए जारी रखें",
+      "proceedToPayment": "भुगतान के लिए आगे बढ़ें"
     }
+  },
+  "BookingTabs": {
+    "userNotLoggedIn": "उपयोगकर्ता लॉग इन नहीं है",
+    "noBooking": "कोई बुकिंग नहीं है",
+    "BookingHeader": {
+      "yourBookings": "आपकी बुकिंग",
+      "viewManageTrack": "अपने सभी होटल आरक्षण एक ही स्थान पर देखें, प्रबंधित करें और ट्रैक करें"
+    },
+    "BookingTabsNavigation": {
+      "allBookings": "सभी बुकिंग",
+      "upcoming": "आगामी",
+      "completed": "पूर्ण किए गए",
+      "cancelled": "रद्द किए गए"
+    },
+    "LoadingState": {
+      "retrievingBookings": "आपकी बुकिंग प्राप्त की जा रही हैं",
+      "fetchingDetails": "हम आपके आरक्षण विवरण प्राप्त करते समय थोड़ा इंतज़ार करें..."
+    },
+    "ErrorState": {
+      "noBookingsFound": "हमें आपके खाते से संबंधित कोई बुकिंग नहीं मिली।",
+      "startBookingNow": "अभी बुकिंग शुरू करें"
+    },
+    "EmptyState": {
+      "heading": {
+        "all": "कोई बुकिंग नहीं मिली",
+        "upcoming": "कोई आगामी बुकिंग नहीं",
+        "completed": "कोई पूरी की गई बुकिंग नहीं",
+        "cancelled": "कोई रद्द की गई बुकिंग नहीं"
+      },
+      "paragraph": {
+        "all": "अपनी अगली यात्रा की योजना बनाना शुरू करें!",
+        "upcoming": "आपके पास कोई आगामी होटल आरक्षण नहीं है।",
+        "completed": "आपने अभी तक कोई ठहरने की बुकिंग पूरी नहीं की है।",
+        "cancelled": "आपके पास कोई रद्द आरक्षण नहीं है।"
+      },
+      "bookHotelButton": "एक होटल बुक करें"
+    },
+    "BookingCard": {
+      "bookingId": "बुकिंग आईडी",
+      "nightSingular": "रात",
+      "nightsPlural": "रातें",
+      "checkIn": "चेक-इन",
+      "checkOut": "चेक-आउट",
+      "roomType": "कमरे का प्रकार",
+      "standardRoom": "मानक कमरा",
+      "paymentMethod": "भुगतान विधि",
+      "primaryGuest": "प्राथमिक अतिथि",
+      "rateBreakdown": "दर का विवरण",
+      "viewBookingDetails": "बुकिंग विवरण देखें",
+      "modify": "संशोधित करें",
+      "cancel": "रद्द करें"
+    },
+    "BookingPagination": {
+      "show": "दिखाएँ",
+      "perPage": "प्रति पृष्ठ",
+      "showing": "दिखा रहा है",
+      "of": "में से",
+      "bookings": "बुकिंग",
+      "noBookingsToShow": "दिखाने के लिए कोई बुकिंग नहीं है"
+    },
+    "CancellationModal": {},
+    "AmendReservationModal": {},
+    "BookingDetailsModal": {}
   }
 }

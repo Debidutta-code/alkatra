@@ -205,48 +205,111 @@
       "reviewAndPayStep": "مراجعة ودفع",
       "roomSummary": "ملخص الغرفة",
       "roomType": "نوع الغرفة",
-      "checkIn": "تسجيل الدخول",
-      "checkOut": "تسجيل الخروج",
-      "nights": "{count} ليلة",
-      "nights_plural": "{count} ليالي",
+      "checkIn": "تسجيل الوصول",
+      "checkOut": "تسجيل المغادرة",
+      "nights": "ليلة",
+      "nightsPlural": "ليالي",
       "guestInformation": "معلومات الضيف",
       "firstNameLabel": "الاسم الأول",
       "firstNamePlaceholder": "أدخل اسمك الأول",
       "firstNameError": "الاسم الأول مطلوب ويجب أن يحتوي على أحرف ومسافات فقط.",
       "lastNameLabel": "اسم العائلة",
-      "lastNamePlaceholder": "أدخل اسم عائلتك",
+      "lastNamePlaceholder": "أدخل اسم العائلة",
       "lastNameError": "اسم العائلة مطلوب ويجب أن يحتوي على أحرف ومسافات فقط.",
       "emailLabel": "عنوان البريد الإلكتروني",
-      "emailPlaceholder": "بريدك.الإلكتروني@مثال.كوم",
-      "emailInfo": "سيتم إرسال تأكيد الحجز الخاص بك إلى عنوان البريد الإلكتروني هذا",
-      "emailError": "الرجاء إدخال عنوان بريد إلكتروني صالح.",
+      "emailPlaceholder": "your.email@example.com",
+      "emailInfo": "سيتم إرسال تأكيد الحجز إلى هذا البريد الإلكتروني",
+      "emailError": "يرجى إدخال عنوان بريد إلكتروني صالح.",
       "phoneLabel": "رقم الهاتف",
       "phonePlaceholder": "أدخل رقم الهاتف",
-      "phoneInfo": "لإشعارات الحجز",
+      "phoneInfo": "لإشعارات متعلقة بالحجز",
       "phoneError": "رقم الهاتف مطلوب",
-      "guestDetailsSection": "تفاصيل الضيف",
+      "guestDetailsSection": "تفاصيل الضيوف",
       "roomSingular": "غرفة",
       "roomsPlural": "غرف",
       "adultSingular": "بالغ",
       "adultsPlural": "بالغون",
       "childSingular": "طفل",
       "childrenPlural": "أطفال",
-      "guestDisplayFormat": "{{roomsCount}} {{roomText}} · {{adultsCount}} {{adultText}}{{childrenText}}",
-      "childrenPartFormat": " · {{childrenCount}} {{childText}}",
+      "guestDisplayFormat": "الغرف والضيوف",
+      "childrenPartFormat": "أطفال",
       "informationVerified": "تم التحقق من المعلومات بنجاح!",
-      "propertyInfoMissing": "معلومات العقار مفقودة. الرجاء المحاولة مرة أخرى.",
+      "propertyInfoMissing": "معلومات العقار مفقودة. يرجى المحاولة مرة أخرى.",
       "bookingSummary": "ملخص الحجز",
       "stayDetails": "تفاصيل الإقامة",
       "primaryGuest": "الضيف الأساسي",
       "priceDetails": "تفاصيل السعر",
       "roomRate": "سعر الغرفة",
-      "totalAmount": "المبلغ الإجمالي",
+      "totalAmount": "الإجمالي",
       "paymentNoticeTitle": "سيتم معالجة الدفع بأمان",
-      "paymentNoticeDescription": "باستمرارك، فإنك توافق على الشروط والأحكام وسياسة الخصوصية الخاصة بنا.",
+      "paymentNoticeDescription": "بالمتابعة، فإنك توافق على شروطنا وسياسة الخصوصية.",
       "backToDetails": "العودة إلى التفاصيل",
       "cancel": "إلغاء",
-      "continueToReview": "المتابعة للمراجعة",
-      "proceedToPayment" : "المتابعة للدفع"
+      "continueToReview": "متابعة إلى المراجعة",
+      "proceedToPayment": "المتابعة إلى الدفع"
     }
+  },
+  "BookingTabs": {
+    "userNotLoggedIn": "المستخدم غير مسجل الدخول",
+    "noBooking": "لا يوجد حجز",
+    "BookingHeader": {
+      "yourBookings": "حجوزاتك",
+      "viewManageTrack": "عرض وإدارة وتتبع جميع حجوزات الفنادق الخاصة بك في مكان واحد"
+    },
+    "BookingTabsNavigation": {
+      "allBookings": "جميع الحجوزات",
+      "upcoming": "القادمة",
+      "completed": "المكتملة",
+      "cancelled": "الملغاة"
+    },
+    "LoadingState": {
+      "retrievingBookings": "جاري استرداد حجوزاتك",
+      "fetchingDetails": "لحظة من فضلك بينما نستعيد تفاصيل حجزك..."
+    },
+    "ErrorState": {
+      "noBookingsFound": "لم نتمكن من العثور على أي حجوزات مرتبطة بحسابك.",
+      "startBookingNow": "ابدأ الحجز الآن"
+    },
+    "EmptyState": {
+      "heading": {
+        "all": "لم يتم العثور على حجوزات",
+        "upcoming": "لا توجد حجوزات قادمة",
+        "completed": "لا توجد إقامات مكتملة",
+        "cancelled": "لا توجد حجوزات ملغاة"
+      },
+      "paragraph": {
+        "all": "ابدأ التخطيط لرحلتك القادمة!",
+        "upcoming": "ليس لديك أي حجوزات فندقية قادمة.",
+        "completed": "لم تكمل أي إقامات بعد.",
+        "cancelled": "ليس لديك أي حجوزات ملغاة."
+      },
+      "bookHotelButton": "احجز فندقًا"
+    },
+    "BookingCard": {
+      "bookingId": "معرف الحجز",
+      "nightSingular": "ليلة",
+      "nightsPlural": "ليالٍ",
+      "checkIn": "تسجيل الدخول",
+      "checkOut": "تسجيل الخروج",
+      "roomType": "نوع الغرفة",
+      "standardRoom": "غرفة قياسية",
+      "paymentMethod": "طريقة الدفع",
+      "primaryGuest": "الضيف الأساسي",
+      "rateBreakdown": "تفاصيل السعر",
+      "viewBookingDetails": "عرض تفاصيل الحجز",
+      "modify": "تعديل",
+      "cancel": "إلغاء"
+    },
+    "BookingPagination": {
+      "show": "عرض",
+      "perPage": "لكل صفحة",
+      "showing": "عرض",
+      "of": "من",
+      "bookings": "حجوزات",
+      "noBookingsToShow": "لا توجد حجوزات لعرضها"
+    },
+    "CancellationModal": {},
+    "AmendReservationModal": {},
+    "BookingDetailsModal": {}
   }
 }
