@@ -20,10 +20,107 @@
     "errorInvalidLocation": "يرجى إدخال موقع صالح.",
     "errorSelectDates": "يرجى تحديد تاريخي الوصول والمغادرة."
   },
+  "HotelListing": {
+    "CompactSearchBar": {
+      "locationPlaceholder": "إلى أين أنت ذاهب؟",
+      "checkInPlaceholder": "تاريخ الوصول",
+      "checkOutPlaceholder": "تاريخ المغادرة",
+      "searchButton": "بحث",
+      "errorInvalidLocation": "يرجى إدخال موقع صالح.",
+      "errorSelectDates": "يرجى تحديد تاريخي الوصول والمغادرة.",
+      "errorNoHotels": "لا توجد فنادق متاحة للموقع المحدد.",
+      "ariaClearSearch": "مسح البحث",
+      "ariaSearchHotels": "البحث عن فنادق",
+      "ariaSearching": "جارٍ البحث..."
+    },
+    "HotelCardItem": {
+      "noImage": "لا توجد صورة",
+      "descriptionFallback": "استمتع بإقامة مريحة في هذا الفندق الرائع.",
+      "contactLabel": "اتصال",
+      "viewRoomButton": "عرض الغرفة",
+      "amenitiesList": {
+        "wifi": "واي فاي مجاني",
+        "swimming_pool": "حمام سباحة",
+        "fitness_center": "مركز لياقة بدنية",
+        "spa_and_wellness": "سبا وصحة",
+        "restaurant": "مطعم",
+        "room_service": "خدمة الغرف",
+        "bar_and_lounge": "بار وصالة",
+        "parking": "موقف سيارات",
+        "concierge_services": "خدمات الكونسيرج",
+        "pet_friendly": "صديق للحيوانات الأليفة",
+        "business_facilities": "مرافق الأعمال",
+        "laundry_services": "خدمات الغسيل",
+        "child_friendly_facilities": "مرافق صديقة للأطفال"
+      }
+    },
+    "heroTitle": "ابحث عن إقامتك المثالية",
+    "heroSubtitle": "احجز أماكن إقامة بأفضل الأسعار",
+    "hotelsIn": "فنادق في",
+    "yourDestination": "وجهتك",
+    "selectDates": "اختر التواريخ",
+    "propertiesFound": "تم العثور على العقارات",
+    "nights": "ليالي",
+    "filters": "الفلاتر",
+    "activeFilter": "فلتر نشط",
+    "activeFilters": "فلاتر نشطة",
+    "clearAll": "مسح الكل",
+    "popularFilters": "الفلاتر الشعبية",
+    "freeWifi": "واي فاي مجاني",
+    "parking": "موقف سيارات",
+    "breakfast": "إفطار",
+    "searchPropertyName": "ابحث عن اسم العقار",
+    "sortBy": "ترتيب حسب",
+    "recommended": "موصى به",
+    "highestRating": "أعلى تقييم",
+    "lowestRating": "أدنى تقييم",
+    "whyBookWithTripSwift": "لماذا تحجز مع TripSwift",
+    "freeCancellation": "إلغاء مجاني",
+    "freeCancellationDesc": "معظم عقاراتنا تقدم إلغاء مجاني حتى 24 ساعة قبل تسجيل الوصول.",
+    "bestPriceGuarantee": "ضمان أفضل سعر",
+    "bestPriceGuaranteeDesc": "هل وجدت سعرًا أقل؟ سنطابق السعر ونمنحك خصمًا إضافيًا بنسبة 10%.",
+    "secureBooking": "حجز آمن",
+    "secureBookingDesc": "نستخدم تشفيرًا بمعايير الصناعة لحماية معلوماتك الشخصية.",
+    "noHotelsError": "لم يتم العثور على فنادق لمعايير البحث المحددة.",
+    "tryModifyingSearch": "يرجى محاولة تعديل البحث"
+  },
   "HotelBox": {
     "DateRange": {
       "checkInPlaceholder": "تاريخ الوصول",
       "checkOutPlaceholder": "تاريخ المغادرة"
+    },
+    "FilterModal": {
+      "title": "الفلاتر",
+      "propertyRating": "تقييم العقار",
+      "amenities": "المرافق",
+      "sortBy": "ترتيب حسب",
+      "cancel": "إلغاء",
+      "applyFilters": "تطبيق الفلاتر",
+      "ariaCloseModal": "إغلاق النافذة",
+      "ariaSortOrder": "ترتيب الفرز",
+      "ratingUp": "وما فوق",
+      "amenitiesList": {
+        "wifi": "واي فاي مجاني",
+        "swimming_pool": "حمام سباحة",
+        "fitness_center": "مركز لياقة بدنية",
+        "spa_and_wellness": "سبا وصحة",
+        "restaurant": "مطعم",
+        "room_service": "خدمة الغرف",
+        "bar_and_lounge": "بار وصالة",
+        "parking": "موقف سيارات",
+        "concierge_services": "خدمات الكونسيرج",
+        "pet_friendly": "صديق للحيوانات الأليفة",
+        "business_facilities": "مرافق الأعمال",
+        "laundry_services": "خدمات الغسيل",
+        "child_friendly_facilities": "مرافق صديقة للأطفال"
+      },
+      "sortOptions": {
+        "recommended": "موصى به",
+        "rating_desc": "التقييم: من الأعلى إلى الأدنى",
+        "rating_asc": "التقييم: من الأدنى إلى الأعلى",
+        "price_desc": "السعر: من الأعلى إلى الأدنى",
+        "price_asc": "السعر: من الأدنى إلى الأعلى"
+      }
     }
   },
   "HomeSections": {
@@ -36,9 +133,9 @@
         "description": "خصم يصل إلى 50% على حجوزات الفنادق",
         "validTill": "2 ساعة 45 دقيقة"
       },
-      "flightDeal": {
-        "title": "عرض الطيران",
-        "description": "استرداد نقدي ₹2000 على الرحلات الجوية",
+      "luxuryStay": {
+        "title": "إقامة فاخرة",
+        "description": "خصم يصل إلى 30% على الفنادق الفاخرة",
         "validTill": "5 ساعات 30 دقيقة"
       },
       "weekendGetaway": {
@@ -47,5 +144,38 @@
         "validTill": "3 ساعات 15 دقيقة"
       }
     }
+  },
+  "RoomsPage": {
+    "backToSearch": "العودة إلى البحث",
+    "starHotelRating": "فندق نجوم",
+    "viewPropertyDetails": "عرض تفاصيل العقار",
+    "aboutThisProperty": "عن هذا العقار",
+    "noImagesAvailable": "لا توجد صور متاحة",
+    "propertyAmenities": "مرافق العقار",
+    "amenitiesList": {
+      "wifi": "واي فاي مجاني",
+      "swimming_pool": "حمام سباحة",
+      "fitness_center": "مركز لياقة بدنية",
+      "spa_and_wellness": "سبا وصحة",
+      "restaurant": "مطعم",
+      "room_service": "خدمة الغرف",
+      "bar_and_lounge": "بار وصالة",
+      "parking": "موقف سيارات",
+      "concierge_services": "خدمات الكونسيرج",
+      "pet_friendly": "صديق للحيوانات الأليفة",
+      "business_facilities": "مرافق الأعمال",
+      "laundry_services": "خدمات الغسيل",
+      "child_friendly_facilities": "مرافق صديقة للأطفال"
+    },
+    "noAmenitiesSpecified": "لم يتم تحديد أي مرافق لهذا العقار.",
+    "contactInformation": "معلومات الاتصال",
+    "allRooms": "جميع الغرف",
+    "searchRoomName": "البحث عن اسم الغرفة",
+    "availableRooms": "الغرف المتاحة",
+    "showingRooms_one": "عرض {count} غرفة",
+    "showingRooms_other": "عرض {count} غرف",
+    "noRoomsAvailableTitle": "لا توجد غرف متاحة",
+    "noRoomsAvailableMessage": "لم نتمكن من العثور على أي غرف مطابقة لمعايير البحث الخاصة بك. حاول تعديل فلاتر البحث أو التواريخ.",
+    "clearFilters": "مسح الفلاتر"
   }
 }

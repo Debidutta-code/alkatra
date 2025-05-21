@@ -1,6 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Star, Coffee, Ban } from 'lucide-react';
 
 export function PopularHotels() {
@@ -36,39 +35,41 @@ export function PopularHotels() {
   ];
 
   return (
-    <section className="py-12">
+    <section className="py-12 bg-tripswift-off-white">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-8">Popular Hotels</h2>
+        <h2 className="text-3xl font-tripswift-bold mb-8 text-tripswift-black">Popular Hotels</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {hotels.map((hotel, index) => (
-            <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow">
+            <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow border border-gray-100">
               <img
                 src={hotel.image}
                 alt={hotel.name}
                 className="w-full h-48 object-cover"
               />
               <CardContent className="p-4">
-                <h3 className="text-xl font-semibold mb-2">{hotel.name}</h3>
+                <h3 className="text-xl font-tripswift-bold mb-2 text-tripswift-black">{hotel.name}</h3>
                 <div className="flex items-center mb-2">
-                  <Star className="w-4 h-4 text-yellow-400 mr-1" />
-                  <span className="font-medium">{hotel.rating}</span>
+                  <Star className="w-4 h-4 text-tripswift-blue mr-1" />
+                  <span className="font-tripswift-medium">{hotel.rating}</span>
                 </div>
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <Badge variant="outline" className="flex items-center">
+                  <Badge variant="outline" className="flex items-center border-tripswift-blue/30 bg-tripswift-blue/5 text-tripswift-blue">
                     <Ban className="w-3 h-3 mr-1" />
                     Free Cancellation
                   </Badge>
-                  <Badge variant="outline" className="flex items-center">
+                  <Badge variant="outline" className="flex items-center border-tripswift-blue/30 bg-tripswift-blue/5 text-tripswift-blue">
                     <Coffee className="w-3 h-3 mr-1" />
                     Breakfast
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-sm text-gray-500">Starting from</span>
-                    <p className="text-lg font-bold text-blue-600">{hotel.price}</p>
+                    <span className="text-sm text-tripswift-black/60 font-tripswift-regular">Starting from</span>
+                    <p className="text-lg font-tripswift-bold text-tripswift-blue">{hotel.price}</p>
                   </div>
-                  <Button variant="outline">Book Now</Button>
+                  <button className="btn-tripswift-primary py-2 px-4 rounded-lg text-sm hover:shadow-md transition-all">
+                    Book Now
+                  </button>
                 </div>
               </CardContent>
             </Card>

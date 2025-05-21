@@ -1,44 +1,62 @@
+"use client";
+
 import React, { useState, useRef, useEffect } from "react";
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Search, MapPin, Calendar, Users, Loader2, X, ChevronRight } from 'lucide-react';
+import { Search, MapPin, Calendar, Loader2, X, ChevronRight } from 'lucide-react';
 import toast from "react-hot-toast";
 import DateRange from "../HotelBox/DateRange";
 import GuestBox from "../HotelBox/GuestBox";
 import { getHotelsByCity } from '@/api/hotel';
 import { format, addDays } from 'date-fns';
+import { useSelector } from "@/Redux/store";
+import { t } from "i18next"; // Ensure i18next is set up to provide the t function
+
 
 interface CompactSearchBarProps {
   initialLocation?: string;
   initialCheckin?: string;
   initialCheckout?: string;
-  onSearch?: (location: string, checkin: string, checkout: string) => void;
+  onSearch?: (location: string, checkin: string, checkout: string, guestDetails?: any) => void;
+  onGuestChange?: (guestDetails: any) => void;
 }
 
 const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
-  initialLocation = "Bhubaneswar", // Default location set to Bhubaneswar
+  initialLocation = "Bhubaneswar",
   initialCheckin = "",
   initialCheckout = "",
-  onSearch
+  onSearch,
+  onGuestChange
 }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const searchContainerRef = useRef<HTMLDivElement>(null);
   
+  // Get guest details from Redux store
+  const { guestDetails } = useSelector((state) => state.hotel);
+  
   // Set default dates (tomorrow and day after tomorrow)
-  const tomorrow = format(addDays(new Date(), 1), 'yyyy-MM-dd');
-  const dayAfterTomorrow = format(addDays(new Date(), 2), 'yyyy-MM-dd');
-  
+  const tomorrow = format(addDays(new Date(), 1), "yyyy-MM-dd");
+  const dayAfterTomorrow = format(addDays(new Date(), 2), "yyyy-MM-dd");
+
   // Get current search parameters from URL or props or defaults
-  const currentLocation = initialLocation || searchParams.get("location") || searchParams.get("destination") || "Bhubaneswar";
+  const currentLocation =
+    initialLocation ||
+    searchParams.get("location") ||
+    searchParams.get("destination") ||
+    "Bhubaneswar";
   const checkinDate = initialCheckin || searchParams.get("checkin") || tomorrow;
-  const checkoutDate = initialCheckout || searchParams.get("checkout") || dayAfterTomorrow;
-  
+  const checkoutDate =
+    initialCheckout || searchParams.get("checkout") || dayAfterTomorrow;
+
   // Set initial states with current search parameters
   const [searchQuery, setSearchQuery] = useState(currentLocation);
-  const [dates, setDates] = useState<string[] | undefined>([checkinDate, checkoutDate]);
+  const [dates, setDates] = useState<string[] | undefined>([
+    checkinDate,
+    checkoutDate,
+  ]);
   const [loading, setLoading] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  
+
   // Update state when props change
   useEffect(() => {
     if (initialLocation) setSearchQuery(initialLocation);
@@ -46,41 +64,53 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
       setDates([initialCheckin, initialCheckout]);
     }
   }, [initialLocation, initialCheckin, initialCheckout]);
-  
+
   const clearSearch = () => {
     setSearchQuery("");
   };
   
+  // Handler for when guest details change
+  const handleGuestDetailsChange = (details: any) => {
+    if (onGuestChange) {
+      onGuestChange(details);
+    }
+  };
+  
   const handleSearchButtonClick = async (e: React.MouseEvent) => {
     e.preventDefault();
-    
+
     if (loading) return;
-    
+
     // Validation logic
     if (!searchQuery || searchQuery.length < 3) {
-      toast.error("Please enter a valid location.");
+      toast.error(t("HotelListing.CompactSearchBar.errorInvalidLocation"));
       return;
     }
 
     if (!dates || dates.length !== 2 || !dates[0] || !dates[1]) {
-      toast.error("Please select both check-in and check-out dates.");
+      toast.error(t("HotelListing.CompactSearchBar.errorSelectDates"));
       return;
     }
 
     setLoading(true);
     try {
       await getHotelsByCity(searchQuery);
-      const checkinDate = encodeURIComponent(dates[0] || '');
-      const checkoutDate = encodeURIComponent(dates[1] || '');
-      
+      const checkinDate = encodeURIComponent(dates[0] || "");
+      const checkoutDate = encodeURIComponent(dates[1] || "");
+
       // Use the onSearch callback if provided, otherwise use router
       if (onSearch) {
-        onSearch(searchQuery, dates[0], dates[1]);
+        onSearch(searchQuery, dates[0], dates[1], guestDetails);
       } else {
-        router.push(`/destination?location=${encodeURIComponent(searchQuery)}&checkin=${checkinDate}&checkout=${checkoutDate}`);
+        // Build guest details query parameters
+        const guestParams = guestDetails ? 
+          `&rooms=${guestDetails.rooms || 1}&adults=${guestDetails.guests || 1}&children=${guestDetails.children || 0}` : 
+          '';
+        
+        router.push(`/destination?location=${encodeURIComponent(searchQuery)}&checkin=${checkinDate}&checkout=${checkoutDate}${guestParams}`);
       }
     } catch (error) {
-      toast.error("No hotels available for the selected location.");
+      toast.error(t("HotelListing.CompactSearchBar.errorNoHotels"));
     } finally {
       setLoading(false);
     }
@@ -92,8 +122,16 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
         {/* Location Input */}
         <div className="w-full sm:w-auto sm:flex-1" ref={searchContainerRef}>
           <div className="relative group">
-            <div className={`absolute inset-y-0 left-3 flex items-center pointer-events-none transition-colors duration-200 ${isSearchFocused ? 'text-tripswift-blue' : 'text-tripswift-black/40'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-300 ${isSearchFocused ? 'bg-tripswift-blue/10' : 'bg-transparent'}`}>
+            <div
+              className={`absolute inset-y-0 left-3 flex items-center pointer-events-none transition-colors duration-200 ${isSearchFocused
+                  ? "text-tripswift-blue"
+                  : "text-tripswift-black/40"
+                }`}
+            >
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-300 ${isSearchFocused ? "bg-tripswift-blue/10" : "bg-transparent"
+                  }`}
+              >
                 <MapPin className="h-4 w-4" />
               </div>
             </div>
@@ -103,19 +141,18 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
-              placeholder="Where are you going?"
-              className={`block w-full h-14 pl-12 pr-10 py-2 rounded-xl border ${
-                isSearchFocused 
-                  ? 'border-tripswift-blue ring-2 ring-tripswift-blue/10'
-                  : 'border-tripswift-black/10 hover:border-tripswift-blue/30'
-              } outline-none text-tripswift-black transition duration-200 ease-in-out shadow-sm font-tripswift-medium text-[15px]`}
-              aria-label="Search destination"
+              placeholder={t("HotelListing.CompactSearchBar.locationPlaceholder")} // Translated placeholder
+              className={`block w-full h-14 pl-12 pr-10 py-2 rounded-xl border ${isSearchFocused
+                  ? "border-tripswift-blue ring-2 ring-tripswift-blue/10"
+                  : "border-tripswift-black/10 hover:border-tripswift-blue/30"
+                } outline-none text-tripswift-black transition duration-200 ease-in-out shadow-sm font-tripswift-medium text-[15px]`}
+              aria-label={t("HotelListing.CompactSearchBar.locationPlaceholder")} // Translated aria-label
             />
             {searchQuery && (
               <button
                 onClick={clearSearch}
                 className="absolute inset-y-0 right-3 flex items-center text-tripswift-black/40 hover:text-tripswift-black transition-colors"
-                aria-label="Clear search"
+                aria-label={t("HotelListing.CompactSearchBar.ariaClearSearch")} // Translated aria-label
               >
                 <div className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-gray-100">
                   <X className="h-4 w-4" />
@@ -124,7 +161,7 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
             )}
           </div>
         </div>
-        
+
         {/* Date Range */}
         <div className="w-full sm:w-auto sm:flex-1">
           <div className="relative group">
@@ -138,21 +175,12 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
             </div>
           </div>
         </div>
-        
+
         {/* Guest Selection */}
-        <div className="w-full sm:w-auto sm:flex-[0.7]">
-          <div className="relative group">
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center group-hover:bg-tripswift-blue/10 transition-colors duration-300">
-                <Users className="h-4 w-4 text-tripswift-black/40 group-hover:text-tripswift-blue transition-colors duration-200" />
-              </div>
-            </div>
-            <div className="bg-white border border-tripswift-black/10 hover:border-tripswift-blue/30 rounded-xl shadow-sm transition-all duration-200 h-14 pl-12 flex items-center">
-              <GuestBox />
-            </div>
-          </div>
+        <div className="w-full sm:w-auto sm:flex-1">
+          <GuestBox onChange={handleGuestDetailsChange} />
         </div>
-        
+
         {/* Search Button */}
         <div className="w-full sm:w-auto">
           <button
@@ -160,7 +188,11 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
             disabled={loading}
             onClick={handleSearchButtonClick}
             className="w-full sm:w-auto h-14 px-6 bg-gradient-to-r from-tripswift-blue to-[#054B8F] hover:from-[#054B8F] hover:to-tripswift-blue disabled:from-tripswift-black/30 disabled:to-tripswift-black/40 text-tripswift-off-white rounded-xl flex items-center justify-center gap-2 transition-all duration-300 font-tripswift-medium text-[14px] shadow-md hover:shadow-lg relative overflow-hidden group"
-            aria-label={loading ? "Searching..." : "Search hotels"}
+            aria-label={
+              loading
+                ? t("HotelListing.CompactSearchBar.ariaSearching") // Translated aria-label for loading state
+                : t("HotelListing.CompactSearchBar.ariaSearchHotels") // Translated aria-label for default state
+            }
           >
             <div className="absolute inset-0 bg-gradient-to-r from-tripswift-blue to-[#054B8F] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <span className="relative z-10 flex items-center gap-2.5">
@@ -169,7 +201,9 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
               ) : (
                 <>
                   <Search className="w-5 h-5" />
-                  <span className="font-tripswift-medium">Search</span>
+                  <span className="font-tripswift-medium">
+                    {t("HotelListing.CompactSearchBar.searchButton")} {/* Translated button text */}
+                  </span>
                   <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" />
                 </>
               )}

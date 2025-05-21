@@ -65,14 +65,14 @@ h1 {
   letter-spacing: 3.42px;
   font-family: var(--font-primary);
   font-weight: var(--font-weight-extrabold);
-  color: var(--color-secondary-black);
+  color: var(--color-primary-off-white);
 }
 
 h2 {
   font-size: 12px;
   line-height: 15px;
   letter-spacing: 2px;
-  color: var(--color-secondary-black);
+  color: var(--color-primary-off-white);
   font-family: var(--font-primary);
   font-weight: var(--font-weight-medium);
 }

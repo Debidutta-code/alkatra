@@ -20,10 +20,107 @@
     "errorInvalidLocation": "कृपया एक मान्य स्थान दर्ज करें।",
     "errorSelectDates": "कृपया चेक-इन और चेक-आउट दोनों तारीखें चुनें।"
   },
+  "HotelListing": {
+    "CompactSearchBar": {
+      "locationPlaceholder": "आप कहाँ जा रहे हैं?",
+      "checkInPlaceholder": "चेक-इन",
+      "checkOutPlaceholder": "चेक-आउट",
+      "searchButton": "खोजें",
+      "errorInvalidLocation": "कृपया एक मान्य स्थान दर्ज करें।",
+      "errorSelectDates": "कृपया चेक-इन और चेक-आउट दोनों तारीखें चुनें।",
+      "errorNoHotels": "चयनित स्थान के लिए कोई होटल उपलब्ध नहीं है।",
+      "ariaClearSearch": "खोज साफ करें",
+      "ariaSearchHotels": "होटल खोजें",
+      "ariaSearching": "खोज रहा है..."
+    },
+    "HotelCardItem": {
+      "noImage": "कोई छवि नहीं",
+      "descriptionFallback": "इस अद्भुत संपत्ति में आरामदायक प्रवास का अनुभव करें।",
+      "contactLabel": "संपर्क करें",
+      "viewRoomButton": "कमरा देखें",
+      "amenitiesList": {
+        "wifi": "मुफ्त वाईफाई",
+        "swimming_pool": "स्विमिंग पूल",
+        "fitness_center": "फिटनेस सेंटर",
+        "spa_and_wellness": "स्पा और वेलनेस",
+        "restaurant": "रेस्तरां",
+        "room_service": "रूम सर्विस",
+        "bar_and_lounge": "बार और लाउंज",
+        "parking": "पार्किंग",
+        "concierge_services": "कंसीयज सेवाएँ",
+        "pet_friendly": "पेट फ्रेंडली",
+        "business_facilities": "व्यावसायिक सुविधाएँ",
+        "laundry_services": "लॉन्ड्री सेवाएँ",
+        "child_friendly_facilities": "बच्चों के अनुकूल सुविधाएँ"
+      }
+    },
+    "heroTitle": "अपना सही ठहराव खोजें",
+    "heroSubtitle": "सबसे अच्छी कीमतों पर आवास बुक करें",
+    "hotelsIn": "में होटल",
+    "yourDestination": "आपका गंतव्य",
+    "selectDates": "तारीखें चुनें",
+    "propertiesFound": "प्रॉपर्टी मिलीं",
+    "nights": "रातें",
+    "filters": "फ़िल्टर",
+    "activeFilter": "सक्रिय फ़िल्टर",
+    "activeFilters": "सक्रिय फ़िल्टर",
+    "clearAll": "सभी साफ करें",
+    "popularFilters": "लोकप्रिय फ़िल्टर",
+    "freeWifi": "मुफ्त वाईफाई",
+    "parking": "पार्किंग",
+    "breakfast": "नाश्ता",
+    "searchPropertyName": "प्रॉपर्टी का नाम खोजें",
+    "sortBy": "इसके अनुसार क्रमबद्ध करें",
+    "recommended": "अनुशंसित",
+    "highestRating": "उच्चतम रेटिंग",
+    "lowestRating": "निम्नतम रेटिंग",
+    "whyBookWithTripSwift": "TripSwift के साथ बुक क्यों करें",
+    "freeCancellation": "मुफ्त रद्दीकरण",
+    "freeCancellationDesc": "हमारी अधिकांश प्रॉपर्टी चेक-इन से 24 घंटे पहले तक मुफ्त रद्दीकरण प्रदान करती हैं।",
+    "bestPriceGuarantee": "सर्वश्रेष्ठ मूल्य गारंटी",
+    "bestPriceGuaranteeDesc": "कम कीमत मिली? हम उसका मिलान करेंगे और आपको अतिरिक्त 10% छूट देंगे।",
+    "secureBooking": "सुरक्षित बुकिंग",
+    "secureBookingDesc": "हम आपकी व्यक्तिगत जानकारी की सुरक्षा के लिए उद्योग-मानक एन्क्रिप्शन का उपयोग करते हैं।",
+    "noHotelsError": "दिए गए खोज मानदंडों के लिए कोई होटल नहीं मिला।",
+    "tryModifyingSearch": "कृपया खोज को संशोधित करने का प्रयास करें"
+  },
   "HotelBox": {
     "DateRange": {
       "checkInPlaceholder": "चेक-इन तारीख",
       "checkOutPlaceholder": "चेक-आउट तारीख"
+    },
+    "FilterModal": {
+      "title": "फ़िल्टर",
+      "propertyRating": "प्रॉपर्टी रेटिंग",
+      "amenities": "सुविधाएँ",
+      "sortBy": "इसके अनुसार क्रमबद्ध करें",
+      "cancel": "रद्द करें",
+      "applyFilters": "फ़िल्टर लागू करें",
+      "ariaCloseModal": "मॉडल बंद करें",
+      "ariaSortOrder": "क्रमबद्ध करें",
+      "ratingUp": "और ऊपर",
+      "amenitiesList": {
+        "wifi": "मुफ्त वाईफाई",
+        "swimming_pool": "स्विमिंग पूल",
+        "fitness_center": "फिटनेस सेंटर",
+        "spa_and_wellness": "स्पा और वेलनेस",
+        "restaurant": "रेस्तरां",
+        "room_service": "रूम सर्विस",
+        "bar_and_lounge": "बार और लाउंज",
+        "parking": "पार्किंग",
+        "concierge_services": "कंसीयज सेवाएँ",
+        "pet_friendly": "पेट फ्रेंडली",
+        "business_facilities": "व्यावसायिक सुविधाएँ",
+        "laundry_services": "लॉन्ड्री सेवाएँ",
+        "child_friendly_facilities": "बच्चों के अनुकूल सुविधाएँ"
+      },
+      "sortOptions": {
+        "recommended": "अनुशंसित",
+        "rating_desc": "रेटिंग: उच्च से निम्न",
+        "rating_asc": "रेटिंग: निम्न से उच्च",
+        "price_desc": "मूल्य: उच्च से निम्न",
+        "price_asc": "मूल्य: निम्न से उच्च"
+      }
     }
   },
   "HomeSections": {
@@ -36,9 +133,9 @@
         "description": "होटल बुकिंग पर 50% तक की छूट",
         "validTill": "2 घंटे 45 मिनट"
       },
-      "flightDeal": {
-        "title": "फ्लाइट डील",
-        "description": "फ्लाइट पर ₹2000 की तत्काल कैशबैक",
+      "luxuryStay": {
+        "title": "लक्ज़री स्टे",
+        "description": "प्रीमियम होटलों पर 30% तक की छूट",
         "validTill": "5 घंटे 30 मिनट"
       },
       "weekendGetaway": {
@@ -47,5 +144,38 @@
         "validTill": "3 घंटे 15 मिनट"
       }
     }
+  },
+  "RoomsPage": {
+    "backToSearch": "खोज पर वापस जाएं",
+    "starHotelRating": "सितारा होटल रेटिंग",
+    "viewPropertyDetails": "संपत्ति विवरण देखें",
+    "aboutThisProperty": "इस संपत्ति के बारे में",
+    "noImagesAvailable": "कोई छवि उपलब्ध नहीं है",
+    "propertyAmenities": "संपत्ति की सुविधाएँ",
+    "amenitiesList": {
+      "wifi": "मुफ्त वाईफाई",
+      "swimming_pool": "स्विमिंग पूल",
+      "fitness_center": "फिटनेस सेंटर",
+      "spa_and_wellness": "स्पा और वेलनेस",
+      "restaurant": "रेस्तरां",
+      "room_service": "रूम सर्विस",
+      "bar_and_lounge": "बार और लाउंज",
+      "parking": "पार्किंग",
+      "concierge_services": "कंसीयज सेवाएँ",
+      "pet_friendly": "पेट फ्रेंडली",
+      "business_facilities": "व्यावसायिक सुविधाएँ",
+      "laundry_services": "लॉन्ड्री सेवाएँ",
+      "child_friendly_facilities": "बच्चों के अनुकूल सुविधाएँ"
+    },
+    "noAmenitiesSpecified": "इस संपत्ति के लिए कोई सुविधाएँ निर्दिष्ट नहीं हैं।",
+    "contactInformation": "संपर्क जानकारी",
+    "allRooms": "सभी कमरे",
+    "searchRoomName": "कमरे का नाम खोजें",
+    "availableRooms": "उपलब्ध कमरे",
+    "showingRooms_one": "कमरा दिखा रहा है",
+    "showingRooms_other": "कमरे दिखा रहा है",
+    "noRoomsAvailableTitle": "कोई कमरा उपलब्ध नहीं है",
+    "noRoomsAvailableMessage": "हमें आपके मानदंडों से मेल खाने वाले कोई कमरे नहीं मिले। कृपया अपने खोज फ़िल्टर या तारीखें समायोजित करने का प्रयास करें।",
+    "clearFilters": "फ़िल्टर साफ़ करें"
   }
 }

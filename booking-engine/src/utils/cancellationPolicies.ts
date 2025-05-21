@@ -1,5 +1,4 @@
-import { FaCheckCircle, FaInfoCircle, FaTimesCircle } from "react-icons/fa";
-import { IconType } from "react-icons";
+import { CheckCircle, Info, XCircle, AlertCircle, LucideIcon } from "lucide-react";
 
 /**
  * Standard OTA cancellation policy types
@@ -21,11 +20,11 @@ export interface PolicyRules {
  * Policy styling information for UI display
  */
 export interface PolicyStyling {
-  color: string;
+  headerBgColor: string;
   bgColor: string;
   borderColor: string;
   textColor: string;
-  icon: IconType;
+  icon: LucideIcon;
 }
 
 /**
@@ -69,35 +68,35 @@ export const getPolicyStyling = (policyType: PolicyType): PolicyStyling => {
   switch (policyType) {
     case "Flexible":
       return { 
-        color: "green", 
+        headerBgColor: "bg-green-500", 
         bgColor: "bg-green-50", 
         borderColor: "border-green-200",
         textColor: "text-green-800",
-        icon: FaCheckCircle 
+        icon: CheckCircle 
       };
     case "Moderate":
       return { 
-        color: "tripswift-blue", 
+        headerBgColor: "bg-tripswift-blue", 
         bgColor: "bg-tripswift-blue/10", 
         borderColor: "border-tripswift-blue/20",
         textColor: "text-tripswift-blue",
-        icon: FaInfoCircle 
+        icon: Info 
       };
     case "Strict":
       return { 
-        color: "orange", 
-        bgColor: "bg-orange-50", 
-        borderColor: "border-orange-200",
-        textColor: "text-orange-800",
-        icon: FaInfoCircle 
+        headerBgColor: "bg-amber-500", 
+        bgColor: "bg-amber-50", 
+        borderColor: "border-amber-200",
+        textColor: "text-amber-800",
+        icon: AlertCircle 
       };
     case "NonRefundable":
       return { 
-        color: "red", 
+        headerBgColor: "bg-red-500", 
         bgColor: "bg-red-50", 
         borderColor: "border-red-200",
         textColor: "text-red-800",
-        icon: FaTimesCircle 
+        icon: XCircle 
       };
   }
 };
@@ -121,7 +120,7 @@ export const getPolicyBulletPoints = (policyType: PolicyType): { text: string, c
     case "Strict":
       return [
         { text: "Full refund: If cancelled 7+ days before check-in", color: "text-green-600" },
-        { text: "50% refund: If cancelled 1-7 days before check-in", color: "text-yellow-600" },
+        { text: "50% refund: If cancelled 1-7 days before check-in", color: "text-amber-600" },
         { text: "No refund: If cancelled within 24 hours of check-in", color: "text-red-600" }
       ];
     case "NonRefundable":
@@ -210,5 +209,30 @@ export const getRoomCardPolicyDescription = (policyType: PolicyType): string => 
       return "Free cancellation up to 7 days before check-in";
     case "NonRefundable":
       return "Non-refundable rate with special discount";
+  }
+};
+
+/**
+ * Get the icon component for a policy type
+ * Note: Returns the component itself, not a JSX element
+ */
+export const getPolicyIcon = (policyType: PolicyType): LucideIcon => {
+  const styling = getPolicyStyling(policyType);
+  return styling.icon;
+};
+
+/**
+ * Get badge styling for policy display
+ */
+export const getPolicyBadgeStyling = (policyType: PolicyType): string => {
+  switch (policyType) {
+    case "Flexible":
+      return "bg-green-100 text-green-800 border-green-200";
+    case "Moderate":
+      return "bg-tripswift-blue/10 text-tripswift-blue border-tripswift-blue/20";
+    case "Strict":
+      return "bg-amber-100 text-amber-800 border-amber-200";
+    case "NonRefundable":
+      return "bg-red-100 text-red-800 border-red-200";
   }
 };

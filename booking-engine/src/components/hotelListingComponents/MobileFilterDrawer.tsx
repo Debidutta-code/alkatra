@@ -122,7 +122,7 @@ const MobileFilterDrawer: React.FC<MobileFilterDrawerProps> = ({
                   htmlFor={`mobile-amenity-${amenity.key}`} 
                   className="ml-2 text-xs text-tripswift-black/80 normal-case font-tripswift-regular cursor-pointer"
                 >
-                  {amenity.label}
+                  {amenity.labelKey}
                 </label>
               </div>
             ))}
