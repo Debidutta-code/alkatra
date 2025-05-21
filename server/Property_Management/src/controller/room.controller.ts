@@ -6,6 +6,8 @@ import { PropertyInfo } from "../model/property.info.model";
 import PropertyRatePlan from "../model/ratePlan.model";
 import mongoose from "mongoose";
 import PropertyPrice from "../model/ratePlan.model";
+import QRCode from 'qrcode';
+
 
 interface UpdateFields {
   room_name?: string;
@@ -287,10 +289,8 @@ const getRoomsByPropertyId = catchAsync(async (req: Request, res: Response, next
 
 const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const propertyInfoId = req.params.id;
-
   const rooms = await Room.find({ propertyInfo_id: propertyInfoId }).exec();
   const ratePlanList = await PropertyPrice.find({ property_id: propertyInfoId });
-
   if (!rooms) {
     return next(
       new AppError(`No property found with this id ${propertyInfoId}`, 404)
@@ -303,8 +303,7 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
   }
 
   const roomsWithPrices = rooms.map((room) => {
-    const ratePlan = ratePlanList.find((ratePlan) => ratePlan.property_id.toString() === room.propertyInfo_id.toString());
-    
+    const ratePlan = ratePlanList.find((ratePlan) => ratePlan.property_id.toString() === room.propertyInfo_id.toString());    
     return {
       ...room.toObject(),
       room_price: ratePlan ? ratePlan.room_price : null,
@@ -313,11 +312,16 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
     };
   });
   console.log("Rooms with Prices: ", roomsWithPrices);
+
+  const dynamicUrl = `http://localhost:8080/api/v1/property/${propertyInfoId}`;
+  const qrCodeData = await QRCode.toDataURL(dynamicUrl);
+
   res.status(200).json({
     status: "success",
     error: false,
     message: "Rooms fetched by property id with rate plan successfully",
     data: roomsWithPrices,
+    qrCode: qrCodeData,
   });
 });
 
