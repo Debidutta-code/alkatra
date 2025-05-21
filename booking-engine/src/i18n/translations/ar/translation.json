@@ -311,5 +311,113 @@
     "CancellationModal": {},
     "AmendReservationModal": {},
     "BookingDetailsModal": {}
+  },
+  "Payment": {
+    "PaymentPageContent": {
+      "invalidPayment": {
+        "title": "دفع غير صالح",
+        "message": "لم نتمكن من معالجة دفعتك بسبب المعلومات المفقودة.",
+        "returnToHomepage": "العودة إلى الصفحة الرئيسية"
+      },
+      "bookingSummary": {
+        "title": "ملخص الحجز",
+        "stayDates": "تواريخ الإقامة",
+        "night": "ليلة",
+        "nights": "ليالٍ",
+        "guests": "الضيوف",
+        "room": "غرفة",
+        "rooms": "غرف",
+        "adult": "بالغ",
+        "adults": "بالغون",
+        "child": "طفل",
+        "children": "أطفال",
+        "guest": "الضيف"
+      },
+      "paymentMethod": {
+        "title": "طريقة الدفع"
+      },
+      "priceDetails": {
+        "title": "تفاصيل السعر",
+        "roomRate": "سعر الغرفة",
+        "perNight": "لكل ليلة",
+        "total": "الإجمالي",
+        "payAtHotelInfo": "سيتم تخزين بطاقتك بشكل آمن، ولكن سيتم تحصيل الدفع في الفندق."
+      },
+      "securityBadges": {
+        "securePayments": "مدفوعات آمنة",
+        "noCardStorage": "لا نقوم أبدًا بتخزين تفاصيل بطاقتك بالكامل",
+        "freeCancellation": "إلغاء مجاني متاح"
+      },
+      "needHelp": {
+        "title": "هل تحتاج مساعدة؟",
+        "message": "فريق خدمة العملاء لدينا متاح على مدار الساعة طوال أيام الأسبوع لمساعدتك في أي أسئلة حول حجزك.",
+        "contactSupport": "اتصل بالدعم"
+      },
+      "loading": {
+        "title": "جارٍ تحميل معلومات الدفع...",
+        "message": "يرجى الانتظار بينما نقوم بإعداد عملية الدفع الخاصة بك."
+      }
+    },
+    "PaymentComponents": {
+      "PaymentOptionSelector": {
+        "title": "خيارات الدفع",
+        "payNow": "ادفع الآن",
+        "payNowDescription": "أكمل الدفع فوراً",
+        "payAtHotel": "الدفع في الفندق",
+        "payAtHotelDescription": "احفظ بطاقتك بأمان للدفع في الفندق"
+      },
+      "PayAtHotelFunction": {
+        "infoTitle": "معلومات الدفع في الفندق",
+        "infoMessage": "سيتم تخزين تفاصيل بطاقتك الائتمانية بشكل آمن ولكن لن يتم تحصيلها الآن. سيتم معالجة الدفع أثناء إقامتك في الفندق.",
+        "cardDetailsLabel": "تفاصيل البطاقة",
+        "stripeNotLoadedError": "لم يتم تحميل Stripe بعد. يرجى المحاولة مرة أخرى.",
+        "notLoggedInError": "يجب عليك تسجيل الدخول لإكمال هذا الحجز. يرجى تسجيل الدخول والمحاولة مرة أخرى.",
+        "cardElementNotFoundError": "لم يتم العثور على عنصر البطاقة",
+        "cardSetupFailedError": "فشل إعداد البطاقة",
+        "processing": "جاري المعالجة...",
+        "confirmBooking": "تأكيد الحجز",
+        "paymentProcessingError": "حدث خطأ أثناء معالجة الدفع"
+      }
+    },
+    "PaymentSuccess": {
+      "processingBooking": "جارٍ معالجة حجزك...",
+      "confirmingReservation": "نحن نؤكد حجزك. يجب أن يستغرق هذا لحظة فقط.",
+      "bookingFailedTitle": "فشل الحجز",
+      "returnToHomepage": "العودة إلى الصفحة الرئيسية",
+      "bookingConfirmedTitle": "تم تأكيد الحجز!",
+      "reservationSuccessMessage": "تم إتمام حجزك بنجاح",
+      "bookingId": "معرف الحجز:",
+      "bookingSummaryTitle": "ملخص الحجز",
+      "checkInLabel": "تسجيل الدخول",
+      "checkOutLabel": "تسجيل الخروج",
+      "night": "ليلة",
+      "nights": "ليالٍ",
+      "guestsLabel": "الضيوف",
+      "guestInfoTitle": "معلومات الضيف",
+      "guestNameLabel": "اسم الضيف",
+      "guestDefaultName": "ضيف",
+      "emailLabel": "البريد الإلكتروني",
+      "paymentMethodLabel": "طريقة الدفع",
+      "paymentMethodCreditCard": "بطاقة الائتمان",
+      "paymentMethodPayAtHotel": "الدفع في الفندق",
+      "paymentMethodUnknown": "غير معروف",
+      "paymentDetailsTitle": "تفاصيل الدفع",
+      "roomRate": "سعر الغرفة",
+      "perNight": "لكل ليلة",
+      "total": "الإجمالي",
+      "paymentAtHotelMessage": "سيتم تحصيل الدفع في الفندق",
+      "paymentProcessedMessage": "تمت معالجة الدفع",
+      "viewMyBookings": "عرض حجوزاتي",
+      "returnHome": "العودة إلى الرئيسية",
+      "whatsNextTitle": "ماذا بعد؟",
+      "confirmationEmailSent": "تم إرسال بريد إلكتروني للتأكيد إلى بريدك الوارد",
+      "viewBookingDetails": "يمكنك عرض تفاصيل الحجز في حسابك في أي وقت",
+      "contactSupportForChanges": "هل تحتاج إلى إجراء تغييرات؟ اتصل بنا 24/7 للحصول على الدعم",
+      "downloadBookingConfirmation": "تنزيل تأكيد الحجز",
+      "needHelpTitle": "هل تحتاج مساعدة؟",
+      "customerServiceMessage": "فريق خدمة العملاء لدينا متاح على مدار الساعة طوال أيام الأسبوع لمساعدتك في أي أسئلة.",
+      "contactSupportButton": "اتصل بالدعم",
+      "exploreMoreHotels": "استكشاف المزيد من خيارات الفنادق"
+    }
   }
 }

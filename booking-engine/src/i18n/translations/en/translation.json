@@ -311,5 +311,113 @@
     "CancellationModal": {},
     "AmendReservationModal": {},
     "BookingDetailsModal": {}
+  },
+  "Payment": {
+    "PaymentPageContent": {
+      "invalidPayment": {
+        "title": "Invalid Payment",
+        "message": "We couldn't process your payment due to missing information.",
+        "returnToHomepage": "Return to Homepage"
+      },
+      "bookingSummary": {
+        "title": "Booking Summary",
+        "stayDates": "Stay Dates",
+        "night": "night",
+        "nights": "nights",
+        "guests": "Guests",
+        "room": "Room",
+        "rooms": "Rooms",
+        "adult": "Adult",
+        "adults": "Adults",
+        "child": "Child",
+        "children": "Children",
+        "guest": "Guest"
+      },
+      "paymentMethod": {
+        "title": "Payment Method"
+      },
+      "priceDetails": {
+        "title": "Price Details",
+        "roomRate": "Room Rate",
+        "perNight": "per night",
+        "total": "Total",
+        "payAtHotelInfo": "Your card will be securely stored, but payment will be collected at the hotel."
+      },
+      "securityBadges": {
+        "securePayments": "Secure payments",
+        "noCardStorage": "We never store your full card details",
+        "freeCancellation": "Free cancellation available"
+      },
+      "needHelp": {
+        "title": "Need Help?",
+        "message": "Our customer service team is available 24/7 to assist you with any questions about your booking.",
+        "contactSupport": "Contact Support"
+      },
+      "loading": {
+        "title": "Loading payment information...",
+        "message": "Please wait while we prepare your checkout."
+      }
+    },
+    "PaymentComponents": {
+      "PaymentOptionSelector": {
+        "title": "Payment Options",
+        "payNow": "Pay Now",
+        "payNowDescription": "Complete payment immediately",
+        "payAtHotel": "Pay at Hotel",
+        "payAtHotelDescription": "Securely save card for hotel payment"
+      },
+      "PayAtHotelFunction": {
+        "infoTitle": "Pay at Hotel Information",
+        "infoMessage": "Your credit card details will be securely stored but not charged now. Payment will be processed during your stay at the hotel.",
+        "cardDetailsLabel": "Card Details",
+        "stripeNotLoadedError": "Stripe hasn't loaded yet. Please try again.",
+        "notLoggedInError": "You need to be logged in to complete this booking. Please sign in and try again.",
+        "cardElementNotFoundError": "Card element not found",
+        "cardSetupFailedError": "Card setup failed",
+        "processing": "Processing...",
+        "confirmBooking": "Confirm Booking",
+        "paymentProcessingError": "An error occurred during payment processing"
+      }
+    },
+    "PaymentSuccess": {
+      "processingBooking": "Processing your booking...",
+      "confirmingReservation": "We're confirming your reservation. This should only take a moment.",
+      "bookingFailedTitle": "Booking Failed",
+      "returnToHomepage": "Return to Homepage",
+      "bookingConfirmedTitle": "Booking Confirmed!",
+      "reservationSuccessMessage": "Your reservation has been successfully completed",
+      "bookingId": "Booking ID:",
+      "bookingSummaryTitle": "Booking Summary",
+      "checkInLabel": "Check-in",
+      "checkOutLabel": "Check-out",
+      "night": "night",
+      "nights": "nights",
+      "guestsLabel": "Guests",
+      "guestInfoTitle": "Guest Information",
+      "guestNameLabel": "Guest Name",
+      "guestDefaultName": "Guest",
+      "emailLabel": "Email",
+      "paymentMethodLabel": "Payment Method",
+      "paymentMethodCreditCard": "Credit Card",
+      "paymentMethodPayAtHotel": "Pay at Hotel",
+      "paymentMethodUnknown": "Unknown",
+      "paymentDetailsTitle": "Payment Details",
+      "roomRate": "Room Rate",
+      "perNight": "per night",
+      "total": "Total",
+      "paymentAtHotelMessage": "Payment will be collected at the hotel",
+      "paymentProcessedMessage": "Payment has been processed",
+      "viewMyBookings": "View My Bookings",
+      "returnHome": "Return Home",
+      "whatsNextTitle": "What's Next?",
+      "confirmationEmailSent": "A confirmation email has been sent to your inbox",
+      "viewBookingDetails": "You can view booking details in your account anytime",
+      "contactSupportForChanges": "Need to make changes? Contact us 24/7 for support",
+      "downloadBookingConfirmation": "Download Booking Confirmation",
+      "needHelpTitle": "Need Help?",
+      "customerServiceMessage": "Our customer service team is available 24/7 to assist you with any questions.",
+      "contactSupportButton": "Contact Support",
+      "exploreMoreHotels": "Explore more hotel options"
+    }
   }
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { useTranslation } from "react-i18next";
 
 interface PaymentOptionSelectorProps {
   selectedOption: string;
@@ -11,9 +12,13 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
   selectedOption, 
   onChange 
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="payment-options">
-      <h3 className="text-lg font-tripswift-medium mb-3 text-tripswift-black">Payment Options</h3>
+      <h3 className="text-lg font-tripswift-medium mb-3 text-tripswift-black">
+        {t('Payment.PaymentComponents.PaymentOptionSelector.title')}
+      </h3>
       <div className="flex flex-col sm:flex-row gap-4">
         <label className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all ${
           selectedOption === 'payNow' 
@@ -29,8 +34,12 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
             className="mr-3 text-tripswift-blue"
           />
           <div className="flex flex-col">
-            <span className="font-tripswift-medium text-tripswift-black">Pay Now</span>
-            <span className="text-sm text-tripswift-black/70">Complete payment immediately</span>
+            <span className="font-tripswift-medium text-tripswift-black">
+              {t('Payment.PaymentComponents.PaymentOptionSelector.payNow')}
+            </span>
+            <span className="text-sm text-tripswift-black/70">
+              {t('Payment.PaymentComponents.PaymentOptionSelector.payNowDescription')}
+            </span>
           </div>
         </label>
 
@@ -48,8 +57,12 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
             className="mr-3 text-tripswift-blue"
           />
           <div className="flex flex-col">
-            <span className="font-tripswift-medium text-tripswift-black">Pay at Hotel</span>
-            <span className="text-sm text-tripswift-black/70">Securely save card for hotel payment</span>
+            <span className="font-tripswift-medium text-tripswift-black">
+              {t('Payment.PaymentComponents.PaymentOptionSelector.payAtHotel')}
+            </span>
+            <span className="text-sm text-tripswift-black/70">
+              {t('Payment.PaymentComponents.PaymentOptionSelector.payAtHotelDescription')}
+            </span>
           </div>
         </label>
       </div>

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Modal from "@/components/ui/modal/Modal";
 import GuestBox from "../HotelBox/GuestBox";
 import PhoneInput from 'react-phone-number-input';
 import "react-phone-number-input/style.css";
@@ -220,10 +219,16 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   const nightsText = nightsCount === 1 ? t('BookingComponents.GuestInformationModal.nights') : t('BookingComponents.GuestInformationModal.nightsPlural');
 
   return (
-    <Modal onClose={onClose} isOpen={isOpen}>
-      <div className="relative flex flex-col w-full max-h-[90vh] bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8]">
+    <>
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={onClose}></div>
+
+      {/* Centered Dialog Box */}
+      <div
+        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 flex flex-col w-full max-w-2xl max-h-[90vh] bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8] rounded-lg shadow-lg"
+      >
         {/* Modal Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between bg-tripswift-blue text-tripswift-off-white px-6 py-4">
+        <div className="sticky top-0 z-10 flex items-center justify-between bg-tripswift-blue text-tripswift-off-white px-6 py-4 rounded-t-lg">
           <h2 className="text-xl font-tripswift-bold">{t('BookingComponents.GuestInformationModal.completeYourBooking')}</h2>
           <button
             onClick={onClose}
@@ -263,8 +268,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        {/* Main Content with padding-bottom to prevent overlap with fixed footer */}
+        <div className="flex-1 overflow-y-auto p-6 pb-24">
           {activeSection === 'details' ? (
             <div className="space-y-6">
               {/* Room Summary */}
@@ -500,8 +505,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
           )}
         </div>
 
-        {/* Footer actions */}
-        <div className="sticky bottom-0 bg-white border-t border-tripswift-black/10 p-6 flex flex-col sm:flex-row gap-3 justify-between">
+        {/* Fixed Footer */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-tripswift-black/10 p-6 flex flex-col sm:flex-row gap-3 justify-end rounded-b-lg">
           <button
             onClick={() => activeSection === 'review' ? setActiveSection('details') : onClose()}
             className="btn-tripswift-secondary px-6 py-2.5 rounded-md transition-all duration-300 font-tripswift-medium flex items-center justify-center"
@@ -527,7 +532,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
           )}
         </div>
       </div>
-    </Modal>
+    </>
   );
 };
 

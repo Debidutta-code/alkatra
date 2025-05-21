@@ -9,8 +9,10 @@ import { useSelector } from "react-redux";
 import Link from "next/link";
 import { Calendar, CreditCard, User, CheckCircle, Home, Users, ArrowRight, Download, Mail } from "lucide-react";
 import { formatDate, calculateNights } from "@/utils/dateUtils";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 export default function PaymentSuccess() {
+  const { t } = useTranslation(); // Initialize useTranslation hook
   const searchParams = useSearchParams();
   const firstName = searchParams.get("firstName") || "";
   const lastName = searchParams.get("lastName") || "";
@@ -27,7 +29,7 @@ export default function PaymentSuccess() {
 
   const [booking, setBooking] = useState<any>(null);
   const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("Failed to complete booking. Please try again.");
+  const [errorMessage, setErrorMessage] = useState(t('Payment.PaymentSuccess.errorMessageDefault')); // Default error message
   const [isLoading, setIsLoading] = useState(true);
   const isRequestSent = useRef(false);
   const router = useRouter();
@@ -67,15 +69,15 @@ export default function PaymentSuccess() {
 
           if (bookingData && bookingData._id) {
             setBooking(bookingData);
-            toast.success("Booking confirmed!");
+            toast.success(t('Payment.PaymentSuccess.bookingConfirmedToast'));
           } else {
-            throw new Error("Invalid booking data structure");
+            throw new Error(t('Payment.PaymentSuccess.invalidBookingDataStructure'));
           }
         } catch (error: any) {
           console.error("Error fetching booking:", error);
           setError(true);
-          setErrorMessage("Could not retrieve booking details. Please check My Bookings.");
-          toast.error("Could not retrieve booking details");
+          setErrorMessage(t('Payment.PaymentSuccess.fetchBookingError'));
+          toast.error(t('Payment.PaymentSuccess.fetchBookingErrorToast'));
         } finally {
           setIsLoading(false);
         }
@@ -88,8 +90,8 @@ export default function PaymentSuccess() {
     // Rest of your existing code...
     if (!authUser || !property_id || !room_id || !checkInDate || !checkOutDate) {
       setError(true);
-      setErrorMessage("Missing required booking details. Please try again.");
-      toast.error("Missing required booking details. Please try again.");
+      setErrorMessage(t('Payment.PaymentSuccess.missingBookingDetails'));
+      toast.error(t('Payment.PaymentSuccess.missingBookingDetailsToast'));
 
       setTimeout(() => {
         router.push("/");
@@ -163,12 +165,12 @@ export default function PaymentSuccess() {
         setIsLoading(true);
         const response = await makeBookingRequest(payload, token as string);
         setBooking(response);
-        toast.success("Booking confirmed!");
+        toast.success(t('Payment.PaymentSuccess.bookingConfirmedToast'));
       } catch (error: any) {
         console.error("Booking Error:", error);
         setError(true);
-        setErrorMessage(error?.message || "Failed to complete booking. Please try again.");
-        toast.error("Failed to complete booking. Please try again.");
+        setErrorMessage(error?.message || t('Payment.PaymentSuccess.bookingFailedDefaultMessage'));
+        toast.error(t('Payment.PaymentSuccess.bookingFailedDefaultToast'));
 
         setTimeout(() => {
           router.push("/");
@@ -179,7 +181,7 @@ export default function PaymentSuccess() {
     };
 
     handleBooking();
-  }, [amount, firstName, lastName, email, property_id, room_id, checkInDate, checkOutDate, authUser, guestDetails, phone, paymentMethod, reference, router, rooms, adults, children]);
+  }, [amount, firstName, lastName, email, property_id, room_id, checkInDate, checkOutDate, authUser, guestDetails, phone, paymentMethod, reference, router, rooms, adults, children, t]); // Added t to dependency array
 
   const getPaymentMethodText = () => {
     if (!booking) return "";
@@ -192,11 +194,11 @@ export default function PaymentSuccess() {
     switch (method) {
       case "CREDIT_CARD":
       case "card":
-        return "Credit Card";
+        return t('Payment.PaymentSuccess.paymentMethodCreditCard');
       case "payAtHotel":
-        return "Pay at Hotel";
+        return t('Payment.PaymentSuccess.paymentMethodPayAtHotel');
       default:
-        return method || "Unknown";
+        return method || t('Payment.PaymentSuccess.paymentMethodUnknown');
     }
   };
 
@@ -208,7 +210,7 @@ export default function PaymentSuccess() {
       return `${guest.firstName || ''} ${guest.lastName || ''}`.trim();
     }
 
-    return `${firstName || ''} ${lastName || ''}`.trim() || "Guest";
+    return `${firstName || ''} ${lastName || ''}`.trim() || t('Payment.PaymentSuccess.guestDefaultName');
   };
 
   const getBookingId = () => {
@@ -218,9 +220,10 @@ export default function PaymentSuccess() {
   const getBookingNights = () => {
     if (booking?.checkInDate && booking?.checkOutDate) {
       return calculateNights(booking.checkInDate, booking.checkOutDate);
-    } else {
+    } else if (checkInDate && checkOutDate) { // Fallback to Redux/URL params if booking is not fully loaded yet
       return calculateNights(checkInDate, checkOutDate);
     }
+    return 0; // Default if no dates are available
   };
 
   // Get guest count display
@@ -231,12 +234,12 @@ export default function PaymentSuccess() {
       const bookingAdults = booking.bookingDetails.adults || 1;
       const bookingChildren = booking.bookingDetails.children || 0;
 
-      return `${bookingRooms} ${bookingRooms === 1 ? 'Room' : 'Rooms'} · ${bookingAdults} ${bookingAdults === 1 ? 'Adult' : 'Adults'}${bookingChildren > 0 ? ` · ${bookingChildren} ${bookingChildren === 1 ? 'Child' : 'Children'}` : ''
+      return `${bookingRooms} ${bookingRooms === 1 ? t('Payment.PaymentPageContent.bookingSummary.room') : t('Payment.PaymentPageContent.bookingSummary.rooms')} · ${bookingAdults} ${bookingAdults === 1 ? t('Payment.PaymentPageContent.bookingSummary.adult') : t('Payment.PaymentPageContent.bookingSummary.adults')}${bookingChildren > 0 ? ` · ${bookingChildren} ${bookingChildren === 1 ? t('Payment.PaymentPageContent.bookingSummary.child') : t('Payment.PaymentPageContent.bookingSummary.children')}` : ''
         }`;
     }
 
     // Otherwise use URL params or defaults
-    return `${rooms} ${rooms === 1 ? 'Room' : 'Rooms'} · ${adults} ${adults === 1 ? 'Adult' : 'Adults'}${children > 0 ? ` · ${children} ${children === 1 ? 'Child' : 'Children'}` : ''
+    return `${rooms} ${rooms === 1 ? t('Payment.PaymentPageContent.bookingSummary.room') : t('Payment.PaymentPageContent.bookingSummary.rooms')} · ${adults} ${adults === 1 ? t('Payment.PaymentPageContent.bookingSummary.adult') : t('Payment.PaymentPageContent.bookingSummary.adults')}${children > 0 ? ` · ${children} ${children === 1 ? t('Payment.PaymentPageContent.bookingSummary.child') : t('Payment.PaymentPageContent.bookingSummary.children')}` : ''
       }`;
   };
 
@@ -247,8 +250,8 @@ export default function PaymentSuccess() {
         {isLoading ? (
           <div className="bg-tripswift-off-white rounded-xl shadow-xl p-12 text-center animate-pulse max-w-lg mx-auto mt-16">
             <div className="w-20 h-20 border-t-4 border-b-4 border-tripswift-blue rounded-full animate-spin mx-auto mb-8"></div>
-            <h2 className="text-xl font-tripswift-medium text-tripswift-black mb-3">Processing your booking...</h2>
-            <p className="text-tripswift-black/60">We're confirming your reservation. This should only take a moment.</p>
+            <h2 className="text-xl font-tripswift-medium text-tripswift-black mb-3">{t('Payment.PaymentSuccess.processingBooking')}</h2>
+            <p className="text-tripswift-black/60">{t('Payment.PaymentSuccess.confirmingReservation')}</p>
           </div>
         ) : error ? (
           <div className="bg-tripswift-off-white rounded-xl shadow-xl p-12 text-center max-w-lg mx-auto mt-16">
@@ -257,10 +260,10 @@ export default function PaymentSuccess() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </div>
-            <h2 className="text-2xl font-tripswift-bold text-tripswift-black mb-4">Booking Failed</h2>
+            <h2 className="text-2xl font-tripswift-bold text-tripswift-black mb-4">{t('Payment.PaymentSuccess.bookingFailedTitle')}</h2>
             <p className="text-tripswift-black/70 mb-6">{errorMessage}</p>
             <Link href="/" className="btn-tripswift-primary py-3 px-8 rounded-lg inline-block transition-all duration-300 hover:shadow-lg">
-              Return to Homepage
+              {t('Payment.PaymentSuccess.returnToHomepage')}
             </Link>
           </div>
         ) : (
@@ -274,13 +277,13 @@ export default function PaymentSuccess() {
                     <CheckCircle size={32} />
                   </div>
                   <div className="ml-4">
-                    <h1 className="text-3xl font-tripswift-bold">Booking Confirmed!</h1>
-                    <p className="opacity-90 mt-1">Your reservation has been successfully completed</p>
+                    <h1 className="text-3xl font-tripswift-bold">{t('Payment.PaymentSuccess.bookingConfirmedTitle')}</h1>
+                    <p className="opacity-90 mt-1">{t('Payment.PaymentSuccess.reservationSuccessMessage')}</p>
                   </div>
                 </div>
                 <div className="mt-4 bg-white/10 py-2 px-4 rounded-md">
                   <div className="flex items-center">
-                    <span className="text-sm">Booking ID:</span>
+                    <span className="text-sm">{t('Payment.PaymentSuccess.bookingId')}</span>
                     <span className="ml-2 font-tripswift-medium">{getBookingId()}</span>
                   </div>
                 </div>
@@ -291,27 +294,27 @@ export default function PaymentSuccess() {
                 {/* Summary Section */}
                 <div className="flex flex-col md:flex-row gap-6 border-b border-gray-200 pb-8">
                   <div className="flex-1">
-                    <h2 className="text-xl font-tripswift-bold text-tripswift-black mb-4">Booking Summary</h2>
+                    <h2 className="text-xl font-tripswift-bold text-tripswift-black mb-4">{t('Payment.PaymentSuccess.bookingSummaryTitle')}</h2>
                     <div className="space-y-4">
                       <div className="flex items-start">
                         <Calendar className="text-tripswift-blue mr-3 flex-shrink-0 mt-1" size={20} />
                         <div>
-                          <p className="text-sm text-tripswift-black/60">Check-in</p>
+                          <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentSuccess.checkInLabel')}</p>
                           <p className="font-tripswift-medium">{formatDate(booking?.checkInDate || checkInDate)}</p>
                         </div>
                       </div>
                       <div className="flex items-start">
                         <Calendar className="text-tripswift-blue mr-3 flex-shrink-0 mt-1" size={20} />
                         <div>
-                          <p className="text-sm text-tripswift-black/60">Check-out</p>
+                          <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentSuccess.checkOutLabel')}</p>
                           <p className="font-tripswift-medium">{formatDate(booking?.checkOutDate || checkOutDate)}</p>
-                          <p className="text-xs text-tripswift-black/60 mt-1">{getBookingNights()} night{getBookingNights() !== 1 ? 's' : ''}</p>
+                          <p className="text-xs text-tripswift-black/60 mt-1">{getBookingNights()} {getBookingNights() !== 1 ? t('Payment.PaymentSuccess.nights') : t('Payment.PaymentSuccess.night')}</p>
                         </div>
                       </div>
                       <div className="flex items-start">
                         <Users className="text-tripswift-blue mr-3 flex-shrink-0 mt-1" size={20} />
                         <div>
-                          <p className="text-sm text-tripswift-black/60">Guests</p>
+                          <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentSuccess.guestsLabel')}</p>
                           <p className="font-tripswift-medium">
                             {getGuestCountDisplay()}
                           </p>
@@ -321,26 +324,26 @@ export default function PaymentSuccess() {
                   </div>
 
                   <div className="flex-1">
-                    <h2 className="text-xl font-tripswift-bold text-tripswift-black mb-4">Guest Information</h2>
+                    <h2 className="text-xl font-tripswift-bold text-tripswift-black mb-4">{t('Payment.PaymentSuccess.guestInfoTitle')}</h2>
                     <div className="space-y-4">
                       <div className="flex items-start">
                         <User className="text-tripswift-blue mr-3 flex-shrink-0 mt-1" size={20} />
                         <div>
-                          <p className="text-sm text-tripswift-black/60">Guest Name</p>
+                          <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentSuccess.guestNameLabel')}</p>
                           <p className="font-tripswift-medium">{getGuestName()}</p>
                         </div>
                       </div>
                       <div className="flex items-start">
                         <Mail className="text-tripswift-blue mr-3 flex-shrink-0 mt-1" size={20} />
                         <div>
-                          <p className="text-sm text-tripswift-black/60">Email</p>
+                          <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentSuccess.emailLabel')}</p>
                           <p className="font-tripswift-medium">{email}</p>
                         </div>
                       </div>
                       <div className="flex items-start">
                         <CreditCard className="text-tripswift-blue mr-3 flex-shrink-0 mt-1" size={20} />
                         <div>
-                          <p className="text-sm text-tripswift-black/60">Payment Method</p>
+                          <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentSuccess.paymentMethodLabel')}</p>
                           <p className="font-tripswift-medium">{getPaymentMethodText()}</p>
                         </div>
                       </div>
@@ -349,31 +352,30 @@ export default function PaymentSuccess() {
                 </div>
 
                 {/* Price Details Section */}
-                {/* Replace the current Price Details section in payment-success/page.tsx */}
                 <div className="py-6 border-b border-gray-200">
-                  <h2 className="text-xl font-tripswift-bold text-tripswift-black mb-4">Payment Details</h2>
+                  <h2 className="text-xl font-tripswift-bold text-tripswift-black mb-4">{t('Payment.PaymentSuccess.paymentDetailsTitle')}</h2>
                   <div className="bg-gray-50 rounded-lg p-4">
                     {/* Add per-night rate */}
                     <div className="flex justify-between mb-2">
-                      <span className="text-tripswift-black/70">Room Rate</span>
-                      <span className="font-tripswift-medium">₹{Math.round(amount / getBookingNights()).toLocaleString()} per night</span>
+                      <span className="text-tripswift-black/70">{t('Payment.PaymentSuccess.roomRate')}</span>
+                      <span className="font-tripswift-medium">₹{Math.round(amount / getBookingNights()).toLocaleString()} {t('Payment.PaymentSuccess.perNight')}</span>
                     </div>
 
                     {/* Show calculation */}
                     <div className="flex justify-between mb-2">
-                      <span className="text-tripswift-black/70">{getBookingNights()} {getBookingNights() === 1 ? 'night' : 'nights'}</span>
+                      <span className="text-tripswift-black/70">{getBookingNights()} {getBookingNights() === 1 ? t('Payment.PaymentSuccess.night') : t('Payment.PaymentSuccess.nights')}</span>
                       <span className="font-tripswift-medium">₹{Math.round(amount / getBookingNights()).toLocaleString()} × {getBookingNights()}</span>
                     </div>
 
                     <div className="border-t border-gray-200 my-2 pt-2"></div>
                     <div className="flex justify-between">
-                      <span className="font-tripswift-bold text-lg text-tripswift-black">Total</span>
+                      <span className="font-tripswift-bold text-lg text-tripswift-black">{t('Payment.PaymentSuccess.total')}</span>
                       <span className="font-tripswift-bold text-lg text-tripswift-blue">₹{amount.toLocaleString()}</span>
                     </div>
                     <div className="text-xs text-tripswift-black/50 text-right mt-1">
-                      {getPaymentMethodText() === "Pay at Hotel" ?
-                        "Payment will be collected at the hotel" :
-                        "Payment has been processed"
+                      {getPaymentMethodText() === t('Payment.PaymentSuccess.paymentMethodPayAtHotel') ?
+                        t('Payment.PaymentSuccess.paymentAtHotelMessage') :
+                        t('Payment.PaymentSuccess.paymentProcessedMessage')
                       }
                     </div>
                   </div>
@@ -383,11 +385,11 @@ export default function PaymentSuccess() {
                 <div className="pt-6 flex flex-col sm:flex-row gap-4">
                   <Link href="/my-trip" className="btn-tripswift-primary py-3 px-6 rounded-lg flex-1 flex items-center justify-center gap-2 text-center font-tripswift-medium transition-all duration-300 hover:shadow-md">
                     <CheckCircle size={18} />
-                    <span>View My Bookings</span>
+                    <span>{t('Payment.PaymentSuccess.viewMyBookings')}</span>
                   </Link>
                   <Link href="/" className="bg-gray-100 text-tripswift-black py-3 px-6 rounded-lg flex-1 flex items-center justify-center gap-2 text-center font-tripswift-medium transition-colors duration-300 hover:bg-gray-200">
                     <Home size={18} />
-                    <span>Return Home</span>
+                    <span>{t('Payment.PaymentSuccess.returnHome')}</span>
                   </Link>
                 </div>
               </div>
@@ -396,46 +398,46 @@ export default function PaymentSuccess() {
             {/* Additional Info Cards */}
             <div className="max-w-4xl mx-auto mt-8 grid md:grid-cols-2 gap-6">
               <div className="bg-tripswift-off-white rounded-xl shadow-md p-6">
-                <h3 className="text-lg font-tripswift-bold text-tripswift-black mb-3">What's Next?</h3>
+                <h3 className="text-lg font-tripswift-bold text-tripswift-black mb-3">{t('Payment.PaymentSuccess.whatsNextTitle')}</h3>
                 <ul className="space-y-3 text-tripswift-black/70">
                   <li className="flex items-start">
                     <span className="inline-block bg-green-100 rounded-full p-1 mr-2 mt-0.5">
                       <CheckCircle size={14} className="text-green-600" />
                     </span>
-                    A confirmation email has been sent to your inbox
+                    {t('Payment.PaymentSuccess.confirmationEmailSent')}
                   </li>
                   <li className="flex items-start">
                     <span className="inline-block bg-green-100 rounded-full p-1 mr-2 mt-0.5">
                       <CheckCircle size={14} className="text-green-600" />
                     </span>
-                    You can view booking details in your account anytime
+                    {t('Payment.PaymentSuccess.viewBookingDetails')}
                   </li>
                   <li className="flex items-start">
                     <span className="inline-block bg-green-100 rounded-full p-1 mr-2 mt-0.5">
                       <CheckCircle size={14} className="text-green-600" />
                     </span>
-                    Need to make changes? Contact us 24/7 for support
+                    {t('Payment.PaymentSuccess.contactSupportForChanges')}
                   </li>
                 </ul>
 
                 {/* Download Booking button */}
                 <button className="mt-4 w-full flex items-center justify-center gap-2 border border-tripswift-blue/30 text-tripswift-blue bg-tripswift-blue/5 hover:bg-tripswift-blue/10 py-2 px-4 rounded-lg text-sm font-tripswift-medium transition-colors">
                   <Download size={16} />
-                  Download Booking Confirmation
+                  {t('Payment.PaymentSuccess.downloadBookingConfirmation')}
                 </button>
               </div>
 
               <div className="bg-tripswift-off-white rounded-xl shadow-md p-6">
-                <h3 className="text-lg font-tripswift-bold text-tripswift-black mb-3">Need Help?</h3>
-                <p className="text-tripswift-black/70 mb-4">Our customer service team is available 24/7 to assist you with any questions.</p>
+                <h3 className="text-lg font-tripswift-bold text-tripswift-black mb-3">{t('Payment.PaymentSuccess.needHelpTitle')}</h3>
+                <p className="text-tripswift-black/70 mb-4">{t('Payment.PaymentSuccess.customerServiceMessage')}</p>
                 <button className="btn-tripswift-primary py-2 px-4 rounded-lg w-full flex items-center justify-center gap-2 text-center font-tripswift-medium transition-all duration-300">
-                  Contact Support
+                  {t('Payment.PaymentSuccess.contactSupportButton')}
                 </button>
 
                 {/* Explore more hotels link */}
                 <div className="mt-4 text-center">
                   <Link href="/hotel-listing" className="inline-flex items-center text-tripswift-blue hover:underline text-sm">
-                    Explore more hotel options <ArrowRight size={14} className="ml-1" />
+                    {t('Payment.PaymentSuccess.exploreMoreHotels')} <ArrowRight size={14} className="ml-1" />
                   </Link>
                 </div>
               </div>
