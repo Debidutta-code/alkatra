@@ -96,7 +96,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
     if (!newRoom.room_type) errors.room_type = "Room Type is required.";
     if (newRoom.total_room <= 0) errors.total_room = "Total Room is required.";
     if (newRoom.floor < 0) errors.floor = "Floor cannot be negative.";
-    if (!newRoom.room_view) errors.room_view = "Room View is required.";
+    // if (!newRoom.room_view) errors.room_view = "Room View is required.";
     if (newRoom.room_size <= 0) errors.room_size = "Room Size is required.";
     if (!newRoom.room_unit) errors.room_unit = "Room Unit is required.";
     if (!newRoom.smoking_policy) errors.smoking_policy = "Smoking Policy is required.";
@@ -106,7 +106,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
     if (newRoom.number_of_bedrooms <= 0) errors.number_of_bedrooms = "Number of bedrooms is required.";
     if (newRoom.number_of_living_room < 0) errors.number_of_living_room = "Number of living rooms cannot be negative.";
     if (newRoom.extra_bed < 0) errors.extra_bed = "Extra Bed cannot be negative.";
-    if (!newRoom.description) errors.description = "Description is required.";
+    // if (!newRoom.description) errors.description = "Description is required.";
     // if (newRoom.image.length === 0) errors.image = "Room image is required.";
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;

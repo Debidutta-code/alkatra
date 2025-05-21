@@ -37,10 +37,10 @@ const roomSchema = z.object({
   smoking_policy: z.string().min(1, "Smoking policy is required"),
   max_occupancy: z.number().min(1, "Max occupancy is required").nonnegative("Max occupancy must be a positive number"),
   max_number_of_adults: z.number().min(1, "Max number of adults is required").nonnegative("Max number of adults must be a positive number"),
-  max_number_of_children: z.number().min(1, "Max number of children is required").nonnegative("Max number of children must be a positive number"), // Changed to min(1) - required
+  max_number_of_children: z.number().min(0, "Max number of children is required").nonnegative("Max number of children must be a positive number"), // Changed to min(1) - required
   number_of_bedrooms: z.number().min(1, "Number of bedrooms is required").nonnegative("Number of bedrooms must be a positive number"), // Changed to min(1) - required
-  number_of_living_room: z.number().min(1, "Number of living rooms is required").nonnegative("Number of living room must be a positive number"), // Changed to min(1) - required
-  extra_bed: z.number().min(1, "Extra bed is required").nonnegative("Extra bed must be a positive number"), // Changed to min(1) - required
+  number_of_living_room: z.number().min(0, "Number of living rooms is required").nonnegative("Number of living room must be a positive number"), // Changed to min(1) - required
+  extra_bed: z.number().min(0, "Extra bed is required").nonnegative("Extra bed must be a positive number"), // Changed to min(1) - required
   description: z.string().optional(),
   image: z.array(z.string()).optional(),
   available: z.boolean()
@@ -127,10 +127,10 @@ export default function XRooms({ onNext, onPrevious }: Props) {
       smoking_policy: "",
       max_occupancy: 0,
       max_number_of_adults: 0,
-      max_number_of_children: 1,
+      max_number_of_children: 0,
       number_of_bedrooms: 1,
-      number_of_living_room: 1,
-      extra_bed: 1,
+      number_of_living_room: 0,
+      extra_bed: 0,
       description: "",
       image: [],
       available: false

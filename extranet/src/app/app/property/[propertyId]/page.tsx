@@ -140,7 +140,6 @@ export default function Page({ params, searchParams }: Props) {
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const propertyId = params.propertyId;
   // Fetch initial data
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -154,6 +153,7 @@ export default function Page({ params, searchParams }: Props) {
         // const choosedRatePlan = await fetchPriceById(params.propertyId);
 
         // Set state with fetched data
+        console.log("property data at property page",propertyData.data.rate_plan)
         setProperty(propertyData);
         setRatePlanList(propertyData.data.rate_plan);
         setEditedProperty({ ...propertyData.data });
@@ -163,7 +163,8 @@ export default function Page({ params, searchParams }: Props) {
         // Set address data
         setAddress(propertyData.data.property_address);
         setEditedAddress({ ...propertyData.data.property_address });
-
+        console.log("property datat",propertyData)
+        console.log("before use effect the room data",Rooms)
         if (propertyData.data.property_room) {
           setRooms([{ ...propertyData.data.property_room }]);
         }
@@ -326,67 +327,133 @@ export default function Page({ params, searchParams }: Props) {
     }
   };
 
+
+  useEffect(() => {
+  console.log("🔥 ROOMS STATE UPDATED:", rooms);
+}, [rooms]);
+
+const fetchRooms = async () => {
+  if (!accessToken) return;
+  try {
+    const roomsFromApi = await fetchProperty(params.propertyId, accessToken);
+    setRooms(roomsFromApi);
+  } catch (err) {
+    console.error('Failed to fetch rooms:', err);
+  }
+};
   // Handlers for rooms
-  const handleAddRoom = async (newRoom: RoomType) => {
-    // console.log("NEW ROOM: ", newRoom)
-    try {
-      if (!accessToken) {
-        console.error('Access token is undefined or not set');
-        return;
-      }
-      const addedRoom = await addPropertyRoom(params.propertyId, accessToken, newRoom);
-      (addedRoom !== null ?
-        toast.success('Room added successfully!') :
-        toast.error('Room could not be added!')
-      )
-      setRooms(prevRooms => [...prevRooms, addedRoom.data]);
+const handleAddRoom = async (newRoom: RoomType) => {
+  try {
+    if (!accessToken) {
+      console.error('Access token is undefined or not set');
+      return;
     }
-    catch (error) {
-      console.error('Error adding new room:', error);
-    }
-  };
+    // console.log("New Room", newRoom);
+    // console.log("property id",params.propertyId)
+    const addedRoom = await addPropertyRoom(params.propertyId, accessToken, newRoom);
+    // console.log("property id",params.propertyId);
+    //     console.log("new room data after property id",newRoom);
 
-  const handleEditRoom = async (updatedRoom: RoomType) => {
-    try {
-      if (!accessToken) {
-        console.error('Access token is undefined or not set');
-        return;
-      }
-      const updatedRoomData = await updatePropertyRoom(params.propertyId, accessToken, updatedRoom);
-  
-      // Log the response to check its structure
-      console.log("Updated Room Data:", updatedRoomData);
-  
-      // Ensure updatedRoomData has the expected structure
-      if (!updatedRoomData || !updatedRoomData.updated_room || !updatedRoomData.updated_room._id) {
-        throw new Error('Invalid response structure from updatePropertyRoom');
-      }
-  
-      setRooms(rooms.map(room =>
-        room._id === updatedRoomData.updated_room._id ? updatedRoomData.updated_room : room
-      ));
-    } catch (error) {
-      console.error('Error updating room:', error);
-    }
-  };
-  
-  const handleDeleteRoom = async (_id: string) => {
-    try {
-      if (!accessToken) {
-        console.error('Access token is undefined or not set');
-        return;
-      }
-      const deleteRoomResponse = await deletePropertyRoom(_id, accessToken);
+    //         console.log("property id",accessToken);
 
-      if (deleteRoomResponse.success) {
-        toast.success('Room deleted successfully!');
-      }
 
-      setRooms(rooms.filter(room => room._id !== _id));
-    } catch (error) {
-      console.error('Error deleting room:', error);
+    (addedRoom !== null ?
+      toast.success('Room added successfully!') :
+      toast.error('Room could not be added!')
+    );
+
+    // console.log("room data", addedRoom);
+    // console.log("rooms before set",rooms)
+    setRooms((prevRooms) => {
+  const roomContainer = prevRooms[0] || {};
+  const newKey = Object.keys(roomContainer).length;
+  return [{ ...roomContainer, [newKey]: addedRoom.new_room}];
+});
+
+
+// setRooms((prevRooms)=>[...prevRooms , addedRoom.new_room])
+    // console.log("rooms after set",rooms)
+  } catch (error) {
+    console.error('Error adding new room:', error);
+  }
+};
+
+// console.log("updated room data",rooms)
+const handleEditRoom = async (updatedRoom: RoomType) => {
+  try {
+    if (!accessToken) {
+      console.error('Access token is undefined or not set');
+      return;
     }
-  };
+
+    const updatedRoomData = await updatePropertyRoom(params.propertyId, accessToken, updatedRoom);
+
+    if (
+      !updatedRoomData ||
+      !updatedRoomData.updated_room ||
+      !updatedRoomData.updated_room._id
+    ) {
+      throw new Error('Invalid response from updatePropertyRoom');
+    }
+
+    setRooms((prevRooms) => {
+      const container = { ...prevRooms[0] };
+      const updatedRoom = updatedRoomData.updated_room;
+
+      for (const key in container) {
+  const room = (container as any)[key] as RoomType;
+
+  if (room._id === updatedRoom._id) {
+    (container as any)[key] = updatedRoom;
+    break;
+  }
+}
+
+
+      return [container];
+    });
+  } catch (error) {
+    console.error('Error updating room:', error);
+  }
+};
+
+
+
+  
+const handleDeleteRoom = async (_id: string) => {
+  try {
+    if (!accessToken) {
+      console.error('Access token is undefined or not set');
+      return;
+    }
+
+    const deleteRoomResponse = await deletePropertyRoom(_id, accessToken);
+
+    if (deleteRoomResponse.success) {
+      toast.success('Room deleted successfully!');
+
+      setRooms((prevRooms) => {
+        const container = { ...prevRooms[0] };
+
+        for (const key in container) {
+          const room = (container as any)[key] as RoomType;
+
+          if (room._id === _id) {
+            delete (container as any)[key];
+            break;
+          }
+        }
+
+        return [container];
+      });
+    }
+  } catch (error) {
+    console.error('Error deleting room:', error);
+  }
+};
+
+
+
 
   // Room Amenities handlers
   const handleRoomAmenityEditClick = () => setEditRoomAmenityMode(!editRoomAmenityMode);
@@ -436,6 +503,7 @@ export default function Page({ params, searchParams }: Props) {
         return;
       }
       const updatedRatePlan = await updateRatePlan(params.propertyId, accessToken, newRatePlan);
+      console.log("updated rate plan at page.tsxx",updatedRatePlan)
       setRatePlan(updatedRatePlan.newList)
 
     } catch (error) {
@@ -533,6 +601,7 @@ export default function Page({ params, searchParams }: Props) {
 
           {/* Rate Plan Component */}
           <RatePlan
+          setRatePlanList={setRatePlanList}
             ratePlanList={ratePlanList}
             rooms={rooms}
             setRatePlan={setRatePlan}

@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useMemo, useState } from "react";
+import axios from "axios";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardContent,
   CardTitle,
-  CardFooter
+  CardFooter,
 } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -19,21 +19,16 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "../../components/ui/select";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter
+  DialogFooter,
 } from "../../components/ui/dialog";
-import {
-  PenTool,
-  Plus,
-  X,
-  Save
-} from "lucide-react";
+import { PenTool, Plus, X, Save } from "lucide-react";
 import { Skeleton } from "../../components/ui/skeleton";
 
 export const globalRoomMappings = {
@@ -49,18 +44,18 @@ interface RoomType {
 }
 
 interface RatePlanType {
-  _id: string,
-  property_id: string,
-  applicable_room_type: string,
-  applicable_room_name: string,
-  meal_plan: string,
-  room_price: number,
-  rate_plan_name: string,
-  rate_plan_description: string,
-  min_length_stay: number,
-  max_length_stay: number,
-  min_book_advance: number,
-  max_book_advance: number
+  _id: string;
+  property_id: string;
+  applicable_room_type: string;
+  applicable_room_name: string;
+  meal_plan: string;
+  room_price: number;
+  rate_plan_name: string;
+  rate_plan_description: string;
+  min_length_stay: number;
+  max_length_stay: number;
+  min_book_advance: number;
+  max_book_advance: number;
 }
 
 interface RatePlanProps {
@@ -68,6 +63,7 @@ interface RatePlanProps {
   rooms: RoomType[];
   // ratePlan: RatePlanType | [];
   setRatePlan: React.Dispatch<React.SetStateAction<RatePlanType | []>>;
+    setRatePlanList: React.Dispatch<React.SetStateAction<RatePlanType[]>>;
   property_id: string;
   accessToken: string;
 }
@@ -80,9 +76,13 @@ const ratePlanSchema = z.object({
   room_price: z.number().min(0, "Price must be a positive number *"),
   rate_plan_name: z.string().min(1, "Rate plan name is required *"),
   rate_plan_description: z.string().optional(),
-  min_length_stay: z.number().min(0, "Minimum stay must be a positive number *"),
+  min_length_stay: z
+    .number()
+    .min(0, "Minimum stay must be a positive number *"),
   max_length_stay: z.number().optional(),
-  min_book_advance: z.number().min(0, "Minimum advance booking must be a positive number *"),
+  min_book_advance: z
+    .number()
+    .min(0, "Minimum advance booking must be a positive number *"),
   max_book_advance: z.number().optional(),
 });
 
@@ -92,13 +92,19 @@ type FormValues = z.infer<typeof ratePlanSchema>;
 const convertObjectOfObjectsToArray = (obj: any) => {
   if (!obj) return [];
   if (Array.isArray(obj)) return obj;
-  return typeof obj === 'object' ? Object.values(obj) : [];
+  return typeof obj === "object" ? Object.values(obj) : [];
 };
 
 // Helper function to validate if a room object is valid
 const isValidRoom = (room: any): room is RoomType => {
-  return room && typeof room === 'object' && room._id && typeof room._id === 'string'
-    && room.room_name && typeof room.room_name === 'string';
+  return (
+    room &&
+    typeof room === "object" &&
+    room._id &&
+    typeof room._id === "string" &&
+    room.room_name &&
+    typeof room.room_name === "string"
+  );
 };
 
 export function RatePlan({
@@ -107,33 +113,39 @@ export function RatePlan({
   // ratePlan,
   setRatePlan,
   property_id,
-  accessToken
+  accessToken,
+  setRatePlanList
 }: RatePlanProps) {
   // State management
+  
   const [loading, setLoading] = useState<boolean>(false);
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [selectedRatePlan, setSelectedRatePlan] = useState<RatePlanType | null>(null);
+  const [selectedRatePlan, setSelectedRatePlan] = useState<RatePlanType | null>(
+    null
+  );
   const [ratePlanId, setRatePlanId] = useState<string | null>(null);
 
   // Make sure rooms is always an array
   const safeRooms = Array.isArray(rooms) ? rooms : [];
-
+console.log("rate plan list",ratePlanList);
   // Get array of rooms safely
-  const arrayOfRooms = safeRooms.length > 0
-    ? safeRooms[0] && typeof safeRooms[0] === 'object'
-      ? convertObjectOfObjectsToArray(safeRooms[0])
-      : convertObjectOfObjectsToArray(safeRooms)
-    : [];
+  const arrayOfRooms =
+    safeRooms.length > 0
+      ? safeRooms[0] && typeof safeRooms[0] === "object"
+        ? convertObjectOfObjectsToArray(safeRooms[0])
+        : convertObjectOfObjectsToArray(safeRooms)
+      : [];
 
   // Filter out invalid room objects to prevent errors
   const validRooms = useMemo(() => {
     const safeRooms = Array.isArray(rooms) ? rooms : [];
-    const arrayOfRooms = safeRooms.length > 0
-      ? safeRooms[0] && typeof safeRooms[0] === 'object'
-        ? convertObjectOfObjectsToArray(safeRooms[0])
-        : convertObjectOfObjectsToArray(safeRooms)
-      : [];
+    const arrayOfRooms =
+      safeRooms.length > 0
+        ? safeRooms[0] && typeof safeRooms[0] === "object"
+          ? convertObjectOfObjectsToArray(safeRooms[0])
+          : convertObjectOfObjectsToArray(safeRooms)
+        : [];
     return arrayOfRooms.filter(isValidRoom);
   }, [rooms]);
 
@@ -143,7 +155,7 @@ export function RatePlan({
     handleSubmit,
     setValue,
     reset,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     defaultValues: {
       applicable_room_type: "",
@@ -161,22 +173,24 @@ export function RatePlan({
   });
 
   // Create a safe mapping of room names to IDs
-  globalRoomMappings.roomNameToId = validRooms.length > 0
-    ? Object.fromEntries(
-      validRooms.map(room => {
-        console.log(`Room Name: ${room.room_name}, Room ID: ${room._id}`);
-        return [room.room_name, room._id];
-      })
-    )
-    : {};
-  globalRoomMappings.roomIdToName = validRooms.length > 0
-    ? Object.fromEntries(
-      validRooms.map(room => {
-        console.log(`Room ID: ${room._id}, Room Name: ${room.room_name}`);
-        return [room._id, room.room_name];
-      })
-    )
-    : {};
+  globalRoomMappings.roomNameToId =
+    validRooms.length > 0
+      ? Object.fromEntries(
+          validRooms.map((room) => {
+            console.log(`Room Name: ${room.room_name}, Room ID: ${room._id}`);
+            return [room.room_name, room._id];
+          })
+        )
+      : {};
+  globalRoomMappings.roomIdToName =
+    validRooms.length > 0
+      ? Object.fromEntries(
+          validRooms.map((room) => {
+            console.log(`Room ID: ${room._id}, Room Name: ${room.room_name}`);
+            return [room._id, room.room_name];
+          })
+        )
+      : {};
 
   // Toggle create mode
   const handleCreateToggle = () => {
@@ -195,6 +209,7 @@ export function RatePlan({
     }
     setIsEditing(true);
     setIsCreating(false);
+    console.log("rate plan", ratePlan);
     setSelectedRatePlan(ratePlan);
     const roomId = ratePlan.applicable_room_type || "";
     const roomName = ratePlan.applicable_room_name || "";
@@ -209,7 +224,11 @@ export function RatePlan({
     setValue("min_book_advance", ratePlan.min_book_advance || 0);
     setValue("max_book_advance", ratePlan.max_length_stay || 0);
   };
-
+  useEffect(() => {
+    if (selectedRatePlan) {
+      console.log("✅ selectedRatePlan updated:", selectedRatePlan);
+    }
+  }, [selectedRatePlan]);
   // Cancel edit mode
   const handleCancelEdit = () => {
     setIsEditing(false);
@@ -218,9 +237,9 @@ export function RatePlan({
   };
 
   useEffect(() => {
-    const hasFetched = { current: false };  
+    const hasFetched = { current: false };
     const fetchRatePlans = async () => {
-      if (hasFetched.current) return;  
+      if (hasFetched.current) return;
       setLoading(true);
       try {
         let roomsToUse = validRooms;
@@ -231,12 +250,12 @@ export function RatePlan({
           );
           roomsToUse = roomsResponse.data.filter(isValidRoom);
         }
-  
+        console.log("")
         if (roomsToUse.length === 0) {
           console.warn("No valid rooms available");
           toast.error("No rooms available to fetch rate plans");
           return;
-        }  
+        }
         const roomId = roomsToUse[0]._id;
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/price/${roomId}`,
@@ -244,10 +263,13 @@ export function RatePlan({
         );
         if (response.status === 200) {
           // toast.success("Fetched rate plans successfully!");
-          console.log("#####################\nThe rate plans are:", response.data);
-          const id = response.data.ratePlanList[0]?._id;
-          setRatePlanId(id || null);
-          setRatePlan(response.data.ratePlanList[0] || []);          
+          console.log(
+            "#####################\nThe rate plans are:",
+            response.data
+          );
+          // const id = response.data.ratePlanList[0]?._id;
+          setRatePlanId( null);
+          setRatePlan(response.data.ratePlanList || []);
           hasFetched.current = true;
         }
       } catch (error: any) {
@@ -257,22 +279,24 @@ export function RatePlan({
         setLoading(false);
       }
     };
-  
+
     if (property_id && accessToken) {
       fetchRatePlans();
     }
-  }, [validRooms, ]);
-
+  }, [validRooms]);
 
   // Submit handler for creating a new rate plan
   const onCreateSubmit = async (data: FormValues) => {
     setLoading(true);
     try {
-      const selectedRoom = validRooms.find(room => room._id === data.applicable_room_type);
+      const selectedRoom = validRooms.find(
+        (room) => room._id === data.applicable_room_type
+      );
       const requestData = {
         ...data,
         applicable_room_type: data.applicable_room_type,
-        applicable_room_name: selectedRoom?.room_name || data.applicable_room_name,
+        applicable_room_name:
+          selectedRoom?.room_name || data.applicable_room_name,
       };
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/price/${property_id}`,
@@ -283,9 +307,11 @@ export function RatePlan({
           },
         }
       );
-      if (response) {
+
+      if (response.status === 200) {
+        console.log("resonse", response);
         toast.success("Rate Plan created successfully!");
-        setRatePlan(response.data.data);
+        setRatePlan(response.data);
         setIsCreating(false);
       }
     } catch (err) {
@@ -313,51 +339,76 @@ export function RatePlan({
         throw new Error(`Invalid rate plan ID: ${rateplan_id}`);
       }
       console.log(`###################Entering into 2`);
-      const selectedRoom = validRooms.find(room => room._id === data.applicable_room_type);
+      const selectedRoom = validRooms.find(
+        (room) => room._id === data.applicable_room_type
+      );
       const requestData = {
         ...data,
         applicable_room_type: data.applicable_room_type,
-        applicable_room_name: selectedRoom?.room_name || data.applicable_room_name,
+        applicable_room_name:
+          selectedRoom?.room_name || data.applicable_room_name,
       };
-      console.log(`@@@@@@@@@@@@!!!!!!!!!The requested data is: ${JSON.stringify(requestData)}`);
+      console.log(
+        `@@@@@@@@@@@@!!!!!!!!!The requested data is: ${JSON.stringify(
+          requestData
+        )}`
+      );
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/price/${rateplan_id}`,
         requestData,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-cache'
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache",
           },
         }
       );
       if (response.status === 200) {
         toast.success("Rate Plan updated successfully!");
-        setRatePlan(response.data.updatedRatePlan || response.data.data);
+        console.log("response after submit", response);
+        const updatedPlan = response.data.updatedRatePlan || response.data.data;
+        setRatePlanList((prevList) =>
+         prevList.map((plan) =>
+      plan._id === updatedPlan._id ? updatedPlan : plan
+    )
+   );        
+   setRatePlan(updatedPlan);
+   setSelectedRatePlan(updatedPlan);
         setIsEditing(false);
       }
     } catch (err: any) {
       console.error("Error updating rate plan:", {
         message: err.message,
-        response: err.response ? {
-          status: err.response.status,
-          data: err.response.data
-        } : null
+        response: err.response
+          ? {
+              status: err.response.status,
+              data: err.response.data,
+            }
+          : null,
       });
-      const errorMessage = err.response?.data?.message || err.message || "Failed to update rate plan";
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to update rate plan";
       toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
-
+console.log("rate plan list afterv the submit",ratePlanList)
   // Check if we can create a rate plan
-  const cantCreate = validRooms.length > 0
-    ? validRooms.every((room) => room.rateplan_created === true)
-    : true;
+  const cantCreate =
+    validRooms.length > 0
+      ? validRooms.every((room) => room.rateplan_created === true)
+      : true;
 
   // Render a form for creating or editing rate plans
-  const renderRatePlanForm = (onSubmitHandler: (data: FormValues) => Promise<void>, formTitle: string, buttonText: string) => (
+  const renderRatePlanForm = (
+    onSubmitHandler: (data: FormValues) => Promise<void>,
+    formTitle: string,
+    buttonText: string
+  ) => (
     <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-6">
       <div className="grid grid-cols-1 gap-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -368,7 +419,9 @@ export function RatePlan({
             <Select
               onValueChange={(value) => {
                 setValue("applicable_room_type", value);
-                const selectedRoom = validRooms.find(room => room._id === value);
+                const selectedRoom = validRooms.find(
+                  (room) => room._id === value
+                );
                 setValue("applicable_room_name", selectedRoom?.room_name || "");
               }}
               defaultValue={selectedRatePlan?.applicable_room_type || ""}
@@ -407,9 +460,15 @@ export function RatePlan({
                 <SelectValue placeholder="Select a meal plan" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Including breakfast">Including breakfast</SelectItem>
-                <SelectItem value="Including breakfast, lunch and dinner">Including breakfast, lunch and dinner</SelectItem>
-                <SelectItem value="Including breakfast, lunch or dinner">Including breakfast, lunch or dinner</SelectItem>
+                <SelectItem value="Including breakfast">
+                  Including breakfast
+                </SelectItem>
+                <SelectItem value="Including breakfast, lunch and dinner">
+                  Including breakfast, lunch and dinner
+                </SelectItem>
+                <SelectItem value="Including breakfast, lunch or dinner">
+                  Including breakfast, lunch or dinner
+                </SelectItem>
                 <SelectItem value="Room Only">Room Only</SelectItem>
               </SelectContent>
             </Select>
@@ -536,7 +595,7 @@ export function RatePlan({
           {loading ? (
             <span className="flex items-center">
               <span className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
-              {formTitle === "Create Rate Plan" ? 'Creating...' : 'Updating...'}
+              {formTitle === "Create Rate Plan" ? "Creating..." : "Updating..."}
             </span>
           ) : (
             buttonText
@@ -549,7 +608,9 @@ export function RatePlan({
   return (
     <Card className="w-full shadow-sm hover:shadow-md transition-shadow duration-300">
       <CardHeader className="flex flex-row items-center justify-between border-b pb-3">
-        <CardTitle className="text-xl font-semibold text-primary">Rate Plans</CardTitle>
+        <CardTitle className="text-xl font-semibold text-primary">
+          Rate Plans
+        </CardTitle>
         <div className="flex gap-2">
           {isCreating && (
             <Button variant="outline" size="sm" onClick={handleCreateToggle}>
@@ -606,7 +667,9 @@ export function RatePlan({
                 {/* Header */}
                 <div className="flex justify-between items-center mb-6 border-b pb-2">
                   <div className="text-lg font-semibold text-primary dark:text-primary-light">
-                    {ratePlan.applicable_room_name || ratePlan.applicable_room_type || "Room name not available"}
+                    {ratePlan.applicable_room_name ||
+                      ratePlan.applicable_room_type ||
+                      "Room name not available"}
                   </div>
                   <Button
                     variant="outline"
@@ -626,8 +689,10 @@ export function RatePlan({
                     <span className="text-gray-500 dark:text-gray-400 text-sm">
                       Meal Plan:
                     </span>
-                    <p className="text-lg font-medium 
-                              text-gray-800 dark:text-gray-200">
+                    <p
+                      className="text-lg font-medium 
+                              text-gray-800 dark:text-gray-200"
+                    >
                       {ratePlan.meal_plan}
                     </p>
                   </div>
@@ -637,8 +702,10 @@ export function RatePlan({
                     <span className="text-gray-500 dark:text-gray-400 text-sm">
                       Room Price:
                     </span>
-                    <p className="text-lg font-medium 
-                              text-gray-800 dark:text-gray-200">
+                    <p
+                      className="text-lg font-medium 
+                              text-gray-800 dark:text-gray-200"
+                    >
                       ₹{ratePlan.room_price}
                     </p>
                   </div>
@@ -648,8 +715,10 @@ export function RatePlan({
                     <span className="text-gray-500 dark:text-gray-400 text-sm">
                       Rate Plan Name:
                     </span>
-                    <p className="text-lg font-medium 
-                              text-gray-800 dark:text-gray-200">
+                    <p
+                      className="text-lg font-medium 
+                              text-gray-800 dark:text-gray-200"
+                    >
                       {ratePlan.rate_plan_name}
                     </p>
                   </div>
@@ -659,8 +728,10 @@ export function RatePlan({
                     <span className="text-gray-500 dark:text-gray-400 text-sm">
                       Description:
                     </span>
-                    <p className="text-lg font-medium truncate max-w-xs 
-                              text-gray-800 dark:text-gray-200">
+                    <p
+                      className="text-lg font-medium truncate max-w-xs 
+                              text-gray-800 dark:text-gray-200"
+                    >
                       {ratePlan.rate_plan_description}
                     </p>
                   </div>
@@ -670,8 +741,10 @@ export function RatePlan({
                     <span className="text-gray-500 dark:text-gray-400 text-sm">
                       Min Stay:
                     </span>
-                    <p className="text-lg font-medium 
-                              text-gray-800 dark:text-gray-200">
+                    <p
+                      className="text-lg font-medium 
+                              text-gray-800 dark:text-gray-200"
+                    >
                       {ratePlan.min_length_stay}
                     </p>
                   </div>
@@ -681,9 +754,13 @@ export function RatePlan({
                     <span className="text-gray-500 dark:text-gray-400 text-sm">
                       Max Stay:
                     </span>
-                    <p className="text-lg font-medium 
-                              text-gray-800 dark:text-gray-200">
-                      {ratePlan.max_length_stay === 0 ? "Unlimited" : ratePlan.max_length_stay}
+                    <p
+                      className="text-lg font-medium 
+                              text-gray-800 dark:text-gray-200"
+                    >
+                      {ratePlan.max_length_stay === 0
+                        ? "Unlimited"
+                        : ratePlan.max_length_stay}
                     </p>
                   </div>
 
@@ -692,8 +769,10 @@ export function RatePlan({
                     <span className="text-gray-500 dark:text-gray-400 text-sm">
                       Min Book Advance:
                     </span>
-                    <p className="text-lg font-medium 
-                              text-gray-800 dark:text-gray-200">
+                    <p
+                      className="text-lg font-medium 
+                              text-gray-800 dark:text-gray-200"
+                    >
                       {ratePlan.min_book_advance}
                     </p>
                   </div>
@@ -703,9 +782,13 @@ export function RatePlan({
                     <span className="text-gray-500 dark:text-gray-400 text-sm">
                       Max Book Advance:
                     </span>
-                    <p className="text-lg font-medium 
-                              text-gray-800 dark:text-gray-200">
-                      {ratePlan.max_book_advance === 0 ? "Unlimited" : ratePlan.max_book_advance}
+                    <p
+                      className="text-lg font-medium 
+                              text-gray-800 dark:text-gray-200"
+                    >
+                      {ratePlan.max_book_advance === 0
+                        ? "Unlimited"
+                        : ratePlan.max_book_advance}
                     </p>
                   </div>
                 </div>

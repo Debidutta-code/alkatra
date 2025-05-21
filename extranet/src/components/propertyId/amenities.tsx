@@ -221,6 +221,7 @@ export function Amenities({
         amenities: {
           ...selectedAmenities
         }
+        
       };
 
       await handleAmenitySaveClick(newData);
@@ -229,6 +230,7 @@ export function Amenities({
 
       // Update the amenity state to reflect the new data
       setAmenity(newData);
+      console.log("new data",newData);
       
       // Show success toast notification
       toast.success('Amenities updated successfully!');
@@ -315,6 +317,7 @@ export function Amenities({
             id="no_of_rooms_available"
             {...register("no_of_rooms_available", { required: "Rooms Available is required", valueAsNumber: true })}
             type="number"
+            min={0}
             placeholder="Total No. of Rooms Available"
             defaultValue={amenity?.no_of_rooms_available}
           />
@@ -327,22 +330,25 @@ export function Amenities({
       <div className="pt-4">
         <h3 className="text-base font-medium mb-4">Available Amenities</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {AmenityData.map((amenity) => (
-            <div key={amenity} className="flex items-center space-x-2">
-              <Checkbox
-                id={amenity}
-                defaultChecked={property?.data?.property_amenities?.amenities[amenity]}
-                onCheckedChange={(value: boolean) => {
-                  setValue(`amenities.${amenity}`, value);
-                }}
-                {...register(`amenities.${amenity}`)}
-              />
-              <label htmlFor={amenity} className="text-sm font-medium leading-none flex items-center">
-                {amenityIcons[amenity]}
-                {amenity.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-              </label>
-            </div>
-          ))}
+         {AmenityData.map((amenity) => (
+  <div key={amenity} className="flex items-center space-x-2">
+    <Checkbox
+      id={amenity}
+      checked={watch(`amenities.${amenity}`) || false}
+      onCheckedChange={(value: boolean) => {
+        setValue(`amenities.${amenity}`, value);
+      }}
+    />
+    <label htmlFor={amenity} className="text-sm font-medium leading-none flex items-center">
+      {amenityIcons[amenity]}
+      {amenity
+        .split('_')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')}
+    </label>
+  </div>
+))}
+
         </div>
       </div>
 
@@ -437,24 +443,32 @@ export function Amenities({
         )}
 
         {/* Display available amenities */}
-        {availableAmenities && !editAmenityMode && Object.values(availableAmenities).some(value => value) && (
-          <div className="mt-8 pt-6 border-t">
-            <h4 className="text-sm font-medium mb-4">Available Amenities</h4>
-            <div className="flex flex-wrap gap-2">
-              {Object.entries(availableAmenities).map(([amenityKey, isAvailable]) => {
-                if (isAvailable) {
-                  return (
-                    <Badge key={amenityKey} variant="secondary" className="bg-primary text-primary-foreground flex items-center px-3 py-1">
-                      {amenityIcons[amenityKey]}
-                      {amenityKey.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-                    </Badge>
-                  );
-                }
-                return null;
-              })}
-            </div>
-          </div>
-        )}
+        {amenity?.amenities && !editAmenityMode && Object.values(amenity.amenities).some(value => value) && (
+  <div className="mt-8 pt-6 border-t">
+    <h4 className="text-sm font-medium mb-4">Available Amenities</h4>
+    <div className="flex flex-wrap gap-2">
+      {Object.entries(amenity.amenities).map(([amenityKey, isAvailable]) => {
+        if (isAvailable) {
+          return (
+            <Badge
+              key={amenityKey}
+              variant="secondary"
+              className="bg-primary text-primary-foreground flex items-center px-3 py-1"
+            >
+              {amenityIcons[amenityKey]}
+              {amenityKey
+                .split('_')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ')}
+            </Badge>
+          );
+        }
+        return null;
+      })}
+    </div>
+  </div>
+)}
+
       </CardContent>
     </Card>
   );

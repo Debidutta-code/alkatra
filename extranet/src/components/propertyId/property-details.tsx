@@ -30,7 +30,7 @@ export function PropertyDetails({
     }
 
     // Basic email regex pattern
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email)) {
       return { isValid: false, errorMessage: 'Please enter a valid email address' };
     }
@@ -42,8 +42,10 @@ export function PropertyDetails({
     const newErrors = {
       property_name: !editedProperty.property_name || editedProperty.property_name.trim() === '',
       property_email: false, // Reset email error
-      property_contact: !editedProperty.property_contact || editedProperty.property_contact.trim() === ''
-    };
+      property_contact:
+      !editedProperty.property_contact ||
+      editedProperty.property_contact.trim().length !== 10 ||
+      !/^\d{10}$/.test(editedProperty.property_contact.trim())    };
 
     // Perform specific email validation
     const emailValidation = validateEmail(editedProperty.property_email);
@@ -163,7 +165,7 @@ export function PropertyDetails({
                   className={`w-full ${errors.property_contact ? 'border-red-500' : ''}`}
                 />
                 {errors.property_contact && (
-                  <p className="text-red-500 text-xs mt-1">Property Contact is required</p>
+                  <p className="text-red-500 text-xs mt-1">Contact must be a valid 10-digit number</p>
                 )}
               </div>
             </div>
@@ -172,12 +174,6 @@ export function PropertyDetails({
           <div className="space-y-0">
             {property && property.data ? (
               <div>
-                <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">Property ID:</div>
-                  <div className="w-3/4 text-sm font-medium break-words overflow-hidden">
-                    {property.data._id || 'N/A'}
-                  </div>
-                </div>
                 <div className="py-2 flex items-start">
                   <div className="w-1/4 text-sm text-gray-500">Name:</div>
                   <div className="w-3/4 text-sm font-medium break-words overflow-hidden">
@@ -196,6 +192,12 @@ export function PropertyDetails({
                     {property.data.property_contact || 'N/A'}
                   </div>
                 </div>
+                {/* <div className="py-2 flex items-start">
+                  <div className="w-1/4 text-sm text-gray-500">Property Type</div>
+                  <div className="w-3/4 text-sm font-medium break-words overflow-hidden">
+                    {property.data. || 'N/A'}
+                //   </div> */}
+                {/* // </div> */}
               </div>
             ) : (
               <div className="bg-muted/50 rounded-lg p-6 text-center">

@@ -463,7 +463,8 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 {...register("country")}
                 className={`block appearance-none w-full border ${countryError ? "border-red-500" : "border-gray-300 dark:border-gray-600"
                   } bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-2 px-3 md:h-12.1 md:px-3 md:py-4 rounded-md leading-tight focus:outline-none focus:border-primary-500`}
-                onChange={(e) => handleCountryChange(e.target.value)}
+                value={selectedCountry}
+                  onChange={(e) => handleCountryChange(e.target.value)}
               >
                 {loading ? (
                   <option value="" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Loading...</option>

@@ -283,7 +283,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                         <SelectTrigger>
                           <SelectValue placeholder="Select bed type" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent >
                           {["single", "double", "king", "twin", "queen"]?.map(
                             (item, index) => (
                               <SelectItem key={`${item + index}`} value={item}>
