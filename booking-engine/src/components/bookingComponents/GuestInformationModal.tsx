@@ -7,8 +7,9 @@ import PhoneInput from 'react-phone-number-input';
 import "react-phone-number-input/style.css";
 import { useDispatch, useSelector } from "react-redux";
 import { setGuestDetails } from "@/Redux/slices/pmsHotelCard.slice";
-import { User, Mail, Phone, Calendar, CreditCard, CheckCircle, Users } from "lucide-react";
-import { formatDate, calculateNights } from "@/utils/dateUtils"; 
+import { User, Mail, Phone, Calendar, CreditCard, CheckCircle, Users, X } from "lucide-react";
+import { formatDate, calculateNights } from "@/utils/dateUtils";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 // User type definition
 interface UserType {
@@ -53,7 +54,7 @@ interface GuestInformationModalProps {
     roomId: string;
     checkIn: string;
     checkOut: string;
-    amount: string; 
+    amount: string;
     userId?: string;
     rooms?: number;
     adults?: number;
@@ -62,7 +63,7 @@ interface GuestInformationModalProps {
   // Add guestData prop
   guestData?: {
     rooms?: number;
-    guests?: number;
+    guests?: number; // Corresponds to adults
     children?: number;
     childAges?: number[];
     firstName?: string;
@@ -79,7 +80,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   checkInDate,
   checkOutDate,
   onConfirmBooking,
-  guestData // Add this parameter
+  guestData
 }) => {
   const authUser = useSelector((state: RootState) => state.auth.user);
   const [firstName, setFirstName] = useState<string>(authUser?.firstName || "");
@@ -92,29 +93,45 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   const [activeSection, setActiveSection] = useState<'details' | 'review'>('details');
 
   const dispatch = useDispatch();
+  const { t } = useTranslation(); // Initialize useTranslation hook
 
   // Helper function to get guest count display
   const getGuestCountDisplay = () => {
-    if (!guestData) return "1 Room · 1 Adult · 0 Children";
-    
-    const rooms = guestData.rooms || 1;
-    const adults = guestData.guests || 1;
-    const children = guestData.children || 0;
-    
-    return `${rooms} ${rooms === 1 ? 'Room' : 'Rooms'} · ${adults} ${adults === 1 ? 'Adult' : 'Adults'}${
-      children > 0 ? ` · ${children} ${children === 1 ? 'Child' : 'Children'}` : ''
-    }`;
+    // Default values if guestData is not provided or incomplete
+    const rooms = guestData?.rooms || 1;
+    const adults = guestData?.guests || 1; // 'guests' in guestData means adults
+    const children = guestData?.children || 0;
+
+    const roomText = t('BookingComponents.GuestInformationModal.roomSingular', { count: rooms });
+    const adultText = t('BookingComponents.GuestInformationModal.adultSingular', { count: adults });
+    const childText = t('BookingComponents.GuestInformationModal.childSingular', { count: children });
+
+    const childrenPart = children > 0
+      ? t('BookingComponents.GuestInformationModal.childrenPartFormat', { childrenCount: children, childText: childText })
+      : '';
+
+    return t('BookingComponents.GuestInformationModal.guestDisplayFormat', {
+      roomsCount: rooms,
+      roomText: roomText,
+      adultsCount: adults,
+      adultText: adultText,
+      childrenText: childrenPart
+    });
   };
 
   useEffect(() => {
-    // First try to use guest data from props
+    // Prioritize guestData from props
     if (guestData) {
-      if (guestData.firstName) setFirstName(guestData.firstName);
-      if (guestData.lastName) setLastName(guestData.lastName);
-      if (guestData.email) setEmail(guestData.email);
-      if (guestData.phone) setPhone(guestData.phone);
+      setFirstName(guestData.firstName || "");
+      setLastName(guestData.lastName || "");
+      setEmail(guestData.email || "");
+      if (guestData.phone) {
+        setPhone(guestData.phone.startsWith('+') ? guestData.phone : `+${guestData.phone}`);
+      } else {
+        setPhone("");
+      }
     }
-    // Fall back to auth user if available
+    // Fall back to auth user if available and guestData wasn't provided or didn't have contact info
     else if (authUser) {
       setFirstName(authUser.firstName);
       setLastName(authUser.lastName);
@@ -133,46 +150,47 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     }
   }, [authUser, guestData]);
 
+
   const handleUpdate = () => {
     let valid = true;
     setErrorMessage(null);
 
     if (!firstName || !/^[A-Za-z\s]+$/.test(firstName)) {
-      setErrorMessage("First Name is required and should only contain letters and spaces.");
+      setErrorMessage(t('BookingComponents.GuestInformationModal.firstNameError'));
       valid = false;
     }
 
     if (!lastName || !/^[A-Za-z\s]+$/.test(lastName)) {
-      setErrorMessage("Last Name is required and should only contain letters and spaces.");
+      setErrorMessage(t('BookingComponents.GuestInformationModal.lastNameError'));
       valid = false;
     }
 
     if (!email || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
-      setErrorMessage("Please enter a valid email address.");
+      setErrorMessage(t('BookingComponents.GuestInformationModal.emailError'));
       valid = false;
     }
 
     if (!phone) {
-      setErrorMessage("Phone number is required");
+      setErrorMessage(t('BookingComponents.GuestInformationModal.phoneError'));
       valid = false;
     }
 
     if (valid) {
       setIsFormUpdated(true);
-      setUpdateMessage("Information verified successfully!");
-      
+      setUpdateMessage(t('BookingComponents.GuestInformationModal.informationVerified'));
+
       // Include guest count details from guestData when saving to Redux
-      dispatch(setGuestDetails({ 
-        firstName, 
-        lastName, 
-        email, 
+      dispatch(setGuestDetails({
+        firstName,
+        lastName,
+        email,
         phone,
         rooms: guestData?.rooms || 1,
         guests: guestData?.guests || 1,
         children: guestData?.children || 0,
         childAges: guestData?.childAges || []
       }));
-      
+
       // Auto-advance to review section after successful update
       setTimeout(() => {
         setActiveSection('review');
@@ -183,21 +201,21 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   const handleConfirmBooking = () => {
     if (isFormUpdated && selectedRoom) {
       // Determine property ID from the room object
-      const propertyId = selectedRoom.propertyInfo_id || 
-                         selectedRoom.property_id || 
-                         selectedRoom.propertyId || 
+      const propertyId = selectedRoom.propertyInfo_id ||
+                         selectedRoom.property_id ||
+                         selectedRoom.propertyId ||
                          "";
-      
+
       // If propertyId is missing, show an error
       if (!propertyId) {
-        setErrorMessage("Property information is missing. Please try again.");
+        setErrorMessage(t('BookingComponents.GuestInformationModal.propertyInfoMissing'));
         return;
       }
-      
+
       // Calculate total price based on number of nights
       const nightsCount = calculateNights(checkInDate, checkOutDate);
       const totalPrice = selectedRoom.room_price * nightsCount;
-      
+
       onConfirmBooking({
         firstName,
         lastName,
@@ -211,7 +229,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         userId: authUser?._id, // Pass user ID if available
         // Add guest counts
         rooms: guestData?.rooms || 1,
-        adults: guestData?.guests || 1,
+        adults: guestData?.guests || 1, // 'guests' in guestData corresponds to adults
         children: guestData?.children || 0
       });
     }
@@ -227,16 +245,16 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       <div className="relative flex flex-col w-full max-h-[90vh] bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8]">
         {/* Modal Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between bg-tripswift-blue text-tripswift-off-white px-6 py-4">
-          <h2 className="text-xl font-tripswift-bold">Complete Your Booking</h2>
-          <button 
+          <h2 className="text-xl font-tripswift-bold">{t('BookingComponents.GuestInformationModal.completeYourBooking')}</h2>
+          <button
             onClick={onClose}
             className="p-1 rounded-full hover:bg-tripswift-blue/80 transition-colors"
             aria-label="Close"
           >
-            {/* <X size={24} /> */}
+            <X size={24} />
           </button>
         </div>
-        
+
         {/* Progress Steps */}
         <div className="bg-white px-6 py-3 border-b border-tripswift-black/10">
           <div className="flex justify-between mb-2">
@@ -248,7 +266,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
               }`}>
                 1
               </div>
-              <span className="text-xs mt-1 font-tripswift-medium">Guest Details</span>
+              <span className="text-xs mt-1 font-tripswift-medium">{t('BookingComponents.GuestInformationModal.guestDetailsStep')}</span>
             </div>
             <div className="flex-1 flex items-center mx-2">
               <div className={`h-1 w-full ${isFormUpdated ? 'bg-tripswift-blue' : 'bg-tripswift-black/10'}`}></div>
@@ -261,7 +279,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
               }`}>
                 2
               </div>
-              <span className="text-xs mt-1 font-tripswift-medium">Review & Pay</span>
+              <span className="text-xs mt-1 font-tripswift-medium">{t('BookingComponents.GuestInformationModal.reviewAndPayStep')}</span>
             </div>
           </div>
         </div>
@@ -283,7 +301,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         {formatDate(checkInDate)} - {formatDate(checkOutDate)}
                       </span>
                       <span className="text-xs bg-tripswift-blue/5 text-tripswift-black/70 px-2 py-1 rounded font-tripswift-medium">
-                        {nightsCount} night{nightsCount !== 1 ? 's' : ''}
+                        {t('BookingComponents.GuestInformationModal.nights', { count: nightsCount })}
                       </span>
                     </div>
                   </div>
@@ -292,14 +310,14 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
 
               {/* Guest Information Form */}
               <div className="bg-white rounded-lg shadow-sm p-6 border border-tripswift-black/10">
-                <h3 className="text-lg font-tripswift-bold text-tripswift-black mb-4">Guest Information</h3>
-                
+                <h3 className="text-lg font-tripswift-bold text-tripswift-black mb-4">{t('BookingComponents.GuestInformationModal.guestInformation')}</h3>
+
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1">
                       <label htmlFor="firstName" className="text-sm font-tripswift-medium text-tripswift-black/80 flex items-center">
                         <User size={16} className="text-tripswift-blue mr-2" />
-                        First Name
+                        {t('BookingComponents.GuestInformationModal.firstNameLabel')}
                       </label>
                       <input
                         type="text"
@@ -307,15 +325,15 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         name="firstName"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
-                        placeholder="Enter your first name"
+                        placeholder={t('BookingComponents.GuestInformationModal.firstNamePlaceholder')}
                         className="w-full px-3 py-2 border border-tripswift-black/20 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-sm font-tripswift-regular"
                       />
                     </div>
-                    
+
                     <div className="space-y-1">
                       <label htmlFor="lastName" className="text-sm font-tripswift-medium text-tripswift-black/80 flex items-center">
                         <User size={16} className="text-tripswift-blue mr-2" />
-                        Last Name
+                        {t('BookingComponents.GuestInformationModal.lastNameLabel')}
                       </label>
                       <input
                         type="text"
@@ -323,16 +341,16 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         name="lastName"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
-                        placeholder="Enter your last name"
+                        placeholder={t('BookingComponents.GuestInformationModal.lastNamePlaceholder')}
                         className="w-full px-3 py-2 border border-tripswift-black/20 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-sm font-tripswift-regular"
                       />
                     </div>
                   </div>
-                  
+
                   <div className="space-y-1">
                     <label htmlFor="email" className="text-sm font-tripswift-medium text-tripswift-black/80 flex items-center">
                       <Mail size={16} className="text-tripswift-blue mr-2" />
-                      Email Address
+                      {t('BookingComponents.GuestInformationModal.emailLabel')}
                     </label>
                     <input
                       type="email"
@@ -340,16 +358,16 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       name="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="your.email@example.com"
+                      placeholder={t('BookingComponents.GuestInformationModal.emailPlaceholder')}
                       className="w-full px-3 py-2 border border-tripswift-black/20 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-sm font-tripswift-regular"
                     />
-                    <p className="text-xs text-tripswift-black/50 mt-1">Your booking confirmation will be sent to this email address</p>
+                    <p className="text-xs text-tripswift-black/50 mt-1">{t('BookingComponents.GuestInformationModal.emailInfo')}</p>
                   </div>
-                  
+
                   <div className="space-y-1">
                     <label htmlFor="phone" className="text-sm font-tripswift-medium text-tripswift-black/80 flex items-center">
                       <Phone size={16} className="text-tripswift-blue mr-2" />
-                      Phone Number
+                      {t('BookingComponents.GuestInformationModal.phoneLabel')}
                     </label>
                     <PhoneInput
                       id="phone"
@@ -358,11 +376,11 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       onChange={setPhone}
                       maxLength={15}
                       defaultCountry="IN"
-                      placeholder="Enter phone number"
+                      placeholder={t('BookingComponents.GuestInformationModal.phonePlaceholder')}
                       className="w-full px-3 py-2 border border-tripswift-black/20 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-sm font-tripswift-regular"
                       international
                     />
-                    <p className="text-xs text-tripswift-black/50 mt-1">For booking-related notifications</p>
+                    <p className="text-xs text-tripswift-black/50 mt-1">{t('BookingComponents.GuestInformationModal.phoneInfo')}</p>
                   </div>
                 </div>
 
@@ -370,26 +388,26 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                   <div className="space-y-3">
                     <label htmlFor="guestDetails" className="text-sm font-tripswift-medium text-tripswift-black/80 flex items-center">
                       <Users size={16} className="text-tripswift-blue mr-2" />
-                      Guest Details
+                      {t('BookingComponents.GuestInformationModal.guestDetailsSection')}
                     </label>
-                    
+
                     {/* Guest count display */}
-                    {/* <div className="bg-tripswift-blue/5 border border-tripswift-blue/10 rounded-lg p-3 mb-3">
+                     <div className="bg-tripswift-blue/5 border border-tripswift-blue/10 rounded-lg p-3 mb-3">
                       <p className="text-sm font-tripswift-medium text-tripswift-blue/80">
                         {getGuestCountDisplay()}
                       </p>
-                    </div> */}
-                    
+                    </div>
+
                     <GuestBox />
                   </div>
                 </div>
-                
+
                 {errorMessage && (
                   <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm font-tripswift-regular">
                     {errorMessage}
                   </div>
                 )}
-                
+
                 {updateMessage && (
                   <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md text-green-600 text-sm font-tripswift-regular flex items-center">
                     <CheckCircle size={16} className="mr-2" />
@@ -403,56 +421,56 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
               {/* Review Booking Section */}
               <div className="bg-white rounded-lg shadow-sm border border-tripswift-black/10 overflow-hidden">
                 <div className="bg-tripswift-blue/5 border-b border-tripswift-black/10 p-4">
-                  <h3 className="font-tripswift-bold text-tripswift-black text-lg">Booking Summary</h3>
+                  <h3 className="font-tripswift-bold text-tripswift-black text-lg">{t('BookingComponents.GuestInformationModal.bookingSummary')}</h3>
                 </div>
-                
+
                 <div className="p-6">
                   <div className="flex flex-col md:flex-row gap-8">
                     <div className="flex-1">
                       <h4 className="font-tripswift-medium text-tripswift-black mb-3 flex items-center">
                         <Calendar size={18} className="text-tripswift-blue mr-2" />
-                        Stay Details
+                        {t('BookingComponents.GuestInformationModal.stayDetails')}
                       </h4>
                       <div className="space-y-3 pl-6">
                         <div>
-                          <p className="text-sm text-tripswift-black/60">Room Type</p>
+                          <p className="text-sm text-tripswift-black/60">{t('BookingComponents.GuestInformationModal.roomType')}</p>
                           <p className="font-tripswift-medium">{selectedRoom.room_name} ({selectedRoom.room_type})</p>
                         </div>
                         <div>
-                          <p className="text-sm text-tripswift-black/60">Check-in</p>
+                          <p className="text-sm text-tripswift-black/60">{t('BookingComponents.GuestInformationModal.checkIn')}</p>
                           <p className="font-tripswift-medium">{formatDate(checkInDate)}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-tripswift-black/60">Check-out</p>
+                          <p className="text-sm text-tripswift-black/60">{t('BookingComponents.GuestInformationModal.checkOut')}</p>
                           <p className="font-tripswift-medium">{formatDate(checkOutDate)}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-tripswift-black/60">Duration</p>
-                          <p className="font-tripswift-medium">{nightsCount} night{nightsCount !== 1 ? 's' : ''}</p>
+                          <p className="text-sm text-tripswift-black/60">{t('BookingComponents.GuestInformationModal.duration')}</p>
+                          <p className="font-tripswift-medium">{t('BookingComponents.GuestInformationModal.nights', { count: nightsCount })}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-tripswift-black/60">Guests</p>
+                          <p className="text-sm text-tripswift-black/60">{t('BookingComponents.GuestInformationModal.guests')}</p>
                           <p className="font-tripswift-medium">{getGuestCountDisplay()}</p>
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex-1">
                       <h4 className="font-tripswift-medium text-tripswift-black mb-3 flex items-center">
                         <User size={18} className="text-tripswift-blue mr-2" />
-                        Guest Information
+                        {t('BookingComponents.GuestInformationModal.guestInformation')}
                       </h4>
                       <div className="space-y-3 pl-6">
                         <div>
-                          <p className="text-sm text-tripswift-black/60">Primary Guest</p>
+                          <p className="text-sm text-tripswift-black/60">{t('BookingComponents.GuestInformationModal.primaryGuest')}</p>
                           <p className="font-tripswift-medium">{firstName} {lastName}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-tripswift-black/60">Email</p>
+                          <p className="text-sm text-tripswift-black/60">{t('BookingComponents.GuestInformationModal.emailLabel')}</p>
                           <p className="font-tripswift-medium">{email}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-tripswift-black/60">Phone</p>
+                          <p className="text-sm text-tripswift-black/60">{t('BookingComponents.GuestInformationModal.phoneLabel')}</p>
                           <p className="font-tripswift-medium">{phone}</p>
                         </div>
                       </div>
@@ -460,24 +478,24 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                   </div>
                 </div>
               </div>
-              
+
               {/* Price Summary Card */}
               <div className="bg-white rounded-lg shadow-sm border border-tripswift-black/10 overflow-hidden">
                 <div className="bg-tripswift-blue/5 border-b border-tripswift-black/10 p-4">
-                  <h3 className="font-tripswift-bold text-tripswift-black text-lg">Price Details</h3>
+                  <h3 className="font-tripswift-bold text-tripswift-black text-lg">{t('BookingComponents.GuestInformationModal.priceDetails')}</h3>
                 </div>
-                
+
                 <div className="p-6">
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-tripswift-black/70">
-                        Room Rate ({nightsCount} {nightsCount === 1 ? 'night' : 'nights'})
+                        {t('BookingComponents.GuestInformationModal.roomRate')} ({t('BookingComponents.GuestInformationModal.nights', { count: nightsCount })})
                       </span>
                       <span className="font-tripswift-medium">₹{selectedRoom.room_price} × {nightsCount}</span>
                     </div>
                     <div className="border-t border-tripswift-black/10 my-3 pt-3"></div>
                     <div className="flex justify-between items-center">
-                      <span className="font-tripswift-bold text-lg">Total Amount</span>
+                      <span className="font-tripswift-bold text-lg">{t('BookingComponents.GuestInformationModal.totalAmount')}</span>
                       <span className="font-tripswift-bold text-xl text-tripswift-blue">
                         ₹{(selectedRoom.room_price * nightsCount)}
                       </span>
@@ -485,17 +503,17 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                   </div>
                 </div>
               </div>
-              
+
               {/* Payment Notice */}
               <div className="bg-tripswift-blue/5 rounded-lg p-4 border border-tripswift-blue/20">
                 <div className="flex items-start">
                   <CreditCard className="text-tripswift-blue flex-shrink-0 mt-1 mr-3" size={20} />
                   <div>
                     <p className="text-sm text-tripswift-black/80 font-tripswift-medium">
-                      Payment will be processed securely
+                      {t('BookingComponents.GuestInformationModal.paymentNoticeTitle')}
                     </p>
                     <p className="text-xs text-tripswift-black/60 mt-1">
-                      By proceeding, you agree to our terms and conditions and privacy policy.
+                      {t('BookingComponents.GuestInformationModal.paymentNoticeDescription')}
                     </p>
                   </div>
                 </div>
@@ -503,22 +521,22 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
             </div>
           )}
         </div>
-        
+
         {/* Footer actions */}
         <div className="sticky bottom-0 bg-white border-t border-tripswift-black/10 p-6 flex flex-col sm:flex-row gap-3 justify-between">
           <button
             onClick={() => activeSection === 'review' ? setActiveSection('details') : onClose()}
             className="btn-tripswift-secondary px-6 py-2.5 rounded-md transition-all duration-300 font-tripswift-medium flex items-center justify-center"
           >
-            {activeSection === 'review' ? 'Back to Details' : 'Cancel'}
+            {activeSection === 'review' ? t('BookingComponents.GuestInformationModal.backToDetails') : t('BookingComponents.GuestInformationModal.cancel')}
           </button>
-          
+
           {activeSection === 'details' ? (
             <button
               onClick={handleUpdate}
               className="btn-tripswift-primary px-6 py-2.5 rounded-md transition-all duration-300 shadow-sm hover:shadow-md font-tripswift-medium flex items-center justify-center"
             >
-              Continue to Review
+              {t('BookingComponents.GuestInformationModal.continueToReview')}
             </button>
           ) : (
             <button
@@ -526,7 +544,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
               disabled={!isFormUpdated}
               className={`btn-tripswift-primary px-6 py-2.5 rounded-md transition-all duration-300 shadow-sm hover:shadow-md font-tripswift-medium flex items-center justify-center ${!isFormUpdated ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
-              Proceed to Payment
+              {t('BookingComponents.GuestInformationModal.proceedToPayment')}
             </button>
           )}
         </div>

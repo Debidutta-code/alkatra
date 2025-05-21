@@ -1,17 +1,22 @@
 "use client";
 import Image from "next/image";
 import React from "react";
-import img from "../assets/TRIP-1.png";
+import img from "../assets/TRIP-1.png"; // Make sure this path is correct
 import { usePathname } from "next/navigation";
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import Link from "next/link";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 type Props = {};
 
 const Footer = (props: Props) => {
   const pathname = usePathname();
-  
+  const { t } = useTranslation(); // Initialize useTranslation hook
+
   const isFooterVisible = pathname !== "/my-trip" && pathname !== "/login" && pathname !== "/register";
+
+  // Get current year for copyright
+  const currentYear = new Date().getFullYear();
 
   return (
     <>
@@ -24,7 +29,7 @@ const Footer = (props: Props) => {
                 src={img}
                 width={170}
                 height={20}
-                alt="TripSwift - Redifines Hospitality Technology"
+                alt="TripSwift - Redefines Hospitality Technology" // Consider adding translation for alt text if needed
                 className="object-contain"
               />
             </div>
@@ -33,88 +38,88 @@ const Footer = (props: Props) => {
             <div className="flex flex-col md:flex-row md:space-x-10 md:items-start">
               {/* Company Section */}
               <div className="flex flex-col p-2 cursor-pointer">
-                <header className="text-lg font-tripswift-extrabold mb-4">Company</header>
+                <header className="text-lg font-tripswift-extrabold mb-4">{t('Footer.companyTitle')}</header>
                 <Link
                   href="/about-us"
                   className="text-base mb-2 hover:underline text-tripswift-off-white/80 hover:text-tripswift-blue font-tripswift-regular"
                 >
-                  About Us
+                  {t('Footer.aboutUs')}
                 </Link>
                 <Link
                   href="/why-choose-us"
                   className="text-base mb-2 hover:underline text-tripswift-off-white/80 hover:text-tripswift-blue font-tripswift-regular"
                 >
-                  Why Choose Us
+                  {t('Footer.whyChooseUs')}
                 </Link>
                 <Link
                   href="/pricing"
                   className="text-base mb-2 hover:underline text-tripswift-off-white/80 hover:text-tripswift-blue font-tripswift-regular"
                 >
-                  Pricing
+                  {t('Footer.pricing')}
                 </Link>
                 <Link
                   href="/testimonials"
                   className="text-base mb-2 hover:underline text-tripswift-off-white/80 hover:text-tripswift-blue font-tripswift-regular"
                 >
-                  Testimonial
+                  {t('Footer.testimonials')}
                 </Link>
               </div>
   
               {/* Resources Section */}
               <div className="flex flex-col p-2 cursor-pointer">
-                <header className="text-lg font-tripswift-extrabold mb-4">Resources</header>
+                <header className="text-lg font-tripswift-extrabold mb-4">{t('Footer.resourcesTitle')}</header>
                 <Link
                   href="/privacy"
                   className="text-base mb-2 hover:underline text-tripswift-off-white/80 hover:text-tripswift-blue font-tripswift-regular"
                 >
-                  Privacy Policy
+                  {t('Footer.privacyPolicy')}
                 </Link>
                 <Link
                   href="/terms"
                   className="text-base mb-2 hover:underline text-tripswift-off-white/80 hover:text-tripswift-blue font-tripswift-regular"
                 >
-                  Terms and Conditions
+                  {t('Footer.termsAndConditions')}
                 </Link>
                 <Link
                   href="/blog"
                   className="text-base mb-2 hover:underline text-tripswift-off-white/80 hover:text-tripswift-blue font-tripswift-regular"
                 >
-                  Blog
+                  {t('Footer.blog')}
                 </Link>
                 <Link
                   href="/contact"
                   className="text-base mb-2 hover:underline text-tripswift-off-white/80 hover:text-tripswift-blue font-tripswift-regular"
                 >
-                  Contact Us
+                  {t('Footer.contactUs')}
                 </Link>
               </div>
   
               {/* Product Section */}
               <div className="flex flex-col p-2 cursor-pointer">
-                <header className="text-lg font-tripswift-extrabold mb-4">Product</header>
+                <header className="text-lg font-tripswift-extrabold mb-4">{t('Footer.productTitle')}</header>
                 <Link
                   href="/project-management"
                   className="text-base mb-2 hover:underline text-tripswift-off-white/80 hover:text-tripswift-blue font-tripswift-regular"
                 >
-                  Project Management
+                  {t('Footer.projectManagement')}
                 </Link>
                 <Link
                   href="/time-tracker"
                   className="text-base mb-2 hover:underline text-tripswift-off-white/80 hover:text-tripswift-blue font-tripswift-regular"
                 >
-                  Time Tracker
+                  {t('Footer.timeTracker')}
                 </Link>
                 <Link
                   href="/time-schedule"
                   className="text-base mb-2 hover:underline text-tripswift-off-white/80 hover:text-tripswift-blue font-tripswift-regular"
                 >
-                  Time Schedule
+                  {t('Footer.timeSchedule')}
                 </Link>
                 <Link
                   href="/lead-generation"
                   className="text-base mb-2 hover:underline text-tripswift-off-white/80 hover:text-tripswift-blue font-tripswift-regular"
                 >
-                  Lead Generation
+                  {t('Footer.leadGeneration')}
                 </Link>
               </div>
             </div>
@@ -126,12 +131,12 @@ const Footer = (props: Props) => {
               <div className="relative w-full md:w-64">
                 <input
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t('Footer.emailPlaceholder')}
                   className="border border-tripswift-off-white/30 bg-tripswift-black/20 rounded px-4 py-2 w-full text-tripswift-off-white placeholder-tripswift-off-white/50 focus:outline-none focus:border-tripswift-blue font-tripswift-regular"
                 />
               </div>
               <button className="w-full md:w-auto btn-tripswift-primary">
-                Subscribe
+                {t('Footer.subscribeButton')}
               </button>
             </div>
           </div>
@@ -140,7 +145,7 @@ const Footer = (props: Props) => {
           <div className="flex flex-col md:flex-row items-center justify-between mt-8 space-y-4 md:space-y-0">
             <div className="hidden md:block w-full md:w-auto border-t border-tripswift-off-white/20 flex-grow"></div>
             <div className="text-center text-sm mt-2 md:mt-0 w-full md:w-auto text-tripswift-off-white/80 font-tripswift-regular">
-              © {new Date().getFullYear()} TripSwift - All rights reserved
+              {t('Footer.copyright', { year: currentYear })}
             </div>
             <div className="hidden md:block w-full md:w-auto border-t border-tripswift-off-white/20 flex-grow"></div>
           </div>
