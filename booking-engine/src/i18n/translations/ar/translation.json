@@ -133,9 +133,9 @@
         "description": "خصم يصل إلى 50% على حجوزات الفنادق",
         "validTill": "2 ساعة 45 دقيقة"
       },
-      "flightDeal": {
-        "title": "عرض الطيران",
-        "description": "استرداد نقدي ₹2000 على الرحلات الجوية",
+      "luxuryStay": {
+        "title": "إقامة فاخرة",
+        "description": "خصم يصل إلى 30% على الفنادق الفاخرة",
         "validTill": "5 ساعات 30 دقيقة"
       },
       "weekendGetaway": {

@@ -5,12 +5,13 @@ import CheckoutPage from "@/components/Stripe/checkoutPage";
 import PayAtHotelFunction from "@/components/paymentComponents/PayAtHotelFunction";
 import PaymentOptionSelector from "@/components/paymentComponents/PaymentOptionSelector";
 import convertToSubcurrency from "@/lib/convertToSubcurrency";
+import { formatDate, calculateNights } from "@/utils/dateUtils"; // Import date utilities
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSelector } from "react-redux";
-import { Shield, CreditCard, CheckCircle, Clock, CalendarRange } from "lucide-react";
+import { Shield, CreditCard, CheckCircle, Clock, CalendarRange, Users, Bed } from "lucide-react";
 import Link from "next/link";
 
 // Define RootState type based on your store's state shape
@@ -41,6 +42,7 @@ function PaymentPageContent() {
   const searchParams = useSearchParams();
   const authUser = useSelector((state: RootState) => state.auth.user);
   
+  // Get booking parameters from URL
   const amount = parseInt(searchParams.get("amount") || "0", 10);
   const currency = searchParams.get("currency")?.toLowerCase() || "inr";
   const firstName = searchParams.get('firstName') || authUser?.firstName || '';
@@ -53,25 +55,16 @@ function PaymentPageContent() {
   const checkOut = searchParams.get('checkOut') || '';
   const userId = authUser?._id || searchParams.get('userId') || '';
   
-  // Format dates for display
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-  };
+  // Get guest counts from URL parameters
+  const rooms = parseInt(searchParams.get('rooms') || '1', 10);
+  const adults = parseInt(searchParams.get('adults') || '1', 10);
+  const children = parseInt(searchParams.get('children') || '0', 10);
   
-  // Calculate nights for display
-  const calculateNights = () => {
-    if (!checkIn || !checkOut) return 1;
-    
-    const checkInDate = new Date(checkIn);
-    const checkOutDate = new Date(checkOut);
-    
-    const diffTime = Math.abs(checkOutDate.getTime() - checkInDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    return diffDays || 1;
-  };
+  // Calculate nights between check-in and check-out
+  const nights = calculateNights(checkIn, checkOut);
+  
+  // Calculate rate per night
+  const ratePerNight = amount / (nights || 1);
 
   // Compile all booking details in one object to pass to payment components
   const bookingDetails = {
@@ -85,7 +78,10 @@ function PaymentPageContent() {
     lastName,
     email,
     phone,
-    userId
+    userId,
+    rooms,
+    adults,
+    children
   };
 
   // Add a loading or error state handler
@@ -122,14 +118,31 @@ function PaymentPageContent() {
                     <h2 className="font-tripswift-medium text-lg">Booking Summary</h2>
                   </div>
                   <div className="p-6">
-                    <div className="flex flex-col md:flex-row gap-6">
+                    <div className="flex flex-col md:flex-row md:justify-between gap-6">
                       <div className="flex items-start space-x-3">
                         <CalendarRange className="text-tripswift-blue flex-shrink-0 mt-1" size={20} />
                         <div>
                           <p className="text-sm text-tripswift-black/60">Stay Dates</p>
-                          <p className="font-tripswift-medium">{formatDate(checkIn)} - {formatDate(checkOut)}</p>
+                          <p className="font-tripswift-medium">
+                            {formatDate(checkIn, { weekday: 'short', month: 'short', day: 'numeric' })} - {formatDate(checkOut, { weekday: 'short', month: 'short', day: 'numeric' })}
+                          </p>
+                          <p className="text-sm text-tripswift-black/60">
+                            {nights} {nights === 1 ? 'night' : 'nights'}
+                          </p>
                         </div>
                       </div>
+                      
+                      <div className="flex items-start space-x-3">
+                        <Users className="text-tripswift-blue flex-shrink-0 mt-1" size={20} />
+                        <div>
+                          <p className="text-sm text-tripswift-black/60">Guests</p>
+                          <p className="font-tripswift-medium">
+                            {rooms} {rooms === 1 ? 'Room' : 'Rooms'} · {adults} {adults === 1 ? 'Adult' : 'Adults'}
+                            {children > 0 ? ` · ${children} ${children === 1 ? 'Child' : 'Children'}` : ''}
+                          </p>
+                        </div>
+                      </div>
+                      
                       <div className="flex items-start space-x-3">
                         <CheckCircle className="text-tripswift-blue flex-shrink-0 mt-1" size={20} />
                         <div>
@@ -197,8 +210,14 @@ function PaymentPageContent() {
                       <div className="space-y-4">
                         <div className="flex justify-between items-center">
                           <div className="text-tripswift-black/70">Room Rate</div>
-                          <div className="font-tripswift-medium">{currency.toUpperCase()} {amount.toLocaleString()}</div>
+                          <div className="font-tripswift-medium">{currency.toUpperCase()} {ratePerNight.toLocaleString()} per night</div>
                         </div>
+                        
+                        <div className="flex justify-between items-center">
+                          <div className="text-tripswift-black/70">{nights} {nights === 1 ? 'night' : 'nights'}</div>
+                          <div className="font-tripswift-medium">{currency.toUpperCase()} {ratePerNight.toLocaleString()} × {nights}</div>
+                        </div>
+                        
                         <div className="border-t border-gray-200 my-4"></div>
                         <div className="flex justify-between items-center">
                           <div className="font-tripswift-bold text-lg">Total</div>

@@ -14,11 +14,11 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  
+
   // Get auth state from Redux store
   const auth = useSelector((state: any) => state.auth);
   const token = auth?.token || auth?.accessToken; // Try both possible token names
-  
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -26,7 +26,7 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
       setErrorMessage("Stripe hasn't loaded yet. Please try again.");
       return;
     }
-    
+
     // Check if user is authenticated
     if (!token) {
       setErrorMessage("You need to be logged in to complete this booking. Please sign in and try again.");
@@ -100,11 +100,11 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
           }
         }
       };
-      
+
       const bookingResponse = await confirmBookingWithStoredCard(bookingPayload, token);
 
       // Handle success
-      router.push(`/payment-success?reference=${bookingResponse.savedBooking._id}`);
+      router.push(`/payment-success?reference=${bookingResponse.savedBooking._id}&amount=${bookingDetails.amount}&firstName=${bookingDetails.firstName}&lastName=${bookingDetails.lastName}&email=${bookingDetails.email}&phone=${bookingDetails.phone}&method=payAtHotel`);
     } catch (error: any) {
       console.error('Payment error:', error);
       setErrorMessage(error.message || 'An error occurred during payment processing');
@@ -163,11 +163,10 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
       <button
         type="submit"
         disabled={!stripe || isLoading}
-        className={`w-full py-3 px-4 rounded-md transition ${
-          isLoading || !stripe
+        className={`w-full py-3 px-4 rounded-md transition ${isLoading || !stripe
             ? 'bg-gray-300 cursor-not-allowed text-tripswift-black/50'
             : 'bg-tripswift-blue hover:bg-[#054B8F] text-tripswift-off-white'
-        } font-tripswift-medium`}
+          } font-tripswift-medium`}
       >
         {isLoading ? (
           <span className="flex items-center justify-center">

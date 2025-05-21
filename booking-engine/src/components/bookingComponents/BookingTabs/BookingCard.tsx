@@ -1,7 +1,8 @@
 import React from 'react';
-import { FaHotel, FaMapMarkerAlt, FaCalendarCheck, FaCalendarTimes, FaUser, FaTicketAlt, FaEdit, FaRegTimesCircle } from 'react-icons/fa';
+import { FaHotel, FaMapMarkerAlt, FaCalendarCheck, FaCalendarTimes, FaUser, FaTicketAlt, FaEdit, FaRegTimesCircle, FaCalendarDay } from 'react-icons/fa';
 import { Booking } from './types';
-import { formatDateString, calculateNights, getStatusClass, getStatusIcon, getRoomTypeStyle, getPaymentMethodText, getPaymentMethodIcon, getBookingId, getRoomTypeIcon } from './utils';
+import { getStatusClass, getStatusIcon, getRoomTypeStyle, getPaymentMethodText, getPaymentMethodIcon, getBookingId, getRoomTypeIcon } from './utils';
+import { formatDate, calculateNights } from "@/utils/dateUtils";
 
 interface BookingCardProps {
   booking: Booking;
@@ -16,6 +17,12 @@ const BookingCard: React.FC<BookingCardProps> = ({
   onModify, 
   onCancel 
 }) => {
+  // Calculate number of nights
+  const nights = calculateNights(booking.checkInDate, booking.checkOutDate);
+  
+  // Calculate per-night rate
+  const nightlyRate = nights > 0 ? Math.round(booking.amount / nights) : booking.amount;
+  
   return (
     <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 group">
       {/* Booking ID Banner */}
@@ -46,11 +53,12 @@ const BookingCard: React.FC<BookingCardProps> = ({
         )}
         
         {/* Stay Duration */}
-        {/* <div className="absolute bottom-0 right-0 transform translate-y-1/2 mr-5">
-          <div className="bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-tripswift-bold text-tripswift-blue">
-            {calculateNights(booking.checkInDate, booking.checkOutDate)} {calculateNights(booking.checkInDate, booking.checkOutDate) === 1 ? 'Night' : 'Nights'}
+        <div className="absolute bottom-0 right-0 transform translate-y-1/2 mr-5">
+          <div className="bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-tripswift-bold text-tripswift-blue flex items-center">
+            <FaCalendarDay className="mr-1.5" />
+            {nights} {nights === 1 ? 'Night' : 'Nights'}
           </div>
-        </div> */}
+        </div>
       </div>
 
       {/* Card Body */}
@@ -61,14 +69,14 @@ const BookingCard: React.FC<BookingCardProps> = ({
             <p className="text-xs text-gray-500 mb-1">Check-in</p>
             <p className="flex items-center text-gray-800 font-tripswift-medium text-sm">
               <FaCalendarCheck className="mr-2 text-green-500 flex-shrink-0" />
-              {formatDateString(booking.checkInDate)}
+              {formatDate(booking.checkInDate)}
             </p>
           </div>
           <div>
             <p className="text-xs text-gray-500 mb-1">Check-out</p>
             <p className="flex items-center text-gray-800 font-tripswift-medium text-sm">
               <FaCalendarTimes className="mr-2 text-red-500 flex-shrink-0" />
-              {formatDateString(booking.checkOutDate)}
+              {formatDate(booking.checkOutDate)}
             </p>
           </div>
         </div>
@@ -108,8 +116,14 @@ const BookingCard: React.FC<BookingCardProps> = ({
             </p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-gray-500 mb-1">Total Amount</p>
-            <p className="text-lg font-tripswift-bold text-tripswift-blue">₹{booking.amount.toLocaleString()}</p>
+            {/* Enhanced pricing information with per-night rate */}
+            <div className="flex flex-col">
+              <p className="text-xs text-gray-500 mb-1">Rate Breakdown</p>
+              <div className="flex items-center justify-end text-sm text-tripswift-black/70 mb-1">
+                <span>₹{nightlyRate.toLocaleString()} × {nights} {nights === 1 ? 'night' : 'nights'}</span>
+              </div>
+              <p className="text-lg font-tripswift-bold text-tripswift-blue">₹{booking.amount.toLocaleString()}</p>
+            </div>
           </div>
         </div>
       </div>

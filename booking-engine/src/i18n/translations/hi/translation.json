@@ -133,9 +133,9 @@
         "description": "होटल बुकिंग पर 50% तक की छूट",
         "validTill": "2 घंटे 45 मिनट"
       },
-      "flightDeal": {
-        "title": "फ्लाइट डील",
-        "description": "फ्लाइट पर ₹2000 की तत्काल कैशबैक",
+      "luxuryStay": {
+        "title": "लक्ज़री स्टे",
+        "description": "प्रीमियम होटलों पर 30% तक की छूट",
         "validTill": "5 घंटे 30 मिनट"
       },
       "weekendGetaway": {

@@ -13,8 +13,6 @@ import {
   getRevenueByOwner,
   getRevenueByProperty,
   getBookingDetailsOfUser,
-  // New controllers for Pay at Hotel feature
-  createSetupIntent,
   createReservationWithStoredCard
 } from "../controllers/bookings.controller";
 
@@ -29,6 +27,8 @@ router.route("/update/:id").patch(authenticateCustomer as any, updateStatusOfBoo
 router.route("/getreservation/:reservationId").get(getReservation);
 router.route("/getreservations").get(getAllReservations);
 router.route("/getUserReservations/:id").get(getAllReservationsOfUser);
+router.route("/create-reservation-with-card").post(authenticateCustomer as any, createReservationWithStoredCard);
+
 
 router.route("/:id")
   .get(authenticateCustomer as any, getBookingsForDashboard)

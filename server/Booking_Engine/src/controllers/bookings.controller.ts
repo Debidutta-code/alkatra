@@ -1,44 +1,18 @@
 import { Request, Response, NextFunction } from "express";
 import Bookings from "../models/booking.model";
-import { validateBookingDates } from "../utils/booking.validator.dates";
 import mongoose, { Types } from "mongoose";
 import { CatchAsyncError } from "../middleware/catchAsyncError";
 import ErrorHandler from "../utils/errorHandler";
 import AuthModelType from "../../../User-Authentication/src/Model/auth.model";
 import { PropertyInfo } from "../../../Property_Management/src/model/property.info.model";
 import { Room } from "../../../Property_Management/src/model/room.model";
-import { checkPreferences } from "joi";
-import { User } from "@clerk/clerk-sdk-node";
 import { Location } from "../../../Property_Management/src/model/property.location.model";
 import { ThirdPartyReservationService } from '../../../wincloud/src/controller/reservationController';
 import { ThirdPartyAmendReservationService } from '../../../wincloud/src/controller/amendReservationController';
-import { ThirdPartyAmendBooking } from "../../../wincloud/src/model/amendReservationModel";
 import { ThirdPartyBooking } from "../../../wincloud/src/model/reservationModel";
 import stripeService from "../services/stripe.service";
 import Customer from "../../../Customer-Authentication/src/models/customer.model";
 
-
-// New controller function to create a setup intent
-export const createSetupIntent = CatchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      // Replace createStripeSetupIntent() with stripeService.createSetupIntent()
-      const result = await stripeService.createSetupIntent();
-
-      if (!result.success) {
-        return next(new ErrorHandler(result.error || 'Failed to create setup intent', 500));
-      }
-
-      res.status(200).json({
-        success: true,
-        clientSecret: result.clientSecret
-      });
-    } catch (error: any) {
-      console.error("Setup Intent Error:", error);
-      return next(new ErrorHandler(error.message, 500));
-    }
-  }
-);
 
 // New controller function to create a reservation with stored card (Pay at Hotel)
 export const createReservationWithStoredCard = CatchAsyncError(

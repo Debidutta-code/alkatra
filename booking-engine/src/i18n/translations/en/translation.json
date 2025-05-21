@@ -133,9 +133,9 @@
         "description": "Up to 50% off on Hotel Bookings",
         "validTill": "2h 45m"
       },
-      "flightDeal": {
-        "title": "Flight Deal",
-        "description": "Flat ₹2000 Cashback on Flights",
+      "luxuryStay": {
+        "title": "Luxury Stay",
+        "description": "Up to 30% off on Premium Hotels",
         "validTill": "5h 30m"
       },
       "weekendGetaway": {
