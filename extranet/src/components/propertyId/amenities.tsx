@@ -233,7 +233,7 @@ export function Amenities({
       console.log("new data",newData);
       
       // Show success toast notification
-      toast.success('Amenities updated successfully!');
+      toast.success('Property Amenities updated successfully!');
     } catch (error) {
       console.error('Error editing amenities:', error);
       toast.error('Failed to update amenities. Please try again.');

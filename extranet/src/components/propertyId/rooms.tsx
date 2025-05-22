@@ -316,7 +316,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="floor">Floor <span className="text-destructive">*</span></Label>
+            <Label htmlFor="floor">Floor </Label>
             <Input
               id="floor"
               name="floor"
@@ -330,7 +330,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="room_view">Room View <span className="text-destructive">*</span></Label>
+            <Label htmlFor="room_view">Room View </Label>
             <Input
               id="room_view"
               name="room_view"
@@ -425,7 +425,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="max_number_of_children">Max Children <span className="text-destructive">*</span></Label>
+            <Label htmlFor="max_number_of_children">Max Children </Label>
             <Input
               id="max_number_of_children"
               name="max_number_of_children"
@@ -456,7 +456,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="number_of_living_room">Living Rooms <span className="text-destructive">*</span></Label>
+            <Label htmlFor="number_of_living_room">Living Rooms </Label>
             <Input
               id="number_of_living_room"
               name="number_of_living_room"
@@ -470,7 +470,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="extra_bed">Extra Bed <span className="text-destructive">*</span></Label>
+            <Label htmlFor="extra_bed">Extra Bed </Label>
             <Input
               id="extra_bed"
               name="extra_bed"
@@ -488,7 +488,6 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
         <div className="space-y-2">
           <Label htmlFor="description" className="flex items-center">
             Description
-            <span className="text-destructive ml-1">*</span>
             <span className="ml-2 text-xs text-muted-foreground">
               {newRoom.description.length} / 500 characters
             </span>

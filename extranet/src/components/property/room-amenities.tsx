@@ -265,22 +265,22 @@ export default function Rooms({ onNext, onPrevious }: Props) {
           <CardHeader>
             <CardTitle>Amenities</CardTitle>
           </CardHeader>
-          <CardContent className="flex gap-4 flex-wrap">
-            <ScrollArea className="h-72 w-full">
+          <CardContent className="flex gap-4 flex-wrap ">
+            <ScrollArea className="h-72 w-full px-6">
               <Accordion type="multiple" className="w-full">
                 <AccordionItem value="amenity-1">
                   <AccordionTrigger >Room Amenities</AccordionTrigger>
                   <AccordionContent className="flex gap-4 items-center justify-between">
                     <div className="w-full">
                       <Label>Bed Type</Label>
-                      <Select
+                      <Select 
                         value={roomDetails?.bed || ''}
                         onValueChange={(value: any) => {
                           setroomDetails({ ...roomDetails, bed: value })
                           setValue("bed", value as any)
                         }}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger >
                           <SelectValue placeholder="Select bed type" />
                         </SelectTrigger>
                         <SelectContent >
