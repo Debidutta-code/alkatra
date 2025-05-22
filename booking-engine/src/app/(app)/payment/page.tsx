@@ -5,14 +5,15 @@ import CheckoutPage from "@/components/Stripe/checkoutPage";
 import PayAtHotelFunction from "@/components/paymentComponents/PayAtHotelFunction";
 import PaymentOptionSelector from "@/components/paymentComponents/PaymentOptionSelector";
 import convertToSubcurrency from "@/lib/convertToSubcurrency";
-import { formatDate, calculateNights } from "@/utils/dateUtils"; // Import date utilities
+import { formatDate, calculateNights } from "@/utils/dateUtils";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSelector } from "react-redux";
-import { Shield, CreditCard, CheckCircle, Clock, CalendarRange, Users, Bed } from "lucide-react";
+import { Shield, CreditCard, CheckCircle, Clock, CalendarRange, Users, Loader2 } from "lucide-react";
 import Link from "next/link";
+import axios from "axios";
 
 // Define RootState type based on your store's state shape
 interface RootState {
@@ -31,17 +32,20 @@ interface UserType {
   _id?: string;
 }
 
-if (process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY === undefined) {
-  throw new Error("NEXT_PUBLIC_STRIPE_PUBLIC_KEY is not defined");
-}
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
+// Don't create Stripe promise at module level
+// Instead, create it on demand when user selects payment method
 
 function PaymentPageContent() {
   const [loading, setLoading] = useState(true);
-  const [paymentOption, setPaymentOption] = useState<string>("payNow");
+  const [paymentOption, setPaymentOption] = useState<string | null>(null);
+  const [isInitializing, setIsInitializing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
+
   const searchParams = useSearchParams();
   const authUser = useSelector((state: RootState) => state.auth.user);
-  
+
   // Get booking parameters from URL
   const amount = parseInt(searchParams.get("amount") || "0", 10);
   const currency = searchParams.get("currency")?.toLowerCase() || "inr";
@@ -54,15 +58,15 @@ function PaymentPageContent() {
   const checkIn = searchParams.get('checkIn') || '';
   const checkOut = searchParams.get('checkOut') || '';
   const userId = authUser?._id || searchParams.get('userId') || '';
-  
+
   // Get guest counts from URL parameters
   const rooms = parseInt(searchParams.get('rooms') || '1', 10);
   const adults = parseInt(searchParams.get('adults') || '1', 10);
   const children = parseInt(searchParams.get('children') || '0', 10);
-  
+
   // Calculate nights between check-in and check-out
   const nights = calculateNights(checkIn, checkOut);
-  
+
   // Calculate rate per night
   const ratePerNight = amount / (nights || 1);
 
@@ -82,6 +86,44 @@ function PaymentPageContent() {
     rooms,
     adults,
     children
+  };
+
+  // Initialize payment when payment method is selected
+  const handleInitializePayment = async (option: string) => {
+    setIsInitializing(true);
+    setError(null);
+
+    try {
+      // Initialize Stripe
+      if (!stripePromise) {
+        if (process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY === undefined) {
+          throw new Error("NEXT_PUBLIC_STRIPE_PUBLIC_KEY is not defined");
+        }
+        setStripePromise(loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY));
+      }
+
+      // For Pay Now, create a payment intent
+      if (option === 'payNow') {
+        console.log("Creating payment intent for Pay Now option");
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/payment/create-payment-intent`, {
+          amount: convertToSubcurrency(amount),
+          currency: currency
+        });
+
+        setClientSecret(response.data.clientSecret);
+      }
+
+      // We don't need to create a setup intent here for payAtHotel
+      // That will be handled by the PayAtHotelFunction component
+
+      setPaymentOption(option);
+    } catch (err: any) {
+      console.error("Payment initialization error:", err);
+      setError(err.response?.data?.message || "Failed to initialize payment method");
+      setPaymentOption(null);
+    } finally {
+      setIsInitializing(false);
+    }
   };
 
   // Add a loading or error state handler
@@ -131,7 +173,7 @@ function PaymentPageContent() {
                           </p>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-start space-x-3">
                         <Users className="text-tripswift-blue flex-shrink-0 mt-1" size={20} />
                         <div>
@@ -142,7 +184,7 @@ function PaymentPageContent() {
                           </p>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-start space-x-3">
                         <CheckCircle className="text-tripswift-blue flex-shrink-0 mt-1" size={20} />
                         <div>
@@ -154,7 +196,7 @@ function PaymentPageContent() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Payment Details Card */}
                 <div className="bg-white rounded-xl shadow-md overflow-hidden">
                   <div className="bg-tripswift-blue p-4 text-white">
@@ -163,42 +205,92 @@ function PaymentPageContent() {
                   <div className="p-6">
                     {/* Payment Option Selector */}
                     <div className="mb-6">
-                      <PaymentOptionSelector 
+                      <PaymentOptionSelector
                         selectedOption={paymentOption}
-                        onChange={setPaymentOption}
+                        onChange={handleInitializePayment}
                       />
                     </div>
-                    
-                    {/* Payment Form */}
-                    <div className="mt-6">
-                      <Elements
-                        stripe={stripePromise}
-                        options={{
-                          mode: "payment",
-                          amount: convertToSubcurrency(amount),
-                          currency: currency,
-                        }}
-                      >
-                        {paymentOption === 'payNow' ? (
-                          <CheckoutPage 
-                            amount={amount} 
-                            currency={currency}
-                            firstName={firstName}
-                            lastName={lastName}
-                            email={email}
-                            phone={phone as string}
-                          />
+
+                    {/* Initializing State */}
+                    {isInitializing && (
+                      <div className="flex flex-col items-center justify-center py-8">
+                        <Loader2 className="w-8 h-8 animate-spin text-tripswift-blue mb-4" />
+                        <p className="text-sm text-tripswift-black/70">
+                          Initializing payment method...
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Error State */}
+                    {error && (
+                      <div className="bg-red-50 p-4 rounded-lg border border-red-200 text-red-700 mb-6">
+                        <p className="font-medium">Payment Error</p>
+                        <p className="text-sm mt-1">{error}</p>
+                        <button
+                          onClick={() => {
+                            setError(null);
+                            setPaymentOption(null);
+                          }}
+                          className="mt-3 py-2 px-4 bg-white border border-red-300 rounded-md text-sm hover:bg-red-50"
+                        >
+                          Try Again
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Payment Form - Only render when payment option is selected and not initializing */}
+                    {paymentOption && stripePromise && !isInitializing && !error && (
+                      <div className="mt-6">
+                        {paymentOption === 'payNow' && clientSecret ? (
+                          <Elements
+                            stripe={stripePromise}
+                            options={{
+                              clientSecret, // This is required for payment mode
+                              appearance: {
+                                theme: 'stripe',
+                              },
+                            }}
+                          >
+                            <CheckoutPage
+                              amount={amount}
+                              currency={currency}
+                              firstName={firstName}
+                              lastName={lastName}
+                              email={email}
+                              phone={phone as string}
+                              clientSecret={clientSecret}
+                              roomId={roomId}
+                              propertyId={propertyId}
+                              checkIn={checkIn}
+                              checkOut={checkOut}
+                              userId={userId}
+                              rooms={rooms}
+                              adults={adults}
+                              children={children}
+                            />
+                          </Elements>
                         ) : (
-                          <PayAtHotelFunction 
-                            bookingDetails={bookingDetails}
-                          />
+                          <Elements
+                            stripe={stripePromise}
+                            options={{
+                              mode: 'setup',
+                              currency: currency, // Added currency here - this fixes the error
+                              appearance: {
+                                theme: 'stripe',
+                              },
+                            }}
+                          >
+                            <PayAtHotelFunction
+                              bookingDetails={bookingDetails}
+                            />
+                          </Elements>
                         )}
-                      </Elements>
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-              
+
               {/* Order Summary - 2 columns */}
               <div className="md:col-span-2">
                 <div className="md:sticky md:top-6" style={{ position: '-webkit-sticky' }}>
@@ -212,12 +304,12 @@ function PaymentPageContent() {
                           <div className="text-tripswift-black/70">Room Rate</div>
                           <div className="font-tripswift-medium">{currency.toUpperCase()} {ratePerNight.toLocaleString()} per night</div>
                         </div>
-                        
+
                         <div className="flex justify-between items-center">
                           <div className="text-tripswift-black/70">{nights} {nights === 1 ? 'night' : 'nights'}</div>
                           <div className="font-tripswift-medium">{currency.toUpperCase()} {ratePerNight.toLocaleString()} × {nights}</div>
                         </div>
-                        
+
                         <div className="border-t border-gray-200 my-4"></div>
                         <div className="flex justify-between items-center">
                           <div className="font-tripswift-bold text-lg">Total</div>
@@ -225,7 +317,7 @@ function PaymentPageContent() {
                             {currency.toUpperCase()} {amount.toLocaleString()}
                           </div>
                         </div>
-                        
+
                         {paymentOption === 'payAtHotel' && (
                           <div className="bg-blue-50 p-3 rounded-lg mt-4">
                             <div className="flex items-start">
@@ -237,7 +329,7 @@ function PaymentPageContent() {
                           </div>
                         )}
                       </div>
-                      
+
                       {/* Security badges */}
                       <div className="mt-8 pt-4 border-t border-gray-200">
                         <div className="flex flex-col space-y-3">
@@ -254,7 +346,7 @@ function PaymentPageContent() {
                             <span className="text-sm text-tripswift-black/70">Free cancellation available</span>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center justify-center mt-6 space-x-4">
                           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Stripe_Logo%2C_revised_2016.svg/2560px-Stripe_Logo%2C_revised_2016.svg.png" alt="Stripe" className="h-6 opacity-70" />
                           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" alt="Visa" className="h-6 opacity-70" />
@@ -263,7 +355,7 @@ function PaymentPageContent() {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Need Help Card (moved inside sticky container) */}
                   <div className="bg-white rounded-xl shadow-md p-6 mt-6">
                     <h3 className="text-lg font-tripswift-bold text-tripswift-black mb-3">Need Help?</h3>

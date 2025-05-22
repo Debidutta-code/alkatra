@@ -1,9 +1,10 @@
+// components/paymentComponents/PaymentOptionSelector.tsx
 "use client";
 
 import React from 'react';
 
 interface PaymentOptionSelectorProps {
-  selectedOption: string;
+  selectedOption: string | null;
   onChange: (option: string) => void;
 }
 

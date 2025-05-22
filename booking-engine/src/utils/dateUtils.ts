@@ -45,3 +45,44 @@ export const formatDate = (
       return 0;
     }
   };
+
+  // Format date to display in a more readable format
+// export const formatDate = (dateString: string): string => {
+//   if (!dateString) return '';
+  
+//   const date = new Date(dateString);
+//   return date.toLocaleDateString('en-US', { 
+//     weekday: 'short',  
+//     month: 'short', 
+//     day: 'numeric'
+//   });
+// };
+
+// // Calculate nights between two dates
+// export const calculateNights = (checkIn: string, checkOut: string): number => {
+//   if (!checkIn || !checkOut) return 0;
+
+//   const startDate = new Date(checkIn);
+//   const endDate = new Date(checkOut);
+//   const differenceInTime = endDate.getTime() - startDate.getTime();
+//   const differenceInDays = differenceInTime / (1000 * 3600 * 24);
+  
+//   return Math.round(differenceInDays);
+// };
+
+// // Format date in YYYY-MM-DD format
+// export const formatDateYYYYMMDD = (dateString: string): string => {
+//   if (!dateString) return '';
+  
+//   const date = new Date(dateString);
+//   const year = date.getFullYear();
+//   const month = (date.getMonth() + 1).toString().padStart(2, '0');
+//   const day = date.getDate().toString().padStart(2, '0');
+  
+//   return `${year}-${month}-${day}`;
+// };
+
+// // Format price with currency symbol
+// export const formatPrice = (price: number, currency: string = '₹'): string => {
+//   return `${currency}${price.toLocaleString('en-IN')}`;
+// };
