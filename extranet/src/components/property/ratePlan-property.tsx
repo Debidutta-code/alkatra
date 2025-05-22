@@ -19,11 +19,11 @@ const createRatePlanSchema = z.object({
   // room_price: z.number().nonnegative("Room price is required and must be a positive number"),
   rate_plan_name: z.string().min(1, "Rate plan name is required"),
   rate_plan_description: z.string().min(1, "Rate plan description is required"),
-  min_length_stay: z.number().int().min(1, "Minimum length stay is required and must be a positive number"),
-  max_length_stay: z.number().int().min(1, "Maximum length stay is required and must be a positive number"),
-  min_book_advance: z.number().int().min(1, "Minimum book advance is required and must be a positive number"),
-  max_book_advance: z.number().int().min(1, "Maximum book advance is required and must be a positive number"),
-  room_price: z.number().min(1, "Room price is required and must be greater than zero"),
+  min_length_stay: z.number().int().min(0, "Minimum length stay is required and must be a positive number"),
+  max_length_stay: z.number().int().min(0, "Maximum length stay is required and must be a positive number"),
+  min_book_advance: z.number().int().min(0, "Minimum book advance is required and must be a positive number"),
+  max_book_advance: z.number().int().min(0, "Maximum book advance is required and must be a positive number"),
+  room_price: z.number().int().min(1, "Room price is required and must be greater than zero"),
 });
 type Inputs = {
   applicable_room_type: string,
@@ -228,7 +228,7 @@ export default function RatePlan({ onPrevious }: Props) {
         <div className="grid grid-cols-2 gap-4">
           {/* Min length stay */}
           <div className="w-full">
-            <Label htmlFor="min_length_stay" className="text-sm font-medium">Min Length Stay <span className="text-destructive">*</span></Label>
+            <Label htmlFor="min_length_stay" className="text-sm font-medium">Min Length Stay </Label>
             <Input
               id="min_length_stay"
               {...register("min_length_stay", { valueAsNumber: true })}
@@ -243,7 +243,7 @@ export default function RatePlan({ onPrevious }: Props) {
 
           {/* Max length stay */}
           <div className="w-full">
-            <Label htmlFor="max_length_stay" className="text-sm font-medium">Max Length Stay<span className="text-destructive">*</span></Label>
+            <Label htmlFor="max_length_stay" className="text-sm font-medium">Max Length Stay</Label>
             <Input
               id="max_length_stay"
               {...register("max_length_stay", { valueAsNumber: true })}
@@ -261,7 +261,7 @@ export default function RatePlan({ onPrevious }: Props) {
         <div className="grid grid-cols-2 gap-4">
           {/* Min book advance */}
           <div className="w-full">
-            <Label htmlFor="min_book_advance" className="text-sm font-medium">Min Book Advance <span className="text-destructive">*</span></Label>
+            <Label htmlFor="min_book_advance" className="text-sm font-medium">Min Book Advance </Label>
             <Input
               id="min_book_advance"
               {...register("min_book_advance", { valueAsNumber: true })}
@@ -276,7 +276,7 @@ export default function RatePlan({ onPrevious }: Props) {
 
           {/* Max book advance */}
           <div className="w-full">
-            <Label htmlFor="max_book_advance" className="text-sm font-medium">Max Book Advance<span className="text-destructive">*</span></Label>
+            <Label htmlFor="max_book_advance" className="text-sm font-medium">Max Book Advance</Label>
             <Input
               id="max_book_advance"
               {...register("max_book_advance", { valueAsNumber: true })}

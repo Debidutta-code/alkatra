@@ -358,6 +358,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
               id="no_of_rooms_available"
               size={"md"}
               type="number"
+            min={1}
               variant={noOfRoomsAvailableError && "error"}
               {...register("no_of_rooms_available")}
               value={propertyAminity?.no_of_rooms_available}

@@ -60,9 +60,10 @@ export function Address({
     const fetchedCountries = Country.getAllCountries();
     setCountries(fetchedCountries);
   }, []);
-
+  console.log("countries",countries)
   useEffect(() => {
     if (selectedCountry) {
+      console.log("selected ",selectedCountry)
       const fetchedStates = State.getStatesOfCountry(selectedCountry);
       setStates(fetchedStates);
       // Reset state and city when country changes
@@ -79,6 +80,7 @@ export function Address({
       // setSelectedCity("");
     }
   }, [selectedState, selectedCountry]);
+  console.log("country",address)
 
   useEffect(() => {
     if (editAddressMode && address) {
@@ -95,6 +97,10 @@ export function Address({
     switch (name) {
       case 'address_line_1':
         return !stringValue.trim() ? 'Address Line 1 is required' : null;
+        case 'address_line_2':
+        return !stringValue.trim() ? 'Address Line 2 is required' : null;
+        case 'landmark':
+        return !stringValue.trim() ? 'landmark is required' : null;
       case 'city':
         return !stringValue.trim() ? 'City is required' : null;
       case 'state':
@@ -108,6 +114,7 @@ export function Address({
         return null;
     }
   };
+  console.log("address",address)
 
   // Validate all fields
   const validateAllFields = () => {
@@ -115,7 +122,7 @@ export function Address({
     
     // Mandatory fields to check
     const mandatoryFields = [
-      'address_line_1', 'city', 'state', 'country', 'zip_code'
+      'address_line_1','address_line_2','landmark', 'city', 'state', 'country', 'zip_code'
     ];
 
     mandatoryFields.forEach(field => {
@@ -174,7 +181,11 @@ export function Address({
   };
 
   const handleStateChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    console.log("datas of a state",event.target.name)
     const stateCode = event.target.value;
+    console.log(
+      "state code ",stateCode
+    )
     setSelectedState(stateCode);
     setSelectedCity("");
     
@@ -286,25 +297,43 @@ export function Address({
           )}
         </div>
       </div>
-      <div className="grid grid-cols-[120px_1fr] items-center">
-        <label className="text-sm text-gray-500">Address Line 2</label>
-        <Input
-          name="address_line_2"
-          value={editedAddress?.address_line_2 || ""}
-          onChange={handleValidatedInputChange}
-          placeholder="Address Line 2"
-          className="w-full"
-        />
+       <div className="grid grid-cols-[120px_1fr] items-center">
+        <label className="text-sm text-gray-500">
+          Address Line 2 <span className="text-destructive">*</span>
+        </label>
+        <div>
+          <Input
+            name="address_line_2"
+            value={editedAddress?.address_line_2 || ""}
+            onChange={handleValidatedInputChange}
+            placeholder="Address Line 1"
+            className={`w-full ${validationErrors.address_line_2 ? 'border-destructive' : ''}`}
+          />
+          {validationErrors.address_line_2 && (
+            <p className="text-destructive text-sm mt-1">
+              {validationErrors.address_line_2}
+            </p>
+          )}
+        </div>
       </div>
-      <div className="grid grid-cols-[120px_1fr] items-center">
-        <label className="text-sm text-gray-500">Landmark</label>
-        <Input
-          name="landmark"
-          value={editedAddress?.landmark || ""}
-          onChange={handleValidatedInputChange}
-          placeholder="Landmark"
-          className="w-full"
-        />
+       <div className="grid grid-cols-[120px_1fr] items-center">
+        <label className="text-sm text-gray-500">
+          Landmark <span className="text-destructive">*</span>
+        </label>
+        <div>
+          <Input
+            name="landmark"
+            value={editedAddress?.landmark || ""}
+            onChange={handleValidatedInputChange}
+            placeholder="landmark"
+            className={`w-full ${validationErrors.landmark? 'border-destructive' : ''}`}
+          />
+          {validationErrors.landmark && (
+            <p className="text-destructive text-sm mt-1">
+              {validationErrors.landmark}
+            </p>
+          )}
+        </div>
       </div>
       <div className="grid grid-cols-[120px_1fr] items-center">
         <label className="text-sm text-gray-500">
@@ -391,14 +420,23 @@ export function Address({
         </div>
       </div>
       <div className="grid grid-cols-1">
-        <label className="mb-1 text-sm text-muted-foreground">Address Line 2</label>
-        <Input
-          name="address_line_2"
-          value={editedAddress?.address_line_2 || ""}
-          onChange={handleValidatedInputChange}
-          placeholder="Address Line 2"
-          className="w-full"
-        />
+        <label className="mb-1 text-sm text-muted-foreground">
+          Address Line 2 <span className="text-destructive">*</span>
+        </label>
+        <div>
+          <Input
+            name="address_line_2"
+            value={editedAddress?.address_line_2 || ""}
+            onChange={handleValidatedInputChange}
+            placeholder="Address Line 2"
+            className={`w-full ${validationErrors.address_line_2 ? 'border-destructive' : ''}`}
+          />
+          {validationErrors.address_line_2 && (
+            <p className="text-destructive text-sm mt-1">
+              {validationErrors.address_line_2}
+            </p>
+          )}
+        </div>
       </div>
       <div className="grid grid-cols-1">
         <label className="mb-1 text-sm text-muted-foreground">Landmark</label>
@@ -409,6 +447,11 @@ export function Address({
           placeholder="Landmark"
           className="w-full"
         />
+         {validationErrors.landmark && (
+            <p className="text-destructive text-sm mt-1">
+              {validationErrors.landmark}
+            </p>
+          )}
       </div>
       <div className="grid grid-cols-1">
         <label className="mb-1 text-sm text-muted-foreground">

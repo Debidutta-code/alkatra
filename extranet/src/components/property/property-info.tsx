@@ -544,18 +544,21 @@ export default function PropertyInfo({ onNext }: Props) {
           </div>
 
           <div className="flex items-center justify-center gap-4">
-            <div className="w-full">
-              <Label htmlFor="description">Property Description <span className="text-destructive">*</span></Label>
-              <Textarea
-                id="description"
-                {...register("description")}
-                value={propertyData?.description}
-              />
-              {propertydescription && (
-                <p className="text-red-500 text-sm mt-1">{propertydescription.message}</p>
-              )}
-            </div>
-          </div>
+  <div className="w-full">
+    <Label htmlFor="description">
+      Property Description <span className="text-destructive">*</span>
+    </Label>
+    <Textarea
+      id="description"
+      {...register("description")}
+      className={propertydescription ? "border-red-500 focus-visible:ring-red-500" : ""}
+    />
+    {propertydescription && (
+      <p className="text-red-500 text-sm mt-1">{propertydescription.message}</p>
+    )}
+  </div>
+</div>
+
 
           <div className="items-center gap-4">
             <div className="w-40 sm:mb-0 mb-4">
@@ -758,17 +761,21 @@ export default function PropertyInfo({ onNext }: Props) {
           </div>
 
           <div className="flex items-center justify-center gap-4">
-            <div className="w-full">
-              <Label htmlFor="description">Property Description <span className="text-destructive">*</span></Label>
-              <Textarea
-                id="description"
-                {...register("description")}
-              />
-              {propertydescription && (
-                <p className="text-red-500 text-sm mt-1">{propertydescription.message}</p>
-              )}
-            </div>
-          </div>
+  <div className="w-full">
+    <Label htmlFor="description">
+      Property Description <span className="text-destructive">*</span>
+    </Label>
+    <Textarea
+      id="description"
+      {...register("description")}
+      className={propertydescription ? "border-red-500 focus-visible:ring-red-500" : ""}
+    />
+    {propertydescription && (
+      <p className="text-red-500 text-sm mt-1">{propertydescription.message}</p>
+    )}
+  </div>
+</div>
+
 
           <div className="items-center gap-4 mb-5">
             <div className="w-40">
