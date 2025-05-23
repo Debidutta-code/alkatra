@@ -8,7 +8,7 @@ interface CreateRatePlanResponse {
 
 export const createRatePlan = async (payload: RatePlanFormData, token: string): Promise<CreateRatePlanResponse> => {
   try {
-    const response = await axios.post<CreateRatePlanResponse>('/api/rateplan/create', payload, {
+    const response = await axios.post<CreateRatePlanResponse>(`${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/create`, payload, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;

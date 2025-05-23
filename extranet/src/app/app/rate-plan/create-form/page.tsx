@@ -11,6 +11,8 @@ import BookingAdvanceForm from './components/BookingAdvanceForm';
 import { createRatePlan } from './api/ratePlanApi';
 import { RatePlanFormData, DateRange } from './types/ratePlanTypes';
 import { getInitialFormData } from './constants/initialFormData';
+import Cookies from 'js-cookie';
+import toast from 'react-hot-toast';
 
 export default function RatePlanForm() {
   const router = useRouter();
@@ -96,27 +98,30 @@ export default function RatePlanForm() {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = Cookies.get('accessToken');
       if (!token) {
         throw new Error('No access token found');
       }
 
-      const payload: RatePlanFormData = {
-        ...formData,
+      // Construct scheduling data
+      const scheduling = {
+        type: formData.scheduling.type,
+        weeklyDays: formData.scheduling.type === 'weekly' ? formData.scheduling.weeklyDays : [],
+        dateRanges: formData.scheduling.type === 'date_range'
+          ? formData.scheduling.dateRanges.map(range => ({
+              start: new Date(range.start).toISOString(),
+              end: new Date(range.end).toISOString(),
+            }))
+          : [],
+        availableSpecificDates: formData.scheduling.type === 'specific-dates' ? formData.scheduling.availableSpecificDates : [],
+      };
+
+      const payload = {
+        propertyId: formData.propertyId,
+        ratePlanName: formData.ratePlanName,
+        ratePlanCode: formData.ratePlanCode,
         description: formData.description || '',
-        scheduling: {
-          type: formData.scheduling.type,
-          weeklyDays: formData.scheduling.type === 'weekly' ? formData.scheduling.weeklyDays : [],
-          dateRanges: formData.scheduling.type === 'date_range'
-            ? formData.scheduling.dateRanges.map(range => ({
-                start: new Date(range.start).toISOString(),
-                end: new Date(range.end).toISOString(),
-              }))
-            : [],
-          availableSpecificDates: formData.scheduling.type === 'specific-dates' ? formData.scheduling.availableSpecificDates : [],
-        },
-        maxOccupancy: Number(formData.maxOccupancy),
-        adultOccupancy: Number(formData.adultOccupancy),
+        mealPlan: formData.mealPlan,
         minLengthStay: Number(formData.minLengthStay),
         maxLengthStay: Number(formData.maxLengthStay),
         minReleaseDay: Number(formData.minReleaseDay),
@@ -125,16 +130,28 @@ export default function RatePlanForm() {
           days: Number(formData.cancellationDeadline.days),
           hours: Number(formData.cancellationDeadline.hours),
         },
-        minBookAdvance: Number(formData.minBookAdvance),
-        maxBookAdvance: Number(formData.maxBookAdvance),
+        currency: formData.currency,
+        status: formData.status,
         createdBy: new Date(formData.createdBy).toISOString(),
         updatedBy: new Date(formData.updatedBy).toISOString(),
+        // Add top-level scheduling fields
+        type: scheduling.type,
+        weeklyDays: scheduling.weeklyDays,
+        dateRanges: scheduling.dateRanges,
+        availableSpecificDates: scheduling.availableSpecificDates,
+        // Include the nested scheduling object
+        scheduling: scheduling,
+        // Include additional fields from the form
+        maxOccupancy: Number(formData.maxOccupancy),
+        adultOccupancy: Number(formData.adultOccupancy),
+        minBookAdvance: Number(formData.minBookAdvance),
+        maxBookAdvance: Number(formData.maxBookAdvance),
       };
 
       const response = await createRatePlan(payload, token);
 
       if (response.success) {
-        alert('Rate plan created successfully');
+        toast.success('Rate plan created successfully!');
         router.push(`/app/property/${propertyId}`);
       } else {
         throw new Error('Failed to create rate plan');
@@ -150,46 +167,50 @@ export default function RatePlanForm() {
     router.push(`/app/property/${propertyId}`);
   };
 
-  if (loading) return <div className="text-center">Loading...</div>;
+  if (loading) return <div className="text-center text-gray-600">Loading...</div>;
   if (error) return <div className="text-red-500 text-center">{error}</div>;
 
   return (
-    <div className="max-w-2xl mx-auto p-4 bg-white shadow-md rounded">
-      <h2 className="text-2xl font-bold mb-4">Create Rate Plan</h2>
+    <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-sm">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">Create Rate Plan</h2>
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium">Property ID</label>
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-gray-600 mb-1">Property ID</label>
         <input
           type="text"
           name="propertyId"
           value={formData.propertyId}
           onChange={handleChange}
-          className="mt-1 block w-full border rounded p-2"
+          className="w-full p-2 bg-gray-100 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-gray-300 text-gray-700"
           readOnly
         />
       </div>
 
-      <div className="space-y-6">
-        <BasicInfoForm formData={formData} handleChange={handleChange} />
-        <SchedulingForm
-          scheduling={formData.scheduling}
-          handleSchedulingTypeChange={handleSchedulingTypeChange}
-          handleWeeklyDaysChange={handleWeeklyDaysChange}
-          addDateRange={addDateRange}
-          updateDateRange={updateDateRange}
-          removeDateRange={removeDateRange}
-          handleSpecificDatesChange={handleSpecificDatesChange}
-        />
-        <OccupancyForm formData={formData} handleChange={handleChange} />
-        <StayDetailsForm formData={formData} handleChange={handleChange} />
-        <BookingAdvanceForm formData={formData} handleChange={handleChange} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="space-y-8">
+          <BasicInfoForm formData={formData} handleChange={handleChange} />
+          <OccupancyForm formData={formData} handleChange={handleChange} />
+          <BookingAdvanceForm formData={formData} handleChange={handleChange} />
+        </div>
+        <div className="space-y-8">
+          <SchedulingForm
+            scheduling={formData.scheduling}
+            handleSchedulingTypeChange={handleSchedulingTypeChange}
+            handleWeeklyDaysChange={handleWeeklyDaysChange}
+            addDateRange={addDateRange}
+            updateDateRange={updateDateRange}
+            removeDateRange={removeDateRange}
+            handleSpecificDatesChange={handleSpecificDatesChange}
+          />
+          <StayDetailsForm formData={formData} handleChange={handleChange} />
+        </div>
       </div>
 
-      <div className="flex space-x-2 mt-6">
+      <div className="flex space-x-3 mt-8">
         <Button
           type="button"
           onClick={handleSubmit}
-          className="bg-green-500 text-white p-2 rounded w-full"
+          className="bg-green-600 hover:bg-green-700 text-white p-2 rounded w-full transition-colors duration-200"
           disabled={loading}
         >
           {loading ? 'Saving...' : 'Save'}
@@ -197,7 +218,7 @@ export default function RatePlanForm() {
         <Button
           type="button"
           onClick={handleCancel}
-          className="bg-gray-500 text-white p-2 rounded w-full"
+          className="bg-gray-400 hover:bg-gray-500 text-white p-2 rounded w-full transition-colors duration-200"
         >
           Cancel
         </Button>

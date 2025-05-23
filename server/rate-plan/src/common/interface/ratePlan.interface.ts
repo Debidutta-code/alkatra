@@ -1,34 +1,33 @@
-import  {  Document, Types } from "mongoose";
-
+import { Document, Types } from "mongoose";
 
 export interface SchedulingType {
-  type: 'weekly' | 'date_range' | 'specific-dates'; // present
-  weeklyDays?: string[]; // present
-  dateRanges?: { start: Date; end: Date }[]; // present
-  availableSpecificDates?: Date[]; // present
+  type: 'weekly' | 'date_range' | 'specific-dates';
+  weeklyDays?: string[];
+  dateRanges?: { start: Date; end: Date }[];
+  availableSpecificDates?: Date[];
 }
 
 export interface RatePlan extends Document {
-  propertyId: Types.ObjectId; // present
-  ratePlanCode: string; // present
-  ratePlanName: string; // present
-  description?: string; // present
-  mealPlan: 'RO' | 'BB' | 'HB' | 'FB'; // present
+  propertyId: Types.ObjectId;
+  ratePlanCode: string;
+  ratePlanName: string;
+  description?: string;
+  mealPlan: 'RO' | 'BB' | 'HB' | 'FB';
   maxOccupancy: number;
   adultOccupancy: number;
-  minLengthStay: number; // present
-  maxLengthStay: number; // present
-  minReleaseDay: number; // present
-  maxReleaseDay: number; // present
+  minLengthStay: number;
+  maxLengthStay: number;
+  minReleaseDay: number;
+  maxReleaseDay: number;
   cancellationDeadline: {
-    days: number; // present
-    hours: number; // present
+    days: number;
+    hours: number;
   }
-  currency: string; // present
+  currency: string;
   minBookAdvance: number;
   maxBookAdvance: number;
-  status: 'active' | 'inactive'; // present
+  status: 'active' | 'inactive';
   createdBy: Date;
   updatedBy: Date;
-  scheduling: SchedulingType; // present
+  scheduling: SchedulingType;
 }
