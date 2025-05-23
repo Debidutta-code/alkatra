@@ -17,52 +17,32 @@ const DateRangeSchema = z.object({
 
 // Define the Scheduling schema
 interface DateRange {
-    start: string;
-    end: string;
+  start: string;
+  end: string;
 }
 
 interface Scheduling {
-    type: 'weekly' | 'date_range' | 'specific-dates';
-    weeklyDays: string[];
-    dateRanges: DateRange[];
-    availableSpecificDates: string[];
+  type: 'weekly' | 'date_range' | 'specific-dates';
+  weeklyDays: string[];
+  dateRanges: DateRange[];
+  availableSpecificDates: string[];
 }
 
 interface SchedulingSchemaType {
-    type: 'weekly' | 'date_range' | 'specific-dates';
-    weeklyDays: string[];
-    dateRanges: DateRange[];
-    availableSpecificDates: string[];
+  type: 'weekly' | 'date_range' | 'specific-dates';
+  weeklyDays: string[];
+  dateRanges: DateRange[];
+  availableSpecificDates: string[];
 }
 
-interface SchedulingSchemaContext {
-    parent: SchedulingSchemaType;
-}
-
-const SchedulingSchema: z.ZodType<SchedulingSchemaType, z.ZodTypeDef, unknown> = z.object({
-    type: z.enum(['weekly', 'date_range', 'specific-dates'], {
-        required_error: "Scheduling type is required",
-    }),
-    weeklyDays: z.array(z.string()),
-    dateRanges: z.array(DateRangeSchema)
-        .default([])
-        .superRefine((val, ctx) => {
-            // ctx.parent is not available here, but ctx.parent is the object being validated
-            // So we can access ctx.parent.type
-            // However, in Zod v3, ctx.parent is not documented, but ctx is ZodRefinementCtx
-            // Instead, we can access the sibling fields via ctx from the object schema
-            // So, we need to move this check to the object level, or use superRefine at the object level
-            // For now, we can skip this check here and move it to the object level below
-        }),
-    availableSpecificDates: z.array(z.string())
-        .default([])
-        .superRefine((val, ctx) => {
-            // ctx.parent is not available here, but ctx is ZodRefinementCtx
-            // Instead, we can access the sibling fields via ctx from the object schema
-            // So, we need to move this check to the object level, or use superRefine at the object level below
-            // For now, we can skip this check here and move it to the object level below
-        }),
-}) as z.ZodType<SchedulingSchemaType>;
+const SchedulingSchema = z.object({
+  type: z.enum(['weekly', 'date_range', 'specific-dates'], {
+    required_error: "Scheduling type is required",
+  }),
+  weeklyDays: z.array(z.string()),
+  dateRanges: z.array(DateRangeSchema).default([]),
+  availableSpecificDates: z.array(z.string()).default([]),
+});
 
 // Define the CancellationDeadline schema
 const CancellationDeadlineSchema = z.object({
@@ -85,8 +65,8 @@ const CancellationDeadlineSchema = z.object({
   ),
 });
 
-// Define the main RatePlanFormData schema
-export const RatePlanFormSchema = z.object({
+// Define the base RatePlanFormData schema without refinements
+export const BaseRatePlanFormSchema = z.object({
   propertyId: z.string().min(1, { message: "Property ID is required" }),
   ratePlanName: z.string()
     .min(1, { message: "Rate plan name is required" })
@@ -172,20 +152,19 @@ export const RatePlanFormSchema = z.object({
       .min(0, { message: "Maximum book advance cannot be negative" })
       .refine(val => !isNaN(val), { message: "Maximum book advance must be a valid number" })
   ),
-})
-.refine(
+});
+
+// Apply refinements separately
+export const RatePlanFormSchema = BaseRatePlanFormSchema.refine(
   (data) => data.maxLengthStay >= data.minLengthStay,
   { message: "Maximum length of stay must be greater than or equal to minimum length of stay", path: ["maxLengthStay"] }
-)
-.refine(
+).refine(
   (data) => data.maxReleaseDay >= data.minReleaseDay,
   { message: "Maximum release day must be greater than or equal to minimum release day", path: ["maxReleaseDay"] }
-)
-.refine(
+).refine(
   (data) => data.maxOccupancy >= data.adultOccupancy,
   { message: "Adult occupancy cannot exceed maximum occupancy", path: ["adultOccupancy"] }
-)
-.refine(
+).refine(
   (data) => data.maxBookAdvance >= data.minBookAdvance,
   { message: "Maximum book advance must be greater than or equal to minimum book advance", path: ["maxBookAdvance"] }
 );

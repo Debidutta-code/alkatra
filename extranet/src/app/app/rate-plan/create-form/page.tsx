@@ -11,9 +11,10 @@ import BookingAdvanceForm from './components/BookingAdvanceForm';
 import { createRatePlan } from './api/ratePlanApi';
 import { RatePlanFormData, DateRange } from './types/ratePlanTypes';
 import { getInitialFormData } from './constants/initialFormData';
-import { RatePlanFormSchema } from '../validator/ratePlanFormValidator';
+import { RatePlanFormSchema, BaseRatePlanFormSchema } from '../validator/ratePlanFormValidator';
 import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
+import { z } from 'zod';
 
 export default function RatePlanForm() {
   const router = useRouter();
@@ -25,8 +26,11 @@ export default function RatePlanForm() {
   const [error, setError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
+    // Update form data
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
       setFormData((prev) => {
@@ -42,6 +46,52 @@ export default function RatePlanForm() {
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
+
+    // Validate the changed field
+    const partialData = name.includes('.')
+      ? { [name.split('.')[0]]: { [name.split('.')[1]]: value } }
+      : { [name]: value };
+
+    // For minLengthStay and maxLengthStay, validate both fields with RatePlanFormSchema to check refine rules
+    if (name === 'minLengthStay' || name === 'maxLengthStay') {
+      const result = RatePlanFormSchema.safeParse(formData);
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        // Clear errors for minLengthStay and maxLengthStay
+        delete newErrors['minLengthStay'];
+        delete newErrors['maxLengthStay'];
+        // Add new errors if validation fails
+        if (!result.success) {
+          result.error.issues.forEach((issue: z.ZodIssue) => {
+            const path = issue.path.join('.');
+            if (path === 'minLengthStay' || path === 'maxLengthStay') {
+              newErrors[path] = issue.message;
+            }
+          });
+        }
+        return newErrors;
+      });
+    } else {
+      // For other fields, use partial validation with BaseRatePlanFormSchema
+      const partialSchema = BaseRatePlanFormSchema.partial();
+      const result = partialSchema.safeParse({ ...formData, ...partialData });
+
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        // Clear error for the changed field
+        delete newErrors[name];
+        // Add new errors if validation fails
+        if (!result.success) {
+          result.error.issues.forEach((issue: z.ZodIssue) => {
+            const path = issue.path.join('.');
+            if (path === name || path.startsWith(name + '.')) {
+              newErrors[path] = issue.message;
+            }
+          });
+        }
+        return newErrors;
+      });
+    }
   };
 
   const handleSchedulingTypeChange = (type: 'weekly' | 'date_range' | 'specific-dates') => {
@@ -49,6 +99,16 @@ export default function RatePlanForm() {
       ...prev,
       scheduling: { ...prev.scheduling, type, weeklyDays: [], dateRanges: [], availableSpecificDates: [] },
     }));
+    // Clear scheduling-related errors
+    setValidationErrors((prev) => {
+      const newErrors = { ...prev };
+      Object.keys(newErrors).forEach((key) => {
+        if (key.startsWith('scheduling.')) {
+          delete newErrors[key];
+        }
+      });
+      return newErrors;
+    });
   };
 
   const handleWeeklyDaysChange = (day: string) => {
@@ -59,6 +119,19 @@ export default function RatePlanForm() {
       ...prev,
       scheduling: { ...prev.scheduling, weeklyDays },
     }));
+    // Validate scheduling
+    const schedulingSchema = BaseRatePlanFormSchema.shape.scheduling;
+    const result = schedulingSchema.safeParse(formData.scheduling);
+    setValidationErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors['scheduling.weeklyDays'];
+      if (!result.success) {
+        result.error.issues.forEach((issue: z.ZodIssue) => {
+          newErrors[`scheduling.${issue.path.join('.')}`] = issue.message;
+        });
+      }
+      return newErrors;
+    });
   };
 
   const addDateRange = () => {
@@ -78,6 +151,19 @@ export default function RatePlanForm() {
       ...prev,
       scheduling: { ...prev.scheduling, dateRanges },
     }));
+    // Validate dateRanges
+    const schedulingSchema = BaseRatePlanFormSchema.shape.scheduling;
+    const result = schedulingSchema.safeParse(formData.scheduling);
+    setValidationErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[`scheduling.dateRanges.${index}.${field}`];
+      if (!result.success) {
+        result.error.issues.forEach((issue: z.ZodIssue) => {
+          newErrors[`scheduling.${issue.path.join('.')}`] = issue.message;
+        });
+      }
+      return newErrors;
+    });
   };
 
   const removeDateRange = (index: number) => {
@@ -86,6 +172,13 @@ export default function RatePlanForm() {
       ...prev,
       scheduling: { ...prev.scheduling, dateRanges },
     }));
+    // Clear errors for removed date range
+    setValidationErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[`scheduling.dateRanges.${index}.start`];
+      delete newErrors[`scheduling.dateRanges.${index}.end`];
+      return newErrors;
+    });
   };
 
   const handleSpecificDatesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,6 +187,19 @@ export default function RatePlanForm() {
       ...prev,
       scheduling: { ...prev.scheduling, availableSpecificDates: dates },
     }));
+    // Validate specific dates
+    const schedulingSchema = BaseRatePlanFormSchema.shape.scheduling;
+    const result = schedulingSchema.safeParse(formData.scheduling);
+    setValidationErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors['scheduling.availableSpecificDates'];
+      if (!result.success) {
+        result.error.issues.forEach((issue: z.ZodIssue) => {
+          newErrors[`scheduling.${issue.path.join('.')}`] = issue.message;
+        });
+      }
+      return newErrors;
+    });
   };
 
   const handleSubmit = async () => {
@@ -101,11 +207,11 @@ export default function RatePlanForm() {
     setError(null);
     setValidationErrors({});
 
-    // Validate the form data only on submit
+    // Validate the entire form data with the full schema (including refinements)
     const result = RatePlanFormSchema.safeParse(formData);
     if (!result.success) {
       const errors: Record<string, string> = {};
-      result.error.issues.forEach((issue) => {
+      result.error.issues.forEach((issue: z.ZodIssue) => {
         const path = issue.path.join('.');
         errors[path] = issue.message;
       });
@@ -133,7 +239,7 @@ export default function RatePlanForm() {
         availableSpecificDates: formData.scheduling.type === 'specific-dates' ? formData.scheduling.availableSpecificDates : [],
       };
 
-      const currentTimestamp = new Date().toISOString(); // Current timestamp: 2025-05-23T11:27:00.000Z
+      const currentTimestamp = new Date().toISOString();
 
       const payload = {
         propertyId: formData.propertyId,
