@@ -20,6 +20,12 @@ interface SchedulingFormProps {
   updateDateRange: (index: number, field: 'start' | 'end', value: string) => void;
   removeDateRange: (index: number) => void;
   handleSpecificDatesChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  errors: {
+    type?: string;
+    weeklyDays?: string;
+    dateRanges: Array<{ start?: string; end?: string }>;
+    availableSpecificDates?: string;
+  };
 }
 
 export default function SchedulingForm({
@@ -30,6 +36,7 @@ export default function SchedulingForm({
   updateDateRange,
   removeDateRange,
   handleSpecificDatesChange,
+  errors,
 }: SchedulingFormProps) {
   return (
     <div className="space-y-4">
@@ -39,19 +46,24 @@ export default function SchedulingForm({
         <label className="block text-sm font-medium text-gray-600 mb-1">Scheduling Type</label>
         <select
           value={scheduling.type}
-          onChange={(e) => handleSchedulingTypeChange(e.target.value as any)}
-          className="w-full p-2 bg-gray-100 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-gray-300 text-gray-700"
+          onChange={(e) => handleSchedulingTypeChange(e.target.value as 'weekly' | 'date_range' | 'specific-dates')}
+          className={`w-full p-2 pr-8 bg-gray-100 border rounded focus:outline-none focus:ring-1 focus:ring-gray-300 text-gray-700 ${
+            errors.type ? 'border-red-500' : 'border-gray-200'
+          }`}
         >
           <option value="weekly">Weekly</option>
           <option value="date_range">Date Range</option>
           <option value="specific-dates">Specific Dates</option>
         </select>
+        {errors.type && (
+          <span className="block text-red-500 text-sm mt-1">{errors.type}</span>
+        )}
       </div>
 
       {scheduling.type === 'weekly' && (
         <div>
           <label className="block text-sm font-medium text-gray-600 mb-1">Weekly Days</label>
-          <div className="space-y-2">
+          <div className={`space-y-2 ${errors.weeklyDays ? 'border border-red-500 rounded p-2' : ''}`}>
             {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map((day) => (
               <label key={day} className="flex items-center space-x-2">
                 <input
@@ -66,6 +78,9 @@ export default function SchedulingForm({
               </label>
             ))}
           </div>
+          {errors.weeklyDays && (
+            <span className="block text-red-500 text-sm mt-1">{errors.weeklyDays}</span>
+          )}
         </div>
       )}
 
@@ -74,18 +89,32 @@ export default function SchedulingForm({
           <label className="block text-sm font-medium text-gray-600 mb-1">Date Ranges</label>
           {scheduling.dateRanges.map((range, index) => (
             <div key={index} className="flex space-x-2 mb-2">
-              <input
-                type="date"
-                value={range.start}
-                onChange={(e) => updateDateRange(index, 'start', e.target.value)}
-                className="w-full p-2 bg-gray-100 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-gray-300 text-gray-700"
-              />
-              <input
-                type="date"
-                value={range.end}
-                onChange={(e) => updateDateRange(index, 'end', e.target.value)}
-                className="w-full p-2 bg-gray-100 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-gray-300 text-gray-700"
-              />
+              <div className="flex-1">
+                <input
+                  type="date"
+                  value={range.start}
+                  onChange={(e) => updateDateRange(index, 'start', e.target.value)}
+                  className={`w-full p-2 bg-gray-100 border rounded focus:outline-none focus:ring-1 focus:ring-gray-300 text-gray-700 ${
+                    errors.dateRanges[index]?.start ? 'border-red-500' : 'border-gray-200'
+                  }`}
+                />
+                {errors.dateRanges[index]?.start && (
+                  <span className="block text-red-500 text-sm mt-1">{errors.dateRanges[index].start}</span>
+                )}
+              </div>
+              <div className="flex-1">
+                <input
+                  type="date"
+                  value={range.end}
+                  onChange={(e) => updateDateRange(index, 'end', e.target.value)}
+                  className={`w-full p-2 bg-gray-100 border rounded focus:outline-none focus:ring-1 focus:ring-gray-300 text-gray-700 ${
+                    errors.dateRanges[index]?.end ? 'border-red-500' : 'border-gray-200'
+                  }`}
+                />
+                {errors.dateRanges[index]?.end && (
+                  <span className="block text-red-500 text-sm mt-1">{errors.dateRanges[index].end}</span>
+                )}
+              </div>
               <button
                 type="button"
                 onClick={() => removeDateRange(index)}
@@ -112,9 +141,14 @@ export default function SchedulingForm({
             type="text"
             value={scheduling.availableSpecificDates.join(', ')}
             onChange={handleSpecificDatesChange}
-            className="w-full p-2 bg-gray-100 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-gray-300 text-gray-700"
+            className={`w-full p-2 bg-gray-100 border rounded focus:outline-none focus:ring-1 focus:ring-gray-300 text-gray-700 ${
+              errors.availableSpecificDates ? 'border-red-500' : 'border-gray-200'
+            }`}
             placeholder="YYYY-MM-DD, YYYY-MM-DD, ..."
           />
+          {errors.availableSpecificDates && (
+            <span className="block text-red-500 text-sm mt-1">{errors.availableSpecificDates}</span>
+          )}
         </div>
       )}
     </div>

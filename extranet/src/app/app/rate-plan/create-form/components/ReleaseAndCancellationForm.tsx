@@ -12,9 +12,17 @@ interface ReleaseAndCancellationFormProps {
     };
   };
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  errors: {
+    minReleaseDay?: string;
+    maxReleaseDay?: string;
+    cancellationDeadline: {
+      days?: string;
+      hours?: string;
+    };
+  };
 }
 
-export default function ReleaseAndCancellationForm({ formData, handleChange }: ReleaseAndCancellationFormProps) {
+export default function ReleaseAndCancellationForm({ formData, handleChange, errors }: ReleaseAndCancellationFormProps) {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-gray-800">Release and Cancellation Details</h3>
@@ -26,10 +34,13 @@ export default function ReleaseAndCancellationForm({ formData, handleChange }: R
           name="minReleaseDay"
           value={formData.minReleaseDay}
           onChange={handleChange}
-          className="w-full p-2 bg-gray-100 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-gray-300 text-gray-700"
-          min="0"
-          required
+          className={`w-full p-2 bg-gray-100 border rounded focus:outline-none focus:ring-1 focus:ring-gray-300 text-gray-700 ${
+            errors.minReleaseDay ? 'border-red-500' : 'border-gray-200'
+          }`}
         />
+        {errors.minReleaseDay && (
+          <span className="block text-red-500 text-sm mt-1">{errors.minReleaseDay}</span>
+        )}
       </div>
 
       <div>
@@ -39,10 +50,13 @@ export default function ReleaseAndCancellationForm({ formData, handleChange }: R
           name="maxReleaseDay"
           value={formData.maxReleaseDay}
           onChange={handleChange}
-          className="w-full p-2 bg-gray-100 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-gray-300 text-gray-700"
-          min="0"
-          required
+          className={`w-full p-2 bg-gray-100 border rounded focus:outline-none focus:ring-1 focus:ring-gray-300 text-gray-700 ${
+            errors.maxReleaseDay ? 'border-red-500' : 'border-gray-200'
+          }`}
         />
+        {errors.maxReleaseDay && (
+          <span className="block text-red-500 text-sm mt-1">{errors.maxReleaseDay}</span>
+        )}
       </div>
 
       <div>
@@ -52,10 +66,13 @@ export default function ReleaseAndCancellationForm({ formData, handleChange }: R
           name="cancellationDeadline.days"
           value={formData.cancellationDeadline.days}
           onChange={handleChange}
-          className="w-full p-2 bg-gray-100 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-gray-300 text-gray-700"
-          min="0"
-          required
+          className={`w-full p-2 bg-gray-100 border rounded focus:outline-none focus:ring-1 focus:ring-gray-300 text-gray-700 ${
+            errors.cancellationDeadline.days ? 'border-red-500' : 'border-gray-200'
+          }`}
         />
+        {errors.cancellationDeadline.days && (
+          <span className="block text-red-500 text-sm mt-1">{errors.cancellationDeadline.days}</span>
+        )}
       </div>
 
       <div>
@@ -65,11 +82,13 @@ export default function ReleaseAndCancellationForm({ formData, handleChange }: R
           name="cancellationDeadline.hours"
           value={formData.cancellationDeadline.hours}
           onChange={handleChange}
-          className="w-full p-2 bg-gray-100 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-gray-300 text-gray-700"
-          min="0"
-          max="23"
-          required
+          className={`w-full p-2 bg-gray-100 border rounded focus:outline-none focus:ring-1 focus:ring-gray-300 text-gray-700 ${
+            errors.cancellationDeadline.hours ? 'border-red-500' : 'border-gray-200'
+          }`}
         />
+        {errors.cancellationDeadline.hours && (
+          <span className="block text-red-500 text-sm mt-1">{errors.cancellationDeadline.hours}</span>
+        )}
       </div>
     </div>
   );

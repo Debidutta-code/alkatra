@@ -7,9 +7,11 @@ import BasicInfoForm from './components/BasicInfoForm';
 import SchedulingForm from './components/SchedulingForm';
 import LengthOfStayForm from './components/LengthOfStayForm';
 import ReleaseAndCancellationForm from './components/ReleaseAndCancellationForm';
+import BookingAdvanceForm from './components/BookingAdvanceForm';
 import { createRatePlan } from './api/ratePlanApi';
 import { RatePlanFormData, DateRange } from './types/ratePlanTypes';
 import { getInitialFormData } from './constants/initialFormData';
+import { RatePlanFormSchema } from '../validator/ratePlanFormValidator';
 import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
 
@@ -21,6 +23,7 @@ export default function RatePlanForm() {
   const [formData, setFormData] = useState<RatePlanFormData>(getInitialFormData(propertyId));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -96,6 +99,22 @@ export default function RatePlanForm() {
   const handleSubmit = async () => {
     setLoading(true);
     setError(null);
+    setValidationErrors({});
+
+    // Validate the form data only on submit
+    const result = RatePlanFormSchema.safeParse(formData);
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.issues.forEach((issue) => {
+        const path = issue.path.join('.');
+        errors[path] = issue.message;
+      });
+      setValidationErrors(errors);
+      setError('Kindly review and correct the highlighted fields to proceed with your submission.');
+      setLoading(false);
+      return;
+    }
+
     try {
       const token = Cookies.get('accessToken');
       if (!token) {
@@ -114,7 +133,7 @@ export default function RatePlanForm() {
         availableSpecificDates: formData.scheduling.type === 'specific-dates' ? formData.scheduling.availableSpecificDates : [],
       };
 
-      const currentTimestamp = new Date().toISOString(); // Current timestamp: 2025-05-23T09:52:00.000Z
+      const currentTimestamp = new Date().toISOString(); // Current timestamp: 2025-05-23T11:27:00.000Z
 
       const payload = {
         propertyId: formData.propertyId,
@@ -155,7 +174,6 @@ export default function RatePlanForm() {
       }
     } catch (err: any) {
       setError(err.message || 'Failed to create rate plan');
-    } finally {
       setLoading(false);
     }
   };
@@ -165,11 +183,16 @@ export default function RatePlanForm() {
   };
 
   if (loading) return <div className="text-center text-gray-600">Loading...</div>;
-  if (error) return <div className="text-red-500 text-center">{error}</div>;
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-sm">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Create Rate Plan</h2>
+
+      {error && (
+        <div className="mb-6 text-red-500 text-center">
+          {error}
+        </div>
+      )}
 
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-600 mb-1">Property ID</label>
@@ -185,8 +208,26 @@ export default function RatePlanForm() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="space-y-8">
-          <BasicInfoForm formData={formData} handleChange={handleChange} />
-          <LengthOfStayForm formData={formData} handleChange={handleChange} />
+          <BasicInfoForm
+            formData={formData}
+            handleChange={handleChange}
+            errors={{
+              ratePlanName: validationErrors['ratePlanName'],
+              ratePlanCode: validationErrors['ratePlanCode'],
+              description: validationErrors['description'],
+              mealPlan: validationErrors['mealPlan'],
+              currency: validationErrors['currency'],
+              status: validationErrors['status'],
+            }}
+          />
+          <LengthOfStayForm
+            formData={formData}
+            handleChange={handleChange}
+            errors={{
+              minLengthStay: validationErrors['minLengthStay'],
+              maxLengthStay: validationErrors['maxLengthStay'],
+            }}
+          />
         </div>
         <div className="space-y-8">
           <SchedulingForm
@@ -197,8 +238,36 @@ export default function RatePlanForm() {
             updateDateRange={updateDateRange}
             removeDateRange={removeDateRange}
             handleSpecificDatesChange={handleSpecificDatesChange}
+            errors={{
+              type: validationErrors['scheduling.type'],
+              weeklyDays: validationErrors['scheduling.weeklyDays'],
+              dateRanges: formData.scheduling.dateRanges.map((_, index) => ({
+                start: validationErrors[`scheduling.dateRanges.${index}.start`],
+                end: validationErrors[`scheduling.dateRanges.${index}.end`],
+              })),
+              availableSpecificDates: validationErrors['scheduling.availableSpecificDates'],
+            }}
           />
-          <ReleaseAndCancellationForm formData={formData} handleChange={handleChange} />
+          <ReleaseAndCancellationForm
+            formData={formData}
+            handleChange={handleChange}
+            errors={{
+              minReleaseDay: validationErrors['minReleaseDay'],
+              maxReleaseDay: validationErrors['maxReleaseDay'],
+              cancellationDeadline: {
+                days: validationErrors['cancellationDeadline.days'],
+                hours: validationErrors['cancellationDeadline.hours'],
+              },
+            }}
+          />
+          <BookingAdvanceForm
+            formData={formData}
+            handleChange={handleChange}
+            errors={{
+              minBookAdvance: validationErrors['minBookAdvance'],
+              maxBookAdvance: validationErrors['maxBookAdvance'],
+            }}
+          />
         </div>
       </div>
 
@@ -216,7 +285,7 @@ export default function RatePlanForm() {
           className="bg-green-600 hover:bg-green-700 text-white p-2 rounded transition-colors duration-200"
           disabled={loading}
         >
-          {loading ? 'Creating Rate Plan...' : 'Create Rate Plan'}
+          {loading ? 'Creating Rate...' : 'Create Rate Plan'}
         </Button>
       </div>
     </div>
