@@ -86,7 +86,7 @@ const MobileFilterDrawer: React.FC<MobileFilterDrawerProps> = ({
                   type="checkbox"
                   checked={ratingFilter === rating}
                   onChange={() => handleRatingChange(ratingFilter === rating ? null : rating)}
-                  className="h-4 w-4 text-tripswift-blue rounded border-gray-300 focus:ring-tripswift-blue"
+                  className="h-4 w-4 mb-2 text-tripswift-blue rounded border-gray-300 focus:ring-tripswift-blue"
                 />
                 <label
                   htmlFor={`star-${rating}`}
@@ -116,7 +116,7 @@ const MobileFilterDrawer: React.FC<MobileFilterDrawerProps> = ({
                   type="checkbox"
                   checked={!!amenities[amenity.key]}
                   onChange={() => toggleAmenityFilter(amenity.key)}
-                  className="h-4 w-4 text-tripswift-blue rounded border-gray-300 focus:ring-tripswift-blue focus:ring-opacity-25"
+                  className="h-4 w-4 mb-2 text-tripswift-blue rounded border-gray-300 focus:ring-tripswift-blue focus:ring-opacity-25"
                 />
                 <label 
                   htmlFor={`mobile-amenity-${amenity.key}`} 

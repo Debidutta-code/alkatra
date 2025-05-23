@@ -27,10 +27,10 @@ const BookingCard: React.FC<BookingCardProps> = ({
     <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 group">
       {/* Booking ID Banner */}
       <div className="bg-gray-50 py-2 px-4 border-b border-gray-100 flex items-center justify-between">
-        <div className="flex items-center">
+        {/* <div className="flex items-center">
           <span className="text-xs font-tripswift-medium text-gray-500 mr-2">Booking ID:</span>
           <span className="text-xs font-tripswift-bold tracking-wider">{getBookingId(booking)}</span>
-        </div>
+        </div> */}
         <div className="flex items-center">
           <span className={`inline-flex items-center text-xs font-tripswift-medium px-2.5 py-1 rounded-full ${getStatusClass(booking.status)}`}>
             {getStatusIcon(booking.status)}
@@ -55,7 +55,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
         {/* Stay Duration */}
         <div className="absolute bottom-0 right-0 transform translate-y-1/2 mr-5">
           <div className="bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-tripswift-bold text-tripswift-blue flex items-center">
-            <FaCalendarDay className="mr-1.5" />
+            {/* <FaCalendarDay className="mr-1.5" /> */}
             {nights} {nights === 1 ? 'Night' : 'Nights'}
           </div>
         </div>
@@ -68,14 +68,14 @@ const BookingCard: React.FC<BookingCardProps> = ({
           <div className="mb-3 sm:mb-0">
             <p className="text-xs text-gray-500 mb-1">Check-in</p>
             <p className="flex items-center text-gray-800 font-tripswift-medium text-sm">
-              <FaCalendarCheck className="mr-2 text-green-500 flex-shrink-0" />
+              <FaCalendarCheck className="mr-2 text-green-500 flex-shrink-0 mb-1" />
               {formatDate(booking.checkInDate)}
             </p>
           </div>
           <div>
             <p className="text-xs text-gray-500 mb-1">Check-out</p>
             <p className="flex items-center text-gray-800 font-tripswift-medium text-sm">
-              <FaCalendarTimes className="mr-2 text-red-500 flex-shrink-0" />
+              <FaCalendarTimes className="mr-2 text-red-500 flex-shrink-0 mb-1" />
               {formatDate(booking.checkOutDate)}
             </p>
           </div>

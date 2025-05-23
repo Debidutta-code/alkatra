@@ -1,13 +1,13 @@
 import React from 'react';
 import { Booking } from './types';
-import { 
-  FaHotel, FaMapMarkerAlt, FaTicketAlt, FaRegCalendarAlt, FaCalendarCheck, 
-  FaCalendarTimes, FaUser, FaPhone, FaCreditCard, FaRegCalendarCheck, 
+import {
+  FaHotel, FaMapMarkerAlt, FaTicketAlt, FaRegCalendarAlt, FaCalendarCheck,
+  FaCalendarTimes, FaUser, FaPhone, FaCreditCard, FaRegCalendarCheck,
   FaEdit, FaRegTimesCircle
 } from 'react-icons/fa';
-import { 
-  formatDateString, calculateNights, getStatusClass, getStatusIcon, 
-  getRoomTypeStyle, getRoomTypeIcon, getPaymentMethodIcon, 
+import {
+  formatDateString, calculateNights, getStatusClass, getStatusIcon,
+  getRoomTypeStyle, getRoomTypeIcon, getPaymentMethodIcon,
   getPaymentMethodText, getBookingId
 } from './utils';
 
@@ -30,10 +30,10 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
       <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] p-6 rounded-t-xl relative">
         <div className="flex justify-between items-start">
           <div>
-            <div className="inline-flex items-center px-3 py-1 rounded-md bg-white/15 text-tripswift-off-white text-sm mb-3">
+            {/* <div className="inline-flex items-center px-3 py-1 rounded-md bg-white/15 text-tripswift-off-white text-sm mb-3">
               <FaTicketAlt className="mr-2" />
               Booking #{getBookingId(booking)}
-            </div>
+            </div> */}
             <h2 className="text-2xl font-tripswift-bold text-tripswift-off-white leading-tight mb-1">
               {booking.property.property_name}
             </h2>
@@ -53,16 +53,15 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             </svg>
           </button>
         </div>
-        
+
         {/* Status Badge */}
         <div className="absolute bottom-0 right-6 transform translate-y-1/2">
-          <div className={`flex items-center px-4 py-2 rounded-full shadow-md ${
-            booking.status === "Confirmed" 
-              ? "bg-green-50 text-green-700 border border-green-200" 
+          <div className={`flex items-center px-4 py-2 rounded-full shadow-md ${booking.status === "Confirmed"
+              ? "bg-green-50 text-green-700 border border-green-200"
               : booking.status === "Pending"
                 ? "bg-yellow-50 text-yellow-700 border border-yellow-200"
                 : "bg-red-50 text-red-700 border border-red-200"
-          }`}>
+            }`}>
             {getStatusIcon(booking.status)}
             <span className="font-tripswift-bold">{booking.status}</span>
           </div>
@@ -74,23 +73,23 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
         {/* Stay Details */}
         <div className="mb-8">
           <h3 className="text-xl font-tripswift-bold text-gray-800 mb-4 flex items-center">
-            <FaRegCalendarAlt className="mr-2 text-tripswift-blue" />
+            <FaRegCalendarAlt className="mr-2 text-tripswift-blue mb-1" />
             Stay Details
           </h3>
-          
+
           <div className="bg-gray-50 p-5 rounded-xl">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <p className="text-sm text-gray-500 mb-1">Check-in</p>
                 <p className="flex items-center text-gray-800 font-tripswift-bold">
-                  <FaCalendarCheck className="mr-2 text-green-500" />
+                  <FaCalendarCheck className="mr-2 text-green-500 mb-1" />
                   {formatDateString(booking.checkInDate)}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-gray-500 mb-1">Check-out</p>
                 <p className="flex items-center text-gray-800 font-tripswift-bold">
-                  <FaCalendarTimes className="mr-2 text-red-500" />
+                  <FaCalendarTimes className="mr-2 text-red-500 mb-1" />
                   {formatDateString(booking.checkOutDate)}
                 </p>
               </div>
@@ -102,7 +101,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                 </p>
               </div> */}
             </div>
-            
+
             <div className="border-t border-gray-200 mt-5 pt-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -126,10 +125,10 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
         {/* Guest Details */}
         <div className="mb-8">
           <h3 className="text-xl font-tripswift-bold text-gray-800 mb-4 flex items-center">
-            <FaUser className="mr-2 text-tripswift-blue" />
+            <FaUser className="mr-2 text-tripswift-blue mb-1" />
             Guest Details
           </h3>
-          
+
           <div className="bg-gray-50 p-5 rounded-xl">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -141,7 +140,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                 <p className="text-gray-800 font-tripswift-medium">{booking.booking_user_phone}</p>
               </div>
             </div>
-            
+
             {(booking.adultCount || booking.childCount) && (
               <div className="border-t border-gray-200 mt-5 pt-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -160,7 +159,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                 </div>
               </div>
             )}
-            
+
             {booking.specialRequests && (
               <div className="border-t border-gray-200 mt-5 pt-5">
                 <p className="text-sm text-gray-500 mb-1">Special Requests</p>
@@ -173,10 +172,10 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
         {/* Payment Details */}
         <div className="mb-8">
           <h3 className="text-xl font-tripswift-bold text-gray-800 mb-4 flex items-center">
-            <FaCreditCard className="mr-2 text-tripswift-blue" />
+            <FaCreditCard className="mr-2 text-tripswift-blue mb-1" />
             Payment Details
           </h3>
-          
+
           <div className="bg-gray-50 p-5 rounded-xl">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -189,18 +188,27 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
               <div>
                 <p className="text-sm text-gray-500 mb-1">Booking Date</p>
                 <p className="flex items-center text-gray-800 font-tripswift-medium">
-                  <FaRegCalendarCheck className="mr-2 text-gray-500" />
+                  <FaRegCalendarCheck className="mr-2 text-gray-500 mb-1" />
                   {formatDateString(booking.booking_dates)}
                 </p>
               </div>
             </div>
-            
+
             <div className="border-t border-gray-200 mt-5 pt-5 flex justify-between items-center">
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Total Amount</p>
-                <p className="text-2xl font-tripswift-bold text-tripswift-blue">₹{booking.amount.toLocaleString()}</p>
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm text-gray-500 mb-1">
+                  Total Amount
+                </p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-tripswift-bold text-tripswift-blue">
+                    ₹{booking.amount.toLocaleString()}
+                  </span>
+                  <span className="text-lg text-gray-500 mb-1">
+                    / night
+                  </span>
+                </div>
               </div>
-              
+
               {booking.ratePlanName && (
                 <div className="text-right">
                   <p className="text-sm text-gray-500 mb-1">Rate Plan</p>

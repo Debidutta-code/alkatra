@@ -162,7 +162,7 @@ function PaymentPageContent() {
                   <div className="p-6">
                     <div className="flex flex-col md:flex-row md:justify-between gap-6">
                       <div className="flex items-start space-x-3">
-                        <CalendarRange className="text-tripswift-blue flex-shrink-0 mt-1" size={20} />
+                        <CalendarRange className="text-tripswift-blue flex-shrink-0" size={20} />
                         <div>
                           <p className="text-sm text-tripswift-black/60">Stay Dates</p>
                           <p className="font-tripswift-medium">
@@ -175,7 +175,7 @@ function PaymentPageContent() {
                       </div>
 
                       <div className="flex items-start space-x-3">
-                        <Users className="text-tripswift-blue flex-shrink-0 mt-1" size={20} />
+                        <Users className="text-tripswift-blue flex-shrink-0" size={20} />
                         <div>
                           <p className="text-sm text-tripswift-black/60">Guests</p>
                           <p className="font-tripswift-medium">
@@ -186,7 +186,7 @@ function PaymentPageContent() {
                       </div>
 
                       <div className="flex items-start space-x-3">
-                        <CheckCircle className="text-tripswift-blue flex-shrink-0 mt-1" size={20} />
+                        <CheckCircle className="text-tripswift-blue flex-shrink-0" size={20} />
                         <div>
                           <p className="text-sm text-tripswift-black/60">Guest</p>
                           <p className="font-tripswift-medium">{firstName} {lastName}</p>
@@ -293,7 +293,8 @@ function PaymentPageContent() {
 
               {/* Order Summary - 2 columns */}
               <div className="md:col-span-2">
-                <div className="md:sticky md:top-6" style={{ position: '-webkit-sticky' }}>
+                <div className="md:sticky md:top-6 flex flex-col space-y-6">
+                  {/* Price Details Card */}
                   <div className="bg-white rounded-xl shadow-md overflow-hidden">
                     <div className="bg-tripswift-blue p-4 text-white">
                       <h2 className="font-tripswift-medium text-lg">Price Details</h2>
@@ -302,7 +303,7 @@ function PaymentPageContent() {
                       <div className="space-y-4">
                         <div className="flex justify-between items-center">
                           <div className="text-tripswift-black/70">Room Rate</div>
-                          <div className="font-tripswift-medium">{currency.toUpperCase()} {ratePerNight.toLocaleString()} per night</div>
+                          <div className="font-tripswift-medium">{currency.toUpperCase()} {ratePerNight.toLocaleString()} / night</div>
                         </div>
 
                         <div className="flex justify-between items-center">
@@ -357,7 +358,7 @@ function PaymentPageContent() {
                   </div>
 
                   {/* Need Help Card (moved inside sticky container) */}
-                  <div className="bg-white rounded-xl shadow-md p-6 mt-6">
+                  {/* <div className="bg-white rounded-xl shadow-md p-6">
                     <h3 className="text-lg font-tripswift-bold text-tripswift-black mb-3">Need Help?</h3>
                     <p className="text-tripswift-black/70 text-sm mb-4">
                       Our customer service team is available 24/7 to assist you with any questions about your booking.
@@ -365,7 +366,7 @@ function PaymentPageContent() {
                     <div className="text-tripswift-blue font-tripswift-medium cursor-pointer hover:underline">
                       Contact Support
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>

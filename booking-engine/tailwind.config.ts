@@ -68,7 +68,7 @@ const config: Config = {
         }
       },
       fontFamily: {
-        nunito: ['Nunito', 'sans-serif'],
+        'noto-sans': ['Noto Sans', 'sans-serif'],
       },
       fontWeight: {
         normal: 'var(--font-weight-regular)', // 400 (from globals.css)

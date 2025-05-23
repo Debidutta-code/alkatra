@@ -268,7 +268,7 @@ export default function PaymentSuccess() {
             {/* Success Card */}
             <div className="max-w-4xl mx-auto bg-tripswift-off-white rounded-xl shadow-xl overflow-hidden">
               {/* Top success banner */}
-              <div className="bg-gradient-to-r from-green-500 to-emerald-600 py-10 px-8 text-white">
+              <div className="bg-gradient-to-r from-green-500 to-emerald-600 py-8 px-8 text-white">
                 <div className="flex items-center">
                   <div className="bg-white/20 p-3 rounded-full">
                     <CheckCircle size={32} />
@@ -278,12 +278,12 @@ export default function PaymentSuccess() {
                     <p className="opacity-90 mt-1">Your reservation has been successfully completed</p>
                   </div>
                 </div>
-                <div className="mt-4 bg-white/10 py-2 px-4 rounded-md">
+                {/* <div className="mt-4 bg-white/10 py-2 px-4 rounded-md">
                   <div className="flex items-center">
                     <span className="text-sm">Booking ID:</span>
                     <span className="ml-2 font-tripswift-medium">{getBookingId()}</span>
                   </div>
-                </div>
+                </div> */}
               </div>
 
               {/* Booking Details */}
@@ -294,22 +294,22 @@ export default function PaymentSuccess() {
                     <h2 className="text-xl font-tripswift-bold text-tripswift-black mb-4">Booking Summary</h2>
                     <div className="space-y-4">
                       <div className="flex items-start">
-                        <Calendar className="text-tripswift-blue mr-3 flex-shrink-0 mt-1" size={20} />
+                        <Calendar className="text-tripswift-blue mr-3 flex-shrink-0" size={20} />
                         <div>
                           <p className="text-sm text-tripswift-black/60">Check-in</p>
                           <p className="font-tripswift-medium">{formatDate(booking?.checkInDate || checkInDate)}</p>
                         </div>
                       </div>
                       <div className="flex items-start">
-                        <Calendar className="text-tripswift-blue mr-3 flex-shrink-0 mt-1" size={20} />
+                        <Calendar className="text-tripswift-blue mr-3 flex-shrink-0" size={20} />
                         <div>
                           <p className="text-sm text-tripswift-black/60">Check-out</p>
                           <p className="font-tripswift-medium">{formatDate(booking?.checkOutDate || checkOutDate)}</p>
-                          <p className="text-xs text-tripswift-black/60 mt-1">{getBookingNights()} night{getBookingNights() !== 1 ? 's' : ''}</p>
+                          <p className="text-xs text-tripswift-black/60">{getBookingNights()} night{getBookingNights() !== 1 ? 's' : ''}</p>
                         </div>
                       </div>
                       <div className="flex items-start">
-                        <Users className="text-tripswift-blue mr-3 flex-shrink-0 mt-1" size={20} />
+                        <Users className="text-tripswift-blue mr-3 flex-shrink-0" size={20} />
                         <div>
                           <p className="text-sm text-tripswift-black/60">Guests</p>
                           <p className="font-tripswift-medium">
@@ -324,21 +324,21 @@ export default function PaymentSuccess() {
                     <h2 className="text-xl font-tripswift-bold text-tripswift-black mb-4">Guest Information</h2>
                     <div className="space-y-4">
                       <div className="flex items-start">
-                        <User className="text-tripswift-blue mr-3 flex-shrink-0 mt-1" size={20} />
+                        <User className="text-tripswift-blue mr-3 flex-shrink-0" size={20} />
                         <div>
                           <p className="text-sm text-tripswift-black/60">Guest Name</p>
                           <p className="font-tripswift-medium">{getGuestName()}</p>
                         </div>
                       </div>
                       <div className="flex items-start">
-                        <Mail className="text-tripswift-blue mr-3 flex-shrink-0 mt-1" size={20} />
+                        <Mail className="text-tripswift-blue mr-3 flex-shrink-0" size={20} />
                         <div>
                           <p className="text-sm text-tripswift-black/60">Email</p>
                           <p className="font-tripswift-medium">{email}</p>
                         </div>
                       </div>
                       <div className="flex items-start">
-                        <CreditCard className="text-tripswift-blue mr-3 flex-shrink-0 mt-1" size={20} />
+                        <CreditCard className="text-tripswift-blue mr-3 flex-shrink-0" size={20} />
                         <div>
                           <p className="text-sm text-tripswift-black/60">Payment Method</p>
                           <p className="font-tripswift-medium">{getPaymentMethodText()}</p>
@@ -356,7 +356,7 @@ export default function PaymentSuccess() {
                     {/* Add per-night rate */}
                     <div className="flex justify-between mb-2">
                       <span className="text-tripswift-black/70">Room Rate</span>
-                      <span className="font-tripswift-medium">₹{Math.round(amount / getBookingNights()).toLocaleString()} per night</span>
+                      <span className="font-tripswift-medium">₹{Math.round(amount / getBookingNights()).toLocaleString()} / night</span>
                     </div>
 
                     {/* Show calculation */}

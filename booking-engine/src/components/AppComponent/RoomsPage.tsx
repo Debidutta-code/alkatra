@@ -348,26 +348,26 @@ const RoomsPage: React.FC = () => {
               onClick={() => router.back()}
               className="inline-flex items-center text-sm font-tripswift-medium bg-tripswift-off-white/20 px-3 py-1.5 rounded-full hover:bg-tripswift-off-white/30 transition-colors mb-2 md:mb-0"
             >
-              <ChevronRight className="h-4 w-4 mr-1 rotate-180" /> {t('RoomsPage.backToSearch')}
+              <ChevronRight className="h-4 w-4 mr-1 mb-0.5 rotate-180" /> {t('RoomsPage.backToSearch')}
             </button>
           </div>
 
           <div className="flex flex-wrap gap-4 mt-2 items-center">
             <div className="flex items-center bg-tripswift-off-white/10 pl-3 pr-4 py-2 rounded-lg">
-              <Calendar className="h-5 w-5 mr-2 text-tripswift-off-white/70" />
+              <Calendar className="h-5 w-5 mr-2 mb-1 text-tripswift-off-white/70" />
               <div>
                 <div className="text-sm font-tripswift-semibold">
                   {formatDate(checkInDate)} - {formatDate(checkOutDate)}
                 </div>
-                <div className="text-xs font-tripswift-regular text-tripswift-off-white/60 mt-0.5">
+                {/* <div className="text-xs font-tripswift-regular text-tripswift-off-white/60 mt-0.5">
                   {calculateNights(checkInDate, checkOutDate)} {calculateNights(checkInDate, checkOutDate) === 1 ? 'night' : 'nights'} stay
-                </div>
+                </div> */}
               </div>
             </div>
 
             {/* Add Guest Information Display */}
             <div className="flex items-center bg-tripswift-off-white/10 pl-3 pr-4 py-2 rounded-lg">
-              <Users className="h-5 w-5 mr-2 text-tripswift-off-white/70" />
+              <Users className="h-5 w-5 mr-2 mb-1 text-tripswift-off-white/70" />
               <div>
                 <div className="text-sm font-tripswift-semibold">
                   {getGuestCountDisplay()}
@@ -377,7 +377,7 @@ const RoomsPage: React.FC = () => {
 
             {propertyDetails?.star_rating && (
               <div className="flex items-center bg-tripswift-off-white/10 pl-3 pr-4 py-2 rounded-lg">
-                <Star className="h-5 w-5 mr-2 text-yellow-400" />
+                <Star className="h-5 w-5 mr-2 mb-1 text-yellow-400" />
                 <div>
                   <div className="text-sm font-tripswift-semibold">
                     {propertyDetails.star_rating} Star Hotel Rating
@@ -398,7 +398,7 @@ const RoomsPage: React.FC = () => {
             onClick={() => setShowPropertyDetails(!showPropertyDetails)}
           >
             <div>
-              <h1 className="text-property-title text-xl font-tripswift-semibold text-gray-800 tracking-tight">
+              <h1 className="text-property-title text-gray-800 tracking-tight">
                 {propertyDetails?.property_name || t('RoomsPage.viewPropertyDetails')}
               </h1>
               {propertyDetails?.property_address && (

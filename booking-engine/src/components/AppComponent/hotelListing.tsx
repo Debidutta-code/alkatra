@@ -274,7 +274,7 @@ const HotelListing: React.FC = () => {
         </div>
         <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
           <div className="text-tripswift-off-white mb-6">
-            <h1 className="text-2xl md:text-3xl font-tripswift-bold">
+            <h1 className="text-2xl md:text-3xl font-tripswift-bold text-tripswift-off-white">
               {t("HotelListing.heroTitle", { defaultValue: "Find Your Perfect Stay" })}
             </h1>
             <p className="mt-2 font-tripswift-regular opacity-90">
@@ -466,17 +466,24 @@ const HotelListing: React.FC = () => {
 
               <div className="flex items-center space-x-3">
                 <span className="text-sm font-tripswift-medium text-tripswift-black/70">
-                  {t("HotelListing.sortBy", { defaultValue: "Sort by" })}:
+                  {t("HotelListing.sortBy", { defaultValue: "Sort by" })}
                 </span>
-                <select
-                  value={filters.sortOrder}
-                  onChange={(e) => handleSortChange(e.target.value)}
-                  className="border border-gray-200 rounded-md px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue"
-                >
-                  <option value="">{t("HotelListing.recommended", { defaultValue: "Recommended" })}</option>
-                  <option value="rating_desc">{t("HotelListing.highestRating", { defaultValue: "Highest Rating" })}</option>
-                  <option value="rating_asc">{t("HotelListing.lowestRating", { defaultValue: "Lowest Rating" })}</option>
-                </select>
+                <div className="relative">
+                  <select
+                    value={filters.sortOrder}
+                    onChange={(e) => handleSortChange(e.target.value)}
+                    className="appearance-none border border-gray-200 rounded-md pl-3 pr-8 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue"
+                  >
+                    <option value="">{t("HotelListing.recommended", { defaultValue: "Recommended" })}</option>
+                    <option value="rating_desc">{t("HotelListing.highestRating", { defaultValue: "Highest Rating" })}</option>
+                    <option value="rating_asc">{t("HotelListing.lowestRating", { defaultValue: "Lowest Rating" })}</option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                    <svg className="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                    </svg>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -511,7 +518,7 @@ const HotelListing: React.FC = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="flex items-start">
-                    <div className="bg-tripswift-blue/10 p-2 rounded-full mr-3">
+                    <div className="bg-tripswift-blue/10 p-1 rounded-full mr-3">
                       <CreditCard className="h-5 w-5 text-tripswift-blue" />
                     </div>
                     <div>
@@ -525,7 +532,7 @@ const HotelListing: React.FC = () => {
                   </div>
 
                   <div className="flex items-start">
-                    <div className="bg-tripswift-blue/10 p-2 rounded-full mr-3">
+                    <div className="bg-tripswift-blue/10 p-1 rounded-full mr-3">
                       <Star className="h-5 w-5 text-tripswift-blue" />
                     </div>
                     <div>
@@ -539,7 +546,7 @@ const HotelListing: React.FC = () => {
                   </div>
 
                   <div className="flex items-start">
-                    <div className="bg-tripswift-blue/10 p-2 rounded-full mr-3">
+                    <div className="bg-tripswift-blue/10 p-1 rounded-full mr-3">
                       <Shield className="h-5 w-5 text-tripswift-blue" />
                     </div>
                     <div>

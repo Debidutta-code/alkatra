@@ -1,5 +1,5 @@
 /* Updated font import to include semibold (600) weight */
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -15,11 +15,11 @@
   --color-gray-800: #1f2937; /* Added for text-gray-800 */
   
   /* Typography */
-  --font-primary: 'Nunito', sans-serif;
+  --font-primary: 'Noto Sans', sans-serif;
   --font-weight-regular: 400;
   --font-weight-medium: 500;
-  --font-weight-semibold: 600; /* Added semibold weight */
-  --font-weight-bold: 700;
+  --font-weight-semibold: 400;
+  --font-weight-bold: 600;
   --font-weight-extrabold: 800;
   
   /* Legacy variables for compatibility */
@@ -218,30 +218,29 @@ header p {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-nunito;
+    @apply bg-background text-foreground font-noto-sans; 
   }
 }
 
-/* Added new component classes for consistent typography */
 @layer components {
   .text-property-title {
-    @apply font-nunito font-semibold text-lg text-gray-800 tracking-normal;
+    @apply font-noto-sans font-medium text-lg text-gray-800 tracking-normal; 
   }
   
   .text-room-title {
-    @apply font-nunito font-semibold text-base text-gray-800 tracking-normal;
+    @apply font-noto-sans font-medium text-base text-gray-800 tracking-normal; 
   }
   
   .text-section-heading {
-    @apply font-nunito font-semibold text-base text-gray-800 tracking-normal;
+    @apply font-noto-sans font-medium text-base text-gray-800 tracking-normal; 
   }
   
   .text-price {
-    @apply font-nunito font-bold text-lg text-tripswift-blue;
+    @apply font-noto-sans font-bold text-lg text-tripswift-blue; 
   }
   
   .text-description {
-    @apply font-nunito text-sm text-gray-600 tracking-normal;
+    @apply font-noto-sans text-sm text-gray-600 tracking-normal;
   }
 }
 
