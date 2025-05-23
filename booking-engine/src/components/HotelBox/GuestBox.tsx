@@ -317,7 +317,7 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
                 <Users className="h-4 w-4 text-tripswift-black/40 group-hover:text-tripswift-blue transition-colors duration-200" />
               </div>
             </div>
-            <div className="bg-white border border-tripswift-black/10 hover:border-tripswift-blue/30 rounded-xl shadow-sm transition-all duration-200 h-14 pl-12 flex items-center">
+            <div className="bg-white border border-tripswift-black/10 hover:border-tripswift-blue/20 rounded-md shadow-sm transition-all duration-200 h-11 pl-12 flex items-center">
               <span className="text-tripswift-black/70 text-sm font-tripswift-medium">
                 {displayText || "1 Room · 1 Adult · 0 Children"}
               </span>

@@ -107,7 +107,7 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
 
                     {/* Rating badge with TripSwift styling */}
                     <div className="absolute top-3 right-3 bg-tripswift-blue bg-opacity-90 text-tripswift-off-white px-2 py-1 rounded text-sm font-tripswift-medium flex items-center shadow-sm">
-                        <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" />
+                        <Star className="h-4 w-4 mb-1 text-yellow-400 fill-current mr-1" />
                         <span>{formatRating(hotel.star_rating).toFixed(1)}</span>
                     </div>
                 </div>

@@ -1,8 +1,6 @@
 import 'regenerator-runtime/runtime';
 
 import HotelCard from "@/components/HotelBox/HotelCard";
-import HotelPicture from "@/components/homeComponents/HomeSection";
-import Image from "next/image";
 import DestinationCarousel from '@/components/homeComponents/HomeSection';
 
 export default function Home() {
