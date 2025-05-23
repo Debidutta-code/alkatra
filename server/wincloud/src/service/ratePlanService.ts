@@ -227,6 +227,38 @@ export class RatePlanService {
             }
         }
     }
+
+
+
+    /**
+     * Retrieves all room details for a given hotel code.
+     * @param hotelCode 
+     * @returns 
+     */
+    async getRoomsByHotelCode(hotelCode: string): Promise<any> {
+        try {
+            return await this.repository.getRoomsByHotelCode(hotelCode);
+        } catch (error) {
+            throw new Error(error.message);
+        }
+    }
+
+
+    /**
+     * Retrieves all room details for a given hotel code, inventory type code, and date range.
+     * @param hotelCode 
+     * @param invTypeCode 
+     * @param startDate 
+     * @param endDate 
+     * @returns 
+     */    
+    async getRoomDetails(hotelCode: string, invTypeCode: string, startDate: Date, endDate: Date): Promise<any> {
+        try {
+            return await this.repository.getRoomDetails(hotelCode, invTypeCode, startDate, endDate);
+        } catch (error) {
+            throw new Error(error.message);
+        }
+    }
 }
 
 export { RatePlanError };

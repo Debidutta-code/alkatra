@@ -49,4 +49,30 @@ export class RatePlanRepository {
         const savedRateAmount = await rateAmount.save();
         return savedRateAmount.toJSON();
     }
+
+
+    /**
+     * Retrieves all room details for a given hotel code.
+     * @param hotelCode 
+     */
+    async getRoomsByHotelCode(hotelCode: string): Promise<any> {
+        return await RateAmount.find({ hotelCode: hotelCode });
+    }
+
+
+    /**
+     * Retrieves room details based on hotel code, inventory type code, and date range.
+     * @param hotelCode 
+     * @param invTypeCode 
+     * @param startDate 
+     * @param endDate 
+     */
+    async getRoomDetails(hotelCode: string, invTypeCode: string, startDate: Date, endDate: Date): Promise<any> {
+        await RateAmount.find({
+            invTypeCode,
+            hotelCode,
+            startDate: { $lte: startDate },
+            endDate: { $gte: endDate }
+        }).lean().exec();
+    }
 }
