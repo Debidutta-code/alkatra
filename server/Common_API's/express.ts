@@ -12,6 +12,7 @@ import customerRouter from "../Customer-Authentication/src/api/routes/customerRo
 import bookingRouter from "../Booking_Engine/src/routes/booking.routes";
 import paymentRouter from "../Booking_Engine/src/routes/payment.routes";
 import ratePlaneRoute from "../rate-plan/src/routes/ratePlan.route";
+import couponManagement from "../Coupon_Management/routes/couponRoutes";
 
 export async function initializeExpressRoutes({ app }: { app: Express }) {
   app.head("/status", (_, res: Response) => res.status(200).end());
@@ -30,6 +31,10 @@ export async function initializeExpressRoutes({ app }: { app: Express }) {
   app.use("/api/v1/payment", paymentRouter);
 
   app.use("/api/v1/rate-plan", ratePlaneRoute);
+
+  // Coupon managemen api
+  app.use("/api/v1/coupon", couponManagement);
+
   
 
   app.all("*", (req: Request, _res: Response, next: NextFunction) => {

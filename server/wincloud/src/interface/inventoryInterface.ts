@@ -1,10 +1,21 @@
+// export interface InventoryData {
+//   hotelCode: string;
+//   // hotelName: string;
+//   invTypeCode: string;
+//   startDate: string;
+//   endDate: string;
+//   count: number;
+// }
+
 export interface InventoryData {
   hotelCode: string;
-  hotelName: string;
+  // hotelName?: string;
   invTypeCode: string;
-  startDate: string;
-  endDate: string;
-  count: number;
+  availability: {
+    startDate: string;
+    endDate: string;
+    count: number;
+  };
 }
 
 export interface OTAHotelInvCountNotifRQ {
@@ -25,7 +36,7 @@ export interface OTAHotelInvCountNotifRQ {
     Inventories: {
       $: {
         HotelCode: string;
-        HotelName: string;
+        // HotelName: string;
       };
       Inventory: Array<{
         StatusApplicationControl: {

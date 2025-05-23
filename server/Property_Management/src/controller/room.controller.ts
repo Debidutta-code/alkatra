@@ -7,6 +7,7 @@ import PropertyRatePlan from "../model/ratePlan.model";
 import mongoose from "mongoose";
 import PropertyPrice from "../model/ratePlan.model";
 import QRCode from 'qrcode';
+import { generateCouponCode } from "../../../Coupon_Management/services/couponService";
 
 
 interface UpdateFields {
@@ -28,6 +29,14 @@ interface UpdateFields {
   image?: string[];
   available?: boolean;
 }
+
+interface RedirectParams {
+  propertyId: string;
+}
+
+interface RedirectQuery {
+  coupon?: string;
+} 
 
 // create room
 const createRoom = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -301,7 +310,6 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
       new AppError(`No rate plans found for property with id ${propertyInfoId}`, 404)
     );
   }
-
   const roomsWithPrices = rooms.map((room) => {
     const ratePlan = ratePlanList.find((ratePlan) => ratePlan.property_id.toString() === room.propertyInfo_id.toString());    
     return {
@@ -313,17 +321,57 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
   });
   console.log("Rooms with Prices: ", roomsWithPrices);
 
-  const dynamicUrl = `http://localhost:8080/api/v1/property/${propertyInfoId}`;
+  const coupon = await generateCouponCode();
+  const couponCode = coupon.code;
+
+  const dynamicUrl = `${process.env.BASE_LINK}/redirect/property/${propertyInfoId}/coupon/${couponCode}`;
   const qrCodeData = await QRCode.toDataURL(dynamicUrl);
 
   res.status(200).json({
     status: "success",
     error: false,
     message: "Rooms fetched by property id with rate plan successfully",
-    data: roomsWithPrices,
+    data: roomsWithPrices,  
     qrCode: qrCodeData,
   });
 });
+
+
+const handlePropertyRedirect = catchAsync(async (req: Request<RedirectParams>, res: Response, next: NextFunction) => {
+  const { propertyId, couponCode } = req.params;
+
+  const rooms = await Room.find({ propertyInfo_id: propertyId }).exec();
+  if (!rooms || rooms.length === 0) {
+    return next(new AppError(`No property found with this id ${propertyId}`, 404));
+  }
+
+  const deepLink = `${process.env.DEEP_LINK}/property/${propertyId}${couponCode ? `?coupon=${couponCode}` : ''}#Intent;scheme=trip_swift_final;package=com.example.trip_swift_final;end`;
+
+  res.status(200).send(`
+    <html>
+      <head>
+        <title>Opening App</title>
+      </head>
+      <body>
+        <p>Opening app...</p>
+        <script>
+          (function() {
+            const linkToOpen = '${deepLink}';
+            const fallbackUrl = '${process.env.PUBLIC_BACKEND_URL}/download';
+            const timeout = 2000;
+
+            window.location = linkToOpen;
+
+            setTimeout(function() {
+              window.location = fallbackUrl;
+            }, timeout);
+          })();
+        </script>
+      </body>
+    </html>
+  `);
+});
+
 
 
 export const getRoomsForBooking = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -381,74 +429,5 @@ export const getRoomsForBooking = catchAsync(async (req: Request, res: Response,
   });
 })
 
-export { createRoom, updateRoom, deleteRoom, getRoomById, getRooms, getRoomsByPropertyId, getRoomsByPropertyId2 };
+export { createRoom, updateRoom, deleteRoom, getRoomById, getRooms, getRoomsByPropertyId, getRoomsByPropertyId2, handlePropertyRedirect };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const updateRoom = catchAsync(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const id = req.params.id;
-//     const updateData = {
-//       $set: req.body,
-//     };
-
-//     if (!updateData) {
-//       return next(new AppError("Please provide data to update", 400));
-//     }
-
-//     const updatedRoom = await Room.findByIdAndUpdate(id, updateData, {
-//       new: true,
-//       runValidators: true,
-//     });
-
-//     if (!updatedRoom) {
-//       return next(new AppError("Room not found", 404));
-//     }
-
-//     res.status(200).json({
-//       status: "success",
-//       error: false,
-//       message: "Room updated successfully",
-//       data: updatedRoom,
-//     });
-//   }
-// );

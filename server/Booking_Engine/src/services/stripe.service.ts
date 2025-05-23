@@ -21,29 +21,59 @@ class StripeService {
    */
   async createPaymentIntent(amount: number, currency: string) {
     try {
+      console.log('[Payment] Starting payment intent creation...');
+      console.log(`[Payment] Amount: ${amount}, Currency: ${currency}`);
+
       // Input validation
       if (!amount || amount <= 0) {
-        return { 
-          success: false, 
-          error: 'Valid amount is required' 
+        console.error('[Payment] Validation failed: Invalid amount');
+        return {
+          success: false,
+          error: 'Valid amount is required'
         };
       }
 
+      if (!currency || currency.length !== 3) {
+        console.error('[Payment] Validation failed: Invalid currency');
+        return {
+          success: false,
+          error: 'Valid 3-letter currency code is required'
+        };
+      }
+
+      console.log('[Payment] Calling Stripe API to create payment intent...');
       const paymentIntent = await this.stripe.paymentIntents.create({
         amount,
         currency,
         automatic_payment_methods: { enabled: true },
       });
-      
-      return { 
-        success: true, 
-        clientSecret: paymentIntent.client_secret 
+
+      console.log('[Payment] Payment intent created successfully');
+      console.log(`[Payment] Client secret: ${paymentIntent.client_secret?.substring(0, 10)}...`);
+      console.log(`[Payment] Payment intent ID: ${paymentIntent.id}`);
+
+      return {
+        success: true,
+        clientSecret: paymentIntent.client_secret
       };
     } catch (error: any) {
-      console.error('Payment Intent Error:', error.message);
-      return { 
-        success: false, 
-        error: error.message || 'An error occurred while creating the payment intent' 
+      console.error('[Payment] Error creating payment intent:');
+      console.error('--- Error Details ---');
+      console.error('Message:', error.message);
+      console.error('Type:', error.type || 'N/A');
+      console.error('Code:', error.code || 'N/A');
+      console.error('Stack:', error.stack || 'N/A');
+      console.error('Raw:', error.raw || 'N/A');
+      console.error('---------------------');
+
+      return {
+        success: false,
+        error: error.message || 'An error occurred while creating the payment intent',
+        details: {
+          type: error.type,
+          code: error.code,
+          statusCode: error.statusCode
+        }
       };
     }
   }
@@ -56,16 +86,16 @@ class StripeService {
       const setupIntent = await this.stripe.setupIntents.create({
         usage: 'off_session',
       });
-      
-      return { 
-        success: true, 
-        clientSecret: setupIntent.client_secret 
+
+      return {
+        success: true,
+        clientSecret: setupIntent.client_secret
       };
     } catch (error: any) {
       console.error('Setup Intent Error:', error);
-      return { 
-        success: false, 
-        error: error.message || 'An error occurred while creating the setup intent' 
+      return {
+        success: false,
+        error: error.message || 'An error occurred while creating the setup intent'
       };
     }
   }
@@ -97,12 +127,12 @@ class StripeService {
         email: email,
         limit: 1
       });
-      
+
       let customerId: string;
-      
+
       if (existingCustomers.data.length > 0) {
         customerId = existingCustomers.data[0].id;
-        
+
         try {
           await this.stripe.paymentMethods.attach(paymentMethodId, {
             customer: customerId
@@ -119,23 +149,23 @@ class StripeService {
           phone,
           payment_method: paymentMethodId
         });
-        
+
         customerId = newCustomer.id;
       }
-      
+
       // Set as default payment method
       await this.stripe.customers.update(customerId, {
         invoice_settings: {
           default_payment_method: paymentMethodId
         }
       });
-      
+
       return { success: true, customerId };
     } catch (error: any) {
       console.error('Customer Management Error:', error);
-      return { 
-        success: false, 
-        error: error.message || 'An error occurred while managing customer data' 
+      return {
+        success: false,
+        error: error.message || 'An error occurred while managing customer data'
       };
     }
   }
@@ -148,10 +178,10 @@ class StripeService {
    * @param description Description of the charge
    */
   async chargeCustomer(
-    customerId: string, 
+    customerId: string,
     paymentMethodId: string,
-    amount: number, 
-    currency: string, 
+    amount: number,
+    currency: string,
     description: string
   ) {
     try {
@@ -171,11 +201,11 @@ class StripeService {
         description,
         off_session: true
       });
-      
+
       return { success: true, paymentIntent };
     } catch (error: any) {
       console.error('Charge Customer Error:', error);
-      
+
       // Handle authentication required error specifically
       if (error.code === 'authentication_required') {
         return {
@@ -183,10 +213,10 @@ class StripeService {
           error: 'This payment requires authentication. Please try a different payment method.'
         };
       }
-      
-      return { 
-        success: false, 
-        error: error.message || 'An error occurred while processing the payment' 
+
+      return {
+        success: false,
+        error: error.message || 'An error occurred while processing the payment'
       };
     }
   }

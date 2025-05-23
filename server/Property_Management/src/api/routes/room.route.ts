@@ -8,6 +8,7 @@ import {
   getRoomsByPropertyId,
   getRoomsByPropertyId2,
   getRoomsForBooking,
+  handlePropertyRedirect,
 } from "../../controller/room.controller";
 
 const router = Router();
@@ -17,6 +18,7 @@ export default (app: Router) => {
 
   router.route("/rooms_by_propertyId/:id").get(getRoomsByPropertyId as any);
   router.route("/rooms_by_propertyId2/:id").get(getRoomsByPropertyId2 as any);
+  router.get('/redirect/property/:propertyId/coupon/:couponId', handlePropertyRedirect as any);
   router.route("/getRoomsForBooking/:id").get(getRoomsForBooking as any);
 
   router
