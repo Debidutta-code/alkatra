@@ -368,7 +368,7 @@ export default function PaymentSuccess() {
                     <div className="border-t border-gray-200 my-2 pt-2"></div>
                     <div className="flex justify-between">
                       <span className="font-tripswift-bold text-lg text-tripswift-black">Total</span>
-                      <span className="font-tripswift-bold text-lg text-tripswift-blue">₹{amount.toLocaleString()}</span>
+                      <span className="font-tripswift-bold text-lg text-tripswift-black">₹{amount.toLocaleString()}</span>
                     </div>
                     <div className="text-xs text-tripswift-black/50 text-right mt-1">
                       {getPaymentMethodText() === "Pay at Hotel" ?

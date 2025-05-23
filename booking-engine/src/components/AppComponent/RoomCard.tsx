@@ -3,7 +3,11 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Cookies from "js-cookie";
+import {jwtDecode} from "jwt-decode";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux"; // or your Redux store hook
+import { logout } from "@/Redux/slices/auth.slice";
+
 import {
   FaStar, FaRegStar, FaWifi, FaSnowflake, FaSmokingBan, FaBed, FaChild, FaUser, FaTree,
   FaCheckCircle, FaShoppingCart, FaPercent, FaTimes, FaInfoCircle, FaRulerCombined
@@ -49,11 +53,14 @@ interface RoomCardProps {
 
 export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) => {
   const [showPolicyModal, setShowPolicyModal] = useState(false);
+  
 
   const DEFAULT_IMAGE = data.default_image_url || "https://images.unsplash.com/photo-1617104678098-de229db51175?q=80&w=1514&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
   const selectedImage = data.image && data.image.length > 0 ? data.image[0] : DEFAULT_IMAGE;
 
   const router = useRouter();
+  const dispatch = useDispatch();
+
 
   const policyType = getPolicyType(data.cancellation_policy);
   const policyStyling = getPolicyStyling(policyType);
@@ -78,17 +85,46 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
   };
 
   const truncatedDescription = truncateDescription(data.description);
+const handleBookNow = () => {
+  const accessToken = Cookies.get("accessToken");
 
-  const handleBookNow = () => {
-    const accessToken = Cookies.get("accessToken");
-    if (!accessToken) {
+  if (!accessToken) {
+    const fullUrl = window.location.href;
+    Cookies.set("redirectAfterLogin", fullUrl);
+    router.push("/login");
+    dispatch(logout());  // <--- logout on no token
+    return;
+  }
+
+  try {
+    const decodedToken: { exp: number } = jwtDecode(accessToken);
+    const currentTime = Math.floor(Date.now() / 1000);
+
+    if (decodedToken.exp < currentTime) {
+      // Token expired
+      Cookies.remove("accessToken"); // Clear expired token
       const fullUrl = window.location.href;
       Cookies.set("redirectAfterLogin", fullUrl);
       router.push("/login");
-    } else {
-      onBookNow();
+      dispatch(logout());  // <--- logout on expired token
+      return;
     }
-  };
+
+    // Token is valid, proceed with booking
+    onBookNow();
+
+  } catch (error) {
+    // Invalid token, remove and redirect
+    Cookies.remove("accessToken"); // Clear invalid token
+    const fullUrl = window.location.href;
+    Cookies.set("redirectAfterLogin", fullUrl);
+    router.push("/login");
+    dispatch(logout());  // <--- logout on invalid token
+  }
+};
+
+
+
 
   const getRoomAmenities = () => {
     if (data.amenities && data.amenities.length > 0) {
