@@ -5,9 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@src/components/ui/button';
 import BasicInfoForm from './components/BasicInfoForm';
 import SchedulingForm from './components/SchedulingForm';
-import OccupancyForm from './components/OccupancyForm';
-import StayDetailsForm from './components/StayDetailsForm';
-import BookingAdvanceForm from './components/BookingAdvanceForm';
+import LengthOfStayForm from './components/LengthOfStayForm';
+import ReleaseAndCancellationForm from './components/ReleaseAndCancellationForm';
 import { createRatePlan } from './api/ratePlanApi';
 import { RatePlanFormData, DateRange } from './types/ratePlanTypes';
 import { getInitialFormData } from './constants/initialFormData';
@@ -103,7 +102,6 @@ export default function RatePlanForm() {
         throw new Error('No access token found');
       }
 
-      // Construct scheduling data
       const scheduling = {
         type: formData.scheduling.type,
         weeklyDays: formData.scheduling.type === 'weekly' ? formData.scheduling.weeklyDays : [],
@@ -115,6 +113,8 @@ export default function RatePlanForm() {
           : [],
         availableSpecificDates: formData.scheduling.type === 'specific-dates' ? formData.scheduling.availableSpecificDates : [],
       };
+
+      const currentTimestamp = new Date().toISOString(); // Current timestamp: 2025-05-23T09:52:00.000Z
 
       const payload = {
         propertyId: formData.propertyId,
@@ -132,16 +132,13 @@ export default function RatePlanForm() {
         },
         currency: formData.currency,
         status: formData.status,
-        createdBy: new Date(formData.createdBy).toISOString(),
-        updatedBy: new Date(formData.updatedBy).toISOString(),
-        // Add top-level scheduling fields
+        createdBy: currentTimestamp,
+        updatedBy: currentTimestamp,
         type: scheduling.type,
         weeklyDays: scheduling.weeklyDays,
         dateRanges: scheduling.dateRanges,
         availableSpecificDates: scheduling.availableSpecificDates,
-        // Include the nested scheduling object
         scheduling: scheduling,
-        // Include additional fields from the form
         maxOccupancy: Number(formData.maxOccupancy),
         adultOccupancy: Number(formData.adultOccupancy),
         minBookAdvance: Number(formData.minBookAdvance),
@@ -189,8 +186,7 @@ export default function RatePlanForm() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="space-y-8">
           <BasicInfoForm formData={formData} handleChange={handleChange} />
-          <OccupancyForm formData={formData} handleChange={handleChange} />
-          <BookingAdvanceForm formData={formData} handleChange={handleChange} />
+          <LengthOfStayForm formData={formData} handleChange={handleChange} />
         </div>
         <div className="space-y-8">
           <SchedulingForm
@@ -202,25 +198,25 @@ export default function RatePlanForm() {
             removeDateRange={removeDateRange}
             handleSpecificDatesChange={handleSpecificDatesChange}
           />
-          <StayDetailsForm formData={formData} handleChange={handleChange} />
+          <ReleaseAndCancellationForm formData={formData} handleChange={handleChange} />
         </div>
       </div>
 
-      <div className="flex space-x-3 mt-8">
-        <Button
-          type="button"
-          onClick={handleSubmit}
-          className="bg-green-600 hover:bg-green-700 text-white p-2 rounded w-full transition-colors duration-200"
-          disabled={loading}
-        >
-          {loading ? 'Saving...' : 'Save'}
-        </Button>
+      <div className="mt-8 flex justify-end space-x-3">
         <Button
           type="button"
           onClick={handleCancel}
-          className="bg-gray-400 hover:bg-gray-500 text-white p-2 rounded w-full transition-colors duration-200"
+          className="bg-gray-400 hover:bg-gray-500 text-white p-2 rounded transition-colors duration-200"
         >
           Cancel
+        </Button>
+        <Button
+          type="button"
+          onClick={handleSubmit}
+          className="bg-green-600 hover:bg-green-700 text-white p-2 rounded transition-colors duration-200"
+          disabled={loading}
+        >
+          {loading ? 'Creating Rate Plan...' : 'Create Rate Plan'}
         </Button>
       </div>
     </div>
