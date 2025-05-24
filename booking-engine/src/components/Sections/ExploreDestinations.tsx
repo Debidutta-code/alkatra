@@ -36,12 +36,12 @@ export function ExploreDestinations() {
   ];
 
   return (
-    <section className="py-12 bg-gray-50">
+    <section className="py-12 bg-tripswift-off-white">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-8">Explore Destinations</h2>
+        <h2 className="text-3xl font-tripswift-bold mb-8 text-tripswift-black">Explore Destinations</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {destinations.map((destination, index) => (
-            <Card key={index} className="overflow-hidden group cursor-pointer">
+            <Card key={index} className="overflow-hidden group cursor-pointer border border-gray-100">
               <div className="relative h-64">
                 <img
                   src={destination.image}
@@ -50,9 +50,9 @@ export function ExploreDestinations() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 <CardContent className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                  <h3 className="text-2xl font-bold mb-1">{destination.name}</h3>
+                  <h3 className="text-2xl font-tripswift-bold mb-1">{destination.name}</h3>
                   <p className="text-sm mb-4">{destination.category}</p>
-                  <Button variant="secondary" className="bg-white/20 backdrop-blur-sm hover:bg-white/30">
+                  <Button variant="secondary" className="btn-tripswift-primary py-2 px-4 rounded-lg text-sm hover:shadow-md transition-all">
                     Explore Now
                   </Button>
                 </CardContent>

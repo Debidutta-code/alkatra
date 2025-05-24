@@ -10,6 +10,26 @@
     "signUp": "साइन अप करें",
     "login": "लॉग इन करें"
   },
+  "Footer": {
+    "companyTitle": "कंपनी",
+    "aboutUs": "हमारे बारे में",
+    "whyChooseUs": "हमें क्यों चुनें",
+    "pricing": "मूल्य निर्धारण",
+    "testimonials": "प्रशंसापत्र",
+    "resourcesTitle": "संसाधन",
+    "privacyPolicy": "गोपनीयता नीति",
+    "termsAndConditions": "नियम और शर्तें",
+    "blog": "ब्लॉग",
+    "contactUs": "हमसे संपर्क करें",
+    "productTitle": "उत्पाद",
+    "projectManagement": "परियोजना प्रबंधन",
+    "timeTracker": "समय ट्रैकर",
+    "timeSchedule": "समय अनुसूची",
+    "leadGeneration": "लीड जनरेशन",
+    "emailPlaceholder": "अपना ईमेल दर्ज करें",
+    "subscribeButton": "सदस्यता लें",
+    "copyright": "© {year} ट्रिपस्विफ्ट - सर्वाधिकार सुरक्षित"
+  },
   "HotelCard": {
     "heroTitle": "अपनी यात्रा के लिए सही ठहरने की जगह खोजें",
     "heroSubtitle": "विशेष कीमतों पर शानदार आवास खोजें",
@@ -20,10 +40,107 @@
     "errorInvalidLocation": "कृपया एक मान्य स्थान दर्ज करें।",
     "errorSelectDates": "कृपया चेक-इन और चेक-आउट दोनों तारीखें चुनें।"
   },
+  "HotelListing": {
+    "CompactSearchBar": {
+      "locationPlaceholder": "आप कहाँ जा रहे हैं?",
+      "checkInPlaceholder": "चेक-इन",
+      "checkOutPlaceholder": "चेक-आउट",
+      "searchButton": "खोजें",
+      "errorInvalidLocation": "कृपया एक मान्य स्थान दर्ज करें।",
+      "errorSelectDates": "कृपया चेक-इन और चेक-आउट दोनों तारीखें चुनें।",
+      "errorNoHotels": "चयनित स्थान के लिए कोई होटल उपलब्ध नहीं है।",
+      "ariaClearSearch": "खोज साफ करें",
+      "ariaSearchHotels": "होटल खोजें",
+      "ariaSearching": "खोज रहा है..."
+    },
+    "HotelCardItem": {
+      "noImage": "कोई छवि नहीं",
+      "descriptionFallback": "इस अद्भुत संपत्ति में आरामदायक प्रवास का अनुभव करें।",
+      "contactLabel": "संपर्क करें",
+      "viewRoomButton": "कमरा देखें",
+      "amenitiesList": {
+        "wifi": "मुफ्त वाईफाई",
+        "swimming_pool": "स्विमिंग पूल",
+        "fitness_center": "फिटनेस सेंटर",
+        "spa_and_wellness": "स्पा और वेलनेस",
+        "restaurant": "रेस्तरां",
+        "room_service": "रूम सर्विस",
+        "bar_and_lounge": "बार और लाउंज",
+        "parking": "पार्किंग",
+        "concierge_services": "कंसीयज सेवाएँ",
+        "pet_friendly": "पेट फ्रेंडली",
+        "business_facilities": "व्यावसायिक सुविधाएँ",
+        "laundry_services": "लॉन्ड्री सेवाएँ",
+        "child_friendly_facilities": "बच्चों के अनुकूल सुविधाएँ"
+      }
+    },
+    "heroTitle": "अपना सही ठहराव खोजें",
+    "heroSubtitle": "सबसे अच्छी कीमतों पर आवास बुक करें",
+    "hotelsIn": "में होटल",
+    "yourDestination": "आपका गंतव्य",
+    "selectDates": "तारीखें चुनें",
+    "propertiesFound": "प्रॉपर्टी मिलीं",
+    "nights": "रातें",
+    "filters": "फ़िल्टर",
+    "activeFilter": "सक्रिय फ़िल्टर",
+    "activeFilters": "सक्रिय फ़िल्टर",
+    "clearAll": "सभी साफ करें",
+    "popularFilters": "लोकप्रिय फ़िल्टर",
+    "freeWifi": "मुफ्त वाईफाई",
+    "parking": "पार्किंग",
+    "breakfast": "नाश्ता",
+    "searchPropertyName": "प्रॉपर्टी का नाम खोजें",
+    "sortBy": "इसके अनुसार क्रमबद्ध करें",
+    "recommended": "अनुशंसित",
+    "highestRating": "उच्चतम रेटिंग",
+    "lowestRating": "निम्नतम रेटिंग",
+    "whyBookWithTripSwift": "TripSwift के साथ बुक क्यों करें",
+    "freeCancellation": "मुफ्त रद्दीकरण",
+    "freeCancellationDesc": "हमारी अधिकांश प्रॉपर्टी चेक-इन से 24 घंटे पहले तक मुफ्त रद्दीकरण प्रदान करती हैं।",
+    "bestPriceGuarantee": "सर्वश्रेष्ठ मूल्य गारंटी",
+    "bestPriceGuaranteeDesc": "कम कीमत मिली? हम उसका मिलान करेंगे और आपको अतिरिक्त 10% छूट देंगे।",
+    "secureBooking": "सुरक्षित बुकिंग",
+    "secureBookingDesc": "हम आपकी व्यक्तिगत जानकारी की सुरक्षा के लिए उद्योग-मानक एन्क्रिप्शन का उपयोग करते हैं।",
+    "noHotelsError": "दिए गए खोज मानदंडों के लिए कोई होटल नहीं मिला।",
+    "tryModifyingSearch": "कृपया खोज को संशोधित करने का प्रयास करें"
+  },
   "HotelBox": {
     "DateRange": {
       "checkInPlaceholder": "चेक-इन तारीख",
       "checkOutPlaceholder": "चेक-आउट तारीख"
+    },
+    "FilterModal": {
+      "title": "फ़िल्टर",
+      "propertyRating": "प्रॉपर्टी रेटिंग",
+      "amenities": "सुविधाएँ",
+      "sortBy": "इसके अनुसार क्रमबद्ध करें",
+      "cancel": "रद्द करें",
+      "applyFilters": "फ़िल्टर लागू करें",
+      "ariaCloseModal": "मॉडल बंद करें",
+      "ariaSortOrder": "क्रमबद्ध करें",
+      "ratingUp": "और ऊपर",
+      "amenitiesList": {
+        "wifi": "मुफ्त वाईफाई",
+        "swimming_pool": "स्विमिंग पूल",
+        "fitness_center": "फिटनेस सेंटर",
+        "spa_and_wellness": "स्पा और वेलनेस",
+        "restaurant": "रेस्तरां",
+        "room_service": "रूम सर्विस",
+        "bar_and_lounge": "बार और लाउंज",
+        "parking": "पार्किंग",
+        "concierge_services": "कंसीयज सेवाएँ",
+        "pet_friendly": "पेट फ्रेंडली",
+        "business_facilities": "व्यावसायिक सुविधाएँ",
+        "laundry_services": "लॉन्ड्री सेवाएँ",
+        "child_friendly_facilities": "बच्चों के अनुकूल सुविधाएँ"
+      },
+      "sortOptions": {
+        "recommended": "अनुशंसित",
+        "rating_desc": "रेटिंग: उच्च से निम्न",
+        "rating_asc": "रेटिंग: निम्न से उच्च",
+        "price_desc": "मूल्य: उच्च से निम्न",
+        "price_asc": "मूल्य: निम्न से उच्च"
+      }
     }
   },
   "HomeSections": {
@@ -36,9 +153,9 @@
         "description": "होटल बुकिंग पर 50% तक की छूट",
         "validTill": "2 घंटे 45 मिनट"
       },
-      "flightDeal": {
-        "title": "फ्लाइट डील",
-        "description": "फ्लाइट पर ₹2000 की तत्काल कैशबैक",
+      "luxuryStay": {
+        "title": "लक्ज़री स्टे",
+        "description": "प्रीमियम होटलों पर 30% तक की छूट",
         "validTill": "5 घंटे 30 मिनट"
       },
       "weekendGetaway": {
@@ -46,6 +163,261 @@
         "description": "कुछ होटलों पर अब बुक करें, बाद में भुगतान करें",
         "validTill": "3 घंटे 15 मिनट"
       }
+    }
+  },
+  "RoomsPage": {
+    "backToSearch": "खोज पर वापस जाएं",
+    "starHotelRating": "सितारा होटल रेटिंग",
+    "viewPropertyDetails": "संपत्ति विवरण देखें",
+    "aboutThisProperty": "इस संपत्ति के बारे में",
+    "noImagesAvailable": "कोई छवि उपलब्ध नहीं है",
+    "propertyAmenities": "संपत्ति की सुविधाएँ",
+    "amenitiesList": {
+      "wifi": "मुफ्त वाईफाई",
+      "swimming_pool": "स्विमिंग पूल",
+      "fitness_center": "फिटनेस सेंटर",
+      "spa_and_wellness": "स्पा और वेलनेस",
+      "restaurant": "रेस्तरां",
+      "room_service": "रूम सर्विस",
+      "bar_and_lounge": "बार और लाउंज",
+      "parking": "पार्किंग",
+      "concierge_services": "कंसीयज सेवाएँ",
+      "pet_friendly": "पेट फ्रेंडली",
+      "business_facilities": "व्यावसायिक सुविधाएँ",
+      "laundry_services": "लॉन्ड्री सेवाएँ",
+      "child_friendly_facilities": "बच्चों के अनुकूल सुविधाएँ"
+    },
+    "noAmenitiesSpecified": "इस संपत्ति के लिए कोई सुविधाएँ निर्दिष्ट नहीं हैं।",
+    "contactInformation": "संपर्क जानकारी",
+    "allRooms": "सभी कमरे",
+    "searchRoomName": "कमरे का नाम खोजें",
+    "availableRooms": "उपलब्ध कमरे",
+    "showingRooms_one": "कमरा दिखा रहा है",
+    "showingRooms_other": "कमरे दिखा रहा है",
+    "noRoomsAvailableTitle": "कोई कमरा उपलब्ध नहीं है",
+    "noRoomsAvailableMessage": "हमें आपके मानदंडों से मेल खाने वाले कोई कमरे नहीं मिले। कृपया अपने खोज फ़िल्टर या तारीखें समायोजित करने का प्रयास करें।",
+    "clearFilters": "फ़िल्टर साफ़ करें"
+  },
+  "BookingComponents": {
+    "GuestInformationModal": {
+      "completeYourBooking": "अपनी बुकिंग पूरी करें",
+      "guestDetailsStep": "अतिथि विवरण",
+      "reviewAndPayStep": "समीक्षा और भुगतान",
+      "roomSummary": "कमरा सारांश",
+      "roomType": "कमरे का प्रकार",
+      "checkIn": "चेक-इन",
+      "checkOut": "चेक-आउट",
+      "nights": "रात",
+      "nightsPlural": "रातें",
+      "guestInformation": "अतिथि जानकारी",
+      "firstNameLabel": "पहला नाम",
+      "firstNamePlaceholder": "अपना पहला नाम दर्ज करें",
+      "firstNameError": "पहला नाम आवश्यक है और इसमें केवल अक्षर और रिक्त स्थान होने चाहिए।",
+      "lastNameLabel": "अंतिम नाम",
+      "lastNamePlaceholder": "अपना अंतिम नाम दर्ज करें",
+      "lastNameError": "अंतिम नाम आवश्यक है और इसमें केवल अक्षर और रिक्त स्थान होने चाहिए।",
+      "emailLabel": "ईमेल पता",
+      "emailPlaceholder": "your.email@example.com",
+      "emailInfo": "आपकी बुकिंग की पुष्टि इस ईमेल पते पर भेजी जाएगी",
+      "emailError": "कृपया एक मान्य ईमेल पता दर्ज करें।",
+      "phoneLabel": "फोन नंबर",
+      "phonePlaceholder": "फोन नंबर दर्ज करें",
+      "phoneInfo": "बुकिंग से संबंधित सूचनाओं के लिए",
+      "phoneError": "फोन नंबर आवश्यक है",
+      "guestDetailsSection": "अतिथि विवरण",
+      "roomSingular": "कमरा",
+      "roomsPlural": "कमरे",
+      "adultSingular": "वयस्क",
+      "adultsPlural": "वयस्क",
+      "childSingular": "बच्चा",
+      "childrenPlural": "बच्चे",
+      "guestDisplayFormat": "कमरे और अतिथि",
+      "childrenPartFormat": "बच्चे",
+      "informationVerified": "जानकारी सफलतापूर्वक सत्यापित!",
+      "propertyInfoMissing": "प्रॉपर्टी जानकारी अनुपस्थित है। कृपया पुनः प्रयास करें।",
+      "bookingSummary": "बुकिंग सारांश",
+      "stayDetails": "ठहरने का विवरण",
+      "primaryGuest": "प्राथमिक अतिथि",
+      "priceDetails": "मूल्य विवरण",
+      "roomRate": "कमरे की दर",
+      "totalAmount": "कुल राशि",
+      "paymentNoticeTitle": "भुगतान सुरक्षित रूप से संसाधित किया जाएगा",
+      "paymentNoticeDescription": "आगे बढ़ने से, आप हमारी शर्तों और गोपनीयता नीति से सहमत होते हैं।",
+      "backToDetails": "विवरण पर वापस",
+      "cancel": "रद्द करें",
+      "continueToReview": "समीक्षा के लिए जारी रखें",
+      "proceedToPayment": "भुगतान के लिए आगे बढ़ें"
+    }
+  },
+  "BookingTabs": {
+    "userNotLoggedIn": "उपयोगकर्ता लॉग इन नहीं है",
+    "noBooking": "कोई बुकिंग नहीं है",
+    "BookingHeader": {
+      "yourBookings": "आपकी बुकिंग",
+      "viewManageTrack": "अपने सभी होटल आरक्षण एक ही स्थान पर देखें, प्रबंधित करें और ट्रैक करें"
+    },
+    "BookingTabsNavigation": {
+      "allBookings": "सभी बुकिंग",
+      "upcoming": "आगामी",
+      "completed": "पूर्ण किए गए",
+      "cancelled": "रद्द किए गए"
+    },
+    "LoadingState": {
+      "retrievingBookings": "आपकी बुकिंग प्राप्त की जा रही हैं",
+      "fetchingDetails": "हम आपके आरक्षण विवरण प्राप्त करते समय थोड़ा इंतज़ार करें..."
+    },
+    "ErrorState": {
+      "noBookingsFound": "हमें आपके खाते से संबंधित कोई बुकिंग नहीं मिली।",
+      "startBookingNow": "अभी बुकिंग शुरू करें"
+    },
+    "EmptyState": {
+      "heading": {
+        "all": "कोई बुकिंग नहीं मिली",
+        "upcoming": "कोई आगामी बुकिंग नहीं",
+        "completed": "कोई पूरी की गई बुकिंग नहीं",
+        "cancelled": "कोई रद्द की गई बुकिंग नहीं"
+      },
+      "paragraph": {
+        "all": "अपनी अगली यात्रा की योजना बनाना शुरू करें!",
+        "upcoming": "आपके पास कोई आगामी होटल आरक्षण नहीं है।",
+        "completed": "आपने अभी तक कोई ठहरने की बुकिंग पूरी नहीं की है।",
+        "cancelled": "आपके पास कोई रद्द आरक्षण नहीं है।"
+      },
+      "bookHotelButton": "एक होटल बुक करें"
+    },
+    "BookingCard": {
+      "bookingId": "बुकिंग आईडी",
+      "nightSingular": "रात",
+      "nightsPlural": "रातें",
+      "checkIn": "चेक-इन",
+      "checkOut": "चेक-आउट",
+      "roomType": "कमरे का प्रकार",
+      "standardRoom": "मानक कमरा",
+      "paymentMethod": "भुगतान विधि",
+      "primaryGuest": "प्राथमिक अतिथि",
+      "rateBreakdown": "दर का विवरण",
+      "viewBookingDetails": "बुकिंग विवरण देखें",
+      "modify": "संशोधित करें",
+      "cancel": "रद्द करें"
+    },
+    "BookingPagination": {
+      "show": "दिखाएँ",
+      "perPage": "प्रति पृष्ठ",
+      "showing": "दिखा रहा है",
+      "of": "में से",
+      "bookings": "बुकिंग",
+      "noBookingsToShow": "दिखाने के लिए कोई बुकिंग नहीं है"
+    },
+    "CancellationModal": {},
+    "AmendReservationModal": {},
+    "BookingDetailsModal": {}
+  },
+  "Payment": {
+    "PaymentPageContent": {
+      "invalidPayment": {
+        "title": "अमान्य भुगतान",
+        "message": "हम गुम जानकारी के कारण आपके भुगतान को संसाधित नहीं कर सके।",
+        "returnToHomepage": "मुखपृष्ठ पर वापस लौटें"
+      },
+      "bookingSummary": {
+        "title": "बुकिंग सारांश",
+        "stayDates": "ठहरने की तारीखें",
+        "night": "रात",
+        "nights": "रातें",
+        "guests": "मेहमान",
+        "room": "कमरा",
+        "rooms": "कमरे",
+        "adult": "वयस्क",
+        "adults": "वयस्क",
+        "child": "बच्चा",
+        "children": "बच्चे",
+        "guest": "अतिथि"
+      },
+      "paymentMethod": {
+        "title": "भुगतान विधि"
+      },
+      "priceDetails": {
+        "title": "मूल्य विवरण",
+        "roomRate": "कमरे का किराया",
+        "perNight": "प्रति रात",
+        "total": "कुल",
+        "payAtHotelInfo": "आपका कार्ड सुरक्षित रूप से संग्रहीत किया जाएगा, लेकिन भुगतान होटल में एकत्र किया जाएगा।"
+      },
+      "securityBadges": {
+        "securePayments": "सुरक्षित भुगतान",
+        "noCardStorage": "हम आपके पूर्ण कार्ड विवरण कभी संग्रहीत नहीं करते हैं",
+        "freeCancellation": "मुफ्त रद्दीकरण उपलब्ध है"
+      },
+      "needHelp": {
+        "title": "मदद चाहिए?",
+        "message": "हमारी ग्राहक सेवा टीम आपके बुकिंग के बारे में किसी भी प्रश्न के लिए 24/7 उपलब्ध है।",
+        "contactSupport": "समर्थन से संपर्क करें"
+      },
+      "loading": {
+        "title": "भुगतान जानकारी लोड हो रही है...",
+        "message": "कृपया प्रतीक्षा करें जब तक हम आपकी चेकआउट तैयार करते हैं।"
+      }
+    },
+    "PaymentComponents": {
+      "PaymentOptionSelector": {
+        "title": "भुगतान विकल्प",
+        "payNow": "अभी भुगतान करें",
+        "payNowDescription": "भुगतान तुरंत पूरा करें",
+        "payAtHotel": "होटल में भुगतान करें",
+        "payAtHotelDescription": "होटल भुगतान के लिए कार्ड सुरक्षित रूप से सहेजें"
+      },
+      "PayAtHotelFunction": {
+        "infoTitle": "होटल में भुगतान की जानकारी",
+        "infoMessage": "आपके क्रेडिट कार्ड का विवरण सुरक्षित रूप से संग्रहीत किया जाएगा लेकिन अभी शुल्क नहीं लिया जाएगा। भुगतान आपके होटल में ठहरने के दौरान संसाधित किया जाएगा।",
+        "cardDetailsLabel": "कार्ड विवरण",
+        "stripeNotLoadedError": "स्ट्राइप अभी तक लोड नहीं हुआ है। कृपया पुनः प्रयास करें।",
+        "notLoggedInError": "इस बुकिंग को पूरा करने के लिए आपको लॉग इन करना होगा। कृपया साइन इन करें और पुनः प्रयास करें।",
+        "cardElementNotFoundError": "कार्ड तत्व नहीं मिला",
+        "cardSetupFailedError": "कार्ड सेटअप विफल",
+        "processing": "प्रसंस्करण हो रहा है...",
+        "confirmBooking": "बुकिंग की पुष्टि करें",
+        "paymentProcessingError": "भुगतान प्रसंस्करण के दौरान एक त्रुटि हुई"
+      }
+    },
+    "PaymentSuccess": {
+      "processingBooking": "आपकी बुकिंग संसाधित हो रही है...",
+      "confirmingReservation": "हम आपका आरक्षण पुष्टि कर रहे हैं। इसमें केवल एक क्षण लगना चाहिए।",
+      "bookingFailedTitle": "बुकिंग विफल",
+      "returnToHomepage": "मुखपृष्ठ पर वापस लौटें",
+      "bookingConfirmedTitle": "बुकिंग की पुष्टि हो गई!",
+      "reservationSuccessMessage": "आपका आरक्षण सफलतापूर्वक पूरा हो गया है",
+      "bookingId": "बुकिंग आईडी:",
+      "bookingSummaryTitle": "बुकिंग सारांश",
+      "checkInLabel": "चेक-इन",
+      "checkOutLabel": "चेक-आउट",
+      "night": "रात",
+      "nights": "रातें",
+      "guestsLabel": "मेहमान",
+      "guestInfoTitle": "मेहमान जानकारी",
+      "guestNameLabel": "मेहमान का नाम",
+      "guestDefaultName": "मेहमान",
+      "emailLabel": "ईमेल",
+      "paymentMethodLabel": "भुगतान विधि",
+      "paymentMethodCreditCard": "क्रेडिट कार्ड",
+      "paymentMethodPayAtHotel": "होटल में भुगतान",
+      "paymentMethodUnknown": "अज्ञात",
+      "paymentDetailsTitle": "भुगतान विवरण",
+      "roomRate": "कमरे का किराया",
+      "perNight": "प्रति रात",
+      "total": "कुल",
+      "paymentAtHotelMessage": "भुगतान होटल में एकत्र किया जाएगा",
+      "paymentProcessedMessage": "भुगतान संसाधित हो गया है",
+      "viewMyBookings": "मेरी बुकिंग देखें",
+      "returnHome": "घर लौटें",
+      "whatsNextTitle": "आगे क्या?",
+      "confirmationEmailSent": "आपके इनबॉक्स में एक पुष्टिकरण ईमेल भेजा गया है",
+      "viewBookingDetails": "आप किसी भी समय अपने खाते में बुकिंग विवरण देख सकते हैं",
+      "contactSupportForChanges": "परिवर्तन करने की आवश्यकता है? समर्थन के लिए 24/7 हमसे संपर्क करें",
+      "downloadBookingConfirmation": "बुकिंग पुष्टिकरण डाउनलोड करें",
+      "needHelpTitle": "मदद चाहिए?",
+      "customerServiceMessage": "हमारी ग्राहक सेवा टीम आपके किसी भी प्रश्न में सहायता के लिए 24/7 उपलब्ध है।",
+      "contactSupportButton": "समर्थन से संपर्क करें",
+      "exploreMoreHotels": "और होटल विकल्प एक्सप्लोर करें"
     }
   }
 }

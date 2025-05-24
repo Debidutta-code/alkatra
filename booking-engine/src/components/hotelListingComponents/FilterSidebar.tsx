@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Star, Check } from 'lucide-react';
 import { AMENITIES } from "@/components/HotelBox/FilterModal";
+import { t } from 'i18next';
 
 interface FilterSidebarProps {
   amenities: { [key: string]: boolean };
@@ -81,7 +82,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
                 type="checkbox"
                 checked={ratingFilter === rating}
                 onChange={() => handleRatingChange(ratingFilter === rating ? null : rating)}
-                className="h-4 w-4 text-tripswift-blue rounded border-gray-300 focus:ring-tripswift-blue"
+                className="h-4 w-4 mb-2 text-tripswift-blue rounded border-gray-300 focus:ring-tripswift-blue"
               />
               <label
                 htmlFor={`star-${rating}`}
@@ -111,14 +112,14 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
                 type="checkbox"
                 checked={!!amenities[amenity.key]}
                 onChange={() => toggleAmenityFilter(amenity.key)}
-                className="h-4 w-4 text-tripswift-blue rounded border-gray-300 focus:ring-tripswift-blue"
+                className="h-4 w-4 mb-2 text-tripswift-blue rounded border-gray-300 focus:ring-tripswift-blue"
               />
               <label
                 htmlFor={`amenity-${amenity.key}`}
                 className="ml-2 text-xs text-gray-700 normal-case cursor-pointer font-tripswift-regular"
                 onClick={() => toggleAmenityFilter(amenity.key)}
               >
-                {amenity.label}
+                {t(`HotelBox.FilterModal.amenitiesList.${amenity.labelKey}`, { defaultValue: amenity.labelKey })}
               </label>
             </div>
           ))}

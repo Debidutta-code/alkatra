@@ -1,5 +1,7 @@
+// BookingPagination.tsx
 import React from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 
 interface BookingPaginationProps {
   currentPage: number;
@@ -18,12 +20,14 @@ const BookingPagination: React.FC<BookingPaginationProps> = ({
   onPageChange,
   onItemsPerPageChange
 }) => {
+  const { t } = useTranslation(); // Initialize useTranslation
+
   const maxPageButtons = 5;
-  
+
   // Calculate indexes for display text
   const indexOfFirstItem = (currentPage - 1) * itemsPerPage + 1;
   const indexOfLastItem = Math.min(currentPage * itemsPerPage, totalBookings);
-  
+
   // Generate page numbers for pagination
   const pageNumbers = [];
   let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
@@ -41,15 +45,17 @@ const BookingPagination: React.FC<BookingPaginationProps> = ({
   return (
     <div className="mt-8 flex flex-col sm:flex-row justify-between items-center bg-white rounded-lg shadow-sm p-4">
       <div className="mb-4 sm:mb-0 flex items-center">
-        <span className="text-sm text-gray-500 mr-3">Show:</span>
+        <span className="text-sm text-gray-500 mr-3">
+          {t('BookingTabs.BookingPagination.show')}:
+        </span>
         <select
           className="px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue"
           value={itemsPerPage}
           onChange={onItemsPerPageChange}
         >
-          <option value={6}>6 per page</option>
-          <option value={9}>9 per page</option>
-          <option value={12}>12 per page</option>
+          <option value={6}>{`${6} ${t('BookingTabs.BookingPagination.perPage')}`}</option>
+          <option value={9}>{`${9} ${t('BookingTabs.BookingPagination.perPage')}`}</option>
+          <option value={12}>{`${12} ${t('BookingTabs.BookingPagination.perPage')}`}</option>
         </select>
       </div>
 
@@ -80,8 +86,8 @@ const BookingPagination: React.FC<BookingPaginationProps> = ({
           <button
             key={number}
             onClick={() => onPageChange(number)}
-            className={`w-9 h-9 mx-1 rounded-md ${currentPage === number 
-              ? 'bg-tripswift-blue text-tripswift-off-white' 
+            className={`w-9 h-9 mx-1 rounded-md ${currentPage === number
+              ? 'bg-tripswift-blue text-tripswift-off-white'
               : 'bg-white border border-gray-200 text-gray-700 hover:border-tripswift-blue/30 hover:bg-tripswift-blue/5'}`}
           >
             {number}
@@ -105,8 +111,8 @@ const BookingPagination: React.FC<BookingPaginationProps> = ({
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className={`p-2 rounded-md ${currentPage === totalPages 
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+          className={`p-2 rounded-md ${currentPage === totalPages
+            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
             : 'bg-white border border-tripswift-blue/30 text-tripswift-blue hover:bg-tripswift-blue/5'}`}
         >
           <FaChevronRight size={14} />
@@ -115,8 +121,8 @@ const BookingPagination: React.FC<BookingPaginationProps> = ({
 
       <div className="mt-4 sm:mt-0 text-sm text-gray-600 hidden sm:block">
         {totalBookings > 0
-          ? `Showing ${indexOfFirstItem}-${indexOfLastItem} of ${totalBookings} bookings`
-          : 'No bookings to show'}
+          ? `${t('BookingTabs.BookingPagination.showing')} ${indexOfFirstItem}-${indexOfLastItem} ${t('BookingTabs.BookingPagination.of')} ${totalBookings} ${t('BookingTabs.BookingPagination.bookings')}`
+          : t('BookingTabs.BookingPagination.noBookingsToShow')}
       </div>
     </div>
   );

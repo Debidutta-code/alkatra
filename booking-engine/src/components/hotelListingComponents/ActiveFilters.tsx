@@ -27,7 +27,7 @@ const ActiveFilters: React.FC<ActiveFiltersProps> = ({
   // Function to find the label for an amenity key
   const getAmenityLabel = (key: string) => {
     const amenity = AMENITIES.find(a => a.key === key);
-    return amenity ? amenity.label : key.replace(/_/g, ' ');
+    return amenity ? amenity.labelKey : key.replace(/_/g, ' ');
   };
 
   if (activeFilterCount === 0) return null;

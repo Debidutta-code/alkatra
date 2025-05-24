@@ -183,6 +183,7 @@ export async function updateProfile(accessToken: string, updatedData: UpdateProf
 // Add a new room to a property
 export async function addPropertyRoom(propertyId: string, accessToken: string, newRoomData: any) {
   try {
+    console.log("new Room Data",newRoomData);
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/${propertyId}`,
       newRoomData,
@@ -192,6 +193,7 @@ export async function addPropertyRoom(propertyId: string, accessToken: string, n
         },
       }
     );
+    console.log("data we get from backend when we add a room", response.data)
     return response.data;
   } catch (error: any) {
     throw new Error(`Error adding property room: ${error.message}`);
@@ -201,6 +203,7 @@ export async function addPropertyRoom(propertyId: string, accessToken: string, n
 // Update a room in a property
 export async function updatePropertyRoom(propertyId: string, accessToken: string, updatedData: any) {
   try {
+    console.log("updated data we get",updatedData)
     const response = await axios.patch(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/${propertyId}?roomId=${updatedData._id}`,
       updatedData,

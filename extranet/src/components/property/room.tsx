@@ -30,17 +30,17 @@ const roomSchema = z.object({
   room_name: z.string().min(1, "Room name is required"),
   room_type: z.string().min(1, "Room type is required"),
   total_room: z.number().min(1, "Total rooms is required").nonnegative("Total room must be a positive number"),
-  floor: z.number().nonnegative("Price must be a positive number").optional(),
+  floor: z.number().min(0).nonnegative("Floor must be a positive number").optional(),
   room_view: z.string().optional(),
   room_size: z.number().min(1, "Room size is required").nonnegative("Room size must be a positive number"),
   room_unit: z.string().min(1, "Room unit is required"),
   smoking_policy: z.string().min(1, "Smoking policy is required"),
   max_occupancy: z.number().min(1, "Max occupancy is required").nonnegative("Max occupancy must be a positive number"),
   max_number_of_adults: z.number().min(1, "Max number of adults is required").nonnegative("Max number of adults must be a positive number"),
-  max_number_of_children: z.number().min(1, "Max number of children is required").nonnegative("Max number of children must be a positive number"), // Changed to min(1) - required
+  max_number_of_children: z.number().min(0).nonnegative("Max number of children must be a positive number").optional(), // Changed to min(1) - required
   number_of_bedrooms: z.number().min(1, "Number of bedrooms is required").nonnegative("Number of bedrooms must be a positive number"), // Changed to min(1) - required
-  number_of_living_room: z.number().min(1, "Number of living rooms is required").nonnegative("Number of living room must be a positive number"), // Changed to min(1) - required
-  extra_bed: z.number().min(1, "Extra bed is required").nonnegative("Extra bed must be a positive number"), // Changed to min(1) - required
+  number_of_living_room: z.number().min(0).nonnegative("Number of living room must be a positive number").optional(), // Changed to min(1) - required
+  extra_bed: z.number().min(0).nonnegative("Extra bed must be a positive number").optional(), // Changed to min(1) - required
   description: z.string().optional(),
   image: z.array(z.string()).optional(),
   available: z.boolean()
@@ -127,10 +127,10 @@ export default function XRooms({ onNext, onPrevious }: Props) {
       smoking_policy: "",
       max_occupancy: 0,
       max_number_of_adults: 0,
-      max_number_of_children: 1,
+      max_number_of_children: 0,
       number_of_bedrooms: 1,
-      number_of_living_room: 1,
-      extra_bed: 1,
+      number_of_living_room: 0,
+      extra_bed: 0,
       description: "",
       image: [],
       available: false
@@ -587,7 +587,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
 
           {/* Max number of Children field */}
           <div className="w-full">
-            <Label htmlFor="max_number_of_children" className="whitespace-nowrap pr-1">Max no. of Children <span className="text-destructive">*</span></Label>
+            <Label htmlFor="max_number_of_children" className="whitespace-nowrap pr-1">Max no. of Children </Label>
             <Input
               id="max_number_of_children"
               size={"md"}
@@ -622,7 +622,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
 
           {/* Number of Living Room field */}
           <div className="w-full">
-            <Label htmlFor="number_of_living_room" className="whitespace-nowrap">No. of Living Room <span className="text-destructive">*</span></Label>
+            <Label htmlFor="number_of_living_room" className="whitespace-nowrap">No. of Living Room</Label>
             <Input
               id="number_of_living_room"
               size={"md"}
@@ -638,7 +638,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
 
           {/* Extra Bed field */}
           <div className="w-full ">
-            <Label htmlFor="extra_bed">Extra Bed <span className="text-destructive">*</span></Label>
+            <Label htmlFor="extra_bed">Extra Bed</Label>
             <Input
               id="extra_bed"
               size={"md"}

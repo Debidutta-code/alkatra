@@ -1,3 +1,6 @@
+/* Updated font import to include semibold (600) weight */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,12 +12,14 @@
   --color-primary-black: #000000; /* Matches style guide */
   --color-secondary-off-white: #FFFDFF; /* Matches style guide */
   --color-secondary-black: #000000; /* Matches style guide */
+  --color-gray-800: #1f2937; /* Added for text-gray-800 */
   
   /* Typography */
-  --font-primary: Arial, sans-serif;
+  --font-primary: 'Noto Sans', sans-serif;
   --font-weight-regular: 400;
   --font-weight-medium: 500;
-  --font-weight-bold: 700;
+  --font-weight-semibold: 400;
+  --font-weight-bold: 600;
   --font-weight-extrabold: 800;
   
   /* Legacy variables for compatibility */
@@ -53,34 +58,35 @@
   height: 100vh;
 }
 
-/* Typography */
+/* Updated Typography */
 html {
   font-family: var(--font-primary);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-regular);
 }
 
+/* Updated h1 style to match your preferred style */
 h1 {
-  font-size: 28px;
-  line-height: 36px;
-  letter-spacing: 3.42px;
   font-family: var(--font-primary);
-  font-weight: var(--font-weight-extrabold);
-  color: var(--color-secondary-black);
+  font-weight: var(--font-weight-semibold);
+  font-size: 1.125rem; /* text-lg */
+  line-height: 1.5;
+  letter-spacing: normal; /* tracking-normal */
+  color: var(--color-gray-800);
 }
 
 h2 {
   font-size: 12px;
   line-height: 15px;
-  letter-spacing: 2px;
-  color: var(--color-secondary-black);
+  letter-spacing: normal;
+  color: var(--color-primary-off-white);
   font-family: var(--font-primary);
   font-weight: var(--font-weight-medium);
 }
 
 input:placeholder-shown {
-  font-size: 18px;
+  font-size: 16px;
   line-height: 23px;
-  letter-spacing: 0px;
+  letter-spacing: normal;
   text-indent: 16px;
   font-family: var(--font-primary);
 }
@@ -88,24 +94,29 @@ input:placeholder-shown {
 label {
   font-size: 12px;
   line-height: 15px;
-  letter-spacing: 2px;
+  letter-spacing: normal;
   color: var(--color-secondary-black);
   text-transform: uppercase;
   font-family: var(--font-primary);
   font-weight: var(--font-weight-medium);
+  margin-bottom: 9px;
 }
 
 header h1 {
   font-size: 18px;
   line-height: 23px;
-  letter-spacing: 2.200000047683716px;
+  letter-spacing: normal;
   color: var(--color-primary-off-white);
+}
+
+.header--white-bg h1 {
+  color: var(--color-primary-black); /* Use black for better contrast */
 }
 
 header p {
   font-size: 9px;
   line-height: 11px;
-  letter-spacing: 1.2857142686843872px;
+  letter-spacing: normal;
   color: var(--color-primary-off-white);
 }
 
@@ -114,30 +125,25 @@ header p {
   h2 {
     font-size: 18px;
     line-height: 23px;
-    letter-spacing: 0px;
+    letter-spacing: normal;
   }
 
   header h1 {
     font-size: 28px;
     line-height: 36px;
-    letter-spacing: 3.422222137451172px;
+    letter-spacing: normal;
   }
 
   header p {
     font-size: 14px;
     line-height: 18px;
-    letter-spacing: 2px;
+    letter-spacing: normal;
   }
 }
 
 /* Head styles */
 .header--image_container_front {
   box-shadow: var(--shadow);
-}
-
-/* Form styles */
-label {
-  margin-bottom: 9px;
 }
 
 @layer base {
@@ -212,7 +218,29 @@ label {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-['Arial'];
+    @apply bg-background text-foreground font-noto-sans; 
+  }
+}
+
+@layer components {
+  .text-property-title {
+    @apply font-noto-sans font-medium text-lg text-gray-800 tracking-normal; 
+  }
+  
+  .text-room-title {
+    @apply font-noto-sans font-medium text-base text-gray-800 tracking-normal; 
+  }
+  
+  .text-section-heading {
+    @apply font-noto-sans font-medium text-base text-gray-800 tracking-normal; 
+  }
+  
+  .text-price {
+    @apply font-noto-sans font-bold text-lg text-tripswift-blue; 
+  }
+  
+  .text-description {
+    @apply font-noto-sans text-sm text-gray-600 tracking-normal;
   }
 }
 
@@ -289,6 +317,9 @@ label {
   .font-tripswift-medium {
     font-weight: var(--font-weight-medium);
   }
+  .font-tripswift-semibold {
+    font-weight: var(--font-weight-semibold);
+  }
   .font-tripswift-bold {
     font-weight: var(--font-weight-bold);
   }
@@ -302,7 +333,7 @@ label {
   background-color: var(--color-primary-blue);
   color: var(--color-primary-off-white);
   font-family: var(--font-primary);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   border-radius: var(--radius);
   padding: 0.5rem 1rem;
   transition: background-color 0.2s ease-in-out;
@@ -317,7 +348,7 @@ label {
   color: var(--color-primary-blue);
   border: 1px solid var(--color-primary-blue);
   font-family: var(--font-primary);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   border-radius: var(--radius);
   padding: 0.5rem 1rem;
   transition: all 0.2s ease-in-out;
@@ -326,6 +357,21 @@ label {
 .btn-tripswift-secondary:hover {
   background-color: var(--color-primary-blue);
   color: var(--color-primary-off-white);
+}
+
+/* Added book now button for OTA look */
+.btn-book-now {
+  background-color: #0C8046;
+  color: white;
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.btn-book-now:hover {
+  background-color: #0A6A3A;
 }
 
 /* Override NextUI styles for consistency */

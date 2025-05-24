@@ -1,17 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Save, ChevronDown, Plus, PenTool } from "lucide-react";
-import { Country, State, City, ICountry, IState, ICity } from 'country-state-city';
-import toast from 'react-hot-toast';
+import {
+  Country,
+  State,
+  City,
+  ICountry,
+  IState,
+  ICity,
+} from "country-state-city";
+import toast from "react-hot-toast";
 
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter
+  DialogFooter,
 } from "../../components/ui/dialog";
 
 // Define the address data interface
@@ -30,7 +42,9 @@ interface AddressProps {
   address: AddressData | null;
   editedAddress: AddressData | null;
   editAddressMode: boolean;
-  handleAddressInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleAddressInputChange: (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => void;
   handleAddressSaveClick: () => Promise<void>;
   handleAddressEditClick: () => void;
   handleAddressAddClick: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;
@@ -43,10 +57,12 @@ export function Address({
   handleAddressInputChange,
   handleAddressSaveClick,
   handleAddressEditClick,
-  handleAddressAddClick
+  handleAddressAddClick,
 }: AddressProps) {
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [validationErrors, setValidationErrors] = useState<{ [key: string]: string }>({});
+  const [validationErrors, setValidationErrors] = useState<{
+    [key: string]: string;
+  }>({});
 
   const [countries, setCountries] = useState<ICountry[]>([]);
   const [states, setStates] = useState<IState[]>([]);
@@ -55,14 +71,17 @@ export function Address({
   const [selectedCountry, setSelectedCountry] = useState<string>("");
   const [selectedState, setSelectedState] = useState<string>("");
   const [selectedCity, setSelectedCity] = useState<string>("");
+  const [selectedCountryName, setSelectedCountryName] = useState<string>("");
+  const [selectedStateName, setSelectedStateName] = useState<string>("");
 
   useEffect(() => {
     const fetchedCountries = Country.getAllCountries();
     setCountries(fetchedCountries);
   }, []);
-
+  // console.log("countries", countries);
   useEffect(() => {
     if (selectedCountry) {
+      // console.log("selected ", selectedCountry);
       const fetchedStates = State.getStatesOfCountry(selectedCountry);
       setStates(fetchedStates);
       // Reset state and city when country changes
@@ -73,12 +92,16 @@ export function Address({
 
   useEffect(() => {
     if (selectedState && selectedCountry) {
-      const fetchedCities = City.getCitiesOfState(selectedCountry, selectedState);
+      const fetchedCities = City.getCitiesOfState(
+        selectedCountry,
+        selectedState
+      );
       setCities(fetchedCities);
       // Reset city when state changes
       // setSelectedCity("");
     }
   }, [selectedState, selectedCountry]);
+  // console.log("country", address);
 
   useEffect(() => {
     if (editAddressMode && address) {
@@ -90,53 +113,69 @@ export function Address({
 
   // Validation function
   const validateField = (name: string, value: any): string | null => {
-    const stringValue = String(value || ''); // Ensure value is a string
-  
+    const stringValue = String(value || ""); // Ensure value is a string
+
     switch (name) {
-      case 'address_line_1':
-        return !stringValue.trim() ? 'Address Line 1 is required' : null;
-      case 'city':
-        return !stringValue.trim() ? 'City is required' : null;
-      case 'state':
-        return !stringValue.trim() ? 'State is required' : null;
-      case 'country':
-        return !stringValue.trim() ? 'Country is required' : null;
-      case 'zip_code':
-        return !stringValue.trim() ? 'Zip Code is required' : 
-               !/^\d{6}$/.test(stringValue) ? 'Zip Code must be 6 digits' : null;
+      case "address_line_1":
+        return !stringValue.trim() ? "Address Line 1 is required" : null;
+      case "address_line_2":
+        return !stringValue.trim() ? "Address Line 2 is required" : null;
+      case "landmark":
+        return !stringValue.trim() ? "landmark is required" : null;
+      case "city":
+        return !stringValue.trim() ? "City is required" : null;
+      case "state":
+        return !stringValue.trim() ? "State is required" : null;
+      case "country":
+        return !stringValue.trim() ? "Country is required" : null;
+      case "zip_code":
+        return !stringValue.trim()
+          ? "Zip Code is required"
+          : !/^\d{6}$/.test(stringValue)
+          ? "Zip Code must be 6 digits"
+          : null;
       default:
         return null;
     }
   };
+  // console.log("address", address);
 
   // Validate all fields
   const validateAllFields = () => {
     const errors: { [key: string]: string } = {};
-    
+
     // Mandatory fields to check
     const mandatoryFields = [
-      'address_line_1', 'city', 'state', 'country', 'zip_code'
+      "address_line_1",
+      "address_line_2",
+      "landmark",
+      "city",
+      "state",
+      "country",
+      "zip_code",
     ];
 
-    mandatoryFields.forEach(field => {
-      const value = editedAddress?.[field as keyof AddressData] || '';
+    mandatoryFields.forEach((field) => {
+      const value = editedAddress?.[field as keyof AddressData] || "";
       const error = validateField(field, value);
       if (error) errors[field] = error;
     });
 
     // Special validation for dropdowns
-    if (!selectedCountry) errors['country'] = 'Country is required';
-    if (!selectedState) errors['state'] = 'State is required';
-    if (!selectedCity) errors['city'] = 'City is required';
+    if (!selectedCountry) errors["country"] = "Country is required";
+    if (!selectedState) errors["state"] = "State is required";
+    if (!selectedCity) errors["city"] = "City is required";
 
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   // Modify existing input change handler to include validation
-  const handleValidatedInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleValidatedInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const { name, value } = event.target;
-    
+
     // Clear previous error for this field
     const newErrors = { ...validationErrors };
     delete newErrors[name];
@@ -146,12 +185,15 @@ export function Address({
     handleAddressInputChange(event);
   };
 
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>, fieldName: string) => {
+  const handleSelectChange = (
+    event: React.ChangeEvent<HTMLSelectElement>,
+    fieldName: string
+  ) => {
     const syntheticEvent = {
       target: {
         name: fieldName,
-        value: event.target.value
-      }
+        value: event.target.value,
+      },
     } as React.ChangeEvent<HTMLInputElement>;
 
     handleAddressInputChange(syntheticEvent);
@@ -162,41 +204,49 @@ export function Address({
     setSelectedCountry(countryCode);
     setSelectedState("");
     setSelectedCity("");
-    
-    // Clear country-related errors
+
+    // 🔍 Store country name based on isoCode
+    const selected = countries.find((c) => c.isoCode === countryCode);
+    setSelectedCountryName(selected?.name || "");
+
+    // Clear validation errors
     const newErrors = { ...validationErrors };
-    delete newErrors['country'];
-    delete newErrors['state'];
-    delete newErrors['city'];
+    delete newErrors["country"];
+    delete newErrors["state"];
+    delete newErrors["city"];
     setValidationErrors(newErrors);
 
-    handleSelectChange(event, 'country');
+    handleSelectChange(event, "country");
   };
 
   const handleStateChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const stateCode = event.target.value;
     setSelectedState(stateCode);
     setSelectedCity("");
-    
-    // Clear state-related errors
+
+    // 🔍 Store state name based on isoCode
+    const selected = states.find((s) => s.isoCode === stateCode);
+    setSelectedStateName(selected?.name || "");
+
+    // Clear state-related validation errors
     const newErrors = { ...validationErrors };
-    delete newErrors['state'];
-    delete newErrors['city'];
+    delete newErrors["state"];
+    delete newErrors["city"];
     setValidationErrors(newErrors);
 
-    handleSelectChange(event, 'state');
+    handleSelectChange(event, "state");
   };
 
   const handleCityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const cityName = event.target.value;
     setSelectedCity(cityName);
-    
+
     // Clear city error
     const newErrors = { ...validationErrors };
-    delete newErrors['city'];
+    delete newErrors["city"];
     setValidationErrors(newErrors);
 
-    handleSelectChange(event, 'city');
+    handleSelectChange(event, "city");
   };
 
   // Modify save click to validate before saving
@@ -204,23 +254,25 @@ export function Address({
     if (validateAllFields()) {
       try {
         await handleAddressSaveClick();
-        toast.success('Address updated successfully');
+        toast.success("Address updated successfully");
       } catch (error) {
-        toast.error('Failed to update address');
+        toast.error("Failed to update address");
       }
     }
   };
 
   // Modify add click to validate before adding
-  const handleAddWithValidation = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAddWithValidation = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
     if (validateAllFields()) {
       try {
         await handleAddressAddClick(e);
         setShowModal(false);
-        toast.success('Address added successfully');
+        toast.success("Address added successfully");
       } catch (error) {
-        toast.error('Failed to add address');
+        toast.error("Failed to add address");
       }
     }
   };
@@ -232,7 +284,7 @@ export function Address({
     onChange,
     options,
     placeholder,
-    error
+    error,
   }: {
     name: string;
     value: string;
@@ -247,7 +299,11 @@ export function Address({
           name={name}
           value={value}
           onChange={onChange}
-          className={`block appearance-none w-full border ${error ? 'border-destructive' : 'border-input'} bg-background py-2 px-3 pr-8 rounded-md leading-tight focus:outline-none focus:ring-2 ${error ? 'focus:ring-destructive' : 'focus:ring-primary'}`}
+          className={`block appearance-none w-full border ${
+            error ? "border-destructive" : "border-input"
+          } bg-background py-2 px-3 pr-8 rounded-md leading-tight focus:outline-none focus:ring-2 ${
+            error ? "focus:ring-destructive" : "focus:ring-primary"
+          }`}
         >
           <option value="">{placeholder}</option>
           {options.map((option) => (
@@ -277,7 +333,9 @@ export function Address({
             value={editedAddress?.address_line_1 || ""}
             onChange={handleValidatedInputChange}
             placeholder="Address Line 1"
-            className={`w-full ${validationErrors.address_line_1 ? 'border-destructive' : ''}`}
+            className={`w-full ${
+              validationErrors.address_line_1 ? "border-destructive" : ""
+            }`}
           />
           {validationErrors.address_line_1 && (
             <p className="text-destructive text-sm mt-1">
@@ -287,24 +345,46 @@ export function Address({
         </div>
       </div>
       <div className="grid grid-cols-[120px_1fr] items-center">
-        <label className="text-sm text-gray-500">Address Line 2</label>
-        <Input
-          name="address_line_2"
-          value={editedAddress?.address_line_2 || ""}
-          onChange={handleValidatedInputChange}
-          placeholder="Address Line 2"
-          className="w-full"
-        />
+        <label className="text-sm text-gray-500">
+          Address Line 2 <span className="text-destructive">*</span>
+        </label>
+        <div>
+          <Input
+            name="address_line_2"
+            value={editedAddress?.address_line_2 || ""}
+            onChange={handleValidatedInputChange}
+            placeholder="Address Line 1"
+            className={`w-full ${
+              validationErrors.address_line_2 ? "border-destructive" : ""
+            }`}
+          />
+          {validationErrors.address_line_2 && (
+            <p className="text-destructive text-sm mt-1">
+              {validationErrors.address_line_2}
+            </p>
+          )}
+        </div>
       </div>
       <div className="grid grid-cols-[120px_1fr] items-center">
-        <label className="text-sm text-gray-500">Landmark</label>
-        <Input
-          name="landmark"
-          value={editedAddress?.landmark || ""}
-          onChange={handleValidatedInputChange}
-          placeholder="Landmark"
-          className="w-full"
-        />
+        <label className="text-sm text-gray-500">
+          Landmark <span className="text-destructive">*</span>
+        </label>
+        <div>
+          <Input
+            name="landmark"
+            value={editedAddress?.landmark || ""}
+            onChange={handleValidatedInputChange}
+            placeholder="landmark"
+            className={`w-full ${
+              validationErrors.landmark ? "border-destructive" : ""
+            }`}
+          />
+          {validationErrors.landmark && (
+            <p className="text-destructive text-sm mt-1">
+              {validationErrors.landmark}
+            </p>
+          )}
+        </div>
       </div>
       <div className="grid grid-cols-[120px_1fr] items-center">
         <label className="text-sm text-gray-500">
@@ -314,7 +394,10 @@ export function Address({
           name="country"
           value={selectedCountry}
           onChange={handleCountryChange}
-          options={countries.map(country => ({ value: country.isoCode, label: country.name }))}
+          options={countries.map((country) => ({
+            value: country.isoCode,
+            label: country.name,
+          }))}
           placeholder="Select Country"
           error={validationErrors.country}
         />
@@ -327,7 +410,10 @@ export function Address({
           name="state"
           value={selectedState}
           onChange={handleStateChange}
-          options={states.map(state => ({ value: state.isoCode, label: state.name }))}
+          options={states.map((state) => ({
+            value: state.isoCode,
+            label: state.name,
+          }))}
           placeholder="Select State"
           error={validationErrors.state}
         />
@@ -340,7 +426,10 @@ export function Address({
           name="city"
           value={selectedCity}
           onChange={handleCityChange}
-          options={cities.map(city => ({ value: city.name, label: city.name }))}
+          options={cities.map((city) => ({
+            value: city.name,
+            label: city.name,
+          }))}
           placeholder="Select City"
           error={validationErrors.city}
         />
@@ -356,7 +445,9 @@ export function Address({
             maxLength={6}
             onChange={handleValidatedInputChange}
             placeholder="Zip Code"
-            className={`w-full ${validationErrors.zip_code ? 'border-destructive' : ''}`}
+            className={`w-full ${
+              validationErrors.zip_code ? "border-destructive" : ""
+            }`}
           />
           {validationErrors.zip_code && (
             <p className="text-destructive text-sm mt-1">
@@ -381,7 +472,9 @@ export function Address({
             value={editedAddress?.address_line_1 || ""}
             onChange={handleValidatedInputChange}
             placeholder="Address Line 1"
-            className={`w-full ${validationErrors.address_line_1 ? 'border-destructive' : ''}`}
+            className={`w-full ${
+              validationErrors.address_line_1 ? "border-destructive" : ""
+            }`}
           />
           {validationErrors.address_line_1 && (
             <p className="text-destructive text-sm mt-1">
@@ -391,14 +484,25 @@ export function Address({
         </div>
       </div>
       <div className="grid grid-cols-1">
-        <label className="mb-1 text-sm text-muted-foreground">Address Line 2</label>
-        <Input
-          name="address_line_2"
-          value={editedAddress?.address_line_2 || ""}
-          onChange={handleValidatedInputChange}
-          placeholder="Address Line 2"
-          className="w-full"
-        />
+        <label className="mb-1 text-sm text-muted-foreground">
+          Address Line 2 <span className="text-destructive">*</span>
+        </label>
+        <div>
+          <Input
+            name="address_line_2"
+            value={editedAddress?.address_line_2 || ""}
+            onChange={handleValidatedInputChange}
+            placeholder="Address Line 2"
+            className={`w-full ${
+              validationErrors.address_line_2 ? "border-destructive" : ""
+            }`}
+          />
+          {validationErrors.address_line_2 && (
+            <p className="text-destructive text-sm mt-1">
+              {validationErrors.address_line_2}
+            </p>
+          )}
+        </div>
       </div>
       <div className="grid grid-cols-1">
         <label className="mb-1 text-sm text-muted-foreground">Landmark</label>
@@ -409,6 +513,11 @@ export function Address({
           placeholder="Landmark"
           className="w-full"
         />
+        {validationErrors.landmark && (
+          <p className="text-destructive text-sm mt-1">
+            {validationErrors.landmark}
+          </p>
+        )}
       </div>
       <div className="grid grid-cols-1">
         <label className="mb-1 text-sm text-muted-foreground">
@@ -418,7 +527,10 @@ export function Address({
           name="country"
           value={selectedCountry}
           onChange={handleCountryChange}
-          options={countries.map(country => ({ value: country.isoCode, label: country.name }))}
+          options={countries.map((country) => ({
+            value: country.isoCode,
+            label: country.name,
+          }))}
           placeholder="Select Country"
           error={validationErrors.country}
         />
@@ -431,7 +543,10 @@ export function Address({
           name="state"
           value={selectedState}
           onChange={handleStateChange}
-          options={states.map(state => ({ value: state.isoCode, label: state.name }))}
+          options={states.map((state) => ({
+            value: state.isoCode,
+            label: state.name,
+          }))}
           placeholder="Select State"
           error={validationErrors.state}
         />
@@ -444,7 +559,10 @@ export function Address({
           name="city"
           value={selectedCity}
           onChange={handleCityChange}
-          options={cities.map(city => ({ value: city.name, label: city.name }))}
+          options={cities.map((city) => ({
+            value: city.name,
+            label: city.name,
+          }))}
           placeholder="Select City"
           error={validationErrors.city}
         />
@@ -460,7 +578,9 @@ export function Address({
             maxLength={6}
             onChange={handleValidatedInputChange}
             placeholder="Zip Code"
-            className={`w-full ${validationErrors.zip_code ? 'border-destructive' : ''}`}
+            className={`w-full ${
+              validationErrors.zip_code ? "border-destructive" : ""
+            }`}
           />
           {validationErrors.zip_code && (
             <p className="text-destructive text-sm mt-1">
@@ -475,28 +595,46 @@ export function Address({
   return (
     <Card className="w-full shadow-sm hover:shadow-md transition-shadow duration-300">
       <CardHeader className="flex flex-row items-center justify-between border-b pb-3">
-        <CardTitle className="text-primary font-semibold">Address Details</CardTitle>
+        <CardTitle className="text-primary font-semibold">
+          Address Details
+        </CardTitle>
         <div className="flex gap-2">
           {editAddressMode && (
-            <Button variant="outline" size="sm" onClick={handleAddressEditClick}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleAddressEditClick}
+            >
               Cancel
             </Button>
           )}
-          {
-            address ?
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={editAddressMode ? handleSaveWithValidation : handleAddressEditClick}
-              >
-                {editAddressMode ? <Save className="mr-2 h-4 w-4" /> : <PenTool className="mr-2 h-4 w-4" />}
-                {editAddressMode ? 'Update' : 'Edit'}
-              </Button> :
-              <Button variant="outline" size="sm" onClick={() => setShowModal(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Address
-              </Button>
-          }
+          {address ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={
+                editAddressMode
+                  ? handleSaveWithValidation
+                  : handleAddressEditClick
+              }
+            >
+              {editAddressMode ? (
+                <Save className="mr-2 h-4 w-4" />
+              ) : (
+                <PenTool className="mr-2 h-4 w-4" />
+              )}
+              {editAddressMode ? "Update" : "Edit"}
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowModal(true)}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Address
+            </Button>
+          )}
         </div>
       </CardHeader>
 
@@ -517,9 +655,7 @@ export function Address({
                   >
                     Cancel
                   </Button>
-                  <Button type="submit">
-                    Add Address
-                  </Button>
+                  <Button type="submit">Add Address</Button>
                 </DialogFooter>
               </div>
             </form>
@@ -533,51 +669,60 @@ export function Address({
             {address ? (
               <div className="">
                 <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">Address Line 1:</div>
+                  <div className="w-1/4 text-sm text-gray-500">
+                    Address Line 1:
+                  </div>
                   <div className="w-3/4 text-sm font-medium break-words overflow-hidden">
-                    {address.address_line_1 || 'N/A'}
+                    {address.address_line_1 || "N/A"}
                   </div>
                 </div>
                 <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">Address Line 2:</div>
+                  <div className="w-1/4 text-sm text-gray-500">
+                    Address Line 2:
+                  </div>
                   <div className="w-3/4  text-sm font-medium break-words overflow-hidden">
-                    {address.address_line_2 || 'N/A'}
+                    {address.address_line_2 || "N/A"}
                   </div>
                 </div>
                 <div className="py-2 flex items-start">
                   <div className="w-1/4 text-sm text-gray-500">Landmark:</div>
                   <div className="w-3/4  text-sm font-medium break-words overflow-hidden">
-                    {address.landmark || 'N/A'}
+                    {address.landmark || "N/A"}
                   </div>
                 </div>
                 <div className="py-2 flex items-start">
                   <div className="w-1/4 text-sm text-gray-500">City:</div>
                   <div className="w-3/4  text-sm font-medium break-words overflow-hidden">
-                    {address.city || 'N/A'}
+                    {address.city || "N/A"}
                   </div>
                 </div>
                 <div className="py-2 flex items-start">
                   <div className="w-1/4 text-sm text-gray-500">State:</div>
                   <div className="w-3/4  text-sm font-medium break-words overflow-hidden">
-                    {address.state || 'N/A'}
+                    {states.find((s) => s.isoCode === address.state)?.name ||
+                      address.state ||
+                      "N/A"}
                   </div>
                 </div>
                 <div className="py-2 flex items-start">
                   <div className="w-1/4 text-sm text-gray-500">Country:</div>
                   <div className="w-3/4  text-sm font-medium break-words overflow-hidden">
-                    {address.country || 'N/A'}
+                    {countries.find((c) => c.isoCode === address.country)
+                      ?.name || "N/A"}
                   </div>
                 </div>
                 <div className="py-2 flex items-start">
                   <div className="w-1/4 text-sm text-gray-500">Zip Code:</div>
                   <div className="w-3/4  text-sm font-medium break-words overflow-hidden">
-                    {address.zip_code || 'N/A'}
+                    {address.zip_code || "N/A"}
                   </div>
                 </div>
               </div>
             ) : (
               <div className="bg-muted/50 rounded-lg p-6 text-center">
-                <p className="text-muted-foreground">No address details found</p>
+                <p className="text-muted-foreground">
+                  No address details found
+                </p>
               </div>
             )}
           </div>

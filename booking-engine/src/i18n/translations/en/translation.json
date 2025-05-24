@@ -10,6 +10,26 @@
     "signUp": "Sign Up",
     "login": "Log In"
   },
+  "Footer": {
+    "companyTitle": "Company",
+    "aboutUs": "About Us",
+    "whyChooseUs": "Why Choose Us",
+    "pricing": "Pricing",
+    "testimonials": "Testimonials",
+    "resourcesTitle": "Resources",
+    "privacyPolicy": "Privacy Policy",
+    "termsAndConditions": "Terms and Conditions",
+    "blog": "Blog",
+    "contactUs": "Contact Us",
+    "productTitle": "Product",
+    "projectManagement": "Project Management",
+    "timeTracker": "Time Tracker",
+    "timeSchedule": "Time Schedule",
+    "leadGeneration": "Lead Generation",
+    "emailPlaceholder": "Enter your email",
+    "subscribeButton": "Subscribe",
+    "copyright": "© {year} TripSwift - All rights reserved"
+  },
   "HotelCard": {
     "heroTitle": "Find the Perfect Stay for Your Journey",
     "heroSubtitle": "Discover amazing accommodations at exclusive prices",
@@ -20,10 +40,107 @@
     "errorInvalidLocation": "Please enter a valid location.",
     "errorSelectDates": "Please select both check-in and check-out dates."
   },
+  "HotelListing": {
+    "CompactSearchBar": {
+      "locationPlaceholder": "Where are you going?",
+      "checkInPlaceholder": "Check-in",
+      "checkOutPlaceholder": "Check-out",
+      "searchButton": "Search",
+      "errorInvalidLocation": "Please enter a valid location.",
+      "errorSelectDates": "Please select both check-in and check-out dates.",
+      "errorNoHotels": "No hotels available for the selected location.",
+      "ariaClearSearch": "Clear search",
+      "ariaSearchHotels": "Search hotels",
+      "ariaSearching": "Searching..."
+    },
+    "HotelCardItem": {
+      "noImage": "No image",
+      "descriptionFallback": "Experience a comfortable stay at this wonderful property.",
+      "contactLabel": "Contact",
+      "viewRoomButton": "View Room",
+      "amenitiesList": {
+        "wifi": "Free Wifi",
+        "swimming_pool": "Swimming Pool",
+        "fitness_center": "Fitness Center",
+        "spa_and_wellness": "Spa and Wellness",
+        "restaurant": "Restaurant",
+        "room_service": "Room Service",
+        "bar_and_lounge": "Bar and Lounge",
+        "parking": "Parking",
+        "concierge_services": "Concierge Services",
+        "pet_friendly": "Pet Friendly",
+        "business_facilities": "Business Facilities",
+        "laundry_services": "Laundry Services",
+        "child_friendly_facilities": "Child Friendly Facilities"
+      }
+    },
+    "heroTitle": "Find Your Perfect Stay",
+    "heroSubtitle": "Book accommodations at the best prices",
+    "hotelsIn": "Hotels in",
+    "yourDestination": "your destination",
+    "selectDates": "Select dates",
+    "propertiesFound": "properties found",
+    "nights": "nights",
+    "filters": "Filters",
+    "activeFilter": "active filter",
+    "activeFilters": "active filters",
+    "clearAll": "Clear all",
+    "popularFilters": "Popular Filters",
+    "freeWifi": "Free WiFi",
+    "parking": "Parking",
+    "breakfast": "Breakfast",
+    "searchPropertyName": "Search property name",
+    "sortBy": "Sort by",
+    "recommended": "Recommended",
+    "highestRating": "Highest Rating",
+    "lowestRating": "Lowest Rating",
+    "whyBookWithTripSwift": "Why Book With TripSwift",
+    "freeCancellation": "Free Cancellation",
+    "freeCancellationDesc": "Most of our properties offer free cancellation up to 24 hours before check-in.",
+    "bestPriceGuarantee": "Best Price Guarantee",
+    "bestPriceGuaranteeDesc": "Find a lower price? We'll match it and give you an additional 10% off.",
+    "secureBooking": "Secure Booking",
+    "secureBookingDesc": "We use industry-standard encryption to protect your personal information.",
+    "noHotelsError": "No hotels found for the given search criteria.",
+    "tryModifyingSearch": "Please try modifying the search"
+  },
   "HotelBox": {
     "DateRange": {
       "checkInPlaceholder": "Check-in Date",
       "checkOutPlaceholder": "Check-out Date"
+    },
+    "FilterModal": {
+      "title": "Filters",
+      "propertyRating": "Property Rating",
+      "amenities": "Amenities",
+      "sortBy": "Sort By",
+      "cancel": "Cancel",
+      "applyFilters": "Apply Filters",
+      "ariaCloseModal": "Close modal",
+      "ariaSortOrder": "Sort order",
+      "ratingUp": "& Up",
+      "amenitiesList": {
+        "wifi": "Free Wifi",
+        "swimming_pool": "Swimming Pool",
+        "fitness_center": "Fitness Center",
+        "spa_and_wellness": "Spa and Wellness",
+        "restaurant": "Restaurant",
+        "room_service": "Room Service",
+        "bar_and_lounge": "Bar and Lounge",
+        "parking": "Parking",
+        "concierge_services": "Concierge Services",
+        "pet_friendly": "Pet Friendly",
+        "business_facilities": "Business Facilities",
+        "laundry_services": "Laundry Services",
+        "child_friendly_facilities": "Child Friendly Facilities"
+      },
+      "sortOptions": {
+        "recommended": "Recommended",
+        "rating_desc": "Rating: High to Low",
+        "rating_asc": "Rating: Low to High",
+        "price_desc": "Price: High to Low",
+        "price_asc": "Price: Low to High"
+      }
     }
   },
   "HomeSections": {
@@ -36,9 +153,9 @@
         "description": "Up to 50% off on Hotel Bookings",
         "validTill": "2h 45m"
       },
-      "flightDeal": {
-        "title": "Flight Deal",
-        "description": "Flat ₹2000 Cashback on Flights",
+      "luxuryStay": {
+        "title": "Luxury Stay",
+        "description": "Up to 30% off on Premium Hotels",
         "validTill": "5h 30m"
       },
       "weekendGetaway": {
@@ -46,6 +163,261 @@
         "description": "Book Now Pay Later on Select Hotels",
         "validTill": "3h 15m"
       }
+    }
+  },
+  "RoomsPage": {
+    "backToSearch": "Back to Search",
+    "starHotelRating": "Star Hotel Rating",
+    "viewPropertyDetails": "View Property Details",
+    "aboutThisProperty": "About this property",
+    "noImagesAvailable": "No images available",
+    "propertyAmenities": "Property Amenities",
+    "amenitiesList": {
+      "wifi": "Free Wifi",
+      "swimming_pool": "Swimming Pool",
+      "fitness_center": "Fitness Center",
+      "spa_and_wellness": "Spa and Wellness",
+      "restaurant": "Restaurant",
+      "room_service": "Room Service",
+      "bar_and_lounge": "Bar and Lounge",
+      "parking": "Parking",
+      "concierge_services": "Concierge Services",
+      "pet_friendly": "Pet Friendly",
+      "business_facilities": "Business Facilities",
+      "laundry_services": "Laundry Services",
+      "child_friendly_facilities": "Child Friendly Facilities"
+    },
+    "noAmenitiesSpecified": "No amenities specified for this property.",
+    "contactInformation": "Contact Information",
+    "allRooms": "All Rooms",
+    "searchRoomName": "Search room name",
+    "availableRooms": "Available Rooms",
+    "showingRooms_one": "Showing {count} room",
+    "showingRooms_other": "Showing {count} rooms",
+    "noRoomsAvailableTitle": "No Rooms Available",
+    "noRoomsAvailableMessage": "We couldn't find any rooms matching your criteria. Try adjusting your search filters or dates.",
+    "clearFilters": "Clear Filters"
+  },
+  "BookingComponents": {
+    "GuestInformationModal": {
+      "completeYourBooking": "Complete Your Booking",
+      "guestDetailsStep": "Guest Details",
+      "reviewAndPayStep": "Review & Pay",
+      "roomSummary": "Room Summary",
+      "roomType": "Room Type",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "nights": "Night",
+      "nightsPlural": "Nights",
+      "guestInformation": "Guest Information",
+      "firstNameLabel": "First Name",
+      "firstNamePlaceholder": "Enter your first name",
+      "firstNameError": "First Name is required and should only contain letters and spaces.",
+      "lastNameLabel": "Last Name",
+      "lastNamePlaceholder": "Enter your last name",
+      "lastNameError": "Last Name is required and should only contain letters and spaces.",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "your.email@example.com",
+      "emailInfo": "Your booking confirmation will be sent to this email address",
+      "emailError": "Please enter a valid email address.",
+      "phoneLabel": "Phone Number",
+      "phonePlaceholder": "Enter phone number",
+      "phoneInfo": "For booking-related notifications",
+      "phoneError": "Phone number is required",
+      "guestDetailsSection": "Guest Details",
+      "roomSingular": "Room",
+      "roomsPlural": "Rooms",
+      "adultSingular": "Adult",
+      "adultsPlural": "Adults",
+      "childSingular": "Child",
+      "childrenPlural": "Children",
+      "guestDisplayFormat": "Rooms and Guests",
+      "childrenPartFormat": "Children",
+      "informationVerified": "Information verified successfully!",
+      "propertyInfoMissing": "Property information is missing. Please try again.",
+      "bookingSummary": "Booking Summary",
+      "stayDetails": "Stay Details",
+      "primaryGuest": "Primary Guest",
+      "priceDetails": "Price Details",
+      "roomRate": "Room Rate",
+      "totalAmount": "Total Amount",
+      "paymentNoticeTitle": "Payment will be processed securely",
+      "paymentNoticeDescription": "By proceeding, you agree to our terms and conditions and privacy policy.",
+      "backToDetails": "Back to Details",
+      "cancel": "Cancel",
+      "continueToReview": "Continue to Review",
+      "proceedToPayment": "Proceed to Payment"
+    }
+  },
+  "BookingTabs": {
+    "userNotLoggedIn": "User not logged in",
+    "noBooking": "There is no booking",
+    "BookingHeader": {
+      "yourBookings": "Your Bookings",
+      "viewManageTrack": "View, manage, and track all your hotel reservations in one place"
+    },
+    "BookingTabsNavigation": {
+      "allBookings": "All Bookings",
+      "upcoming": "Upcoming",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "LoadingState": {
+      "retrievingBookings": "Retrieving your bookings",
+      "fetchingDetails": "Just a moment while we fetch your reservation details..."
+    },
+    "ErrorState": {
+      "noBookingsFound": "We couldn't find any bookings associated with your account.",
+      "startBookingNow": "Start Booking Now"
+    },
+    "EmptyState": {
+      "heading": {
+        "all": "No bookings found",
+        "upcoming": "No upcoming bookings",
+        "completed": "No completed stays",
+        "cancelled": "No cancelled bookings"
+      },
+      "paragraph": {
+        "all": "Start planning your next trip!",
+        "upcoming": "You don't have any upcoming hotel reservations.",
+        "completed": "You haven't completed any stays yet.",
+        "cancelled": "You don't have any cancelled reservations."
+      },
+      "bookHotelButton": "Book a Hotel"
+    },
+    "BookingCard": {
+      "bookingId": "Booking ID",
+      "nightSingular": "Night",
+      "nightsPlural": "Nights",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "roomType": "Room Type",
+      "standardRoom": "Standard Room",
+      "paymentMethod": "Payment Method",
+      "primaryGuest": "Primary Guest",
+      "rateBreakdown": "Rate Breakdown",
+      "viewBookingDetails": "View Booking Details",
+      "modify": "Modify",
+      "cancel": "Cancel"
+    },
+    "BookingPagination": {
+      "show": "Show",
+      "perPage": "per page",
+      "showing": "Showing",
+      "of": "of",
+      "bookings": "bookings",
+      "noBookingsToShow": "No bookings to show"
+    },
+    "CancellationModal": {},
+    "AmendReservationModal": {},
+    "BookingDetailsModal": {}
+  },
+  "Payment": {
+    "PaymentPageContent": {
+      "invalidPayment": {
+        "title": "Invalid Payment",
+        "message": "We couldn't process your payment due to missing information.",
+        "returnToHomepage": "Return to Homepage"
+      },
+      "bookingSummary": {
+        "title": "Booking Summary",
+        "stayDates": "Stay Dates",
+        "night": "night",
+        "nights": "nights",
+        "guests": "Guests",
+        "room": "Room",
+        "rooms": "Rooms",
+        "adult": "Adult",
+        "adults": "Adults",
+        "child": "Child",
+        "children": "Children",
+        "guest": "Guest"
+      },
+      "paymentMethod": {
+        "title": "Payment Method"
+      },
+      "priceDetails": {
+        "title": "Price Details",
+        "roomRate": "Room Rate",
+        "perNight": "per night",
+        "total": "Total",
+        "payAtHotelInfo": "Your card will be securely stored, but payment will be collected at the hotel."
+      },
+      "securityBadges": {
+        "securePayments": "Secure payments",
+        "noCardStorage": "We never store your full card details",
+        "freeCancellation": "Free cancellation available"
+      },
+      "needHelp": {
+        "title": "Need Help?",
+        "message": "Our customer service team is available 24/7 to assist you with any questions about your booking.",
+        "contactSupport": "Contact Support"
+      },
+      "loading": {
+        "title": "Loading payment information...",
+        "message": "Please wait while we prepare your checkout."
+      }
+    },
+    "PaymentComponents": {
+      "PaymentOptionSelector": {
+        "title": "Payment Options",
+        "payNow": "Pay Now",
+        "payNowDescription": "Complete payment immediately",
+        "payAtHotel": "Pay at Hotel",
+        "payAtHotelDescription": "Securely save card for hotel payment"
+      },
+      "PayAtHotelFunction": {
+        "infoTitle": "Pay at Hotel Information",
+        "infoMessage": "Your credit card details will be securely stored but not charged now. Payment will be processed during your stay at the hotel.",
+        "cardDetailsLabel": "Card Details",
+        "stripeNotLoadedError": "Stripe hasn't loaded yet. Please try again.",
+        "notLoggedInError": "You need to be logged in to complete this booking. Please sign in and try again.",
+        "cardElementNotFoundError": "Card element not found",
+        "cardSetupFailedError": "Card setup failed",
+        "processing": "Processing...",
+        "confirmBooking": "Confirm Booking",
+        "paymentProcessingError": "An error occurred during payment processing"
+      }
+    },
+    "PaymentSuccess": {
+      "processingBooking": "Processing your booking...",
+      "confirmingReservation": "We're confirming your reservation. This should only take a moment.",
+      "bookingFailedTitle": "Booking Failed",
+      "returnToHomepage": "Return to Homepage",
+      "bookingConfirmedTitle": "Booking Confirmed!",
+      "reservationSuccessMessage": "Your reservation has been successfully completed",
+      "bookingId": "Booking ID:",
+      "bookingSummaryTitle": "Booking Summary",
+      "checkInLabel": "Check-in",
+      "checkOutLabel": "Check-out",
+      "night": "night",
+      "nights": "nights",
+      "guestsLabel": "Guests",
+      "guestInfoTitle": "Guest Information",
+      "guestNameLabel": "Guest Name",
+      "guestDefaultName": "Guest",
+      "emailLabel": "Email",
+      "paymentMethodLabel": "Payment Method",
+      "paymentMethodCreditCard": "Credit Card",
+      "paymentMethodPayAtHotel": "Pay at Hotel",
+      "paymentMethodUnknown": "Unknown",
+      "paymentDetailsTitle": "Payment Details",
+      "roomRate": "Room Rate",
+      "perNight": "per night",
+      "total": "Total",
+      "paymentAtHotelMessage": "Payment will be collected at the hotel",
+      "paymentProcessedMessage": "Payment has been processed",
+      "viewMyBookings": "View My Bookings",
+      "returnHome": "Return Home",
+      "whatsNextTitle": "What's Next?",
+      "confirmationEmailSent": "A confirmation email has been sent to your inbox",
+      "viewBookingDetails": "You can view booking details in your account anytime",
+      "contactSupportForChanges": "Need to make changes? Contact us 24/7 for support",
+      "downloadBookingConfirmation": "Download Booking Confirmation",
+      "needHelpTitle": "Need Help?",
+      "customerServiceMessage": "Our customer service team is available 24/7 to assist you with any questions.",
+      "contactSupportButton": "Contact Support",
+      "exploreMoreHotels": "Explore more hotel options"
     }
   }
 }

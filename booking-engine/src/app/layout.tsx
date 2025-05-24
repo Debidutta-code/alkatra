@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Nunito } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import { Toaster } from "react-hot-toast";
 import { Providers } from "./provider";
 import Footer from "../components/layout/Footer";
 import Script from "next/script";
-import { FlightOffersStoreProvider } from "@/components/context/flight-offers-provider";
 
-const popins = Poppins({
+const nunito = Nunito({
   subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-nunito",
 });
 
 export const metadata: Metadata = {
@@ -27,10 +27,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           strategy="lazyOnload"
         />
       </head>
-      <body className={popins.className}>
+      <body className={nunito.className}>
         <Providers>
           <Navbar />
-          <FlightOffersStoreProvider>{children}</FlightOffersStoreProvider>
+          {children}
           <Footer />
           <Toaster position="top-right" />
         </Providers>

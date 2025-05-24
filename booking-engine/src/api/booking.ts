@@ -109,7 +109,7 @@ export const createSetupIntent = async (guestData: any, token?: string) => {
       
       console.log("Making 'Pay at Hotel' booking with stored card...");
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/payment/create-reservation-with-card`, 
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/booking/create-reservation-with-card`, 
         payload,
         {
           headers: {

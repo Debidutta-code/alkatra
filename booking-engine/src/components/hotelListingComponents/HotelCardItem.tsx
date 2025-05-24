@@ -1,6 +1,7 @@
 // src/components/hotelListingComponents/HotelCardItem.tsx
 import React from "react";
 import { MapPin, Star, Coffee, Wifi, Car, Waves, Droplets, Briefcase, Utensils, BellRing, Dog, Bath } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export interface Hotel {
     _id: string;
@@ -29,6 +30,10 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
     checkinDate,
     checkoutDate
 }) => {
+
+    // Translation hook
+    const { t } = useTranslation();
+
     // Function to get amenity icon based on amenity key
     const getAmenityIcon = (amenity: string) => {
         switch (amenity) {
@@ -96,13 +101,13 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
                         />
                     ) : (
                         <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-gray-400 font-tripswift-regular">No image</span>
+                            <span className="text-gray-400 font-tripswift-regular">{t('HotelListing.HotelCardItem.noImage')}</span>
                         </div>
                     )}
 
                     {/* Rating badge with TripSwift styling */}
                     <div className="absolute top-3 right-3 bg-tripswift-blue bg-opacity-90 text-tripswift-off-white px-2 py-1 rounded text-sm font-tripswift-medium flex items-center shadow-sm">
-                        <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" />
+                        <Star className="h-4 w-4 mb-1 text-yellow-400 fill-current mr-1" />
                         <span>{formatRating(hotel.star_rating).toFixed(1)}</span>
                     </div>
                 </div>
@@ -128,7 +133,7 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
 
                         {/* Description */}
                         <p className="text-sm text-tripswift-black/70 mb-3 line-clamp-2 font-tripswift-regular">
-                            {hotel.description || "Experience a comfortable stay at this wonderful property."}
+                            {hotel.description || t('HotelListing.HotelCardItem.descriptionFallback')}
                         </p>
 
                         {/* Amenities */}
@@ -139,7 +144,7 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
                                 .map(([amenity]) => (
                                     <div key={amenity} className="flex items-center text-xs font-tripswift-medium text-tripswift-blue bg-tripswift-blue/5 border border-tripswift-blue/20 px-2 py-1 rounded-md">
                                         {getAmenityIcon(amenity)}
-                                        <span className="capitalize ml-1">{amenity.replace(/_/g, ' ')}</span>
+                                        <span className="capitalize ml-1">{t(`HotelListing.HotelCardItem.amenitiesList.${amenity}`)}</span>
                                     </div>
                                 ))}
                         </div>
@@ -156,16 +161,16 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
                     {/* Contact and button */}
                     <div className="flex items-end justify-between mt-2 pt-3 border-t border-gray-100">
                         <div>
-                            <div className="text-xs text-tripswift-black/50">Contact</div>
+                            <div className="text-xs text-tripswift-black/50">{t('HotelListing.HotelCardItem.contactLabel')}</div>
                             <div className="text-sm text-tripswift-black/80 font-tripswift-medium">{hotel.property_contact}</div>
                         </div>
 
                         <button
                             onClick={() => onViewRoom(hotel._id)}
                             className="btn-tripswift-primary px-6 py-2 rounded-md text-sm transition-all duration-300 hover:shadow-md"
-                            aria-label={`View rooms at ${hotel.property_name}`}
+                            aria-label={t('HotelListing.HotelCardItem.viewRoomButton')}
                         >
-                            View Room
+                            {t('HotelListing.HotelCardItem.viewRoomButton')}
                         </button>
                     </div>
                 </div>

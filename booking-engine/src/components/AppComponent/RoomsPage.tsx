@@ -5,14 +5,19 @@ import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import { RoomCard } from "@/components/AppComponent/RoomCard";
 import GuestInformationModal from "@/components/bookingComponents/GuestInformationModal";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "@/Redux/store";
 import { setAmount, setRoomId } from "@/Redux/slices/pmsHotelCard.slice";
+import { setGuestDetails } from "@/Redux/slices/hotelcard.slice";
 import {
   Calendar, Search, Bed, ChevronRight, ChevronLeft, ChevronDown,
   MapPin, Star, Coffee, Wifi, Car, Waves, Droplets, Briefcase, Utensils, BellRing, CheckCircle,
-  Bath, Dog, ImageIcon
+  Bath, Dog, ImageIcon, Users
 } from "lucide-react";
 import LoadingSkeleton from "../hotelListingComponents/LoadingSkeleton";
+import { formatDate, calculateNights } from "@/utils/dateUtils";
+
+import { useTranslation } from "react-i18next";
+import i18next from "i18next";
 
 interface Room {
   _id: string;
@@ -111,7 +116,30 @@ const RoomsPage: React.FC = () => {
   const [showPropertyDetails, setShowPropertyDetails] = useState(true);
   const [selectedImage, setSelectedImage] = useState<number>(0);
 
+  // Get guest details from Redux
+  const { guestDetails } = useSelector((state) => state.hotel);
+
+  const { t } = useTranslation();
+
   const dispatch = useDispatch();
+
+  // Initialize Redux with URL parameters
+  useEffect(() => {
+    // Get guest details from URL parameters
+    const rooms = searchParams.get('rooms');
+    const adults = searchParams.get('adults');
+    const children = searchParams.get('children');
+
+    if (rooms || adults || children) {
+      // Initialize Redux with URL parameters
+      dispatch(setGuestDetails({
+        rooms: Number(rooms) || 1,
+        guests: Number(adults) || 1,
+        children: Number(children) || 0,
+        childAges: Array(Number(children) || 0).fill(0)
+      }));
+    }
+  }, [searchParams, dispatch]);
 
   // Helper function to format address
   const getFormattedAddress = (addressObj: any): string => {
@@ -127,6 +155,18 @@ const RoomsPage: React.FC = () => {
     ].filter(Boolean);
 
     return parts.join(', ');
+  };
+
+  // Helper function to display guest count information
+  const getGuestCountDisplay = () => {
+    if (!guestDetails) return "1 Room · 1 Adult · 0 Children";
+
+    const rooms = guestDetails.rooms || 1;
+    const adults = guestDetails.guests || 1;
+    const children = guestDetails.children || 0;
+
+    return `${rooms} ${rooms === 1 ? 'Room' : 'Rooms'} · ${adults} ${adults === 1 ? 'Adult' : 'Adults'}${children > 0 ? ` · ${children} ${children === 1 ? 'Child' : 'Children'}` : ''
+      }`;
   };
 
   useEffect(() => {
@@ -209,6 +249,9 @@ const RoomsPage: React.FC = () => {
     checkOut: string;
     amount: string;
     userId?: string;
+    rooms?: number;
+    adults?: number;
+    children?: number;
   }) => {
     // Create the URL query params with all necessary data
     const queryParams = new URLSearchParams({
@@ -222,24 +265,18 @@ const RoomsPage: React.FC = () => {
       lastName: formData.lastName,
       email: formData.email,
       phone: formData.phone,
-      userId: formData.userId || ""
+      userId: formData.userId || "",
+
+      // Add guest counts if available
+      ...(formData.rooms ? { rooms: formData.rooms.toString() } : {}),
+      ...(formData.adults ? { adults: formData.adults.toString() } : {}),
+      ...(formData.children ? { children: formData.children.toString() } : {})
     }).toString();
 
     // Navigate to the payment page with all parameters
     router.push(`/payment?${queryParams}`);
   };
 
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
 
   // Get unique room types from all rooms
   const roomTypes = React.useMemo(() => {
@@ -309,29 +346,41 @@ const RoomsPage: React.FC = () => {
           <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
             <button
               onClick={() => router.back()}
-              className="inline-flex items-center text-sm bg-tripswift-off-white/20 px-3 py-1.5 rounded-full hover:bg-tripswift-off-white/30 transition-colors mb-2 md:mb-0"
+              className="inline-flex items-center text-sm font-tripswift-medium bg-tripswift-off-white/20 px-3 py-1.5 rounded-full hover:bg-tripswift-off-white/30 transition-colors mb-2 md:mb-0"
             >
-              <ChevronRight className="h-4 w-4 mr-1 rotate-180" /> Back to Search
+              <ChevronRight className="h-4 w-4 mr-1 mb-0.5 rotate-180" /> {t('RoomsPage.backToSearch')}
             </button>
           </div>
 
-
           <div className="flex flex-wrap gap-4 mt-2 items-center">
             <div className="flex items-center bg-tripswift-off-white/10 pl-3 pr-4 py-2 rounded-lg">
-              <Calendar className="h-5 w-5 mr-2 text-tripswift-off-white/70" />
+              <Calendar className="h-5 w-5 mr-2 mb-1 text-tripswift-off-white/70" />
               <div>
-                <div className="text-sm font-tripswift-medium">
+                <div className="text-sm font-tripswift-semibold">
                   {formatDate(checkInDate)} - {formatDate(checkOutDate)}
+                </div>
+                {/* <div className="text-xs font-tripswift-regular text-tripswift-off-white/60 mt-0.5">
+                  {calculateNights(checkInDate, checkOutDate)} {calculateNights(checkInDate, checkOutDate) === 1 ? 'night' : 'nights'} stay
+                </div> */}
+              </div>
+            </div>
+
+            {/* Add Guest Information Display */}
+            <div className="flex items-center bg-tripswift-off-white/10 pl-3 pr-4 py-2 rounded-lg">
+              <Users className="h-5 w-5 mr-2 mb-1 text-tripswift-off-white/70" />
+              <div>
+                <div className="text-sm font-tripswift-semibold">
+                  {getGuestCountDisplay()}
                 </div>
               </div>
             </div>
+
             {propertyDetails?.star_rating && (
               <div className="flex items-center bg-tripswift-off-white/10 pl-3 pr-4 py-2 rounded-lg">
-                <Star className="h-5 w-5 mr-2 text-yellow-400" />
+                <Star className="h-5 w-5 mr-2 mb-1 text-yellow-400" />
                 <div>
-                  <div className="text-sm font-tripswift-medium">
+                  <div className="text-sm font-tripswift-semibold">
                     {propertyDetails.star_rating} Star Hotel Rating
-
                   </div>
                 </div>
               </div>
@@ -349,14 +398,16 @@ const RoomsPage: React.FC = () => {
             onClick={() => setShowPropertyDetails(!showPropertyDetails)}
           >
             <div>
-              <h1 className="text-2xl md:text-xl font-tripswift-bold">
-                {propertyDetails?.property_name || "View Property Details"}
+              <h1 className="text-property-title text-gray-800 tracking-tight">
+                {propertyDetails?.property_name || t('RoomsPage.viewPropertyDetails')}
               </h1>
               {propertyDetails?.property_address && (
-                <p className="text-tripswift-off-white/80 mt-1 font-tripswift-regular flex items-center">
-                  <MapPin className="h-4 w-4 mr-1 text-tripswift-off-white/60" />
-                  {getFormattedAddress(propertyDetails.property_address)}
-                </p>
+                <div className="text-location flex items-center text-gray-600 mt-1.5">
+                  <MapPin className="h-4 w-4 mr-1.5 text-tripswift-blue flex-shrink-0" />
+                  <span className="font-tripswift-regular text-sm">
+                    {getFormattedAddress(propertyDetails.property_address)}
+                  </span>
+                </div>
               )}
             </div>
             <ChevronDown
@@ -405,7 +456,7 @@ const RoomsPage: React.FC = () => {
                             </button>
 
                             {/* Image count indicator */}
-                            <div className="absolute bottom-3 right-3 bg-tripswift-black/70 text-white text-xs py-1 px-3 rounded-full">
+                            <div className="absolute bottom-3 right-3 bg-tripswift-black/70 text-white text-xs py-1 px-3 rounded-full font-tripswift-medium">
                               {selectedImage + 1} / {propertyDetails.image.length}
                             </div>
                           </>
@@ -414,7 +465,7 @@ const RoomsPage: React.FC = () => {
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <ImageIcon className="h-12 w-12 text-gray-400" />
-                        <span className="ml-2 text-gray-500">No images available</span>
+                        <span className="ml-2 text-gray-500 font-tripswift-medium">{t('RoomsPage.noImagesAvailable')}</span>
                       </div>
                     )}
                   </div>
@@ -442,8 +493,8 @@ const RoomsPage: React.FC = () => {
                   {/* Property description */}
                   {propertyDetails?.description && (
                     <div className="mt-4">
-                      <h3 className="text-md font-tripswift-medium text-tripswift-black mb-2">About this property</h3>
-                      <p className="text-tripswift-black/70 text-sm">
+                      <h3 className="text-section-heading mb-2">{t('RoomsPage.aboutThisProperty')}</h3>
+                      <p className="text-description">
                         {propertyDetails.description}
                       </p>
                     </div>
@@ -453,8 +504,8 @@ const RoomsPage: React.FC = () => {
                 {/* Property amenities and contact info */}
                 <div className="lg:col-span-1">
                   {/* Property amenities */}
-                  <div className="bg-tripswift-blue/5 rounded-lg mb-4">
-                    <h3 className="text-md font-tripswift-medium text-tripswift-black mb-3">Property Amenities</h3>
+                  <div className="bg-tripswift-blue/5 p-4 rounded-lg mb-4">
+                    <h3 className="text-section-heading mb-3">{t('RoomsPage.propertyAmenities')}</h3>
 
                     {propertyDetails?.property_amenities?.amenities &&
                       Object.keys(propertyDetails.property_amenities.amenities).length > 0 ? (
@@ -468,21 +519,21 @@ const RoomsPage: React.FC = () => {
                               className="flex items-center text-xs font-tripswift-medium text-tripswift-blue bg-tripswift-blue/5 border border-tripswift-blue/20 px-2 py-1 rounded-md"
                             >
                               {getAmenityIcon(amenity)}
-                              <span className="capitalize ml-1">{amenity.replace(/_/g, ' ')}</span>
+                              <span className="capitalize ml-1">{t(`RoomsPage.amenitiesList.${amenity}`)}</span>
                             </div>
                           ))}
                       </div>
                     ) : (
-                      <p className="text-sm text-tripswift-black/60">No amenities specified for this property.</p>
+                      <p className="text-description">{t('RoomsPage.noAmenitiesSpecified')}</p>
                     )}
                   </div>
 
                   {/* Contact information */}
                   <div className="bg-white p-4 rounded-lg border border-gray-200">
-                    <h3 className="text-md font-tripswift-medium text-tripswift-black mb-3">Contact Information</h3>
-                    <div className="space-y-2 text-sm">
+                    <h3 className="text-section-heading mb-3">{t('RoomsPage.contactInformation')}</h3>
+                    <div className="space-y-2">
                       {propertyDetails?.property_contact && (
-                        <div className="flex items-center text-tripswift-black/70">
+                        <div className="flex items-center text-description">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-tripswift-blue mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                           </svg>
@@ -490,7 +541,7 @@ const RoomsPage: React.FC = () => {
                         </div>
                       )}
                       {propertyDetails?.property_email && (
-                        <div className="flex items-center text-tripswift-black/70">
+                        <div className="flex items-center text-description">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-tripswift-blue mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                           </svg>
@@ -498,7 +549,7 @@ const RoomsPage: React.FC = () => {
                         </div>
                       )}
                       {propertyDetails?.property_address && (
-                        <div className="flex items-center text-tripswift-black/70">
+                        <div className="flex items-center text-description">
                           <MapPin className="h-4 w-4 text-tripswift-blue mr-2 flex-shrink-0" />
                           {getFormattedAddress(propertyDetails.property_address)}
                         </div>
@@ -528,7 +579,7 @@ const RoomsPage: React.FC = () => {
                     : 'bg-gray-100 text-tripswift-black/70 hover:bg-gray-200'
                     }`}
                 >
-                  {type === 'all' ? 'All Rooms' : type}
+                  {type === 'all' ? t('RoomsPage.allRooms') : type}
                 </button>
               ))}
             </div>
@@ -542,8 +593,8 @@ const RoomsPage: React.FC = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search room name"
-                className="pl-10 w-full border border-gray-200 rounded-md px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue"
+                placeholder={t('RoomsPage.searchRoomName')}
+                className="pl-10 w-full border border-gray-200 rounded-md px-3 py-1.5 text-sm font-tripswift-regular bg-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue"
               />
             </div>
           </div>
@@ -551,11 +602,33 @@ const RoomsPage: React.FC = () => {
 
         {/* Results count */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-tripswift-bold text-tripswift-black flex items-center">
-            Available Rooms
+          <h2 className="text-section-heading text-lg">
+            {t('RoomsPage.availableRooms')}
           </h2>
-          <div className="text-sm text-tripswift-black/70 font-tripswift-medium bg-tripswift-blue/5 px-3 py-1 rounded-md">
-            Showing {filteredRooms.length} {filteredRooms.length === 1 ? 'room' : 'rooms'}
+          <div className="text-sm font-tripswift-medium text-tripswift-black/70 bg-tripswift-blue/5 px-3 py-1 rounded-md">
+            {i18next.language === 'hi' && (
+              <span>
+                <span className="mr-1">
+                  {filteredRooms.length}
+                </span>
+                {filteredRooms.length > 1 ? (
+                  <span>{t('RoomsPage.showingRooms_other')}</span>
+                ) : (
+                  <span>{t('RoomsPage.showingRooms_one')}</span>
+                )}
+              </span>
+            )}
+            {i18next.language === 'en' && (
+              <span>
+                Showing {filteredRooms.length} {filteredRooms.length > 1 ? 'Rooms' : 'Room'}
+              </span>
+            )}
+            {/* Static text for Arabic */}
+            {i18next.language === 'ar' && (
+              <span>
+                عرض {filteredRooms.length} {filteredRooms.length > 1 ? 'غرف' : 'غرفة'}
+              </span>
+            )}
           </div>
         </div>
 
@@ -568,18 +641,18 @@ const RoomsPage: React.FC = () => {
             <div className="w-16 h-16 mx-auto bg-tripswift-blue/10 rounded-full flex items-center justify-center mb-4">
               <Bed className="h-8 w-8 text-tripswift-blue" />
             </div>
-            <h3 className="text-xl font-tripswift-bold text-tripswift-black mb-2">No Rooms Available</h3>
-            <p className="text-tripswift-black/70 max-w-md mx-auto mb-6">
-              We couldn't find any rooms matching your criteria. Try adjusting your search filters or dates.
+            <h3 className="text-xl font-tripswift-bold text-tripswift-black mb-2">{t('RoomsPage.noRoomsAvailableTitle')}</h3>
+            <p className="text-description max-w-md mx-auto mb-6">
+              {t('RoomsPage.noRoomsAvailableMessage')}
             </p>
             <button
               onClick={() => {
                 setFilterType('all');
                 setSearchQuery('');
               }}
-              className="btn-tripswift-primary px-6 py-2 rounded-lg text-sm"
+              className="btn-tripswift-primary px-6 py-2 rounded-lg text-sm font-tripswift-semibold"
             >
-              Clear Filters
+              {t('RoomsPage.clearFilters')}
             </button>
           </div>
         )}
@@ -598,7 +671,6 @@ const RoomsPage: React.FC = () => {
           </div>
         )}
       </div>
-
       <GuestInformationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -606,6 +678,7 @@ const RoomsPage: React.FC = () => {
         checkInDate={checkInDate}
         checkOutDate={checkOutDate}
         onConfirmBooking={confirmBooking}
+        guestData={guestDetails}
       />
     </div>
   );

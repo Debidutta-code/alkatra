@@ -1,3 +1,4 @@
+// BookingTabs.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -16,6 +17,7 @@ import EmptyState from "./EmptyState";
 import BookingCard from "./BookingCard";
 import BookingPagination from "./BookingPagination";
 import BookingDetailsModal from "./BookingDetailsModal";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 interface RootState {
   auth: {
@@ -30,6 +32,8 @@ interface RootState {
 }
 
 export default function BookingTabs() {
+  const { t } = useTranslation(); // Initialize useTranslation
+
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,14 +56,15 @@ export default function BookingTabs() {
   useEffect(() => {
     const fetchBookings = async () => {
       if (!authUser?._id) {
-        setError("User not logged in");
+        // Using translation for error message
+        setError(t("BookingTabs.userNotLoggedIn"));
         setLoading(false);
         return;
       }
 
       try {
         const response = await axios.get<PaginationResponse>(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/booking/user/booking/details/${authUser?._id}`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/booking/customers/booking/details/${authUser?._id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -76,18 +81,19 @@ export default function BookingTabs() {
         setTotalPages(response.data.totalPages);
         setLoading(false);
       } catch (err) {
-        setError("There is no booking");
+        // Using translation for error message
+        setError(t("BookingTabs.noBooking"));
         setLoading(false);
       }
     };
 
     fetchBookings();
-  }, [authUser, token, currentPage, itemsPerPage]);
+  }, [authUser, token, currentPage, itemsPerPage, t]); // Add t to dependency array
 
   // Filter bookings based on active tab
   useEffect(() => {
     const today = new Date();
-    
+
     if (activeTab === 'all') {
       setFilteredBookings(bookings);
     } else if (activeTab === 'upcoming') {

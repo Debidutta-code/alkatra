@@ -9,13 +9,14 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-
   return (
-    <div>
-      {/* <Navbar/> */}
-      {children}
+    <div className="min-h-screen bg-tripswift-off-white text-tripswift-black font-primary">
+      {/* <Navbar /> */}
+      {/* <CheckAuthentication> */}
+        {children}
+      {/* </CheckAuthentication> */}
     </div>
-  )
+  );
 }
 
 
