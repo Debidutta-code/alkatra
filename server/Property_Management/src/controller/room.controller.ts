@@ -7,6 +7,7 @@ import PropertyRatePlan from "../model/ratePlan.model";
 import mongoose from "mongoose";
 import PropertyPrice from "../model/ratePlan.model";
 import QRCode from 'qrcode';
+import { v4 as uuidv4 } from "uuid";
 import { generateCouponCode } from "../../../Coupon_Management/services/couponService";
 
 
@@ -296,82 +297,54 @@ const getRoomsByPropertyId = catchAsync(async (req: Request, res: Response, next
   });
 })
 
+
 const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const propertyInfoId = req.params.id;
   const rooms = await Room.find({ propertyInfo_id: propertyInfoId }).exec();
   const ratePlanList = await PropertyPrice.find({ property_id: propertyInfoId });
-  if (!rooms) {
-    return next(
-      new AppError(`No property found with this id ${propertyInfoId}`, 404)
-    );
+
+  if (!rooms || rooms.length === 0) {
+    return next(new AppError(`No property found with this id ${propertyInfoId}`, 404));
   }
+
   if (!ratePlanList || ratePlanList.length === 0) {
-    return next(
-      new AppError(`No rate plans found for property with id ${propertyInfoId}`, 404)
-    );
+    return next(new AppError(`No rate plans found for property with id ${propertyInfoId}`, 404));
   }
+
   const roomsWithPrices = rooms.map((room) => {
-    const ratePlan = ratePlanList.find((ratePlan) => ratePlan.property_id.toString() === room.propertyInfo_id.toString());    
+    const ratePlan = ratePlanList.find(
+      (ratePlan) => ratePlan.property_id.toString() === room.propertyInfo_id.toString()
+    );
     return {
       ...room.toObject(),
       room_price: ratePlan ? ratePlan.room_price : null,
       meal_plan: ratePlan ? ratePlan.meal_plan : null,
-      rateplan_id: ratePlan ? ratePlan._id : null
+      rateplan_id: ratePlan ? ratePlan._id : null,
     };
   });
-  console.log("Rooms with Prices: ", roomsWithPrices);
 
-  const coupon = await generateCouponCode();
-  const couponCode = coupon.code;
+  const couponCode = await generateCouponCode();
 
-  const dynamicUrl = `${process.env.BASE_LINK}/redirect/property/${propertyInfoId}/coupon/${couponCode}`;
-  const qrCodeData = await QRCode.toDataURL(dynamicUrl);
+  const deepLinkUrl = `${process.env.DEEP_LINK}/property/${propertyInfoId}?coupon=${couponCode.code}`;
+
+  let qrCodeData: string;
+  try {
+    qrCodeData = await QRCode.toDataURL(deepLinkUrl);
+  } 
+  catch (error) {
+    return next(new AppError("Failed to generate QR code", 500));
+  }
 
   res.status(200).json({
     status: "success",
     error: false,
     message: "Rooms fetched by property id with rate plan successfully",
-    data: roomsWithPrices,  
+    data: roomsWithPrices,
     qrCode: qrCodeData,
+    couponCode: couponCode.code, // For debug purpose
+    deepLink: deepLinkUrl   // For debug purpose
   });
 });
-
-
-const handlePropertyRedirect = catchAsync(async (req: Request<RedirectParams>, res: Response, next: NextFunction) => {
-  const { propertyId, couponCode } = req.params;
-
-  const rooms = await Room.find({ propertyInfo_id: propertyId }).exec();
-  if (!rooms || rooms.length === 0) {
-    return next(new AppError(`No property found with this id ${propertyId}`, 404));
-  }
-
-  const deepLink = `${process.env.DEEP_LINK}/property/${propertyId}${couponCode ? `?coupon=${couponCode}` : ''}#Intent;scheme=trip_swift_final;package=com.example.trip_swift_final;end`;
-
-  res.status(200).send(`
-    <html>
-      <head>
-        <title>Opening App</title>
-      </head>
-      <body>
-        <p>Opening app...</p>
-        <script>
-          (function() {
-            const linkToOpen = '${deepLink}';
-            const fallbackUrl = '${process.env.PUBLIC_BACKEND_URL}/download';
-            const timeout = 2000;
-
-            window.location = linkToOpen;
-
-            setTimeout(function() {
-              window.location = fallbackUrl;
-            }, timeout);
-          })();
-        </script>
-      </body>
-    </html>
-  `);
-});
-
 
 
 export const getRoomsForBooking = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -429,5 +402,5 @@ export const getRoomsForBooking = catchAsync(async (req: Request, res: Response,
   });
 })
 
-export { createRoom, updateRoom, deleteRoom, getRoomById, getRooms, getRoomsByPropertyId, getRoomsByPropertyId2, handlePropertyRedirect };
+export { createRoom, updateRoom, deleteRoom, getRoomById, getRooms, getRoomsByPropertyId, getRoomsByPropertyId2 };
 
