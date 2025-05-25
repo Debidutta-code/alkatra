@@ -142,7 +142,7 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack }) => {
       footerContent={
         <button 
           onClick={onBack} 
-          className="w-full text-center text-tripswift-blue text-sm hover:text-[#054B8F] font-tripswift-medium flex items-center justify-center"
+          className="w-full text-center text-tripswift-blue text-sm hover:text-[#054B8F] font-tripswift-medium flex items-center justify-center transition-colors duration-300"
         >
           <ArrowLeft size={16} className="mr-2" />
           Back to Login
@@ -182,7 +182,7 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack }) => {
         
         {/* Success Message */}
         {message && (
-          <div className="mt-4 text-sm text-green-600 bg-green-50 p-3 rounded-lg border border-green-200 flex items-center">
+          <div className="mt-4 text-sm text-green-600 bg-green-50 p-3 rounded-lg border border-green-200 flex items-center font-noto-sans">
             <CheckCircle size={16} className="mr-2 flex-shrink-0 text-green-500" />
             <span className="font-tripswift-medium">{message}</span>
           </div>
@@ -190,7 +190,7 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack }) => {
         
         {/* Error Message */}
         {error && (
-          <div className="mt-4 text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200 flex items-center">
+          <div className="mt-4 text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200 flex items-center font-noto-sans">
             <AlertTriangle size={16} className="mr-2 flex-shrink-0" />
             <span className="font-tripswift-medium">{error}</span>
           </div>

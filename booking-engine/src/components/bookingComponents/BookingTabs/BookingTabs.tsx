@@ -207,7 +207,7 @@ export default function BookingTabs() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-gray-50">
+    <div className="w-full min-h-screen bg-gray-50 font-noto-sans">
       {/* Header Section */}
       <BookingHeader />
 
@@ -251,7 +251,7 @@ export default function BookingTabs() {
       {/* Modals */}
       {showModal && selectedBooking && (
         <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto relative">
+          <div className="bg-tripswift-off-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto relative">
             {showCancellationUI ? (
               <CancellationModal
                 booking={selectedBooking}

@@ -6,7 +6,9 @@ import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import {
   FaStar, FaRegStar, FaWifi, FaSnowflake, FaSmokingBan, FaBed, FaChild, FaUser, FaTree,
-  FaCheckCircle, FaShoppingCart, FaPercent, FaTimes, FaInfoCircle, FaRulerCombined
+  FaCheckCircle, FaShoppingCart, FaPercent, FaTimes, FaInfoCircle, FaRulerCombined,
+  FaShieldAlt,
+  FaRegCalendarAlt
 } from "react-icons/fa";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getPolicyType, getPolicyStyling, getPolicyBulletPoints } from "@/utils/cancellationPolicies";
@@ -122,38 +124,41 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
 
   return (
     <>
-      <Card className="w-full min-h-48 shadow-sm hover:shadow-md transition-shadow duration-300 bg-tripswift-off-white border border-gray-200 rounded-lg flex flex-col sm:flex-row overflow-hidden">        {/* Image Section */}
+      <Card className="w-full min-h-48 shadow-sm hover:shadow-md transition-shadow duration-300 bg-tripswift-off-white border border-gray-200 rounded-xl flex flex-col sm:flex-row overflow-hidden font-noto-sans">        {/* Image Section */}
         {/* Image Section */}
-<div className="relative w-full sm:w-[45%] h-48 sm:h-auto flex-shrink-0 overflow-hidden group">
-  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10"></div>
-  <Image
-    src={selectedImage}
-    alt={`${data.room_name || "Room"} image`}
-    layout="fill"
-    objectFit="cover"
-    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-    onError={(e) => {
-      const target = e.target as HTMLImageElement;
-      target.onerror = null;
-      target.src = DEFAULT_IMAGE;
-    }}
-  />
+        <div className="relative w-full sm:w-[45%] h-48 sm:h-auto flex-shrink-0 overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10"></div>
+          <Image
+            src={selectedImage}
+            alt={`${data.room_name || "Room"} image`}
+            layout="fill"
+            objectFit="cover"
+            className="w-full h-full object-cover transition-transform"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.onerror = null;
+              target.src = DEFAULT_IMAGE;
+            }}
+          />
 
-  {/* Discount tag */}
-  {hasDiscount && (
-    <div className="absolute top-3 left-3 z-20 bg-red-600 text-tripswift-off-white text-xs font-tripswift-semibold py-1 px-2.5 rounded-full flex items-center shadow-md">
-      <FaPercent className="h-2.5 w-2.5 mr-1" /> {discountPercentage}% OFF
-    </div>
-  )}
-</div>
+          {/* Discount tag */}
+          {hasDiscount && (
+            <div className="absolute top-3 left-3 z-20 bg-red-600 text-tripswift-off-white text-xs font-tripswift-semibold py-1 px-2.5 rounded-full flex items-center shadow-md">
+              <FaPercent className="h-2.5 w-2.5 mr-1" /> {discountPercentage}% OFF
+            </div>
+          )}
+        </div>
         {/* Details Section */}
         <div className="w-full sm:w-[55%] flex flex-col p-3 sm:p-4">
           {/* Header */}
           <CardHeader className="p-0 pb-2 flex-shrink-0">
             <div className="flex justify-between items-start">
-              <h3 className="text-lg text-room-title text-tripswift-black">
-                {data.room_name} - {data.room_type}
-              </h3>
+              <div className="flex flex-col gap-1.5">
+                <h3 className="text-room-title">
+                  {data.room_name} - {data.room_type}
+                </h3>
+              </div>
+
               <div className="flex items-center text-yellow-400 gap-0.5 pt-1">
                 {Array.from({ length: maxRating }).map((_, i) => (
                   i < Math.floor(rating) ? (
@@ -175,22 +180,30 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
           <CardContent className="p-0 pt-1 flex-grow flex flex-col gap-2">
             {/* Room specs section */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 p-1.5 rounded-md">
-              <div className="flex items-center text-xs font-tripswift-medium text-gray-700">
+              <div className="flex items-center text-xs font-tripswift-medium text-tripswift-black/70">
                 <FaUser className="mr-1.5 h-3 w-3 text-tripswift-blue" />
                 <span>{data.max_number_of_adults} adults</span>
               </div>
               {data.max_number_of_children > 0 && (
-                <div className="flex items-center text-xs font-tripswift-medium text-gray-700">
+                <div className="flex items-center text-xs font-tripswift-medium text-tripswift-black/70">
                   <FaChild className="mr-1.5 h-3 w-3 text-tripswift-blue" />
                   <span>{data.max_number_of_children} children</span>
                 </div>
               )}
               {data.room_size > 0 && (
-                <div className="flex items-center text-xs font-tripswift-medium text-gray-700">
+                <div className="flex items-center text-xs font-tripswift-medium text-tripswift-black/70">
                   <FaRulerCombined className="mr-1.5 h-3 w-3 text-tripswift-blue" />
                   <span>{data.room_size} {data.room_unit || "m²"}</span>
                 </div>
               )}
+              {data.room_view && (
+                  <div className="flex flex-wrap gap-1.5">
+                    <span className="bg-tripswift-blue/5 text-tripswift-black/70 text-xs px-0.5 py-1 rounded-full font-tripswift-medium inline-flex items-center">
+                      <FaTree className="h-3 w-3 mr-1.5 text-tripswift-blue" />
+                      {data.room_view}
+                    </span>
+                  </div>
+                )}
             </div>
 
             {/* Enhanced Amenities Display */}
@@ -203,39 +216,15 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
               ))}
             </div>
 
-            {/* Enhanced Cancellation Policy Indicator */}
-            <div className={`flex items-center text-xs font-tripswift-medium px-2 py-1.5 rounded-md ${policyType === "Flexible"
-              ? " text-green-700 "
-              : " text-amber-700 "
-              }`}>
-              {policyType === "Flexible" ? (
-                <>
-                  <FaCheckCircle className="mr-1.5 h-3 w-3" />
-                  <span>Free cancellation</span>
-                </>
-              ) : (
-                <>
-                  <FaInfoCircle className="mr-1.5 h-3 w-3" />
-                  <span>Non-refundable</span>
-                </>
-              )}
-              <button
-                onClick={() => setShowPolicyModal(true)}
-                className="ml-1.5 underline hover:text-tripswift-blue transition-colors text-xs font-tripswift-regular"
-              >
-                Details
-              </button>
-            </div>
-
             {/* Price and Button */}
             <div className="mt-auto pt-2 border-t border-gray-100 flex items-center justify-between">
               <div className="flex flex-col">
                 {hasDiscount && (
-                  <span className="text-xs line-through text-gray-500 font-tripswift-regular">₹{originalPrice}</span>
+                  <span className="text-xs line-through text-tripswift-black/60 font-tripswift-regular">₹{originalPrice}</span>
                 )}
                 <div className="flex items-baseline">
                   <span className="text-price">{price}</span>
-                  <span className="text-gray-500 text-lg ml-1.5 font-tripswift-regular">/ night</span>
+                  <span className="text-tripswift-black/60 text-lg ml-1.5 font-tripswift-regular">/ night</span>
                 </div>
               </div>
               <button
@@ -244,6 +233,20 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
               >
                 <FaShoppingCart className="mr-1.5 h-3 w-3" /> Book Now
               </button>
+            </div>
+            {/* Policy details link - hidden on smallest screens, visible on sm and up */}
+            <div className=" pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-2 sm:gap-0">
+              <button
+                onClick={() => setShowPolicyModal(true)}
+                className="text-xs text-tripswift-black/60 hover:text-tripswift-blue transition-colors duration-300 flex items-center font-tripswift-regular"
+              >
+                <FaInfoCircle className="mr-1.5 h-3 w-3" /> View booking policies
+              </button>
+
+              <div className="flex items-center text-xs text-tripswift-black/60 font-tripswift-regular">
+                <FaShieldAlt className="mr-1.5 h-3 w-3 text-green-600" />
+                <span>Secure payment</span>
+              </div>
             </div>
           </CardContent>
         </div>
@@ -257,7 +260,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
               <h3 className="text-lg font-tripswift-semibold">Booking Policies</h3>
               <button
                 onClick={() => setShowPolicyModal(false)}
-                className="text-tripswift-off-white hover:bg-[#054B8F] active:bg-[#03315c] rounded-full p-1 transition-colors"
+                className="text-tripswift-off-white hover:bg-[#054B8F] active:bg-[#03315c] rounded-full p-1 transition-colors duration-300"
                 aria-label="Close modal"
               >
                 <FaTimes />
@@ -311,7 +314,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
 
               <button
                 onClick={() => setShowPolicyModal(false)}
-                className="mt-2 w-full bg-tripswift-blue hover:bg-[#054B8F] active:bg-[#03315c] text-tripswift-off-white font-tripswift-semibold py-2.5 px-4 rounded transition-colors duration-300 shadow-sm"
+                className="mt-2 w-full bg-tripswift-blue hover:bg-[#054B8F] active:bg-[#03315c] text-tripswift-off-white font-tripswift-semibold py-2.5 px-4 rounded-lg transition-colors duration-300 shadow-sm"
               >
                 Got it
               </button>

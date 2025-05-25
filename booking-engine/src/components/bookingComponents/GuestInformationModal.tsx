@@ -271,7 +271,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       ></div>
 
       {/* Centered Dialog Box */}
-      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 flex flex-col w-full max-w-2xl max-h-[90vh] bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8] rounded-lg shadow-lg">
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 flex flex-col w-full max-w-2xl max-h-[90vh] bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8] rounded-lg shadow-lg font-noto-sans">
         {/* Modal Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between bg-tripswift-blue text-tripswift-off-white px-6 py-4 rounded-t-lg">
           <h2 className="text-xl font-tripswift-bold">
@@ -287,15 +287,14 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         </div>
 
         {/* Progress Steps */}
-        <div className="bg-white px-6 py-3 border-b border-tripswift-black/10">
+        <div className="bg-tripswift-off-white px-6 py-3 border-b border-tripswift-black/10">
           <div className="flex justify-between mb-2">
             <div className="flex flex-col items-center">
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-tripswift-medium ${
-                  activeSection === "details" || isFormUpdated
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-tripswift-medium ${activeSection === "details" || isFormUpdated
                     ? "bg-tripswift-blue text-tripswift-off-white"
                     : "bg-tripswift-black/10 text-tripswift-black/60"
-                }`}
+                  }`}
               >
                 1
               </div>
@@ -305,18 +304,16 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
             </div>
             <div className="flex-1 flex items-center mx-2">
               <div
-                className={`h-1 w-full ${
-                  isFormUpdated ? "bg-tripswift-blue" : "bg-tripswift-black/10"
-                }`}
+                className={`h-1 w-full ${isFormUpdated ? "bg-tripswift-blue" : "bg-tripswift-black/10"
+                  }`}
               ></div>
             </div>
             <div className="flex flex-col items-center">
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-tripswift-medium ${
-                  activeSection === "review" && isFormUpdated
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-tripswift-medium ${activeSection === "review" && isFormUpdated
                     ? "bg-tripswift-blue text-tripswift-off-white"
                     : "bg-tripswift-black/10 text-tripswift-black/60"
-                }`}
+                  }`}
               >
                 2
               </div>
@@ -332,7 +329,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
           {activeSection === "details" ? (
             <div className="space-y-6">
               {/* Room Summary */}
-              <div className="bg-white rounded-lg shadow-sm p-3 border border-tripswift-black/10 mb-6">
+              <div className="bg-tripswift-off-white rounded-lg shadow-sm p-3 border border-tripswift-black/10 mb-6">
                 <h3 className="font-tripswift-medium text-tripswift-black text-lg mb-1 px-3">
                   {selectedRoom.room_name}
                 </h3>
@@ -500,7 +497,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
           ) : (
             <div className="space-y-6">
               {/* Review Booking Section */}
-              <div className="bg-white rounded-lg shadow-sm border border-tripswift-black/10 overflow-hidden">
+              <div className="bg-tripswift-off-white rounded-lg shadow-sm border border-tripswift-black/10 overflow-hidden">
                 <div className="bg-tripswift-blue/5 border-b border-tripswift-black/10 p-4">
                   <h3 className="font-tripswift-bold text-tripswift-black text-lg">
                     {t(
@@ -616,7 +613,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
               </div>
 
               {/* Price Summary Card */}
-              <div className="bg-white rounded-lg shadow-sm border border-tripswift-black/10 overflow-hidden">
+              <div className="bg-tripswift-off-white rounded-lg shadow-sm border border-tripswift-black/10 overflow-hidden">
                 <div className="bg-tripswift-blue/5 border-b border-tripswift-black/10 p-4">
                   <h3 className="font-tripswift-bold text-tripswift-black text-lg">
                     {t("BookingComponents.GuestInformationModal.priceDetails")}
@@ -675,7 +672,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         </div>
 
         {/* Fixed Footer */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-tripswift-black/10 p-6 flex flex-col sm:flex-row gap-3 justify-end rounded-b-lg">
+        <div className="fixed bottom-0 left-0 right-0 bg-tripswift-off-white border-t border-tripswift-black/10 p-6 flex flex-col sm:flex-row gap-3 justify-end rounded-b-lg">
           <button
             onClick={() =>
               activeSection === "review"
@@ -700,9 +697,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
             <button
               onClick={handleConfirmBooking}
               disabled={!isFormUpdated}
-              className={`btn-tripswift-primary px-6 py-2.5 rounded-md transition-all duration-300 shadow-sm hover:shadow-md font-tripswift-medium flex items-center justify-center ${
-                !isFormUpdated ? "opacity-70 cursor-not-allowed" : ""
-              }`}
+              className={`btn-tripswift-primary px-6 py-2.5 rounded-md transition-all duration-300 shadow-sm hover:shadow-md font-tripswift-medium flex items-center justify-center ${!isFormUpdated ? "opacity-70 cursor-not-allowed" : ""
+                }`}
             >
               {t("BookingComponents.GuestInformationModal.proceedToPayment")}
             </button>

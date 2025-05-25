@@ -60,7 +60,7 @@ const Navbar: React.FC = () => {
       setScrolled(false);
     }
   }, []);
-  
+
   // Handle scroll effect for shadow
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
@@ -114,16 +114,15 @@ const Navbar: React.FC = () => {
 
   return (
     <div
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        scrolled 
-          ? 'bg-tripswift-off-white/85 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.06)]' 
-          : 'bg-tripswift-off-white border-b border-tripswift-black/5'
-      } ${pathname === '/login' || pathname === '/register' ? 'hidden' : ''}`}
+      className={`sticky top-0 z-50 transition-all duration-300 font-noto-sans ${scrolled
+          ? 'bg-gray-100 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.06)]'
+          : 'bg-gray-100 border-b border-tripswift-black/5'
+        } ${pathname === '/login' || pathname === '/register' ? 'hidden' : ''}`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between h-20 px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <Link 
-          href="/" 
+        <Link
+          href="/"
           className="flex items-center relative z-10 group"
         >
           <div className="overflow-hidden">
@@ -149,7 +148,7 @@ const Navbar: React.FC = () => {
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           className="lg:hidden cursor-pointer z-50 relative"
           onClick={toggleMenu}
-        >          
+        >
           <div className={`w-10 h-10 rounded-full flex items-center justify-center bg-tripswift-off-white ${isMenuOpen ? 'shadow-inner' : 'shadow-sm'} transition-all duration-300`}>
             {isMenuOpen ? (
               <X size={20} className="text-tripswift-blue" />
@@ -178,7 +177,7 @@ const Navbar: React.FC = () => {
           {/* My Trip */}
           <div
             onClick={handleMyTripClick}
-            className="flex items-center cursor-pointer px-3 py-2 rounded-full text-tripswift-black hover:text-tripswift-blue hover:bg-tripswift-blue/5 text-[15px] leading-[20px] tracking-tight font-tripswift-medium transition-all duration-300"          
+            className="flex items-center cursor-pointer px-3 py-2 rounded-full text-tripswift-black hover:text-tripswift-blue hover:bg-tripswift-blue/5 text-[15px] leading-[20px] tracking-tight font-tripswift-medium transition-all duration-300"
           >
             <Image src={MTrip} width={16} height={16} alt={t('Navbar.myTrip')} className="mr-2" />
             <span>{t('Navbar.myTrip')}</span>
@@ -209,13 +208,13 @@ const Navbar: React.FC = () => {
                   <ChevronDown size={16} className="text-tripswift-black/60" />
                 </div>
               </DropdownTrigger>
-              <DropdownMenu 
-                aria-label="User Actions" 
+              <DropdownMenu
+                aria-label="User Actions"
                 variant="flat"
                 className="p-2 min-w-[240px]"
               >
-                <DropdownItem 
-                  key="profile-header" 
+                <DropdownItem
+                  key="profile-header"
                   className="h-auto py-3 opacity-100 cursor-default"
                   textValue="Profile header"
                 >
@@ -229,23 +228,23 @@ const Navbar: React.FC = () => {
                   </div>
                 </DropdownItem>
                 <DropdownItem key="separator" className="h-px bg-tripswift-black/10 my-1" />
-                <DropdownItem 
-                  key="profile-settings" 
+                <DropdownItem
+                  key="profile-settings"
                   onClick={() => router.push('/profile')}
                   startContent={<User size={16} className="text-tripswift-blue" />}
                   className="py-2.5 text-[14px] font-tripswift-medium"
                 >
                   {t('Navbar.profileSettings')}
                 </DropdownItem>
-                <DropdownItem 
+                <DropdownItem
                   key="help-feedback"
                   startContent={<HelpCircle size={16} className="text-tripswift-blue" />}
                   className="py-2.5 text-[14px] font-tripswift-medium"
                 >
                   {t('Navbar.helpFeedback')}
                 </DropdownItem>
-                <DropdownItem 
-                  key="logout" 
+                <DropdownItem
+                  key="logout"
                   onClick={handleLogout}
                   startContent={<LogOut size={16} className="text-red-500" />}
                   className="py-2.5 text-[14px] font-tripswift-medium text-red-600"
@@ -264,7 +263,7 @@ const Navbar: React.FC = () => {
               </button>
               <button
                 onClick={handleSignup}
-                className="cursor-pointer relative overflow-hidden group text-[15px] leading-[20px] tracking-tight font-tripswift-medium px-5 py-2.5 rounded-full text-white shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-r from-tripswift-blue to-[#054B8F]"
+                className="cursor-pointer relative overflow-hidden group text-[15px] leading-[20px] tracking-tight font-tripswift-medium px-5 py-2.5 rounded-full text-tripswift-off-white shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-r from-tripswift-blue to-[#054B8F]"
               >
                 <span className="relative z-10">{t('Navbar.signUp')}</span>
                 <span className="absolute inset-0 bg-gradient-to-r from-[#054B8F] to-tripswift-blue opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
@@ -316,7 +315,7 @@ const Navbar: React.FC = () => {
                 </div>
                 <div
                   onClick={handleSignup}
-                  className="cursor-pointer btn-tripswift-primary text-[16px] leading-[20px] tracking-[2px] font-tripswift-medium px-4 py-2 rounded-md hover:shadow-md transition-all duration-300"
+                  className="cursor-pointer btn-tripswift-primary text-[16px] leading-[20px] tracking-[0px] font-tripswift-medium px-4 py-2 rounded-full hover:shadow-md transition-all duration-300"
                 >
                   {t('Navbar.signUp')}
                 </div>

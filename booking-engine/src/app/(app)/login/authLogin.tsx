@@ -174,7 +174,7 @@ const Login: React.FC = () => {
             id="remember"
             checked={rememberMe}
             onChange={() => setRememberMe(!rememberMe)}
-            className="w-4 h-4 rounded border-gray-300 text-tripswift-blue focus:ring-tripswift-blue"
+            className="w-4 h-4 rounded-md border-tripswift-black/20 text-tripswift-blue focus:ring-tripswift-blue/20 transition-colors duration-300"
           />
           <label htmlFor="remember" className="ml-2 text-sm text-tripswift-black/70 font-tripswift-medium">
             Remember me

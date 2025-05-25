@@ -13,14 +13,13 @@ const BookingTabsNavigation: React.FC<BookingTabsNavigationProps> = ({ activeTab
   const { t } = useTranslation(); // Initialize useTranslation
 
   return (
-    <div className="bg-white rounded-xl shadow-md mb-8 overflow-hidden">
+    <div className="bg-tripswift-off-white rounded-xl shadow-md mb-8 overflow-hidden font-noto-sans">
       <div className="flex flex-wrap md:flex-nowrap">
         <button
-          className={`flex-1 py-4 px-4 text-center font-tripswift-medium text-sm md:text-base transition-colors border-b-2 ${
-            activeTab === 'all'
+          className={`flex-1 py-4 px-4 text-center font-tripswift-medium text-sm md:text-base transition-colors duration-300 border-b-2 ${activeTab === 'all'
               ? 'border-tripswift-blue text-tripswift-blue'
               : 'border-transparent text-gray-500 hover:text-tripswift-blue/70'
-          }`}
+            }`}
           onClick={() => setActiveTab('all')}
         >
           <span className="flex items-center justify-center">
@@ -29,11 +28,10 @@ const BookingTabsNavigation: React.FC<BookingTabsNavigationProps> = ({ activeTab
           </span>
         </button>
         <button
-          className={`flex-1 py-4 px-4 text-center font-tripswift-medium text-sm md:text-base transition-colors border-b-2 ${
-            activeTab === 'upcoming'
+          className={`flex-1 py-4 px-4 text-center font-tripswift-medium text-sm md:text-base transition-colors duration-300 border-b-2 ${activeTab === 'upcoming'
               ? 'border-tripswift-blue text-tripswift-blue'
               : 'border-transparent text-gray-500 hover:text-tripswift-blue/70'
-          }`}
+            }`}
           onClick={() => setActiveTab('upcoming')}
         >
           <span className="flex items-center justify-center">
@@ -42,11 +40,10 @@ const BookingTabsNavigation: React.FC<BookingTabsNavigationProps> = ({ activeTab
           </span>
         </button>
         <button
-          className={`flex-1 py-4 px-4 text-center font-tripswift-medium text-sm md:text-base transition-colors border-b-2 ${
-            activeTab === 'completed'
+          className={`flex-1 py-4 px-4 text-center font-tripswift-medium text-sm md:text-base transition-colors duration-300 border-b-2 ${activeTab === 'completed'
               ? 'border-tripswift-blue text-tripswift-blue'
               : 'border-transparent text-gray-500 hover:text-tripswift-blue/70'
-          }`}
+            }`}
           onClick={() => setActiveTab('completed')}
         >
           <span className="flex items-center justify-center">
@@ -55,11 +52,10 @@ const BookingTabsNavigation: React.FC<BookingTabsNavigationProps> = ({ activeTab
           </span>
         </button>
         <button
-          className={`flex-1 py-4 px-4 text-center font-tripswift-medium text-sm md:text-base transition-colors border-b-2 ${
-            activeTab === 'cancelled'
+          className={`flex-1 py-4 px-4 text-center font-tripswift-medium text-sm md:text-base transition-colors duration-300 border-b-2 ${activeTab === 'cancelled'
               ? 'border-tripswift-blue text-tripswift-blue'
               : 'border-transparent text-gray-500 hover:text-tripswift-blue/70'
-          }`}
+            }`}
           onClick={() => setActiveTab('cancelled')}
         >
           <span className="flex items-center justify-center">

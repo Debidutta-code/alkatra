@@ -131,8 +131,8 @@ function PaymentPageContent() {
   // Add a loading or error state handler
   if (!searchParams || !amount) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8]">
-        <div className="text-center p-8 bg-white rounded-xl shadow-xl max-w-md">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8] font-noto-sans">
+        <div className="text-center p-8 bg-tripswift-off-white rounded-xl shadow-xl max-w-md">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -150,15 +150,15 @@ function PaymentPageContent() {
 
   return (
     <CheckAuthentication setLoading={setLoading}>
-      <div className="min-h-screen bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8] relative">
+      <div className="min-h-screen bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8] relative font-noto-sans">
         <div className="container mx-auto px-4 py-10 relative z-10">
           <div className="max-w-6xl mx-auto">
             <div className="grid md:grid-cols-5 gap-8">
               {/* Payment Form - 3 columns */}
               <div className="md:col-span-3 space-y-6">
                 {/* Booking Summary Card */}
-                <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                  <div className="bg-tripswift-blue p-4 text-white">
+                <div className="bg-tripswift-off-white rounded-xl shadow-md overflow-hidden">
+                  <div className="bg-tripswift-blue p-4 text-tripswift-off-white">
                     <h2 className="font-tripswift-medium text-lg">{t('Payment.PaymentPageContent.bookingSummary.title')}</h2>
                   </div>
                   <div className="p-6">
@@ -200,8 +200,8 @@ function PaymentPageContent() {
                 </div>
 
                 {/* Payment Details Card */}
-                <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                  <div className="bg-tripswift-blue p-4 text-white">
+                <div className="bg-tripswift-off-white rounded-xl shadow-md overflow-hidden">
+                  <div className="bg-tripswift-blue p-4 text-tripswift-off-white">
                     <h2 className="font-tripswift-medium text-lg">{t('Payment.PaymentPageContent.paymentMethod.title')}</h2>
                   </div>
                   <div className="p-6">
@@ -212,7 +212,7 @@ function PaymentPageContent() {
                         onChange={handleInitializePayment}
                       />
                     </div>
-                    
+
                     {/* Initializing State */}
                     {isInitializing && (
                       <div className="flex flex-col items-center justify-center py-8">
@@ -233,7 +233,7 @@ function PaymentPageContent() {
                             setError(null);
                             setPaymentOption(null);
                           }}
-                          className="mt-3 py-2 px-4 bg-white border border-red-300 rounded-md text-sm hover:bg-red-50"
+                          className="mt-3 py-2 px-4 bg-tripswift-off-white border border-red-300 rounded-lg text-sm font-tripswift-medium hover:bg-red-50 transition-all duration-300"
                         >
                           Try Again
                         </button>
@@ -297,8 +297,8 @@ function PaymentPageContent() {
               <div className="md:col-span-2">
                 <div className="md:sticky md:top-6 flex flex-col space-y-6">
                   {/* Price Details Card */}
-                  <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                    <div className="bg-tripswift-blue p-4 text-white">
+                  <div className="bg-tripswift-off-white rounded-xl shadow-md overflow-hidden">
+                    <div className="bg-tripswift-blue p-4 text-tripswift-off-white">
                       <h2 className="font-tripswift-medium text-lg">{t('Payment.PaymentPageContent.priceDetails.title')}</h2>
                     </div>
                     <div className="p-6">
@@ -326,7 +326,7 @@ function PaymentPageContent() {
                         {paymentOption === 'payAtHotel' && (
                           <div className="bg-blue-50 p-3 rounded-lg mt-4">
                             <div className="flex items-start">
-                              <Clock className="text-tripswift-blue flex-shrink-0 mt-1 mr-2" size={16} />
+                              <Clock className="text-tripswift-blue flex-shrink-0 mt-0.5 mr-2" size={16} />
                               <p className="text-sm text-tripswift-black/70">
                                 {t('Payment.PaymentPageContent.priceDetails.payAtHotelInfo')}
                               </p>
@@ -387,7 +387,7 @@ export default function Home() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8]">
-        <div className="p-8 bg-white rounded-xl shadow-xl max-w-md text-center">
+        <div className="p-8 bg-tripswift-off-white rounded-xl shadow-xl max-w-md text-center font-noto-sans">
           <div className="w-16 h-16 border-t-4 border-b-4 border-tripswift-blue rounded-full animate-spin mx-auto mb-6"></div>
           <h2 className="text-xl font-tripswift-medium text-tripswift-black mb-3">{t('Payment.PaymentPageContent.loading.title')}</h2>
           <p className="text-tripswift-black/60">{t('Payment.PaymentPageContent.loading.message')}</p>

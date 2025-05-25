@@ -38,7 +38,7 @@ const FormInput: React.FC<FormInputProps> = ({
   disabled = false
 }) => {
   return (
-    <div className="group">
+    <div className="group font-noto-sans">
       <label htmlFor={id} className="block text-sm font-tripswift-medium text-tripswift-black/80 mb-2 transition-colors group-hover:text-tripswift-black">
         {label}
       </label>
@@ -75,9 +75,9 @@ const FormInput: React.FC<FormInputProps> = ({
               ? 'border-red-300 bg-red-50/50' 
               : isFocused
                 ? 'border-tripswift-blue/50 bg-tripswift-blue/[0.02] shadow-[0_0_0_3px_rgba(7,109,179,0.1)]'
-                : 'border-gray-200 hover:border-gray-300'
-          } focus:outline-none transition-all duration-200 text-tripswift-black/90 placeholder:text-tripswift-black/40
-          disabled:bg-gray-50 disabled:text-tripswift-black/40 disabled:border-gray-100 disabled:cursor-not-allowed`}
+                : 'border-tripswift-black/10 hover:border-tripswift-blue/30'
+          } focus:outline-none transition-all duration-300 text-tripswift-black/90 placeholder:text-tripswift-black/40
+          disabled:bg-tripswift-off-white/50 disabled:text-tripswift-black/40 disabled:border-tripswift-black/5 disabled:cursor-not-allowed`}
         />
         
         {/* Success checkmark with enhanced styling */}
@@ -92,7 +92,7 @@ const FormInput: React.FC<FormInputProps> = ({
       
       {/* Error message with improved styling */}
       {error && (
-        <div className="text-red-500 text-[13px] mt-2 flex items-center bg-red-50/50 p-2 rounded border border-red-100">
+        <div className="text-red-500 text-[13px] mt-2 flex items-center bg-red-50/50 p-2 rounded-md border border-red-100">
           <AlertCircle size={14} className="mr-1.5 flex-shrink-0" />
           <span className="font-tripswift-medium">{error}</span>
         </div>

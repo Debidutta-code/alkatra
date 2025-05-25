@@ -245,7 +245,7 @@ export default function PaymentSuccess() {
 
   // Rest of your render code - significantly improved UI
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8]">
+    <div className="min-h-screen bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8] font-noto-sans">
       <div className="container mx-auto px-4 pt-10 pb-20 relative z-10">
         {isLoading ? (
           <div className="bg-tripswift-off-white rounded-xl shadow-xl p-12 text-center animate-pulse max-w-lg mx-auto mt-16">
@@ -271,9 +271,9 @@ export default function PaymentSuccess() {
             {/* Success Card */}
             <div className="max-w-4xl mx-auto bg-tripswift-off-white rounded-xl shadow-xl overflow-hidden">
               {/* Top success banner */}
-              <div className="bg-gradient-to-r from-green-500 to-emerald-600 py-8 px-8 text-white">
+              <div className="bg-gradient-to-r from-green-500 to-emerald-600 py-8 px-8 text-tripswift-off-white">
                 <div className="flex items-center">
-                  <div className="bg-white/20 p-3 rounded-full">
+                  <div className="bg-tripswift-off-white/20 p-3 rounded-full">
                     <CheckCircle size={32} />
                   </div>
                   <div className="ml-4">
@@ -358,7 +358,7 @@ export default function PaymentSuccess() {
                     {/* Add per-night rate */}
                     <div className="flex justify-between mb-2">
                       <span className="text-tripswift-black/70">{t('Payment.PaymentSuccess.roomRate')}</span>
-                      <span className="font-tripswift-medium">₹{Math.round(amount / getBookingNights()).toLocaleString()} {t('Payment.PaymentSuccess.perNight')} / night</span>
+                      <span className="font-tripswift-medium">₹{Math.round(amount / getBookingNights()).toLocaleString()} {t('Payment.PaymentSuccess.perNight')}</span>
                     </div>
 
                     {/* Show calculation */}
@@ -421,7 +421,7 @@ export default function PaymentSuccess() {
                 </ul>
 
                 {/* Download Booking button */}
-                <button className="mt-4 w-full flex items-center justify-center gap-2 border border-tripswift-blue/30 text-tripswift-blue bg-tripswift-blue/5 hover:bg-tripswift-blue/10 py-2 px-4 rounded-lg text-sm font-tripswift-medium transition-colors">
+                <button className="mt-4 w-full flex items-center justify-center gap-2 border border-tripswift-blue/30 text-tripswift-blue bg-tripswift-blue/5 hover:bg-tripswift-blue/10 py-2 px-4 rounded-lg text-sm font-tripswift-medium transition-colors duration-300">
                   <Download size={16} />
                   {t('Payment.PaymentSuccess.downloadBookingConfirmation')}
                 </button>
@@ -436,7 +436,7 @@ export default function PaymentSuccess() {
 
                 {/* Explore more hotels link */}
                 <div className="mt-4 text-center">
-                  <Link href="/hotel-listing" className="inline-flex items-center text-tripswift-blue hover:underline text-sm">
+                  <Link href="/" className="inline-flex items-center text-tripswift-blue hover:underline text-sm transition-all duration-300">
                     {t('Payment.PaymentSuccess.exploreMoreHotels')} <ArrowRight size={14} className="ml-1" />
                   </Link>
                 </div>

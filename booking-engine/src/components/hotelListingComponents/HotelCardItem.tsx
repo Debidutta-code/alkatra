@@ -89,7 +89,7 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
     };
 
     return (
-        <div className="bg-tripswift-off-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300 group">
+        <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300 group font-noto-sans">
             <div className="flex flex-col sm:flex-row">
                 {/* Hotel image */}
                 <div className="sm:w-1/3 h-52 sm:h-auto relative overflow-hidden">
@@ -127,7 +127,7 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
 
                         {/* Location */}
                         <div className="flex items-center text-sm text-tripswift-black/60 mb-2">
-                            <MapPin className="h-4 w-4 mr-1 text-tripswift-blue" />
+                            <MapPin className="h-4 w-4 mr-1 text-tripswift-blue mb-1" />
                             <span>{location}</span>
                         </div>
 
@@ -167,7 +167,7 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
 
                         <button
                             onClick={() => onViewRoom(hotel._id)}
-                            className="btn-tripswift-primary px-6 py-2 rounded-md text-sm transition-all duration-300 hover:shadow-md"
+                            className="btn-tripswift-primary px-6 py-2 rounded-lg text-sm font-tripswift-medium transition-all duration-300 hover:shadow-md"
                             aria-label={t('HotelListing.HotelCardItem.viewRoomButton')}
                         >
                             {t('HotelListing.HotelCardItem.viewRoomButton')}
