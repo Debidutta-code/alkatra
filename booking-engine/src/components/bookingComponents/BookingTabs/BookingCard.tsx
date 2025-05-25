@@ -28,7 +28,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
   const nightlyRate = nights > 0 ? Math.round(booking.amount / nights) : booking.amount;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 group">
+    <div className="bg-tripswift-off-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 group font-noto-sans">
       {/* Booking ID Banner */}
       <div className="bg-gray-50 py-2 px-4 border-b border-gray-100 flex items-center justify-between">
         {/* <div className="flex items-center">
@@ -58,7 +58,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
 
         {/* Stay Duration */}
         <div className="absolute bottom-0 right-0 transform translate-y-1/2 mr-5">
-          <div className="bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-tripswift-bold text-tripswift-blue flex items-center">
+          <div className="bg-tripswift-off-white px-3 py-1.5 rounded-full shadow-md text-sm font-tripswift-bold text-tripswift-blue flex items-center">
             {/* <FaCalendarDay className="mr-1.5" /> */}
             {nights} {t(nights === 1 ? 'BookingTabs.BookingCard.nightSingular' : 'BookingTabs.BookingCard.nightsPlural')}
           </div>
@@ -68,24 +68,24 @@ const BookingCard: React.FC<BookingCardProps> = ({
       {/* Card Body */}
       <div className="p-5 pt-7">
         {/* Dates */}
-        <div className="flex flex-col sm:flex-row justify-between mb-5 bg-gray-50 p-3 rounded-lg">
+        <div className="flex flex-col sm:flex-row justify-between mb-5 bg-tripswift-off-white/70 p-3 rounded-lg">
           <div className="mb-3 sm:mb-0">
             <p className="text-xs text-gray-500 mb-1">{t('BookingTabs.BookingCard.checkIn')}</p>
-            <p className="flex items-center text-gray-800 font-tripswift-medium text-sm">
+            <p className="flex items-center text-tripswift-black font-tripswift-medium text-sm">
               <FaCalendarCheck className="mr-2 text-green-500 flex-shrink-0 mb-1" />
               {formatDate(booking.checkInDate)}
             </p>
           </div>
           <div>
             <p className="text-xs text-gray-500 mb-1">{t('BookingTabs.BookingCard.checkOut')}</p>
-            <p className="flex items-center text-gray-800 font-tripswift-medium text-sm">
+            <p className="flex items-center text-tripswift-black font-tripswift-medium text-sm">
               <FaCalendarTimes className="mr-2 text-red-500 flex-shrink-0 mb-1" />
               {formatDate(booking.checkOutDate)}
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-5">
+        <div className="grid grid-cols-2 gap-8 mb-5">
           {/* Room Type */}
           <div>
             <p className="text-xs text-gray-500 mb-1.5">{t('BookingTabs.BookingCard.roomType')}</p>
@@ -135,9 +135,9 @@ const BookingCard: React.FC<BookingCardProps> = ({
       </div>
 
       {/* Card Footer */}
-      <div className="bg-gray-50 p-4 border-t border-gray-100">
+      <div className="bg-tripswift-off-white/70 p-4 border-t border-gray-100">
         <button
-          className="w-full bg-tripswift-blue hover:bg-[#054B8F] text-tripswift-off-white py-2.5 px-4 rounded-lg transition-colors text-sm font-tripswift-medium shadow-sm hover:shadow-md flex items-center justify-center"
+          className="w-full bg-tripswift-blue hover:bg-[#054B8F] text-tripswift-off-white py-2.5 px-4 rounded-lg transition-colors duration-300 text-sm font-tripswift-medium shadow-sm hover:shadow-md flex items-center justify-center"
           onClick={() => onViewDetails(booking)}
         >
           <FaTicketAlt className="mr-2" />
@@ -147,7 +147,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
         {booking.status === "Confirmed" && (
           <div className="grid grid-cols-2 gap-3 mt-3">
             <button
-              className="bg-tripswift-off-white hover:bg-gray-100 text-tripswift-blue border border-tripswift-blue/30 py-2 px-4 rounded-lg transition-colors text-xs font-tripswift-medium flex items-center justify-center"
+              className="bg-tripswift-off-white hover:bg-gray-100 text-tripswift-blue border border-tripswift-blue/30 py-2 px-4 rounded-lg transition-colors duration-300 text-xs font-tripswift-medium flex items-center justify-center"
               onClick={() => onModify(booking)}
             >
               <FaEdit className="mr-1.5" />

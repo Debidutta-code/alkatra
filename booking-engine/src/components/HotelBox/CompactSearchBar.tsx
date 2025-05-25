@@ -9,8 +9,7 @@ import GuestBox from "../HotelBox/GuestBox";
 import { getHotelsByCity } from '@/api/hotel';
 import { format, addDays } from 'date-fns';
 import { useSelector } from "@/Redux/store";
-import { t } from "i18next"; // Ensure i18next is set up to provide the t function
-
+import { t } from "i18next";
 
 interface CompactSearchBarProps {
   initialLocation?: string;
@@ -117,20 +116,20 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
   };
 
   return (
-    <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-tripswift-black/5 p-3 font-['Arial']">
+    <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-tripswift-black/5 p-3 font-noto-sans">
       <div className="flex flex-col sm:flex-row items-center gap-3.5">
         {/* Location Input */}
         <div className="w-full sm:w-auto sm:flex-1" ref={searchContainerRef}>
           <div className="relative group">
             <div
-              className={`absolute inset-y-0 left-3 flex items-center pointer-events-none transition-colors duration-200 ${isSearchFocused
-                  ? "text-tripswift-blue"
-                  : "text-tripswift-black/40"
-                }`}
+              className={`absolute inset-y-0 left-3 flex items-center pointer-events-none transition-colors duration-200 ${
+                isSearchFocused ? "text-tripswift-blue" : "text-tripswift-black/40"
+              }`}
             >
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-300 ${isSearchFocused ? "bg-tripswift-blue/10" : "bg-transparent"
-                  }`}
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-300 ${
+                  isSearchFocused ? "bg-tripswift-blue/10" : "bg-transparent"
+                }`}
               >
                 <MapPin className="h-4 w-4" />
               </div>
@@ -141,20 +140,22 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
-              placeholder={t("HotelListing.CompactSearchBar.locationPlaceholder")} // Translated placeholder
-              className={`block w-full h-11 pl-12 pr-10 py-2 rounded-md border ${isSearchFocused
+              placeholder={t("HotelListing.CompactSearchBar.locationPlaceholder")}
+              className={`block w-full h-11 pl-12 pr-10 py-2 rounded-md border ${
+                isSearchFocused
                   ? "border-tripswift-blue ring-2 ring-tripswift-blue/10"
                   : "border-tripswift-black/10 hover:border-tripswift-blue/30"
-                } outline-none text-tripswift-black transition duration-200 ease-in-out shadow-sm font-tripswift-medium text-[15px]`}
-              aria-label={t("HotelListing.CompactSearchBar.locationPlaceholder")} // Translated aria-label
+              } outline-none text-tripswift-black transition duration-200 ease-in-out shadow-sm font-tripswift-medium text-[16px] tracking-normal`}
+              style={{ textIndent: "16px" }} // Match input:placeholder-shown style
+              aria-label={t("HotelListing.CompactSearchBar.locationPlaceholder")}
             />
             {searchQuery && (
               <button
                 onClick={clearSearch}
                 className="absolute inset-y-0 right-3 flex items-center text-tripswift-black/40 hover:text-tripswift-black transition-colors"
-                aria-label={t("HotelListing.CompactSearchBar.ariaClearSearch")} // Translated aria-label
+                aria-label={t("HotelListing.CompactSearchBar.ariaClearSearch")}
               >
-                <div className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-gray-100">
+                <div className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-tripswift-black/5">
                   <X className="h-4 w-4" />
                 </div>
               </button>
@@ -170,7 +171,7 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
                 <Calendar className="h-4 w-4 text-tripswift-black/40 group-hover:text-tripswift-blue transition-colors duration-200" />
               </div>
             </div>
-            <div className="bg-white border border-tripswift-black/10 hover:border-tripswift-blue/30 rounded-md shadow-sm transition-all duration-200 h-11 pl-12 flex items-center">
+            <div className="bg-tripswift-off-white border border-tripswift-black/10 hover:border-tripswift-blue/30 rounded-md shadow-sm transition-all duration-200 h-11 pl-12 flex items-center">
               <DateRange dates={dates} setDates={setDates} />
             </div>
           </div>
@@ -187,22 +188,21 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
             type="button"
             disabled={loading}
             onClick={handleSearchButtonClick}
-            className="w-full sm:w-auto h-11 px-6 bg-gradient-to-r from-tripswift-blue to-[#054B8F] hover:from-[#054B8F] hover:to-tripswift-blue disabled:from-tripswift-black/30 disabled:to-tripswift-black/40 text-tripswift-off-white rounded-md flex items-center justify-center gap-2 transition-all duration-300 font-tripswift-medium text-[14px] shadow-md hover:shadow-lg relative overflow-hidden group"
+            className="btn-tripswift-primary w-full sm:w-auto h-11 px-6 flex items-center justify-center gap-2 transition-all duration-300 shadow-md hover:shadow-lg relative overflow-hidden group"
             aria-label={
               loading
-                ? t("HotelListing.CompactSearchBar.ariaSearching") // Translated aria-label for loading state
-                : t("HotelListing.CompactSearchBar.ariaSearchHotels") // Translated aria-label for default state
+                ? t("HotelListing.CompactSearchBar.ariaSearching")
+                : t("HotelListing.CompactSearchBar.ariaSearchHotels")
             }
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-tripswift-blue to-[#054B8F] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <span className="relative z-10 flex items-center gap-2.5">
               {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <>
                   <Search className="w-5 h-5" />
-                  <span className="font-tripswift-medium">
-                    {t("HotelListing.CompactSearchBar.searchButton")} {/* Translated button text */}
+                  <span className="font-tripswift-semibold text-[14px]">
+                    {t("HotelListing.CompactSearchBar.searchButton")}
                   </span>
                   <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" />
                 </>

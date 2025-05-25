@@ -57,10 +57,10 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
         {/* Status Badge */}
         <div className="absolute bottom-0 right-6 transform translate-y-1/2">
           <div className={`flex items-center px-4 py-2 rounded-full shadow-md ${booking.status === "Confirmed"
-              ? "bg-green-50 text-green-700 border border-green-200"
-              : booking.status === "Pending"
-                ? "bg-yellow-50 text-yellow-700 border border-yellow-200"
-                : "bg-red-50 text-red-700 border border-red-200"
+            ? "bg-green-50 text-green-700 border border-green-200"
+            : booking.status === "Pending"
+              ? "bg-yellow-50 text-yellow-700 border border-yellow-200"
+              : "bg-red-50 text-red-700 border border-red-200"
             }`}>
             {getStatusIcon(booking.status)}
             <span className="font-tripswift-bold">{booking.status}</span>
@@ -69,7 +69,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
       </div>
 
       {/* Modal Content */}
-      <div className="p-6 pt-10">
+      <div className="p-6 pt-10 font-noto-sans">
         {/* Stay Details */}
         <div className="mb-8">
           <h3 className="text-xl font-tripswift-bold text-gray-800 mb-4 flex items-center">
@@ -77,11 +77,11 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             Stay Details
           </h3>
 
-          <div className="bg-gray-50 p-5 rounded-xl">
+          <div className="bg-tripswift-off-white p-5 rounded-xl">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Check-in</p>
-                <p className="flex items-center text-gray-800 font-tripswift-bold">
+                <p className="text-sm text-tripswift-black/60 mb-1">Check-in</p>
+                <p className="flex items-center text-tripswift-black font-tripswift-bold">
                   <FaCalendarCheck className="mr-2 text-green-500 mb-1" />
                   {formatDateString(booking.checkInDate)}
                 </p>
@@ -129,7 +129,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             Guest Details
           </h3>
 
-          <div className="bg-gray-50 p-5 rounded-xl">
+          <div className="bg-tripswift-off-white p-5 rounded-xl">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <p className="text-sm text-gray-500 mb-1">Guest Name</p>
@@ -176,7 +176,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             Payment Details
           </h3>
 
-          <div className="bg-gray-50 p-5 rounded-xl">
+          <div className="bg-tripswift-off-white p-5 rounded-xl">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <p className="text-sm text-gray-500 mb-1">Payment Method</p>
@@ -226,14 +226,14 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
           {booking.status === "Confirmed" && (
             <>
               <button
-                className="flex-1 bg-tripswift-blue text-tripswift-off-white py-3 px-6 rounded-lg hover:bg-[#054B8F] transition-colors shadow-sm hover:shadow-md font-tripswift-medium flex items-center justify-center"
+                className="flex-1 bg-tripswift-blue text-tripswift-off-white py-3 px-6 rounded-lg hover:bg-[#054B8F] transition-colors duration-300 shadow-sm hover:shadow-md font-tripswift-medium flex items-center justify-center"
                 onClick={onAmend}
               >
                 <FaEdit className="mr-2" />
                 Modify Booking
               </button>
               <button
-                className="flex-1 bg-white text-red-600 border border-red-200 py-3 px-6 rounded-lg hover:bg-red-50 transition-colors font-tripswift-medium flex items-center justify-center"
+                className="flex-1 bg-tripswift-off-white text-red-600 border border-red-200 py-3 px-6 rounded-lg hover:bg-red-50 transition-colors duration-300 font-tripswift-medium flex items-center justify-center"
                 onClick={onCancel}
               >
                 <FaRegTimesCircle className="mr-2" />
@@ -242,7 +242,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             </>
           )}
           <button
-            className="flex-1 bg-gray-700 text-white py-3 px-6 rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center font-tripswift-medium"
+            className="flex-1 bg-gray-700 text-tripswift-off-white py-3 px-6 rounded-lg hover:bg-gray-800 transition-colors duration-300 flex items-center justify-center font-tripswift-medium"
             onClick={() => window.print()}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

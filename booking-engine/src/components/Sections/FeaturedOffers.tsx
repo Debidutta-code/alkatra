@@ -24,12 +24,12 @@ export function FeaturedOffers() {
   ];
 
   return (
-    <section className="py-2 bg-tripswift-off-white">
+    <section className="py-12 bg-tripswift-off-white font-noto-sans">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-tripswift-bold mb-8 text-tripswift-black">{t('HomeSections.FeaturedOffers.title')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {offers.map((offer, index) => (
-            <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow border border-gray-100">
+            <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100 rounded-xl shadow-md">
               <img
                 src={offer.image}
                 alt={t(`HomeSections.FeaturedOffers.${offer.key}.title`)}

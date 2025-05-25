@@ -21,7 +21,7 @@ const Footer = (props: Props) => {
   return (
     <>
       {isFooterVisible && (
-        <div className="flex flex-col mt-10 bg-tripswift-black w-full py-6 px-6 md:px-12 text-tripswift-off-white">
+        <div className="flex flex-col mt-10 bg-tripswift-black w-full py-6 px-6 md:px-12 text-tripswift-off-white font-noto-sans">
           <header className="flex flex-col md:flex-row justify-between items-start gap-6">
             {/* Logo Section */}
             <div className="flex items-start">
@@ -132,10 +132,10 @@ const Footer = (props: Props) => {
                 <input
                   type="email"
                   placeholder={t('Footer.emailPlaceholder')}
-                  className="border border-tripswift-off-white/30 bg-tripswift-black/20 rounded px-4 py-2 w-full text-tripswift-off-white placeholder-tripswift-off-white/50 focus:outline-none focus:border-tripswift-blue font-tripswift-regular"
+                  className="border border-tripswift-off-white/30 bg-tripswift-black/20 rounded-lg px-4 py-2 w-full text-tripswift-off-white placeholder-tripswift-off-white/50 focus:outline-none focus:border-tripswift-blue font-tripswift-regular"
                 />
               </div>
-              <button className="w-full md:w-auto btn-tripswift-primary">
+              <button className="w-full md:w-auto btn-tripswift-primary py-2 px-4 rounded-lg font-tripswift-medium transition-all duration-300 hover:shadow-md">
                 {t('Footer.subscribeButton')}
               </button>
             </div>
@@ -152,16 +152,16 @@ const Footer = (props: Props) => {
   
           {/* Social Media Icons */}
           <div className="flex justify-center mt-4 space-x-4">
-            <a href="#" className="text-tripswift-off-white/70 hover:text-tripswift-blue transition-colors">
+            <a href="#" className="text-tripswift-off-white/70 hover:text-tripswift-blue transition-colors duration-300">
               <Facebook size={20} />
             </a>
-            <a href="#" className="text-tripswift-off-white/70 hover:text-tripswift-blue transition-colors">
+            <a href="#" className="text-tripswift-off-white/70 hover:text-tripswift-blue transition-colors duration-300">
               <Twitter size={20} />
             </a>
-            <a href="#" className="text-tripswift-off-white/70 hover:text-tripswift-blue transition-colors">
+            <a href="#" className="text-tripswift-off-white/70 hover:text-tripswift-blue transition-colors duration-300">
               <Instagram size={20} />
             </a>
-            <a href="#" className="text-tripswift-off-white/70 hover:text-tripswift-blue transition-colors">
+            <a href="#" className="text-tripswift-off-white/70 hover:text-tripswift-blue transition-colors duration-300">
               <Linkedin size={20} />
             </a>
           </div>

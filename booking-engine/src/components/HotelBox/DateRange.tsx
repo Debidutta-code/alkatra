@@ -48,7 +48,7 @@ const DateRange: React.FC<Props> = ({ dates, setDates }) => {
         onChange={handleDateChange}
         disabledDate={disabledDate}
         suffixIcon={<></>}
-        format="YYYY-MM-DD"
+        format="DD-MM-YYYY"
         picker="date"
         separator=" - "
         allowClear={false}

@@ -33,7 +33,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
   //   : AMENITIES.slice(0, initialAmenityCount);
 
   return (
-    <div className="bg-tripswift-off-white rounded-lg shadow-sm border border-gray-200 p-4 sticky top-4">
+    <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-200 p-4 sticky top-4">
       {/* <div className="flex justify-between items-center mb-4">
         <h2 className="text-sm font-tripswift-medium text-tripswift-black">Filters</h2>
         {activeFilterCount > 0 && (

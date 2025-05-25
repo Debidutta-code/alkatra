@@ -314,8 +314,8 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
   };
   
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 font-noto-sans">
+      <div className="bg-tripswift-off-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6">
         {/* Header */}
         <div className="text-center mb-8">
           <h3 className="text-2xl font-tripswift-bold text-tripswift-black">Amend Your Reservation</h3>
@@ -334,7 +334,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
             {/* Left column */}
             <div className="space-y-4">
               <div className="flex items-start">
-                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center mr-3 shadow-sm flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-3 shadow-sm flex-shrink-0">
                   <Calendar className="h-5 w-5 text-tripswift-blue" />
                 </div>
                 <div>
@@ -349,7 +349,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
               </div>
               
               <div className="flex items-start">
-                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center mr-3 shadow-sm flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-3 shadow-sm flex-shrink-0">
                   <Users className="h-5 w-5 text-tripswift-blue" />
                 </div>
                 <div>
@@ -364,7 +364,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
             {/* Right column */}
             <div className="space-y-4">
               <div className="flex items-start">
-                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center mr-3 shadow-sm flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-3 shadow-sm flex-shrink-0">
                   <BedIcon className="h-5 w-5 text-tripswift-blue" />
                 </div>
                 <div>
@@ -379,7 +379,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
               </div>
               
               <div className="flex items-start">
-                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center mr-3 shadow-sm flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-3 shadow-sm flex-shrink-0">
                   <CreditCard className="h-5 w-5 text-tripswift-blue" />
                 </div>
                 <div>
@@ -403,10 +403,10 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
             <button
               onClick={() => setAmendmentType("dates")}
               className={`
-                flex items-center gap-2 px-4 py-2.5 rounded-lg border transition-all
+                flex items-center gap-2 px-4 py-2.5 rounded-lg border transition-all duration-300
                 ${amendmentType === "dates" 
-                  ? "bg-tripswift-blue text-white border-tripswift-blue" 
-                  : "bg-white text-tripswift-black/70 border-gray-200 hover:border-tripswift-blue/50 hover:bg-tripswift-blue/5"}
+                  ? "bg-tripswift-blue text-tripswift-off-white border-tripswift-blue"
+                  :"bg-tripswift-off-white text-tripswift-black/70 border-gray-200 hover:border-tripswift-blue/50 hover:bg-tripswift-blue/5"}
               `}
             >
               <CalendarDays className="h-4 w-4" />
@@ -455,7 +455,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         </div>
         
         {/* Amendment form fields */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 mb-6 transition duration-300">
+        <div className="bg-tripswift-off-white border border-gray-200 rounded-xl shadow-sm p-6 mb-6 transition duration-300">
           {/* Dates Amendment Form */}
           {amendmentType === "dates" && (
             <div className="space-y-5">
@@ -752,11 +752,11 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
           <button 
             onClick={handleSubmitAmendment}
             disabled={loading}
-            className="px-6 py-3 bg-gradient-to-r from-tripswift-blue to-[#054B8F] hover:from-[#054B8F] hover:to-tripswift-blue text-white rounded-xl font-tripswift-medium shadow-sm hover:shadow-md transition-all relative overflow-hidden flex items-center justify-center"
+            className="px-6 py-3 bg-gradient-to-r from-tripswift-blue to-[#054B8F] hover:from-[#054B8F] hover:to-tripswift-blue text-tripswift-off-white rounded-xl font-tripswift-medium shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden flex items-center justify-center"
           >
             {loading ? (
               <div className="flex items-center gap-2">
-                <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                <div className="w-5 h-5 border-2 border-tripswift-off-white/20 border-t-tripswift-off-white rounded-full animate-spin"></div>
                 <span>Processing...</span>
               </div>
             ) : (

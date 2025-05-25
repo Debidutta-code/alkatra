@@ -1,5 +1,4 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 
 export function ExploreDestinations() {
   const destinations = [
@@ -36,12 +35,12 @@ export function ExploreDestinations() {
   ];
 
   return (
-    <section className="py-12 bg-tripswift-off-white">
+    <section className="py-12 bg-tripswift-off-white font-noto-sans">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-tripswift-bold mb-8 text-tripswift-black">Explore Destinations</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {destinations.map((destination, index) => (
-            <Card key={index} className="overflow-hidden group cursor-pointer border border-gray-100">
+            <Card key={index} className="overflow-hidden group cursor-pointer border border-gray-100 rounded-xl shadow-md">
               <div className="relative h-64">
                 <img
                   src={destination.image}
@@ -49,12 +48,12 @@ export function ExploreDestinations() {
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <CardContent className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <CardContent className="absolute bottom-0 left-0 right-0 p-6 text-tripswift-off-white">
                   <h3 className="text-2xl font-tripswift-bold mb-1">{destination.name}</h3>
-                  <p className="text-sm mb-4">{destination.category}</p>
-                  <Button variant="secondary" className="btn-tripswift-primary py-2 px-4 rounded-lg text-sm hover:shadow-md transition-all">
+                  <p className="text-sm font-tripswift-medium mb-4">{destination.category}</p>
+                  <button className="btn-tripswift-primary py-2 px-4 rounded-lg text-sm font-tripswift-medium hover:shadow-md transition-all duration-300">
                     Explore Now
-                  </Button>
+                  </button>
                 </CardContent>
               </div>
             </Card>
