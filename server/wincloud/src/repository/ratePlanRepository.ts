@@ -1,5 +1,6 @@
 import { RateAmount } from '../model/ratePlanModel';
 import { RatePlanData } from '../interface/ratePlanInterface';
+import { FilterQuery, UpdateQuery } from 'mongoose';
 
 export class RatePlanRepository {
     async upsertRateAmount(data: RatePlanData): Promise<any> {
@@ -74,5 +75,41 @@ export class RatePlanRepository {
             startDate: { $lte: startDate },
             endDate: { $gte: endDate }
         }).lean().exec();
+    }
+
+
+    /**
+     * Updates a single rate amount document based on the provided filter and update.
+     * @param filter 
+     * @param update 
+     * @returns 
+     */
+    async updateOne(filter: FilterQuery<any>, update: UpdateQuery<any>) {
+        return await RateAmount.findOneAndUpdate(filter, update, { new: true });
+    }
+
+
+    /**
+     * Updates multiple rate amount documents based on the provided filter and update.
+     * @param filter 
+     * @param update 
+     * @returns 
+     */
+    async updateMany(filter: FilterQuery<any>, update: UpdateQuery<any>) {
+        return await RateAmount.updateMany(filter, update);
+    }
+
+
+    /**
+     * Updates multiple rate amounts in bulk.
+     * @param operations Array of update operations
+     * @returns Result of the bulk write operation
+     */
+    async bulkWrite(operations: any[]) {
+        if (!Array.isArray(operations) || operations.length === 0) {
+            throw new Error("Bulk operations array must not be empty.");
+        }
+
+        return await RateAmount.bulkWrite(operations, { ordered: false });
     }
 }

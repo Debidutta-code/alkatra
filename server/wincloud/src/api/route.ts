@@ -16,4 +16,6 @@ router.get('/',
     ratePlanController.getRoomDetails.bind(ratePlanController)
 )
 
+router.put('/rate-amount/update', ratePlanController.updateRateAmount.bind(ratePlanController));
+
 export default router;
