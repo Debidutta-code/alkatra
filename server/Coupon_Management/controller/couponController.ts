@@ -9,6 +9,17 @@ export const generateCouponCode = asyncHandler(async (req: Request, res: Respons
   res.status(201).json({ success: true, data: promoCode });
 });
 
+export const getCouponDetails = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const { code } = req.params;
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(400).json({ success: false, message: 'User not authenticated' });
+    return;
+  }
+  const result = await promoService.getCouponDetailService(code);
+  res.status(200).json({ success: true, data: result });
+});
+
 export const validateCouponCode = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
   const { code, bookingAmount } = req.body;
   const userId = req.user?._id;
