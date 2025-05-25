@@ -67,7 +67,7 @@ const Login: React.FC = () => {
 
       // Only if we get here, login was successful
       if (rememberMe) {
-        Cookies.set("rememberMe", "true", { expires: 14 });
+        Cookies.set("rememberMe", "true", { expires: 7 });
       }
 
       toast.success("Login successful! Welcome back.", {
@@ -176,7 +176,7 @@ const Login: React.FC = () => {
             onChange={() => setRememberMe(!rememberMe)}
             className="w-4 h-4 rounded-md border-tripswift-black/20 text-tripswift-blue focus:ring-tripswift-blue/20 transition-colors duration-300"
           />
-          <label htmlFor="remember" className="ml-2 text-sm text-tripswift-black/70 font-tripswift-medium">
+          <label htmlFor="remember" className="ml-2 mt-0.5 text-sm text-tripswift-black/70 font-tripswift-medium">
             Remember me
           </label>
         </div>

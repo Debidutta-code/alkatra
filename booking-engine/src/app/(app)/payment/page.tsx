@@ -317,7 +317,7 @@ function PaymentPageContent() {
 
                         <div className="border-t border-gray-200 my-4"></div>
                         <div className="flex justify-between items-center">
-                          <div className="font-tripswift-bold text-lg">{t('Payment.PaymentPageContent.priceDetails.total')}</div>
+                        <div className="font-tripswift-bold text-lg">{t('Payment.PaymentPageContent.priceDetails.total')}</div>
                           <div className="font-tripswift-bold text-xl text-tripswift-blue">
                             {currency.toUpperCase()} {amount.toLocaleString()}
                           </div>

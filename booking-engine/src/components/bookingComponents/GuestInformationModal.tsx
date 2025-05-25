@@ -638,7 +638,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                           "BookingComponents.GuestInformationModal.totalAmount"
                         )}
                       </span>
-                      <span className="font-tripswift-bold text-xl text-tripswift-blue">
+                      <span className="font-tripswift-bold text-xl text-tripswift-black/70">
                         ₹{selectedRoom.room_price * nightsCount}
                       </span>
                     </div>
