@@ -33,7 +33,7 @@ const Footer = (props: Props) => {
                 className="object-contain"
               />
             </div>
-  
+
             {/* Navigation Sections */}
             <div className="flex flex-col md:flex-row md:space-x-10 md:items-start">
               {/* Company Section */}
@@ -64,7 +64,7 @@ const Footer = (props: Props) => {
                   {t('Footer.testimonials')}
                 </Link>
               </div>
-  
+
               {/* Resources Section */}
               <div className="flex flex-col p-2 cursor-pointer">
                 <header className="text-lg font-tripswift-extrabold mb-4">{t('Footer.resourcesTitle')}</header>
@@ -93,7 +93,7 @@ const Footer = (props: Props) => {
                   {t('Footer.contactUs')}
                 </Link>
               </div>
-  
+
               {/* Product Section */}
               <div className="flex flex-col p-2 cursor-pointer">
                 <header className="text-lg font-tripswift-extrabold mb-4">{t('Footer.productTitle')}</header>
@@ -124,7 +124,7 @@ const Footer = (props: Props) => {
               </div>
             </div>
           </header>
-  
+
           {/* Subscription Section */}
           <div className="flex flex-col md:flex-row md:items-center mt-6 md:mt-6 w-full md:w-auto">
             <div className="flex flex-col md:flex-row w-full md:w-auto items-center gap-2">
@@ -140,16 +140,16 @@ const Footer = (props: Props) => {
               </button>
             </div>
           </div>
-  
+
           {/* Footer Bottom */}
           <div className="flex flex-col md:flex-row items-center justify-between mt-8 space-y-4 md:space-y-0">
             <div className="hidden md:block w-full md:w-auto border-t border-tripswift-off-white/20 flex-grow"></div>
             <div className="text-center text-sm mt-2 md:mt-0 w-full md:w-auto text-tripswift-off-white/80 font-tripswift-regular">
-              {t('Footer.copyright', { year: currentYear })}
+              © {currentYear} {t('Footer.copyright').replace('{year}', '')}
             </div>
             <div className="hidden md:block w-full md:w-auto border-t border-tripswift-off-white/20 flex-grow"></div>
           </div>
-  
+
           {/* Social Media Icons */}
           <div className="flex justify-center mt-4 space-x-4">
             <a href="#" className="text-tripswift-off-white/70 hover:text-tripswift-blue transition-colors duration-300">
