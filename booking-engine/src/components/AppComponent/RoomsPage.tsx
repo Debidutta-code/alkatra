@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import { RoomCard } from "@/components/AppComponent/RoomCard";
@@ -11,7 +11,7 @@ import { setGuestDetails } from "@/Redux/slices/hotelcard.slice";
 import {
   Calendar, Search, Bed, ChevronRight, ChevronLeft, ChevronDown,
   MapPin, Star, Coffee, Wifi, Car, Waves, Droplets, Briefcase, Utensils, BellRing, CheckCircle,
-  Bath, Dog, ImageIcon, Users
+  Bath, Dog, ImageIcon, Users, Filter
 } from "lucide-react";
 import LoadingSkeleton from "../hotelListingComponents/LoadingSkeleton";
 import { formatDate, calculateNights } from "@/utils/dateUtils";
@@ -188,8 +188,6 @@ const RoomsPage: React.FC = () => {
         // Handle different response formats
         const propDetails = propertyResponse.data.property || propertyResponse.data.data || propertyResponse.data;
         setPropertyDetails(propDetails);
-
-        console.log("Property details:", propDetails); // For debugging
       } catch (error) {
         console.error("Error fetching data:", error);
         setRooms({ success: true, data: [] });
@@ -278,15 +276,15 @@ const RoomsPage: React.FC = () => {
   };
 
 
-  // Get unique room types from all rooms
-  const roomTypes = React.useMemo(() => {
+  // Get unique room types from all rooms - optimized with useMemo
+  const roomTypes = useMemo(() => {
     if (!rooms?.data) return [];
     const types = new Set(rooms.data.map(room => room.room_type));
     return ['all', ...Array.from(types)];
   }, [rooms]);
 
-  // Filter rooms based on selected filters and search query
-  const filteredRooms = React.useMemo(() => {
+  // Filter rooms based on selected filters and search query - optimized with useMemo
+  const filteredRooms = useMemo(() => {
     if (!rooms?.data) return [];
 
     return rooms.data.filter(room => {
@@ -339,47 +337,47 @@ const RoomsPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#F5F7FA] min-h-screen">
-      {/* Property header */}
+    <div className="bg-[#F5F7FA] min-h-screen font-noto-sans">
+      {/* Property header - Using TripSwift gradient */}
       <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] text-tripswift-off-white">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-4 py-5">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
             <button
               onClick={() => router.back()}
-              className="inline-flex items-center text-sm font-tripswift-medium bg-tripswift-off-white/20 px-3 py-1.5 rounded-full hover:bg-tripswift-off-white/30 transition-colors mb-2 md:mb-0"
+              className="inline-flex items-center text-sm font-tripswift-medium bg-tripswift-off-white/20 px-3.5 py-2 rounded-full hover:bg-tripswift-off-white/30 transition-colors mb-2 md:mb-0"
             >
-              <ChevronRight className="h-4 w-4 mr-1 mb-0.5 rotate-180" /> {t('RoomsPage.backToSearch')}
+              <ChevronLeft className="h-4 w-4 mr-1.5" /> {t('RoomsPage.backToSearch')}
             </button>
           </div>
 
-          <div className="flex flex-wrap gap-4 mt-2 items-center">
-            <div className="flex items-center bg-tripswift-off-white/10 pl-3 pr-4 py-2 rounded-lg">
-              <Calendar className="h-5 w-5 mr-2 mb-1 text-tripswift-off-white/70" />
+          <div className="flex flex-wrap gap-3 mt-3 items-center">
+            <div className="flex items-center bg-tripswift-off-white/10 backdrop-blur-sm pl-3.5 pr-4 py-2.5 rounded-xl">
+              <Calendar className="h-5 w-5 mr-2.5 text-tripswift-off-white/80" />
               <div>
-                <div className="text-sm font-tripswift-semibold">
+                <div className="text-sm font-tripswift-medium">
                   {formatDate(checkInDate)} - {formatDate(checkOutDate)}
                 </div>
-                {/* <div className="text-xs font-tripswift-regular text-tripswift-off-white/60 mt-0.5">
+                <div className="text-xs text-tripswift-off-white/80 mt-0.5 font-tripswift-regular">
                   {calculateNights(checkInDate, checkOutDate)} {calculateNights(checkInDate, checkOutDate) === 1 ? 'night' : 'nights'} stay
-                </div> */}
+                </div>
               </div>
             </div>
 
-            {/* Add Guest Information Display */}
-            <div className="flex items-center bg-tripswift-off-white/10 pl-3 pr-4 py-2 rounded-lg">
-              <Users className="h-5 w-5 mr-2 mb-1 text-tripswift-off-white/70" />
+            {/* Guest Information Display */}
+            <div className="flex items-center bg-tripswift-off-white/10 backdrop-blur-sm pl-3.5 pr-4 py-2.5 rounded-xl">
+              <Users className="h-5 w-5 mr-2.5 text-tripswift-off-white/80" />
               <div>
-                <div className="text-sm font-tripswift-semibold">
+                <div className="text-sm font-tripswift-medium">
                   {getGuestCountDisplay()}
                 </div>
               </div>
             </div>
 
             {propertyDetails?.star_rating && (
-              <div className="flex items-center bg-tripswift-off-white/10 pl-3 pr-4 py-2 rounded-lg">
-                <Star className="h-5 w-5 mr-2 mb-1 text-yellow-400" />
+              <div className="flex items-center bg-tripswift-off-white/10 backdrop-blur-sm pl-3.5 pr-4 py-2.5 rounded-xl">
+                <Star className="h-5 w-5 mr-2.5 text-yellow-400" />
                 <div>
-                  <div className="text-sm font-tripswift-semibold">
+                  <div className="text-sm font-tripswift-medium">
                     {propertyDetails.star_rating} Star Hotel Rating
                   </div>
                 </div>
@@ -389,18 +387,18 @@ const RoomsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Property Details Section */}
-      <div className="container mx-auto px-4 py-6">
-        <div className="bg-tripswift-off-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          {/* Collapsible header */}
+      {/* Property Details Section - Using TripSwift classes */}
+      <div className="container mx-auto px-4 py-4">
+        <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          {/* Collapsible header - TripSwift branded */}
           <div
             className="flex justify-between items-center bg-tripswift-blue/5 p-4 cursor-pointer"
             onClick={() => setShowPropertyDetails(!showPropertyDetails)}
           >
             <div>
-              <h1 className="text-property-title text-gray-800 tracking-tight">
+              <h1 className="text-property-title">
                 {propertyDetails?.property_name || t('RoomsPage.viewPropertyDetails')}
-              </h1>
+              </h1> 
               {propertyDetails?.property_address && (
                 <div className="text-location flex items-center text-gray-600 mt-1.5">
                   <MapPin className="h-4 w-4 mr-1.5 text-tripswift-blue flex-shrink-0" />
@@ -416,68 +414,217 @@ const RoomsPage: React.FC = () => {
           </div>
 
           {showPropertyDetails && (
-            <div className="p-4">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="px-4 pt-3 pb-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {/* Property images gallery */}
                 <div className="lg:col-span-2">
-                  <div className="relative rounded-lg overflow-hidden bg-gray-100 h-64 md:h-80 group">
-                    {propertyDetails?.image && propertyDetails.image.length > 0 ? (
+                  {/* Main container with padding to allow for inner rounded images */}
+                  <div className="relative rounded-xl overflow-hidden bg-white shadow-sm p-1.5">
+                    {propertyDetails?.image && Array.isArray(propertyDetails.image) && propertyDetails.image.length > 0 ? (
                       <>
-                        <img
-                          src={propertyDetails.image[selectedImage]}
-                          alt={propertyDetails.property_name || "Property"}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
+                        {/* Different layouts based on image count */}
+                        {propertyDetails.image.length === 1 ? (
+                          /* Single image layout with 4-sided curve */
+                          <div className="h-[280px] rounded-xl overflow-hidden">
+                            <img
+                              src={propertyDetails.image[0]}
+                              alt={propertyDetails.property_name || "Property"}
+                              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                            />
+                          </div>
+                        ) : propertyDetails.image.length === 2 ? (
+                          /* Two images layout - EACH with 4-sided curve */
+                          <div className="grid grid-cols-2 gap-2 h-[280px]">
+                            {propertyDetails.image.map((img, index) => (
+                              <div key={index} className="relative h-full rounded-xl overflow-hidden">
+                                <img
+                                  src={img}
+                                  alt={`${propertyDetails.property_name || "Property"} view ${index + 1}`}
+                                  className="w-full h-full object-cover"
+                                />
+                                {index === selectedImage && (
+                                  <div className="absolute inset-0 shadow-inner"></div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : propertyDetails.image.length <= 4 ? (
+                          /* 3-4 images layout - EACH with 4-sided curve */
+                          <div className="grid grid-cols-2 gap-2 h-[280px]">
+                            {/* Main selected image - larger with 4-sided curve */}
+                            <div className="col-span-2 md:col-span-1 row-span-2 relative h-full rounded-xl overflow-hidden">
+                              <img
+                                src={propertyDetails.image[selectedImage]}
+                                alt={propertyDetails.property_name || "Property"}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
 
-                        {/* Navigation arrows for images */}
-                        {propertyDetails.image.length > 1 && (
+                            {/* Grid of other images - each with 4-sided curve */}
+                            <div className="hidden md:grid md:grid-cols-1 md:grid-rows-2 gap-2">
+                              {propertyDetails.image
+                                .filter((_, i) => i !== selectedImage)
+                                .slice(0, 2)
+                                .map((img, index) => {
+                                  const images = propertyDetails?.image;
+                                  return (
+                                    <div
+                                      key={index}
+                                      className="relative cursor-pointer h-[138px] rounded-xl overflow-hidden"
+                                      onClick={() => {
+                                        if (images && Array.isArray(images)) {
+                                          const newIndex = images.findIndex(i => i === img);
+                                          if (newIndex !== -1) setSelectedImage(newIndex);
+                                        }
+                                      }}
+                                    >
+                                      <img
+                                        src={img}
+                                        alt={`Property view ${index + 1}`}
+                                        className="w-full h-full object-cover hover:opacity-90 transition-opacity"
+                                      />
+                                    </div>
+                                  );
+                                })}
+                              {propertyDetails.image.length > 3 && selectedImage !== 3 && (
+                                <div
+                                  className="relative cursor-pointer h-[138px] rounded-xl overflow-hidden"
+                                  onClick={() => setSelectedImage(3)}
+                                >
+                                  <img
+                                    src={propertyDetails.image[3]}
+                                    alt={`Property view 4`}
+                                    className="w-full h-full object-cover hover:opacity-90 transition-opacity"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          /* 5+ images layout - EACH with 4-sided curve */
+                          <div className="grid grid-cols-4 gap-2 h-[280px]">
+                            {/* Main selected image with 4-sided curve */}
+                            <div className="col-span-4 md:col-span-2 md:row-span-2 relative h-full rounded-xl overflow-hidden">
+                              <img
+                                src={propertyDetails.image[selectedImage]}
+                                alt={propertyDetails.property_name || "Property"}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+
+                            {/* Grid of other images - each with 4-sided curve */}
+                            <div className="hidden md:grid md:col-span-2 md:grid-cols-2 md:grid-rows-2 gap-2">
+                              {propertyDetails.image
+                                .filter((_, i) => i !== selectedImage)
+                                .slice(0, 3)
+                                .map((img, index) => {
+                                  const images = propertyDetails?.image;
+                                  return (
+                                    <div
+                                      key={index}
+                                      className="relative cursor-pointer rounded-xl overflow-hidden"
+                                      onClick={() => {
+                                        if (images && Array.isArray(images)) {
+                                          const newIndex = images.findIndex(i => i === img);
+                                          if (newIndex !== -1) setSelectedImage(newIndex);
+                                        }
+                                      }}
+                                    >
+                                      <img
+                                        src={img}
+                                        alt={`Property view ${index + 1}`}
+                                        className="w-full h-full object-cover hover:opacity-90 transition-opacity"
+                                      />
+                                    </div>
+                                  );
+                                })}
+
+                              {/* Last image with overlay showing more images - with 4-sided curve */}
+                              <div className="relative cursor-pointer rounded-xl overflow-hidden">
+                                <img
+                                  src={propertyDetails.image[4]}
+                                  alt="More property images"
+                                  className="w-full h-full object-cover brightness-75"
+                                />
+                                <div className="absolute inset-0 flex items-center justify-center text-tripswift-off-white">
+                                  <div className="text-center">
+                                    <ImageIcon className="h-6 w-6 mx-auto mb-1" />
+                                    <span className="font-tripswift-medium">+{propertyDetails.image.length - 4}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Navigation controls */}
+                        {propertyDetails.image.length > 2 && (
                           <>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setSelectedImage(prev =>
-                                  prev === 0 ? propertyDetails.image!.length - 1 : prev - 1
-                                );
+                                const images = propertyDetails.image;
+                                if (images && Array.isArray(images) && images.length > 0) {
+                                  setSelectedImage((prev) =>
+                                    prev <= 0 ? images.length - 1 : prev - 1
+                                  );
+                                }
                               }}
-                              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-tripswift-black/50 text-white rounded-full p-2 hover:bg-tripswift-black/70 transition-colors"
+                              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-tripswift-off-white/70 backdrop-blur-sm text-tripswift-black rounded-full p-2.5 shadow-sm hover:bg-tripswift-off-white transition-colors duration-300"
                             >
                               <ChevronLeft className="h-5 w-5" />
                             </button>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setSelectedImage(prev =>
-                                  prev === propertyDetails.image!.length - 1 ? 0 : prev + 1
-                                );
+                                const images = propertyDetails.image;
+                                if (images && Array.isArray(images) && images.length > 0) {
+                                  setSelectedImage((prev) =>
+                                    prev >= images.length - 1 ? 0 : prev + 1
+                                  );
+                                }
                               }}
-                              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-tripswift-black/50 text-white rounded-full p-2 hover:bg-tripswift-black/70 transition-colors"
+                              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-tripswift-off-white/70 backdrop-blur-sm text-tripswift-black rounded-full p-2.5 shadow-sm hover:bg-tripswift-off-white transition-colors duration-300"
                             >
                               <ChevronRight className="h-5 w-5" />
                             </button>
 
-                            {/* Image count indicator */}
-                            <div className="absolute bottom-3 right-3 bg-tripswift-black/70 text-white text-xs py-1 px-3 rounded-full font-tripswift-medium">
+                            {/* Counter */}
+                            <div className="absolute bottom-4 right-4 bg-tripswift-off-white/70 backdrop-blur-sm text-tripswift-black text-xs py-1.5 px-4 rounded-full font-tripswift-medium shadow-sm">
                               {selectedImage + 1} / {propertyDetails.image.length}
                             </div>
                           </>
                         )}
+
+                        {/* View all photos button */}
+                        {propertyDetails.image.length >= 3 && (
+                          <button
+                            className="absolute top-4 right-4 bg-tripswift-off-white/70 backdrop-blur-sm text-tripswift-black text-xs font-tripswift-medium px-3.5 py-2 rounded-full shadow-sm flex items-center hover:bg-tripswift-off-white transition-colors duration-300"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Implement fullscreen gallery view
+                            }}
+                          >
+                            <ImageIcon className="h-3.5 w-3.5 mr-1.5" /> View all photos
+                          </button>
+                        )}
                       </>
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <ImageIcon className="h-12 w-12 text-gray-400" />
-                        <span className="ml-2 text-gray-500 font-tripswift-medium">{t('RoomsPage.noImagesAvailable')}</span>
+                      <div className="w-full h-[280px] rounded-xl flex items-center justify-center">
+                        <ImageIcon className="h-12 w-12 text-gray-300" />
+                        <span className="ml-2 text-gray-400 font-tripswift-medium">{t('RoomsPage.noImagesAvailable')}</span>
                       </div>
                     )}
                   </div>
 
-                  {/* Image thumbnails */}
-                  {propertyDetails?.image && propertyDetails.image.length > 1 && (
-                    <div className="flex mt-2 space-x-2 overflow-x-auto pb-2">
+                  {/* Image thumbnails with 4-sided curve */}
+                  {propertyDetails?.image && Array.isArray(propertyDetails.image) && propertyDetails.image.length >= 3 && (
+                    <div className="flex mt-3 space-x-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
                       {propertyDetails.image.map((img, index) => (
                         <div
                           key={index}
                           onClick={() => setSelectedImage(index)}
-                          className={`w-20 h-20 flex-shrink-0 rounded-md overflow-hidden cursor-pointer relative transition-all duration-300 ${selectedImage === index ? 'ring-2 ring-tripswift-blue' : 'opacity-70 hover:opacity-90'
+                          className={`w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-xl overflow-hidden cursor-pointer relative transition-all duration-300 ${selectedImage === index ? 'shadow-md scale-105' : 'opacity-70 hover:opacity-90'
                             }`}
                         >
                           <img
@@ -485,6 +632,9 @@ const RoomsPage: React.FC = () => {
                             alt={`Thumbnail ${index + 1}`}
                             className="w-full h-full object-cover"
                           />
+                          {selectedImage === index && (
+                            <div className="absolute bottom-0 left-0 right-0 h-1 bg-tripswift-blue"></div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -501,10 +651,11 @@ const RoomsPage: React.FC = () => {
                   )}
                 </div>
 
+                
                 {/* Property amenities and contact info */}
                 <div className="lg:col-span-1">
                   {/* Property amenities */}
-                  <div className="bg-tripswift-blue/5 p-4 rounded-lg mb-4">
+                  <div className="bg-tripswift-blue/5 p-4 rounded-xl mb-4">
                     <h3 className="text-section-heading mb-3">{t('RoomsPage.propertyAmenities')}</h3>
 
                     {propertyDetails?.property_amenities?.amenities &&
@@ -529,7 +680,7 @@ const RoomsPage: React.FC = () => {
                   </div>
 
                   {/* Contact information */}
-                  <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <div className="bg-tripswift-off-white p-4 rounded-xl border border-gray-100">
                     <h3 className="text-section-heading mb-3">{t('RoomsPage.contactInformation')}</h3>
                     <div className="space-y-2">
                       {propertyDetails?.property_contact && (
@@ -550,7 +701,7 @@ const RoomsPage: React.FC = () => {
                       )}
                       {propertyDetails?.property_address && (
                         <div className="flex items-center text-description">
-                          <MapPin className="h-4 w-4 text-tripswift-blue mr-2 flex-shrink-0" />
+                          <MapPin className="h-4 w-4 text-tripswift-blue mr-2 flex-shrink-0 mb-0.5" />
                           {getFormattedAddress(propertyDetails.property_address)}
                         </div>
                       )}
@@ -565,16 +716,19 @@ const RoomsPage: React.FC = () => {
 
       {/* Main content */}
       <div className="container mx-auto px-4">
-        {/* Filter and Search Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-8">
+        {/* Filter and Search Section - TripSwift styled */}
+        <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4 justify-between">
             {/* Room type filter */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+              <div className="text-gray-500 flex items-center mr-1 font-tripswift-medium">
+                <Filter className="h-4 w-4 mr-1.5" /> Filter
+              </div>
               {roomTypes.map((type) => (
                 <button
                   key={type}
                   onClick={() => setFilterType(type)}
-                  className={`px-4 py-1.5 rounded-md text-sm font-tripswift-medium transition-colors ${filterType === type
+                  className={`px-3.5 py-1.5 rounded-lg text-sm whitespace-nowrap font-tripswift-medium transition-colors duration-300 ${filterType === type
                     ? 'bg-tripswift-blue text-tripswift-off-white'
                     : 'bg-gray-100 text-tripswift-black/70 hover:bg-gray-200'
                     }`}
@@ -594,18 +748,18 @@ const RoomsPage: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t('RoomsPage.searchRoomName')}
-                className="pl-10 w-full border border-gray-200 rounded-md px-3 py-1.5 text-sm font-tripswift-regular bg-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue"
+                className="pl-10 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-tripswift-regular bg-tripswift-off-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 focus:border-tripswift-blue transition-colors duration-300"
               />
             </div>
           </div>
         </div>
 
-        {/* Results count */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-section-heading text-lg">
+        {/* Results count - TripSwift styled */}
+        <div className="flex justify-between items-center mb-5">
+          <h2 className="text-section-heading">
             {t('RoomsPage.availableRooms')}
           </h2>
-          <div className="text-sm font-tripswift-medium text-tripswift-black/70 bg-tripswift-blue/5 px-3 py-1 rounded-md">
+          <div className="text-sm font-tripswift-medium text-tripswift-black/70 bg-tripswift-blue/5 px-3.5 py-1.5 rounded-lg">
             {i18next.language === 'hi' && (
               <span>
                 <span className="mr-1">
@@ -632,16 +786,23 @@ const RoomsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Loading state */}
-        {isLoading && <LoadingSkeleton type="room" count={4} />}
+        {/* Enhanced Loading state */}
+        {isLoading && (
+          <div className="space-y-4">
+            <LoadingSkeleton type="room" count={3} />
+            <div className="mt-2 text-center text-sm text-gray-500 font-tripswift-regular">
+              Loading available rooms...
+            </div>
+          </div>
+        )}
 
-        {/* Empty state */}
+        {/* Empty state with TripSwift styling */}
         {!isLoading && (!filteredRooms || filteredRooms.length === 0) && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+          <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
             <div className="w-16 h-16 mx-auto bg-tripswift-blue/10 rounded-full flex items-center justify-center mb-4">
               <Bed className="h-8 w-8 text-tripswift-blue" />
             </div>
-            <h3 className="text-xl font-tripswift-bold text-tripswift-black mb-2">{t('RoomsPage.noRoomsAvailableTitle')}</h3>
+            <h3 className="text-lg font-tripswift-semibold text-tripswift-black mb-2">{t('RoomsPage.noRoomsAvailableTitle')}</h3>
             <p className="text-description max-w-md mx-auto mb-6">
               {t('RoomsPage.noRoomsAvailableMessage')}
             </p>
@@ -650,16 +811,16 @@ const RoomsPage: React.FC = () => {
                 setFilterType('all');
                 setSearchQuery('');
               }}
-              className="btn-tripswift-primary px-6 py-2 rounded-lg text-sm font-tripswift-semibold"
+              className="btn-tripswift-primary px-6 py-2.5 rounded-lg text-sm font-tripswift-medium transition-all duration-300"
             >
               {t('RoomsPage.clearFilters')}
             </button>
           </div>
         )}
 
-        {/* Rooms grid */}
+        {/* Rooms grid - Optimized with gap */}
         {!isLoading && filteredRooms.length > 0 && (
-          <div className="space-y-4">
+          <div className="space-y-3.5">
             {filteredRooms.map((room) => (
               <RoomCard
                 key={room._id}
@@ -671,6 +832,8 @@ const RoomsPage: React.FC = () => {
           </div>
         )}
       </div>
+      
+      {/* GuestInformationModal remains unchanged */}
       <GuestInformationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

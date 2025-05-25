@@ -65,7 +65,7 @@ const GuestBox: React.FC = () => {
   const isChildAgeValid = () => {
     return children === 0 || childAges.every((age: number) => age > 0 && age < 14);
   };
-  
+
 
   const handleApplyChanges = () => {
     if (isChildAgeValid()) {
@@ -86,15 +86,15 @@ const GuestBox: React.FC = () => {
   };
 
   return (
-    <div className="relative">
+    <div className="relative font-noto-sans">
       {/* Trigger Button */}
       <div
-        className="w-full px-3 py-2 border rounded-xl cursor-pointer hover:border-gray-400 transition-colors"
+        className="w-full px-3 py-2 border rounded-xl cursor-pointer hover:border-tripswift-blue/30 transition-colors duration-300"
         onClick={openModal}
       >
-<div className="text-sm sm:text-base text-gray-700 whitespace-pre-line">
-  {displayText || "Select guests"}
-</div>
+        <div className="text-sm sm:text-base text-tripswift-black/70 whitespace-pre-line">
+          {displayText || "Select guests"}
+        </div>
 
       </div>
 
@@ -108,15 +108,15 @@ const GuestBox: React.FC = () => {
 
           {/* Modal */}
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6 overflow-y-auto max-h-[80vh]">
+            <div className="w-full max-w-md bg-tripswift-off-white rounded-xl shadow-xl p-6 overflow-y-auto max-h-[80vh]">
               <div className="space-y-6">
                 {/* Room Section */}
                 <div className="flex items-center justify-between">
-                  <label className="text-gray-700">Rooms</label>
+                  <label className="text-tripswift-black/70">Rooms</label>
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
-                      className="w-8 h-8 rounded-lg bg-[#D80032] hover:bg-red-500 text-white flex items-center justify-center transition-colors"
+                      className="w-8 h-8 rounded-lg bg-tripswift-blue hover:bg-[#054B8F] text-tripswift-off-white flex items-center justify-center transition-colors duration-300"
                       onClick={() => incDecHandler(setRooms, -1)}
                     >
                       -
@@ -134,7 +134,7 @@ const GuestBox: React.FC = () => {
 
                 {/* Guests Section */}
                 <div className="flex items-center justify-between">
-                  <label className="text-gray-700">Guests</label>
+                  <label className="text-tripswift-black/70">Guests</label>
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
@@ -157,14 +157,14 @@ const GuestBox: React.FC = () => {
                 {/* Children Section */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-gray-700" htmlFor="modalChildren">
+                    <label className="text-tripswift-black/70" htmlFor="modalChildren">
                       Children
                     </label>
                     <select
                       id="modalChildren"
                       value={children}
                       onChange={(e) => handleChildrenChange(parseInt(e.target.value))}
-                      className="w-24 p-2 border rounded-lg bg-white focus:ring-2 focus:ring-[#D80032] focus:border-transparent"
+                      className="w-24 p-2 border rounded-lg bg-tripswift-off-white focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue transition-all duration-300"
                     >
                       {[0, 1, 2, 3, 4].map((option) => (
                         <option key={option} value={option}>
@@ -179,17 +179,14 @@ const GuestBox: React.FC = () => {
                     <div className="space-y-3 mt-4">
                       {Array.from({ length: children }).map((_, index) => (
                         <div key={index} className="flex items-center justify-between">
-                          <label
-                            className="text-gray-600 text-sm"
-                            htmlFor={`childAge${index + 1}`}
-                          >
+                          <label className="text-tripswift-black/60 text-sm" htmlFor={`childAge${index + 1}`}>
                             Child {index + 1} Age
                           </label>
                           <select
                             id={`childAge${index + 1}`}
                             value={childAges[index]}
                             onChange={(e) => handleChildAgeChange(index, parseInt(e.target.value))}
-                            className="w-24 p-2 border rounded-lg bg-white focus:ring-2 focus:ring-[#D80032] focus:border-transparent"
+                            className="w-24 p-2 border rounded-lg bg-tripswift-off-white focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue transition-all duration-300"
                           >
                             {Array.from({ length: 14 }, (_, i) => i).map((age) => (
                               <option key={age} value={age}>
@@ -207,13 +204,13 @@ const GuestBox: React.FC = () => {
                 <div className="flex items-center justify-end gap-4 pt-4 border-t">
                   <button
                     onClick={closeModal}
-                    className="px-4 py-2 text-gray-500 hover:text-gray-700 transition-colors"
+                    className="px-4 py-2 text-tripswift-black/60 hover:text-tripswift-black transition-colors duration-300"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleApplyChanges}
-                    className="px-6 py-2 bg-[#D80032] hover:bg-red-500 text-white rounded-lg transition-colors"
+                    className="px-6 py-2 bg-tripswift-blue hover:bg-[#054B8F] text-tripswift-off-white rounded-lg transition-colors duration-300"
                   >
                     Apply
                   </button>

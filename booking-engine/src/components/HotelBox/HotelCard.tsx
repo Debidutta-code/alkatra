@@ -66,7 +66,7 @@ const HotelCard = () => {
   }, [router, t]);
 
   return (
-    <div className="relative w-full h-[400px] sm:h-[500px] overflow-hidden">
+    <div className="relative w-full h-[400px] sm:h-[500px] overflow-hidden font-noto-sans">
       {/* Hero Image with Parallax Effect */}
       <div 
         className="absolute inset-0 w-full h-full transition-transform duration-1000"
@@ -113,24 +113,24 @@ const HotelCard = () => {
           
           {/* Special Offers Bar */}
           <div className="mt-5 flex items-center justify-center animate-in slide-in-from-bottom duration-700 delay-300">
-            <div className="bg-white/20 backdrop-blur-lg px-5 py-2.5 rounded-full shadow-lg flex items-center gap-4">
+            <div className="bg-tripswift-off-white/20 backdrop-blur-lg px-5 py-2.5 rounded-full shadow-lg flex items-center gap-4">
               <div className="flex items-center">
                 <span className="inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse mr-2"></span>
-                <span className="text-sm font-tripswift-medium text-white">Free Cancellation</span>
+                <span className="text-sm font-tripswift-medium text-tripswift-off-white">Free Cancellation</span>
               </div>
               
               <div className="w-1 h-1 rounded-full bg-white/40"></div>
               
               <div className="flex items-center">
                 <span className="inline-block w-2 h-2 bg-yellow-400 rounded-full animate-pulse mr-2"></span>
-                <span className="text-sm font-tripswift-medium text-white">Best Price Guarantee</span>
+                <span className="text-sm font-tripswift-medium text-tripswift-off-white">Best Price Guarantee</span>
               </div>
               
               <div className="w-1 h-1 rounded-full bg-white/40 hidden sm:block"></div>
               
               <div className="hidden sm:flex items-center">
                 <span className="inline-block w-2 h-2 bg-tripswift-blue rounded-full animate-pulse mr-2"></span>
-                <span className="text-sm font-tripswift-medium text-white">{t('HotelCard.specialOffer')}</span>
+                <span className="text-sm font-tripswift-medium text-tripswift-off-white">{t('HotelCard.specialOffer')}</span>
               </div>
             </div>
           </div>

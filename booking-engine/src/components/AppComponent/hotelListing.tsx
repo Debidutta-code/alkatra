@@ -267,7 +267,7 @@ const HotelListing: React.FC = () => {
     (ratingFilter !== null ? 1 : 0);
 
   return (
-    <div className="bg-[#F5F7FA] min-h-screen">
+    <div className="bg-[#F5F7FA] min-h-screen font-noto-sans">
       <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] relative">
         <div className="absolute inset-0 opacity-10">
           <div className="h-full w-full bg-pattern-dots"></div>
@@ -333,7 +333,7 @@ const HotelListing: React.FC = () => {
         <div className="lg:hidden mb-5">
           <button
             onClick={() => setMobileFiltersOpen(true)}
-            className="w-full py-2.5 bg-white border border-gray-200 rounded-lg shadow-sm text-sm font-tripswift-medium text-tripswift-black hover:bg-gray-50 transition-colors flex items-center justify-center"
+            className="w-full py-2.5 bg-white border border-gray-200 rounded-lg shadow-sm text-sm font-tripswift-medium text-tripswift-black hover:bg-gray-50 transition-colors duration-300 flex items-center justify-center"
           >
             <Filter className="h-4 w-4 mr-2 text-tripswift-blue" />
             <span>{t("HotelListing.filters", { defaultValue: "Filters" })}</span>
@@ -358,7 +358,7 @@ const HotelListing: React.FC = () => {
 
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="hidden lg:block lg:w-1/4">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden sticky top-6">
+            <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-200 overflow-hidden sticky top-6">
               <div className="p-4 bg-tripswift-blue/5 border-b border-gray-200">
                 <h3 className="font-tripswift-bold text-tripswift-black text-lg">
                   {t("HotelListing.filters", { defaultValue: "Filters" })}
@@ -373,7 +373,7 @@ const HotelListing: React.FC = () => {
                     </span>
                     <button
                       onClick={resetFilters}
-                      className="ml-2 text-tripswift-blue hover:underline font-tripswift-medium"
+                      className="ml-2 text-tripswift-blue hover:underline font-tripswift-medium transition-all duration-300"
                     >
                       {t("HotelListing.clearAll", { defaultValue: "Clear all" })}
                     </button>
@@ -395,14 +395,14 @@ const HotelListing: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mt-4 p-4">
+            {/* <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mt-4 p-4">
               <h3 className="font-tripswift-bold text-tripswift-black mb-3">
                 {t("HotelListing.popularFilters", { defaultValue: "Popular Filters" })}
               </h3>
               <div className="space-y-2">
                 <button
                   onClick={() => toggleAmenityFilter('free_wifi')}
-                  className={`w-full text-left px-3 py-2 rounded flex justify-between items-center ${filters.amenities['free_wifi']
+                  className="w-full text-left px-3 py-2 rounded flex justify-between items-center transition-colors duration-300 ${filters.amenities['free_wifi']
                     ? 'bg-tripswift-blue/10 text-tripswift-blue'
                     : 'hover:bg-gray-50 text-tripswift-black/70'
                     }`}
@@ -431,7 +431,7 @@ const HotelListing: React.FC = () => {
                   {filters.amenities["breakfast"] && <Check className="h-4 w-4" />}
                 </button>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Mobile sidebar */}
@@ -450,7 +450,7 @@ const HotelListing: React.FC = () => {
           />
 
           <div className="lg:w-3/4">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-200 p-4 mb-4 flex flex-wrap items-center justify-between gap-3">
               <div className="relative flex-grow max-w-xs">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search className="h-4 w-4 text-tripswift-black/50" />
@@ -460,7 +460,7 @@ const HotelListing: React.FC = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t("HotelListing.searchPropertyName", { defaultValue: "Search property name" })}
-                  className="pl-10 w-full border border-gray-200 rounded-md px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue"
+                  className="pl-10 w-full border border-gray-200 rounded-md px-3 py-1.5 text-sm bg-tripswift-off-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue transition-all duration-300"
                 />
               </div>
 
@@ -472,7 +472,7 @@ const HotelListing: React.FC = () => {
                   <select
                     value={filters.sortOrder}
                     onChange={(e) => handleSortChange(e.target.value)}
-                    className="appearance-none border border-gray-200 rounded-md pl-3 pr-8 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue"
+                    className="appearance-none border border-gray-200 rounded-md pl-3 pr-8 py-1.5 text-sm bg-tripswift-off-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue transition-all duration-300"
                   >
                     <option value="">{t("HotelListing.recommended", { defaultValue: "Recommended" })}</option>
                     <option value="rating_desc">{t("HotelListing.highestRating", { defaultValue: "Highest Rating" })}</option>
@@ -511,17 +511,17 @@ const HotelListing: React.FC = () => {
             )}
 
             {filteredHotels.length > 0 && !isLoading && (
-              <div className="mt-10 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="mt-6 bg-tripswift-off-white rounded-xl shadow-sm border border-gray-200 p-4">
                 <h3 className="font-tripswift-bold text-lg text-tripswift-black mb-4">
                   {t("HotelListing.whyBookWithTripSwift", { defaultValue: "Why Book With TripSwift" })}
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="flex items-start">
-                    <div className="bg-tripswift-blue/10 p-1 rounded-full mr-3">
+                    <div className="bg-tripswift-blue/10 p-1 rounded-full mr-3 mt-0.5">
                       <CreditCard className="h-5 w-5 text-tripswift-blue" />
                     </div>
-                    <div>
+                    <div className="mt-1">
                       <h4 className="font-tripswift-medium text-tripswift-black">
                         {t("HotelListing.freeCancellation", { defaultValue: "Free Cancellation" })}
                       </h4>
@@ -532,10 +532,10 @@ const HotelListing: React.FC = () => {
                   </div>
 
                   <div className="flex items-start">
-                    <div className="bg-tripswift-blue/10 p-1 rounded-full mr-3">
+                    <div className="bg-tripswift-blue/10 p-1 rounded-full mr-3 mt-0.5">
                       <Star className="h-5 w-5 text-tripswift-blue" />
                     </div>
-                    <div>
+                    <div className="mt-1.5">
                       <h4 className="font-tripswift-medium text-tripswift-black">
                         {t("HotelListing.bestPriceGuarantee", { defaultValue: "Best Price Guarantee" })}
                       </h4>
@@ -546,10 +546,10 @@ const HotelListing: React.FC = () => {
                   </div>
 
                   <div className="flex items-start">
-                    <div className="bg-tripswift-blue/10 p-1 rounded-full mr-3">
+                    <div className="bg-tripswift-blue/10 p-1 rounded-full mr-3 mt-0.5">
                       <Shield className="h-5 w-5 text-tripswift-blue" />
                     </div>
-                    <div>
+                    <div className="mt-1">
                       <h4 className="font-tripswift-medium text-tripswift-black">
                         {t("HotelListing.secureBooking", { defaultValue: "Secure Booking" })}
                       </h4>

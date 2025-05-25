@@ -36,7 +36,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="group">
+    <div className="group font-noto-sans">
       <div className="flex justify-between items-center mb-2">
         <label htmlFor={id} className="block text-sm font-tripswift-medium text-tripswift-black/80 transition-colors group-hover:text-tripswift-black">
           {label}
@@ -45,7 +45,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
           <button
             type="button"
             onClick={onForgotPasswordClick}
-            className="text-sm font-tripswift-medium text-tripswift-blue hover:text-[#054B8F] transition-colors flex items-center"
+            className="text-sm font-tripswift-medium text-tripswift-blue hover:text-[#054B8F] transition-colors duration-300 flex items-center"
           >
             <span>Forgot password?</span>
           </button>
@@ -82,9 +82,9 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
               ? 'border-red-300 bg-red-50/50' 
               : isFocused
                 ? 'border-tripswift-blue/50 bg-tripswift-blue/[0.02] shadow-[0_0_0_3px_rgba(7,109,179,0.1)]'
-                : 'border-gray-200 hover:border-gray-300'
-          } focus:outline-none transition-all duration-200 text-tripswift-black/90 placeholder:text-tripswift-black/40
-          disabled:bg-gray-50 disabled:text-tripswift-black/40 disabled:border-gray-100 disabled:cursor-not-allowed`}
+                : 'border-tripswift-black/10 hover:border-tripswift-blue/30'
+          } focus:outline-none transition-all duration-300 text-tripswift-black/90 placeholder:text-tripswift-black/40
+          disabled:bg-tripswift-off-white/50 disabled:text-tripswift-black/40 disabled:border-tripswift-black/5 disabled:cursor-not-allowed`}
         />
         
         {/* Enhanced show/hide password button */}
@@ -92,7 +92,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
           type="button"
           onClick={() => setShowPassword(!showPassword)}
           disabled={disabled}
-          className={`absolute inset-y-0 right-4 flex items-center transition-colors duration-200 ${
+          className={`absolute inset-y-0 right-4 flex items-center transition-colors duration-300 ${
             disabled 
               ? 'text-tripswift-black/30 cursor-not-allowed' 
               : isFocused
@@ -101,11 +101,11 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
           }`}
         >
           {showPassword ? (
-            <div className="p-1.5 rounded-full bg-tripswift-blue/10 group-hover:bg-tripswift-blue/15 transition-colors">
+            <div className="p-1.5 rounded-full bg-tripswift-blue/10 group-hover:bg-tripswift-blue/15 transition-colors duration-300">
               <EyeOff size={16} />
             </div>
           ) : (
-            <div className="p-1.5 rounded-full bg-gray-100 group-hover:bg-gray-200 transition-colors">
+            <div className="p-1.5 rounded-full bg-tripswift-off-white group-hover:bg-tripswift-blue/5 transition-colors duration-300">
               <Eye size={16} />
             </div>
           )}
@@ -114,7 +114,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
       
       {/* Error message with improved styling */}
       {error && (
-        <div className="text-red-500 text-[13px] mt-2 flex items-start bg-red-50/50 p-2 rounded border border-red-100">
+        <div className="text-red-500 text-[13px] mt-2 flex items-start bg-red-50/50 p-2 rounded-md border border-red-100">
           <AlertCircle size={14} className="mr-1.5 mt-0.5 flex-shrink-0" />
           <span className="font-tripswift-medium">{error}</span>
         </div>
