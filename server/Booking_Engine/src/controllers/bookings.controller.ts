@@ -871,7 +871,7 @@ export const getBookingDetailsOfUser = CatchAsyncError(
           path: "room",
           select: "room_name room_type",
         })
-        .select("room booking_user_name booking_user_phone amount booking_dates status checkInDate checkOutDate guests")
+        .select("room booking_user_name booking_user_phone amount booking_dates status checkInDate checkOutDate guests paymentType")
         .sort({ _id: -1 })
         .skip(skip)
         .limit(limit);
