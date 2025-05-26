@@ -555,7 +555,7 @@ export default function Page({ params, searchParams }: Props) {
           <div className="mt-4">
             <Button
               variant="default"
-              onClick={() => router.push(`/app/rate-plan/create-form?propertyId=${propertyId}`)}
+              onClick={() => router.push(`/app/rate-plan/create-rate-plan?propertyId=${propertyId}`)}
               className="bg-blue-500 hover:bg-blue-600 text-white"
             >
               Add/Edit Rate Plan

@@ -177,7 +177,7 @@ export default function GetRatePlan() {
           <h1 className="text-2xl font-bold text-gray-900">Rate Plans</h1>
           <Button
             variant="default"
-            onClick={() => router.push(`/app/rate-plan/create-form?propertyId=${propertyId}`)}
+            onClick={() => router.push(`/app/rate-plan/create-rate-plan?propertyId=${propertyId}`)}
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300"
           >
             Create New Rate Plan

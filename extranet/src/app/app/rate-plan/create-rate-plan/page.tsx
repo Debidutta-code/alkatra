@@ -15,6 +15,7 @@ import { RatePlanFormSchema, BaseRatePlanFormSchema } from '../validator/ratePla
 import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
+import Breadcrumbs from '@src/components/ui/breadcrumbs';
 
 export default function RatePlanForm() {
   const router = useRouter();
@@ -292,6 +293,9 @@ export default function RatePlanForm() {
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-sm">
+      <div className="flex items-center justify-between">
+              <Breadcrumbs />
+            </div>
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Create Rate Plan</h2>
 
       {error && (
