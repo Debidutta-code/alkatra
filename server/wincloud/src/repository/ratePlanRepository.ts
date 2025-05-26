@@ -9,11 +9,12 @@ export class RatePlanRepository {
             hotelCode: data.hotelCode,
             hotelName: data.hotelName,
             invTypeCode: data.invTypeCode,
+            ratePlanCode: data.ratePlanCode,
         };
 
         const update = {
             $set: {
-                ratePlanCode: data.ratePlanCode,
+                // ratePlanCode: data.ratePlanCode,
                 startDate: new Date(data.startDate),
                 endDate: new Date(data.endDate),
                 days: data.days,
