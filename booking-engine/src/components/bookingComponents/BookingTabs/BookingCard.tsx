@@ -26,7 +26,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
 
   // Calculate per-night rate
   const nightlyRate = nights > 0 ? Math.round(booking.amount / nights) : booking.amount;
-
+  console.log("booking data ",booking)  
   return (
     <div className="bg-tripswift-off-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 group font-noto-sans">
       {/* Booking ID Banner */}
@@ -46,8 +46,8 @@ const BookingCard: React.FC<BookingCardProps> = ({
       {/* Card Header */}
       <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] p-5 relative">
         <h2 className="text-xl font-tripswift-bold text-tripswift-off-white flex items-start">
-          <FaHotel className="mr-3 flex-shrink-0 mt-1" />
-          <span className="leading-tight">{booking.property.property_name}</span>
+          <FaHotel className="mr-3 flex-shrink-0 mt-0.5" />
+          <span className="leading-tight ">{booking.property.property_name}</span>
         </h2>
         {booking.property.property_address && (
           <p className="text-tripswift-off-white/80 text-sm mt-2 flex items-start">

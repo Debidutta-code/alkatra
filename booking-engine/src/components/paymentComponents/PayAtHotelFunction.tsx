@@ -157,9 +157,17 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
       console.log("Sending booking payload:", bookingPayload);
       const bookingResponse = await confirmBookingWithStoredCard(bookingPayload, token);
       console.log("Booking response:", bookingResponse);
+      const checkInRaw = bookingResponse.savedBooking.checkInDate
+      const checkOutRaw= bookingResponse.savedBooking.checkOutDate
+       const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return '';
+    return new Date(dateStr).toISOString().split('T')[0]; // "YYYY-MM-DD"
+  };
+  const checkIn = formatDate(checkInRaw);
+  const checkOut = formatDate(checkOutRaw);
 
       // Handle success
-      router.push(`/payment-success?reference=${bookingResponse.savedBooking._id || bookingResponse.savedBooking.id || ""}&amount=${bookingDetails.amount}&firstName=${bookingDetails.firstName}&lastName=${bookingDetails.lastName}&email=${bookingDetails.email}&phone=${bookingDetails.phone}&method=payAtHotel`);
+      router.push(`/payment-success?reference=${bookingResponse.savedBooking._id || bookingResponse.savedBooking.id || ""}&amount=${bookingDetails.amount}&firstName=${bookingDetails.firstName}&lastName=${bookingDetails.lastName}&email=${bookingDetails.email}&checkIn=${checkIn}&checkOut=${checkOut}&ropertyId=${bookingDetails.propertyId}&phone=${bookingDetails.phone}&method=payAtHotel`);
     } catch (error: any) {
       console.error('Payment error:', error);
       setErrorMessage(error.message || t('Payment.PaymentComponents.PayAtHotelFunction.paymentProcessingError'));
