@@ -1,4 +1,7 @@
+'use client';
+
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Booking } from './types';
 import {
   FaHotel, FaMapMarkerAlt, FaTicketAlt, FaRegCalendarAlt, FaCalendarCheck,
@@ -24,6 +27,8 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
   onAmend,
   onCancel
 }) => {
+  const { t } = useTranslation();
+  
   return (
     <>
       {/* Modal Header */}
@@ -32,7 +37,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
           <div>
             {/* <div className="inline-flex items-center px-3 py-1 rounded-md bg-white/15 text-tripswift-off-white text-sm mb-3">
               <FaTicketAlt className="mr-2" />
-              Booking #{getBookingId(booking)}
+              {t('BookingTabs.BookingDetailsModal.bookingNumber', { id: getBookingId(booking) })}
             </div> */}
             <h2 className="text-2xl font-tripswift-bold text-tripswift-off-white leading-tight mb-1">
               {booking.property.property_name}
@@ -47,6 +52,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
           <button
             onClick={onClose}
             className="text-tripswift-off-white/80 hover:text-tripswift-off-white bg-tripswift-off-white/10 hover:bg-tripswift-off-white/20 rounded-full p-2 transition-colors"
+            aria-label={t('BookingTabs.BookingDetailsModal.closeModal')}
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -63,7 +69,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
               : "bg-red-50 text-red-700 border border-red-200"
             }`}>
             {getStatusIcon(booking.status)}
-            <span className="font-tripswift-bold">{booking.status}</span>
+            <span className="font-tripswift-bold">{t(`BookingTabs.BookingDetailsModal.status.${booking.status.toLowerCase()}`)}</span>
           </div>
         </div>
       </div>
@@ -74,30 +80,30 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
         <div className="mb-8">
           <h3 className="text-xl font-tripswift-bold text-gray-800 mb-4 flex items-center">
             <FaRegCalendarAlt className="mr-2 text-tripswift-blue mb-1" />
-            Stay Details
+            {t('BookingTabs.BookingDetailsModal.stayDetails')}
           </h3>
 
           <div className="bg-tripswift-off-white p-5 rounded-xl">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <p className="text-sm text-tripswift-black/60 mb-1">Check-in</p>
+                <p className="text-sm text-tripswift-black/60 mb-1">{t('BookingTabs.BookingDetailsModal.checkIn')}</p>
                 <p className="flex items-center text-tripswift-black font-tripswift-bold">
                   <FaCalendarCheck className="mr-2 text-green-500 mb-1" />
                   {formatDateString(booking.checkInDate)}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500 mb-1">Check-out</p>
+                <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.checkOut')}</p>
                 <p className="flex items-center text-gray-800 font-tripswift-bold">
                   <FaCalendarTimes className="mr-2 text-red-500 mb-1" />
                   {formatDateString(booking.checkOutDate)}
                 </p>
               </div>
               {/* <div>
-                <p className="text-sm text-gray-500 mb-1">Duration</p>
+                <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.duration')}</p>
                 <p className="flex items-center text-gray-800 font-tripswift-bold">
                   <FaRegCalendarAlt className="mr-2 text-tripswift-blue" />
-                  {calculateNights(booking.checkInDate, booking.checkOutDate)} {calculateNights(booking.checkInDate, booking.checkOutDate) === 1 ? 'Night' : 'Nights'}
+                  {t('BookingTabs.BookingDetailsModal.nightsStay', { count: calculateNights(booking.checkInDate, booking.checkOutDate) })}
                 </p>
               </div> */}
             </div>
@@ -105,7 +111,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             <div className="border-t border-gray-200 mt-5 pt-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">Room Type</p>
+                  <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.roomType')}</p>
                   <div className="flex items-center">
                     <span className={`inline-flex items-center px-3 py-1.5 rounded-md text-sm font-tripswift-medium ${getRoomTypeStyle(booking.room.room_type)}`}>
                       {getRoomTypeIcon(booking.room.room_type)}
@@ -114,7 +120,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">Room Name</p>
+                  <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.roomName')}</p>
                   <p className="text-gray-800 font-tripswift-medium">{booking.room.room_name}</p>
                 </div>
               </div>
@@ -126,17 +132,17 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
         <div className="mb-8">
           <h3 className="text-xl font-tripswift-bold text-gray-800 mb-4 flex items-center">
             <FaUser className="mr-2 text-tripswift-blue mb-1" />
-            Guest Details
+            {t('BookingTabs.BookingDetailsModal.guestDetails')}
           </h3>
 
           <div className="bg-tripswift-off-white p-5 rounded-xl">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Guest Name</p>
+                <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.guestName')}</p>
                 <p className="text-gray-800 font-tripswift-medium">{booking.booking_user_name}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500 mb-1">Contact Number</p>
+                <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.contactNumber')}</p>
                 <p className="text-gray-800 font-tripswift-medium">{booking.booking_user_phone}</p>
               </div>
             </div>
@@ -146,13 +152,13 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {booking.adultCount && (
                     <div>
-                      <p className="text-sm text-gray-500 mb-1">Adults</p>
+                      <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.adults')}</p>
                       <p className="text-gray-800 font-tripswift-medium">{booking.adultCount}</p>
                     </div>
                   )}
                   {booking.childCount && (
                     <div>
-                      <p className="text-sm text-gray-500 mb-1">Children</p>
+                      <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.children')}</p>
                       <p className="text-gray-800 font-tripswift-medium">{booking.childCount}</p>
                     </div>
                   )}
@@ -162,7 +168,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
 
             {booking.specialRequests && (
               <div className="border-t border-gray-200 mt-5 pt-5">
-                <p className="text-sm text-gray-500 mb-1">Special Requests</p>
+                <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.specialRequests')}</p>
                 <p className="text-gray-800 italic">{booking.specialRequests}</p>
               </div>
             )}
@@ -173,20 +179,20 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
         <div className="mb-8">
           <h3 className="text-xl font-tripswift-bold text-gray-800 mb-4 flex items-center">
             <FaCreditCard className="mr-2 text-tripswift-blue mb-1" />
-            Payment Details
+            {t('BookingTabs.BookingDetailsModal.paymentDetails')}
           </h3>
 
           <div className="bg-tripswift-off-white p-5 rounded-xl">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Payment Method</p>
+                <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.paymentMethod')}</p>
                 <p className="flex items-center font-tripswift-medium">
                   {getPaymentMethodIcon(booking)}
-                  {getPaymentMethodText(booking)}
+                  {/* {t(`BookingTabs.BookingDetailsModal.paymentMethods.${getPaymentMethodText(booking).toLowerCase().replace(/\s+/g, '_')}`)} */}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500 mb-1">Booking Date</p>
+                <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.bookingDate')}</p>
                 <p className="flex items-center text-gray-800 font-tripswift-medium">
                   <FaRegCalendarCheck className="mr-2 text-gray-500 mb-1" />
                   {formatDateString(booking.booking_dates)}
@@ -197,21 +203,21 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             <div className="border-t border-gray-200 mt-5 pt-5 flex justify-between items-center">
               <div className="flex flex-col space-y-1">
                 <p className="text-sm text-gray-500 mb-1">
-                  Total Amount
+                  {t('BookingTabs.BookingDetailsModal.totalAmount')}
                 </p>
                 <div className="flex items-baseline gap-2">
                   <span className="text-2xl font-tripswift-bold text-tripswift-blue">
                     ₹{booking.amount.toLocaleString()}
                   </span>
                   <span className="text-lg text-gray-500 mb-1">
-                    / night
+                    / {t('BookingTabs.BookingDetailsModal.night')}
                   </span>
                 </div>
               </div>
 
               {booking.ratePlanName && (
                 <div className="text-right">
-                  <p className="text-sm text-gray-500 mb-1">Rate Plan</p>
+                  <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.ratePlan')}</p>
                   <div className="inline-block px-3 py-1 bg-blue-50 text-blue-700 rounded-md text-sm font-tripswift-medium">
                     {booking.ratePlanName}
                   </div>
@@ -230,14 +236,14 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                 onClick={onAmend}
               >
                 <FaEdit className="mr-2" />
-                Modify Booking
+                {t('BookingTabs.BookingDetailsModal.modifyBooking')}
               </button>
               <button
                 className="flex-1 bg-tripswift-off-white text-red-600 border border-red-200 py-3 px-6 rounded-lg hover:bg-red-50 transition-colors duration-300 font-tripswift-medium flex items-center justify-center"
                 onClick={onCancel}
               >
                 <FaRegTimesCircle className="mr-2" />
-                Cancel Booking
+                {t('BookingTabs.BookingDetailsModal.cancelBooking')}
               </button>
             </>
           )}
@@ -248,7 +254,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
             </svg>
-            Print Itinerary
+            {t('BookingTabs.BookingDetailsModal.printItinerary')}
           </button>
         </div>
       </div>

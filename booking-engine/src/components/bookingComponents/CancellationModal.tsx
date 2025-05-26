@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from "react";
 import { format, parseISO, differenceInDays, differenceInHours } from "date-fns";
 import {
@@ -16,6 +18,7 @@ import {
   X,
   FileQuestion
 } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 import {
   PolicyType,
   getPolicyType,
@@ -56,6 +59,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
   onClose,
   onCancellationComplete
 }) => {
+  const { t } = useTranslation();
   const [cancellationLoading, setCancellationLoading] = useState(false);
   const [cancellationMessage, setCancellationMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [cancellationReason, setCancellationReason] = useState("");
@@ -83,7 +87,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
       const date = parseISO(dateString);
       return format(date, "MMM d, yyyy");
     } catch (error) {
-      return "Invalid Date";
+      return t('BookingTabs.CancellationModal.invalidDate');
     }
   };
 
@@ -141,7 +145,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
       console.error("Error checking cancellation policy:", error);
       setCancellationMessage({
         type: 'error',
-        text: 'Unable to retrieve cancellation policy information. You may continue, but fee information might not be accurate.'
+        text: t('BookingTabs.CancellationModal.errorRetrievingPolicy')
       });
     } finally {
       setPolicyLoading(false);
@@ -160,8 +164,8 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
       setCancellationMessage({
         type: 'success',
         text: refundInfo && refundInfo.amount > 0
-          ? `Your booking has been successfully cancelled. A refund of ₹${refundInfo.amount.toFixed(2)} will be processed.`
-          : 'Your booking has been successfully cancelled. No refund will be issued based on the cancellation policy.'
+          ? t('BookingTabs.CancellationModal.successWithRefund', { amount: refundInfo.amount.toFixed(2) })
+          : t('BookingTabs.CancellationModal.successNoRefund')
       });
 
       // Notify parent component of cancellation (UI only for now)
@@ -173,7 +177,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
       console.error('Error cancelling booking:', error);
       setCancellationMessage({
         type: 'error',
-        text: 'Unable to cancel booking. Please try again or contact support.'
+        text: t('BookingTabs.CancellationModal.errorCancelling')
       });
     } finally {
       setCancellationLoading(false);
@@ -194,9 +198,11 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 mb-4">
             <AlertTriangle className="h-8 w-8 text-amber-600" />
           </div>
-          <h3 className="text-2xl font-tripswift-bold text-tripswift-black">Confirm Cancellation</h3>
+          <h3 className="text-2xl font-tripswift-bold text-tripswift-black">
+            {t('BookingTabs.CancellationModal.confirmCancellation')}
+          </h3>
           <p className="text-tripswift-black/60 mt-2 max-w-lg mx-auto">
-            Please review the details below before proceeding with your cancellation
+            {t('BookingTabs.CancellationModal.reviewBeforeProceeding')}
           </p>
         </div>
 
@@ -205,7 +211,9 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
           <div className="bg-tripswift-blue/10 p-4 border-b border-gray-200">
             <div className="flex items-center">
               <Info className="h-5 w-5 text-tripswift-blue mr-2" />
-              <h4 className="font-tripswift-bold text-tripswift-black/80">Booking Details</h4>
+              <h4 className="font-tripswift-bold text-tripswift-black/80">
+                {t('BookingTabs.CancellationModal.bookingDetails')}
+              </h4>
             </div>
           </div>
 
@@ -217,7 +225,9 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
                     <Home className="h-4 w-4 text-tripswift-blue" />
                   </div>
                   <div>
-                    <p className="text-sm text-tripswift-black/60 font-tripswift-medium">Property</p>
+                    <p className="text-sm text-tripswift-black/60 font-tripswift-medium">
+                      {t('BookingTabs.CancellationModal.property')}
+                    </p>
                     <p className="text-tripswift-black font-tripswift-medium">
                       {booking.property.property_name}
                     </p>
@@ -229,7 +239,9 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
                     <BedDouble className="h-4 w-4 text-tripswift-blue" />
                   </div>
                   <div>
-                    <p className="text-sm text-tripswift-black/60 font-tripswift-medium">Room</p>
+                    <p className="text-sm text-tripswift-black/60 font-tripswift-medium">
+                      {t('BookingTabs.CancellationModal.room')}
+                    </p>
                     <p className="text-tripswift-black font-tripswift-medium">
                       {booking.room.room_name}
                     </p>
@@ -246,12 +258,16 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
                     <Calendar className="h-4 w-4 text-tripswift-blue" />
                   </div>
                   <div>
-                    <p className="text-sm text-tripswift-black/60 font-tripswift-medium">Stay Dates</p>
+                    <p className="text-sm text-tripswift-black/60 font-tripswift-medium">
+                      {t('BookingTabs.CancellationModal.stayDates')}
+                    </p>
                     <p className="text-tripswift-black font-tripswift-medium">
                       {formatDateString(booking.checkInDate)} - {formatDateString(booking.checkOutDate)}
                     </p>
                     <p className="text-xs text-tripswift-black/50 mt-0.5">
-                      {differenceInDays(parseISO(booking.checkOutDate), parseISO(booking.checkInDate))} night stay
+                      {t('BookingTabs.CancellationModal.nightStay', {
+                        count: differenceInDays(parseISO(booking.checkOutDate), parseISO(booking.checkInDate))
+                      })}
                     </p>
                   </div>
                 </div>
@@ -261,7 +277,9 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
                     <CreditCard className="h-4 w-4 text-tripswift-blue" />
                   </div>
                   <div>
-                    <p className="text-sm text-tripswift-black/60 font-tripswift-medium">Total Amount</p>
+                    <p className="text-sm text-tripswift-black/60 font-tripswift-medium">
+                      {t('BookingTabs.CancellationModal.totalAmount')}
+                    </p>
                     <p className="text-tripswift-black font-tripswift-medium">
                       ₹{booking.amount.toFixed(2)}
                     </p>
@@ -276,7 +294,9 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
         {policyLoading ? (
           <div className="bg-tripswift-off-white border border-gray-200 shadow-sm rounded-xl p-6 mb-6 flex items-center justify-center">
             <Loader2 className="h-8 w-8 text-tripswift-blue animate-spin" />
-            <span className="ml-3 text-tripswift-black/70 font-tripswift-medium">Calculating cancellation details...</span>
+            <span className="ml-3 text-tripswift-black/70 font-tripswift-medium">
+              {t('BookingTabs.CancellationModal.calculatingDetails')}
+            </span>
           </div>
         ) : (
           <div className="bg-tripswift-off-white border border-gray-200 shadow-sm rounded-xl overflow-hidden mb-6">
@@ -284,18 +304,20 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
               <div className="flex items-center">
                 <Shield className={`h-5 w-5 ${policyStyling.textColor} mr-2`} />
                 <h4 className={`font-tripswift-bold ${policyStyling.textColor}`}>
-                  {policyType} Cancellation Policy
+                  {t(`BookingTabs.CancellationModal.policyTypes.${policyType.toLowerCase()}`)}
                 </h4>
               </div>
               <span className={`inline-block px-3 py-1 text-xs rounded-full ${policyStyling.bgColor} ${policyStyling.textColor} font-tripswift-medium`}>
-                {refundPercentage}% Refund Eligible
+                {t('BookingTabs.CancellationModal.refundEligible', { percentage: refundPercentage })}
               </span>
             </div>
 
             <div className="p-5">
               {/* Policy details in bullet points */}
               <div className="mb-5">
-                <h5 className="text-sm font-tripswift-bold text-tripswift-black/80 mb-3">Policy Terms</h5>
+                <h5 className="text-sm font-tripswift-bold text-tripswift-black/80 mb-3">
+                  {t('BookingTabs.CancellationModal.policyTerms')}
+                </h5>
                 <ul className="space-y-2.5">
                   {policyBulletPoints.map((point, index) => (
                     <li key={index} className="flex items-start">
@@ -318,10 +340,14 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
                     <Clock className="h-4 w-4 text-tripswift-blue" />
                   </div>
                   <div>
-                    <h5 className="text-sm font-tripswift-bold text-tripswift-black mb-1">Your Refund Status</h5>
+                    <h5 className="text-sm font-tripswift-bold text-tripswift-black mb-1">
+                      {t('BookingTabs.CancellationModal.yourRefundStatus')}
+                    </h5>
                     <p className="text-sm text-tripswift-black/70">
-                      Based on your check-in date and the {policyType.toLowerCase()} policy,
-                      you will receive a <span className="font-tripswift-bold text-tripswift-blue">{refundPercentage}% refund</span>.
+                      {t('BookingTabs.CancellationModal.refundExplanation', {
+                        policyType: policyType.toLowerCase(),
+                        percentage: refundPercentage
+                      })}
                     </p>
                   </div>
                 </div>
@@ -329,15 +355,21 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
 
               {/* Financial breakdown */}
               <div className="bg-gray-50 rounded-xl p-4">
-                <h5 className="text-sm font-tripswift-bold text-tripswift-black/80 mb-3">Financial Breakdown</h5>
+                <h5 className="text-sm font-tripswift-bold text-tripswift-black/80 mb-3">
+                  {t('BookingTabs.CancellationModal.financialBreakdown')}
+                </h5>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-tripswift-black/70">Original Payment Amount</span>
+                    <span className="text-sm text-tripswift-black/70">
+                      {t('BookingTabs.CancellationModal.originalPayment')}
+                    </span>
                     <span className="font-tripswift-bold text-tripswift-black">₹{booking.amount.toFixed(2)}</span>
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-tripswift-black/70">Cancellation Fee</span>
+                    <span className="text-sm text-tripswift-black/70">
+                      {t('BookingTabs.CancellationModal.cancellationFee')}
+                    </span>
                     <span className={`font-tripswift-bold ${cancellationFee && cancellationFee > 0 ? 'text-red-600' : 'text-green-600'}`}>
                       ₹{cancellationFee !== null ? cancellationFee.toFixed(2) : '0.00'}
                     </span>
@@ -345,7 +377,9 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
 
                   <div className="border-t border-gray-200 pt-3 mt-1">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-tripswift-bold text-tripswift-black">Refund Amount</span>
+                      <span className="text-sm font-tripswift-bold text-tripswift-black">
+                        {t('BookingTabs.CancellationModal.refundAmount')}
+                      </span>
                       <span className="font-tripswift-bold text-green-600 text-lg">
                         ₹{refundInfo ? refundInfo.amount.toFixed(2) : '0.00'}
                       </span>
@@ -362,7 +396,9 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
           <div className="bg-gray-50 p-4 border-b border-gray-200">
             <div className="flex items-center">
               <FileQuestion className="h-5 w-5 text-tripswift-black/60 mr-2" />
-              <h4 className="font-tripswift-bold text-tripswift-black/80">Reason for Cancellation</h4>
+              <h4 className="font-tripswift-bold text-tripswift-black/80">
+                {t('BookingTabs.CancellationModal.reasonForCancellation')}
+              </h4>
             </div>
           </div>
 
@@ -370,12 +406,12 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
             <textarea
               rows={3}
               className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue transition-colors duration-300 bg-tripswift-off-white"
-              placeholder="Please tell us why you're cancelling (optional)..."
+              placeholder={t('BookingTabs.CancellationModal.reasonPlaceholder')}
               value={cancellationReason}
               onChange={(e) => setCancellationReason(e.target.value)}
             ></textarea>
             <p className="text-xs text-tripswift-black/50 mt-2">
-              Your feedback helps us improve our services. This information is only used internally.
+              {t('BookingTabs.CancellationModal.feedbackHelpsImprove')}
             </p>
           </div>
         </div>
@@ -393,7 +429,9 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
                   <XCircle className="h-5 w-5 text-white mr-2" />
                 )}
                 <h4 className="font-tripswift-bold text-white">
-                  {cancellationMessage.type === 'success' ? 'Success' : 'Error'}
+                  {cancellationMessage.type === 'success' 
+                    ? t('BookingTabs.CancellationModal.success') 
+                    : t('BookingTabs.CancellationModal.error')}
                 </h4>
               </div>
             </div>
@@ -414,10 +452,11 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
             <AlertCircle className="h-5 w-5 text-amber-600" />
           </div>
           <div>
-            <p className="text-amber-800 font-tripswift-medium mb-1">This action cannot be undone</p>
+            <p className="text-amber-800 font-tripswift-medium mb-1">
+              {t('BookingTabs.CancellationModal.actionCannotBeUndone')}
+            </p>
             <p className="text-sm text-amber-700">
-              Once you confirm cancellation, your reservation will be immediately cancelled and cannot be reinstated.
-              Any applicable refund will be processed according to the policy above.
+              {t('BookingTabs.CancellationModal.cancellationWarning')}
             </p>
           </div>
         </div>
@@ -431,7 +470,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
           >
             <span className="flex items-center justify-center gap-2">
               <X className="h-4 w-4" />
-              <span>Keep My Reservation</span>
+              <span>{t('BookingTabs.CancellationModal.keepMyReservation')}</span>
             </span>
           </button>
 
@@ -443,12 +482,12 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
             {cancellationLoading ? (
               <span className="flex items-center justify-center gap-2">
                 <Loader2 className="h-5 w-5 animate-spin" />
-                <span>Processing...</span>
+                <span>{t('BookingTabs.CancellationModal.processing')}</span>
               </span>
             ) : (
               <span className="flex items-center justify-center gap-2">
                 <AlertTriangle className="h-4 w-4" />
-                <span>Confirm Cancellation</span>
+                <span>{t('BookingTabs.CancellationModal.confirmCancellationButton')}</span>
               </span>
             )}
           </button>

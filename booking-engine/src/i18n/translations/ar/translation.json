@@ -28,7 +28,7 @@
     "leadGeneration": "توليد العملاء المحتملين",
     "emailPlaceholder": "أدخل بريدك الإلكتروني",
     "subscribeButton": "اشترك",
-    "copyright": "© {year} تريبسويفت - جميع الحقوق محفوظة"
+    "copyright": "{year} تريبسويفت - جميع الحقوق محفوظة"
   },
   "HotelCard": {
     "heroTitle": "ابحث عن الإقامة المثالية لرحلتك",
@@ -163,7 +163,58 @@
         "description": "احجز الآن وادفع لاحقًا في فنادق مختارة",
         "validTill": "3 ساعات 15 دقيقة"
       }
+    },
+    "PopularHotels": {
+    "title": "الفنادق الشعبية",
+    "freeCancellation": "إلغاء مجاني",
+    "breakfast": "إفطار",
+    "startingFrom": "ابتداءً من",
+    "bookNow": "احجز الآن",
+    "hotels": {
+      "grandPlaza": {
+        "name": "فندق جراند بلازا"
+      },
+      "sunsetBeach": {
+        "name": "منتجع شاطئ الغروب"
+      },
+      "mountainView": {
+        "name": "نزل ماونتن فيو"
+      },
+      "cityLights": {
+        "name": "فندق أضواء المدينة"
+      }
     }
+  },
+  "ExploreDestinations": {
+    "title": "استكشف الوجهات",
+    "exploreNow": "استكشف الآن",
+    "destinations": {
+      "maldives": {
+        "name": "جزر المالديف",
+        "category": "جنة الشاطئ"
+      },
+      "swissAlps": {
+        "name": "جبال الألب السويسرية",
+        "category": "مغامرة"
+      },
+      "santorini": {
+        "name": "سانتوريني",
+        "category": "هروب رومانسي"
+      },
+      "dubai": {
+        "name": "دبي",
+        "category": "فخامة"
+      },
+      "bali": {
+        "name": "بالي",
+        "category": "ثقافي"
+      },
+      "tokyo": {
+        "name": "طوكيو",
+        "category": "حياة المدينة"
+      }
+    }
+  }
   },
   "RoomsPage": {
     "backToSearch": "العودة إلى البحث",
@@ -308,9 +359,178 @@
       "bookings": "حجوزات",
       "noBookingsToShow": "لا توجد حجوزات لعرضها"
     },
-    "CancellationModal": {},
-    "AmendReservationModal": {},
-    "BookingDetailsModal": {}
+    "CancellationModal": {
+    "confirmCancellation": "تأكيد الإلغاء",
+    "reviewBeforeProceeding": "يرجى مراجعة التفاصيل أدناه قبل المتابعة في إلغاء حجزك",
+    "bookingDetails": "تفاصيل الحجز",
+    "property": "العقار",
+    "room": "الغرفة",
+    "stayDates": "تواريخ الإقامة",
+    "nightStay_one": "إقامة {{count}} ليلة",
+    "nightStay_other": "إقامة {{count}} ليالي",
+    "totalAmount": "المبلغ الإجمالي",
+    "calculatingDetails": "حساب تفاصيل الإلغاء...",
+    "policyTypes": {
+      "flexible": "سياسة إلغاء مرنة",
+      "moderate": "سياسة إلغاء معتدلة",
+      "strict": "سياسة إلغاء صارمة",
+      "nonrefundable": "سياسة غير قابلة للاسترداد"
+    },
+    "refundEligible": "مؤهل لاسترداد {{percentage}}%",
+    "policyTerms": "شروط السياسة",
+    "yourRefundStatus": "حالة الاسترداد الخاصة بك",
+    "refundExplanation": "بناءً على تاريخ تسجيل الوصول وسياسة {{policyType}}، ستحصل على استرداد بنسبة {{percentage}}%.",
+    "financialBreakdown": "التفاصيل المالية",
+    "originalPayment": "مبلغ الدفع الأصلي",
+    "cancellationFee": "رسوم الإلغاء",
+    "refundAmount": "مبلغ الاسترداد",
+    "reasonForCancellation": "سبب الإلغاء",
+    "reasonPlaceholder": "يرجى إخبارنا بسبب الإلغاء (اختياري)...",
+    "feedbackHelpsImprove": "تساعدنا ملاحظاتك على تحسين خدماتنا. يتم استخدام هذه المعلومات داخليًا فقط.",
+    "success": "نجاح",
+    "error": "خطأ",
+    "successWithRefund": "تم إلغاء حجزك بنجاح. سيتم معالجة استرداد بقيمة ₹{{amount}}.",
+    "successNoRefund": "تم إلغاء حجزك بنجاح. لن يتم إصدار استرداد بناءً على سياسة الإلغاء.",
+    "errorCancelling": "غير قادر على إلغاء الحجز. يرجى المحاولة مرة أخرى أو الاتصال بالدعم.",
+    "errorRetrievingPolicy": "غير قادر على استرداد معلومات سياسة الإلغاء. يمكنك المتابعة، ولكن قد لا تكون معلومات الرسوم دقيقة.",
+    "actionCannotBeUndone": "لا يمكن التراجع عن هذا الإجراء",
+    "cancellationWarning": "بمجرد تأكيد الإلغاء، سيتم إلغاء حجزك على الفور ولا يمكن استعادته. سيتم معالجة أي استرداد قابل للتطبيق وفقًا للسياسة المذكورة أعلاه.",
+    "keepMyReservation": "الاحتفاظ بحجزي",
+    "processing": "جارٍ المعالجة...",
+    "confirmCancellationButton": "تأكيد الإلغاء",
+    "invalidDate": "تاريخ غير صالح"
+  },
+  "AmendReservationModal": {
+    "title": "تعديل حجزك",
+    "subtitle": "قم بإجراء تغييرات على إقامتك القادمة في {{propertyName}}",
+    "currentBookingDetails": "تفاصيل الحجز الحالية",
+    "stayDates": "تواريخ الإقامة",
+    "nightsCount_one": "ليلة {{count}}",
+    "nightsCount_other": "{{count}} ليالٍ",
+    "guests": "الضيوف",
+    "guestsCount": "{{adults}} بالغ، {{children}} طفل",
+    "roomDetails": "تفاصيل الغرفة",
+    "ratePlan": "خطة السعر",
+    "bestAvailableRate": "أفضل سعر متاح",
+    "total": "إجمالي",
+    "whatToChange": "ما الذي ترغب في تغييره؟",
+    "amendmentTypes": {
+      "dates": "التواريخ",
+      "guests": "الضيوف",
+      "roomType": "نوع الغرفة",
+      "specialRequests": "طلبات خاصة"
+    },
+    "changeDates": "تغيير التواريخ",
+    "selectNewDates": "حدد تواريخ الإقامة الجديدة",
+    "checkInDate": "تاريخ الوصول",
+    "checkOutDate": "تاريخ المغادرة",
+    "stayDuration_one": "مدة الإقامة: ليلة {{count}}",
+    "stayDuration_other": "مدة الإقامة: {{count}} ليالٍ",
+    "nightsAdded_one": "(+{{count}} ليلة)",
+    "nightsAdded_other": "(+{{count}} ليالٍ)",
+    "nightsReduced_one": "(-{{count}} ليلة)",
+    "nightsReduced_other": "(-{{count}} ليالٍ)",
+    "changeGuests": "تغيير الضيوف",
+    "numberOfAdults": "عدد البالغين",
+    "numberOfChildren": "عدد الأطفال",
+    "adult_one": "بالغ",
+    "adult_other": "بالغين",
+    "child_one": "طفل",
+    "child_other": "أطفال",
+    "guestsNote": "قد تطبق رسوم إضافية للضيوف الإضافيين. يختلف الحد الأقصى للإشغال حسب نوع الغرفة.",
+    "changeRoomType": "تغيير نوع الغرفة",
+    "roomType": "نوع الغرفة",
+    "roomTypeNote": "تخضع تغييرات نوع الغرفة للتوافر وقد تؤثر على السعر الإجمالي.",
+    "updateSpecialRequests": "تحديث الطلبات الخاصة",
+    "specialRequestsLabel": "الطلبات أو التفضيلات الخاصة",
+    "specialRequestsPlaceholder": "أدخل أي طلبات خاصة أو تفضيلات مثل طابق مرتفع، تسجيل دخول مبكر، إلخ.",
+    "specialRequestsNote": "تخضع الطلبات الخاصة للتوافر ولا يمكن ضمانها.",
+    "priceAdjustment": "تعديل السعر",
+    "additionalPayment": "مطلوب دفعة إضافية",
+    "additionalChargeExplanation": "ستؤدي تغييراتك إلى رسوم إضافية قدرها ₹{{amount}}",
+    "refundToBeProcessed": "سيتم معالجة المبلغ المسترد",
+    "refundExplanation": "ستؤدي تغييراتك إلى استرداد مبلغ ₹{{amount}}",
+    "amendmentPolicies": "سياسات التعديل",
+    "policies": {
+      "dateChanges": "تخضع تغييرات التاريخ للتوافر",
+      "changes72Hours": "قد تتكبد التغييرات في غضون 72 ساعة من تسجيل الوصول رسومًا إضافية",
+      "roomUpgrades": "تخضع ترقيات الغرف للتوافر والرسوم الإضافية",
+      "reducingStay": "قد يخضع تقليل مدة الإقامة لسياسة الإلغاء الأصلية للحجز"
+    },
+    "cancel": "إلغاء",
+    "processing": "جارٍ المعالجة...",
+    "confirmAmendment": "تأكيد التعديل",
+    "errors": {
+      "selectValidDates": "يرجى تحديد تواريخ صالحة للوصول والمغادرة.",
+      "unableToAmend": "غير قادر على تعديل الحجز. يرجى المحاولة مرة أخرى أو الاتصال بالدعم."
+    },
+    "success": {
+      "reservationAmended": "تم تعديل حجزك بنجاح.",
+      "additionalPayment": "سيتم معالجة دفعة إضافية بقيمة ₹{{amount}}.",
+      "refundProcessed": "سيتم معالجة استرداد بقيمة ₹{{amount}}.",
+      "noChange": "لا يوجد تغيير في السعر الإجمالي."
+    },
+    "roomTypes": {
+      "standard": "غرفة قياسية",
+      "deluxe": "غرفة ديلوكس",
+      "suite": "جناح",
+      "executive": "جناح تنفيذي",
+      "family": "غرفة عائلية"
+    },
+    "ratePlans": {
+      "bestAvailable": "أفضل سعر متاح",
+      "aaaMember": "سعر عضو AAA",
+      "package": "سعر الباقة",
+      "weekend": "عرض نهاية الأسبوع"
+    },
+    "modifications": {
+      "changedCheckIn": "تم تغيير تاريخ الوصول",
+      "changedCheckOut": "تم تغيير تاريخ المغادرة",
+      "changedRoomType": "تم تغيير نوع الغرفة إلى {{roomType}}",
+      "changedGuestCount": "تم تغيير عدد الضيوف",
+      "changedRatePlan": "تم تغيير خطة السعر إلى {{ratePlanName}}"
+    }
+  },
+  "BookingDetailsModal": {
+    "bookingNumber": "الحجز #{{id}}",
+    "closeModal": "إغلاق النافذة",
+    "status": {
+      "confirmed": "مؤكد",
+      "pending": "قيد الانتظار",
+      "cancelled": "ملغى"
+    },
+    "stayDetails": "تفاصيل الإقامة",
+    "checkIn": "تسجيل الدخول",
+    "checkOut": "تسجيل الخروج",
+    "duration": "المدة",
+    "nightsStay_one": "{{count}} ليلة",
+    "nightsStay_other": "{{count}} ليالي",
+    "roomType": "نوع الغرفة",
+    "roomName": "اسم الغرفة",
+    "guestDetails": "تفاصيل الضيف",
+    "guestName": "اسم الضيف",
+    "contactNumber": "رقم الاتصال",
+    "adults": "البالغين",
+    "children": "الأطفال",
+    "specialRequests": "طلبات خاصة",
+    "paymentDetails": "تفاصيل الدفع",
+    "paymentMethod": "طريقة الدفع",
+    "paymentMethods": {
+      "credit_card": "بطاقة ائتمان",
+      "debit_card": "بطاقة خصم",
+      "pay_at_hotel": "الدفع في الفندق",
+      "bank_transfer": "تحويل بنكي",
+      "paypal": "باي بال",
+      "google_pay": "جوجل باي"
+    },
+    "bookingDate": "تاريخ الحجز",
+    "totalAmount": "المبلغ الإجمالي",
+    "night": "ليلة",
+    "ratePlan": "خطة السعر",
+    "modifyBooking": "تعديل الحجز",
+    "cancelBooking": "إلغاء الحجز",
+    "printItinerary": "طباعة خط سير الرحلة"
+  }
   },
   "Payment": {
     "PaymentPageContent": {

@@ -28,7 +28,7 @@
     "leadGeneration": "लीड जनरेशन",
     "emailPlaceholder": "अपना ईमेल दर्ज करें",
     "subscribeButton": "सदस्यता लें",
-    "copyright": "© {year} ट्रिपस्विफ्ट - सर्वाधिकार सुरक्षित"
+    "copyright": "{year} ट्रिपस्विफ्ट - सर्वाधिकार सुरक्षित"
   },
   "HotelCard": {
     "heroTitle": "अपनी यात्रा के लिए सही ठहरने की जगह खोजें",
@@ -163,7 +163,58 @@
         "description": "कुछ होटलों पर अब बुक करें, बाद में भुगतान करें",
         "validTill": "3 घंटे 15 मिनट"
       }
+    },
+    "PopularHotels": {
+    "title": "लोकप्रिय होटल",
+    "freeCancellation": "मुफ्त रद्दीकरण",
+    "breakfast": "नाश्ता",
+    "startingFrom": "शुरुआती कीमत",
+    "bookNow": "अभी बुक करें",
+    "hotels": {
+      "grandPlaza": {
+        "name": "ग्रैंड प्लाजा होटल"
+      },
+      "sunsetBeach": {
+        "name": "सनसेट बीच रिजॉर्ट"
+      },
+      "mountainView": {
+        "name": "माउंटेन व्यू लॉज"
+      },
+      "cityLights": {
+        "name": "सिटी लाइट्स होटल"
+      }
     }
+  },
+  "ExploreDestinations": {
+    "title": "गंतव्य स्थान देखें",
+    "exploreNow": "अभी एक्सप्लोर करें",
+    "destinations": {
+      "maldives": {
+        "name": "मालदीव",
+        "category": "समुद्र तटीय स्वर्ग"
+      },
+      "swissAlps": {
+        "name": "स्विस आल्प्स",
+        "category": "साहसिक"
+      },
+      "santorini": {
+        "name": "सैंटोरिनी",
+        "category": "रोमांटिक गेटअवे"
+      },
+      "dubai": {
+        "name": "दुबई",
+        "category": "लक्जरी"
+      },
+      "bali": {
+        "name": "बाली",
+        "category": "सांस्कृतिक"
+      },
+      "tokyo": {
+        "name": "टोक्यो",
+        "category": "शहरी जीवन"
+      }
+    }
+  }
   },
   "RoomsPage": {
     "backToSearch": "खोज पर वापस जाएं",
@@ -308,9 +359,178 @@
       "bookings": "बुकिंग",
       "noBookingsToShow": "दिखाने के लिए कोई बुकिंग नहीं है"
     },
-    "CancellationModal": {},
-    "AmendReservationModal": {},
-    "BookingDetailsModal": {}
+    "CancellationModal": {
+    "confirmCancellation": "रद्दीकरण की पुष्टि करें",
+    "reviewBeforeProceeding": "अपने रद्दीकरण के साथ आगे बढ़ने से पहले कृपया नीचे दिए गए विवरण की समीक्षा करें",
+    "bookingDetails": "बुकिंग विवरण",
+    "property": "संपत्ति",
+    "room": "कमरा",
+    "stayDates": "ठहरने की तारीखें",
+    "nightStay_one": "{{count}} रात का प्रवास",
+    "nightStay_other": "{{count}} रातों का प्रवास",
+    "totalAmount": "कुल राशि",
+    "calculatingDetails": "रद्दीकरण विवरण की गणना की जा रही है...",
+    "policyTypes": {
+      "flexible": "लचीली रद्दीकरण नीति",
+      "moderate": "मध्यम रद्दीकरण नीति",
+      "strict": "सख्त रद्दीकरण नीति",
+      "nonrefundable": "अप्रतिदेय नीति"
+    },
+    "refundEligible": "{{percentage}}% रिफंड योग्य",
+    "policyTerms": "नीति शर्तें",
+    "yourRefundStatus": "आपकी रिफंड स्थिति",
+    "refundExplanation": "आपके चेक-इन तिथि और {{policyType}} नीति के आधार पर, आपको {{percentage}}% रिफंड प्राप्त होगा।",
+    "financialBreakdown": "वित्तीय विवरण",
+    "originalPayment": "मूल भुगतान राशि",
+    "cancellationFee": "रद्दीकरण शुल्क",
+    "refundAmount": "रिफंड राशि",
+    "reasonForCancellation": "रद्दीकरण का कारण",
+    "reasonPlaceholder": "कृपया हमें बताएं कि आप रद्द क्यों कर रहे हैं (वैकल्पिक)...",
+    "feedbackHelpsImprove": "आपकी प्रतिक्रिया हमें अपनी सेवाओं में सुधार करने में मदद करती है। यह जानकारी केवल आंतरिक रूप से उपयोग की जाती है।",
+    "success": "सफलता",
+    "error": "त्रुटि",
+    "successWithRefund": "आपकी बुकिंग सफलतापूर्वक रद्द कर दी गई है। ₹{{amount}} का रिफंड प्रोसेस किया जाएगा।",
+    "successNoRefund": "आपकी बुकिंग सफलतापूर्वक रद्द कर दी गई है। रद्दीकरण नीति के आधार पर कोई रिफंड जारी नहीं किया जाएगा।",
+    "errorCancelling": "बुकिंग रद्द करने में असमर्थ। कृपया पुनः प्रयास करें या सहायता से संपर्क करें।",
+    "errorRetrievingPolicy": "रद्दीकरण नीति जानकारी प्राप्त करने में असमर्थ। आप जारी रख सकते हैं, लेकिन शुल्क जानकारी सटीक नहीं हो सकती है।",
+    "actionCannotBeUndone": "यह क्रिया पूर्ववत नहीं की जा सकती",
+    "cancellationWarning": "रद्दीकरण की पुष्टि होते ही, आपका आरक्षण तुरंत रद्द हो जाएगा और इसे पुनर्स्थापित नहीं किया जा सकता। कोई भी लागू रिफंड ऊपर दी गई नीति के अनुसार संसाधित किया जाएगा।",
+    "keepMyReservation": "मेरा आरक्षण रखें",
+    "processing": "प्रोसेसिंग...",
+    "confirmCancellationButton": "रद्दीकरण की पुष्टि करें",
+    "inval,idDate": "अमान्य तिथि"
+  },
+  "AmendReservationModal": {
+    "title": "अपना आरक्षण संशोधित करें",
+    "subtitle": "{{propertyName}} में अपने आगामी प्रवास में परिवर्तन करें",
+    "currentBookingDetails": "वर्तमान बुकिंग विवरण",
+    "stayDates": "प्रवास तिथियाँ",
+    "nightsCount_one": "{{count}} रात",
+    "nightsCount_other": "{{count}} रातें",
+    "guests": "अतिथि",
+    "guestsCount": "{{adults}} वयस्क, {{children}} बच्चे",
+    "roomDetails": "कमरे का विवरण",
+    "ratePlan": "दर योजना",
+    "bestAvailableRate": "सर्वोत्तम उपलब्ध दर",
+    "total": "कुल",
+    "whatToChange": "आप क्या बदलना चाहते हैं?",
+    "amendmentTypes": {
+      "dates": "तिथियाँ",
+      "guests": "अतिथि",
+      "roomType": "कमरे का प्रकार",
+      "specialRequests": "विशेष अनुरोध"
+    },
+    "changeDates": "तिथियाँ बदलें",
+    "selectNewDates": "नई प्रवास तिथियाँ चुनें",
+    "checkInDate": "चेक-इन तिथि",
+    "checkOutDate": "चेक-आउट तिथि",
+    "stayDuration_one": "प्रवास अवधि: {{count}} रात",
+    "stayDuration_other": "प्रवास अवधि: {{count}} रातें",
+    "nightsAdded_one": "(+{{count}} रात)",
+    "nightsAdded_other": "(+{{count}} रातें)",
+    "nightsReduced_one": "(-{{count}} रात)",
+    "nightsReduced_other": "(-{{count}} रातें)",
+    "changeGuests": "अतिथि बदलें",
+    "numberOfAdults": "वयस्कों की संख्या",
+    "numberOfChildren": "बच्चों की संख्या",
+    "adult_one": "वयस्क",
+    "adult_other": "वयस्क",
+    "child_one": "बच्चा",
+    "child_other": "बच्चे",
+    "guestsNote": "अतिरिक्त अतिथियों के लिए अतिरिक्त शुल्क लागू हो सकता है। अधिकतम क्षमता कमरे के प्रकार के अनुसार भिन्न होती है।",
+    "changeRoomType": "कमरे का प्रकार बदलें",
+    "roomType": "कमरे का प्रकार",
+    "roomTypeNote": "कमरे के प्रकार में परिवर्तन उपलब्धता के अधीन हैं और कुल मूल्य को प्रभावित कर सकते हैं।",
+    "updateSpecialRequests": "विशेष अनुरोध अपडेट करें",
+    "specialRequestsLabel": "विशेष अनुरोध या प्राथमिकताएं",
+    "specialRequestsPlaceholder": "किसी भी विशेष अनुरोध या प्राथमिकता जैसे ऊंची मंजिल, जल्दी चेक-इन, आदि दर्ज करें।",
+    "specialRequestsNote": "विशेष अनुरोध उपलब्धता के अधीन हैं और उनकी गारंटी नहीं दी जा सकती।",
+    "priceAdjustment": "मूल्य समायोजन",
+    "additionalPayment": "अतिरिक्त भुगतान आवश्यक",
+    "additionalChargeExplanation": "आपके परिवर्तनों के परिणामस्वरूप ₹{{amount}} का अतिरिक्त शुल्क लगेगा",
+    "refundToBeProcessed": "रिफंड प्रोसेस किया जाएगा",
+    "refundExplanation": "आपके परिवर्तनों के परिणामस्वरूप ₹{{amount}} का रिफंड होगा",
+    "amendmentPolicies": "संशोधन नीतियाँ",
+    "policies": {
+      "dateChanges": "तिथि परिवर्तन उपलब्धता के अधीन हैं",
+      "changes72Hours": "चेक-इन से 72 घंटे के भीतर परिवर्तन पर अतिरिक्त शुल्क लग सकता है",
+      "roomUpgrades": "कमरे के अपग्रेड उपलब्धता और अतिरिक्त शुल्क के अधीन हैं",
+      "reducingStay": "प्रवास की अवधि को कम करने पर मूल बुकिंग की रद्दीकरण नीति लागू हो सकती है"
+    },
+    "cancel": "रद्द करें",
+    "processing": "प्रोसेसिंग...",
+    "confirmAmendment": "संशोधन की पुष्टि करें",
+    "errors": {
+      "selectValidDates": "कृपया वैध चेक-इन और चेक-आउट तिथियाँ चुनें।",
+      "unableToAmend": "बुकिंग संशोधित करने में असमर्थ। कृपया पुनः प्रयास करें या सहायता से संपर्क करें।"
+    },
+    "success": {
+      "reservationAmended": "आपका आरक्षण सफलतापूर्वक संशोधित किया गया है।",
+      "additionalPayment": "₹{{amount}} का अतिरिक्त भुगतान प्रोसेस किया जाएगा।",
+      "refundProcessed": "₹{{amount}} का रिफंड प्रोसेस किया जाएगा।",
+      "noChange": "कुल मूल्य में कोई परिवर्तन नहीं है।"
+    },
+    "roomTypes": {
+      "standard": "स्टैंडर्ड रूम",
+      "deluxe": "डीलक्स रूम",
+      "suite": "सूट रूम",
+      "executive": "एग्जीक्यूटिव सूट",
+      "family": "फैमिली रूम"
+    },
+    "ratePlans": {
+      "bestAvailable": "सर्वोत्तम उपलब्ध दर",
+      "aaaMember": "AAA सदस्य दर",
+      "package": "पैकेज दर",
+      "weekend": "वीकेंड स्पेशल"
+    },
+    "modifications": {
+      "changedCheckIn": "चेक-इन तिथि बदली गई",
+      "changedCheckOut": "चेक-आउट तिथि बदली गई",
+      "changedRoomType": "कमरे का प्रकार {{roomType}} में बदला गया",
+      "changedGuestCount": "अतिथियों की संख्या बदली गई",
+      "changedRatePlan": "दर योजना {{ratePlanName}} में बदली गई"
+    }
+  },
+  "BookingDetailsModal": {
+    "bookingNumber": "बुकिंग #{{id}}",
+    "closeModal": "मॉडल बंद करें",
+    "status": {
+      "confirmed": "पुष्टि की गई",
+      "pending": "लंबित",
+      "cancelled": "रद्द किया गया"
+    },
+    "stayDetails": "ठहरने का विवरण",
+    "checkIn": "चेक-इन",
+    "checkOut": "चेक-आउट",
+    "duration": "अवधि",
+    "nightsStay_one": "{{count}} रात",
+    "nightsStay_other": "{{count}} रातें",
+    "roomType": "कमरे का प्रकार",
+    "roomName": "कमरे का नाम",
+    "guestDetails": "अतिथि विवरण",
+    "guestName": "अतिथि का नाम",
+    "contactNumber": "संपर्क नंबर",
+    "adults": "वयस्क",
+    "children": "बच्चे",
+    "specialRequests": "विशेष अनुरोध",
+    "paymentDetails": "भुगतान विवरण",
+    "paymentMethod": "भुगतान विधि",
+    "paymentMethods": {
+      "credit_card": "क्रेडिट कार्ड",
+      "debit_card": "डेबिट कार्ड",
+      "pay_at_hotel": "होटल में भुगतान",
+      "bank_transfer": "बैंक ट्रांसफर",
+      "paypal": "पेपाल",
+      "google_pay": "गूगल पे"
+    },
+    "bookingDate": "बुकिंग की तारीख",
+    "totalAmount": "कुल राशि",
+    "night": "रात",
+    "ratePlan": "दर योजना",
+    "modifyBooking": "बुकिंग संशोधित करें",
+    "cancelBooking": "बुकिंग रद्द करें",
+    "printItinerary": "मार्ग विवरण प्रिंट करें"
+  }
   },
   "Payment": {
     "PaymentPageContent": {
