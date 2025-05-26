@@ -77,6 +77,7 @@ export default function BookingTabs() {
         );
 
         setBookings(response.data.bookingDetails);
+        console.log("booking details we get from backend ",response.data.bookingDetails)
         setTotalBookings(response.data.totalBookings);
         setTotalPages(response.data.totalPages);
         setLoading(false);

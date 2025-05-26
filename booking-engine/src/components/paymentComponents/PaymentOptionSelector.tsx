@@ -59,7 +59,7 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
             type="radio"
             name="paymentOption"
             value="payAtHotel"
-            checked={selectedOption === 'payAtHotel' || !selectedOption}
+            // checked={selectedOption === 'payAtHotel' || !selectedOption}
             onChange={() => onChange('payAtHotel')}
             className="mr-3 mt-1 text-tripswift-blue flex-shrink-0"
             defaultChecked
