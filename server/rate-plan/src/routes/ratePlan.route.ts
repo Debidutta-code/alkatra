@@ -6,17 +6,17 @@ const route = Router();
 
 
 route.put(
-    "/update/:id",
-    protect as any,
-    async (req: Request, res: Response, next: NextFunction) => {
-        const response = await RatePlanController.updateRatePlan(req, res, next);
-        res.status(200).json(response);
-    }
+  "/update/:id",
+  protect as any,
+  async (req: Request, res: Response, next: NextFunction) => {
+    const response = await RatePlanController.updateRatePlan(req, res, next);
+    res.status(200).json(response);
+  }
 );
 
 route.post(
   "/create",
-   protect as any,
+  protect as any,
   async (req: Request, res: Response, next: NextFunction) => {
     console.log("Inside route handler");
     const response = await RatePlanController.createRatePlan(req, res, next);
@@ -24,6 +24,14 @@ route.post(
   }
 );
 
+route.get(
+  "/:hotelCode",
+  protect as any,
+  async (req: Request, res: Response, next: NextFunction) => {
+    const response = await RatePlanController.getRatePlanByHotelCode(req, res, next);
+    res.status(200).json(response);
+  }
+)
 
 
 export default route;
