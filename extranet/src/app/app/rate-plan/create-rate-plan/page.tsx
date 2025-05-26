@@ -285,7 +285,7 @@ export default function RatePlanForm() {
   };
 
   const handleCancel = () => {
-    router.push(`/app/property/${propertyId}`);
+    router.push(`/app/rate-plan/get-rate-plan/?propertyId=${propertyId}`);
   };
 
   if (loading) return <div className="text-center text-gray-600">Loading...</div>;
@@ -366,14 +366,14 @@ export default function RatePlanForm() {
               },
             }}
           />
-          <BookingAdvanceForm
+          {/* <BookingAdvanceForm
             formData={formData}
             handleChange={handleChange}
             errors={{
               minBookAdvance: validationErrors['minBookAdvance'],
               maxBookAdvance: validationErrors['maxBookAdvance'],
             }}
-          />
+          /> */}
         </div>
       </div>
 

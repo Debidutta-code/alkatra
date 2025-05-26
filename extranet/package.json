@@ -6,7 +6,7 @@
     "dev": "next dev --port=3000",
     "clean": "rimraf .next",
     "build": "npm run clean && next build",
-    "start": "next start",
+    "start": "next start --port=3037",
     "start:pm2": "npm run clean && npm run build && npm start",
     "lint": "next lint"
   },
