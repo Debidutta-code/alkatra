@@ -92,10 +92,10 @@ export class RatePlanService {
             if (!root['$']) throw new RatePlanError('XML Structure Error', 'Root attributes are missing');
             const rootAttrs = root['$'];
 
-            const requiredNamespaces = ['xmlns:xsi', 'xmlns:xsd', 'xmlns'];
-            for (const ns of requiredNamespaces) {
-                if (!rootAttrs[ns]) throw new RatePlanError('Namespace Missing', `${ns} namespace is required`);
-            }
+            // const requiredNamespaces = ['xmlns:xsi', 'xmlns:xsd', 'xmlns'];
+            // for (const ns of requiredNamespaces) {
+            //     if (!rootAttrs[ns]) throw new RatePlanError('Namespace Missing', `${ns} namespace is required`);
+            // }
 
             const requiredRootAttrs = ['EchoToken', 'TimeStamp', 'Target', 'Version'];
             for (const attr of requiredRootAttrs) {
