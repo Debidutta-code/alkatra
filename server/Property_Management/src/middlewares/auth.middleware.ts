@@ -15,7 +15,6 @@ export const protect = catchAsync(
       req.headers.authorization.startsWith("Bearer")
     ) {
       token = req.headers.authorization.split(" ")[1];
-      console.log("token -", token)
     }
 
     if (!token) {

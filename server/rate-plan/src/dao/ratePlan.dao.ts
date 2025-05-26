@@ -29,7 +29,9 @@ class RatePlanDao {
   }
 
   public static async getRatePlanByHotelCode(hotelCode: string) {
-    return await RatePlan.find({ hotelCode });
+    return await RatePlan.find(
+      { propertyId: hotelCode }
+    );
   }
 
 }
