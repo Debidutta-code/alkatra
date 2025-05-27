@@ -133,11 +133,11 @@ const MapRatePlanPage: React.FC = () => {
   };
 
   return (
-    <div className="px-6 min-h-screen" style={{ height: 'calc(100vh - 100px)' }}>
+    <div className="px-10 min-h-screen" style={{ height: 'calc(100vh - 100px)' }}>
       <Toaster position="top-right" />
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm pt-4">
+        <div className="bg-white rounded-lg pt-4">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold text-gray-900">Rate Plan Allotment</h1>
             <button
