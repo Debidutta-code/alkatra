@@ -37,7 +37,7 @@ const bookingSchema = new mongoose.Schema({
   },
   booking_user_phone: {
     type: String,
-    required: true,
+    required: false,
   },
   guests: [guestSchema], // array of guest objects
   booking_dates: {
@@ -46,11 +46,11 @@ const bookingSchema = new mongoose.Schema({
   },
   checkInDate: {
     type: Date,
-    required: true,
+    required: false,
   },
   checkOutDate: {
     type: Date,
-    required: true,
+    required: false,
   },
   payment: {
     type: String,

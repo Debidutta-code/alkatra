@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import LoadingSkeleton from "../hotelListingComponents/LoadingSkeleton";
 import { formatDate, calculateNights } from "@/utils/dateUtils";
+import QRCodeDisplay from "./QRCodeDisplay";
 
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
@@ -115,6 +116,10 @@ const RoomsPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showPropertyDetails, setShowPropertyDetails] = useState(true);
   const [selectedImage, setSelectedImage] = useState<number>(0);
+  const [qrCodeData, setQrCodeData] = useState({
+    qrCode: null,
+    couponCode: null,
+  });
 
   // Get guest details from Redux
   const { guestDetails } = useSelector((state) => state.hotel);
@@ -184,6 +189,14 @@ const RoomsPage: React.FC = () => {
         );
 
         setRooms(response.data);
+
+        // Extract QR code data if available
+        if (response.data.qrCode) {
+          setQrCodeData({
+            qrCode: response.data.qrCode,
+            couponCode: response.data.couponCode || "",
+          });
+        }
 
         // Handle different response formats
         const propDetails = propertyResponse.data.property || propertyResponse.data.data || propertyResponse.data;
@@ -398,7 +411,7 @@ const RoomsPage: React.FC = () => {
             <div>
               <h1 className="text-property-title">
                 {propertyDetails?.property_name || t('RoomsPage.viewPropertyDetails')}
-              </h1> 
+              </h1>
               {propertyDetails?.property_address && (
                 <div className="text-location flex items-center text-gray-600 mt-1.5">
                   <MapPin className="h-4 w-4 mr-1.5 text-tripswift-blue flex-shrink-0" />
@@ -641,21 +654,16 @@ const RoomsPage: React.FC = () => {
                   )}
 
                   {/* Property description */}
-                  {propertyDetails?.description && (
+                  {/* {propertyDetails?.description && (
                     <div className="mt-4">
                       <h3 className="text-section-heading mb-2">{t('RoomsPage.aboutThisProperty')}</h3>
                       <p className="text-description">
                         {propertyDetails.description}
                       </p>
                     </div>
-                  )}
-                </div>
+                  )} */}
+                  <div className="mt-4">
 
-                
-                {/* Property amenities and contact info */}
-                <div className="lg:col-span-1">
-                  {/* Property amenities */}
-                  <div className="bg-tripswift-blue/5 p-4 rounded-xl mb-4">
                     <h3 className="text-section-heading mb-3">{t('RoomsPage.propertyAmenities')}</h3>
 
                     {propertyDetails?.property_amenities?.amenities &&
@@ -676,6 +684,41 @@ const RoomsPage: React.FC = () => {
                       </div>
                     ) : (
                       <p className="text-description">{t('RoomsPage.noAmenitiesSpecified')}</p>
+                    )}
+                  </div>
+                </div>
+
+
+                {/* Property amenities and contact info */}
+                <div className="lg:col-span-1">
+                  {/* Property amenities */}
+                  <div className="bg-tripswift-blue/5 p-4 rounded-xl mb-2">
+                    {/* <h3 className="text-section-heading mb-3">{t('RoomsPage.propertyAmenities')}</h3>
+
+                    {propertyDetails?.property_amenities?.amenities &&
+                      Object.keys(propertyDetails.property_amenities.amenities).length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {Object.entries(propertyDetails.property_amenities.amenities)
+                          .filter(([_, hasAmenity]) => hasAmenity)
+                          .slice(0, 8)
+                          .map(([amenity]) => (
+                            <div
+                              key={amenity}
+                              className="flex items-center text-xs font-tripswift-medium text-tripswift-blue bg-tripswift-blue/5 border border-tripswift-blue/20 px-2 py-1 rounded-md"
+                            >
+                              {getAmenityIcon(amenity)}
+                              <span className="capitalize ml-1">{t(`RoomsPage.amenitiesList.${amenity}`)}</span>
+                            </div>
+                          ))}
+                      </div>
+                    ) : (
+                      <p className="text-description">{t('RoomsPage.noAmenitiesSpecified')}</p>
+                    )} */}
+                    {/* QR Code Section - Add this */}
+                    {qrCodeData.qrCode && qrCodeData.couponCode && (
+                      <QRCodeDisplay
+                        qrCode={qrCodeData.qrCode}
+                      />
                     )}
                   </div>
 
@@ -832,7 +875,7 @@ const RoomsPage: React.FC = () => {
           </div>
         )}
       </div>
-      
+
       {/* GuestInformationModal remains unchanged */}
       <GuestInformationModal
         isOpen={isModalOpen}
