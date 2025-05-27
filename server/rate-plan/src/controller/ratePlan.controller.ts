@@ -82,6 +82,7 @@ class RatePlanController {
     public static async getRatePlanByHotelCode(req: Request, res: Response, next: NextFunction) {
         try {
             const { hotelCode, invTypeCode, startDate, endDate } = req.body;
+            console.log( hotelCode, invTypeCode, startDate, endDate )
             const page=req.query.page.toString()
             const response = await RatePlanService.getRatePlanByHotelCode(hotelCode, invTypeCode&&invTypeCode, startDate&&new Date(startDate), endDate&&new Date(endDate),page&&parseInt(page));
 

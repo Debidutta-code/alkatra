@@ -69,27 +69,27 @@ class RatePlanDao {
 
 
       if (Price && rateAmountId) {
-    const rateUpdated = await RateAmount.findByIdAndUpdate(
-        rateAmountId,
-        { 
-            $set: { 
-                "baseByGuestAmts.$[].amountBeforeTax": Price 
-            } 
-        },
-        { new: true, runValidators: true }
-    );
+        const rateUpdated = await RateAmount.findByIdAndUpdate(
+          rateAmountId,
+          {
+            $set: {
+              "baseByGuestAmts.$[].amountBeforeTax": Price
+            }
+          },
+          { new: true, runValidators: true }
+        );
 
-    if (!rateUpdated) {
-        throw new Error("Rate Amount update failed");
-    }
+        if (!rateUpdated) {
+          throw new Error("Rate Amount update failed");
+        }
 
-    return {
-        rateAmount: rateUpdated,
-        message: "Rate plan updated successfully"
-    };
-} else {
-    throw new Error("Price or rateAmountId not provided");
-}
+        return {
+          rateAmount: rateUpdated,
+          message: "Rate plan updated successfully"
+        };
+      } else {
+        throw new Error("Price or rateAmountId not provided");
+      }
 
 
 
@@ -120,6 +120,7 @@ class RatePlanDao {
       resultsPerPage: number;
     };
   }> {
+    
     const resultsPerPage = 20;
     const skip = (page - 1) * resultsPerPage;
 
