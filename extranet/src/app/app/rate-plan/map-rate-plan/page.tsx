@@ -48,7 +48,15 @@ const MapRatePlanPage: React.FC = () => {
     if (dateRange?.from && dateRange?.to) {
       filtered = filtered.filter(item => {
         const itemDate = parseISO(item.date);
-        return isWithinInterval(itemDate, { start: dateRange.from, end: dateRange.to });
+        // Normalize dates to remove time components for comparison
+        const itemDateStr = format(itemDate, 'yyyy-MM-dd');
+        const endDateStr = format(dateRange.to, 'yyyy-MM-dd');
+        
+        // Include item if it's within the interval or matches the end date
+        return (
+          isWithinInterval(itemDate, { start: dateRange.from, end: dateRange.to }) ||
+          itemDateStr === endDateStr
+        );
       });
     }
 
@@ -93,22 +101,6 @@ const MapRatePlanPage: React.FC = () => {
     }
   };
 
-  const handleRatePlanChange = (index: number, newRatePlanCode: string) => {
-    const updatedData = [...data];
-    const originalIndex = data.findIndex(item => 
-      item.date === filteredData[index].date &&
-      item.ratePlanCode === filteredData[index].ratePlanCode &&
-      item.roomTypeCode === filteredData[index].roomTypeCode
-    );
-    
-    if (originalIndex !== -1) {
-      const ratePlanName = data.find(item => item.ratePlanCode === newRatePlanCode)?.ratePlanName || '';
-      updatedData[originalIndex].ratePlanCode = newRatePlanCode;
-      updatedData[originalIndex].ratePlanName = ratePlanName;
-      setData(updatedData);
-    }
-  };
-
   const handleSave = async () => {
     setIsLoading(true);
     // Simulate API call
@@ -141,16 +133,16 @@ const MapRatePlanPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="px-6 min-h-screen" style={{ height: 'calc(100vh - 100px)' }}>
       <Toaster position="top-right" />
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-sm pt-4">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-gray-900">Map Rate Plan</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Rate Plan Allotment</h1>
             <button
               onClick={resetFilters}
-              className="px-4 py-2 text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 text-gray-600 hover:text-gray-900 border rounded-lg hover:bg-gray-50"
             >
               Reset Filters
             </button>
@@ -173,7 +165,7 @@ const MapRatePlanPage: React.FC = () => {
                 }
               >
                 <PopoverTrigger>
-                  <div className="w-full px-3 py-2 border border-gray-300 rounded-lg cursor-pointer hover:border-gray-400 bg-white">
+                  <div className="w-full px-3 py-2 border rounded-lg cursor-pointer hover:border-gray-400">
                     {dateRange?.from ? (
                       dateRange.to ? (
                         `${format(dateRange.from, 'PPP')} - ${format(dateRange.to, 'PPP')}`
@@ -196,7 +188,7 @@ const MapRatePlanPage: React.FC = () => {
               <select
                 value={selectedRoomType}
                 onChange={(e) => setSelectedRoomType(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All Room Types</option>
                 {roomTypes.map(type => (
@@ -226,7 +218,7 @@ const MapRatePlanPage: React.FC = () => {
 
         {/* Results */}
         <div className="bg-white rounded-lg shadow-sm">
-          <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+          <div className="pb-4 border-b border-gray-200 flex justify-between items-center">
             <h2 className="text-lg font-semibold text-gray-900">
               Rate Plan Data ({filteredData.length} items)
             </h2>
@@ -276,22 +268,8 @@ const MapRatePlanPage: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          {editingRows.has(index) ? (
-                            <select
-                              value={item.ratePlanCode}
-                              onChange={(e) => handleRatePlanChange(index, e.target.value)}
-                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            >
-                              {ratePlans.map(plan => (
-                                <option key={plan} value={plan}>{plan}</option>
-                              ))}
-                            </select>
-                          ) : (
-                            <>
-                              <div className="text-sm font-medium text-gray-900">{item.ratePlanName}</div>
-                              <div className="text-sm text-gray-500">{item.ratePlanCode}</div>
-                            </>
-                          )}
+                          <div className="text-sm font-medium text-gray-900">{item.ratePlanName}</div>
+                          <div className="text-sm text-gray-500">{item.ratePlanCode}</div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
