@@ -86,23 +86,23 @@ const HotelCard = () => {
      {/* Main Content */}
      <div className={`relative z-10 h-full flex flex-col items-center justify-center px-4 transition-all duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0 translate-y-10'}`}>
         {/* Hero Text */}
-        <div className="max-w-3xl text-center mb-10 animate-in slide-in-from-bottom duration-700">
+        <div className="max-w-3xl text-center  sm:mb-10 animate-in slide-in-from-bottom duration-700">
           <div className="bg-tripswift-blue/20 backdrop-blur-sm text-tripswift-off-white/90 text-sm font-tripswift-medium px-4 py-1.5 rounded-full inline-flex items-center mb-6 shadow-lg">
             <span className="inline-block w-2 h-2 bg-tripswift-blue rounded-full mr-2 animate-pulse"></span>
-            <span>Exclusive Offers Available</span>
+            <span className='text-[#e9d8fd]'>Exclusive Offers Available</span>
           </div>
           
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-tripswift-extrabold text-tripswift-off-white mb-5 leading-tight tracking-tight drop-shadow-lg">
+          <h1 className="text-2xl md:text-5xl mt-4 md:mt-10 lg:text-6xl font-tripswift-extrabold text-tripswift-off-white mb-5 leading-tight tracking-tight drop-shadow-lg">
             {t('HotelCard.heroTitle')}
           </h1>
           
-          <p className="text-lg md:text-xl text-tripswift-off-white font-tripswift-regular max-w-2xl mx-auto drop-shadow-md">
+          <p className="text-lg md:text-xl mb-2 md:mb-0 leading-tight md:leading-normal  text-tripswift-off-white font-tripswift-regular max-w-2xl mx-auto drop-shadow-md">
             {t('HotelCard.heroSubtitle')}
           </p>
         </div>
         
         {/* Search Container */}
-        <div className="w-full max-w-5xl animate-in slide-in-from-bottom duration-700 delay-200">
+        <div className="w-[290px] md:w-full max-w-5xl animate-in slide-in-from-bottom duration-700 delay-200">
           {/* Search Box */}
           <CompactSearchBar 
             initialLocation="Bhubaneswar" 
@@ -112,7 +112,7 @@ const HotelCard = () => {
           />
           
           {/* Special Offers Bar */}
-          <div className="mt-5 flex items-center justify-center animate-in slide-in-from-bottom duration-700 delay-300">
+          <div className="mt-5 md:flex items-center hidden  justify-center animate-in slide-in-from-bottom duration-700 delay-300">
             <div className="bg-tripswift-off-white/20 backdrop-blur-lg px-5 py-2.5 rounded-full shadow-lg flex items-center gap-4">
               <div className="flex items-center">
                 <span className="inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse mr-2"></span>
