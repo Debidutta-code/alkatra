@@ -65,6 +65,7 @@ export default function PaymentSuccess() {
 
   useEffect(() => {
     // If we have a reference, fetch the booking details
+    
     if (reference) {
       const fetchBookingByReference = async () => {
         try {
@@ -197,7 +198,7 @@ export default function PaymentSuccess() {
         setError(true);
         setErrorMessage(
           error?.message ||
-          t("Payment.PaymentSuccess.bookingFailedDefaultMessage")
+            t("Payment.PaymentSuccess.bookingFailedDefaultMessage")
         );
         toast.error(t("Payment.PaymentSuccess.bookingFailedDefaultToast"));
 
@@ -285,7 +286,12 @@ export default function PaymentSuccess() {
     paymentMethod,
     router,
   ]);
-
+  const handleViewBookings = () => {
+    router.replace("/my-trip"); // replaces current history entry
+  };
+  const handleViewHome =()=>{
+  router.replace("/")
+  }
   const getPaymentMethodText = () => {
     if (!booking) return "";
 
@@ -344,35 +350,43 @@ export default function PaymentSuccess() {
       const bookingAdults = booking.bookingDetails.adults || 1;
       const bookingChildren = booking.bookingDetails.children || 0;
 
-      return `${bookingRooms} ${bookingRooms === 1
-        ? t("Payment.PaymentPageContent.bookingSummary.room")
-        : t("Payment.PaymentPageContent.bookingSummary.rooms")
-        } · ${bookingAdults} ${bookingAdults === 1
+      return `${bookingRooms} ${
+        bookingRooms === 1
+          ? t("Payment.PaymentPageContent.bookingSummary.room")
+          : t("Payment.PaymentPageContent.bookingSummary.rooms")
+      } · ${bookingAdults} ${
+        bookingAdults === 1
           ? t("Payment.PaymentPageContent.bookingSummary.adult")
           : t("Payment.PaymentPageContent.bookingSummary.adults")
-        }${bookingChildren > 0
-          ? ` · ${bookingChildren} ${bookingChildren === 1
-            ? t("Payment.PaymentPageContent.bookingSummary.child")
-            : t("Payment.PaymentPageContent.bookingSummary.children")
-          }`
+      }${
+        bookingChildren > 0
+          ? ` · ${bookingChildren} ${
+              bookingChildren === 1
+                ? t("Payment.PaymentPageContent.bookingSummary.child")
+                : t("Payment.PaymentPageContent.bookingSummary.children")
+            }`
           : ""
-        }`;
+      }`;
     }
 
     // Otherwise use URL params or defaults
-    return `${rooms} ${rooms === 1
-      ? t("Payment.PaymentPageContent.bookingSummary.room")
-      : t("Payment.PaymentPageContent.bookingSummary.rooms")
-      } · ${adults} ${adults === 1
+    return `${rooms} ${
+      rooms === 1
+        ? t("Payment.PaymentPageContent.bookingSummary.room")
+        : t("Payment.PaymentPageContent.bookingSummary.rooms")
+    } · ${adults} ${
+      adults === 1
         ? t("Payment.PaymentPageContent.bookingSummary.adult")
         : t("Payment.PaymentPageContent.bookingSummary.adults")
-      }${children > 0
-        ? ` · ${children} ${children === 1
-          ? t("Payment.PaymentPageContent.bookingSummary.child")
-          : t("Payment.PaymentPageContent.bookingSummary.children")
-        }`
+    }${
+      children > 0
+        ? ` · ${children} ${
+            children === 1
+              ? t("Payment.PaymentPageContent.bookingSummary.child")
+              : t("Payment.PaymentPageContent.bookingSummary.children")
+          }`
         : ""
-      }`;
+    }`;
   };
 
   // Rest of your render code - significantly improved UI
@@ -570,7 +584,8 @@ export default function PaymentSuccess() {
                           amount / getBookingNights()
                         ).toLocaleString()}{" "}
                         {t("Payment.PaymentSuccess.perNight")} / night
-                      </span>                    </div>
+                      </span>{" "}
+                    </div>
 
                     {/* Show calculation */}
                     <div className="flex justify-between mb-2">
@@ -591,7 +606,6 @@ export default function PaymentSuccess() {
 
                     <div className="border-t border-gray-200 my-2 pt-2"></div>
                     <div className="flex justify-between">
-
                       <span className="font-tripswift-bold text-lg text-tripswift-black">
                         {t("Payment.PaymentSuccess.total")}
                       </span>
@@ -601,7 +615,7 @@ export default function PaymentSuccess() {
                     </div>
                     <div className="text-xs text-tripswift-black/50 text-right mt-1">
                       {getPaymentMethodText() ===
-                        t("Payment.PaymentSuccess.paymentMethodPayAtHotel")
+                      t("Payment.PaymentSuccess.paymentMethodPayAtHotel")
                         ? t("Payment.PaymentSuccess.paymentAtHotelMessage")
                         : t("Payment.PaymentSuccess.paymentProcessedMessage")}
                     </div>
@@ -610,20 +624,20 @@ export default function PaymentSuccess() {
 
                 {/* Action Buttons */}
                 <div className="pt-6 flex flex-col sm:flex-row gap-4">
-                  <Link
-                    href="/my-trip"
+                  <button
+                    onClick={handleViewBookings}
                     className="btn-tripswift-primary py-3 px-6 rounded-lg flex-1 flex items-center justify-center gap-2 text-center font-tripswift-medium transition-all duration-300 hover:shadow-md"
                   >
                     <CheckCircle size={18} />
                     <span>{t("Payment.PaymentSuccess.viewMyBookings")}</span>
-                  </Link>
-                  <Link
-                    href="/"
+                  </button>
+                  <button
+                    onClick={handleViewHome}
                     className="bg-gray-100 text-tripswift-black py-3 px-6 rounded-lg flex-1 flex items-center justify-center gap-2 text-center font-tripswift-medium transition-colors duration-300 hover:bg-gray-200"
                   >
                     <Home size={18} />
                     <span>{t("Payment.PaymentSuccess.returnHome")}</span>
-                  </Link>
+                  </button>
                 </div>
               </div>
             </div>
@@ -675,7 +689,10 @@ export default function PaymentSuccess() {
 
                 {/* Explore more hotels link */}
                 <div className="mt-4 text-center">
-                  <Link href="/" className="inline-flex items-center text-tripswift-blue hover:underline text-sm transition-all duration-300">
+                  <Link
+                    href="/"
+                    className="inline-flex items-center text-tripswift-blue hover:underline text-sm transition-all duration-300"
+                  >
                     {t("Payment.PaymentSuccess.exploreMoreHotels")}{" "}
                     <ArrowRight size={14} className="ml-1" />
                   </Link>
