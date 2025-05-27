@@ -559,7 +559,7 @@
       "priceDetails": {
         "title": "تفاصيل السعر",
         "roomRate": "سعر الغرفة",
-        "perNight": "لكل ليلة",
+        "perNight": " / ليلة",
         "total": "الإجمالي",
         "payAtHotelInfo": "سيتم تخزين بطاقتك بشكل آمن، ولكن سيتم تحصيل الدفع في الفندق."
       },
@@ -623,7 +623,7 @@
       "paymentMethodUnknown": "غير معروف",
       "paymentDetailsTitle": "تفاصيل الدفع",
       "roomRate": "سعر الغرفة",
-      "perNight": "لكل ليلة",
+      "perNight": " / ليلة",
       "total": "الإجمالي",
       "paymentAtHotelMessage": "سيتم تحصيل الدفع في الفندق",
       "paymentProcessedMessage": "تمت معالجة الدفع",

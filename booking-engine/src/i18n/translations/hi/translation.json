@@ -559,7 +559,7 @@
       "priceDetails": {
         "title": "मूल्य विवरण",
         "roomRate": "कमरे का किराया",
-        "perNight": "प्रति रात",
+        "perNight": "/ रात",
         "total": "कुल",
         "payAtHotelInfo": "आपका कार्ड सुरक्षित रूप से संग्रहीत किया जाएगा, लेकिन भुगतान होटल में एकत्र किया जाएगा।"
       },
@@ -623,7 +623,7 @@
       "paymentMethodUnknown": "अज्ञात",
       "paymentDetailsTitle": "भुगतान विवरण",
       "roomRate": "कमरे का किराया",
-      "perNight": "प्रति रात",
+      "perNight": "/ रात",
       "total": "कुल",
       "paymentAtHotelMessage": "भुगतान होटल में एकत्र किया जाएगा",
       "paymentProcessedMessage": "भुगतान संसाधित हो गया है",

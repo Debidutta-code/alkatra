@@ -13,7 +13,7 @@ const BookingTabsNavigation: React.FC<BookingTabsNavigationProps> = ({ activeTab
   const { t } = useTranslation(); // Initialize useTranslation
 
   return (
-    <div className="bg-tripswift-off-white rounded-xl shadow-md mb-8 overflow-hidden font-noto-sans">
+    <div className="bg-tripswift-off-white rounded-xl shadow-md mb-6 overflow-hidden font-noto-sans">
       <div className="flex flex-wrap md:flex-nowrap">
         <button
           className={`flex-1 py-4 px-4 text-center font-tripswift-medium text-sm md:text-base transition-colors duration-300 border-b-2 ${activeTab === 'all'

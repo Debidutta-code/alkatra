@@ -64,6 +64,9 @@ export default function PaymentSuccess() {
   const amount = amountParam ? parseFloat(amountParam) : reduxAmount;
 
   useEffect(() => {
+    // Prevent background scrolling
+    document.body.style.overflow = 'auto';
+    
     // If we have a reference, fetch the booking details
     if (reference) {
       const fetchBookingByReference = async () => {
@@ -378,22 +381,22 @@ export default function PaymentSuccess() {
   // Rest of your render code - significantly improved UI
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8] font-noto-sans">
-      <div className="container mx-auto px-4 pt-10 pb-20 relative z-10">
+      <div className="container mx-auto px-3 sm:px-4 pt-5 sm:pt-10 pb-12 sm:pb-20 relative z-10">
         {isLoading ? (
-          <div className="bg-tripswift-off-white rounded-xl shadow-xl p-12 text-center animate-pulse max-w-lg mx-auto mt-16">
-            <div className="w-20 h-20 border-t-4 border-b-4 border-tripswift-blue rounded-full animate-spin mx-auto mb-8"></div>
-            <h2 className="text-xl font-tripswift-medium text-tripswift-black mb-3">
+          <div className="bg-tripswift-off-white rounded-xl shadow-xl p-6 sm:p-12 text-center animate-pulse max-w-lg mx-auto mt-8 sm:mt-16">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 border-t-4 border-b-4 border-tripswift-blue rounded-full animate-spin mx-auto mb-6 sm:mb-8"></div>
+            <h2 className="text-lg sm:text-xl font-tripswift-medium text-tripswift-black mb-3">
               {t("Payment.PaymentSuccess.processingBooking")}
             </h2>
-            <p className="text-tripswift-black/60">
+            <p className="text-sm sm:text-base text-tripswift-black/60">
               {t("Payment.PaymentSuccess.confirmingReservation")}
             </p>
           </div>
         ) : error ? (
-          <div className="bg-tripswift-off-white rounded-xl shadow-xl p-12 text-center max-w-lg mx-auto mt-16">
-            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="bg-tripswift-off-white rounded-xl shadow-xl p-6 sm:p-12 text-center max-w-lg mx-auto mt-8 sm:mt-16">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg
-                className="w-10 h-10 text-red-500"
+                className="w-8 h-8 sm:w-10 sm:h-10 text-red-500"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -406,13 +409,13 @@ export default function PaymentSuccess() {
                 />
               </svg>
             </div>
-            <h2 className="text-2xl font-tripswift-bold text-tripswift-black mb-4">
+            <h2 className="text-xl sm:text-2xl font-tripswift-bold text-tripswift-black mb-4">
               {t("Payment.PaymentSuccess.bookingFailedTitle")}
             </h2>
-            <p className="text-tripswift-black/70 mb-6">{errorMessage}</p>
+            <p className="text-sm sm:text-base text-tripswift-black/70 mb-6">{errorMessage}</p>
             <Link
               href="/"
-              className="btn-tripswift-primary py-3 px-8 rounded-lg inline-block transition-all duration-300 hover:shadow-lg"
+              className="btn-tripswift-primary py-2.5 sm:py-3 px-6 sm:px-8 rounded-lg inline-block transition-all duration-300 hover:shadow-lg text-sm sm:text-base"
             >
               {t("Payment.PaymentSuccess.returnToHomepage")}
             </Link>
@@ -422,16 +425,16 @@ export default function PaymentSuccess() {
             {/* Success Card */}
             <div className="max-w-4xl mx-auto bg-tripswift-off-white rounded-xl shadow-xl overflow-hidden">
               {/* Top success banner */}
-              <div className="bg-gradient-to-r from-green-500 to-emerald-600 py-8 px-8 text-tripswift-off-white">
+              <div className="bg-gradient-to-r from-green-500 to-emerald-600 py-4 sm:py-8 px-4 sm:px-8 text-tripswift-off-white">
                 <div className="flex items-center">
-                  <div className="bg-tripswift-off-white/20 p-3 rounded-full">
-                    <CheckCircle size={32} />
+                  <div className="bg-tripswift-off-white/20 p-2 sm:p-3 rounded-full">
+                    <CheckCircle size={24} className="sm:w-8 sm:h-8" />
                   </div>
-                  <div className="ml-4">
-                    <h1 className="text-3xl font-tripswift-bold">
+                  <div className="ml-3 sm:ml-4">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-tripswift-bold text-tripswift-off-white">
                       {t("Payment.PaymentSuccess.bookingConfirmedTitle")}
                     </h1>
-                    <p className="opacity-90 mt-1">
+                    <p className="opacity-90 mt-1 text-sm sm:text-base">
                       {t("Payment.PaymentSuccess.reservationSuccessMessage")}
                     </p>
                   </div>
@@ -445,38 +448,38 @@ export default function PaymentSuccess() {
               </div>
 
               {/* Booking Details */}
-              <div className="p-8">
+              <div className="p-4 sm:p-6 md:p-8">
                 {/* Summary Section */}
-                <div className="flex flex-col md:flex-row gap-6 border-b border-gray-200 pb-8">
+                <div className="flex flex-col md:flex-row gap-6 border-b border-gray-200 pb-6 sm:pb-8">
                   <div className="flex-1">
-                    <h2 className="text-xl font-tripswift-bold text-tripswift-black mb-4">
+                    <h2 className="text-lg sm:text-xl font-tripswift-bold text-tripswift-black mb-3 sm:mb-4">
                       {t("Payment.PaymentSuccess.bookingSummaryTitle")}
                     </h2>
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                       <div className="flex items-start">
                         <Calendar
-                          className="text-tripswift-blue mr-3 flex-shrink-0"
-                          size={20}
+                          className="text-tripswift-blue mr-2 sm:mr-3 flex-shrink-0 mt"
+                          size={18} 
                         />
                         <div>
-                          <p className="text-sm text-tripswift-black/60">
+                          <p className="text-xs sm:text-sm text-tripswift-black/60">
                             {t("Payment.PaymentSuccess.checkInLabel")}
                           </p>
-                          <p className="font-tripswift-medium">
+                          <p className="text-sm sm:text-base font-tripswift-medium">
                             {formatDate(booking?.checkInDate || checkInDate)}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-start">
                         <Calendar
-                          className="text-tripswift-blue mr-3 flex-shrink-0"
-                          size={20}
+                          className="text-tripswift-blue mr-2 sm:mr-3 flex-shrink-0"
+                          size={18}
                         />
                         <div>
-                          <p className="text-sm text-tripswift-black/60">
+                          <p className="text-xs sm:text-sm text-tripswift-black/60">
                             {t("Payment.PaymentSuccess.checkOutLabel")}
                           </p>
-                          <p className="font-tripswift-medium">
+                          <p className="text-sm sm:text-base font-tripswift-medium">
                             {formatDate(booking?.checkOutDate || checkOutDate)}
                           </p>
                           <p className="text-xs text-tripswift-black/60 mt-1">
@@ -489,14 +492,14 @@ export default function PaymentSuccess() {
                       </div>
                       <div className="flex items-start">
                         <Users
-                          className="text-tripswift-blue mr-3 flex-shrink-0"
-                          size={20}
+                          className="text-tripswift-blue mr-2 sm:mr-3 flex-shrink-0"
+                          size={18}
                         />
                         <div>
-                          <p className="text-sm text-tripswift-black/60">
+                          <p className="text-xs sm:text-sm text-tripswift-black/60">
                             {t("Payment.PaymentSuccess.guestsLabel")}
                           </p>
-                          <p className="font-tripswift-medium">
+                          <p className="text-sm sm:text-base font-tripswift-medium">
                             {getGuestCountDisplay()}
                           </p>
                         </div>
@@ -504,47 +507,47 @@ export default function PaymentSuccess() {
                     </div>
                   </div>
 
-                  <div className="flex-1">
-                    <h2 className="text-xl font-tripswift-bold text-tripswift-black mb-4">
+                  <div className="flex-1 mt-4 md:mt-0">
+                    <h2 className="text-lg sm:text-xl font-tripswift-bold text-tripswift-black mb-3 sm:mb-4">
                       {t("Payment.PaymentSuccess.guestInfoTitle")}
                     </h2>
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                       <div className="flex items-start">
                         <User
-                          className="text-tripswift-blue mr-3 flex-shrink-0"
-                          size={20}
+                          className="text-tripswift-blue mr-2 sm:mr-3 flex-shrink-0"
+                          size={18}
                         />
                         <div>
-                          <p className="text-sm text-tripswift-black/60">
+                          <p className="text-xs sm:text-sm text-tripswift-black/60">
                             {t("Payment.PaymentSuccess.guestNameLabel")}
                           </p>
-                          <p className="font-tripswift-medium">
+                          <p className="text-sm sm:text-base font-tripswift-medium">
                             {getGuestName()}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-start">
                         <Mail
-                          className="text-tripswift-blue mr-3 flex-shrink-0"
-                          size={20}
+                          className="text-tripswift-blue mr-2 sm:mr-3 flex-shrink-0 mb-1"
+                          size={18}
                         />
                         <div>
-                          <p className="text-sm text-tripswift-black/60">
+                          <p className="text-xs sm:text-sm text-tripswift-black/60">
                             {t("Payment.PaymentSuccess.emailLabel")}
                           </p>
-                          <p className="font-tripswift-medium">{email}</p>
+                          <p className="text-sm sm:text-base font-tripswift-medium">{email}</p>
                         </div>
                       </div>
                       <div className="flex items-start">
                         <CreditCard
-                          className="text-tripswift-blue mr-3 flex-shrink-0"
-                          size={20}
+                          className="text-tripswift-blue mr-2 sm:mr-3 flex-shrink-0 mb-1"
+                          size={18}
                         />
                         <div>
-                          <p className="text-sm text-tripswift-black/60">
+                          <p className="text-xs sm:text-sm text-tripswift-black/60">
                             {t("Payment.PaymentSuccess.paymentMethodLabel")}
                           </p>
-                          <p className="font-tripswift-medium">
+                          <p className="text-sm sm:text-base font-tripswift-medium">
                             {getPaymentMethodText()}
                           </p>
                         </div>
@@ -554,33 +557,34 @@ export default function PaymentSuccess() {
                 </div>
 
                 {/* Price Details Section */}
-                <div className="py-6 border-b border-gray-200">
-                  <h2 className="text-xl font-tripswift-bold text-tripswift-black mb-4">
+                <div className="py-4 sm:py-6 border-b border-gray-200">
+                  <h2 className="text-lg sm:text-xl font-tripswift-bold text-tripswift-black mb-3 sm:mb-4">
                     {t("Payment.PaymentSuccess.paymentDetailsTitle")}
                   </h2>
-                  <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
                     {/* Add per-night rate */}
                     <div className="flex justify-between mb-2">
-                      <span className="text-tripswift-black/70">
+                      <span className="text-sm sm:text-base text-tripswift-black/70">
                         {t("Payment.PaymentSuccess.roomRate")}
                       </span>
-                      <span className="font-tripswift-medium">
+                      <span className="text-sm sm:text-base font-tripswift-medium">
                         ₹
                         {Math.round(
                           amount / getBookingNights()
                         ).toLocaleString()}{" "}
-                        {t("Payment.PaymentSuccess.perNight")} / night
-                      </span>                    </div>
+                        {t("Payment.PaymentSuccess.perNight")}
+                      </span>
+                    </div>
 
                     {/* Show calculation */}
                     <div className="flex justify-between mb-2">
-                      <span className="text-tripswift-black/70">
+                      <span className="text-sm sm:text-base text-tripswift-black/70">
                         {getBookingNights()}{" "}
                         {getBookingNights() === 1
                           ? t("Payment.PaymentSuccess.night")
                           : t("Payment.PaymentSuccess.nights")}
                       </span>
-                      <span className="font-tripswift-medium">
+                      <span className="text-sm sm:text-base font-tripswift-medium">
                         ₹
                         {Math.round(
                           amount / getBookingNights()
@@ -591,15 +595,14 @@ export default function PaymentSuccess() {
 
                     <div className="border-t border-gray-200 my-2 pt-2"></div>
                     <div className="flex justify-between">
-
-                      <span className="font-tripswift-bold text-lg text-tripswift-black">
+                      <span className="font-tripswift-bold text-base sm:text-lg text-tripswift-black">
                         {t("Payment.PaymentSuccess.total")}
                       </span>
-                      <span className="font-tripswift-bold text-lg text-tripswift-blue">
+                      <span className="font-tripswift-bold text-base sm:text-lg text-tripswift-blue">
                         ₹{amount.toLocaleString()}
                       </span>
                     </div>
-                    <div className="text-xs text-tripswift-black/50 text-right mt-1">
+                    <div className="text-[10px] sm:text-xs text-tripswift-black/50 text-right mt-1">
                       {getPaymentMethodText() ===
                         t("Payment.PaymentSuccess.paymentMethodPayAtHotel")
                         ? t("Payment.PaymentSuccess.paymentAtHotelMessage")
@@ -609,19 +612,19 @@ export default function PaymentSuccess() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="pt-6 flex flex-col sm:flex-row gap-4">
+                <div className="pt-4 sm:pt-6 flex flex-col sm:flex-row gap-3 sm:gap-4">
                   <Link
                     href="/my-trip"
-                    className="btn-tripswift-primary py-3 px-6 rounded-lg flex-1 flex items-center justify-center gap-2 text-center font-tripswift-medium transition-all duration-300 hover:shadow-md"
+                    className="btn-tripswift-primary py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg flex-1 flex items-center justify-center gap-2 text-center font-tripswift-medium transition-all duration-300 hover:shadow-md text-sm sm:text-base"
                   >
-                    <CheckCircle size={18} />
+                    <CheckCircle size={16} className="sm:w-[18px] sm:h-[18px]" />
                     <span>{t("Payment.PaymentSuccess.viewMyBookings")}</span>
                   </Link>
                   <Link
                     href="/"
-                    className="bg-gray-100 text-tripswift-black py-3 px-6 rounded-lg flex-1 flex items-center justify-center gap-2 text-center font-tripswift-medium transition-colors duration-300 hover:bg-gray-200"
+                    className="bg-gray-100 text-tripswift-black py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg flex-1 flex items-center justify-center gap-2 text-center font-tripswift-medium transition-colors duration-300 hover:bg-gray-200 text-sm sm:text-base"
                   >
-                    <Home size={18} />
+                    <Home size={16} className="sm:w-[18px] sm:h-[18px]" />
                     <span>{t("Payment.PaymentSuccess.returnHome")}</span>
                   </Link>
                 </div>
@@ -629,55 +632,55 @@ export default function PaymentSuccess() {
             </div>
 
             {/* Additional Info Cards */}
-            <div className="max-w-4xl mx-auto mt-8 grid md:grid-cols-2 gap-6">
-              <div className="bg-tripswift-off-white rounded-xl shadow-md p-6">
-                <h3 className="text-lg font-tripswift-bold text-tripswift-black mb-3">
+            <div className="max-w-4xl mx-auto mt-4 sm:mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <div className="bg-tripswift-off-white rounded-xl shadow-md p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-tripswift-bold text-tripswift-black mb-2 sm:mb-3">
                   {t("Payment.PaymentSuccess.whatsNextTitle")}
                 </h3>
-                <ul className="space-y-3 text-tripswift-black/70">
+                <ul className="space-y-2 sm:space-y-3 text-sm sm:text-base text-tripswift-black/70">
                   <li className="flex items-start">
                     <span className="inline-block bg-green-100 rounded-full p-1 mr-2 mt-0.5">
-                      <CheckCircle size={14} className="text-green-600" />
+                      <CheckCircle size={12} className="sm:w-[14px] sm:h-[14px] text-green-600" />
                     </span>
                     {t("Payment.PaymentSuccess.confirmationEmailSent")}
                   </li>
                   <li className="flex items-start">
                     <span className="inline-block bg-green-100 rounded-full p-1 mr-2 mt-0.5">
-                      <CheckCircle size={14} className="text-green-600" />
+                      <CheckCircle size={12} className="sm:w-[14px] sm:h-[14px] text-green-600" />
                     </span>
                     {t("Payment.PaymentSuccess.viewBookingDetails")}
                   </li>
                   <li className="flex items-start">
                     <span className="inline-block bg-green-100 rounded-full p-1 mr-2 mt-0.5">
-                      <CheckCircle size={14} className="text-green-600" />
+                      <CheckCircle size={12} className="sm:w-[14px] sm:h-[14px] text-green-600" />
                     </span>
                     {t("Payment.PaymentSuccess.contactSupportForChanges")}
                   </li>
                 </ul>
 
                 {/* Download Booking button */}
-                <button className="mt-4 w-full flex items-center justify-center gap-2 border border-tripswift-blue/30 text-tripswift-blue bg-tripswift-blue/5 hover:bg-tripswift-blue/10 py-2 px-4 rounded-lg text-sm font-tripswift-medium transition-colors duration-300">
-                  <Download size={16} />
+                <button className="mt-3 sm:mt-4 w-full flex items-center justify-center gap-2 border border-tripswift-blue/30 text-tripswift-blue bg-tripswift-blue/5 hover:bg-tripswift-blue/10 py-2 px-3 sm:px-4 rounded-lg text-xs sm:text-sm font-tripswift-medium transition-colors duration-300">
+                  <Download size={14} className="sm:w-4 sm:h-4" />
                   {t("Payment.PaymentSuccess.downloadBookingConfirmation")}
                 </button>
               </div>
 
-              <div className="bg-tripswift-off-white rounded-xl shadow-md p-6">
-                <h3 className="text-lg font-tripswift-bold text-tripswift-black mb-3">
+              <div className="bg-tripswift-off-white rounded-xl shadow-md p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-tripswift-bold text-tripswift-black mb-2 sm:mb-3">
                   {t("Payment.PaymentSuccess.needHelpTitle")}
                 </h3>
-                <p className="text-tripswift-black/70 mb-4">
+                <p className="text-sm sm:text-base text-tripswift-black/70 mb-3 sm:mb-4">
                   {t("Payment.PaymentSuccess.customerServiceMessage")}
                 </p>
-                <button className="btn-tripswift-primary py-2 px-4 rounded-lg w-full flex items-center justify-center gap-2 text-center font-tripswift-medium transition-all duration-300">
+                <button className="btn-tripswift-primary py-2 px-3 sm:px-4 rounded-lg w-full flex items-center justify-center gap-2 text-center font-tripswift-medium transition-all duration-300 text-xs sm:text-sm">
                   {t("Payment.PaymentSuccess.contactSupportButton")}
                 </button>
 
                 {/* Explore more hotels link */}
-                <div className="mt-4 text-center">
-                  <Link href="/" className="inline-flex items-center text-tripswift-blue hover:underline text-sm transition-all duration-300">
+                <div className="mt-3 sm:mt-4 text-center">
+                  <Link href="/" className="inline-flex items-center text-tripswift-blue hover:underline text-xs sm:text-sm transition-all duration-300">
                     {t("Payment.PaymentSuccess.exploreMoreHotels")}{" "}
-                    <ArrowRight size={14} className="ml-1" />
+                    <ArrowRight size={12} className="sm:w-3.5 sm:h-3.5 ml-1" />
                   </Link>
                 </div>
               </div>

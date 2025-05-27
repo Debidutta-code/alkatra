@@ -17,7 +17,7 @@ import EmptyState from "./EmptyState";
 import BookingCard from "./BookingCard";
 import BookingPagination from "./BookingPagination";
 import BookingDetailsModal from "./BookingDetailsModal";
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
 
 interface RootState {
   auth: {
