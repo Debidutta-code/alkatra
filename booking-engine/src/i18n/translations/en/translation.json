@@ -247,7 +247,17 @@
     "showingRooms_other": "Showing {count} rooms",
     "noRoomsAvailableTitle": "No Rooms Available",
     "noRoomsAvailableMessage": "We couldn't find any rooms matching your criteria. Try adjusting your search filters or dates.",
-    "clearFilters": "Clear Filters"
+    "clearFilters": "Clear Filters",
+    "qrCode": {
+      "discountTitle": "Use Your Discount",
+      "qrCodeAlt": "Discount QR Code",
+      "scanToApply": "Scan to apply",
+      "instructions": {
+        "scanAtCheckout": "Scan the QR code at checkout",
+        "applyDiscount": "Apply the discount during checkout to get your special offer",
+        "validityNote": "Valid for this booking session only"
+      }
+    }
   },
   "BookingComponents": {
     "GuestInformationModal": {
