@@ -67,10 +67,10 @@ class RatePlanController {
         next: NextFunction
     ) {
         try {
-            const { id } = req.params;
+            const inventoryId = req.params.id;
             const ratePlanData = req.body;
 
-            const response = await RatePlanService.updateRatePlan(id, ratePlanData);
+            const response = await RatePlanService.updateRatePlan(inventoryId, ratePlanData);
 
             return response;
         } catch (error) {
@@ -81,9 +81,9 @@ class RatePlanController {
 
     public static async getRatePlanByHotelCode(req: Request, res: Response, next: NextFunction) {
         try {
-            const { hotelCode } = req.params;
-
-            const response = await RatePlanService.getRatePlanByHotelCode(hotelCode);
+            const { hotelCode, invTypeCode, startDate, endDate } = req.body;
+            const page=req.query.page.toString()
+            const response = await RatePlanService.getRatePlanByHotelCode(hotelCode, invTypeCode&&invTypeCode, startDate&&new Date(startDate), endDate&&new Date(endDate),page&&parseInt(page));
 
             return response;
         } catch (error) {

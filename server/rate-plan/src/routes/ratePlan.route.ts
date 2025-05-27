@@ -24,8 +24,8 @@ route.post(
   }
 );
 
-route.get(
-  "/:hotelCode",
+route.post(
+  "/hotelCode",
   protect as any,
   async (req: Request, res: Response, next: NextFunction) => {
     const response = await RatePlanController.getRatePlanByHotelCode(req, res, next);

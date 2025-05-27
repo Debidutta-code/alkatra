@@ -1,6 +1,10 @@
 import { RatePlan, RatePlan as RatePlanType } from "../common/interface/ratePlan.interface";
 import { RatePlanDao } from "../dao/ratePlan.dao";
-
+interface UpdateplanData {
+  availability: number;
+  price: number;
+  rateAmountId: string;
+}
 class RatePlanService {
   public static async createRatePlan(ratePlanData: any) {
     // Extract scheduling fields
@@ -33,9 +37,16 @@ class RatePlanService {
     };
   }
 
-  public static async updateRatePlan(id: string, ratePlanData: Partial<RatePlan>) {
+  public static async updateRatePlan(inventoryId: string, ratePlanData: UpdateplanData) {
     // Optional: Add validation or preprocessing here if needed
-    const updatedRatePlan = await RatePlanDao.updateRatePlan(id, ratePlanData);
+    const { availability, price, rateAmountId } = ratePlanData
+    if (!availability || !price || !rateAmountId) {
+      return {
+        success: false,
+        message: "provide all the necessary fields"
+      }
+    }
+    const updatedRatePlan = await RatePlanDao.updateRatePlan(inventoryId, rateAmountId, price, availability);
     return {
       success: true,
       message: "Rate plan updated successfully",
@@ -44,10 +55,8 @@ class RatePlanService {
   }
 
 
-  public static async getRatePlanByHotelCode(hotelCode: string) {
-    const ratePlans = await RatePlanDao.getRatePlanByHotelCode(hotelCode);
-
-    if (ratePlans.length === 0) throw new Error("No rate plans found for this hotel code");
+  public static async getRatePlanByHotelCode(hotelCode: string, invTypeCode?: string, startDate?: Date, endDate?: Date, page?: number) {
+    const ratePlans = await RatePlanDao.getRatePlanByHotelCode(hotelCode, invTypeCode && invTypeCode, startDate && startDate, endDate && endDate, page && page);
 
     return {
       success: true,
