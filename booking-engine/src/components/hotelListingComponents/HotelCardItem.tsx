@@ -90,9 +90,9 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
 
     return (
         <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300 group font-noto-sans">
-            <div className="flex flex-col sm:flex-row">
+            <div className="flex flex-col md:flex-row">
                 {/* Hotel image */}
-                <div className="sm:w-1/3 h-52 sm:h-auto relative overflow-hidden">
+                <div className="md:w-1/3 h-52 md:h-auto relative overflow-hidden">
                     {hotel.image && hotel.image.length > 0 ? (
                         <img
                             src={hotel.image[0]}
@@ -113,7 +113,7 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
                 </div>
 
                 {/* Hotel details */}
-                <div className="sm:w-2/3 p-4 flex flex-col">
+                <div className="md:w-2/3 p-4 flex flex-col">
                     <div className="flex-grow">
                         {/* Hotel name and rating */}
                         <div className="flex justify-between items-start mb-2">

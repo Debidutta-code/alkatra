@@ -116,8 +116,8 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
   };
 
   return (
-    <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-tripswift-black/5 p-3 font-noto-sans">
-      <div className="flex flex-col sm:flex-row items-center gap-3.5">
+    <div className="bg-white/95  backdrop-blur-sm mb-16 sm:mb-0  rounded-xl shadow-lg border border-tripswift-black/5 p-3 font-noto-sans">
+      <div className="flex flex-col gap-2 md:flex-row items-center md:gap-3.5 ">
         {/* Location Input */}
         <div className="w-full sm:w-auto sm:flex-1" ref={searchContainerRef}>
           <div className="relative group">
@@ -141,12 +141,12 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
               placeholder={t("HotelListing.CompactSearchBar.locationPlaceholder")}
-              className={`block w-full h-11 pl-12 pr-10 py-2 rounded-md border ${
+              className={`block w-[262px] md:w-full  h-11 sm:pl-12 pl-8 pr-2 sm:pr-10 py-2 rounded-md border ${
                 isSearchFocused
                   ? "border-tripswift-blue ring-2 ring-tripswift-blue/10"
                   : "border-tripswift-black/10 hover:border-tripswift-blue/30"
-              } outline-none text-tripswift-black transition duration-200 ease-in-out shadow-sm font-tripswift-medium text-[16px] tracking-normal`}
-              style={{ textIndent: "16px" }} // Match input:placeholder-shown style
+              } outline-none text-tripswift-black transition duration-200 ease-in-out shadow-sm font-tripswift-medium text-[16px] px-2 tracking-normal`}
+              style={{ textIndent: "16px " }} // Match input:placeholder-shown style
               aria-label={t("HotelListing.CompactSearchBar.locationPlaceholder")}
             />
             {searchQuery && (
@@ -164,21 +164,21 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
         </div>
 
         {/* Date Range */}
-        <div className="w-full sm:w-auto sm:flex-1">
+        <div className=" w-[262px] sm:flex-1">
           <div className="relative group">
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
               <div className="w-8 h-8 rounded-full flex items-center justify-center group-hover:bg-tripswift-blue/10 transition-colors duration-300">
                 <Calendar className="h-4 w-4 text-tripswift-black/40 group-hover:text-tripswift-blue transition-colors duration-200" />
               </div>
             </div>
-            <div className="bg-tripswift-off-white border border-tripswift-black/10 hover:border-tripswift-blue/30 rounded-md shadow-sm transition-all duration-200 h-11 pl-12 flex items-center">
+            <div className="bg-tripswift-off-white border border-tripswift-black/10 text-[16px] hover:border-tripswift-blue/30 rounded-md shadow-sm transition-all duration-200 h-11  pl-12 flex items-center">
               <DateRange dates={dates} setDates={setDates} />
             </div>
           </div>
         </div>
 
         {/* Guest Selection */}
-        <div className="w-full sm:w-auto sm:flex-1">
+        <div className="w-[262px]  sm:flex-1">
           <GuestBox onChange={handleGuestDetailsChange} />
         </div>
 
@@ -188,7 +188,7 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
             type="button"
             disabled={loading}
             onClick={handleSearchButtonClick}
-            className="btn-tripswift-primary w-full sm:w-auto h-11 px-6 flex items-center justify-center gap-2 transition-all duration-300 shadow-md hover:shadow-lg relative overflow-hidden group"
+            className="btn-tripswift-primary  w-[262px] md:w-auto  h-11 px-6 flex items-center justify-center gap-2 transition-all duration-300 shadow-md hover:shadow-lg relative overflow-hidden group"
             aria-label={
               loading
                 ? t("HotelListing.CompactSearchBar.ariaSearching")

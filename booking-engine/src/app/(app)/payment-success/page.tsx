@@ -66,8 +66,9 @@ export default function PaymentSuccess() {
   useEffect(() => {
     // Prevent background scrolling
     document.body.style.overflow = 'auto';
-    
+
     // If we have a reference, fetch the booking details
+
     if (reference) {
       const fetchBookingByReference = async () => {
         try {
@@ -288,7 +289,12 @@ export default function PaymentSuccess() {
     paymentMethod,
     router,
   ]);
-
+  const handleViewBookings = () => {
+    router.replace("/my-trip"); // replaces current history entry
+  };
+  const handleViewHome = () => {
+    router.replace("/")
+  }
   const getPaymentMethodText = () => {
     if (!booking) return "";
 
@@ -459,7 +465,7 @@ export default function PaymentSuccess() {
                       <div className="flex items-start">
                         <Calendar
                           className="text-tripswift-blue mr-2 sm:mr-3 flex-shrink-0 mt"
-                          size={18} 
+                          size={18}
                         />
                         <div>
                           <p className="text-xs sm:text-sm text-tripswift-black/60">
@@ -595,8 +601,9 @@ export default function PaymentSuccess() {
 
                     <div className="border-t border-gray-200 my-2 pt-2"></div>
                     <div className="flex justify-between">
-                      <span className="font-tripswift-bold text-base sm:text-lg text-tripswift-black">
-                        {t("Payment.PaymentSuccess.total")}
+
+                    <span className="font-tripswift-bold text-base sm:text-lg text-tripswift-black">
+                    {t("Payment.PaymentSuccess.total")}
                       </span>
                       <span className="font-tripswift-bold text-base sm:text-lg text-tripswift-blue">
                         ₹{amount.toLocaleString()}
@@ -612,21 +619,22 @@ export default function PaymentSuccess() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="pt-4 sm:pt-6 flex flex-col sm:flex-row gap-3 sm:gap-4">
-                  <Link
-                    href="/my-trip"
-                    className="btn-tripswift-primary py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg flex-1 flex items-center justify-center gap-2 text-center font-tripswift-medium transition-all duration-300 hover:shadow-md text-sm sm:text-base"
+                <div className="pt-6 flex flex-col sm:flex-row gap-4">
+                <button
+                    onClick={handleViewBookings}
+                    className="btn-tripswift-primary py-3 px-6 rounded-lg flex-1 flex items-center justify-center gap-2 text-center font-tripswift-medium transition-all duration-300 hover:shadow-md"
                   >
-                    <CheckCircle size={16} className="sm:w-[18px] sm:h-[18px]" />
+                    <CheckCircle size={18} />
                     <span>{t("Payment.PaymentSuccess.viewMyBookings")}</span>
-                  </Link>
-                  <Link
-                    href="/"
-                    className="bg-gray-100 text-tripswift-black py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg flex-1 flex items-center justify-center gap-2 text-center font-tripswift-medium transition-colors duration-300 hover:bg-gray-200 text-sm sm:text-base"
+                    </button>
+                  <button
+                    onClick={handleViewHome}
+
+                    className="bg-gray-100 text-tripswift-black py-3 px-6 rounded-lg flex-1 flex items-center justify-center gap-2 text-center font-tripswift-medium transition-colors duration-300 hover:bg-gray-200"
                   >
-                    <Home size={16} className="sm:w-[18px] sm:h-[18px]" />
+                    <Home size={18} />
                     <span>{t("Payment.PaymentSuccess.returnHome")}</span>
-                  </Link>
+                  </button>
                 </div>
               </div>
             </div>
