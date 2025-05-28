@@ -8,7 +8,7 @@ interface UpdateBody {
   firstName?: string;
   lastName?: string;
   email?: string;
-  role?: string;
+  role?: "superAdmin" | "groupManager" | "hotelManager";
 }
 
 interface RegisterBody {
@@ -16,7 +16,7 @@ interface RegisterBody {
   lastName: string;
   email: string;
   password: string;
-  role?: string;
+  role?: "superAdmin" | "groupManager" | "hotelManager";
 }
 
 interface LoginBody {
@@ -43,8 +43,12 @@ export class UserService {
     }
     return user;
   }
-
-  async updateUserProfile(userId: string, requestingUserId: string, requestingUserRole: string, updates: UpdateBody): Promise<AuthType> {
+  async updateUserProfile(
+    userId: string,
+    requestingUserId: string,
+    requestingUserRole: string,
+    updates: UpdateBody
+  ): Promise<AuthType> {
     await this.userRepository.findUserById(userId);
     const filteredUpdates: Partial<AuthType> = {};
     if (requestingUserId === userId) {
@@ -54,22 +58,36 @@ export class UserService {
       if (updates.role) {
         throw formatError(ErrorMessages.ROLE_UPDATE_NOT_ALLOWED);
       }
-    } else if (requestingUserId !== userId && requestingUserRole === "superadmin") {
-      if (updates.role) filteredUpdates.role = updates.role;
+    } else if (
+      requestingUserId !== userId &&
+      requestingUserRole === "superAdmin"
+    ) {
+      if (updates.role)
+        filteredUpdates.role = updates.role as
+          | "superAdmin"
+          | "groupManager"
+          | "hotelManager";
       if (updates.firstName || updates.lastName || updates.email) {
         throw formatError(ErrorMessages.SUPERADMIN_ROLE_ONLY);
       }
     } else {
       throw formatError(ErrorMessages.UNAUTHORIZED_ACTION);
     }
-    const updatedUser = await this.userRepository.updateUser(userId, filteredUpdates);
+    const updatedUser = await this.userRepository.updateUser(
+      userId,
+      filteredUpdates
+    );
     if (!updatedUser) {
       throw formatError(ErrorMessages.USER_NOT_FOUND);
     }
     return updatedUser;
   }
 
-  async getAllUsers(page: number, limit: number, userRole: string) {
+  async getAllUsers(
+    page: number,
+    limit: number,
+    userRole: "superAdmin" | "groupManager" | "hotelManager"
+  ) {
     return await this.userRepository.getAllUsers(page, limit, userRole);
   }
 
@@ -82,8 +100,10 @@ export class UserService {
     if (existingUser) {
       throw formatError(ErrorMessages.USER_ALREADY_EXISTS);
     }
-    if (role === "super-admin") {
-      const superAdminExists = await this.userRepository.findUserByRole("super-admin");
+    if (role === "superAdmin") {
+      const superAdminExists = await this.userRepository.findUserByRole(
+        "superAdmin"
+      );
       if (superAdminExists) {
         throw formatError(ErrorMessages.USER_ROLE_ALREADY_EXISTS);
       }
@@ -94,12 +114,14 @@ export class UserService {
       lastName,
       email,
       password: hashedPassword,
-      role: role || "hotel-admin",
+      role: role || "superAdmin",
     };
     return await this.userRepository.createUser(userData);
   }
 
-  async loginUser(data: LoginBody): Promise<{ user: AuthType; accessToken: string }> {
+  async loginUser(
+    data: LoginBody
+  ): Promise<{ user: AuthType; accessToken: string }> {
     const { email, password } = data;
     if (!email || !password) {
       throw formatError(ErrorMessages.MISSING_LOGIN_CREDENTIALS);
@@ -136,11 +158,13 @@ export class UserService {
       throw formatError(ErrorMessages.MISSING_PASSWORD_UPDATE_FIELDS);
     }
     const hashedPassword = await createHash(newPassword);
-    const updatedUser = await this.userRepository.updateUserPassword(email, hashedPassword);
+    const updatedUser = await this.userRepository.updateUserPassword(
+      email,
+      hashedPassword
+    );
     if (!updatedUser) {
       throw formatError(ErrorMessages.EMAIL_NOT_FOUND);
     }
     return updatedUser;
   }
-
 }
