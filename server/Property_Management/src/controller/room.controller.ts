@@ -325,8 +325,7 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
 
   const couponCode = await generateCouponCode();
 
-  // const deepLinkUrl = `${process.env.DEEP_LINK}/property/${propertyInfoId}?coupon=${couponCode.code}`;
-  const deepLinkUrl = `${process.env.BASE_LINK}/download/app-release.apk`;
+  const deepLinkUrl = `${process.env.DEEP_LINK}/property/${propertyInfoId}?coupon=${couponCode.code}`;
 
   let qrCodeData: string;
   try {
