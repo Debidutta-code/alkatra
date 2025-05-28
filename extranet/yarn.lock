@@ -2494,6 +2494,11 @@
   dependencies:
     "@tanstack/query-core" "5.51.21"
 
+"@types/date-fns@^2.5.3":
+  version "2.5.3"
+  resolved "https://registry.npmjs.org/@types/date-fns/-/date-fns-2.5.3.tgz"
+  integrity sha512-4KVPD3g5RjSgZtdOjvI/TDFkLNUHhdoWxmierdQbDeEg17Rov0hbBYtIzNaQA67ORpteOhvR9YEMTb6xeDCang==
+
 "@types/js-cookie@^3.0.6":
   "integrity" "sha512-wkw9yd1kEXOPnvEeEV1Go1MmxtBJL0RR79aOTAApecWFVu7w0NNXNqhcWgvw2YgZDYadliXkl14pa3WXw5jlCQ=="
   "resolved" "https://registry.npmjs.org/@types/js-cookie/-/js-cookie-3.0.6.tgz"
@@ -5776,3 +5781,4 @@ zod@^3.23.8:
   version "3.23.8"
   resolved "https://registry.npmjs.org/zod/-/zod-3.23.8.tgz"
   integrity sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==
+
