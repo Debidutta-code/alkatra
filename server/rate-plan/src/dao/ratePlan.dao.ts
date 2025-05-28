@@ -286,6 +286,10 @@ class RatePlanDao {
       }
     };
   }
+  public static async getAllRoomType() {
+    const response = await Inventory.distinct("invTypeCode");
+    return response;
+}
 
 
 }

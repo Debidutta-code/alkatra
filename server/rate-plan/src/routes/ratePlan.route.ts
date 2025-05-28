@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { RatePlanController } from "../controller/ratePlan.controller";
+import { RatePlanController,RoomPrice } from "../controller/ratePlan.controller";
 import { protect } from "../../../User-Authentication/src/Middleware/auth.middleware";
 
 const route = Router();
@@ -33,5 +33,18 @@ route.post(
   }
 )
 
+route.get("/hotelRoomPrice",protect,async(req:Request,res:Response,next:NextFunction)=>{
+  const response=await RoomPrice.getRoomPriceByHotelCode(req,res,next)
+  res.status(200).json(response)
+})
+route.post("/getRoomRentPrice",protect,async(req:Request,res:Response,next:NextFunction)=>{
+  const response=await RoomPrice.getRoomRentController(req,res,next)
+  res.status(200).json(response)
+})
+
+route.get("/getRoomType",protect,async(req:Request,res:Response,next:NextFunction)=>{
+  const response=await RoomPrice.getAllRoomTypeController(req,res,next)
+  res.status(200).json(response)
+})
 
 export default route;

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { RatePlanService } from "../service/ratePlan.service";
+import { RatePlanService, RoomPriceService,RoomRentCalculationService } from "../service/ratePlan.service";
 
 class RatePlanController {
     public static async createRatePlan(
@@ -82,9 +82,9 @@ class RatePlanController {
     public static async getRatePlanByHotelCode(req: Request, res: Response, next: NextFunction) {
         try {
             const { hotelCode, invTypeCode, startDate, endDate } = req.body;
-            console.log( hotelCode, invTypeCode, startDate, endDate )
-            const page=req.query.page.toString()
-            const response = await RatePlanService.getRatePlanByHotelCode(hotelCode, invTypeCode&&invTypeCode, startDate&&new Date(startDate), endDate&&new Date(endDate),page&&parseInt(page));
+            console.log(hotelCode, invTypeCode, startDate, endDate)
+            const page = req.query.page.toString()
+            const response = await RatePlanService.getRatePlanByHotelCode(hotelCode, invTypeCode && invTypeCode, startDate && new Date(startDate), endDate && new Date(endDate), page && parseInt(page));
 
             return response;
         } catch (error) {
@@ -92,5 +92,36 @@ class RatePlanController {
             next(error);
         }
     }
+
 }
-export { RatePlanController };
+class RoomPrice {
+    public static async getRoomPriceByHotelCode(req: Request, res: Response, next: NextFunction) {
+
+        const { hotelcode, invTypeCode } = req.query
+        const response = await RoomPriceService.getRoomPriceService(hotelcode as string, invTypeCode as string)
+        return response
+    }
+    public static async getRoomRentController(req: Request, res: Response, next: NextFunction) {
+        const { hotelCode, invTypeCode,
+            startDate,
+            endDate,
+            noOfDaysToStay,
+            noOfChildrens,
+            noOfAdults,
+            noOfRooms } = req.body
+        const response = await RoomRentCalculationService.getRoomRentService(hotelCode,
+            invTypeCode,
+            startDate,
+            endDate,
+            noOfChildrens,
+            noOfAdults,
+            noOfRooms
+        )
+        return response
+    }
+    public static async getAllRoomTypeController(req: Request, res: Response, next: NextFunction){
+        const response=await RoomPriceService.getAllRoomTypeService()
+        return response
+    }
+}
+export { RatePlanController, RoomPrice };
