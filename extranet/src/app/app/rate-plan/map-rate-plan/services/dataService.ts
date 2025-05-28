@@ -1,19 +1,5 @@
+import { DateRange, MapRatePlanData } from '../types';
 import { format, isWithinInterval, parseISO } from '../utils/dateUtils';
-
-interface MapRatePlanData {
-  date: string;
-  ratePlanCode: string;
-  ratePlanName: string;
-  roomTypeCode: string;
-  roomTypeName: string;
-  price: number;
-  availability: number;
-}
-
-interface DateRange {
-  from: Date;
-  to: Date;
-}
 
 export const filterData = (
   data: MapRatePlanData[],
