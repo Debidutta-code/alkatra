@@ -12,7 +12,7 @@ const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ qrCode }) => {
   return (
     <div className="relative overflow-hidden bg-tripswift-off-white  rounded-lg">
       {/* Main Content */}
-      <div className="flex flex-col sm:flex-row gap-6 items-center rounded-xl border border-gray-100 p-2 pl-5">
+      <div className="flex flex-col md:flex-row gap-6 items-center rounded-xl border border-gray-100 p-2 pl-5">
         {/* QR Code Section */}
         <div className="text-center flex-shrink-0">
           <div className="bg-tripswift-off-white rounded-lg p-2 border-2 border-dashed shadow-[var(--shadow)]">

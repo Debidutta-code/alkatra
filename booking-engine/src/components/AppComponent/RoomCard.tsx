@@ -160,9 +160,9 @@ const handleBookNow = () => {
 
   return (
     <>
-      <Card className="w-full min-h-48 shadow-sm hover:shadow-md transition-shadow duration-300 bg-tripswift-off-white border border-gray-200 rounded-xl flex flex-col sm:flex-row overflow-hidden font-noto-sans">        {/* Image Section */}
+      <Card className="w-full min-h-48 shadow-sm hover:shadow-md transition-shadow duration-300 bg-tripswift-off-white border border-gray-200 rounded-xl flex flex-col md:flex-row overflow-hidden font-noto-sans">        {/* Image Section */}
         {/* Image Section */}
-        <div className="relative w-full sm:w-[45%] h-48 sm:h-auto flex-shrink-0 overflow-hidden group">
+        <div className="relative w-full md:w-[45%] h-48 md:h-auto flex-shrink-0 overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10"></div>
           <Image
             src={selectedImage}
@@ -185,7 +185,7 @@ const handleBookNow = () => {
           )}
         </div>
         {/* Details Section */}
-        <div className="w-full sm:w-[55%] flex flex-col p-3 sm:p-4">
+        <div className="w-full md:w-[55%] flex flex-col p-3 sm:p-4">
           {/* Header */}
           <CardHeader className="p-0 pb-2 flex-shrink-0">
             <div className="flex justify-between items-start">
