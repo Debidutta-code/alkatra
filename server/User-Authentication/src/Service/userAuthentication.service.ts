@@ -114,7 +114,7 @@ export class UserService {
       lastName,
       email,
       password: hashedPassword,
-      role: role || "superAdmin",
+      role: role || "hotelManager", // Default to hotelManager for users created through /create-user
     };
     return await this.userRepository.createUser(userData);
   }
