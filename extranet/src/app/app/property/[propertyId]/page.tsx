@@ -542,14 +542,16 @@ export default function Page({ params, searchParams }: Props) {
           <PropertyImageGallery image={property?.data?.image} />
         </div>
 
-        <div className="mt-4">
-          <Button
-            variant="default"
-            onClick={() => router.push(`/app/rate-plan/create-form?propertyId=${propertyId}`)}
-            className="bg-blue-500 hover:bg-blue-600 text-white"
-          >
-            Add/Edit Rate Plan
-          </Button>
+        <div className="flex flex-col md:flex-row gap-2 items-center">
+          <div className="mt-4">
+            <Button
+              variant="default"
+              onClick={() => router.push(`/app/rate-plan/get-rate-plan?propertyId=${propertyId}`)}
+              className="bg-blue-500 hover:bg-blue-600 text-white"
+            >
+              Rate Plans
+            </Button>
+          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
           {/* Property Details Component */}

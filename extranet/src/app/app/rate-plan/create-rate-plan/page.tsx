@@ -15,6 +15,7 @@ import { RatePlanFormSchema, BaseRatePlanFormSchema } from '../validator/ratePla
 import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
+import Breadcrumbs from '@src/components/ui/breadcrumbs';
 
 export default function RatePlanForm() {
   const router = useRouter();
@@ -285,13 +286,16 @@ export default function RatePlanForm() {
   };
 
   const handleCancel = () => {
-    router.push(`/app/property/${propertyId}`);
+    router.push(`/app/rate-plan/get-rate-plan/?propertyId=${propertyId}`);
   };
 
   if (loading) return <div className="text-center text-gray-600">Loading...</div>;
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-sm">
+      <div className="flex items-center justify-between">
+              <Breadcrumbs />
+            </div>
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Create Rate Plan</h2>
 
       {error && (
@@ -366,14 +370,14 @@ export default function RatePlanForm() {
               },
             }}
           />
-          <BookingAdvanceForm
+          {/* <BookingAdvanceForm
             formData={formData}
             handleChange={handleChange}
             errors={{
               minBookAdvance: validationErrors['minBookAdvance'],
               maxBookAdvance: validationErrors['maxBookAdvance'],
             }}
-          />
+          /> */}
         </div>
       </div>
 
