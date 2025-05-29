@@ -326,39 +326,39 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
   };
   
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 font-noto-sans">
-      <div className="bg-tripswift-off-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 font-noto-sans p-3 sm:p-5">
+      <div className="bg-tripswift-off-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-3 sm:p-4 md:p-6">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h3 className="text-2xl font-tripswift-bold text-tripswift-black">
+        <div className="text-center mb-4 sm:mb-6 md:mb-8">
+          <h3 className="text-xl sm:text-2xl font-tripswift-bold text-tripswift-black">
             {t('BookingTabs.AmendReservationModal.title')}
           </h3>
-          <p className="text-tripswift-black/60 mt-2 max-w-lg mx-auto">
+          <p className="text-sm sm:text-base text-tripswift-black/60 mt-1 sm:mt-2 max-w-lg mx-auto">
             {t('BookingTabs.AmendReservationModal.subtitle', { propertyName: booking.property.property_name })}
           </p>
         </div>
         
         {/* Original booking details */}
-        <div className="bg-gradient-to-r from-tripswift-blue/10 to-tripswift-blue/5 rounded-xl p-5 mb-6">
-          <h4 className="text-lg font-tripswift-bold text-tripswift-blue mb-4 flex items-center">
-            <Info className="h-5 w-5 mr-2" />
+        <div className="bg-gradient-to-r from-tripswift-blue/10 to-tripswift-blue/5 rounded-xl p-3 sm:p-4 md:p-5 mb-4 sm:mb-6">
+          <h4 className="text-base sm:text-lg font-tripswift-bold text-tripswift-blue mb-3 sm:mb-4 flex items-center">
+            <Info className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
             {t('BookingTabs.AmendReservationModal.currentBookingDetails')}
           </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {/* Left column */}
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div className="flex items-start">
-                <div className="w-10 h-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-3 shadow-sm flex-shrink-0">
-                  <Calendar className="h-5 w-5 text-tripswift-blue" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 sm:mr-3 shadow-sm flex-shrink-0">
+                  <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
                 </div>
                 <div>
-                  <p className="text-sm text-tripswift-black/60 font-tripswift-medium">
+                  <p className="text-xs sm:text-sm text-tripswift-black/60 font-tripswift-medium">
                     {t('BookingTabs.AmendReservationModal.stayDates')}
                   </p>
-                  <p className="text-tripswift-black font-tripswift-medium">
+                  <p className="text-sm sm:text-base text-tripswift-black font-tripswift-medium">
                     {dayjs(booking.checkInDate).format('MMM D, YYYY')} - {dayjs(booking.checkOutDate).format('MMM D, YYYY')}
                   </p>
-                  <p className="text-xs text-tripswift-black/50 mt-1">
+                  <p className="text-[10px] sm:text-xs text-tripswift-black/50 mt-0.5 sm:mt-1">
                     {t('BookingTabs.AmendReservationModal.nightsCount', {
                       count: dayjs(booking.checkOutDate).diff(dayjs(booking.checkInDate), 'day')
                     })}
@@ -367,14 +367,14 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
               </div>
               
               <div className="flex items-start">
-                <div className="w-10 h-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-3 shadow-sm flex-shrink-0">
-                  <Users className="h-5 w-5 text-tripswift-blue" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 sm:mr-3 shadow-sm flex-shrink-0">
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
                 </div>
                 <div>
-                  <p className="text-sm text-tripswift-black/60 font-tripswift-medium">
+                  <p className="text-xs sm:text-sm text-tripswift-black/60 font-tripswift-medium">
                     {t('BookingTabs.AmendReservationModal.guests')}
                   </p>
-                  <p className="text-tripswift-black font-tripswift-medium">
+                  <p className="text-sm sm:text-base text-tripswift-black font-tripswift-medium">
                     {t('BookingTabs.AmendReservationModal.guestsCount', {
                       adults: booking.adultCount || 2, 
                       children: booking.childCount || 0
@@ -385,36 +385,36 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
             </div>
             
             {/* Right column */}
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div className="flex items-start">
-                <div className="w-10 h-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-3 shadow-sm flex-shrink-0">
-                  <BedIcon className="h-5 w-5 text-tripswift-blue" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 sm:mr-3 shadow-sm flex-shrink-0">
+                  <BedIcon className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
                 </div>
                 <div>
-                  <p className="text-sm text-tripswift-black/60 font-tripswift-medium">
+                  <p className="text-xs sm:text-sm text-tripswift-black/60 font-tripswift-medium">
                     {t('BookingTabs.AmendReservationModal.roomDetails')}
                   </p>
-                  <p className="text-tripswift-black font-tripswift-medium">
+                  <p className="text-sm sm:text-base text-tripswift-black font-tripswift-medium">
                     {booking.room.room_name}
                   </p>
-                  <p className="text-xs text-tripswift-black/50 mt-1">
+                  <p className="text-[10px] sm:text-xs text-tripswift-black/50 mt-0.5 sm:mt-1">
                     {booking.room.room_type}
                   </p>
                 </div>
               </div>
               
               <div className="flex items-start">
-                <div className="w-10 h-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-3 shadow-sm flex-shrink-0">
-                  <CreditCard className="h-5 w-5 text-tripswift-blue" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 sm:mr-3 shadow-sm flex-shrink-0">
+                  <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
                 </div>
                 <div>
-                  <p className="text-sm text-tripswift-black/60 font-tripswift-medium">
+                  <p className="text-xs sm:text-sm text-tripswift-black/60 font-tripswift-medium">
                     {t('BookingTabs.AmendReservationModal.ratePlan')}
                   </p>
-                  <p className="text-tripswift-black font-tripswift-medium">
+                  <p className="text-sm sm:text-base text-tripswift-black font-tripswift-medium">
                     {booking.ratePlanName || t('BookingTabs.AmendReservationModal.bestAvailableRate')}
                   </p>
-                  <p className="text-xs text-tripswift-black/50 mt-1">
+                  <p className="text-[10px] sm:text-xs text-tripswift-black/50 mt-0.5 sm:mt-1">
                     ₹{booking.amount.toFixed(2)} {t('BookingTabs.AmendReservationModal.total')}
                   </p>
                 </div>
@@ -424,79 +424,79 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         </div>
         
         {/* Amendment type selector */}
-        <div className="mb-6">
-          <h4 className="font-tripswift-medium text-tripswift-black mb-3">
+        <div className="mb-4 sm:mb-6">
+          <h4 className="font-tripswift-medium text-tripswift-black mb-2 sm:mb-3 text-sm sm:text-base">
             {t('BookingTabs.AmendReservationModal.whatToChange')}
           </h4>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2 sm:gap-3">
             <button
               onClick={() => setAmendmentType("dates")}
               className={`
-                flex items-center gap-2 px-4 py-2.5 rounded-lg border transition-all duration-300
+                flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border transition-all duration-300 text-xs sm:text-sm
                 ${amendmentType === "dates" 
                   ? "bg-tripswift-blue text-tripswift-off-white border-tripswift-blue"
                   :"bg-tripswift-off-white text-tripswift-black/70 border-gray-200 hover:border-tripswift-blue/50 hover:bg-tripswift-blue/5"}
               `}
             >
-              <CalendarDays className="h-4 w-4" />
+              <CalendarDays className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <span className="font-tripswift-medium">{t('BookingTabs.AmendReservationModal.amendmentTypes.dates')}</span>
             </button>
             
             <button
               onClick={() => setAmendmentType("guests")}
               className={`
-                flex items-center gap-2 px-4 py-2.5 rounded-lg border transition-all
+                flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border transition-all text-xs sm:text-sm
                 ${amendmentType === "guests" 
                   ? "bg-tripswift-blue text-white border-tripswift-blue" 
                   : "bg-white text-tripswift-black/70 border-gray-200 hover:border-tripswift-blue/50 hover:bg-tripswift-blue/5"}
               `}
             >
-              <Users className="h-4 w-4" />
+              <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <span className="font-tripswift-medium">{t('BookingTabs.AmendReservationModal.amendmentTypes.guests')}</span>
             </button>
             
             <button
               onClick={() => setAmendmentType("room")}
               className={`
-                flex items-center gap-2 px-4 py-2.5 rounded-lg border transition-all
+                flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border transition-all text-xs sm:text-sm
                 ${amendmentType === "room" 
                   ? "bg-tripswift-blue text-white border-tripswift-blue" 
                   : "bg-white text-tripswift-black/70 border-gray-200 hover:border-tripswift-blue/50 hover:bg-tripswift-blue/5"}
               `}
             >
-              <BedDouble className="h-4 w-4" />
+              <BedDouble className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <span className="font-tripswift-medium">{t('BookingTabs.AmendReservationModal.amendmentTypes.roomType')}</span>
             </button>
             
             <button
               onClick={() => setAmendmentType("requests")}
               className={`
-                flex items-center gap-2 px-4 py-2.5 rounded-lg border transition-all
+                flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border transition-all text-xs sm:text-sm
                 ${amendmentType === "requests" 
                   ? "bg-tripswift-blue text-white border-tripswift-blue" 
                   : "bg-white text-tripswift-black/70 border-gray-200 hover:border-tripswift-blue/50 hover:bg-tripswift-blue/5"}
               `}
             >
-              <ClipboardEdit className="h-4 w-4" />
+              <ClipboardEdit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <span className="font-tripswift-medium">{t('BookingTabs.AmendReservationModal.amendmentTypes.specialRequests')}</span>
             </button>
           </div>
         </div>
         
         {/* Amendment form fields */}
-        <div className="bg-tripswift-off-white border border-gray-200 rounded-xl shadow-sm p-6 mb-6 transition duration-300">
+        <div className="bg-tripswift-off-white border border-gray-200 rounded-xl shadow-sm p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 transition duration-300">
           {/* Dates Amendment Form */}
           {amendmentType === "dates" && (
-            <div className="space-y-5">
-              <div className="flex items-center gap-2 mb-4">
-                <CalendarDays className="h-5 w-5 text-tripswift-blue" />
-                <h4 className="text-lg font-tripswift-bold text-tripswift-black">
+            <div className="space-y-3 sm:space-y-5">
+              <div className="flex items-center gap-2 mb-2 sm:mb-4">
+                <CalendarDays className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
+                <h4 className="text-base sm:text-lg font-tripswift-bold text-tripswift-black">
                   {t('BookingTabs.AmendReservationModal.changeDates')}
                 </h4>
               </div>
               
               <div>
-                <label className="block text-sm font-tripswift-medium text-tripswift-black/70 mb-2">
+                <label className="block text-xs sm:text-sm font-tripswift-medium text-tripswift-black/70 mb-1 sm:mb-2">
                   {t('BookingTabs.AmendReservationModal.selectNewDates')}
                 </label>
                 <RangePicker
@@ -504,8 +504,8 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                   onChange={(dates) => setDateRange(dates as [Dayjs, Dayjs])}
                   disabledDate={disabledDate}
                   format="YYYY-MM-DD"
-                  className="w-full rounded-lg border-gray-200 py-2 hover:border-tripswift-blue focus:border-tripswift-blue focus:ring focus:ring-tripswift-blue/20"
-                  style={{ height: '48px' }}
+                  className="w-full rounded-lg border-gray-200 py-1.5 sm:py-2 hover:border-tripswift-blue focus:border-tripswift-blue focus:ring focus:ring-tripswift-blue/20"
+                  style={{ height: '40px', fontSize: 'inherit' }}
                   placeholder={[
                     t('BookingTabs.AmendReservationModal.checkInDate'),
                     t('BookingTabs.AmendReservationModal.checkOutDate')
@@ -514,25 +514,27 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
               </div>
               
               {dateRange && dateRange[0] && dateRange[1] && (
-                <div className="px-4 py-3 bg-tripswift-blue/5 rounded-lg text-sm text-tripswift-blue/90 font-tripswift-medium flex items-center">
-                  <Clock className="h-4 w-4 mr-2" />
-                  {t('BookingTabs.AmendReservationModal.stayDuration', {
-                    count: dateRange[1].diff(dateRange[0], 'day')
-                  })}
-                  {dateRange[1].diff(dayjs(booking.checkOutDate), 'day') > 0 && (
-                    <span className="ml-2 text-tripswift-blue/70">
-                      {t('BookingTabs.AmendReservationModal.nightsAdded', {
-                        count: dateRange[1].diff(dayjs(booking.checkOutDate), 'day')
-                      })}
-                    </span>
-                  )}
-                  {dateRange[1].diff(dayjs(booking.checkOutDate), 'day') < 0 && (
-                    <span className="ml-2 text-tripswift-blue/70">
-                      {t('BookingTabs.AmendReservationModal.nightsReduced', {
-                        count: Math.abs(dateRange[1].diff(dayjs(booking.checkOutDate), 'day'))
-                      })}
-                    </span>
-                  )}
+                <div className="px-3 sm:px-4 py-2 sm:py-3 bg-tripswift-blue/5 rounded-lg text-xs sm:text-sm text-tripswift-blue/90 font-tripswift-medium flex items-start sm:items-center">
+                  <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 mt-0.5 sm:mt-0 flex-shrink-0" />
+                  <div>
+                    {t('BookingTabs.AmendReservationModal.stayDuration', {
+                      count: dateRange[1].diff(dateRange[0], 'day')
+                    })}
+                    {dateRange[1].diff(dayjs(booking.checkOutDate), 'day') > 0 && (
+                      <span className="block sm:inline sm:ml-2 text-tripswift-blue/70">
+                        {t('BookingTabs.AmendReservationModal.nightsAdded', {
+                          count: dateRange[1].diff(dayjs(booking.checkOutDate), 'day')
+                        })}
+                      </span>
+                    )}
+                    {dateRange[1].diff(dayjs(booking.checkOutDate), 'day') < 0 && (
+                      <span className="block sm:inline sm:ml-2 text-tripswift-blue/70">
+                        {t('BookingTabs.AmendReservationModal.nightsReduced', {
+                          count: Math.abs(dateRange[1].diff(dayjs(booking.checkOutDate), 'day'))
+                        })}
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -540,24 +542,24 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
           
           {/* Guests Amendment Form */}
           {amendmentType === "guests" && (
-            <div className="space-y-5">
-              <div className="flex items-center gap-2 mb-4">
-                <Users className="h-5 w-5 text-tripswift-blue" />
-                <h4 className="text-lg font-tripswift-bold text-tripswift-black">
+            <div className="space-y-3 sm:space-y-5">
+              <div className="flex items-center gap-2 mb-2 sm:mb-4">
+                <Users className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
+                <h4 className="text-base sm:text-lg font-tripswift-bold text-tripswift-black">
                   {t('BookingTabs.AmendReservationModal.changeGuests')}
                 </h4>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 <div>
-                  <label className="block text-sm font-tripswift-medium text-tripswift-black/70 mb-2">
+                  <label className="block text-xs sm:text-sm font-tripswift-medium text-tripswift-black/70 mb-1 sm:mb-2">
                     {t('BookingTabs.AmendReservationModal.numberOfAdults')}
                   </label>
                   <Select
                     value={adultCount}
                     onChange={value => setAdultCount(value)}
                     className="w-full rounded-lg"
-                    size="large"
+                    size={window.innerWidth < 640 ? "middle" : "large"}
                   >
                     {[1, 2, 3, 4, 5, 6].map(num => (
                       <Option key={`adult-${num}`} value={num}>
@@ -567,14 +569,14 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                   </Select>
                 </div>
                 <div>
-                  <label className="block text-sm font-tripswift-medium text-tripswift-black/70 mb-2">
+                  <label className="block text-xs sm:text-sm font-tripswift-medium text-tripswift-black/70 mb-1 sm:mb-2">
                     {t('BookingTabs.AmendReservationModal.numberOfChildren')}
                   </label>
                   <Select
                     value={childCount}
                     onChange={value => setChildCount(value)}
                     className="w-full rounded-lg"
-                    size="large"
+                    size={window.innerWidth < 640 ? "middle" : "large"}
                   >
                     {[0, 1, 2, 3, 4].map(num => (
                       <Option key={`child-${num}`} value={num}>
@@ -585,26 +587,26 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                 </div>
               </div>
               
-              <div className="px-4 py-3 bg-tripswift-blue/5 rounded-lg text-sm text-tripswift-blue/90 font-tripswift-medium flex items-center">
-                <Info className="h-4 w-4 mr-2" />
-                {t('BookingTabs.AmendReservationModal.guestsNote')}
+              <div className="px-3 sm:px-4 py-2 sm:py-3 bg-tripswift-blue/5 rounded-lg text-xs sm:text-sm text-tripswift-blue/90 font-tripswift-medium flex items-start">
+                <Info className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 mt-0.5 flex-shrink-0" />
+                <span>{t('BookingTabs.AmendReservationModal.guestsNote')}</span>
               </div>
             </div>
           )}
           
           {/* Room Type Amendment Form */}
           {amendmentType === "room" && (
-            <div className="space-y-5">
-              <div className="flex items-center gap-2 mb-4">
-                <BedDouble className="h-5 w-5 text-tripswift-blue" />
-                <h4 className="text-lg font-tripswift-bold text-tripswift-black">
+            <div className="space-y-3 sm:space-y-5">
+              <div className="flex items-center gap-2 mb-2 sm:mb-4">
+                <BedDouble className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
+                <h4 className="text-base sm:text-lg font-tripswift-bold text-tripswift-black">
                   {t('BookingTabs.AmendReservationModal.changeRoomType')}
                 </h4>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 <div>
-                  <label className="block text-sm font-tripswift-medium text-tripswift-black/70 mb-2">
+                  <label className="block text-xs sm:text-sm font-tripswift-medium text-tripswift-black/70 mb-1 sm:mb-2">
                     {t('BookingTabs.AmendReservationModal.roomType')}
                   </label>
                   <Select
@@ -615,7 +617,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                       if (selectedRoom) setRoomType(selectedRoom.name);
                     }}
                     className="w-full rounded-lg"
-                    size="large"
+                    size={window.innerWidth < 640 ? "middle" : "large"}
                   >
                     {availableRoomTypes.map(type => (
                       <Option key={type.code} value={type.code}>{type.name}</Option>
@@ -623,7 +625,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                   </Select>
                 </div>
                 <div>
-                  <label className="block text-sm font-tripswift-medium text-tripswift-black/70 mb-2">
+                  <label className="block text-xs sm:text-sm font-tripswift-medium text-tripswift-black/70 mb-1 sm:mb-2">
                     {t('BookingTabs.AmendReservationModal.ratePlan')}
                   </label>
                   <Select
@@ -634,7 +636,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                       if (selectedPlan) setRatePlanName(selectedPlan.name);
                     }}
                     className="w-full rounded-lg"
-                    size="large"
+                    size={window.innerWidth < 640 ? "middle" : "large"}
                   >
                     {availableRatePlans.map(plan => (
                       <Option key={plan.code} value={plan.code}>{plan.name}</Option>
@@ -643,25 +645,25 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                 </div>
               </div>
               
-              <div className="px-4 py-3 bg-tripswift-blue/5 rounded-lg text-sm text-tripswift-blue/90 font-tripswift-medium flex items-center">
-                <Info className="h-4 w-4 mr-2" />
-                {t('BookingTabs.AmendReservationModal.roomTypeNote')}
+              <div className="px-3 sm:px-4 py-2 sm:py-3 bg-tripswift-blue/5 rounded-lg text-xs sm:text-sm text-tripswift-blue/90 font-tripswift-medium flex items-start">
+                <Info className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 mt-0.5 flex-shrink-0" />
+                <span>{t('BookingTabs.AmendReservationModal.roomTypeNote')}</span>
               </div>
             </div>
           )}
           
           {/* Special Requests Amendment Form */}
           {amendmentType === "requests" && (
-            <div className="space-y-5">
-              <div className="flex items-center gap-2 mb-4">
-                <ClipboardEdit className="h-5 w-5 text-tripswift-blue" />
-                <h4 className="text-lg font-tripswift-bold text-tripswift-black">
+            <div className="space-y-3 sm:space-y-5">
+              <div className="flex items-center gap-2 mb-2 sm:mb-4">
+                <ClipboardEdit className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
+                <h4 className="text-base sm:text-lg font-tripswift-bold text-tripswift-black">
                   {t('BookingTabs.AmendReservationModal.updateSpecialRequests')}
                 </h4>
               </div>
               
               <div>
-                <label className="block text-sm font-tripswift-medium text-tripswift-black/70 mb-2">
+                <label className="block text-xs sm:text-sm font-tripswift-medium text-tripswift-black/70 mb-1 sm:mb-2">
                   {t('BookingTabs.AmendReservationModal.specialRequestsLabel')}
                 </label>
                 <TextArea
@@ -669,13 +671,13 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                   onChange={e => setSpecialRequests(e.target.value)}
                   rows={4}
                   placeholder={t('BookingTabs.AmendReservationModal.specialRequestsPlaceholder')}
-                  className="w-full rounded-lg border-gray-200 hover:border-tripswift-blue focus:border-tripswift-blue focus:ring focus:ring-tripswift-blue/20"
+                  className="w-full rounded-lg border-gray-200 hover:border-tripswift-blue focus:border-tripswift-blue focus:ring focus:ring-tripswift-blue/20 text-sm"
                 />
               </div>
               
-              <div className="px-4 py-3 bg-tripswift-blue/5 rounded-lg text-sm text-tripswift-blue/90 font-tripswift-medium flex items-center">
-                <Info className="h-4 w-4 mr-2" />
-                {t('BookingTabs.AmendReservationModal.specialRequestsNote')}
+              <div className="px-3 sm:px-4 py-2 sm:py-3 bg-tripswift-blue/5 rounded-lg text-xs sm:text-sm text-tripswift-blue/90 font-tripswift-medium flex items-start">
+                <Info className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 mt-0.5 flex-shrink-0" />
+                <span>{t('BookingTabs.AmendReservationModal.specialRequestsNote')}</span>
               </div>
             </div>
           )}
@@ -683,38 +685,38 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         
         {/* Price difference */}
         {priceDifference.type !== "none" && (
-          <div className={`rounded-xl shadow-sm overflow-hidden mb-6`}>
-            <div className={`py-3 px-4 ${
+          <div className={`rounded-xl shadow-sm overflow-hidden mb-4 sm:mb-6`}>
+            <div className={`py-2 sm:py-3 px-3 sm:px-4 ${
               priceDifference.type === "increase" 
                 ? "bg-amber-500 text-white" 
                 : "bg-green-500 text-white"
             }`}>
-              <h4 className="font-tripswift-bold text-base">
+              <h4 className="font-tripswift-bold text-sm sm:text-base">
                 {t('BookingTabs.AmendReservationModal.priceAdjustment')}
               </h4>
             </div>
             
-            <div className={`p-5 border border-t-0 ${
+            <div className={`p-3 sm:p-5 border border-t-0 ${
               priceDifference.type === "increase"
                 ? "border-amber-200 bg-amber-50" 
                 : "border-green-200 bg-green-50"
             }`}>
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center ${
                   priceDifference.type === "increase"
                     ? "bg-amber-100 text-amber-700" 
                     : "bg-green-100 text-green-700"
                 }`}>
-                  <BadgeDollarSign className="h-6 w-6" />
+                  <BadgeDollarSign className="h-5 w-5 sm:h-6 sm:w-6" />
                 </div>
                 
                 <div>
                   {priceDifference.type === "increase" ? (
                     <>
-                      <p className="text-tripswift-black font-tripswift-medium text-base mb-1">
+                      <p className="text-sm sm:text-base text-tripswift-black font-tripswift-medium mb-0.5 sm:mb-1">
                         {t('BookingTabs.AmendReservationModal.additionalPayment')}
                       </p>
-                      <p className="text-tripswift-black/70">
+                      <p className="text-xs sm:text-sm text-tripswift-black/70">
                         {t('BookingTabs.AmendReservationModal.additionalChargeExplanation', {
                           amount: priceDifference.amount.toFixed(2)
                         })}
@@ -722,10 +724,10 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                     </>
                   ) : (
                     <>
-                      <p className="text-tripswift-black font-tripswift-medium text-base mb-1">
+                      <p className="text-sm sm:text-base text-tripswift-black font-tripswift-medium mb-0.5 sm:mb-1">
                         {t('BookingTabs.AmendReservationModal.refundToBeProcessed')}
                       </p>
-                      <p className="text-tripswift-black/70">
+                      <p className="text-xs sm:text-sm text-tripswift-black/70">
                         {t('BookingTabs.AmendReservationModal.refundExplanation', {
                           amount: priceDifference.amount.toFixed(2)
                         })}
@@ -739,32 +741,32 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         )}
         
         {/* Amendment policies */}
-        <div className="bg-gray-50 rounded-xl border border-gray-200 mb-6 overflow-hidden">
-          <div className="py-3 px-4 bg-gray-100 border-b border-gray-200">
-            <div className="flex items-center gap-2"> 
-              <ShieldAlert className="h-4 w-4 text-tripswift-black/60" />
-              <h4 className="font-tripswift-bold text-tripswift-black/80">
+        <div className="bg-gray-50 rounded-xl border border-gray-200 mb-4 sm:mb-6 overflow-hidden">
+          <div className="py-2 sm:py-3 px-3 sm:px-4 bg-gray-100 border-b border-gray-200">
+            <div className="flex items-center gap-1.5 sm:gap-2"> 
+              <ShieldAlert className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-tripswift-black/60" />
+              <h4 className="font-tripswift-bold text-sm sm:text-base text-tripswift-black/80">
                 {t('BookingTabs.AmendReservationModal.amendmentPolicies')}
               </h4>
             </div>
           </div>
           
-          <div className="p-5">
-            <ul className="space-y-2.5 text-sm text-tripswift-black/70">
-              <li className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-tripswift-blue/70 flex-shrink-0 mt-1"></div>
+          <div className="p-3 sm:p-5">
+            <ul className="space-y-2 sm:space-y-2.5 text-xs sm:text-sm text-tripswift-black/70">
+              <li className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-tripswift-blue/70 flex-shrink-0 mt-1.5"></div>
                 <span>{t('BookingTabs.AmendReservationModal.policies.dateChanges')}</span>
               </li>
-              <li className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-tripswift-blue/70 flex-shrink-0 mt-1"></div>
+              <li className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-tripswift-blue/70 flex-shrink-0 mt-1.5"></div>
                 <span>{t('BookingTabs.AmendReservationModal.policies.changes72Hours')}</span>
               </li>
-              <li className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-tripswift-blue/70 flex-shrink-0 mt-1"></div>
+              <li className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-tripswift-blue/70 flex-shrink-0 mt-1.5"></div>
                 <span>{t('BookingTabs.AmendReservationModal.policies.roomUpgrades')}</span>
               </li>
-              <li className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-tripswift-blue/70 flex-shrink-0 mt-1"></div>
+              <li className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-tripswift-blue/70 flex-shrink-0 mt-1.5"></div>
                 <span>{t('BookingTabs.AmendReservationModal.policies.reducingStay')}</span>
               </li>
             </ul>
@@ -773,14 +775,14 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         
         {/* Message display area */}
         {amendmentMessage && (
-          <div className={`mb-6 p-4 rounded-xl border flex items-center gap-4 ${
+          <div className={`mb-4 sm:mb-6 p-3 sm:p-4 rounded-xl border flex items-start sm:items-center gap-3 sm:gap-4 ${
             amendmentMessage.type === 'success' 
               ? 'bg-green-50 border-green-200 text-green-700' 
               : amendmentMessage.type === 'warning' 
                 ? 'bg-amber-50 border-amber-200 text-amber-700'
                 : 'bg-red-50 border-red-200 text-red-700'
           }`}>
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+            <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
               amendmentMessage.type === 'success' 
                 ? 'bg-green-100' 
                 : amendmentMessage.type === 'warning' 
@@ -788,21 +790,21 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                   : 'bg-red-100'
             }`}>
               {amendmentMessage.type === 'success' ? (
-                <Check className="h-5 w-5" />
+                <Check className="h-4 w-4 sm:h-5 sm:w-5" />
               ) : (
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4 sm:h-5 sm:w-5" />
               )}
             </div>
-            <p className="font-tripswift-medium">{amendmentMessage.text}</p>
+            <p className="text-xs sm:text-sm font-tripswift-medium">{amendmentMessage.text}</p>
           </div>
         )}
         
         {/* Action buttons */}
-        <div className="flex flex-col-reverse sm:flex-row justify-end gap-3">
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
           <button 
             onClick={onClose}
             disabled={loading}
-            className="px-6 py-3 border border-gray-200 rounded-xl text-tripswift-black/80 hover:bg-gray-50 font-tripswift-medium transition-colors"
+            className="px-4 sm:px-6 py-2.5 sm:py-3 border border-gray-200 rounded-lg sm:rounded-xl text-tripswift-black/80 hover:bg-gray-50 font-tripswift-medium transition-colors text-sm sm:text-base mt-2 sm:mt-0"
           >
             {t('BookingTabs.AmendReservationModal.cancel')}
           </button>
@@ -810,16 +812,16 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
           <button 
             onClick={handleSubmitAmendment}
             disabled={loading}
-            className="px-6 py-3 bg-gradient-to-r from-tripswift-blue to-[#054B8F] hover:from-[#054B8F] hover:to-tripswift-blue text-tripswift-off-white rounded-xl font-tripswift-medium shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden flex items-center justify-center"
+            className="px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-tripswift-blue to-[#054B8F] hover:from-[#054B8F] hover:to-tripswift-blue text-tripswift-off-white rounded-lg sm:rounded-xl font-tripswift-medium shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden flex items-center justify-center text-sm sm:text-base"
           >
             {loading ? (
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 border-2 border-tripswift-off-white/20 border-t-tripswift-off-white rounded-full animate-spin"></div>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-tripswift-off-white/20 border-t-tripswift-off-white rounded-full animate-spin"></div>
                 <span>{t('BookingTabs.AmendReservationModal.processing')}</span>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <Check className="h-5 w-5" />
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <Check className="h-4 w-4 sm:h-5 sm:w-5" />
                 <span>{t('BookingTabs.AmendReservationModal.confirmAmendment')}</span>
               </div>
             )}

@@ -18,6 +18,8 @@ import BookingCard from "./BookingCard";
 import BookingPagination from "./BookingPagination";
 import BookingDetailsModal from "./BookingDetailsModal";
 import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useRouter } from "next/navigation";
+
 
 interface RootState {
   auth: {
@@ -52,7 +54,21 @@ export default function BookingTabs() {
 
   const authUser = useSelector((state: RootState) => state.auth.user);
   const token = Cookies.get("accessToken");
+  const router =useRouter();
+   
+  //it helps us to 
+  useEffect(() => {
+    const handlePopState = () => {
+      router.replace("/"); // force redirect home on back
+    };
 
+    window.history.pushState(null, "", window.location.href);
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
   useEffect(() => {
     const fetchBookings = async () => {
       if (!authUser?._id) {

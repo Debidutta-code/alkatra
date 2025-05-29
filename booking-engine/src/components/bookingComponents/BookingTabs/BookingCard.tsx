@@ -85,7 +85,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-8 mb-5">
+        <div className="flex flex-col sm:flex-row justify-between mb-5 bg-tripswift-off-white/70 p-3 rounded-lg border-t border-gray-100">
           {/* Room Type */}
           <div>
             <p className="text-xs text-gray-500 mb-1.5">{t('BookingTabs.BookingCard.roomType')}</p>

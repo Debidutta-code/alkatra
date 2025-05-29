@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Booking } from './types';
 import {
@@ -28,100 +28,129 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
   onCancel
 }) => {
   const { t } = useTranslation();
+    useEffect(() => {
+      const originalOverflow = document.body.style.overflow;
+      
+      document.body.style.overflow = 'hidden';
+      
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }, []);
+  
+    useEffect(() => {
+      const handleEscapeKey = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+          onClose();
+        }
+      };
+  
+      document.addEventListener('keydown', handleEscapeKey);
+      return () => {
+        document.removeEventListener('keydown', handleEscapeKey);
+      };
+    }, [onClose]);
+  
+    // Handle backdrop click to close modal
+    const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+      if (e.target === e.currentTarget) {
+        onClose();
+      }
+    };
   
   return (
     <>
       {/* Modal Header */}
-      <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] p-6 rounded-t-xl relative">
+      <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] p-4 sm:p-5 md:p-6 rounded-t-xl relative">
         <div className="flex justify-between items-start">
           <div>
             {/* <div className="inline-flex items-center px-3 py-1 rounded-md bg-white/15 text-tripswift-off-white text-sm mb-3">
               <FaTicketAlt className="mr-2" />
               {t('BookingTabs.BookingDetailsModal.bookingNumber', { id: getBookingId(booking) })}
             </div> */}
-            <h2 className="text-2xl font-tripswift-bold text-tripswift-off-white leading-tight mb-1">
+            <h2 className="text-xl sm:text-2xl font-tripswift-bold text-tripswift-off-white leading-tight mb-1">
               {booking.property.property_name}
             </h2>
             {booking.property.property_address && (
-              <p className="text-tripswift-off-white/80 text-sm flex items-center">
-                <FaMapMarkerAlt className="mr-2" />
+              <p className="text-tripswift-off-white/80 text-xs sm:text-sm flex items-center">
+                <FaMapMarkerAlt className="mr-1.5 sm:mr-2 text-sm sm:text-base" />
                 {booking.property.property_address}
               </p>
             )}
           </div>
           <button
             onClick={onClose}
-            className="text-tripswift-off-white/80 hover:text-tripswift-off-white bg-tripswift-off-white/10 hover:bg-tripswift-off-white/20 rounded-full p-2 transition-colors"
+            className="text-tripswift-off-white hover:text-tripswift-off-white bg-tripswift-off-white/10 hover:bg-tripswift-off-white/20 rounded-full p-1.5 sm:p-2 transition-colors"
             aria-label={t('BookingTabs.BookingDetailsModal.closeModal')}
           >
-            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg className="h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
         </div>
 
         {/* Status Badge */}
-        <div className="absolute bottom-0 right-6 transform translate-y-1/2">
-          <div className={`flex items-center px-4 py-2 rounded-full shadow-md ${booking.status === "Confirmed"
+        <div className="absolute bottom-0 right-4 sm:right-6 transform translate-y-1/2">
+          <div className={`flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-full shadow-md text-xs sm:text-sm ${booking.status === "Confirmed"
             ? "bg-green-50 text-green-700 border border-green-200"
             : booking.status === "Pending"
               ? "bg-yellow-50 text-yellow-700 border border-yellow-200"
               : "bg-red-50 text-red-700 border border-red-200"
             }`}>
-            {getStatusIcon(booking.status)}
+            <span className="mr-1 sm:mr-1.5">{getStatusIcon(booking.status)}</span>
             <span className="font-tripswift-bold">{t(`BookingTabs.BookingDetailsModal.status.${booking.status.toLowerCase()}`)}</span>
           </div>
         </div>
       </div>
 
       {/* Modal Content */}
-      <div className="p-6 pt-10 font-noto-sans">
+      <div className="p-4 sm:p-5 md:p-6 pt-8 sm:pt-10 font-noto-sans">
         {/* Stay Details */}
-        <div className="mb-8">
-          <h3 className="text-xl font-tripswift-bold text-gray-800 mb-4 flex items-center">
-            <FaRegCalendarAlt className="mr-2 text-tripswift-blue mb-1" />
+        <div className="mb-6 sm:mb-8">
+          <h3 className="text-lg sm:text-xl font-tripswift-bold text-gray-800 mb-3 sm:mb-4 flex items-center">
+            <FaRegCalendarAlt className="mr-1.5 sm:mr-2 text-tripswift-blue text-base sm:text-lg" />
             {t('BookingTabs.BookingDetailsModal.stayDetails')}
           </h3>
 
-          <div className="bg-tripswift-off-white p-5 rounded-xl">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-tripswift-off-white p-3 sm:p-4 md:p-5 rounded-xl">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
               <div>
-                <p className="text-sm text-tripswift-black/60 mb-1">{t('BookingTabs.BookingDetailsModal.checkIn')}</p>
-                <p className="flex items-center text-tripswift-black font-tripswift-bold">
-                  <FaCalendarCheck className="mr-2 text-green-500 mb-1" />
+                <p className="text-xs sm:text-sm text-tripswift-black/60 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.checkIn')}</p>
+                <p className="flex items-center text-tripswift-black font-tripswift-bold text-sm sm:text-base">
+                  <FaCalendarCheck className="mr-1.5 sm:mr-2 text-green-500 text-sm sm:text-base" />
                   {formatDateString(booking.checkInDate)}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.checkOut')}</p>
-                <p className="flex items-center text-gray-800 font-tripswift-bold">
-                  <FaCalendarTimes className="mr-2 text-red-500 mb-1" />
+                <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.checkOut')}</p>
+                <p className="flex items-center text-gray-800 font-tripswift-bold text-sm sm:text-base">
+                  <FaCalendarTimes className="mr-1.5 sm:mr-2 text-red-500 text-sm sm:text-base" />
                   {formatDateString(booking.checkOutDate)}
                 </p>
               </div>
               {/* <div>
-                <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.duration')}</p>
-                <p className="flex items-center text-gray-800 font-tripswift-bold">
-                  <FaRegCalendarAlt className="mr-2 text-tripswift-blue" />
+                <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.duration')}</p>
+                <p className="flex items-center text-gray-800 font-tripswift-bold text-sm sm:text-base">
+                  <FaRegCalendarAlt className="mr-1.5 sm:mr-2 text-tripswift-blue text-sm sm:text-base" />
                   {t('BookingTabs.BookingDetailsModal.nightsStay', { count: calculateNights(booking.checkInDate, booking.checkOutDate) })}
                 </p>
               </div> */}
             </div>
 
-            <div className="border-t border-gray-200 mt-5 pt-5">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="border-t border-gray-200 mt-4 sm:mt-5 pt-4 sm:pt-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.roomType')}</p>
+                  <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.roomType')}</p>
                   <div className="flex items-center">
-                    <span className={`inline-flex items-center px-3 py-1.5 rounded-md text-sm font-tripswift-medium ${getRoomTypeStyle(booking.room.room_type)}`}>
-                      {getRoomTypeIcon(booking.room.room_type)}
+                    <span className={`inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 rounded-md text-xs sm:text-sm font-tripswift-medium ${getRoomTypeStyle(booking.room.room_type)}`}>
+                      <span className="mr-1 sm:mr-1.5">{getRoomTypeIcon(booking.room.room_type)}</span>
                       {booking.room.room_type}
                     </span>
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.roomName')}</p>
-                  <p className="text-gray-800 font-tripswift-medium">{booking.room.room_name}</p>
+                  <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.roomName')}</p>
+                  <p className="text-gray-800 font-tripswift-medium text-sm sm:text-base">{booking.room.room_name}</p>
                 </div>
               </div>
             </div>
@@ -129,37 +158,37 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
         </div>
 
         {/* Guest Details */}
-        <div className="mb-8">
-          <h3 className="text-xl font-tripswift-bold text-gray-800 mb-4 flex items-center">
-            <FaUser className="mr-2 text-tripswift-blue mb-1" />
+        <div className="mb-6 sm:mb-8">
+          <h3 className="text-lg sm:text-xl font-tripswift-bold text-gray-800 mb-3 sm:mb-4 flex items-center">
+            <FaUser className="mr-1.5 sm:mr-2 text-tripswift-blue text-base sm:text-lg" />
             {t('BookingTabs.BookingDetailsModal.guestDetails')}
           </h3>
 
-          <div className="bg-tripswift-off-white p-5 rounded-xl">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-tripswift-off-white p-3 sm:p-4 md:p-5 rounded-xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div>
-                <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.guestName')}</p>
-                <p className="text-gray-800 font-tripswift-medium">{booking.booking_user_name}</p>
+                <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.guestName')}</p>
+                <p className="text-gray-800 font-tripswift-medium text-sm sm:text-base">{booking.booking_user_name}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.contactNumber')}</p>
-                <p className="text-gray-800 font-tripswift-medium">{booking.booking_user_phone}</p>
+                <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.contactNumber')}</p>
+                <p className="text-gray-800 font-tripswift-medium text-sm sm:text-base">{booking.booking_user_phone}</p>
               </div>
             </div>
 
             {(booking.adultCount || booking.childCount) && (
-              <div className="border-t border-gray-200 mt-5 pt-5">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="border-t border-gray-200 mt-4 sm:mt-5 pt-4 sm:pt-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                   {booking.adultCount && (
                     <div>
-                      <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.adults')}</p>
-                      <p className="text-gray-800 font-tripswift-medium">{booking.adultCount}</p>
+                      <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.adults')}</p>
+                      <p className="text-gray-800 font-tripswift-medium text-sm sm:text-base">{booking.adultCount}</p>
                     </div>
                   )}
                   {booking.childCount && (
                     <div>
-                      <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.children')}</p>
-                      <p className="text-gray-800 font-tripswift-medium">{booking.childCount}</p>
+                      <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.children')}</p>
+                      <p className="text-gray-800 font-tripswift-medium text-sm sm:text-base">{booking.childCount}</p>
                     </div>
                   )}
                 </div>
@@ -167,58 +196,58 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             )}
 
             {booking.specialRequests && (
-              <div className="border-t border-gray-200 mt-5 pt-5">
-                <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.specialRequests')}</p>
-                <p className="text-gray-800 italic">{booking.specialRequests}</p>
+              <div className="border-t border-gray-200 mt-4 sm:mt-5 pt-4 sm:pt-5">
+                <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.specialRequests')}</p>
+                <p className="text-gray-800 italic text-sm sm:text-base">{booking.specialRequests}</p>
               </div>
             )}
           </div>
         </div>
 
         {/* Payment Details */}
-        <div className="mb-8">
-          <h3 className="text-xl font-tripswift-bold text-gray-800 mb-4 flex items-center">
-            <FaCreditCard className="mr-2 text-tripswift-blue mb-1" />
+        <div className="mb-6 sm:mb-8">
+          <h3 className="text-lg sm:text-xl font-tripswift-bold text-gray-800 mb-3 sm:mb-4 flex items-center">
+            <FaCreditCard className="mr-1.5 sm:mr-2 text-tripswift-blue text-base sm:text-lg" />
             {t('BookingTabs.BookingDetailsModal.paymentDetails')}
           </h3>
 
-          <div className="bg-tripswift-off-white p-5 rounded-xl">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-tripswift-off-white p-3 sm:p-4 md:p-5 rounded-xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div>
-                <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.paymentMethod')}</p>
-                <p className="flex items-center font-tripswift-medium">
+                <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.paymentMethod')}</p>
+                <p className="flex items-center font-tripswift-medium text-sm sm:text-base">
                   {getPaymentMethodIcon(booking)}
                   {/* {t(`BookingTabs.BookingDetailsModal.paymentMethods.${getPaymentMethodText(booking).toLowerCase().replace(/\s+/g, '_')}`)} */}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.bookingDate')}</p>
-                <p className="flex items-center text-gray-800 font-tripswift-medium">
-                  <FaRegCalendarCheck className="mr-2 text-gray-500 mb-1" />
+                <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.bookingDate')}</p>
+                <p className="flex items-center text-gray-800 font-tripswift-medium text-sm sm:text-base">
+                  <FaRegCalendarCheck className="mr-1.5 sm:mr-2 text-gray-500 text-sm sm:text-base" />
                   {formatDateString(booking.booking_dates)}
                 </p>
               </div>
             </div>
 
-            <div className="border-t border-gray-200 mt-5 pt-5 flex justify-between items-center">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm text-gray-500 mb-1">
+            <div className="border-t border-gray-200 mt-4 sm:mt-5 pt-4 sm:pt-5 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+              <div className="flex flex-col space-y-0.5 sm:space-y-1 mb-3 sm:mb-0">
+                <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">
                   {t('BookingTabs.BookingDetailsModal.totalAmount')}
                 </p>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-tripswift-bold text-tripswift-blue">
+                <div className="flex items-baseline gap-1 sm:gap-2">
+                  <span className="text-xl sm:text-2xl font-tripswift-bold text-tripswift-blue">
                     ₹{booking.amount.toLocaleString()}
                   </span>
-                  <span className="text-lg text-gray-500 mb-1">
+                  <span className="text-base sm:text-lg text-gray-500">
                     / {t('BookingTabs.BookingDetailsModal.night')}
                   </span>
                 </div>
               </div>
 
               {booking.ratePlanName && (
-                <div className="text-right">
-                  <p className="text-sm text-gray-500 mb-1">{t('BookingTabs.BookingDetailsModal.ratePlan')}</p>
-                  <div className="inline-block px-3 py-1 bg-blue-50 text-blue-700 rounded-md text-sm font-tripswift-medium">
+                <div className="text-left sm:text-right">
+                  <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.ratePlan')}</p>
+                  <div className="inline-block px-2 sm:px-3 py-0.5 sm:py-1 bg-blue-50 text-blue-700 rounded-md text-xs sm:text-sm font-tripswift-medium">
                     {booking.ratePlanName}
                   </div>
                 </div>
@@ -228,30 +257,30 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 border-t border-gray-200 pt-6">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 border-t border-gray-200 pt-4 sm:pt-6">
           {booking.status === "Confirmed" && (
             <>
               <button
-                className="flex-1 bg-tripswift-blue text-tripswift-off-white py-3 px-6 rounded-lg hover:bg-[#054B8F] transition-colors duration-300 shadow-sm hover:shadow-md font-tripswift-medium flex items-center justify-center"
+                className="flex-1 bg-tripswift-blue text-tripswift-off-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg hover:bg-[#054B8F] transition-colors duration-300 shadow-sm hover:shadow-md font-tripswift-medium flex items-center justify-center text-sm sm:text-base"
                 onClick={onAmend}
               >
-                <FaEdit className="mr-2" />
+                <FaEdit className="mr-1.5 sm:mr-2 text-sm sm:text-base" />
                 {t('BookingTabs.BookingDetailsModal.modifyBooking')}
               </button>
               <button
-                className="flex-1 bg-tripswift-off-white text-red-600 border border-red-200 py-3 px-6 rounded-lg hover:bg-red-50 transition-colors duration-300 font-tripswift-medium flex items-center justify-center"
+                className="flex-1 bg-tripswift-off-white text-red-600 border border-red-200 py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg hover:bg-red-50 transition-colors duration-300 font-tripswift-medium flex items-center justify-center text-sm sm:text-base"
                 onClick={onCancel}
               >
-                <FaRegTimesCircle className="mr-2" />
+                <FaRegTimesCircle className="mr-1.5 sm:mr-2 text-sm sm:text-base" />
                 {t('BookingTabs.BookingDetailsModal.cancelBooking')}
               </button>
             </>
           )}
           <button
-            className="flex-1 bg-gray-700 text-tripswift-off-white py-3 px-6 rounded-lg hover:bg-gray-800 transition-colors duration-300 flex items-center justify-center font-tripswift-medium"
+            className="flex-1 bg-gray-700 text-tripswift-off-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg hover:bg-gray-800 transition-colors duration-300 flex items-center justify-center font-tripswift-medium text-sm sm:text-base"
             onClick={() => window.print()}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
             </svg>
             {t('BookingTabs.BookingDetailsModal.printItinerary')}

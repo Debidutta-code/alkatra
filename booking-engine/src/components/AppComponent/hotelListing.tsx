@@ -273,7 +273,7 @@ const HotelListing: React.FC = () => {
           <div className="h-full w-full bg-pattern-dots"></div>
         </div>
         <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
-          <div className="text-tripswift-off-white mb-6">
+          <div className="text-tripswift-off-white mb-6 flex-col items-center">
             <h1 className="text-2xl md:text-3xl font-tripswift-bold text-tripswift-off-white">
               {t("HotelListing.heroTitle", { defaultValue: "Find Your Perfect Stay" })}
             </h1>
@@ -282,7 +282,7 @@ const HotelListing: React.FC = () => {
             </p>
           </div>
 
-          <div className="">
+          <div className="w-[290px] md:w-full ">
             <CompactSearchBar
               initialLocation={location || destination || ""}
               initialCheckin={checkinDate || ""}

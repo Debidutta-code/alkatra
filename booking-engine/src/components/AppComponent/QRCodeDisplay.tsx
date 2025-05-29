@@ -1,18 +1,20 @@
 // components/AppComponent/QRCodeDisplay.tsx
 import React from "react";
 import { QrCode, Smartphone } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 
 interface QRCodeDisplayProps {
   qrCode: string;
 }
 
 const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ qrCode }) => {
+  const { t } = useTranslation();
   if (!qrCode) return null;
 
   return (
     <div className="relative overflow-hidden bg-tripswift-off-white  rounded-lg">
       {/* Main Content */}
-      <div className="flex flex-col sm:flex-row gap-6 items-center rounded-xl border border-gray-100 p-2 pl-5">
+      <div className="flex flex-col md:flex-row gap-6 items-center rounded-xl border border-gray-100 p-2 pl-5">
         {/* QR Code Section */}
         <div className="text-center flex-shrink-0">
           <div className="bg-tripswift-off-white rounded-lg p-2 border-2 border-dashed shadow-[var(--shadow)]">
@@ -25,8 +27,7 @@ const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ qrCode }) => {
           </div>
           <div className="flex items-center justify-center mt-2 text-xs text-tripswift-black/60 font-tripswift-regular">
             <Smartphone className="h-3 w-3 mr-1 text-tripswift-blue" />
-            Scan to apply
-          </div>
+            {t('RoomsPage.qrCode.scanToApply')}          </div>
         </div>
 
         {/* Discount Information Section */}
@@ -39,15 +40,15 @@ const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ qrCode }) => {
             <ul className="text-description text-tripswift-black/70 space-y-2">
               <li className="flex items-start">
                 <span className="mr-2">•</span>
-                Scan the QR code at checkout
+                {t('RoomsPage.qrCode.instructions.scanAtCheckout')}
               </li>
               <li className="flex items-start">
                 <span className="mr-2">•</span>
-                Apply the discount during checkout to get your special offer
+                {t('RoomsPage.qrCode.instructions.applyDiscount')}
               </li>
               <li className="flex items-start">
                 <span className="mr-2">•</span>
-                Valid for this booking session only
+                {t('RoomsPage.qrCode.instructions.validityNote')}
               </li>
             </ul>
           </div>

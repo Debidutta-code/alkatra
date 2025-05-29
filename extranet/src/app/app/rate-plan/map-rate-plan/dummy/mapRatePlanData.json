@@ -1,0 +1,472 @@
+{
+  "mapRatePlanData": [
+    {
+      "date": "2025-05-25",
+      "ratePlanCode": "BAR",
+      "ratePlanName": "Best Available Rate",
+      "roomTypeCode": "STD",
+      "roomTypeName": "Standard Room",
+      "price": 120.00,
+      "availability": 10
+    },
+    {
+      "date": "2025-05-25",
+      "ratePlanCode": "ADV",
+      "ratePlanName": "Advance Purchase",
+      "roomTypeCode": "STD",
+      "roomTypeName": "Standard Room",
+      "price": 110.00,
+      "availability": 8
+    },
+    {
+      "date": "2025-05-25",
+      "ratePlanCode": "BAR",
+      "ratePlanName": "Best Available Rate",
+      "roomTypeCode": "SUP",
+      "roomTypeName": "Superior Room",
+      "price": 150.00,
+      "availability": 12
+    },
+    {
+      "date": "2025-05-25",
+      "ratePlanCode": "CORP",
+      "ratePlanName": "Corporate Rate",
+      "roomTypeCode": "DLX",
+      "roomTypeName": "Deluxe Room",
+      "price": 180.00,
+      "availability": 6
+    },
+    {
+      "date": "2025-05-26",
+      "ratePlanCode": "BAR",
+      "ratePlanName": "Best Available Rate",
+      "roomTypeCode": "STD",
+      "roomTypeName": "Standard Room",
+      "price": 125.00,
+      "availability": 8
+    },
+    {
+      "date": "2025-05-26",
+      "ratePlanCode": "ADV",
+      "ratePlanName": "Advance Purchase",
+      "roomTypeCode": "STD",
+      "roomTypeName": "Standard Room",
+      "price": 115.00,
+      "availability": 6
+    },
+    {
+      "date": "2025-05-26",
+      "ratePlanCode": "PKG",
+      "ratePlanName": "Package Deal",
+      "roomTypeCode": "SUP",
+      "roomTypeName": "Superior Room",
+      "price": 160.00,
+      "availability": 10
+    },
+    {
+      "date": "2025-05-26",
+      "ratePlanCode": "CORP",
+      "ratePlanName": "Corporate Rate",
+      "roomTypeCode": "STE",
+      "roomTypeName": "Suite",
+      "price": 220.00,
+      "availability": 4
+    },
+    {
+      "date": "2025-05-27",
+      "ratePlanCode": "BAR",
+      "ratePlanName": "Best Available Rate",
+      "roomTypeCode": "STD",
+      "roomTypeName": "Standard Room",
+      "price": 130.00,
+      "availability": 12
+    },
+    {
+      "date": "2025-05-27",
+      "ratePlanCode": "ADV",
+      "ratePlanName": "Advance Purchase",
+      "roomTypeCode": "STD",
+      "roomTypeName": "Standard Room",
+      "price": 118.00,
+      "availability": 9
+    },
+    {
+      "date": "2025-05-27",
+      "ratePlanCode": "BAR",
+      "ratePlanName": "Best Available Rate",
+      "roomTypeCode": "DLX",
+      "roomTypeName": "Deluxe Room",
+      "price": 170.00,
+      "availability": 8
+    },
+    {
+      "date": "2025-05-27",
+      "ratePlanCode": "PROMO",
+      "ratePlanName": "Promotional Rate",
+      "roomTypeCode": "FAM",
+      "roomTypeName": "Family Room",
+      "price": 200.00,
+      "availability": 5
+    },
+    {
+      "date": "2025-05-28",
+      "ratePlanCode": "BAR",
+      "ratePlanName": "Best Available Rate",
+      "roomTypeCode": "STD",
+      "roomTypeName": "Standard Room",
+      "price": 135.00,
+      "availability": 15
+    },
+    {
+      "date": "2025-05-28",
+      "ratePlanCode": "PKG",
+      "ratePlanName": "Package Deal",
+      "roomTypeCode": "SUP",
+      "roomTypeName": "Superior Room",
+      "price": 165.00,
+      "availability": 11
+    },
+    {
+      "date": "2025-05-28",
+      "ratePlanCode": "CORP",
+      "ratePlanName": "Corporate Rate",
+      "roomTypeCode": "DLX",
+      "roomTypeName": "Deluxe Room",
+      "price": 185.00,
+      "availability": 7
+    },
+    {
+      "date": "2025-05-28",
+      "ratePlanCode": "ADV",
+      "ratePlanName": "Advance Purchase",
+      "roomTypeCode": "PSTE",
+      "roomTypeName": "Presidential Suite",
+      "price": 350.00,
+      "availability": 2
+    },
+    {
+      "date": "2025-05-29",
+      "ratePlanCode": "BAR",
+      "ratePlanName": "Best Available Rate",
+      "roomTypeCode": "STD",
+      "roomTypeName": "Standard Room",
+      "price": 140.00,
+      "availability": 6
+    },
+    {
+      "date": "2025-05-29",
+      "ratePlanCode": "PROMO",
+      "ratePlanName": "Promotional Rate",
+      "roomTypeCode": "SUP",
+      "roomTypeName": "Superior Room",
+      "price": 145.00,
+      "availability": 8
+    },
+    {
+      "date": "2025-05-29",
+      "ratePlanCode": "PKG",
+      "ratePlanName": "Package Deal",
+      "roomTypeCode": "DLX",
+      "roomTypeName": "Deluxe Room",
+      "price": 190.00,
+      "availability": 5
+    },
+    {
+      "date": "2025-05-29",
+      "ratePlanCode": "CORP",
+      "ratePlanName": "Corporate Rate",
+      "roomTypeCode": "FAM",
+      "roomTypeName": "Family Room",
+      "price": 210.00,
+      "availability": 3
+    },
+    {
+      "date": "2025-05-30",
+      "ratePlanCode": "BAR",
+      "ratePlanName": "Best Available Rate",
+      "roomTypeCode": "STD",
+      "roomTypeName": "Standard Room",
+      "price": 150.00,
+      "availability": 4
+    },
+    {
+      "date": "2025-05-30",
+      "ratePlanCode": "ADV",
+      "ratePlanName": "Advance Purchase",
+      "roomTypeCode": "STD",
+      "roomTypeName": "Standard Room",
+      "price": 135.00,
+      "availability": 2
+    },
+    {
+      "date": "2025-05-30",
+      "ratePlanCode": "PKG",
+      "ratePlanName": "Package Deal",
+      "roomTypeCode": "STE",
+      "roomTypeName": "Suite",
+      "price": 250.00,
+      "availability": 6
+    },
+    {
+      "date": "2025-05-30",
+      "ratePlanCode": "CORP",
+      "ratePlanName": "Corporate Rate",
+      "roomTypeCode": "PSTE",
+      "roomTypeName": "Presidential Suite",
+      "price": 380.00,
+      "availability": 1
+    },
+    {
+      "date": "2025-05-31",
+      "ratePlanCode": "BAR",
+      "ratePlanName": "Best Available Rate",
+      "roomTypeCode": "STD",
+      "roomTypeName": "Standard Room",
+      "price": 155.00,
+      "availability": 8
+    },
+    {
+      "date": "2025-05-31",
+      "ratePlanCode": "PROMO",
+      "ratePlanName": "Promotional Rate",
+      "roomTypeCode": "SUP",
+      "roomTypeName": "Superior Room",
+      "price": 150.00,
+      "availability": 10
+    },
+    {
+      "date": "2025-05-31",
+      "ratePlanCode": "ADV",
+      "ratePlanName": "Advance Purchase",
+      "roomTypeCode": "DLX",
+      "roomTypeName": "Deluxe Room",
+      "price": 175.00,
+      "availability": 7
+    },
+    {
+      "date": "2025-05-31",
+      "ratePlanCode": "PKG",
+      "ratePlanName": "Package Deal",
+      "roomTypeCode": "FAM",
+      "roomTypeName": "Family Room",
+      "price": 215.00,
+      "availability": 4
+    },
+    {
+      "date": "2025-06-01",
+      "ratePlanCode": "BAR",
+      "ratePlanName": "Best Available Rate",
+      "roomTypeCode": "STD",
+      "roomTypeName": "Standard Room",
+      "price": 145.00,
+      "availability": 10
+    },
+    {
+      "date": "2025-06-01",
+      "ratePlanCode": "ADV",
+      "ratePlanName": "Advance Purchase",
+      "roomTypeCode": "STD",
+      "roomTypeName": "Standard Room",
+      "price": 132.00,
+      "availability": 8
+    },
+    {
+      "date": "2025-06-01",
+      "ratePlanCode": "CORP",
+      "ratePlanName": "Corporate Rate",
+      "roomTypeCode": "SUP",
+      "roomTypeName": "Superior Room",
+      "price": 160.00,
+      "availability": 12
+    },
+    {
+      "date": "2025-06-01",
+      "ratePlanCode": "PKG",
+      "ratePlanName": "Package Deal",
+      "roomTypeCode": "STE",
+      "roomTypeName": "Suite",
+      "price": 240.00,
+      "availability": 6
+    },
+    {
+      "date": "2025-06-02",
+      "ratePlanCode": "BAR",
+      "ratePlanName": "Best Available Rate",
+      "roomTypeCode": "STD",
+      "roomTypeName": "Standard Room",
+      "price": 140.00,
+      "availability": 12
+    },
+    {
+      "date": "2025-06-02",
+      "ratePlanCode": "PROMO",
+      "ratePlanName": "Promotional Rate",
+      "roomTypeCode": "DLX",
+      "roomTypeName": "Deluxe Room",
+      "price": 165.00,
+      "availability": 9
+    },
+    {
+      "date": "2025-06-02",
+      "ratePlanCode": "ADV",
+      "ratePlanName": "Advance Purchase",
+      "roomTypeCode": "FAM",
+      "roomTypeName": "Family Room",
+      "price": 195.00,
+      "availability": 6
+    },
+    {
+      "date": "2025-06-02",
+      "ratePlanCode": "CORP",
+      "ratePlanName": "Corporate Rate",
+      "roomTypeCode": "PSTE",
+      "roomTypeName": "Presidential Suite",
+      "price": 360.00,
+      "availability": 2
+    },
+    {
+      "date": "2025-06-03",
+      "ratePlanCode": "BAR",
+      "ratePlanName": "Best Available Rate",
+      "roomTypeCode": "STD",
+      "roomTypeName": "Standard Room",
+      "price": 135.00,
+      "availability": 14
+    },
+    {
+      "date": "2025-06-03",
+      "ratePlanCode": "ADV",
+      "ratePlanName": "Advance Purchase",
+      "roomTypeCode": "SUP",
+      "roomTypeName": "Superior Room",
+      "price": 125.00,
+      "availability": 12
+    },
+    {
+      "date": "2025-06-03",
+      "ratePlanCode": "PKG",
+      "ratePlanName": "Package Deal",
+      "roomTypeCode": "DLX",
+      "roomTypeName": "Deluxe Room",
+      "price": 170.00,
+      "availability": 8
+    },
+    {
+      "date": "2025-06-03",
+      "ratePlanCode": "CORP",
+      "ratePlanName": "Corporate Rate",
+      "roomTypeCode": "STE",
+      "roomTypeName": "Suite",
+      "price": 230.00,
+      "availability": 5
+    },
+    {
+      "date": "2025-06-04",
+      "ratePlanCode": "BAR",
+      "ratePlanName": "Best Available Rate",
+      "roomTypeCode": "STD",
+      "roomTypeName": "Standard Room",
+      "price": 130.00,
+      "availability": 16
+    },
+    {
+      "date": "2025-06-04",
+      "ratePlanCode": "PROMO",
+      "ratePlanName": "Promotional Rate",
+      "roomTypeCode": "SUP",
+      "roomTypeName": "Superior Room",
+      "price": 135.00,
+      "availability": 14
+    },
+    {
+      "date": "2025-06-04",
+      "ratePlanCode": "ADV",
+      "ratePlanName": "Advance Purchase",
+      "roomTypeCode": "DLX",
+      "roomTypeName": "Deluxe Room",
+      "price": 155.00,
+      "availability": 10
+    },
+    {
+      "date": "2025-06-04",
+      "ratePlanCode": "PKG",
+      "ratePlanName": "Package Deal",
+      "roomTypeCode": "FAM",
+      "roomTypeName": "Family Room",
+      "price": 185.00,
+      "availability": 7
+    },
+    {
+      "date": "2025-06-05",
+      "ratePlanCode": "BAR",
+      "ratePlanName": "Best Available Rate",
+      "roomTypeCode": "STD",
+      "roomTypeName": "Standard Room",
+      "price": 125.00,
+      "availability": 18
+    },
+    {
+      "date": "2025-06-05",
+      "ratePlanCode": "ADV",
+      "ratePlanName": "Advance Purchase",
+      "roomTypeCode": "STD",
+      "roomTypeName": "Standard Room",
+      "price": 115.00,
+      "availability": 16
+    },
+    {
+      "date": "2025-06-05",
+      "ratePlanCode": "CORP",
+      "ratePlanName": "Corporate Rate",
+      "roomTypeCode": "SUP",
+      "roomTypeName": "Superior Room",
+      "price": 145.00,
+      "availability": 15
+    },
+    {
+      "date": "2025-06-05",
+      "ratePlanCode": "PKG",
+      "ratePlanName": "Package Deal",
+      "roomTypeCode": "PSTE",
+      "roomTypeName": "Presidential Suite",
+      "price": 340.00,
+      "availability": 3
+    },
+    {
+      "date": "2025-06-06",
+      "ratePlanCode": "BAR",
+      "ratePlanName": "Best Available Rate",
+      "roomTypeCode": "STD",
+      "roomTypeName": "Standard Room",
+      "price": 120.00,
+      "availability": 20
+    },
+    {
+      "date": "2025-06-06",
+      "ratePlanCode": "PROMO",
+      "ratePlanName": "Promotional Rate",
+      "roomTypeCode": "DLX",
+      "roomTypeName": "Deluxe Room",
+      "price": 150.00,
+      "availability": 18
+    },
+    {
+      "date": "2025-06-06",
+      "ratePlanCode": "ADV",
+      "ratePlanName": "Advance Purchase",
+      "roomTypeCode": "STE",
+      "roomTypeName": "Suite",
+      "price": 210.00,
+      "availability": 8
+    },
+    {
+      "date": "2025-06-06",
+      "ratePlanCode": "CORP",
+      "ratePlanName": "Corporate Rate",
+      "roomTypeCode": "FAM",
+      "roomTypeName": "Family Room",
+      "price": 175.00,
+      "availability": 12
+    }
+  ]
+}

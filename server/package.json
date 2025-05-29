@@ -1,12 +1,12 @@
 {
-  "name": "server",
+  "name": "Extranet_Server",
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
   "scripts": {
     "dev": "nodemon index.ts",
     "build": "rimraf ./dist && tsc",
-    "start": "npm run build && pm2 start dist/index.js --name=AmadeusServer",
+    "start": "npm run build && pm2 start dist/index.js --name=Extranet_Server",
     "pm2:stop": "pm2 stop TwipSwift",
     "pm2:restart": "pm2 restart TwipSwift",
     "pm2:delete": "pm2 delete TwipSwift",
