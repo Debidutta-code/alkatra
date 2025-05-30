@@ -1,6 +1,6 @@
 import { RatePlan as RatePlanType } from "../common/interface/ratePlan.interface";
 import RatePlan from "../model/ratePlan.model";
-import { RateAmount } from "../../../wincloud/src/model/ratePlanModel"
+import  RateAmount  from "../../../wincloud/src/model/ratePlanDateWise.model"
 import { Inventory } from "../../../wincloud/src/model/inventoryModel"
 import { startOfDay, endOfDay } from 'date-fns';
 interface UpdatePlanData {
@@ -158,193 +158,166 @@ class RatePlanDao {
     }
   }
 
-  /**
-   * Get available rooms with their corresponding rates using aggregation pipeline
-   */
-  public static async getRatePlanByHotel(
-    hotelCode: string,
-    invTypeCode?: string,
-    startDate?: Date,
-    endDate?: Date,
-    page: number = 1
-  ): Promise<{
-    data: RoomWithRates[];
-    pagination: {
-      currentPage: number;
-      totalPages: number;
-      totalResults: number;
-      hasNextPage: boolean;
-      hasPreviousPage: boolean;
-      resultsPerPage: number;
-    };
-  }> {
-    
-    const resultsPerPage = 20;
-    const skip = (page - 1) * resultsPerPage;
+/**
+ * Get available rooms with their corresponding rates using aggregation pipeline
+ */
+public static async getRatePlanByHotel(
+  hotelCode: string,
+  invTypeCode?: string,
+  startDate?: Date,
+  endDate?: Date,
+  page?: number
+): Promise<{
+  data: RoomWithRates[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalResults: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    resultsPerPage: number;
+  };
+}> {
+  page = page ?? 1;
+  
+  const resultsPerPage = 20;
+  const skip = (page - 1) * resultsPerPage;
 
-    // Build match stage for inventory
-    const inventoryMatch: any = { hotelCode };
+  // Build match stage for inventory based on given parameters
+  const inventoryMatch: any = { hotelCode };
 
-    if (invTypeCode) {
-      inventoryMatch.invTypeCode = invTypeCode;
-    }
+  if (invTypeCode) {
+    inventoryMatch.invTypeCode = invTypeCode;
+  }
 
-    if (startDate && endDate) {
-      const start = startOfDay(startDate);
-      const end = endOfDay(endDate);
+  if (startDate && endDate) {
+    const start = startOfDay(startDate);
+    const end = endOfDay(endDate);
 
-      inventoryMatch.$or = [
-        { "availability.startDate": { $gte: start, $lte: end } },
-        { "availability.endDate": { $gte: start, $lte: end } },
-        {
+    inventoryMatch.$or = [
+      { "availability.startDate": { $gte: start, $lte: end } },
+      { "availability.endDate": { $gte: start, $lte: end } },
+      {
+        $and: [
+          { "availability.startDate": { $lte: start } },
+          { "availability.endDate": { $gte: end } }
+        ]
+      }
+    ];
+  }
+
+  // UPDATED RATE LOOKUP PIPELINE
+  // Simplified to match exact start dates
+  const rateLookupPipeline: any[] = [
+    {
+      $match: {
+        $expr: {
           $and: [
-            { "availability.startDate": { $lte: start } },
-            { "availability.endDate": { $gte: end } }
+            { $eq: ["$hotelCode", "$$hotelCode"] },
+            { $eq: ["$invTypeCode", "$$invTypeCode"] },
+            // Match exact start date instead of range overlap
+            { $eq: ["$startDate", "$$inventoryStartDate"] }
           ]
         }
-      ];
-    }
-
-    // Build lookup pipeline for rates
-    const rateLookupPipeline: any[] = [
-      {
-        $match: {
-          $expr: {
-            $and: [
-              { $eq: ["$hotelCode", "$$hotelCode"] },
-              { $eq: ["$invTypeCode", "$$invTypeCode"] },
-            ]
-          }
-        }
       }
-    ];
-
-    if (startDate && endDate) {
-      const start = startOfDay(startDate);
-      const end = endOfDay(endDate);
-
-      rateLookupPipeline[0].$match.$expr.$and.push({
-        $or: [
-          {
-            $and: [
-              { $gte: ["$startDate", start] },
-              { $lte: ["$startDate", end] }
-            ]
-          },
-          {
-            $and: [
-              { $gte: ["$endDate", start] },
-              { $lte: ["$endDate", end] }
-            ]
-          },
-          {
-            $and: [
-              { $lte: ["$startDate", start] },
-              { $gte: ["$endDate", end] }
-            ]
-          }
-        ]
-      });
     }
+  ];
 
-    // Pipeline for counting total results
-    const countPipeline = [
-      {
-        $match: inventoryMatch
-      },
-      {
-        $lookup: {
-          from: "rateamounts",
-          let: {
-            hotelCode: "$hotelCode",
-            invTypeCode: "$invTypeCode"
-          },
-          pipeline: rateLookupPipeline,
-          as: "rates"
-        }
-      },
-      {
-        $count: "total"
+  // Pipeline for counting total results
+  const countPipeline = [
+    { $match: inventoryMatch },
+    {
+      $lookup: {
+        from: "rateamountdatewises",
+        let: {
+          hotelCode: "$hotelCode",
+          invTypeCode: "$invTypeCode",
+          inventoryStartDate: "$availability.startDate"
+        },
+        pipeline: rateLookupPipeline,
+        as: "rates"
       }
-    ];
+    },
+    { $count: "total" }
+  ];
 
-    // Pipeline for fetching paginated data
-    const dataPipeline = [
-      // Match available inventory
-      {
-        $match: inventoryMatch
-      },
+  // ... existing code ...
 
-      // Lookup corresponding rates
-      {
-        $lookup: {
-          from: "rateamounts",
-          let: {
-            hotelCode: "$hotelCode",
-            invTypeCode: "$invTypeCode"
-          },
-          pipeline: rateLookupPipeline,
-          as: "rates"
-        }
+// Pipeline for fetching paginated data
+const dataPipeline = [
+  { $match: inventoryMatch },
+  {
+    $lookup: {
+      from: "rateamountdatewises",
+      let: {
+        hotelCode: "$hotelCode",
+        invTypeCode: "$invTypeCode",
+        inventoryStartDate: "$availability.startDate"
       },
-
-      // Skip for pagination
-      {
-        $skip: skip
-      },
-
-      // Limit results per page
-      {
-        $limit: resultsPerPage
-      },
-      {
-        $project: {
-          _id: 1,
-          hotelCode: 1,
-          hotelName: 1,
-          invTypeCode: 1,
-          availability: 1,
-          rates: {
-            $cond: {
-              if: { $gt: [{ $size: "$rates" }, 0] },
-              then: {
-                _id:{ $arrayElemAt: ["$rates._id", 0] },
-                currencyCode: { $arrayElemAt: ["$rates.currencyCode", 0] },
-                baseByGuestAmts: {
-                  $arrayElemAt: [
-                    { $arrayElemAt: ["$rates.baseByGuestAmts", 0] },
-                    0
-                  ]
-                }
-              },
-              else: null
+      pipeline: rateLookupPipeline,
+      as: "rates"
+    }
+  },
+  { $skip: skip },
+  { $limit: resultsPerPage },
+  {
+    $project: {
+      _id: 1,
+      hotelCode: 1,
+      hotelName: 1,
+      invTypeCode: 1,
+      availability: 1,
+      // CHANGED: Convert rates array to single object
+      rates: {
+        $cond: {
+          if: { $gt: [{ $size: "$rates" }, 0] },
+          then: {
+            $let: {
+              vars: { firstRate: { $arrayElemAt: ["$rates", 0] } },
+              in: {
+                _id: "$$firstRate._id",
+                currencyCode: "$$firstRate.currencyCode",
+                // Preserve the baseByGuestAmts structure
+                baseByGuestAmts: { 
+                  $cond: {
+                    if: { $gt: [{ $size: "$$firstRate.baseByGuestAmts" }, 0] },
+                    then: { $arrayElemAt: ["$$firstRate.baseByGuestAmts", 0] },
+                    else: null
+                  }
+                },
+              }
             }
-          }
+          },
+          else: null
         }
       }
-    ];
-
-    // Execute both pipelines concurrently
-    const [countResult, dataResult] = await Promise.all([
-      Inventory.aggregate(countPipeline),
-      Inventory.aggregate(dataPipeline)
-    ]);
-
-    const totalResults = countResult[0]?.total || 0;
-    const totalPages = Math.ceil(totalResults / resultsPerPage);
-
-    return {
-      data: dataResult,
-      pagination: {
-        currentPage: page,
-        totalPages,
-        totalResults,
-        hasNextPage: page < totalPages,
-        hasPreviousPage: page > 1,
-        resultsPerPage
-      }
-    };
+    }
   }
+];
+
+// ... rest of the code remains the same ...
+
+  const [countResult, dataResult] = await Promise.all([
+    Inventory.aggregate(countPipeline),
+    Inventory.aggregate(dataPipeline)
+  ]);
+
+  const totalResults = countResult[0]?.total || 0;
+  const totalPages = Math.ceil(totalResults / resultsPerPage);
+
+  return {
+    data: dataResult,
+    pagination: {
+      currentPage: page,
+      totalPages,
+      totalResults,
+      hasNextPage: page < totalPages,
+      hasPreviousPage: page > 1,
+      resultsPerPage
+    }
+  };
+}
+
   public static async getAllRoomType() {
     try {
       const response = await Inventory.distinct("invTypeCode");

@@ -1,7 +1,7 @@
 import { RateAmount } from '../model/ratePlanModel';
 import { RatePlanData } from '../interface/ratePlanInterface';
 import { FilterQuery, UpdateQuery } from 'mongoose';
-
+import RateAmountDateWise from "../model/ratePlanDateWise.model"
 export class RatePlanRepository {
     async upsertRateAmount(data: RatePlanData): Promise<any> {
         console.log(`@@@@@@@@@@@@@@@@@@@@@@\nRepository Upserting rate amount for hotel: ${JSON.stringify(data, null, 2)}`);
@@ -34,31 +34,79 @@ export class RatePlanRepository {
         return updatedRateAmount.toJSON();
     }
 
-    async createRateAmount(data: RatePlanData): Promise<any> {
-        console.log(`@@@@@@@@@@@@@@@@@@@@@@\nRepository Creating rate amount for hotel: ${JSON.stringify(data, null, 2)}`);
-        const rateAmount = new RateAmount({
-            hotelCode: data.hotelCode,
-            hotelName: data.hotelName,
-            invTypeCode: data.invTypeCode,
-            ratePlanCode: data.ratePlanCode,
-            startDate: new Date(data.startDate),
-            endDate: new Date(data.endDate),
-            days: data.days,
-            currencyCode: data.currencyCode,
-            baseByGuestAmts: data.baseByGuestAmts,
-            additionalGuestAmounts: data.additionalGuestAmounts,
+async createRateAmount(data: RatePlanData): Promise<any> {
+    console.log(`@@@@@@@@@@@@@@@@@@@@@@\nRepository Creating rate amount for hotel: ${JSON.stringify(data, null, 2)}`);
+
+    // Save to main RateAmount database (keep original endDate)
+    const rateAmount = new RateAmount({
+        hotelCode: data.hotelCode,
+        hotelName: data.hotelName,
+        invTypeCode: data.invTypeCode,
+        ratePlanCode: data.ratePlanCode,
+        startDate: new Date(data.startDate),
+        endDate: new Date(data.endDate), // Keep original endDate from data
+        days: data.days,
+        currencyCode: data.currencyCode,
+        baseByGuestAmts: data.baseByGuestAmts,
+        additionalGuestAmounts: data.additionalGuestAmounts,
+    });
+
+    const savedRateAmount = await rateAmount.save();
+
+    // Generate date-wise records for RateAmountDateWise using the saved data
+    const dateWiseRecords = [];
+    const startDate = new Date(savedRateAmount.startDate);
+    const endDate = new Date(savedRateAmount.endDate);
+
+    // Generate records for each date in the range (similar to your GET endpoint logic)
+    for (
+        let currentDate = new Date(startDate);
+        currentDate < endDate;
+        currentDate.setDate(currentDate.getDate() + 1)
+    ) {
+        console.log("currentDate", currentDate.getDate());
+
+        const dateWiseRecord = new RateAmountDateWise({
+            hotelCode: savedRateAmount.hotelCode,
+            hotelName: savedRateAmount.hotelName,
+            invTypeCode: savedRateAmount.invTypeCode,
+            ratePlanCode: savedRateAmount.ratePlanCode,
+            startDate: new Date(currentDate), // Single date for this record
+            endDate: new Date(currentDate.getTime() + 24 * 60 * 60 * 1000), // currentDate + 1 day
+            currencyCode: savedRateAmount.currencyCode,
+            baseByGuestAmts: savedRateAmount.baseByGuestAmts,
+            additionalGuestAmounts: savedRateAmount.additionalGuestAmounts,
         });
-        const savedRateAmount = await rateAmount.save();
-        return savedRateAmount.toJSON();
+
+        dateWiseRecords.push(dateWiseRecord);
     }
 
+    // Save all date-wise records using Promise.all for better performance
+    try {
+        const savedDateWiseRecords = await Promise.all(
+            dateWiseRecords.map(record => record.save())
+        );
+
+        console.log(`Created ${savedDateWiseRecords.length} date-wise records for ${savedRateAmount.hotelCode} - ${savedRateAmount.ratePlanCode}`);
+
+        return {
+            mainRecord: savedRateAmount.toJSON(),
+            dateWiseRecords: savedDateWiseRecords.map(record => record.toJSON()),
+            totalDateWiseRecords: savedDateWiseRecords.length
+        };
+    } catch (error) {
+        console.error(`Error saving date-wise records for ${savedRateAmount.hotelCode} - ${savedRateAmount.ratePlanCode}:`, error);
+        // You might want to decide whether to rollback the main record or handle this differently
+        throw error;
+    }
+}
 
     /**
      * Retrieves all room details for a given hotel code.
      * @param hotelCode 
      */
     async getRoomsByHotelCode(hotelCode: string): Promise<any> {
-        return await RateAmount.find({ hotelCode: hotelCode });
+        return await RateAmount.find({ hotelCode: hotelCode }).exec();
     }
 
 
