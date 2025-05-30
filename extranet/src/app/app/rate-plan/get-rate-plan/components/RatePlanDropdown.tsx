@@ -1,8 +1,8 @@
 import { createPortal } from 'react-dom';
-import { RatePlanInterFace } from '../types';
+import { RatePlan } from '../types';
 
 interface RatePlanDropdownProps {
-  ratePlan: RatePlanInterFace;
+  ratePlan: RatePlan;
   top: number;
   right: number;
   onEdit: (ratePlanId: string) => void;
