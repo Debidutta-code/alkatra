@@ -340,7 +340,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         </div>
 
         {/* Main Content with padding-bottom to prevent overlap with fixed footer */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 pb-20 sm:pb-24">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 pb-28 sm:pb-24 md:pb-28 ">
           {activeSection === "details" ? (
             <div className="space-y-4 sm:space-y-6">
               {/* Room Summary */}
