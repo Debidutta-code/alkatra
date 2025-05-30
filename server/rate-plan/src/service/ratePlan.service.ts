@@ -3,10 +3,11 @@ import { RatePlan, RatePlan as RatePlanType } from "../common/interface/ratePlan
 import { RatePlanDao } from "../dao/ratePlan.dao";
 import { HotelPricesDao } from "../dao/hotelPrices.dao";
 
-interface UpdateplanData {
-  availability: number;
-  price: number;
-  rateAmountId: string;
+interface UpdatePlanData {
+  rateAmountId:string;
+  inventoryId:string;
+  price:number;
+  availability:number;
 }
 interface BaseGuestAmount {
   amountBeforeTax: number;
@@ -68,7 +69,7 @@ class RatePlanService {
       }
     };
 
-    console.log("finalRatePlanData", finalRatePlanData);
+    // console.log("finalRatePlanData", finalRatePlanData);
 
     const savedRatePlan = await RatePlanDao.create(finalRatePlanData);
 
@@ -79,25 +80,30 @@ class RatePlanService {
     };
   }
 
-  public static async updateRatePlan(inventoryId: string, ratePlanData: UpdateplanData) {
+  public static async updateRatePlan(ratePlanData: UpdatePlanData[]) {
     // Optional: Add validation or preprocessing here if needed
-    const { availability, price, rateAmountId } = ratePlanData
-    if (!availability || !price || !rateAmountId || !inventoryId) {
-      return {
-        success: false,
-        message: "provide all the required fields"
-      }
-    }
-    const updatedRatePlan = await RatePlanDao.updateRatePlan(inventoryId, rateAmountId, price, availability);
+    
+    const updatedRatePlan = await RatePlanDao.updateRatePlan(ratePlanData);
     return {
       success: true,
       message: "Rate plan updated successfully",
       data: updatedRatePlan,
     };
   }
-  public static async getRatePlanByHotelCode(hotelCode: string, invTypeCode?: string, startDate?: Date, endDate?: Date, page?: number) {
-    const ratePlans = await RatePlanDao.getRatePlanByHotelCode(hotelCode, invTypeCode && invTypeCode, startDate && startDate, endDate && endDate, page && page);
-    console.log(ratePlans)
+  public static async getRatePlanByHotel(hotelCode: string, invTypeCode?: string, startDate?: Date, endDate?: Date, page?: number) {
+    const ratePlans = await RatePlanDao.getRatePlanByHotel(hotelCode, invTypeCode && invTypeCode, startDate && startDate, endDate && endDate, page && page);
+    // console.log(ratePlans)
+    return {
+      success: true,
+      message: "Rate plans retrieved successfully",
+      data: ratePlans,
+    };
+  }
+  public static async getRatePlanByHotelCode(hotelCode: string) {
+    const ratePlans = await RatePlanDao.getRatePlanByHotelCode(hotelCode);
+
+    if (ratePlans.length === 0) throw new Error("No rate plans found for this hotel code");
+
     return {
       success: true,
       message: "Rate plans retrieved successfully",
@@ -126,12 +132,13 @@ class RoomPriceService {
   }
   public static async getAllRoomTypeService() {
    try {
-     const reponses = await RatePlanDao.getAllRoomType()
+     const responses = await RatePlanDao.getAllRoomType()
     return {
       success:true,
-      roomTypes:reponses
+      roomTypes:responses
     }
    } catch (error:any) {
+    console.log(error.message)
     return {
       success:false,
       message:error.message

@@ -6,7 +6,7 @@ const route = Router();
 
 
 route.put(
-  "/update/:id",
+  "/updateRatePlans",
   protect as any,
   async (req: Request, res: Response, next: NextFunction) => {
     const response = await RatePlanController.updateRatePlan(req, res, next);
@@ -14,6 +14,14 @@ route.put(
   }
 );
 
+route.get(
+  "/:hotelCode",
+  protect as any,
+  async (req: Request, res: Response, next: NextFunction) => {
+    const response = await RatePlanController.getRatePlanByHotelCode(req, res, next);
+    res.status(200).json(response);
+  }
+)
 route.post(
   "/create",
   protect as any,
@@ -28,7 +36,7 @@ route.post(
   "/hotelCode",
   protect as any,
   async (req: Request, res: Response, next: NextFunction) => {
-    const response = await RatePlanController.getRatePlanByHotelCode(req, res, next);
+    const response = await RatePlanController.getRatePlanByHotel(req, res, next);
     res.status(200).json(response);
   }
 )
@@ -42,8 +50,8 @@ route.post("/getRoomRentPrice",protect,async(req:Request,res:Response,next:NextF
   res.status(200).json(response)
 })
 
-route.get("/getRoomType",protect,async(req:Request,res:Response,next:NextFunction)=>{
-  const response=await RoomPrice.getAllRoomTypeController(req,res,next)
+route.get("/getRoomType/all",protect,async(req:Request,res:Response,next:NextFunction)=>{
+  const response=await RoomPrice.getAllRoomTypeController()
   res.status(200).json(response)
 })
 

@@ -67,24 +67,37 @@ class RatePlanController {
         next: NextFunction
     ) {
         try {
+            console.log("Update Rate")
             const inventoryId = req.params.id;
             const ratePlanData = req.body;
-
-            const response = await RatePlanService.updateRatePlan(inventoryId, ratePlanData);
+            const ratePlans=req.body.ratePlans
+            const response = await RatePlanService.updateRatePlan(ratePlans);
 
             return response;
+            return {success:false}
         } catch (error) {
             console.error("Error in updateRatePlan:", error);
             next(error);
         }
     }
+public static async getRatePlanByHotelCode(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { hotelCode } = req.params;
 
-    public static async getRatePlanByHotelCode(req: Request, res: Response, next: NextFunction) {
+            const response = await RatePlanService.getRatePlanByHotelCode(hotelCode);
+
+            return response;
+        } catch (error) {
+            console.error("Error in getRatePlanByHotelCode controller:", error);
+            next(error);
+        }
+    }
+    public static async getRatePlanByHotel(req: Request, res: Response, next: NextFunction) {
         try {
             const { hotelCode, invTypeCode, startDate, endDate } = req.body;
             console.log(hotelCode, invTypeCode, startDate, endDate)
-            const page = req.query.page.toString()
-            const response = await RatePlanService.getRatePlanByHotelCode(hotelCode, invTypeCode && invTypeCode, startDate && new Date(startDate), endDate && new Date(endDate), page && parseInt(page));
+            const page = req.query?.page.toString()
+            const response = await RatePlanService.getRatePlanByHotel(hotelCode, invTypeCode && invTypeCode, startDate && new Date(startDate), endDate && new Date(endDate), page && parseInt(page));
 
             return response;
         } catch (error) {
@@ -119,8 +132,9 @@ class RoomPrice {
         )
         return response
     }
-    public static async getAllRoomTypeController(req: Request, res: Response, next: NextFunction){
+    public static async getAllRoomTypeController(){
         const response=await RoomPriceService.getAllRoomTypeService()
+        console.log(response)
         return response
     }
 }

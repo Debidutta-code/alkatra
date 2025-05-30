@@ -3,7 +3,12 @@ import RatePlan from "../model/ratePlan.model";
 import { RateAmount } from "../../../wincloud/src/model/ratePlanModel"
 import { Inventory } from "../../../wincloud/src/model/inventoryModel"
 import { startOfDay, endOfDay } from 'date-fns';
-
+interface UpdatePlanData {
+  rateAmountId:string;
+  inventoryId:string;
+  price:number;
+  availability:number;
+}
 interface RoomWithRates {
   hotelCode: string;
   hotelName: string;
@@ -50,10 +55,22 @@ class RatePlanDao {
     }
   }
 
-  public static async updateRatePlan(inventoryId: string, rateAmountId: string, Price: number, availability: number) {
+  public static async updateRatePlan(ratePlansData:UpdatePlanData[]) {
 
-    try {
+   try {
+    // Validate input
+    if (!Array.isArray(ratePlansData) || ratePlansData.length === 0) {
+      throw new Error("ratePlansData must be a non-empty array");
+    }
+
+    // Create update promises for each rate plan
+    const updatePromises = ratePlansData.map(async (planData, index) => {
+      const { rateAmountId, inventoryId, price, availability } = planData;
+      
       let inventoryUpdated = null;
+      let rateUpdated = null;
+
+      // Update inventory if availability is provided
       if (availability !== undefined && inventoryId) {
         inventoryUpdated = await Inventory.findByIdAndUpdate(
           inventoryId,
@@ -62,48 +79,89 @@ class RatePlanDao {
         );
 
         if (!inventoryUpdated) {
-          throw new Error("Inventory not found or update failed");
+          throw new Error(`Inventory not found or update failed for inventoryId: ${inventoryId}`);
         }
       }
 
-
-
-      if (Price && rateAmountId) {
-        const rateUpdated = await RateAmount.findByIdAndUpdate(
+      // Update rate amount if price is provided
+      if (price !== undefined && rateAmountId) {
+        console.log("rate amount",rateAmountId)
+        rateUpdated = await RateAmount.findByIdAndUpdate(
           rateAmountId,
           {
             $set: {
-              "baseByGuestAmts.$[].amountBeforeTax": Price
+              "baseByGuestAmts.$[].amountBeforeTax": price
             }
           },
           { new: true, runValidators: true }
         );
 
         if (!rateUpdated) {
-          throw new Error("Rate Amount update failed");
+          throw new Error(`Rate Amount update failed for rateAmountId: ${rateAmountId}`);
         }
-
-        return {
-          rateAmount: rateUpdated,
-          message: "Rate plan updated successfully"
-        };
-      } else {
-        throw new Error("Price or rateAmountId not provided");
       }
 
+      // Validate that at least one update was requested
+      if (price === undefined && availability === undefined) {
+        throw new Error(`No update data provided for index ${index}`);
+      }
 
+      return {
+        index,
+        rateAmountId,
+        inventoryId,
+        rateAmount: rateUpdated,
+        inventory: inventoryUpdated,
+        success: true
+      };
+    });
 
+    // Wait for all updates to complete (parallel execution)
+    const results = await Promise.allSettled(updatePromises);
+    
+    const successResults = [];
+    const errorResults = [];
 
-    } catch (error) {
-      console.error("Error updating rate plan:", error);
-      throw error;
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        successResults.push(result.value);
+      } else {
+        errorResults.push({
+          index,
+          rateAmountId: ratePlansData[index].rateAmountId,
+          inventoryId: ratePlansData[index].inventoryId,
+          error: result.reason.message,
+          success: false
+        });
+      }
+    });
+
+    const response = {
+      totalProcessed: ratePlansData.length,
+      successCount: successResults.length,
+      errorCount: errorResults.length,
+      results: successResults,
+      errors: errorResults,
+      message: `Processed ${ratePlansData.length} rate plans: ${successResults.length} successful, ${errorResults.length} failed`
+    };
+
+    // If all updates failed, throw an error
+    if (errorResults.length === ratePlansData.length) {
+      throw new Error(`All rate plan updates failed: ${errorResults.map(e => e.error).join('; ')}`);
+    }
+
+    return response;
+
+  } catch (error) {
+    console.error("Error updating rate plans:", error);
+    throw error;
     }
   }
 
   /**
    * Get available rooms with their corresponding rates using aggregation pipeline
    */
-  public static async getRatePlanByHotelCode(
+  public static async getRatePlanByHotel(
     hotelCode: string,
     invTypeCode?: string,
     startDate?: Date,
@@ -250,6 +308,7 @@ class RatePlanDao {
             $cond: {
               if: { $gt: [{ $size: "$rates" }, 0] },
               then: {
+                _id:{ $arrayElemAt: ["$rates._id", 0] },
                 currencyCode: { $arrayElemAt: ["$rates.currencyCode", 0] },
                 baseByGuestAmts: {
                   $arrayElemAt: [
@@ -287,11 +346,20 @@ class RatePlanDao {
     };
   }
   public static async getAllRoomType() {
-    const response = await Inventory.distinct("invTypeCode");
-    return response;
+    try {
+      const response = await Inventory.distinct("invTypeCode");
+
+      return response;
+    } catch (error) {
+      throw new Error(error.message)
+    }
 }
 
-
+public static async getRatePlanByHotelCode(hotelCode: string) {
+    return await RatePlan.find(
+      { propertyId: hotelCode }
+    );
+  }
 }
 
 export { RatePlanDao };
