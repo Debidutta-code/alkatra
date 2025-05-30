@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 // Define types
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
+import { jwtDecode } from 'jwt-decode';
 
 interface RootState {
   auth: {
@@ -114,7 +115,7 @@ const Navbar: React.FC = () => {
 
   return (
     <div
-      className={`sticky top-0 z-50 transition-all duration-300 font-noto-sans ${scrolled
+      className={`sticky top-0  z-50 transition-all duration-300 font-noto-sans ${scrolled
           ? 'bg-gray-100 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.06)]'
           : 'bg-gray-100 border-b border-tripswift-black/5'
         } ${pathname === '/login' || pathname === '/register' ? 'hidden' : ''}`}
