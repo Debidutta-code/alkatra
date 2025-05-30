@@ -9,6 +9,7 @@ import { login } from "@/Redux/slices/auth.slice";
 import { Mail } from "lucide-react";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
+import { useTranslation } from "react-i18next";
 
 // Import shared components
 import AuthLayout from "@/components/auth/AuthLayout";
@@ -21,6 +22,7 @@ import ForgotPassword from "./ForgotPassword";
 import UpdatePassword from "./UpdatePassword";
 
 const Login: React.FC = () => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -70,7 +72,7 @@ const Login: React.FC = () => {
         Cookies.set("rememberMe", "true", { expires: 7 });
       }
 
-      toast.success("Login successful! Welcome back.", {
+      toast.success(t('Auth.Login.successMessage'), {
         icon: '👋',
         duration: 3000,
       });
@@ -81,7 +83,7 @@ const Login: React.FC = () => {
 
       router.replace(redirectUrl);
     } catch (error: any) {
-      toast.error("Incorrect email or password. Please try again.", {
+      toast.error(t('Auth.Login.errorMessage'), {
         icon: '❌',
       });
     } finally {
@@ -114,23 +116,23 @@ const Login: React.FC = () => {
 
   return (
     <AuthLayout
-      title="Sign in to your account"
-      subtitle="Welcome back! Please enter your credentials."
-      heroTitle={<>Welcome <span className="text-tripswift-blue">Back</span></>}
-      heroSubtitle="Sign in to access exclusive deals and manage your upcoming adventures with ease."
+      title={t('Auth.Login.title')}
+      subtitle={t('Auth.Login.subtitle')}
+      heroTitle={<>{t('Auth.Login.heroTitle.welcome')} <span className="text-tripswift-blue">{t('Auth.Login.heroTitle.back')}</span></>}
+      heroSubtitle={t('Auth.Login.heroSubtitle')}
       benefits={[
-        "Access to exclusive member-only rates and offers",
-        "Free cancellation on most bookings with flexible options",
-        "Priority customer service and travel support"
+        t('Auth.Login.benefits.exclusiveRates'),
+        t('Auth.Login.benefits.freeCancellation'),
+        t('Auth.Login.benefits.priorityService')
       ]}
       footerContent={
         <p className="text-center text-tripswift-black/60">
-          Don&#39;t have an account yet?{" "}
+          {t('Auth.Login.noAccountYet')}{" "}
           <Link
             href="/register"
             className="font-tripswift-medium text-tripswift-blue hover:text-[#054B8F] transition-colors"
           >
-            Create an account
+            {t('Auth.Login.createAccount')}
           </Link>
         </p>
       }
@@ -140,11 +142,11 @@ const Login: React.FC = () => {
         <FormInput
           id="email"
           name="email"
-          label="Email address"
+          label={t('Auth.Login.emailLabel')}
           type="email"
           value={values.email}
           onChange={handleChange}
-          placeholder="you@example.com"
+          placeholder={t('Auth.Login.emailPlaceholder')}
           error={errors.email}
           icon={<Mail className="text-tripswift-blue" />}
           isFocused={formFocus === 'email'}
@@ -156,7 +158,7 @@ const Login: React.FC = () => {
         <PasswordInput
           id="password"
           name="password"
-          label="Password"
+          label={t('Auth.Login.passwordLabel')}
           value={values.password}
           onChange={handleChange}
           error={errors.password}
@@ -177,12 +179,12 @@ const Login: React.FC = () => {
             className="w-4 h-4 rounded-md border-tripswift-black/20 text-tripswift-blue focus:ring-tripswift-blue/20 transition-colors duration-300"
           />
           <label htmlFor="remember" className="ml-2 mt-2.5 text-sm text-tripswift-black/70 font-tripswift-medium">
-            Remember me
+            {t('Auth.Login.rememberMe')}
           </label>
         </div>
 
         {/* Submit Button */}
-        <AuthButton loading={loading} text="Sign in" />      
+        <AuthButton loading={loading} text={t('Auth.Login.signInButton')} />      
       </form>
     </AuthLayout>
   );

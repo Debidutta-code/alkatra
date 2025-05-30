@@ -1,6 +1,7 @@
 // components/auth/FormInput.tsx
 import React from "react";
 import { Check, AlertCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface FormInputProps {
   id: string;
@@ -37,6 +38,8 @@ const FormInput: React.FC<FormInputProps> = ({
   helpText,
   disabled = false
 }) => {
+  const { t } = useTranslation();
+  
   return (
     <div className="group font-noto-sans">
       <label htmlFor={id} className="block text-sm font-tripswift-medium text-tripswift-black/80 mb-2 transition-colors group-hover:text-tripswift-black">
@@ -70,6 +73,8 @@ const FormInput: React.FC<FormInputProps> = ({
           onBlur={onBlur}
           placeholder={placeholder}
           disabled={disabled}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${id}-error` : helpText ? `${id}-help` : undefined}
           className={`w-full pl-12 pr-${showCheckmark ? '12' : '4'} py-4 rounded-lg border-[1.5px] ${
             error 
               ? 'border-red-300 bg-red-50/50' 
@@ -92,7 +97,7 @@ const FormInput: React.FC<FormInputProps> = ({
       
       {/* Error message with improved styling */}
       {error && (
-        <div className="text-red-500 text-[13px] mt-2 flex items-center bg-red-50/50 p-2 rounded-md border border-red-100">
+        <div id={`${id}-error`} className="text-red-500 text-[13px] mt-2 flex items-center bg-red-50/50 p-2 rounded-md border border-red-100">
           <AlertCircle size={14} className="mr-1.5 flex-shrink-0" />
           <span className="font-tripswift-medium">{error}</span>
         </div>
@@ -100,7 +105,7 @@ const FormInput: React.FC<FormInputProps> = ({
       
       {/* Help text with improved styling */}
       {!error && helpText && (
-        <div className="text-tripswift-black/50 text-xs mt-2 ml-1">
+        <div id={`${id}-help`} className="text-tripswift-black/50 text-xs mt-2 ml-1">
           {helpText}
         </div>
       )}

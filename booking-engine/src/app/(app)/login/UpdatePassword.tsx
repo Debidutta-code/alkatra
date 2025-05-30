@@ -5,6 +5,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, AlertTriangle, CheckCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 // Import shared auth components
 import AuthLayout from "@/components/auth/AuthLayout";
@@ -17,6 +18,7 @@ interface UpdatePasswordProps {
 }
 
 const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack }) => {
+  const { t } = useTranslation();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -45,19 +47,19 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack }) => {
 
     // Validate new password
     if (!newPassword.trim()) {
-      newErrors.newPassword = "Password is required";
+      newErrors.newPassword = t('Auth.Validation.passwordRequired');
       isValid = false;
     } else if (!validatePassword(newPassword)) {
-      newErrors.newPassword = "Password must contain at least 8 characters including one uppercase letter, one lower case letter, one number and one special character.";
+      newErrors.newPassword = t('Auth.Validation.passwordComplexity');
       isValid = false;
     }
 
     // Validate confirm password
     if (!confirmPassword.trim()) {
-      newErrors.confirmPassword = "Please confirm your password";
+      newErrors.confirmPassword = t('Auth.Validation.confirmPasswordRequired');
       isValid = false;
     } else if (newPassword !== confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
+      newErrors.confirmPassword = t('Auth.Validation.passwordsDoNotMatch');
       isValid = false;
     }
 
@@ -104,7 +106,7 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack }) => {
       });
 
       if (response.data.status === "success") {
-        setMessage("Your password has been reset successfully.");
+        setMessage(t('Auth.UpdatePassword.successMessage'));
         
         // Clear form
         setNewPassword("");
@@ -115,13 +117,13 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack }) => {
           router.push("/login?fromReset=true");
         }, 2000);
       } else {
-        setError(response.data.message || "An error occurred. Please try again.");
+        setError(response.data.message || t('Auth.UpdatePassword.errors.generic'));
       }
     } catch (error: any) {
       if (error.response) {
-        setError(error.response.data?.message || "An error occurred. Please try again.");
+        setError(error.response.data?.message || t('Auth.UpdatePassword.errors.generic'));
       } else {
-        setError("An error occurred. Please try again.");
+        setError(t('Auth.UpdatePassword.errors.generic'));
       }
     } finally {
       setLoading(false);
@@ -130,14 +132,14 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack }) => {
 
   return (
     <AuthLayout
-      title="Reset Password"
-      subtitle={`Enter a new password for ${email}`}
-      heroTitle={<>Create <span className="text-tripswift-blue">New Password</span></>}
-      heroSubtitle="Set a strong, secure password for your account to keep your travel plans safe."
+      title={t('Auth.UpdatePassword.title')}
+      subtitle={t('Auth.UpdatePassword.subtitle', { email })}
+      heroTitle={<>{t('Auth.UpdatePassword.heroTitle.create')} <span className="text-tripswift-blue">{t('Auth.UpdatePassword.heroTitle.newPassword')}</span></>}
+      heroSubtitle={t('Auth.UpdatePassword.heroSubtitle')}
       benefits={[
-        "Create a stronger password to enhance security",
-        "Protect your personal information and bookings",
-        "Get back to exploring travel deals right away"
+        t('Auth.UpdatePassword.benefits.strongerPassword'),
+        t('Auth.UpdatePassword.benefits.protectInformation'),
+        t('Auth.UpdatePassword.benefits.quickAccess')
       ]}
       footerContent={
         <button 
@@ -145,7 +147,7 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack }) => {
           className="w-full text-center text-tripswift-blue text-sm hover:text-[#054B8F] font-tripswift-medium flex items-center justify-center transition-colors duration-300"
         >
           <ArrowLeft size={16} className="mr-2" />
-          Back to Login
+          {t('Auth.UpdatePassword.backToLogin')}
         </button>
       }
     >
@@ -154,21 +156,21 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack }) => {
         <PasswordInput
           id="newPassword"
           name="newPassword"
-          label="New Password"
+          label={t('Auth.UpdatePassword.newPasswordLabel')}
           value={newPassword}
           onChange={handleChange}
           error={errors.newPassword}
           isFocused={formFocus === 'newPassword'}
           onFocus={() => setFormFocus('newPassword')}
           onBlur={() => setFormFocus(null)}
-          helpText="Password must contain at least 8 characters including one uppercase letter, one lowercase letter, one number and one special character."
+          helpText={t('Auth.UpdatePassword.passwordHelp')}
         />
         
         {/* Confirm Password Field */}
         <PasswordInput
           id="confirmPassword"
           name="confirmPassword"
-          label="Confirm Password"
+          label={t('Auth.UpdatePassword.confirmPasswordLabel')}
           value={confirmPassword}
           onChange={handleChange}
           error={errors.confirmPassword}
@@ -178,7 +180,7 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack }) => {
         />
         
         {/* Submit Button */}
-        <AuthButton loading={loading} text="Reset Password" />
+        <AuthButton loading={loading} text={t('Auth.UpdatePassword.resetPasswordButton')} />
         
         {/* Success Message */}
         {message && (

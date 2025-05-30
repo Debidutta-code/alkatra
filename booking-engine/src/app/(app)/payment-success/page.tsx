@@ -195,7 +195,7 @@ export default function PaymentSuccess() {
         setIsLoading(true);
         const response = await makeBookingRequest(payload, token as string);
         setBooking(response);
-        toast.success(t("Payment.PaymentSuccess.bookingConfirmedToast"));
+        // toast.success(t("Payment.PaymentSuccess.bookingConfirmedToast"));
       } catch (error: any) {
         console.error("Booking Error:", error);
         setError(true);

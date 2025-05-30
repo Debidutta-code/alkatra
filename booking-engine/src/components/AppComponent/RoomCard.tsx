@@ -3,16 +3,16 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Cookies from "js-cookie";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux"; // or your Redux store hook
 import { logout } from "@/Redux/slices/auth.slice";
+import { useTranslation } from "react-i18next";
 
 import {
   FaStar, FaRegStar, FaWifi, FaSnowflake, FaSmokingBan, FaBed, FaChild, FaUser, FaTree,
   FaCheckCircle, FaShoppingCart, FaPercent, FaTimes, FaInfoCircle, FaRulerCombined,
   FaShieldAlt,
-  FaRegCalendarAlt
 } from "react-icons/fa";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getPolicyType, getPolicyStyling, getPolicyBulletPoints } from "@/utils/cancellationPolicies";
@@ -54,15 +54,14 @@ interface RoomCardProps {
 }
 
 export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) => {
+  const { t } = useTranslation();
   const [showPolicyModal, setShowPolicyModal] = useState(false);
   
-
   const DEFAULT_IMAGE = data.default_image_url || "https://images.unsplash.com/photo-1617104678098-de229db51175?q=80&w=1514&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
   const selectedImage = data.image && data.image.length > 0 ? data.image[0] : DEFAULT_IMAGE;
 
   const router = useRouter();
   const dispatch = useDispatch();
-
 
   const policyType = getPolicyType(data.cancellation_policy);
   const policyStyling = getPolicyStyling(policyType);
@@ -87,46 +86,44 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
   };
 
   const truncatedDescription = truncateDescription(data.description);
-const handleBookNow = () => {
-  const accessToken = Cookies.get("accessToken");
+  
+  const handleBookNow = () => {
+    const accessToken = Cookies.get("accessToken");
 
-  if (!accessToken) {
-    const fullUrl = window.location.href;
-    Cookies.set("redirectAfterLogin", fullUrl);
-    router.push("/login");
-    dispatch(logout());  // <--- logout on no token
-    return;
-  }
-
-  try {
-    const decodedToken: { exp: number } = jwtDecode(accessToken);
-    const currentTime = Math.floor(Date.now() / 1000);
-
-    if (decodedToken.exp < currentTime) {
-      // Token expired
-      Cookies.remove("accessToken"); // Clear expired token
+    if (!accessToken) {
       const fullUrl = window.location.href;
       Cookies.set("redirectAfterLogin", fullUrl);
       router.push("/login");
-      dispatch(logout());  // <--- logout on expired token
+      dispatch(logout());  // <--- logout on no token
       return;
     }
 
-    // Token is valid, proceed with booking
-    onBookNow();
+    try {
+      const decodedToken: { exp: number } = jwtDecode(accessToken);
+      const currentTime = Math.floor(Date.now() / 1000);
 
-  } catch (error) {
-    // Invalid token, remove and redirect
-    Cookies.remove("accessToken"); // Clear invalid token
-    const fullUrl = window.location.href;
-    Cookies.set("redirectAfterLogin", fullUrl);
-    router.push("/login");
-    dispatch(logout());  // <--- logout on invalid token
-  }
-};
+      if (decodedToken.exp < currentTime) {
+        // Token expired
+        Cookies.remove("accessToken"); // Clear expired token
+        const fullUrl = window.location.href;
+        Cookies.set("redirectAfterLogin", fullUrl);
+        router.push("/login");
+        dispatch(logout());  // <--- logout on expired token
+        return;
+      }
 
+      // Token is valid, proceed with booking
+      onBookNow();
 
-
+    } catch (error) {
+      // Invalid token, remove and redirect
+      Cookies.remove("accessToken"); // Clear invalid token
+      const fullUrl = window.location.href;
+      Cookies.set("redirectAfterLogin", fullUrl);
+      router.push("/login");
+      dispatch(logout());  // <--- logout on invalid token
+    }
+  };
 
   const getRoomAmenities = () => {
     if (data.amenities && data.amenities.length > 0) {
@@ -137,9 +134,9 @@ const handleBookNow = () => {
     }
 
     const defaultAmenities = [
-      { icon: <FaWifi className="text-tripswift-blue" />, name: "Free WiFi" },
-      { icon: <FaSnowflake className="text-tripswift-blue" />, name: "Air Conditioning" },
-      { icon: <FaBed className="text-tripswift-blue" />, name: "King Bed" },
+      { icon: <FaWifi className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.wifi') },
+      { icon: <FaSnowflake className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.airConditioning') },
+      { icon: <FaBed className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.kingBed') },
     ];
     return defaultAmenities;
   };
@@ -160,13 +157,13 @@ const handleBookNow = () => {
 
   return (
     <>
-      <Card className="w-full min-h-48 shadow-sm hover:shadow-md transition-shadow duration-300 bg-tripswift-off-white border border-gray-200 rounded-xl flex flex-col md:flex-row overflow-hidden font-noto-sans">        {/* Image Section */}
+      <Card className="w-full min-h-48 shadow-sm hover:shadow-md transition-shadow duration-300 bg-tripswift-off-white border border-gray-200 rounded-xl flex flex-col md:flex-row overflow-hidden font-noto-sans">        
         {/* Image Section */}
         <div className="relative w-full md:w-[45%] h-48 md:h-auto flex-shrink-0 overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10"></div>
           <Image
             src={selectedImage}
-            alt={`${data.room_name || "Room"} image`}
+            alt={`${data.room_name || t('RoomsPage.RoomCard.roomImageAlt')} image`}
             layout="fill"
             objectFit="cover"
             className="w-full h-full object-cover transition-transform"
@@ -180,7 +177,7 @@ const handleBookNow = () => {
           {/* Discount tag */}
           {hasDiscount && (
             <div className="absolute top-3 left-3 z-20 bg-red-600 text-tripswift-off-white text-xs font-tripswift-semibold py-1 px-2.5 rounded-full flex items-center shadow-md">
-              <FaPercent className="h-2.5 w-2.5 mr-1" /> {discountPercentage}% OFF
+              <FaPercent className="h-2.5 w-2.5 mr-1" /> {discountPercentage}% {t('RoomsPage.RoomCard.off')}
             </div>
           )}
         </div>
@@ -218,12 +215,12 @@ const handleBookNow = () => {
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 p-1.5 rounded-md">
               <div className="flex items-center text-xs font-tripswift-medium text-tripswift-black/70">
                 <FaUser className="mr-1.5 h-3 w-3 text-tripswift-blue" />
-                <span>{data.max_number_of_adults} adults</span>
+                <span>{data.max_number_of_adults} {t('RoomsPage.RoomCard.adults')}</span>
               </div>
               {data.max_number_of_children > 0 && (
                 <div className="flex items-center text-xs font-tripswift-medium text-tripswift-black/70">
                   <FaChild className="mr-1.5 h-3 w-3 text-tripswift-blue" />
-                  <span>{data.max_number_of_children} children</span>
+                  <span>{data.max_number_of_children} {t('RoomsPage.RoomCard.children')}</span>
                 </div>
               )}
               {data.room_size > 0 && (
@@ -233,13 +230,13 @@ const handleBookNow = () => {
                 </div>
               )}
               {data.room_view && (
-                  <div className="flex flex-wrap gap-1.5">
-                    <span className="bg-tripswift-blue/5 text-tripswift-black/70 text-xs px-0.5 py-1 rounded-full font-tripswift-medium inline-flex items-center">
-                      <FaTree className="h-3 w-3 mr-1.5 text-tripswift-blue" />
-                      {data.room_view}
-                    </span>
-                  </div>
-                )}
+                <div className="flex flex-wrap gap-1.5">
+                  <span className="bg-tripswift-blue/5 text-tripswift-black/70 text-xs px-0.5 py-1 rounded-full font-tripswift-medium inline-flex items-center">
+                    <FaTree className="h-3 w-3 mr-1.5 text-tripswift-blue" />
+                    {data.room_view}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Enhanced Amenities Display */}
@@ -260,14 +257,14 @@ const handleBookNow = () => {
                 )}
                 <div className="flex items-baseline">
                   <span className="text-price">{price}</span>
-                  <span className="text-tripswift-black/60 text-lg ml-1.5 font-tripswift-regular">/ night</span>
+                  <span className="text-tripswift-black/60 text-lg ml-1.5 font-tripswift-regular">/ {t('RoomsPage.RoomCard.night')}</span>
                 </div>
               </div>
               <button
                 onClick={handleBookNow}
                 className="bg-tripswift-blue hover:bg-[#054B8F] active:bg-[#03315c] text-tripswift-off-white font-tripswift-semibold py-2 px-4 rounded-md text-sm flex items-center transition-colors duration-300 shadow-sm hover:shadow-md"
               >
-                <FaShoppingCart className="mr-1.5 h-3 w-3" /> Book Now
+                <FaShoppingCart className="mr-1.5 h-3 w-3" /> {t('RoomsPage.RoomCard.bookNow')}
               </button>
             </div>
             {/* Policy details link - hidden on smallest screens, visible on sm and up */}
@@ -276,12 +273,12 @@ const handleBookNow = () => {
                 onClick={() => setShowPolicyModal(true)}
                 className="text-xs text-tripswift-black/60 hover:text-tripswift-blue transition-colors duration-300 flex items-center font-tripswift-regular"
               >
-                <FaInfoCircle className="mr-1.5 h-3 w-3" /> View booking policies
+                <FaInfoCircle className="mr-1.5 h-3 w-3" /> {t('RoomsPage.RoomCard.viewBookingPolicies')}
               </button>
 
               <div className="flex items-center text-xs text-tripswift-black/60 font-tripswift-regular">
                 <FaShieldAlt className="mr-1.5 h-3 w-3 text-green-600" />
-                <span>Secure payment</span>
+                <span>{t('RoomsPage.RoomCard.securePayment')}</span>
               </div>
             </div>
           </CardContent>
@@ -293,11 +290,11 @@ const handleBookNow = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-tripswift-off-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
             <div className="flex items-center justify-between bg-tripswift-blue text-tripswift-off-white px-4 py-3">
-              <h3 className="text-lg font-tripswift-semibold">Booking Policies</h3>
+              <h3 className="text-lg font-tripswift-semibold">{t('RoomsPage.RoomCard.policies.title')}</h3>
               <button
                 onClick={() => setShowPolicyModal(false)}
                 className="text-tripswift-off-white hover:bg-[#054B8F] active:bg-[#03315c] rounded-full p-1 transition-colors duration-300"
-                aria-label="Close modal"
+                aria-label={t('RoomsPage.RoomCard.policies.closeModal')}
               >
                 <FaTimes />
               </button>
@@ -313,9 +310,10 @@ const handleBookNow = () => {
                       : policyType === "Strict"
                         ? "bg-amber-500"
                         : "bg-red-500"
-                    }`}></span>                  Cancellation Policy
+                    }`}></span>
+                  {t('RoomsPage.RoomCard.policies.cancellationPolicy')}
                   <span className={`ml-2 text-xs px-2 py-0.5 rounded ${policyStyling.bgColor} ${policyStyling.textColor} font-tripswift-medium`}>
-                    {policyType}
+                    {t(`RoomsPage.RoomCard.policies.policyTypes.${policyType.toLowerCase()}`)}
                   </span>
                 </h4>
 
@@ -335,15 +333,15 @@ const handleBookNow = () => {
               <div>
                 <h4 className="text-section-heading flex items-center mb-3">
                   <FaInfoCircle className="mr-2 text-tripswift-blue" />
-                  Amendment Policy
+                  {t('RoomsPage.RoomCard.policies.amendmentPolicy')}
                 </h4>
 
                 <div className="mb-4">
                   <ul className="list-disc pl-5 space-y-1.5 text-description">
-                    <li>Date changes are subject to availability</li>
-                    <li>Changes within 72 hours of check-in may incur additional fees</li>
-                    <li>Room upgrades are subject to availability and additional charges</li>
-                    <li>Reducing stay length is subject to the cancellation policy</li>
+                    <li>{t('RoomsPage.RoomCard.policies.amendmentPoints.dateChanges')}</li>
+                    <li>{t('RoomsPage.RoomCard.policies.amendmentPoints.changes72Hours')}</li>
+                    <li>{t('RoomsPage.RoomCard.policies.amendmentPoints.roomUpgrades')}</li>
+                    <li>{t('RoomsPage.RoomCard.policies.amendmentPoints.reducingStay')}</li>
                   </ul>
                 </div>
               </div>
@@ -352,7 +350,7 @@ const handleBookNow = () => {
                 onClick={() => setShowPolicyModal(false)}
                 className="mt-2 w-full bg-tripswift-blue hover:bg-[#054B8F] active:bg-[#03315c] text-tripswift-off-white font-tripswift-semibold py-2.5 px-4 rounded-lg transition-colors duration-300 shadow-sm"
               >
-                Got it
+                {t('RoomsPage.RoomCard.policies.gotIt')}
               </button>
             </div>
           </div>

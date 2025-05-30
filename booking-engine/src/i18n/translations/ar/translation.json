@@ -1,4 +1,132 @@
 {
+  "Auth": {
+    "Login": {
+      "title": "تسجيل الدخول إلى حسابك",
+      "subtitle": "مرحباً بعودتك! يرجى إدخال بيانات الاعتماد الخاصة بك.",
+      "heroTitle": {
+        "welcome": "مرحبًا",
+        "back": "بعودتك"
+      },
+      "heroSubtitle": "قم بتسجيل الدخول للوصول إلى عروض حصرية وإدارة مغامراتك القادمة بسهولة.",
+      "benefits": {
+        "exclusiveRates": "الوصول إلى أسعار وعروض حصرية للأعضاء فقط",
+        "freeCancellation": "إلغاء مجاني لمعظم الحجوزات مع خيارات مرنة",
+        "priorityService": "خدمة عملاء ودعم سفر ذو أولوية"
+      },
+      "emailLabel": "عنوان البريد الإلكتروني",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "كلمة المرور",
+      "rememberMe": "تذكرني",
+      "signInButton": "تسجيل الدخول",
+      "noAccountYet": "ليس لديك حساب بعد؟",
+      "createAccount": "إنشاء حساب",
+      "successMessage": "تم تسجيل الدخول بنجاح! مرحباً بعودتك.",
+      "errorMessage": "البريد الإلكتروني أو كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى."
+    },
+    "Register": {
+      "title": "إنشاء حساب",
+      "subtitle": "املأ التفاصيل الخاصة بك للبدء.",
+      "heroTitle": {
+        "join": "انضم",
+        "now": "الآن"
+      },
+      "heroSubtitle": "أنشئ حسابًا لفتح عروض سفر حصرية وإدارة رحلاتك بسهولة.",
+      "benefits": {
+        "memberPricing": "احجز رحلاتك بأسعار خاصة للأعضاء",
+        "personalizedRecommendations": "احصل على توصيات سفر مخصصة",
+        "manageBookings": "إدارة جميع حجوزاتك في مكان واحد"
+      },
+      "firstNameLabel": "الاسم الأول",
+      "firstNamePlaceholder": "محمد",
+      "lastNameLabel": "اسم العائلة",
+      "lastNamePlaceholder": "أحمد",
+      "emailLabel": "عنوان البريد الإلكتروني",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "كلمة المرور",
+      "passwordHelp": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل بما في ذلك حرف كبير واحد وحرف خاص واحد وثلاثة أرقام.",
+      "createAccountButton": "إنشاء حساب",
+      "alreadyHaveAccount": "هل لديك حساب بالفعل؟",
+      "signIn": "تسجيل الدخول",
+      "successMessage": "تم التسجيل بنجاح! يرجى تسجيل الدخول.",
+      "genericError": "حدث خطأ ما",
+      "registrationFailed": "فشل التسجيل"
+    },
+    "ForgotPassword": {
+      "title": "نسيت كلمة المرور؟",
+      "subtitle": "أدخل عنوان بريدك الإلكتروني المسجل لإعادة تعيين كلمة المرور.",
+      "heroTitle": {
+        "reset": "إعادة تعيين",
+        "password": "كلمة المرور"
+      },
+      "heroSubtitle": "سنساعدك على العودة إلى حسابك بأمان.",
+      "benefits": {
+        "quickRecovery": "عملية استرداد كلمة المرور سريعة وسهلة",
+        "secureReset": "إعادة تعيين كلمة المرور بشكل آمن عبر التحقق من البريد الإلكتروني",
+        "quickAccess": "الوصول إلى حسابك مرة أخرى في غضون دقائق"
+      },
+      "emailLabel": "عنوان البريد الإلكتروني",
+      "emailPlaceholder": "you@example.com",
+      "sendResetLinkButton": "إرسال رابط إعادة التعيين",
+      "backToLogin": "العودة إلى تسجيل الدخول",
+      "successMessage": "تم إرسال رابط إعادة التعيين بنجاح إلى بريدك الإلكتروني",
+      "errors": {
+        "emailNotFound": "البريد الإلكتروني غير موجود. يرجى التحقق من عنوان بريدك الإلكتروني.",
+        "emailNotVerified": "البريد الإلكتروني غير مؤكد. يرجى التحقق من بريدك الإلكتروني أولاً.",
+        "generic": "حدث خطأ. يرجى المحاولة مرة أخرى."
+      }
+    },
+    "UpdatePassword": {
+      "title": "إعادة تعيين كلمة المرور",
+      "subtitle": "أدخل كلمة مرور جديدة لـ {{email}}",
+      "heroTitle": {
+        "create": "إنشاء",
+        "newPassword": "كلمة مرور جديدة"
+      },
+      "heroSubtitle": "قم بتعيين كلمة مرور قوية وآمنة لحسابك للحفاظ على خطط سفرك آمنة.",
+      "benefits": {
+        "strongerPassword": "إنشاء كلمة مرور أقوى لتعزيز الأمان",
+        "protectInformation": "حماية معلوماتك الشخصية وحجوزاتك",
+        "quickAccess": "العودة لاستكشاف عروض السفر على الفور"
+      },
+      "newPasswordLabel": "كلمة المرور الجديدة",
+      "confirmPasswordLabel": "تأكيد كلمة المرور",
+      "passwordHelp": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل بما في ذلك حرف كبير واحد، وحرف صغير واحد، ورقم واحد، وحرف خاص واحد.",
+      "resetPasswordButton": "إعادة تعيين كلمة المرور",
+      "backToLogin": "العودة إلى تسجيل الدخول",
+      "successMessage": "تم إعادة تعيين كلمة المرور بنجاح.",
+      "errors": {
+        "generic": "حدث خطأ. يرجى المحاولة مرة أخرى."
+      }
+    },
+    "Layout": {
+      "travelDestinationAlt": "وجهة سفر",
+      "memberBenefits": "مزايا العضوية",
+      "privacySecurity": {
+        "title": "خصوصيتك وأمانك",
+        "description": "يتم تشفير معلوماتك الشخصية وحمايتها باستخدام بروتوكولات أمان صناعية قياسية. نحن لا نشارك بياناتك أبدًا بدون إذن صريح منك."
+      }
+    },
+    "PasswordInput": {
+      "forgotPassword": "نسيت كلمة المرور؟",
+      "showPassword": "إظهار كلمة المرور",
+      "hidePassword": "إخفاء كلمة المرور"
+    },
+    "Button": {
+      "processing": "جارٍ المعالجة..."
+    },
+    "Validation": {
+      "fieldRequired": "{{field}} مطلوب",
+      "firstNameRequired": "الاسم الأول مطلوب",
+      "lastNameRequired": "اسم العائلة مطلوب",
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "emailInvalid": "يرجى إدخال عنوان بريد إلكتروني صالح",
+      "passwordRequired": "كلمة المرور مطلوبة",
+      "confirmPasswordRequired": "يرجى تأكيد كلمة المرور الخاصة بك",
+      "passwordComplexity": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل بما في ذلك حرف كبير واحد، وحرف صغير واحد، ورقم واحد، وحرف خاص واحد.",
+      "minLength": "يجب أن يكون على الأقل {{count}} أحرف",
+      "passwordsDoNotMatch": "كلمات المرور غير متطابقة"
+    }
+  },
   "Navbar": {
     "pleaseLogin": "يرجى تسجيل الدخول لعرض رحلاتك",
     "logoutSuccess": "تم تسجيل الخروج بنجاح",
@@ -256,6 +384,40 @@
         "scanAtCheckout": "امسح رمز QR عند الدفع",
         "applyDiscount": "طبّق الخصم أثناء الدفع للحصول على عرضك الخاص",
         "validityNote": "صالح فقط لهذه الجلسة الحجز"
+      }
+    },
+    "RoomCard": {
+      "roomImageAlt": "غرفة",
+      "off": "خصم",
+      "adults": "بالغين",
+      "children": "أطفال",
+      "night": "ليلة",
+      "bookNow": "احجز الآن",
+      "viewBookingPolicies": "عرض سياسات الحجز",
+      "securePayment": "دفع آمن",
+      "amenities": {
+        "wifi": "واي فاي مجاني",
+        "airConditioning": "تكييف الهواء",
+        "kingBed": "سرير كينج"
+      },
+      "policies": {
+        "title": "سياسات الحجز",
+        "closeModal": "إغلاق النافذة",
+        "cancellationPolicy": "سياسة الإلغاء",
+        "policyTypes": {
+          "flexible": "مرن",
+          "moderate": "معتدل",
+          "strict": "صارم",
+          "nonrefundable": "غير قابل للاسترداد"
+        },
+        "amendmentPolicy": "سياسة التعديل",
+        "amendmentPoints": {
+          "dateChanges": "تغييرات التاريخ تخضع للتوافر",
+          "changes72Hours": "التغييرات خلال 72 ساعة من تسجيل الوصول قد تتكبد رسوم إضافية",
+          "roomUpgrades": "ترقيات الغرف تخضع للتوافر والرسوم الإضافية",
+          "reducingStay": "تقليل مدة الإقامة يخضع لسياسة الإلغاء"
+        },
+        "gotIt": "فهمت"
       }
     }
   },

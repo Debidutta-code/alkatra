@@ -1,4 +1,132 @@
 {
+  "Auth": {
+    "Login": {
+      "title": "Sign in to your account",
+      "subtitle": "Welcome back! Please enter your credentials.",
+      "heroTitle": {
+        "welcome": "Welcome",
+        "back": "Back"
+      },
+      "heroSubtitle": "Sign in to access exclusive deals and manage your upcoming adventures with ease.",
+      "benefits": {
+        "exclusiveRates": "Access to exclusive member-only rates and offers",
+        "freeCancellation": "Free cancellation on most bookings with flexible options",
+        "priorityService": "Priority customer service and travel support"
+      },
+      "emailLabel": "Email address",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "rememberMe": "Remember me",
+      "signInButton": "Sign in",
+      "noAccountYet": "Don't have an account yet?",
+      "createAccount": "Create an account",
+      "successMessage": "Login successful! Welcome back.",
+      "errorMessage": "Incorrect email or password. Please try again."
+    },
+    "Register": {
+      "title": "Create an account",
+      "subtitle": "Fill in your details to get started.",
+      "heroTitle": {
+        "join": "Join",
+        "now": "Now"
+      },
+      "heroSubtitle": "Create an account to unlock exclusive travel deals and manage your trips with ease.",
+      "benefits": {
+        "memberPricing": "Book your travels with special member pricing",
+        "personalizedRecommendations": "Receive personalized travel recommendations",
+        "manageBookings": "Manage all your bookings in one place"
+      },
+      "firstNameLabel": "First Name",
+      "firstNamePlaceholder": "John",
+      "lastNameLabel": "Last Name",
+      "lastNamePlaceholder": "Doe",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "passwordHelp": "Password must contain at least 8 characters including one uppercase letter, one special character, and three numbers.",
+      "createAccountButton": "Create Account",
+      "alreadyHaveAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "successMessage": "Registration successful! Please sign in.",
+      "genericError": "Something went wrong",
+      "registrationFailed": "Registration failed"
+    },
+    "ForgotPassword": {
+      "title": "Forgot Password?",
+      "subtitle": "Enter your registered email address to reset your password.",
+      "heroTitle": {
+        "reset": "Reset",
+        "password": "Password"
+      },
+      "heroSubtitle": "We'll help you get back into your account safely and securely.",
+      "benefits": {
+        "quickRecovery": "Quick and easy password recovery process",
+        "secureReset": "Secure password reset via email verification",
+        "quickAccess": "Access your account again within minutes"
+      },
+      "emailLabel": "Email address",
+      "emailPlaceholder": "you@example.com",
+      "sendResetLinkButton": "Send Reset Link",
+      "backToLogin": "Back to Login",
+      "successMessage": "Reset link sent successfully to your email address",
+      "errors": {
+        "emailNotFound": "Email not found. Please check your email address.",
+        "emailNotVerified": "Email not verified. Please verify your email first.",
+        "generic": "An error occurred. Please try again."
+      }
+    },
+    "UpdatePassword": {
+      "title": "Reset Password",
+      "subtitle": "Enter a new password for {{email}}",
+      "heroTitle": {
+        "create": "Create",
+        "newPassword": "New Password"
+      },
+      "heroSubtitle": "Set a strong, secure password for your account to keep your travel plans safe.",
+      "benefits": {
+        "strongerPassword": "Create a stronger password to enhance security",
+        "protectInformation": "Protect your personal information and bookings",
+        "quickAccess": "Get back to exploring travel deals right away"
+      },
+      "newPasswordLabel": "New Password",
+      "confirmPasswordLabel": "Confirm Password",
+      "passwordHelp": "Password must contain at least 8 characters including one uppercase letter, one lowercase letter, one number and one special character.",
+      "resetPasswordButton": "Reset Password",
+      "backToLogin": "Back to Login",
+      "successMessage": "Your password has been reset successfully.",
+      "errors": {
+        "generic": "An error occurred. Please try again."
+      }
+    },
+    "Layout": {
+      "travelDestinationAlt": "Travel destination",
+      "memberBenefits": "Member Benefits",
+      "privacySecurity": {
+        "title": "Your Privacy & Security",
+        "description": "Your personal information is encrypted and protected using industry-standard security protocols. We never share your data without your explicit permission."
+      }
+    },
+    "PasswordInput": {
+      "forgotPassword": "Forgot password?",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
+    },
+    "Button": {
+      "processing": "Processing..."
+    },
+    "Validation": {
+      "fieldRequired": "{{field}} is required",
+      "firstNameRequired": "First Name is required",
+      "lastNameRequired": "Last Name is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address",
+      "passwordRequired": "Password is required",
+      "confirmPasswordRequired": "Please confirm your password",
+      "passwordComplexity": "Password must contain at least 8 characters including one uppercase letter, one lowercase letter, one number and one special character.",
+      "minLength": "Must be at least {{count}} characters",
+      "passwordsDoNotMatch": "Passwords do not match"
+    }
+  },
   "Navbar": {
     "pleaseLogin": "Please login to view your trips",
     "logoutSuccess": "Successfully logged out",
@@ -165,56 +293,56 @@
       }
     },
     "PopularHotels": {
-    "title": "Popular Hotels",
-    "freeCancellation": "Free Cancellation",
-    "breakfast": "Breakfast",
-    "startingFrom": "Starting from",
-    "bookNow": "Book Now",
-    "hotels": {
-      "grandPlaza": {
-        "name": "Grand Plaza Hotel"
-      },
-      "sunsetBeach": {
-        "name": "Sunset Beach Resort"
-      },
-      "mountainView": {
-        "name": "Mountain View Lodge"
-      },
-      "cityLights": {
-        "name": "City Lights Hotel"
+      "title": "Popular Hotels",
+      "freeCancellation": "Free Cancellation",
+      "breakfast": "Breakfast",
+      "startingFrom": "Starting from",
+      "bookNow": "Book Now",
+      "hotels": {
+        "grandPlaza": {
+          "name": "Grand Plaza Hotel"
+        },
+        "sunsetBeach": {
+          "name": "Sunset Beach Resort"
+        },
+        "mountainView": {
+          "name": "Mountain View Lodge"
+        },
+        "cityLights": {
+          "name": "City Lights Hotel"
+        }
+      }
+    },
+    "ExploreDestinations": {
+      "title": "Explore Destinations",
+      "exploreNow": "Explore Now",
+      "destinations": {
+        "maldives": {
+          "name": "Maldives",
+          "category": "Beach Paradise"
+        },
+        "swissAlps": {
+          "name": "Swiss Alps",
+          "category": "Adventure"
+        },
+        "santorini": {
+          "name": "Santorini",
+          "category": "Romantic Getaway"
+        },
+        "dubai": {
+          "name": "Dubai",
+          "category": "Luxury"
+        },
+        "bali": {
+          "name": "Bali",
+          "category": "Cultural"
+        },
+        "tokyo": {
+          "name": "Tokyo",
+          "category": "City Life"
+        }
       }
     }
-  },
-  "ExploreDestinations": {
-    "title": "Explore Destinations",
-    "exploreNow": "Explore Now",
-    "destinations": {
-      "maldives": {
-        "name": "Maldives",
-        "category": "Beach Paradise"
-      },
-      "swissAlps": {
-        "name": "Swiss Alps",
-        "category": "Adventure"
-      },
-      "santorini": {
-        "name": "Santorini",
-        "category": "Romantic Getaway"
-      },
-      "dubai": {
-        "name": "Dubai",
-        "category": "Luxury"
-      },
-      "bali": {
-        "name": "Bali",
-        "category": "Cultural"
-      },
-      "tokyo": {
-        "name": "Tokyo",
-        "category": "City Life"
-      }
-    }
-  }
   },
   "RoomsPage": {
     "backToSearch": "Back to Search",
@@ -256,6 +384,40 @@
         "scanAtCheckout": "Scan the QR code at checkout",
         "applyDiscount": "Apply the discount during checkout to get your special offer",
         "validityNote": "Valid for this booking session only"
+      }
+    },
+    "RoomCard": {
+      "roomImageAlt": "Room",
+      "off": "OFF",
+      "adults": "adults",
+      "children": "children",
+      "night": "night",
+      "bookNow": "Book Now",
+      "viewBookingPolicies": "View booking policies",
+      "securePayment": "Secure payment",
+      "amenities": {
+        "wifi": "Free WiFi",
+        "airConditioning": "Air Conditioning",
+        "kingBed": "King Bed"
+      },
+      "policies": {
+        "title": "Booking Policies",
+        "closeModal": "Close modal",
+        "cancellationPolicy": "Cancellation Policy",
+        "policyTypes": {
+          "flexible": "Flexible",
+          "moderate": "Moderate",
+          "strict": "Strict",
+          "nonrefundable": "Non-Refundable"
+        },
+        "amendmentPolicy": "Amendment Policy",
+        "amendmentPoints": {
+          "dateChanges": "Date changes are subject to availability",
+          "changes72Hours": "Changes within 72 hours of check-in may incur additional fees",
+          "roomUpgrades": "Room upgrades are subject to availability and additional charges",
+          "reducingStay": "Reducing stay length is subject to the cancellation policy"
+        },
+        "gotIt": "Got it"
       }
     }
   },
@@ -370,177 +532,177 @@
       "noBookingsToShow": "No bookings to show"
     },
     "CancellationModal": {
-    "confirmCancellation": "Confirm Cancellation",
-    "reviewBeforeProceeding": "Please review the details below before proceeding with your cancellation",
-    "bookingDetails": "Booking Details",
-    "property": "Property",
-    "room": "Room",
-    "stayDates": "Stay Dates",
-    "nightStay_one": "{{count}} night stay",
-    "nightStay_other": "{{count}} nights stay",
-    "totalAmount": "Total Amount",
-    "calculatingDetails": "Calculating cancellation details...",
-    "policyTypes": {
-      "flexible": "Flexible Cancellation Policy",
-      "moderate": "Moderate Cancellation Policy",
-      "strict": "Strict Cancellation Policy",
-      "nonrefundable": "Non-Refundable Policy"
+      "confirmCancellation": "Confirm Cancellation",
+      "reviewBeforeProceeding": "Please review the details below before proceeding with your cancellation",
+      "bookingDetails": "Booking Details",
+      "property": "Property",
+      "room": "Room",
+      "stayDates": "Stay Dates",
+      "nightStay_one": "{{count}} night stay",
+      "nightStay_other": "{{count}} nights stay",
+      "totalAmount": "Total Amount",
+      "calculatingDetails": "Calculating cancellation details...",
+      "policyTypes": {
+        "flexible": "Flexible Cancellation Policy",
+        "moderate": "Moderate Cancellation Policy",
+        "strict": "Strict Cancellation Policy",
+        "nonrefundable": "Non-Refundable Policy"
+      },
+      "refundEligible": "{{percentage}}% Refund Eligible",
+      "policyTerms": "Policy Terms",
+      "yourRefundStatus": "Your Refund Status",
+      "refundExplanation": "Based on your check-in date and the {{policyType}} policy, you will receive a {{percentage}}% refund.",
+      "financialBreakdown": "Financial Breakdown",
+      "originalPayment": "Original Payment Amount",
+      "cancellationFee": "Cancellation Fee",
+      "refundAmount": "Refund Amount",
+      "reasonForCancellation": "Reason for Cancellation",
+      "reasonPlaceholder": "Please tell us why you're cancelling (optional)...",
+      "feedbackHelpsImprove": "Your feedback helps us improve our services. This information is only used internally.",
+      "success": "Success",
+      "error": "Error",
+      "successWithRefund": "Your booking has been successfully cancelled. A refund of ₹{{amount}} will be processed.",
+      "successNoRefund": "Your booking has been successfully cancelled. No refund will be issued based on the cancellation policy.",
+      "errorCancelling": "Unable to cancel booking. Please try again or contact support.",
+      "errorRetrievingPolicy": "Unable to retrieve cancellation policy information. You may continue, but fee information might not be accurate.",
+      "actionCannotBeUndone": "This action cannot be undone",
+      "cancellationWarning": "Once you confirm cancellation, your reservation will be immediately cancelled and cannot be reinstated. Any applicable refund will be processed according to the policy above.",
+      "keepMyReservation": "Keep My Reservation",
+      "processing": "Processing...",
+      "confirmCancellationButton": "Confirm Cancellation",
+      "invalidDate": "Invalid Date"
     },
-    "refundEligible": "{{percentage}}% Refund Eligible",
-    "policyTerms": "Policy Terms",
-    "yourRefundStatus": "Your Refund Status",
-    "refundExplanation": "Based on your check-in date and the {{policyType}} policy, you will receive a {{percentage}}% refund.",
-    "financialBreakdown": "Financial Breakdown",
-    "originalPayment": "Original Payment Amount",
-    "cancellationFee": "Cancellation Fee",
-    "refundAmount": "Refund Amount",
-    "reasonForCancellation": "Reason for Cancellation",
-    "reasonPlaceholder": "Please tell us why you're cancelling (optional)...",
-    "feedbackHelpsImprove": "Your feedback helps us improve our services. This information is only used internally.",
-    "success": "Success",
-    "error": "Error",
-    "successWithRefund": "Your booking has been successfully cancelled. A refund of ₹{{amount}} will be processed.",
-    "successNoRefund": "Your booking has been successfully cancelled. No refund will be issued based on the cancellation policy.",
-    "errorCancelling": "Unable to cancel booking. Please try again or contact support.",
-    "errorRetrievingPolicy": "Unable to retrieve cancellation policy information. You may continue, but fee information might not be accurate.",
-    "actionCannotBeUndone": "This action cannot be undone",
-    "cancellationWarning": "Once you confirm cancellation, your reservation will be immediately cancelled and cannot be reinstated. Any applicable refund will be processed according to the policy above.",
-    "keepMyReservation": "Keep My Reservation",
-    "processing": "Processing...",
-    "confirmCancellationButton": "Confirm Cancellation",
-    "invalidDate": "Invalid Date"
-  },
-  "AmendReservationModal": {
-    "title": "Amend Your Reservation",
-    "subtitle": "Make changes to your upcoming stay at {{propertyName}}",
-    "currentBookingDetails": "Current Booking Details",
-    "stayDates": "Stay Dates",
-    "nightsCount_one": "{{count}} night",
-    "nightsCount_other": "{{count}} nights",
-    "guests": "Guests",
-    "guestsCount": "{{adults}} Adults, {{children}} Children",
-    "roomDetails": "Room Details",
-    "ratePlan": "Rate Plan",
-    "bestAvailableRate": "Best Available Rate",
-    "total": "total",
-    "whatToChange": "What would you like to change?",
-    "amendmentTypes": {
-      "dates": "Dates",
+    "AmendReservationModal": {
+      "title": "Amend Your Reservation",
+      "subtitle": "Make changes to your upcoming stay at {{propertyName}}",
+      "currentBookingDetails": "Current Booking Details",
+      "stayDates": "Stay Dates",
+      "nightsCount_one": "{{count}} night",
+      "nightsCount_other": "{{count}} nights",
       "guests": "Guests",
+      "guestsCount": "{{adults}} Adults, {{children}} Children",
+      "roomDetails": "Room Details",
+      "ratePlan": "Rate Plan",
+      "bestAvailableRate": "Best Available Rate",
+      "total": "total",
+      "whatToChange": "What would you like to change?",
+      "amendmentTypes": {
+        "dates": "Dates",
+        "guests": "Guests",
+        "roomType": "Room Type",
+        "specialRequests": "Special Requests"
+      },
+      "changeDates": "Change Dates",
+      "selectNewDates": "Select New Stay Dates",
+      "checkInDate": "Check-in Date",
+      "checkOutDate": "Check-out Date",
+      "stayDuration_one": "Stay duration: {{count}} night",
+      "stayDuration_other": "Stay duration: {{count}} nights",
+      "nightsAdded_one": "(+{{count}} night)",
+      "nightsAdded_other": "(+{{count}} nights)",
+      "nightsReduced_one": "(-{{count}} night)",
+      "nightsReduced_other": "(-{{count}} nights)",
+      "changeGuests": "Change Guests",
+      "numberOfAdults": "Number of Adults",
+      "numberOfChildren": "Number of Children",
+      "adult_one": "Adult",
+      "adult_other": "Adults",
+      "child_one": "Child",
+      "child_other": "Children",
+      "guestsNote": "Additional fees may apply for extra guests. Maximum occupancy varies by room type.",
+      "changeRoomType": "Change Room Type",
       "roomType": "Room Type",
-      "specialRequests": "Special Requests"
+      "roomTypeNote": "Room type changes are subject to availability and may affect the total price.",
+      "updateSpecialRequests": "Update Special Requests",
+      "specialRequestsLabel": "Special Requests or Preferences",
+      "specialRequestsPlaceholder": "Enter any special requests or preferences such as high floor, early check-in, etc.",
+      "specialRequestsNote": "Special requests are subject to availability and cannot be guaranteed.",
+      "priceAdjustment": "Price Adjustment",
+      "additionalPayment": "Additional payment required",
+      "additionalChargeExplanation": "Your changes will result in an additional charge of ₹{{amount}}",
+      "refundToBeProcessed": "Refund to be processed",
+      "refundExplanation": "Your changes will result in a refund of ₹{{amount}}",
+      "amendmentPolicies": "Amendment Policies",
+      "policies": {
+        "dateChanges": "Date changes are subject to availability",
+        "changes72Hours": "Changes within 72 hours of check-in may incur additional fees",
+        "roomUpgrades": "Room upgrades are subject to availability and additional charges",
+        "reducingStay": "Reducing the length of stay may be subject to the original booking's cancellation policy"
+      },
+      "cancel": "Cancel",
+      "processing": "Processing...",
+      "confirmAmendment": "Confirm Amendment",
+      "errors": {
+        "selectValidDates": "Please select valid check-in and check-out dates.",
+        "unableToAmend": "Unable to amend booking. Please try again or contact support."
+      },
+      "success": {
+        "reservationAmended": "Your reservation has been successfully amended.",
+        "additionalPayment": "An additional payment of ₹{{amount}} will be processed.",
+        "refundProcessed": "A refund of ₹{{amount}} will be processed.",
+        "noChange": "There is no change in the total price."
+      },
+      "roomTypes": {
+        "standard": "Standard Room",
+        "deluxe": "Deluxe Room",
+        "suite": "Suite Room",
+        "executive": "Executive Suite",
+        "family": "Family Room"
+      },
+      "ratePlans": {
+        "bestAvailable": "Best Available Rate",
+        "aaaMember": "AAA Member Rate",
+        "package": "Package Rate",
+        "weekend": "Weekend Special"
+      },
+      "modifications": {
+        "changedCheckIn": "Changed check-in date",
+        "changedCheckOut": "Changed check-out date",
+        "changedRoomType": "Changed room type to {{roomType}}",
+        "changedGuestCount": "Changed guest count",
+        "changedRatePlan": "Changed rate plan to {{ratePlanName}}"
+      }
     },
-    "changeDates": "Change Dates",
-    "selectNewDates": "Select New Stay Dates",
-    "checkInDate": "Check-in Date",
-    "checkOutDate": "Check-out Date",
-    "stayDuration_one": "Stay duration: {{count}} night",
-    "stayDuration_other": "Stay duration: {{count}} nights",
-    "nightsAdded_one": "(+{{count}} night)",
-    "nightsAdded_other": "(+{{count}} nights)",
-    "nightsReduced_one": "(-{{count}} night)",
-    "nightsReduced_other": "(-{{count}} nights)",
-    "changeGuests": "Change Guests",
-    "numberOfAdults": "Number of Adults",
-    "numberOfChildren": "Number of Children",
-    "adult_one": "Adult",
-    "adult_other": "Adults",
-    "child_one": "Child",
-    "child_other": "Children",
-    "guestsNote": "Additional fees may apply for extra guests. Maximum occupancy varies by room type.",
-    "changeRoomType": "Change Room Type",
-    "roomType": "Room Type",
-    "roomTypeNote": "Room type changes are subject to availability and may affect the total price.",
-    "updateSpecialRequests": "Update Special Requests",
-    "specialRequestsLabel": "Special Requests or Preferences",
-    "specialRequestsPlaceholder": "Enter any special requests or preferences such as high floor, early check-in, etc.",
-    "specialRequestsNote": "Special requests are subject to availability and cannot be guaranteed.",
-    "priceAdjustment": "Price Adjustment",
-    "additionalPayment": "Additional payment required",
-    "additionalChargeExplanation": "Your changes will result in an additional charge of ₹{{amount}}",
-    "refundToBeProcessed": "Refund to be processed",
-    "refundExplanation": "Your changes will result in a refund of ₹{{amount}}",
-    "amendmentPolicies": "Amendment Policies",
-    "policies": {
-      "dateChanges": "Date changes are subject to availability",
-      "changes72Hours": "Changes within 72 hours of check-in may incur additional fees",
-      "roomUpgrades": "Room upgrades are subject to availability and additional charges",
-      "reducingStay": "Reducing the length of stay may be subject to the original booking's cancellation policy"
-    },
-    "cancel": "Cancel",
-    "processing": "Processing...",
-    "confirmAmendment": "Confirm Amendment",
-    "errors": {
-      "selectValidDates": "Please select valid check-in and check-out dates.",
-      "unableToAmend": "Unable to amend booking. Please try again or contact support."
-    },
-    "success": {
-      "reservationAmended": "Your reservation has been successfully amended.",
-      "additionalPayment": "An additional payment of ₹{{amount}} will be processed.",
-      "refundProcessed": "A refund of ₹{{amount}} will be processed.",
-      "noChange": "There is no change in the total price."
-    },
-    "roomTypes": {
-      "standard": "Standard Room",
-      "deluxe": "Deluxe Room",
-      "suite": "Suite Room",
-      "executive": "Executive Suite",
-      "family": "Family Room"
-    },
-    "ratePlans": {
-      "bestAvailable": "Best Available Rate",
-      "aaaMember": "AAA Member Rate",
-      "package": "Package Rate",
-      "weekend": "Weekend Special"
-    },
-    "modifications": {
-      "changedCheckIn": "Changed check-in date",
-      "changedCheckOut": "Changed check-out date",
-      "changedRoomType": "Changed room type to {{roomType}}",
-      "changedGuestCount": "Changed guest count",
-      "changedRatePlan": "Changed rate plan to {{ratePlanName}}"
+    "BookingDetailsModal": {
+      "bookingNumber": "Booking #{{id}}",
+      "closeModal": "Close modal",
+      "status": {
+        "confirmed": "Confirmed",
+        "pending": "Pending",
+        "cancelled": "Cancelled"
+      },
+      "stayDetails": "Stay Details",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "duration": "Duration",
+      "nightsStay_one": "{{count}} Night",
+      "nightsStay_other": "{{count}} Nights",
+      "roomType": "Room Type",
+      "roomName": "Room Name",
+      "guestDetails": "Guest Details",
+      "guestName": "Guest Name",
+      "contactNumber": "Contact Number",
+      "adults": "Adults",
+      "children": "Children",
+      "specialRequests": "Special Requests",
+      "paymentDetails": "Payment Details",
+      "paymentMethod": "Payment Method",
+      "paymentMethods": {
+        "credit_card": "Credit Card",
+        "debit_card": "Debit Card",
+        "pay_at_hotel": "Pay at Hotel",
+        "bank_transfer": "Bank Transfer",
+        "paypal": "PayPal",
+        "google_pay": "Google Pay"
+      },
+      "bookingDate": "Booking Date",
+      "totalAmount": "Total Amount",
+      "night": "night",
+      "ratePlan": "Rate Plan",
+      "modifyBooking": "Modify Booking",
+      "cancelBooking": "Cancel Booking",
+      "printItinerary": "Print Itinerary"
     }
-  },
-  "BookingDetailsModal": {
-    "bookingNumber": "Booking #{{id}}",
-    "closeModal": "Close modal",
-    "status": {
-      "confirmed": "Confirmed",
-      "pending": "Pending",
-      "cancelled": "Cancelled"
-    },
-    "stayDetails": "Stay Details",
-    "checkIn": "Check-in",
-    "checkOut": "Check-out",
-    "duration": "Duration",
-    "nightsStay_one": "{{count}} Night",
-    "nightsStay_other": "{{count}} Nights",
-    "roomType": "Room Type",
-    "roomName": "Room Name",
-    "guestDetails": "Guest Details",
-    "guestName": "Guest Name",
-    "contactNumber": "Contact Number",
-    "adults": "Adults",
-    "children": "Children",
-    "specialRequests": "Special Requests",
-    "paymentDetails": "Payment Details",
-    "paymentMethod": "Payment Method",
-    "paymentMethods": {
-      "credit_card": "Credit Card",
-      "debit_card": "Debit Card",
-      "pay_at_hotel": "Pay at Hotel",
-      "bank_transfer": "Bank Transfer",
-      "paypal": "PayPal",
-      "google_pay": "Google Pay"
-    },
-    "bookingDate": "Booking Date",
-    "totalAmount": "Total Amount",
-    "night": "night",
-    "ratePlan": "Rate Plan",
-    "modifyBooking": "Modify Booking",
-    "cancelBooking": "Cancel Booking",
-    "printItinerary": "Print Itinerary"
-  }
   },
   "Payment": {
     "PaymentPageContent": {

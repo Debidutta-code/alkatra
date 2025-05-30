@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Mail, User } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 // Import shared components
 import AuthLayout from "@/components/auth/AuthLayout";
@@ -16,6 +17,7 @@ import AuthButton from "@/components/auth/AuthButton";
 import { useFormValidation } from "@/components/auth/hooks/useFormValidation";
 
 const Register: React.FC = () => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -58,38 +60,37 @@ const Register: React.FC = () => {
       );
       if (response.status === 201) {
         setLoading(false);
-        toast.success("Registration successful! Please sign in.");
+        toast.success(t('Auth.Register.successMessage'));
         router.push("/login");
       } else {
-        toast.error("Something went wrong");
+        toast.error(t('Auth.Register.genericError'));
         setLoading(false);
       }
     } catch (error: any) {
       setLoading(false);
-      toast.error(error.response?.data?.message || "Registration failed");
+      toast.error(error.response?.data?.message || t('Auth.Register.registrationFailed'));
     }
   };
 
-
   return (
     <AuthLayout
-      title="Create an account"
-      subtitle="Fill in your details to get started."
-      heroTitle={<>Join <span className="text-blue-200">Now</span></>}
-      heroSubtitle="Create an account to unlock exclusive travel deals and manage your trips with ease."
+      title={t('Auth.Register.title')}
+      subtitle={t('Auth.Register.subtitle')}
+      heroTitle={<>{t('Auth.Register.heroTitle.join')} <span className="text-blue-200">{t('Auth.Register.heroTitle.now')}</span></>}
+      heroSubtitle={t('Auth.Register.heroSubtitle')}
       benefits={[
-        "Book your travels with special member pricing",
-        "Receive personalized travel recommendations",
-        "Manage all your bookings in one place"
+        t('Auth.Register.benefits.memberPricing'),
+        t('Auth.Register.benefits.personalizedRecommendations'),
+        t('Auth.Register.benefits.manageBookings')
       ]}
       footerContent={
         <p className="text-center text-gray-600">
-          Already have an account?{" "}
+          {t('Auth.Register.alreadyHaveAccount')}{" "}
           <Link
             href="/login"
             className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
           >
-            Sign in
+            {t('Auth.Register.signIn')}
           </Link>
         </p>
       }
@@ -99,11 +100,11 @@ const Register: React.FC = () => {
         <FormInput
           id="firstName"
           name="firstName"
-          label="First Name"
+          label={t('Auth.Register.firstNameLabel')}
           type="text"
           value={values.firstName}
           onChange={handleChange}
-          placeholder="John"
+          placeholder={t('Auth.Register.firstNamePlaceholder')}
           error={errors.firstName}
           icon={<User />}
           isFocused={formFocus === 'firstName'}
@@ -115,11 +116,11 @@ const Register: React.FC = () => {
         <FormInput
           id="lastName"
           name="lastName"
-          label="Last Name"
+          label={t('Auth.Register.lastNameLabel')}
           type="text"
           value={values.lastName}
           onChange={handleChange}
-          placeholder="Doe"
+          placeholder={t('Auth.Register.lastNamePlaceholder')}
           error={errors.lastName}
           icon={<User />}
           isFocused={formFocus === 'lastName'}
@@ -131,11 +132,11 @@ const Register: React.FC = () => {
         <FormInput
           id="email"
           name="email"
-          label="Email address"
+          label={t('Auth.Register.emailLabel')}
           type="email"
           value={values.email}
           onChange={handleChange}
-          placeholder="you@example.com"
+          placeholder={t('Auth.Register.emailPlaceholder')}
           error={errors.email}
           icon={<Mail />}
           isFocused={formFocus === 'email'}
@@ -147,18 +148,18 @@ const Register: React.FC = () => {
         <PasswordInput
           id="password"
           name="password"
-          label="Password"
+          label={t('Auth.Register.passwordLabel')}
           value={values.password}
           onChange={handleChange}
           error={errors.password}
           isFocused={formFocus === 'password'}
           onFocus={() => handleFocus('password')}
           onBlur={() => handleBlur('password')}
-          helpText="Password must contain at least 8 characters including one uppercase letter, one special character, and three numbers."
+          helpText={t('Auth.Register.passwordHelp')}
         />
 
         {/* Submit Button */}
-        <AuthButton loading={loading} text="Create Account" />
+        <AuthButton loading={loading} text={t('Auth.Register.createAccountButton')} />
       </form>
     </AuthLayout>
   );
