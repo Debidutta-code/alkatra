@@ -1,5 +1,6 @@
 // components/auth/hooks/useFormValidation.ts
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface ValidationRules {
   required?: boolean;
@@ -16,6 +17,7 @@ export function useFormValidation(
   initialValues: Record<string, string>,
   fieldConfig: FieldConfig
 ) {
+  const { t } = useTranslation();
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formFocus, setFormFocus] = useState<string | null>(null);
@@ -24,20 +26,30 @@ export function useFormValidation(
     const rules = fieldConfig[name] || {};
     
     if (rules.required && !value.trim()) {
-      return `${name.charAt(0).toUpperCase() + name.slice(1).replace(/([A-Z])/g, ' $1').trim()} is required`;
+      // Try to get a specific validation message for this field
+      const specificKey = `Auth.Validation.${name}Required`;
+      const specificMessage = t(specificKey);
+      
+      // If the translation key doesn't exist, fall back to a generic message with field name
+      if (specificMessage === specificKey) {
+        const fieldLabel = name.charAt(0).toUpperCase() + name.slice(1).replace(/([A-Z])/g, ' $1').trim();
+        return t('Auth.Validation.fieldRequired', { field: fieldLabel });
+      }
+      
+      return specificMessage;
     }
     
     if (rules.email && value && !/\S+@\S+\.\S+/.test(value)) {
-      return "Please enter a valid email address";
+      return t('Auth.Validation.emailInvalid');
     }
     
     if (rules.minLength && value.length < rules.minLength) {
-      return `Must be at least ${rules.minLength} characters`;
+      return t('Auth.Validation.minLength', { count: rules.minLength });
     }
     
     if (rules.passwordStrength && value) {
       if (!/^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*\d.*\d.*\d).{8,}$/.test(value)) {
-        return "Password must contain at least 8 characters including one uppercase letter, one special character, and three numbers";
+        return t('Auth.Validation.passwordComplexity');
       }
     }
     

@@ -2,6 +2,7 @@
 import React, { ReactNode } from "react";
 import Image from "next/image";
 import { CheckCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import LoginImg from "@/components/assets/login.jpg";
 import LoginIcon from "@/components/assets/TRIP-1.png";
 import LoginIconMob from "@/components/assets/TRIP-1.png";
@@ -25,6 +26,8 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
   heroSubtitle,
   benefits,
 }) => {
+  const { t } = useTranslation();
+  
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gradient-to-br from-gray-50 to-tripswift-off-white font-noto-sans">
       {/* Left Side Image Panel */}
@@ -39,7 +42,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         <div className="absolute inset-0 transition-transform duration-3000 hover:scale-105">
           <Image 
             src={LoginImg} 
-            alt="Travel destination" 
+            alt={t('Auth.Layout.travelDestinationAlt')} 
             layout="fill" 
             objectFit="cover" 
             className="object-center filter saturate-110"
@@ -66,13 +69,15 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
             {heroTitle}
           </h1>
           
-          <p className="text-xl text-tripswift-off-white/90 max-w-md leading-relaxed mb-10 drop-shadow">
+          <p className="text-xl text-tripswift-off-white max-w-md leading-relaxed mb-10 drop-shadow">
             {heroSubtitle}
           </p>
           
           {/* Premium glass card for benefits */}
           <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 shadow-2xl w-full max-w-md transform transition-all duration-300 hover:bg-white/15">
-            <p className="text-tripswift-off-white font-tripswift-bold text-lg mb-5">Member Benefits</p>
+            <p className="text-tripswift-off-white font-tripswift-bold text-lg mb-5">
+              {t('Auth.Layout.memberBenefits')}
+            </p>
             <ul className="text-white/95 space-y-4">
               {benefits.map((benefit, index) => (
                 <li key={index} className="flex items-start">
@@ -131,9 +136,11 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                 </svg>
               </div>
               <div>
-                <h3 className="text-sm font-tripswift-bold text-tripswift-black">Your Privacy & Security</h3>
+                <h3 className="text-sm font-tripswift-bold text-tripswift-black">
+                  {t('Auth.Layout.privacySecurity.title')}
+                </h3>
                 <p className="text-xs leading-relaxed text-tripswift-black/60 mt-1 max-w-xs">
-                  Your personal information is encrypted and protected using industry-standard security protocols. We never share your data without your explicit permission.
+                  {t('Auth.Layout.privacySecurity.description')}
                 </p>
               </div>
             </div>

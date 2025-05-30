@@ -1,6 +1,7 @@
 // components/auth/PasswordInput.tsx
 import React, { useState } from "react";
 import { Eye, EyeOff, Lock, AlertCircle, Info } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface PasswordInputProps {
   id: string;
@@ -33,6 +34,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
   helpText,
   disabled = false
 }) => {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -47,7 +49,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
             onClick={onForgotPasswordClick}
             className="text-sm font-tripswift-medium text-tripswift-blue hover:text-[#054B8F] transition-colors duration-300 flex items-center"
           >
-            <span>Forgot password?</span>
+            <span>{t('Auth.PasswordInput.forgotPassword')}</span>
           </button>
         )}
       </div>
@@ -85,6 +87,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
                 : 'border-tripswift-black/10 hover:border-tripswift-blue/30'
           } focus:outline-none transition-all duration-300 text-tripswift-black/90 placeholder:text-tripswift-black/40
           disabled:bg-tripswift-off-white/50 disabled:text-tripswift-black/40 disabled:border-tripswift-black/5 disabled:cursor-not-allowed`}
+          aria-label={label}
         />
         
         {/* Enhanced show/hide password button */}
@@ -99,6 +102,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
                 ? 'text-tripswift-blue hover:text-tripswift-blue/80'
                 : 'text-tripswift-black/50 hover:text-tripswift-black/70'
           }`}
+          aria-label={showPassword ? t('Auth.PasswordInput.hidePassword') : t('Auth.PasswordInput.showPassword')}
         >
           {showPassword ? (
             <div className="p-1.5 rounded-full bg-tripswift-blue/10 group-hover:bg-tripswift-blue/15 transition-colors duration-300">

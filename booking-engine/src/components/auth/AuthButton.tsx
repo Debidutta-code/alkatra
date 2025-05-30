@@ -1,6 +1,7 @@
 // components/auth/AuthButton.tsx
 import React from "react";
 import { Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface AuthButtonProps {
   loading: boolean;
@@ -15,6 +16,8 @@ const AuthButton: React.FC<AuthButtonProps> = ({
   type = "submit",
   className = ""
 }) => {
+  const { t } = useTranslation();
+  
   // Base classes that will always be applied
   const baseClasses = `
     w-full flex justify-center items-center py-4 px-6 rounded-xl font-tripswift-bold text-base
@@ -38,7 +41,7 @@ const AuthButton: React.FC<AuthButtonProps> = ({
         {loading ? (
           <div className="flex items-center">
             <Loader2 className="w-5 h-5 animate-spin mr-2" />
-            <span>Processing...</span>
+            <span>{t('Auth.Button.processing')}</span>
           </div>
         ) : (
           <div className="flex items-center">
