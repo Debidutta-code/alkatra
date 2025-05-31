@@ -120,7 +120,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
 
             {/* Footer Area with subtle pattern */}
             <div className="px-10 py-6 bg-tripswift-off-white/70 border-t border-gray-100 relative overflow-hidden">
-              <div className="absolute inset-0 bg-[url('/patterns/subtle-dots.png')] opacity-5"></div>
+              {/* <div className="absolute inset-0 bg-[url('/patterns/subtle-dots.png')] opacity-5"></div> */}
               <div className="relative z-10">
                 {footerContent}
               </div>
