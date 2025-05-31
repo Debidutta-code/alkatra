@@ -124,9 +124,8 @@ class CustomerController {
   async updatePassword(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const { email, newPassword } = req.body;
-      const customerId = req.user?.id;
 
-      await customerService.updatePassword(email, newPassword, customerId || "");
+      await customerService.updatePassword(email, newPassword);
       res.status(200).json({ message: "Password updated successfully" });
     } catch (error: any) {
       const statusMap: Record<string, number> = {
