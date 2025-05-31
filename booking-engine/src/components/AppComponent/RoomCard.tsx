@@ -65,7 +65,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
 
   const policyType = getPolicyType(data.cancellation_policy);
   const policyStyling = getPolicyStyling(policyType);
-  const policyBulletPoints = getPolicyBulletPoints(policyType);
+  const policyBulletPoints = getPolicyBulletPoints(policyType, t);
 
   const numericPrice = parseFloat(price.replace(/[^0-9.]/g, ""));
   const hasOriginalPrice = !!data.original_price;

@@ -166,7 +166,10 @@
     "specialOffer": "Special offer: Get up to 25% off on your first booking!",
     "errorNoHotels": "No hotels available for the selected location.",
     "errorInvalidLocation": "Please enter a valid location.",
-    "errorSelectDates": "Please select both check-in and check-out dates."
+    "errorSelectDates": "Please select both check-in and check-out dates.",
+    "exclusiveOffers": "Exclusive Offers Available",
+    "freeCancellation": "Free Cancellation",
+    "bestPriceGuarantee": "Best Price Guarantee"
   },
   "HotelListing": {
     "CompactSearchBar": {
@@ -419,6 +422,50 @@
         },
         "gotIt": "Got it"
       }
+    }
+  },
+  "CancellationPolicies": {
+    "policyTypes": {
+      "flexible": {
+        "description": "Free cancellation until 24 hours before check-in. After that, the reservation is non-refundable.",
+        "shortDescription": "Free cancellation until 24 hours before check-in",
+        "bulletPoints": [
+          "Full refund: If cancelled more than 24 hours before check-in",
+          "No refund: If cancelled within 24 hours of check-in"
+        ]
+      },
+      "moderate": {
+        "description": "Full refund if cancelled 5+ days before check-in. 50% refund between 1-5 days before check-in. No refund within 24 hours of check-in.",
+        "shortDescription": "Free cancellation until 5 days before check-in",
+        "bulletPoints": [
+          "Full refund: If cancelled 5+ days before check-in",
+          "50% refund: If cancelled 1-5 days before check-in",
+          "No refund: If cancelled within 24 hours of check-in"
+        ]
+      },
+      "strict": {
+        "description": "Full refund if cancelled 7+ days before check-in. 50% refund if cancelled 1-7 days before check-in. No refund within 24 hours of check-in.",
+        "shortDescription": "Free cancellation until 7 days before check-in",
+        "bulletPoints": [
+          "Full refund: If cancelled 7+ days before check-in",
+          "50% refund: If cancelled 1-7 days before check-in",
+          "No refund: If cancelled within 24 hours of check-in"
+        ]
+      },
+      "nonrefundable": {
+        "description": "This booking is non-refundable. No refund will be provided regardless of cancellation timing.",
+        "shortDescription": "Non-refundable rate",
+        "bulletPoints": [
+          "No refund: This booking is non-refundable at any time",
+          "Non-refundable bookings typically come with a discounted rate"
+        ]
+      }
+    },
+    "roomCardPolicyDescriptions": {
+      "flexible": "Free cancellation up to 24h before check-in",
+      "moderate": "Free cancellation up to 5 days before check-in",
+      "strict": "Free cancellation up to 7 days before check-in",
+      "nonrefundable": "Non-refundable rate with special discount"
     }
   },
   "BookingComponents": {
