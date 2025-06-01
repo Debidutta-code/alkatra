@@ -1,27 +1,21 @@
 "use client";
 
-import React, { useState } from "react";
-import { User, Heart, Lock, Bell, Calendar, ChevronDown, Edit3, Award, Bookmark, Camera, CheckCircle, ChevronRight, Gift, HelpCircle, LogOut, Percent, Shield, Star, Menu, X } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { User, Heart, Lock, Bell, Calendar, ChevronDown, Edit3, Bookmark, CheckCircle, ChevronRight, Gift, Percent, Shield, Star, HelpCircle, Eye, EyeOff, LogOut } from "lucide-react";
+import { useSelector, useDispatch } from "react-redux";
+import { logout, getUser, updateProfile } from "@/Redux/slices/auth.slice";
+import { AppDispatch, RootState } from "@/Redux/store";
+import Cookies from "js-cookie";
+import { toast } from "react-toastify";
 
 // Types
-interface Booking {
-  id: string;
-  hotelName: string;
-  location: string;
-  checkIn: string;
-  checkOut: string;
-  status: "Confirmed" | "Pending" | "Cancelled" | "Completed";
-  amount: number;
-  rating: number;
-}
-
-interface User {
+interface UserProfile {
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
   joinDate: string;
-  membershipLevel: string;
   profilePicture: string | null;
   verified: boolean;
   location: string;
@@ -56,28 +50,24 @@ interface ProfileSectionProps {
   defaultOpen?: boolean;
 }
 
-interface BookingCardProps {
-  booking: Booking;
-}
-
 // Avatar Component
-const Avatar = ({ 
-  size = "md", 
-  src, 
-  alt, 
-  fallback 
-}: { 
-  size?: "sm" | "md" | "lg"; 
-  src?: string; 
-  alt?: string; 
-  fallback?: React.ReactNode; 
+const Avatar = ({
+  size = "md",
+  src,
+  alt,
+  fallback
+}: {
+  size?: "sm" | "md" | "lg";
+  src?: string;
+  alt?: string;
+  fallback?: React.ReactNode;
 }) => {
   const sizes = {
     sm: "w-8 h-8",
-    md: "w-12 h-12",  
+    md: "w-12 h-12",
     lg: "w-16 h-16"
   };
-  
+
   return (
     <div className={`${sizes[size]} rounded-full overflow-hidden bg-[var(--color-primary-blue)] flex items-center justify-center border-2 border-[var(--color-primary-blue)]`}>
       {src ? (
@@ -166,76 +156,28 @@ const ProfileSection = ({ title, children, defaultOpen = true }: ProfileSectionP
   );
 };
 
-// Booking Card Component
-const BookingCard = ({ booking }: BookingCardProps) => {
-  const statusColors: { [key in Booking['status']]: string } = {
-    Confirmed: "bg-green-100 text-green-800",
-    Pending: "bg-yellow-100 text-yellow-800",
-    Cancelled: "bg-red-100 text-red-800",
-    Completed: "bg-[var(--color-primary-blue)]/10 text-[var(--color-primary-blue)]"
-  };
-
-  return (
-    <Card className="p-4 sm:p-6" hover>
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 space-y-4 sm:space-y-0">
-        <div className="flex items-center gap-3 sm:gap-4">
-          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-[var(--gradient)] rounded-xl flex items-center justify-center flex-shrink-0">
-            <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-tripswift-blue" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <h3 className="text-base sm:text-lg font-semibold text-[var(--color-secondary-black)] mb-1 truncate">{booking.hotelName}</h3>
-            <p className="text-sm text-[var(--color-secondary-black)]/80 mb-2 truncate">{booking.location}</p>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs sm:text-sm text-[var(--color-secondary-black)]/60">
-              <span>Check-in: {booking.checkIn}</span>
-              <span>Check-out: {booking.checkOut}</span>
-            </div>
-          </div>
-        </div>
-        <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start text-right">
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[booking.status]}`}>
-            {booking.status}
-          </span>
-          <p className="text-lg font-semibold text-[var(--color-secondary-black)] sm:mt-2">${booking.amount}</p>
-        </div>
-      </div>
-
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-4 border-t border-gray-100 space-y-3 sm:space-y-0">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className={`h-4 w-4 ${i < booking.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} />
-            ))}
-          </div>
-          <span className="text-sm text-[var(--color-secondary-black)]/80">({booking.rating}/5)</span>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => { }}>
-            View Details
-          </Button>
-        </div>
-      </div>
-    </Card>
-  );
-};
-
 // Edit Profile Modal Component
 const EditProfileModal = ({
   user,
   onSave,
   onClose
 }: {
-  user: User;
-  onSave: (updatedUser: Partial<User> & { password?: string }) => void;
+  user: UserProfile;
+  onSave: (updatedUser: Partial<UserProfile> & { password?: string }) => Promise<void>;
   onClose: () => void;
 }) => {
   const [formData, setFormData] = useState({
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
+    phone: user.phone,
     password: "",
     confirmPassword: ""
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -245,6 +187,11 @@ const EditProfileModal = ({
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Invalid email format";
+    }
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Phone number is required";
+    } else if (!/^\d{10}$/.test(formData.phone)) {
+      newErrors.phone = "Phone number must be 10 digits";
     }
     if (formData.password && formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
@@ -256,16 +203,24 @@ const EditProfileModal = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      onSave({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        ...(formData.password && { password: formData.password })
-      });
-      onClose();
+      setIsSubmitting(true);
+      try {
+        await onSave({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          ...(formData.password && { password: formData.password })
+        });
+        onClose();
+      } catch (error: any) {
+        toast.error(error || "Failed to update profile");
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -305,30 +260,95 @@ const EditProfileModal = ({
             {errors.email && <p className="text-xs text-red-600 mt-1">{errors.email}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">New Password (optional)</label>
+            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">Phone Number</label>
             <input
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              type="tel"
+              value={formData.phone}
+              onChange={(e) => {
+                // Only allow numbers and limit to 10 digits
+                const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                setFormData({ ...formData, phone: value });
+              }}
+              pattern="[0-9]{10}"
+              maxLength={10}
+              inputMode="numeric"
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-blue)]"
+              required
             />
-            {errors.password && <p className="text-xs text-red-600 mt-1">{errors.password}</p>}
+            {errors.phone && <p className="text-xs text-red-600 mt-1">{errors.phone}</p>}
+            {formData.phone.length !== 10 && formData.phone.length > 0 && (
+              <p className="text-xs text-red-600 mt-1">Phone number must be 10 digits</p>
+            )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">Confirm New Password</label>
-            <input
-              type="password"
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-blue)]"
-            />
+            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">
+              New Password (optional)
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-blue)] pr-10"
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4 text-gray-500" />
+                ) : (
+                  <Eye className="h-4 w-4 text-gray-500" />
+                )}
+              </button>
+            </div>
+            {errors.password && <p className="text-xs text-red-600 mt-1">{errors.password}</p>}
+          </div>
+
+          {/* Updated Confirm Password Field */}
+          <div>
+            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">
+              Confirm New Password
+            </label>
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-blue)] pr-10"
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="h-4 w-4 text-gray-500" />
+                ) : (
+                  <Eye className="h-4 w-4 text-gray-500" />
+                )}
+              </button>
+            </div>
             {errors.confirmPassword && <p className="text-xs text-red-600 mt-1">{errors.confirmPassword}</p>}
           </div>
           <div className="flex flex-col sm:flex-row gap-3 mt-6">
-            <Button variant="primary" size="md" type="submit" className="w-full sm:w-auto">
-              Save Changes
+            <Button
+              variant="primary"
+              size="md"
+              type="submit"
+              className="w-full sm:w-auto"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
-            <Button variant="outline" size="md" onClick={onClose} className="w-full sm:w-auto">
+            <Button
+              variant="outline"
+              size="md"
+              onClick={onClose}
+              className="w-full sm:w-auto"
+              disabled={isSubmitting}
+            >
               Cancel
             </Button>
           </div>
@@ -340,59 +360,50 @@ const EditProfileModal = ({
 
 // Main Component
 const UserProfile: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter(); // Add useRouter
+  const { user: authUser } = useSelector((state: RootState) => state.auth);
   const [activeTab, setActiveTab] = useState<'overview' | 'bookings' | 'preferences' | 'security' | 'notifications' | 'help'>('overview');
   const [isEditing, setIsEditing] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [user, setUser] = useState<User>({
-    firstName: "Sarah",
-    lastName: "Johnson",
-    email: "sarah.johnson@example.com",
-    phone: "+1 (555) 123-4567",
-    joinDate: "March 2022",
-    membershipLevel: "Gold Member",
+
+  // Initialize with Redux user data or fallback to default
+  const [user, setUser] = useState<UserProfile>({
+    firstName: authUser?.firstName || "Guest",
+    lastName: authUser?.lastName || "User",
+    email: authUser?.email || "",
+    phone: authUser?.phone || "",
+    joinDate: authUser?.createdAt
+      ? new Date(authUser.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+      : "March 2025",
     profilePicture: null,
     verified: true,
     location: "New York, USA"
   });
 
+  useEffect(() => {
+    // Fetch user data when component mounts
+    if (Cookies.get("accessToken")) {
+      dispatch(getUser());
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    // Update local state when Redux user data changes
+    if (authUser) {
+      setUser(prev => ({
+        ...prev,
+        firstName: authUser.firstName || prev.firstName,
+        lastName: authUser.lastName || prev.lastName,
+        email: authUser.email || prev.email,
+        phone: authUser.phone || prev.phone
+      }));
+    }
+  }, [authUser]);
+
   const stats: StatsCardProps[] = [
     { icon: Calendar, title: "Trips Completed", value: "23", description: "Since joining" },
     { icon: Star, title: "Average Rating", value: "4.8", description: "From hosts" },
-    { icon: Award, title: "Member Level", value: "Gold", description: "Elite status" },
     { icon: Bookmark, title: "Saved Places", value: "47", description: "Wishlisted" }
-  ];
-
-  const recentBookings: Booking[] = [
-    {
-      id: "1",
-      hotelName: "The Ritz-Carlton",
-      location: "New York, NY",
-      checkIn: "Dec 15, 2024",
-      checkOut: "Dec 18, 2024",
-      status: "Completed",
-      amount: 1299,
-      rating: 5
-    },
-    {
-      id: "2",
-      hotelName: "Grand Hyatt",
-      location: "San Francisco, CA",
-      checkIn: "Jan 22, 2025",
-      checkOut: "Jan 25, 2025",
-      status: "Confirmed",
-      amount: 890,
-      rating: 4
-    },
-    {
-      id: "3",
-      hotelName: "Marriott Downtown",
-      location: "Chicago, IL",
-      checkIn: "Feb 10, 2025",
-      checkOut: "Feb 12, 2025",
-      status: "Pending",
-      amount: 450,
-      rating: 4
-    }
   ];
 
   const menuItems = [
@@ -404,14 +415,47 @@ const UserProfile: React.FC = () => {
     { id: 'help' as const, label: 'Help Center', icon: HelpCircle }
   ];
 
-  const handleSaveProfile = (updatedUser: Partial<User> & { password?: string }) => {
-    setUser((prev) => ({
-      ...prev,
-      firstName: updatedUser.firstName || prev.firstName,
-      lastName: updatedUser.lastName || prev.lastName,
-      email: updatedUser.email || prev.email,
-    }));
-    console.log("Updated user:", updatedUser);
+  const handleSaveProfile = async (updatedUser: Partial<UserProfile> & { password?: string }) => {
+    try {
+      await dispatch(updateProfile({
+        firstName: updatedUser.firstName || user.firstName,
+        lastName: updatedUser.lastName || user.lastName,
+        email: updatedUser.email || user.email,
+        phone: updatedUser.phone || user.phone,
+        ...(updatedUser.password && { password: updatedUser.password })
+      })).unwrap();
+  
+      // Refresh user data from server
+      await dispatch(getUser());
+  
+      setUser(prev => ({
+        ...prev,
+        firstName: updatedUser.firstName || prev.firstName,
+        lastName: updatedUser.lastName || prev.lastName,
+        email: updatedUser.email || prev.email,
+        phone: updatedUser.phone || prev.phone
+      }));
+      toast.success("Profile updated successfully");
+    } catch (error: any) {
+      console.error("Failed to update profile:", error);
+      toast.error(error || "Failed to update profile");
+      if (error === "Session expired. Please log in again.") {
+        window.location.href = "/login";
+      }
+    }
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    window.location.href = "/login";
+  };
+
+  const handleTabClick = (tabId: typeof activeTab) => {
+    if (tabId === 'bookings') {
+      router.push('/my-trip');
+    } else {
+      setActiveTab(tabId);
+    }
   };
 
   const renderContent = () => {
@@ -419,7 +463,7 @@ const UserProfile: React.FC = () => {
       case 'overview':
         return (
           <div className="space-y-6 sm:space-y-8">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
               {stats.map((stat, index) => (
                 <StatsCard key={index} {...stat} />
               ))}
@@ -427,7 +471,12 @@ const UserProfile: React.FC = () => {
             <Card className="p-4 sm:p-6">
               <h3 className="text-base sm:text-lg font-semibold text-[var(--color-secondary-black)] mb-4">Quick Actions</h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-                <Button variant="outline" size="md" className="flex flex-col items-center p-3 sm:p-4 h-auto" onClick={() => { }}>
+                <Button
+                  variant="outline"
+                  size="md"
+                  className="flex flex-col items-center p-3 sm:p-4 h-auto"
+                  onClick={() => router.push('/')}
+                >
                   <Calendar className="h-4 w-4 sm:h-5 sm:w-5 mb-2 text-[var(--color-secondary-black)]" />
                   <span className="text-xs text-[var(--color-secondary-black)]">Book Trip</span>
                 </Button>
@@ -445,44 +494,12 @@ const UserProfile: React.FC = () => {
                 </Button>
               </div>
             </Card>
-            <ProfileSection title="Recent Bookings" defaultOpen={true}>
-              <div className="space-y-4 mt-4">
-                {recentBookings.slice(0, 2).map((booking) => (
-                  <BookingCard key={booking.id} booking={booking} />
-                ))}
-              </div>
-            </ProfileSection>
+            {/* Remove Recent Bookings section since it's handled on /my-trip */}
           </div>
         );
 
       case 'bookings':
-        return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-secondary-black)]">My Trips</h2>
-            </div>
-            <div className="flex gap-2 sm:gap-4 border-b border-gray-200 overflow-x-auto">
-              {['All', 'Upcoming', 'Past', 'Cancelled'].map((tab) => (
-                <button
-                  key={tab}
-                  className={`pb-3 px-2 sm:px-1 text-sm font-medium whitespace-nowrap border-b-2 ${
-                    tab === 'All' 
-                      ? 'border-[var(--color-primary-blue)] text-[var(--color-primary-blue)]' 
-                      : 'border-transparent text-[var(--color-secondary-black)]/60 hover:text-[var(--color-secondary-black)] hover:border-gray-300'
-                  }`}
-                  onClick={() => { }}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-            <div className="space-y-4">
-              {recentBookings.map((booking) => (
-                <BookingCard key={booking.id} booking={booking} />
-              ))}
-            </div>
-          </div>
-        );
+        return null; // No content needed since redirect happens
 
       case 'security':
         return (
@@ -492,7 +509,7 @@ const UserProfile: React.FC = () => {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 space-y-3 sm:space-y-0">
                 <div>
                   <h3 className="text-base sm:text-lg font-semibold text-[var(--color-secondary-black)]">Password</h3>
-                  <p className="text-sm text-[var(--color-secondary-black)]/60">Last updated 3 months ago</p>
+                  <p className="text-sm text-[var(--color-secondary-black)]/60"> Update your password</p>
                 </div>
                 <Button variant="outline" size="md" className="flex items-center border-[var(--color-primary-blue)]/30 bg-[var(--color-primary-blue)]/5 text-[var(--color-primary-blue)] w-full sm:w-auto justify-center" onClick={() => setIsEditing(true)}>
                   <Lock className="h-4 w-4 mr-2" />
@@ -511,7 +528,7 @@ const UserProfile: React.FC = () => {
                 </Button>
               </div>
             </Card>
-            <Card className="p-4 sm:p-6">
+            {/* <Card className="p-4 sm:p-6">
               <h3 className="text-base sm:text-lg font-semibold text-[var(--color-secondary-black)] mb-4">Recent Activity</h3>
               <div className="space-y-3">
                 {[
@@ -528,7 +545,7 @@ const UserProfile: React.FC = () => {
                   </div>
                 ))}
               </div>
-            </Card>
+            </Card> */}
           </div>
         );
 
@@ -558,9 +575,6 @@ const UserProfile: React.FC = () => {
                     </span>
                   }
                 />
-                <button className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-white rounded-full shadow-md flex items-center justify-center border border-gray-200 hover:bg-gray-50">
-                  <Camera className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-[var(--color-secondary-black)]" />
-                </button>
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
@@ -571,7 +585,10 @@ const UserProfile: React.FC = () => {
                     <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 flex-shrink-0" />
                   )}
                 </div>
-                <p className="text-xs sm:text-sm text-[var(--color-secondary-black)]/60 truncate">{user.membershipLevel} • Joined {user.joinDate}</p>
+                <p className="text-xs sm:text-sm text-[var(--color-secondary-black)]/60 truncate">Joined {user.joinDate}</p>
+                {/* {user.phone && (
+                  <p className="text-xs sm:text-sm text-[var(--color-secondary-black)]/60 truncate mt-1">{user.phone}</p>
+                )} */}
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
@@ -584,16 +601,15 @@ const UserProfile: React.FC = () => {
                 <span className="hidden sm:inline">Edit Profile</span>
                 <Edit3 className="w-4 h-4 sm:ml-2" />
               </Button>
-              <Button
+              {/* <Button
                 variant="outline"
                 size="sm"
                 className="flex items-center border-[var(--color-primary-blue)]/30 bg-[var(--color-primary-blue)]/5 text-[var(--color-primary-blue)]"
-                onClick={() => { }}
+                onClick={handleLogout}
               >
                 <span className="hidden sm:inline">Sign Out</span>
                 <LogOut className="h-4 w-4 sm:ml-2" />
-              </Button>
-              {/* Mobile Edit Button */}
+              </Button> */}
               <Button
                 variant="outline"
                 size="sm"
@@ -618,12 +634,11 @@ const UserProfile: React.FC = () => {
                 return (
                   <button
                     key={item.id}
-                    onClick={() => setActiveTab(item.id)}
-                    className={`flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2 text-xs font-medium rounded-md transition-colors min-w-[60px] ${
-                      activeTab === item.id
-                        ? 'bg-[var(--color-primary-blue)]/10 text-[var(--color-primary-blue)]'
-                        : 'text-[var(--color-secondary-black)]/60 hover:bg-gray-50 hover:text-[var(--color-secondary-black)]'
-                    }`}
+                    onClick={() => handleTabClick(item.id)}
+                    className={`flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2 text-xs font-medium rounded-md transition-colors min-w-[60px] ${activeTab === item.id
+                      ? 'bg-[var(--color-primary-blue)]/10 text-[var(--color-primary-blue)]'
+                      : 'text-[var(--color-secondary-black)]/60 hover:bg-gray-50 hover:text-[var(--color-secondary-black)]'
+                      }`}
                   >
                     <Icon className="h-4 w-4" />
                     <span className="truncate">{item.label.split(' ')[0]}</span>
