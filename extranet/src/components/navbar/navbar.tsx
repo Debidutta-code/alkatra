@@ -10,28 +10,18 @@ import {
 import {
   NavigationMenu,
   NavigationMenuContent,
-  NavigationMenuIndicator,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  NavigationMenuViewport,
-  navigationMenuTriggerStyle,
 } from "./../ui/navigation-menu";
 
 import {
   Menubar,
-  MenubarCheckboxItem,
   MenubarContent,
   MenubarItem,
   MenubarMenu,
-  MenubarRadioGroup,
-  MenubarRadioItem,
-  MenubarSeparator,
   MenubarShortcut,
-  MenubarSub,
-  MenubarSubContent,
-  MenubarSubTrigger,
   MenubarTrigger,
 } from "./../ui/menubar";
 
@@ -40,7 +30,7 @@ import { getUser, logout } from "../../redux/slices/authSlice";
 import { cn } from "../../lib/utils";
 import Link from "next/link";
 import { Button } from "../ui/button";
-import { Settings, User, LogOut, Users } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { RootState, store, useSelector, useDispatch } from "../../redux/store";
 import { ModeToggle } from "./../mode-toggle";
@@ -80,7 +70,7 @@ function Navbar({}: Props) {
   // Update logo when theme changes
   useEffect(() => {
     if (theme === "dark") {
-      setLogoSrc("/assets/TRIP-2.png");
+      setLogoSrc("/assets/TRIP-1.png");
     } else {
       setLogoSrc("/assets/TRIP-1.png");
     }
