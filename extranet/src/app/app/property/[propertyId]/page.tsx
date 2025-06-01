@@ -551,6 +551,13 @@ export default function Page({ params, searchParams }: Props) {
             >
               Rate Plans
             </Button>
+            <Button
+              variant="default"
+              onClick={() => router.push(`/app/rate-plan/map-rate-plan`)}
+              className="bg-blue-500 hover:bg-blue-600 text-white m-4"
+            >
+              Rate Allotment
+            </Button>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">

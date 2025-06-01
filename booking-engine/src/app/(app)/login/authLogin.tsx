@@ -60,7 +60,7 @@ const Login: React.FC = () => {
     try {
       // Wait for login to complete and store the result
       const loginResult = await dispatch(login({ email: values.email, password: values.password }));
-      
+
       // Check if login was successful - this is the key fix
       // If loginResult is undefined or null, it means login failed
       if (!loginResult) {
@@ -165,26 +165,37 @@ const Login: React.FC = () => {
           isFocused={formFocus === 'password'}
           onFocus={() => handleFocus('password')}
           onBlur={() => handleBlur('password')}
-          showForgotPassword={true}
-          onForgotPasswordClick={() => setIsForgotPassword(true)}
+          showForgotPassword={false}
+          onForgotPasswordClick={() => setIsForgotPassword(false)}
         />
 
         {/* Remember Me */}
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            id="remember"
-            checked={rememberMe}
-            onChange={() => setRememberMe(!rememberMe)}
-            className="w-4 h-4 rounded-md border-tripswift-black/20 text-tripswift-blue focus:ring-tripswift-blue/20 transition-colors duration-300"
-          />
-          <label htmlFor="remember" className="ml-2 mt-2.5 text-sm text-tripswift-black/70 font-tripswift-medium">
-            {t('Auth.Login.rememberMe')}
-          </label>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="remember"
+              checked={rememberMe}
+              onChange={() => setRememberMe(!rememberMe)}
+              className="w-4 h-4 rounded-md border-tripswift-black/20 text-tripswift-blue focus:ring-tripswift-blue/20 transition-colors duration-300 mb-2"
+            />
+            <label htmlFor="remember" className="ml-2 text-sm text-tripswift-black/70 font-tripswift-medium ">
+              {t('Auth.Login.rememberMe')}
+            </label>
+          </div>
+
+          {/* Forgot Password Link */}
+          <button
+            type="button"
+            onClick={() => setIsForgotPassword(true)}
+            className="text-sm text-tripswift-blue hover:text-[#054B8F] font-tripswift-medium transition-colors mb-2"
+          >
+            {t('Auth.ForgotPassword.title')}
+          </button>
         </div>
 
         {/* Submit Button */}
-        <AuthButton loading={loading} text={t('Auth.Login.signInButton')} />      
+        <AuthButton loading={loading} text={t('Auth.Login.signInButton')} />
       </form>
     </AuthLayout>
   );

@@ -1,4 +1,3 @@
-// app/(app)/login/ForgotPassword.tsx
 "use client";
 
 import { useState } from "react";
@@ -39,7 +38,6 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, onEmailVerified
     if (validationError) {
       setValidationError("");
     }
-    // Clear any previous errors when user is typing
     if (error) {
       setError("");
     }
@@ -48,7 +46,6 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, onEmailVerified
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    // Validate email before submission
     if (!validateEmail()) {
       return;
     }
@@ -59,16 +56,16 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, onEmailVerified
 
     try {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/verify-email`, { email });
-
-      if (response.data.status === "success") {
-        setMessage(response.data.message || t('Auth.ForgotPassword.successMessage'));
-        onEmailVerified(email); // Send the verified email to the parent component
+      console.log("API Response:", response.data);
+      if (response.data.message === "You are authorized") {
+        setMessage(t('Auth.ForgotPassword.successMessage'));
+        console.log("Calling onEmailVerified with email:", email);
+        onEmailVerified(email);
       } else {
-        // Handle specific error for unverified or non-existent email
         setError(response.data.message || t('Auth.ForgotPassword.errors.emailNotFound'));
       }
     } catch (error: any) {
-      // More specific error handling
+      console.error("API Error:", error.response?.data || error.message);
       if (error.response) {
         if (error.response.status === 404) {
           setError(t('Auth.ForgotPassword.errors.emailNotFound'));
@@ -94,11 +91,14 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, onEmailVerified
       benefits={[
         t('Auth.ForgotPassword.benefits.quickRecovery'),
         t('Auth.ForgotPassword.benefits.secureReset'),
-        t('Auth.ForgotPassword.benefits.quickAccess')
+        t('Auth.ForgotPassword.benefits.quickAccess'),
       ]}
       footerContent={
         <button 
-          onClick={onBack} 
+          onClick={() => {
+            console.log("Back to login clicked");
+            onBack();
+          }}
           className="w-full text-center text-tripswift-blue text-sm hover:text-[#054B8F] font-tripswift-medium flex items-center justify-center transition-colors duration-300"
         >
           <ArrowLeft size={16} className="mr-2" />
@@ -122,10 +122,8 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, onEmailVerified
           onBlur={() => setFormFocus(null)}
         />
         
-        {/* Submit Button */}
         <AuthButton loading={loading} text={t('Auth.ForgotPassword.sendResetLinkButton')} />
         
-        {/* Success Message */}
         {message && (
           <div className="mt-4 text-sm text-green-600 bg-green-50 p-3 rounded-lg border border-green-200 flex items-center font-noto-sans">
             <CheckCircle size={16} className="mr-2 flex-shrink-0 text-green-500" />
@@ -133,7 +131,6 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, onEmailVerified
           </div>
         )}
         
-        {/* Error Message */}
         {error && (
           <div className="mt-4 text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200 flex items-center font-noto-sans">
             <AlertTriangle size={16} className="mr-2 flex-shrink-0" />

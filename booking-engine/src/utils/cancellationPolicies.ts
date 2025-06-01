@@ -1,4 +1,5 @@
 import { CheckCircle, Info, XCircle, AlertCircle, LucideIcon } from "lucide-react";
+import { TFunction } from "i18next";
 
 /**
  * Standard OTA cancellation policy types
@@ -27,38 +28,53 @@ export interface PolicyStyling {
   icon: LucideIcon;
 }
 
+// Type for translation keys to ensure type safety
+type TranslationKeys = 
+  | 'CancellationPolicies.policyTypes.flexible.description'
+  | 'CancellationPolicies.policyTypes.flexible.shortDescription'
+  | 'CancellationPolicies.policyTypes.moderate.description'
+  | 'CancellationPolicies.policyTypes.moderate.shortDescription'
+  | 'CancellationPolicies.policyTypes.strict.description'
+  | 'CancellationPolicies.policyTypes.strict.shortDescription'
+  | 'CancellationPolicies.policyTypes.nonrefundable.description'
+  | 'CancellationPolicies.policyTypes.nonrefundable.shortDescription'
+  | `CancellationPolicies.policyTypes.${Lowercase<PolicyType>}.bulletPoints`
+  | `CancellationPolicies.roomCardPolicyDescriptions.${Lowercase<PolicyType>}`;
+
 /**
- * Standard OTA cancellation policies configuration
+ * Get standard OTA cancellation policies using provided translation function
  */
-export const OTA_POLICIES: Record<PolicyType, PolicyRules> = {
-  Flexible: {
-    fullRefundDays: 1, // Full refund if cancelled more than 24 hours before check-in
-    partialRefundDays: 0,
-    partialRefundPercentage: 0,
-    description: "Free cancellation until 24 hours before check-in. After that, the reservation is non-refundable.",
-    shortDescription: "Free cancellation until 24 hours before check-in"
-  },
-  Moderate: {
-    fullRefundDays: 5, // Full refund if cancelled more than 5 days before check-in
-    partialRefundDays: 1, // Partial refund if cancelled between 1-5 days
-    partialRefundPercentage: 50,
-    description: "Full refund if cancelled 5+ days before check-in. 50% refund between 1-5 days before check-in. No refund within 24 hours of check-in.",
-    shortDescription: "Free cancellation until 5 days before check-in"
-  },
-  Strict: {
-    fullRefundDays: 7, // Full refund if cancelled more than 7 days before check-in
-    partialRefundDays: 1, // Partial refund if cancelled between 1-7 days
-    partialRefundPercentage: 50,
-    description: "Full refund if cancelled 7+ days before check-in. 50% refund if cancelled 1-7 days before check-in. No refund within 24 hours of check-in.",
-    shortDescription: "Free cancellation until 7 days before check-in"
-  },
-  NonRefundable: {
-    fullRefundDays: 0,
-    partialRefundDays: 0,
-    partialRefundPercentage: 0,
-    description: "This booking is non-refundable. No refund will be provided regardless of cancellation timing.",
-    shortDescription: "Non-refundable rate"
-  }
+export const getOTAPolicies = (t: TFunction): Record<PolicyType, PolicyRules> => {
+  return {
+    Flexible: {
+      fullRefundDays: 1,
+      partialRefundDays: 0,
+      partialRefundPercentage: 0,
+      description: t('CancellationPolicies.policyTypes.flexible.description' as TranslationKeys, { defaultValue: '' }) as string,
+      shortDescription: t('CancellationPolicies.policyTypes.flexible.shortDescription' as TranslationKeys, { defaultValue: '' }) as string,
+    },
+    Moderate: {
+      fullRefundDays: 5,
+      partialRefundDays: 1,
+      partialRefundPercentage: 50,
+      description: t('CancellationPolicies.policyTypes.moderate.description' as TranslationKeys, { defaultValue: '' }) as string,
+      shortDescription: t('CancellationPolicies.policyTypes.moderate.shortDescription' as TranslationKeys, { defaultValue: '' }) as string,
+    },
+    Strict: {
+      fullRefundDays: 7,
+      partialRefundDays: 1,
+      partialRefundPercentage: 50,
+      description: t('CancellationPolicies.policyTypes.strict.description' as TranslationKeys, { defaultValue: '' }) as string,
+      shortDescription: t('CancellationPolicies.policyTypes.strict.shortDescription' as TranslationKeys, { defaultValue: '' }) as string,
+    },
+    NonRefundable: {
+      fullRefundDays: 0,
+      partialRefundDays: 0,
+      partialRefundPercentage: 0,
+      description: t('CancellationPolicies.policyTypes.nonrefundable.description' as TranslationKeys, { defaultValue: '' }) as string,
+      shortDescription: t('CancellationPolicies.policyTypes.nonrefundable.shortDescription' as TranslationKeys, { defaultValue: '' }) as string,
+    },
+  };
 };
 
 /**
@@ -76,10 +92,10 @@ export const getPolicyStyling = (policyType: PolicyType): PolicyStyling => {
       };
     case "Moderate":
       return { 
-        headerBgColor: "bg-tripswift-blue", 
-        bgColor: "bg-tripswift-blue/10", 
-        borderColor: "border-tripswift-blue/20",
-        textColor: "text-tripswift-blue",
+        headerBgColor: "bg-blue-500", 
+        bgColor: "bg-blue-50", 
+        borderColor: "border-blue-200",
+        textColor: "text-blue-800",
         icon: Info 
       };
     case "Strict":
@@ -98,36 +114,45 @@ export const getPolicyStyling = (policyType: PolicyType): PolicyStyling => {
         textColor: "text-red-800",
         icon: XCircle 
       };
+    default:
+      const exhaustiveCheck: never = policyType;
+      throw new Error(`Unhandled policy type: ${exhaustiveCheck}`);
   }
 };
 
 /**
  * Get bullet points for a specific policy type
  */
-export const getPolicyBulletPoints = (policyType: PolicyType): { text: string, color: string }[] => {
+export const getPolicyBulletPoints = (policyType: PolicyType, t: TFunction): { text: string, color: string }[] => {
+  const bulletPoints = t(`CancellationPolicies.policyTypes.${policyType.toLowerCase()}.bulletPoints` as TranslationKeys, { 
+    returnObjects: true,
+    defaultValue: [] as string[]
+  }) as string[];
+  
   switch (policyType) {
     case "Flexible":
-      return [
-        { text: "Full refund: If cancelled more than 24 hours before check-in", color: "text-green-600" },
-        { text: "No refund: If cancelled within 24 hours of check-in", color: "text-red-600" }
-      ];
+      return bulletPoints.map((text, index) => ({
+        text,
+        color: index === 0 ? "text-green-600" : "text-red-600",
+      }));
     case "Moderate":
-      return [
-        { text: "Full refund: If cancelled 5+ days before check-in", color: "text-green-600" },
-        { text: "50% refund: If cancelled 1-5 days before check-in", color: "text-tripswift-blue" },
-        { text: "No refund: If cancelled within 24 hours of check-in", color: "text-red-600" }
-      ];
+      return bulletPoints.map((text, index) => ({
+        text,
+        color: index === 0 ? "text-green-600" : index === 1 ? "text-blue-600" : "text-red-600",
+      }));
     case "Strict":
-      return [
-        { text: "Full refund: If cancelled 7+ days before check-in", color: "text-green-600" },
-        { text: "50% refund: If cancelled 1-7 days before check-in", color: "text-amber-600" },
-        { text: "No refund: If cancelled within 24 hours of check-in", color: "text-red-600" }
-      ];
+      return bulletPoints.map((text, index) => ({
+        text,
+        color: index === 0 ? "text-green-600" : index === 1 ? "text-amber-600" : "text-red-600",
+      }));
     case "NonRefundable":
-      return [
-        { text: "No refund: This booking is non-refundable at any time", color: "text-red-600" },
-        { text: "Non-refundable bookings typically come with a discounted rate", color: "text-tripswift-black/60" }
-      ];
+      return bulletPoints.map((text, index) => ({
+        text,
+        color: index === 0 ? "text-red-600" : "text-red-600",
+      }));
+    default:
+      const exhaustiveCheck: never = policyType;
+      throw new Error(`Unhandled policy type: ${exhaustiveCheck}`);
   }
 };
 
@@ -138,21 +163,32 @@ export const calculateRefund = (
   policyType: PolicyType,
   bookingAmount: number,
   daysUntilCheckIn: number,
-  hoursUntilCheckIn: number
-): { refundPercentage: number, refundAmount: number, cancellationFee: number } => {
-  const policy = OTA_POLICIES[policyType];
+  hoursUntilCheckIn: number = 0,
+  t: TFunction
+): { refundPercentage: number, refundAmount: number, cancellationFee: number, message: string } => {
+  const policy = getOTAPolicies(t)[policyType];
   let refundPercentage = 0;
-  
+  let message = '';
+
   if (policyType === "NonRefundable") {
-    // Non-refundable booking
     refundPercentage = 0;
+    message = t('CancellationPolicies.messages.nonRefundable' as TranslationKeys, { defaultValue: 'This booking is non-refundable' }) as string;
   } else if (daysUntilCheckIn >= policy.fullRefundDays) {
-    // Full refund period
     refundPercentage = 100;
+    message = t('CancellationPolicies.messages.fullRefund' as TranslationKeys, { 
+      defaultValue: 'Full refund available if cancelled before {{days}} days',
+      days: policy.fullRefundDays
+    }) as string;
   } else if (daysUntilCheckIn >= policy.partialRefundDays || 
             (policy.partialRefundDays === 1 && hoursUntilCheckIn >= 24)) {
-    // Partial refund period
     refundPercentage = policy.partialRefundPercentage;
+    message = t('CancellationPolicies.messages.partialRefund' as TranslationKeys, { 
+      defaultValue: 'Partial refund ({{percentage}}%) available if cancelled before {{days}} days',
+      percentage: policy.partialRefundPercentage,
+      days: policy.partialRefundDays
+    }) as string;
+  } else {
+    message = t('CancellationPolicies.messages.noRefund' as TranslationKeys, { defaultValue: 'No refund available at this time' }) as string;
   }
   
   const refundAmount = (refundPercentage / 100) * bookingAmount;
@@ -161,17 +197,18 @@ export const calculateRefund = (
   return {
     refundPercentage,
     refundAmount,
-    cancellationFee
+    cancellationFee,
+    message
   };
 };
 
 /**
  * Determine the most appropriate policy type based on check-in date
- * (useful for suggesting policies to property owners)
  */
 export const suggestPolicyForDate = (checkInDate: Date): PolicyType => {
   const now = new Date();
-  const daysUntilCheckIn = Math.ceil((checkInDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  const timeDiff = checkInDate.getTime() - now.getTime();
+  const daysUntilCheckIn = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
   
   if (daysUntilCheckIn < 3) {
     return "NonRefundable";
@@ -188,51 +225,51 @@ export const suggestPolicyForDate = (checkInDate: Date): PolicyType => {
  * Get a policy type from string (with fallback)
  */
 export const getPolicyType = (policyString?: string): PolicyType => {
-  if (policyString && Object.keys(OTA_POLICIES).includes(policyString)) {
+  const validPolicies: PolicyType[] = ["Flexible", "Moderate", "Strict", "NonRefundable"];
+  if (policyString && validPolicies.includes(policyString as PolicyType)) {
     return policyString as PolicyType;
   }
   
-  // Default fallback
+  if (policyString) {
+    console.warn(`Invalid policy type provided: ${policyString}. Falling back to "Moderate".`);
+  }
+  
   return "Moderate";
 };
 
 /**
  * Generate description for Room Card display
  */
-export const getRoomCardPolicyDescription = (policyType: PolicyType): string => {
-  switch (policyType) {
-    case "Flexible":
-      return "Free cancellation up to 24h before check-in";
-    case "Moderate":
-      return "Free cancellation up to 5 days before check-in";
-    case "Strict":
-      return "Free cancellation up to 7 days before check-in";
-    case "NonRefundable":
-      return "Non-refundable rate with special discount";
-  }
+export const getRoomCardPolicyDescription = (policyType: PolicyType, t: TFunction): string => {
+  return t(`CancellationPolicies.roomCardPolicyDescriptions.${policyType.toLowerCase()}` as TranslationKeys, { 
+    defaultValue: getOTAPolicies(t)[policyType].shortDescription 
+  }) as string;
 };
 
 /**
  * Get the icon component for a policy type
- * Note: Returns the component itself, not a JSX element
  */
 export const getPolicyIcon = (policyType: PolicyType): LucideIcon => {
-  const styling = getPolicyStyling(policyType);
-  return styling.icon;
+  return getPolicyStyling(policyType).icon;
 };
 
 /**
  * Get badge styling for policy display
  */
-export const getPolicyBadgeStyling = (policyType: PolicyType): string => {
-  switch (policyType) {
-    case "Flexible":
-      return "bg-green-100 text-green-800 border-green-200";
-    case "Moderate":
-      return "bg-tripswift-blue/10 text-tripswift-blue border-tripswift-blue/20";
-    case "Strict":
-      return "bg-amber-100 text-amber-800 border-amber-200";
-    case "NonRefundable":
-      return "bg-red-100 text-red-800 border-red-200";
-  }
+export const getPolicyBadgeStyling = (policyType: PolicyType): { className: string, icon: LucideIcon } => {
+  const styling = getPolicyStyling(policyType);
+  return {
+    className: `${styling.bgColor} ${styling.textColor} border ${styling.borderColor} rounded-md px-2 py-1 text-sm font-medium`,
+    icon: styling.icon
+  };
+};
+
+/**
+ * Get all policy types with their display names
+ */
+export const getPolicyTypesWithNames = (t: TFunction): { type: PolicyType, name: string }[] => {
+  return (["Flexible", "Moderate", "Strict", "NonRefundable"] as PolicyType[]).map(type => ({
+    type,
+    name: t(`CancellationPolicies.policyNames.${type.toLowerCase()}` as TranslationKeys, { defaultValue: type }) as string
+  }));
 };
