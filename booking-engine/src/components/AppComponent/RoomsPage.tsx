@@ -4,7 +4,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import { RoomCard } from "@/components/AppComponent/RoomCard";
-import GuestInformationModal from "@/components/bookingComponents/GuestInformationModal";
+import GuestInformationModal, { Guest } from "@/components/bookingComponents/GuestInformationModal";
 import { useDispatch, useSelector } from "@/Redux/store";
 import { setAmount, setRoomId } from "@/Redux/slices/pmsHotelCard.slice";
 import { setGuestDetails } from "@/Redux/slices/hotelcard.slice";
@@ -134,13 +134,15 @@ const RoomsPage: React.FC = () => {
     const rooms = searchParams.get('rooms');
     const adults = searchParams.get('adults');
     const children = searchParams.get('children');
+    const infants = searchParams.get('infant');
 
-    if (rooms || adults || children) {
+    if (rooms || adults || children ||infants) {
       // Initialize Redux with URL parameters
       dispatch(setGuestDetails({
         rooms: Number(rooms) || 1,
         guests: Number(adults) || 1,
         children: Number(children) || 0,
+        infants: Number(infants) || 0,
         childAges: Array(Number(children) || 0).fill(0)
       }));
     }
@@ -250,8 +252,6 @@ const RoomsPage: React.FC = () => {
 
   // In the parent component (RoomsPage.tsx or similar)
   const confirmBooking = (formData: {
-    firstName: string;
-    lastName: string;
     email: string;
     phone: string;
     propertyId: string;
@@ -263,7 +263,10 @@ const RoomsPage: React.FC = () => {
     rooms?: number;
     adults?: number;
     children?: number;
+    guests?:Guest[];    
   }) => {
+      // console.log("🔍 Booking Payload Received in confirmBooking:", formData);
+
     // Create the URL query params with all necessary data
     const queryParams = new URLSearchParams({
       roomId: formData.roomId,
@@ -272,8 +275,6 @@ const RoomsPage: React.FC = () => {
       currency: "INR",
       checkIn: formData.checkIn,
       checkOut: formData.checkOut,
-      firstName: formData.firstName,
-      lastName: formData.lastName,
       email: formData.email,
       phone: formData.phone,
       userId: formData.userId || "",
