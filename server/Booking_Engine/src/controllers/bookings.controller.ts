@@ -12,132 +12,297 @@ import { ThirdPartyAmendReservationService } from '../../../wincloud/src/control
 import { ThirdPartyBooking } from "../../../wincloud/src/model/reservationModel";
 import stripeService from "../services/stripe.service";
 import Customer from "../../../Customer-Authentication/src/models/customer.model";
+import { ReservationInput } from "../../../wincloud/src/interface/reservationInterface";
+import { ThirdPartyCancelReservationService } from '../../../wincloud/src/service/cancelReservationService';
+import { AmendReservationInput } from "../../../wincloud/src/interface/amendReservationInterface";
 
-interface CancelRequestData {
-  reservationId: string;
-  customerEmail: string;
-  propertyCode: string;
-}
+const calculateAgeCategory = (dob: string) => {
+  const birthDate = new Date(dob);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  if (
+    today.getMonth() < birthDate.getMonth() ||
+    (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())
+  ) {
+    age--;
+  }
+  if (age <= 2) return { age, category: "Infant", ageCode: "7" };
+  if (age <= 12) return { age, category: "Child", ageCode: "8" };
+  return { age, category: "Adult", ageCode: "10" };
+};
 
 // New controller function to create a reservation with stored card (Pay at Hotel)
 export const createReservationWithStoredCard = CatchAsyncError(
   async (req: any, res: Response, next: NextFunction) => {
-    console.log("#########################\n", req.body);
-    const data = req.body.data;
-    const guests = data.guests;
-    const roomAssociations = data.roomAssociations;
-    const payment = data.payment;
-    const bookingDetails = data.bookingDetails;
-    const paymentInfo = data.paymentInfo;
-
-    if (!paymentInfo || !paymentInfo.paymentMethodId) {
-      return next(new ErrorHandler("Payment method ID is required", 400));
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
     }
 
-    const room = roomAssociations[0].roomId;
-    const customer_id = bookingDetails.userId;
-    const booking_user_name = `${guests[0].firstName} ${guests[0].lastName}`;
-    const booking_user_email = guests[0].email;
-    const booking_user_phone = guests[0].phone;
-    const property = bookingDetails.propertyId;
-    const amount = payment.amount;
-    const checkInDate = bookingDetails.checkInDate;
-    const checkOutDate = bookingDetails.checkOutDate;
-    const booking_dates = new Date();
+    const {
+      checkInDate,
+      checkOutDate,
+      hotelCode,
+      hotelName,
+      ratePlanCode,
+      numberOfRooms,
+      roomTypeCode,
+      roomTotalPrice,
+      currencyCode,
+      email,
+      phone, 
+      guests,
+    } = req.body;
 
-    const status = "Confirmed";
-    const paymentMethod = "payAtHotel";
+    const requiredFields = {
+      checkInDate,
+      checkOutDate,
+      hotelCode,
+      hotelName,
+      ratePlanCode,
+      numberOfRooms,
+      roomTypeCode,
+      roomTotalPrice,
+      currencyCode,
+      email,
+      phone,
+      guests,
+    };
 
-    const currentDate = new Date();
-    const formattedCurrentDate = currentDate.toISOString().split("T")[0];
-    const formattedCheckInDate = new Date(checkInDate).toISOString().split("T")[0];
-    const formattedCheckOutDate = new Date(checkOutDate).toISOString().split("T")[0];
+    const missingFields = Object.entries(requiredFields)
+      .filter(([_, value]) => value === undefined || value === null || value === "")
+      .map(([key]) => key);
 
-    if (formattedCheckInDate < formattedCurrentDate || formattedCheckOutDate < formattedCurrentDate) {
-      return res.status(400).json({ message: "Check-in and check-out dates must be in the future" });
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
     }
 
-    if (new Date(checkInDate) >= new Date(checkOutDate)) {
-      return res.status(400).json({ message: "Check-in date must be before check-out date" });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const checkIn = new Date(checkInDate);
+    const checkOut = new Date(checkOutDate);
+
+    if (checkIn < today || checkOut <= checkIn) {
+      return res.status(400).json({
+        message: "Check-in date cannot be in the past or Check-out date must be after check-in date",
+      });
     }
+
+    if (!Array.isArray(guests) || guests.length === 0) {
+      return res.status(400).json({ message: "Guest details are required" });
+    }
+
+    const ageCodeCount: Record<string, number> = { "7": 0, "8": 0, "10": 0 };
+
+    const categorizedGuests = guests.map(({ firstName, lastName, dob }) => {
+      if (!dob) throw new Error(`DOB missing for ${firstName} ${lastName}`);
+      const { age, category, ageCode } = calculateAgeCategory(dob);
+      ageCodeCount[ageCode] = (ageCodeCount[ageCode] || 0) + 1;
+      return { firstName, lastName, dob, age, category, ageCode };
+    });
+
+    const reservationInput: ReservationInput = {
+      bookingDetails: {
+        userId,
+        checkInDate,
+        checkOutDate,
+        hotelCode,
+        hotelName,
+        ratePlanCode,
+        roomTypeCode,
+        numberOfRooms,
+        roomTotalPrice,
+        currencyCode,
+        email,
+        phone,
+      },
+      ageCodeSummary: ageCodeCount,
+    };
+
+    console.log("Reservation Input Data:", JSON.stringify(reservationInput, null, 2));
 
     try {
-      const primaryGuest = guests[0];
-      const customerResult = await stripeService.createOrRetrieveCustomer(
-        primaryGuest.email,
-        `${primaryGuest.firstName} ${primaryGuest.lastName}`,
-        primaryGuest.phone,
-        paymentInfo.paymentMethodId
-      );
+      const thirdPartyService = new ThirdPartyReservationService();
+      await thirdPartyService.processThirdPartyReservation(reservationInput);
+    } catch (error: any) {
+      return res.status(500).json({ message: "Failed to process reservation with third-party" });
+    }
 
-      if (!customerResult.success) {
-        return next(new ErrorHandler(customerResult.error || "Stripe customer creation failed", 500));
-      }
+    res.status(200).json({
+      message: "Reservation received",
+      numberOfRooms,
+      roomTotalPrice,
+      guests: categorizedGuests,
+      ageCodeSummary: ageCodeCount,
+    });
+  }
+);
 
-      try {
-        const thirdPartyService = new ThirdPartyReservationService();
-        await thirdPartyService.processThirdPartyReservation(data);
-      } catch (error) {
-        console.error("Third-party reservation processing error:", error);
-      }
 
-      // Transaction
-      const session = await mongoose.startSession();
-      session.startTransaction();
+export const updateThirdPartyReservation = CatchAsyncError(
+  async (req: any, res: Response, next: NextFunction) => {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+    const reservationId = req.params.id;
+    if (!reservationId) {
+      return res.status(400).json({ message: "Reservation ID is required" });
+    }
+    const existingReservation = await ThirdPartyBooking.findOne({ reservationId });
+    if (!existingReservation) {
+      throw new Error(`Reservation with ID ${reservationId} not found in our record`);
+    }
+    const {
+      checkInDate,
+      checkOutDate,
+      hotelCode,
+      hotelName,
+      ratePlanCode,
+      numberOfRooms,
+      roomTypeCode,
+      roomTotalPrice,
+      currencyCode,
+      email,
+      phone,
+      guests,
+    } = req.body;
 
-      try {
-        const customer = await Customer.findById(customer_id).session(session);
-        if (!customer) {
-          await session.abortTransaction();
-          session.endSession();
-          return next(new ErrorHandler("Customer not found", 404));
-        }
+    const requiredFields = {
+      reservationId,
+      checkInDate,
+      checkOutDate,
+      hotelCode,
+      ratePlanCode,
+      numberOfRooms,
+      roomTypeCode,
+      roomTotalPrice,
+      currencyCode,
+      email,
+      phone,
+      guests,
+    };
 
-        const newReservation = new Bookings({
-          customer_id,
-          room,
-          booking_user_name,
-          booking_user_email,
-          booking_user_phone,
-          property,
-          amount,
-          booking_dates,
-          payment: paymentMethod,
-          status,
-          checkInDate,
-          checkOutDate,
-          paymentType: paymentMethod,
-          stripeCustomerId: customerResult.customerId,
-          stripePaymentMethodId: paymentInfo.paymentMethodId
-        });
+    const missingFields = Object.entries(requiredFields)
+      .filter(([_, value]) => value === undefined || value === null || value === "")
+      .map(([key]) => key);
 
-        const savedBooking = await newReservation.save({ session });
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
 
-        const updatedRoom = await Room.findByIdAndUpdate(
-          room,
-          { $inc: { available_rooms: -1 } },
-          { new: true, session }
-        );
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const checkIn = new Date(checkInDate);
+    const checkOut = new Date(checkOutDate);
 
-        await session.commitTransaction();
-        session.endSession();
+    if (checkIn < today || checkOut <= checkIn) {
+      return res.status(400).json({
+        message: "Check-in date cannot be in the past or Check-out date must be after check-in date",
+      });
+    }
 
-        res.status(201).json({
-          success: true,
-          message: "Booking confirmed with Pay at Hotel option",
-          savedBooking,
-        });
+    if (!Array.isArray(guests) || guests.length === 0) {
+      return res.status(400).json({ message: "Guest details are required" });
+    }
 
-      } catch (error: any) {
-        await session.abortTransaction();
-        session.endSession();
-        console.log(error.message);
-        return next(new ErrorHandler(error.message, 400));
-      }
+    const ageCodeCount: Record<string, number> = { "7": 0, "8": 0, "10": 0 };
 
-    } catch (error) {
-      console.error('Error in createReservationWithStoredCard:', error);
-      return res.status(500).json({ error: "Error in Create Reservation with Stored Card" });
+    const categorizedGuests = guests.map(({ firstName, lastName, dob }) => {
+      if (!dob) throw new Error(`DOB missing for ${firstName} ${lastName}`);
+      const { age, category, ageCode } = calculateAgeCategory(dob);
+      ageCodeCount[ageCode] = (ageCodeCount[ageCode] || 0) + 1;
+      return { firstName, lastName, dob, age, category, ageCode };
+    });
+
+    const amendReservationInput: AmendReservationInput = {
+      bookingDetails: {
+        userId,
+        reservationId,
+        checkInDate,
+        checkOutDate,
+        hotelCode,
+        hotelName,
+        ratePlanCode,
+        roomTypeCode,
+        numberOfRooms,
+        roomTotalPrice,
+        currencyCode,
+        email,
+        phone,
+      },
+      ageCodeSummary: ageCodeCount,
+    };
+
+    console.log("Reservation Input Data:", JSON.stringify(amendReservationInput, null, 2));
+
+    try {
+      const thirdPartyService = new ThirdPartyAmendReservationService();
+      await thirdPartyService.processAmendReservation(amendReservationInput);
+    } catch (error: any) {
+      return res.status(500).json({ message: "Failed to process reservation with third-party" });
+    }
+
+    res.status(200).json({
+      message: "Reservation received",
+      numberOfRooms,
+      roomTotalPrice,
+      guests: categorizedGuests,
+      ageCodeSummary: ageCodeCount,
+    });
+  }
+);
+
+
+export const cancelThirdPartyReservation = CatchAsyncError(
+  async (req: any, res: Response, next: NextFunction) => {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+    const reservationId = req.params.id;
+    if (!reservationId) {
+      return res.status(400).json({ message: "Reservation ID is required" });
+    }
+    const { firstName, lastName, email, hotelCode, hotelName, checkInDate, checkOutDate } = req.body;
+    const requiredFields = { reservationId, firstName, lastName, email, hotelCode, hotelName, checkInDate, checkOutDate };
+    const missingFields = Object.entries(requiredFields)
+      .filter(([_, value]) => value === undefined || value === null || value === "")
+      .map(([key]) => key);
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    const cancelReservationInput = {
+      reservationId,
+      hotelCode,
+      hotelName,
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      checkInDate,
+      checkOutDate,
+      status: "Cancelled",
+    };
+
+    console.log("Cancel Reservation Input Data:", JSON.stringify(cancelReservationInput, null, 2));
+
+    try {
+      const thirdPartyService = new ThirdPartyCancelReservationService();
+      const result = await thirdPartyService.processCancelReservation(cancelReservationInput);
+      res.status(200).json({
+        message: "Reservation cancellation processed successfully",
+        reservationId: result,
+      });
+    } catch (error: any) {
+      return res.status(500).json({ message: `Failed to process cancellation: ${error.message}` });
     }
   }
 );
@@ -900,4 +1065,3 @@ export const getBookingDetailsOfUser = CatchAsyncError(
     }
   }
 );
-

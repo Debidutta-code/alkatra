@@ -13,8 +13,11 @@ import {
   getRevenueByOwner,
   getRevenueByProperty,
   getBookingDetailsOfUser,
-  createReservationWithStoredCard
+  createReservationWithStoredCard,
+  cancelThirdPartyReservation,
+  updateThirdPartyReservation
 } from "../controllers/bookings.controller";
+// import {protect }  from "../../../Customer-Authentication/src/middleware/authMiddleware";
 
 import { authenticateCustomer } from "../../../Customer-Authentication/src/middleware/authMiddleware";
 
@@ -28,10 +31,13 @@ router.route("/getreservation/:reservationId").get(getReservation);
 router.route("/getreservations").get(getAllReservations);
 router.route("/getUserReservations/:id").get(getAllReservationsOfUser);
 router.route("/create-reservation-with-card").post(authenticateCustomer as any, createReservationWithStoredCard);
+router.route("/update-reservation/:id").patch(authenticateCustomer as any, updateThirdPartyReservation);
+router.route("/cancel-reservation/:id").patch(authenticateCustomer as any, cancelThirdPartyReservation);
+
 
 
 router.route("/:id")
-  .get(authenticateCustomer as any, getBookingsForDashboard)
+  .get( getBookingsForDashboard)
   .delete(authenticateCustomer as any, deleteReservation);
   
 router.route("/room/:id").get(authenticateCustomer as any, getReservationByRoom);

@@ -5,6 +5,26 @@ export interface GuestDetails {
     phone: string;
 }
 
+export interface AmendReservationInput {
+  bookingDetails: {
+    userId: string;
+    reservationId: string;
+    checkInDate: string;
+    checkOutDate: string;
+    hotelCode: string;
+    hotelName: string;
+    ratePlanCode: string;
+    roomTypeCode: string;
+    numberOfRooms: number;
+    roomTotalPrice: number;
+    currencyCode: string;
+    email: string;
+    phone: string;
+  };
+  ageCodeSummary: Record<string, number>;
+}
+
+
 export interface ThirdPartyAmendReservationData {
     hotelCode: string;
     hotelName: string;
@@ -12,14 +32,10 @@ export interface ThirdPartyAmendReservationData {
     roomTypeCode: string;
     checkInDate: string;
     checkOutDate: string;
-    guestDetails: GuestDetails[]; // Updated to array of GuestDetails
+    ageCodeSummary: Record<string, number>; 
     amountBeforeTax: number;
     currencyCode: string;
     userId: string;
-    propertyId: string;
-    roomIds: string[]; // Updated to array of room IDs
     status: string;
     reservationId: string;
-    thirdPartyReservationIdType8?: string;
-    thirdPartyReservationIdType3?: string;
 }
