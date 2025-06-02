@@ -7,9 +7,9 @@ import Image from "next/image";
 import { getHotelsByCity } from "@/api/hotel";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import i18next from "../../i18n/Index"; // Import i18n configuration
+import i18next from "../../i18n/Index";
 import Home from "@/components/assets/popular/Home.jpg";
-import CompactSearchBar from "../HotelBox/CompactSearchBar"; // Update with correct path
+import CompactSearchBar from "../HotelBox/CompactSearchBar";
 import { format, addDays } from "date-fns";
 import QRCodeForAPP from "../ui/qrcode";
 
@@ -95,13 +95,12 @@ const HotelCard = () => {
 
       {/* Main Content */}
       <div
-        className={`relative z-10 h-full flex flex-col items-center justify-center px-4 transition-all duration-1000 ${
-          isLoaded ? "opacity-100" : "opacity-0 translate-y-10"
-        }`}
+        className={`relative z-10 h-full flex flex-col items-center justify-center px-4 transition-all duration-1000 ${isLoaded ? "opacity-100" : "opacity-0 translate-y-10"
+          }`}
       >
         <div className="absolute hidden md:block top-0 right-0 md:top-2 lg:top-16 xl:w-52 lg:w-48 md:w-36 sm:w-32 w-16 h-auto md:right-4 shadow-lg rounded-lg   flex-col items-center">
           <QRCodeForAPP />
-          <div
+ <div
             style={{
               backgroundImage:
                 "linear-gradient(90deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 57%, rgba(227,131,57,1) 100%)",
@@ -114,11 +113,12 @@ const HotelCard = () => {
           </div>
         </div>
 
+
         {/* Hero Text */}
         <div className="max-w-3xl text-center  sm:mb-10 animate-in slide-in-from-bottom duration-700">
           <div className="bg-tripswift-blue/20 backdrop-blur-sm text-tripswift-off-white/90 text-sm font-tripswift-medium px-4 py-1.5 rounded-full inline-flex items-center mb-6 shadow-lg">
             <span className="inline-block w-2 h-2 bg-tripswift-blue rounded-full mr-2 animate-pulse"></span>
-            <span className="text-[#214097]">Exclusive Offers Available</span>
+            <span className="text-[#e9d8fd]">{t("HotelCard.exclusiveOffers")}</span>
           </div>
           <h1 className="text-2xl md-text-4xl lg:w-[90%] xl:w-[100%] mt-4 md:mt-10 lg:text-5xl xl:text-6xl font-tripswift-extrabold text-tripswift-off-white mb-5 leading-tight tracking-tight drop-shadow-lg">
             {t("HotelCard.heroTitle")}
@@ -133,7 +133,7 @@ const HotelCard = () => {
         <div className="w-[290px] md:w-full max-w-5xl animate-in slide-in-from-bottom duration-700 delay-200">
           {/* Search Box */}
           <CompactSearchBar
-            initialLocation="Bhubaneswar"
+            initialLocation="Dubai"
             initialCheckin={tomorrow}
             initialCheckout={dayAfterTomorrow}
             onSearch={handleSearch}
@@ -145,7 +145,7 @@ const HotelCard = () => {
               <div className="flex items-center">
                 <span className="inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse mr-2"></span>
                 <span className="text-sm font-tripswift-medium text-tripswift-off-white">
-                  Free Cancellation
+                  {t("HotelCard.freeCancellation")}
                 </span>
               </div>
 
@@ -154,7 +154,7 @@ const HotelCard = () => {
               <div className="flex items-center">
                 <span className="inline-block w-2 h-2 bg-yellow-400 rounded-full animate-pulse mr-2"></span>
                 <span className="text-sm font-tripswift-medium text-tripswift-off-white">
-                  Best Price Guarantee
+                  {t("HotelCard.bestPriceGuarantee")}
                 </span>
               </div>
 

@@ -22,7 +22,7 @@ async function checkElasticClient() {
 
 initializeExpressRoutes({ app }).then(async () => {
   try {
-    const connection = await connect(process.env.EXTRANET_MONGO_URI_TESTING as string);
+    const connection = await connect(process.env.EXTRANET_MONGO_URI_TESTING! as string);
     console.log(`🏡 Database successfully running on ${connection.connection.host}`);
 
     app.listen(config.port, () => {

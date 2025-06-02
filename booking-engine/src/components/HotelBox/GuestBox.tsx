@@ -283,7 +283,7 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
                         onChange={(e) =>
                           handleChildAgeChange(index, parseInt(e.target.value))
                         }
-                        className="w-24 p-2 border border-tripswift-black/20 rounded-lg bg-tripswift-off-white focus:ring-2 focus:ring-tripswift-blue/30 focus:border-tripswift-blue outline-none text-sm text-tripswift-black font-tripswift-medium"
+                        className="w-30 p-2 border border-tripswift-black/20 rounded-lg bg-tripswift-off-white focus:ring-2 focus:ring-tripswift-blue/30 focus:border-tripswift-blue outline-none text-sm text-tripswift-black font-tripswift-medium"
                       >
                         <option value={0} disabled>
                           Select age

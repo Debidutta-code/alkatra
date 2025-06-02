@@ -3,3 +3,4 @@ data
 server/pms_api/public/uploads
 .env
 dist/
+bug.txt

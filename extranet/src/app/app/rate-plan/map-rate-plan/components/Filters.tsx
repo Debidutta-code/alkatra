@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Calendar } from './Calender';
 import { Popover, PopoverTrigger } from './Popover';
 import { format } from '../utils/dateUtils';
-import { DateRange, MapRatePlanData } from '../types';
+import { DateRange, RatePlanInterFace } from '../types';
 
 interface FiltersProps {
   dateRange: DateRange | undefined;
@@ -11,7 +11,8 @@ interface FiltersProps {
   setSelectedRoomType: (roomType: string) => void;
   selectedRatePlan: string;
   setSelectedRatePlan: (ratePlan: string) => void;
-  data: MapRatePlanData[];
+  data: RatePlanInterFace[];
+  roomTypes:any[]
   onResetFilters: () => void;
 }
 
@@ -23,10 +24,16 @@ export const Filters: React.FC<FiltersProps> = ({
   selectedRatePlan,
   setSelectedRatePlan,
   data,
+  roomTypes,
   onResetFilters,
 }) => {
-  const roomTypes = Array.from(new Set(data.map(item => item.roomTypeCode)));
-  const ratePlans = Array.from(new Set(data.map(item => item.ratePlanCode)));
+  // Extract unique room types (invTypeCode) from the data
+useEffect(()=>{
+  console.log(roomTypes)
+},[roomTypes])
+  // For rate plans, since there's no direct ratePlanCode, we might need to use _id or another identifier
+  // Assuming we use _id as the rate plan identifier, or you might want to add a ratePlanCode field
+  // const ratePlans = Array.from(new Set(data.map(item => item._id)));
 
   return (
     <div className="bg-white rounded-lg pt-4">
@@ -85,8 +92,8 @@ export const Filters: React.FC<FiltersProps> = ({
             className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">All Room Types</option>
-            {roomTypes.map(type => (
-              <option key={type} value={type}>{type}</option>
+            {roomTypes.map((type:string,index:number) => (
+              <option key={index} value={type}>{type}</option>
             ))}
           </select>
         </div>
@@ -105,9 +112,9 @@ export const Filters: React.FC<FiltersProps> = ({
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">All Rate Plans</option>
-            {ratePlans.map(plan => (
+            {/* {ratePlans.map(plan => (
               <option key={plan} value={plan}>{plan}</option>
-            ))}
+            ))} */}
           </select>
         </div>
       </div>

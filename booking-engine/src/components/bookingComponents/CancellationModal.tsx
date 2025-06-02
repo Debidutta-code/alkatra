@@ -127,11 +127,12 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
       const hoursUntilCheckIn = differenceInHours(checkInDate, now);
 
       // Use the utility function to calculate refund
-      const { refundPercentage, refundAmount, cancellationFee } = calculateRefund(
+      const { refundPercentage, refundAmount, cancellationFee, message } = calculateRefund(
         selectedPolicyType,
         booking.amount,
         daysUntilCheckIn,
-        hoursUntilCheckIn
+        hoursUntilCheckIn,
+        t 
       );
 
       setRefundPercentage(refundPercentage);
@@ -188,8 +189,8 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
   const policyStyling = getPolicyStyling(policyType);
 
   // Get bullet points for the policy
-  const policyBulletPoints = getPolicyBulletPoints(policyType);
-
+  const policyBulletPoints = getPolicyBulletPoints(policyType, t);
+  
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 font-noto-sans p-3 sm:p-5">
       <div className="bg-tripswift-off-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-3 sm:p-4 md:p-6">
