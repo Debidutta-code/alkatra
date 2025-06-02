@@ -1,5 +1,4 @@
-import  {  Document, Types } from "mongoose";
-
+import { Document, Types } from "mongoose";
 
 export interface SchedulingType {
   type: 'weekly' | 'date_range' | 'specific-dates';
@@ -17,14 +16,14 @@ export interface RatePlan extends Document {
   maxOccupancy: number;
   adultOccupancy: number;
   minLengthStay: number;
-    maxLengthStay: number;
-    minReleaseDay: number;
-    maxReleaseDay: number;
-    cancellationDeadline: {
+  maxLengthStay: number;
+  minReleaseDay: number;
+  maxReleaseDay: number;
+  cancellationDeadline: {
     days: number;
     hours: number;
-    }
-    currency: string;
+  }
+  currency: string;
   minBookAdvance: number;
   maxBookAdvance: number;
   status: 'active' | 'inactive';

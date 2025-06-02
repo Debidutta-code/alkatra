@@ -3,22 +3,22 @@ import { RatePlanData, OTAHotelRateAmountNotifRQ } from '../interface/ratePlanIn
 import { RatePlanRepository } from '../repository/ratePlanRepository';
 
 class RatePlanError extends Error {
-  constructor(
-    public errorType: string,
-    public errorMessage: string,
-    public statusCode: number = 400
-  ) {
-    super(errorMessage);
-    Object.setPrototypeOf(this, RatePlanError.prototype);
-  }
+    constructor(
+        public errorType: string,
+        public errorMessage: string,
+        public statusCode: number = 400
+    ) {
+        super(errorMessage);
+        Object.setPrototypeOf(this, RatePlanError.prototype);
+    }
 
-  toJSON() {
-    return {
-      error: this.errorType,
-      message: this.errorMessage,
-      statusCode: this.statusCode
-    };
-  }
+    toJSON() {
+        return {
+            error: this.errorType,
+            message: this.errorMessage,
+            statusCode: this.statusCode
+        };
+    }
 }
 
 export class RatePlanService {
@@ -92,10 +92,10 @@ export class RatePlanService {
             if (!root['$']) throw new RatePlanError('XML Structure Error', 'Root attributes are missing');
             const rootAttrs = root['$'];
 
-            const requiredNamespaces = ['xmlns:xsi', 'xmlns:xsd', 'xmlns'];
-            for (const ns of requiredNamespaces) {
-                if (!rootAttrs[ns]) throw new RatePlanError('Namespace Missing', `${ns} namespace is required`);
-            }
+            // const requiredNamespaces = ['xmlns:xsi', 'xmlns:xsd', 'xmlns'];
+            // for (const ns of requiredNamespaces) {
+            //     if (!rootAttrs[ns]) throw new RatePlanError('Namespace Missing', `${ns} namespace is required`);
+            // }
 
             const requiredRootAttrs = ['EchoToken', 'TimeStamp', 'Target', 'Version'];
             for (const attr of requiredRootAttrs) {
@@ -163,7 +163,7 @@ export class RatePlanService {
                         ).map(amt => {
                             const amtAttrs = amt['$'];
                             if (!amtAttrs) throw new RatePlanError('XML Structure Error', 'BaseByGuestAmt attributes are missing');
-                            
+
                             if (!amtAttrs.AmountBeforeTax) throw new RatePlanError('Missing Required Field', 'AmountBeforeTax is required in BaseByGuestAmt');
                             if (!amtAttrs.NumberOfGuests) throw new RatePlanError('Missing Required Field', 'NumberOfGuests is required in BaseByGuestAmt');
 
@@ -186,7 +186,7 @@ export class RatePlanService {
                         ).map(amt => {
                             const amtAttrs = amt['$'];
                             if (!amtAttrs) throw new RatePlanError('XML Structure Error', 'AdditionalGuestAmount attributes are missing');
-                            
+
                             if (!amtAttrs.AgeQualifyingCode) throw new RatePlanError('Missing Required Field', 'AgeQualifyingCode is required in AdditionalGuestAmount');
                             if (!amtAttrs.Amount) throw new RatePlanError('Missing Required Field', 'Amount is required in AdditionalGuestAmount');
 
@@ -227,6 +227,106 @@ export class RatePlanService {
             }
         }
     }
+
+
+
+    /**
+     * Retrieves all room details for a given hotel code.
+     * @param hotelCode 
+     * @returns 
+     */
+    async getRoomsByHotelCode(hotelCode: string): Promise<any> {
+        try {
+            return await this.repository.getRoomsByHotelCode(hotelCode);
+        } catch (error) {
+            throw new Error(error.message);
+        }
+    }
+
+
+    /**
+     * Retrieves all room details for a given hotel code, inventory type code, and date range.
+     * @param hotelCode 
+     * @param invTypeCode 
+     * @param startDate 
+     * @param endDate 
+     * @returns 
+     */
+    async getRoomDetails(hotelCode: string, invTypeCode: string, startDate: Date, endDate: Date): Promise<any> {
+        try {
+            return await this.repository.getRoomDetails(hotelCode, invTypeCode, startDate, endDate);
+        } catch (error) {
+            throw new Error(error.message);
+        }
+    }
+
+
+    /**
+     * Updates a single rate amount document based on the provided filter and update.
+     * @param filter 
+     * @param updates 
+     * @returns 
+     */
+    async updateSingleRateAmount(filter: any, updates: any) {
+        if (!filter || !updates) {
+            throw new Error("Missing filter or update payload.");
+        }
+
+        const { hotelCode, invTypeCode } = filter;
+        if (!hotelCode || !invTypeCode) {
+            throw new Error("For single update, 'hotelCode' and 'invTypeCode' are required.");
+        }
+
+        const sanitizedFilter: any = { hotelCode, invTypeCode };
+        if (filter.ratePlanCode) sanitizedFilter.ratePlanCode = filter.ratePlanCode;
+
+        return await this.repository.updateOne(sanitizedFilter, { $set: updates });
+    }
+
+
+    /**
+     * Updates multiple rate amounts based on the provided payload.
+     * @param payload 
+     * @returns 
+     */
+    async updateMultipleRateAmounts(payload: Array<{ filter: any, updates: any }>) {
+        const operations = payload.map(item => {
+            const { filter, updates } = item;
+            const { hotelCode, ...rest } = filter;
+
+            if (!hotelCode || Object.keys(rest).length > 0) {
+                throw new Error("For bulk update, filter must contain only 'hotelCode'.");
+            }
+
+            return {
+                updateMany: {
+                    filter: { hotelCode },
+                    update: { $set: updates }
+                }
+            };
+        });
+
+        return await this.repository.bulkWrite(operations);
+
+        // This code is commented out because we are unknown about the format of the payload.
+        
+        // const results = [];
+        // for (const item of payload) {
+        //     const { filter, updates } = item;
+        //     if (!filter || !updates) continue;
+
+        //     const { hotelCode, ...rest } = filter;
+        //     if (!hotelCode || Object.keys(rest).length > 0) {
+        //         throw new Error("For bulk update, filter must contain only 'hotelCode'.");
+        //     }
+
+        //     const result = await this.repository.updateMany({ hotelCode }, { $set: updates });
+        //     results.push(result);
+        // }
+
+        // return results;
+    }
+
 }
 
 export { RatePlanError };

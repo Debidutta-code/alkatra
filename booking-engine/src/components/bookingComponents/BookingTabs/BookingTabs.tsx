@@ -17,7 +17,7 @@ import EmptyState from "./EmptyState";
 import BookingCard from "./BookingCard";
 import BookingPagination from "./BookingPagination";
 import BookingDetailsModal from "./BookingDetailsModal";
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
 
 interface RootState {
   auth: {
@@ -77,6 +77,7 @@ export default function BookingTabs() {
         );
 
         setBookings(response.data.bookingDetails);
+        console.log("booking details we get from backend ",response.data.bookingDetails)
         setTotalBookings(response.data.totalBookings);
         setTotalPages(response.data.totalPages);
         setLoading(false);

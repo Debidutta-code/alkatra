@@ -20,9 +20,9 @@ class RatePlanService {
         dateRanges,
         availableSpecificDates
       }
-      };
-      
-      console.log("finalRatePlanData", finalRatePlanData);
+    };
+
+    console.log("finalRatePlanData", finalRatePlanData);
 
     const savedRatePlan = await RatePlanDao.create(finalRatePlanData);
 
@@ -31,17 +31,31 @@ class RatePlanService {
       message: "Rate plan created successfully",
       data: savedRatePlan
     };
-    }
-    
-    public static async updateRatePlan(id: string, ratePlanData: Partial<RatePlan>) {
+  }
+
+  public static async updateRatePlan(id: string, ratePlanData: Partial<RatePlan>) {
     // Optional: Add validation or preprocessing here if needed
     const updatedRatePlan = await RatePlanDao.updateRatePlan(id, ratePlanData);
-        return {
-        success: true,
+    return {
+      success: true,
       message: "Rate plan updated successfully",
       data: updatedRatePlan,
     };
   }
+
+
+  public static async getRatePlanByHotelCode(hotelCode: string) {
+    const ratePlans = await RatePlanDao.getRatePlanByHotelCode(hotelCode);
+
+    if (ratePlans.length === 0) throw new Error("No rate plans found for this hotel code");
+
+    return {
+      success: true,
+      message: "Rate plans retrieved successfully",
+      data: ratePlans,
+    };
+  }
+
 }
 
 export { RatePlanService };

@@ -48,7 +48,7 @@ const CheckoutPage = ({
   const elements = useElements();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [loading, setLoading] = useState<boolean>(false);
-
+console.log("cheKOUT",checkOut)
   // No useEffect to fetch client secret - it's now passed as a prop!
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {

@@ -16,7 +16,7 @@ const schedulingSchema = new Schema<SchedulingType>(
         'thursday', 'friday', 'saturday', 'sunday'
       ],
       default: undefined,
-        },
+    },
     // periodic days
     dateRanges: [
       {
@@ -45,21 +45,21 @@ const ratePlanSchema = new Schema<RatePlan>(
     minLengthStay: { type: Number, required: true },
     maxLengthStay: { type: Number, required: true },
     minReleaseDay: { type: Number, required: true },
-        maxReleaseDay: { type: Number, required: true },
+    maxReleaseDay: { type: Number, required: true },
     cancellationDeadline: {
-  days: { type: Number, default: 0 },
-  hours: { type: Number,  default: 0 }
-},
+      days: { type: Number, default: 0 },
+      hours: { type: Number, default: 0 }
+    },
     description: { type: String },
     mealPlan: {
       type: String,
       enum: ['RO', 'BB', 'HB', 'FB'],
       required: false,
       default: 'RO',
-        },
-        currency: {
-            type: String,
-        },
+    },
+    currency: {
+      type: String,
+    },
     status: {
       type: String,
       enum: ['active', 'inactive'],

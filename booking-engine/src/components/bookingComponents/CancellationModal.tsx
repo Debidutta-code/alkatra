@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from "react";
 import { format, parseISO, differenceInDays, differenceInHours } from "date-fns";
 import {
@@ -16,6 +18,7 @@ import {
   X,
   FileQuestion
 } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 import {
   PolicyType,
   getPolicyType,
@@ -56,6 +59,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
   onClose,
   onCancellationComplete
 }) => {
+  const { t } = useTranslation();
   const [cancellationLoading, setCancellationLoading] = useState(false);
   const [cancellationMessage, setCancellationMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [cancellationReason, setCancellationReason] = useState("");
@@ -83,7 +87,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
       const date = parseISO(dateString);
       return format(date, "MMM d, yyyy");
     } catch (error) {
-      return "Invalid Date";
+      return t('BookingTabs.CancellationModal.invalidDate');
     }
   };
 
@@ -141,7 +145,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
       console.error("Error checking cancellation policy:", error);
       setCancellationMessage({
         type: 'error',
-        text: 'Unable to retrieve cancellation policy information. You may continue, but fee information might not be accurate.'
+        text: t('BookingTabs.CancellationModal.errorRetrievingPolicy')
       });
     } finally {
       setPolicyLoading(false);
@@ -160,8 +164,8 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
       setCancellationMessage({
         type: 'success',
         text: refundInfo && refundInfo.amount > 0
-          ? `Your booking has been successfully cancelled. A refund of ₹${refundInfo.amount.toFixed(2)} will be processed.`
-          : 'Your booking has been successfully cancelled. No refund will be issued based on the cancellation policy.'
+          ? t('BookingTabs.CancellationModal.successWithRefund', { amount: refundInfo.amount.toFixed(2) })
+          : t('BookingTabs.CancellationModal.successNoRefund')
       });
 
       // Notify parent component of cancellation (UI only for now)
@@ -173,7 +177,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
       console.error('Error cancelling booking:', error);
       setCancellationMessage({
         type: 'error',
-        text: 'Unable to cancel booking. Please try again or contact support.'
+        text: t('BookingTabs.CancellationModal.errorCancelling')
       });
     } finally {
       setCancellationLoading(false);
@@ -187,82 +191,96 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
   const policyBulletPoints = getPolicyBulletPoints(policyType);
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 font-noto-sans">
-      <div className="bg-tripswift-off-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 font-noto-sans p-3 sm:p-5">
+      <div className="bg-tripswift-off-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-3 sm:p-4 md:p-6">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 mb-4">
-            <AlertTriangle className="h-8 w-8 text-amber-600" />
+        <div className="text-center mb-4 sm:mb-6 md:mb-8">
+          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-amber-100 mb-3 sm:mb-4">
+            <AlertTriangle className="h-6 w-6 sm:h-8 sm:w-8 text-amber-600" />
           </div>
-          <h3 className="text-2xl font-tripswift-bold text-tripswift-black">Confirm Cancellation</h3>
-          <p className="text-tripswift-black/60 mt-2 max-w-lg mx-auto">
-            Please review the details below before proceeding with your cancellation
+          <h3 className="text-xl sm:text-2xl font-tripswift-bold text-tripswift-black">
+            {t('BookingTabs.CancellationModal.confirmCancellation')}
+          </h3>
+          <p className="text-sm sm:text-base text-tripswift-black/60 mt-1 sm:mt-2 max-w-lg mx-auto">
+            {t('BookingTabs.CancellationModal.reviewBeforeProceeding')}
           </p>
         </div>
 
         {/* Booking Details Card */}
-        <div className="bg-tripswift-off-white border border-gray-200 shadow-sm rounded-xl overflow-hidden mb-6">
-          <div className="bg-tripswift-blue/10 p-4 border-b border-gray-200">
+        <div className="bg-tripswift-off-white border border-gray-200 shadow-sm rounded-xl overflow-hidden mb-4 sm:mb-6">
+          <div className="bg-tripswift-blue/10 p-3 sm:p-4 border-b border-gray-200">
             <div className="flex items-center">
-              <Info className="h-5 w-5 text-tripswift-blue mr-2" />
-              <h4 className="font-tripswift-bold text-tripswift-black/80">Booking Details</h4>
+              <Info className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue mr-1.5 sm:mr-2" />
+              <h4 className="text-sm sm:text-base font-tripswift-bold text-tripswift-black/80">
+                {t('BookingTabs.CancellationModal.bookingDetails')}
+              </h4>
             </div>
           </div>
 
-          <div className="p-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="space-y-4">
+          <div className="p-3 sm:p-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+              <div className="space-y-3 sm:space-y-4">
                 <div className="flex items-start">
-                  <div className="w-10 h-10 rounded-full bg-tripswift-blue/10 flex items-center justify-center mr-3 flex-shrink-0">
-                    <Home className="h-4 w-4 text-tripswift-blue" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-tripswift-blue/10 flex items-center justify-center mr-2 sm:mr-3 flex-shrink-0">
+                    <Home className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-tripswift-blue" />
                   </div>
                   <div>
-                    <p className="text-sm text-tripswift-black/60 font-tripswift-medium">Property</p>
-                    <p className="text-tripswift-black font-tripswift-medium">
+                    <p className="text-xs sm:text-sm text-tripswift-black/60 font-tripswift-medium">
+                      {t('BookingTabs.CancellationModal.property')}
+                    </p>
+                    <p className="text-sm sm:text-base text-tripswift-black font-tripswift-medium">
                       {booking.property.property_name}
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-start">
-                  <div className="w-10 h-10 rounded-full bg-tripswift-blue/10 flex items-center justify-center mr-3 flex-shrink-0">
-                    <BedDouble className="h-4 w-4 text-tripswift-blue" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-tripswift-blue/10 flex items-center justify-center mr-2 sm:mr-3 flex-shrink-0">
+                    <BedDouble className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-tripswift-blue" />
                   </div>
                   <div>
-                    <p className="text-sm text-tripswift-black/60 font-tripswift-medium">Room</p>
-                    <p className="text-tripswift-black font-tripswift-medium">
+                    <p className="text-xs sm:text-sm text-tripswift-black/60 font-tripswift-medium">
+                      {t('BookingTabs.CancellationModal.room')}
+                    </p>
+                    <p className="text-sm sm:text-base text-tripswift-black font-tripswift-medium">
                       {booking.room.room_name}
                     </p>
-                    <p className="text-xs text-tripswift-black/50 mt-0.5">
+                    <p className="text-[10px] sm:text-xs text-tripswift-black/50 mt-0.5">
                       {booking.room.room_type}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div className="flex items-start">
-                  <div className="w-10 h-10 rounded-full bg-tripswift-blue/10 flex items-center justify-center mr-3 flex-shrink-0">
-                    <Calendar className="h-4 w-4 text-tripswift-blue" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-tripswift-blue/10 flex items-center justify-center mr-2 sm:mr-3 flex-shrink-0">
+                    <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-tripswift-blue" />
                   </div>
                   <div>
-                    <p className="text-sm text-tripswift-black/60 font-tripswift-medium">Stay Dates</p>
-                    <p className="text-tripswift-black font-tripswift-medium">
+                    <p className="text-xs sm:text-sm text-tripswift-black/60 font-tripswift-medium">
+                      {t('BookingTabs.CancellationModal.stayDates')}
+                    </p>
+                    <p className="text-sm sm:text-base text-tripswift-black font-tripswift-medium">
                       {formatDateString(booking.checkInDate)} - {formatDateString(booking.checkOutDate)}
                     </p>
-                    <p className="text-xs text-tripswift-black/50 mt-0.5">
-                      {differenceInDays(parseISO(booking.checkOutDate), parseISO(booking.checkInDate))} night stay
+                    <p className="text-[10px] sm:text-xs text-tripswift-black/50 mt-0.5">
+                      {t('BookingTabs.CancellationModal.nightStay', {
+                        count: differenceInDays(parseISO(booking.checkOutDate), parseISO(booking.checkInDate))
+                      })}
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-start">
-                  <div className="w-10 h-10 rounded-full bg-tripswift-blue/10 flex items-center justify-center mr-3 flex-shrink-0">
-                    <CreditCard className="h-4 w-4 text-tripswift-blue" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-tripswift-blue/10 flex items-center justify-center mr-2 sm:mr-3 flex-shrink-0">
+                    <CreditCard className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-tripswift-blue" />
                   </div>
                   <div>
-                    <p className="text-sm text-tripswift-black/60 font-tripswift-medium">Total Amount</p>
-                    <p className="text-tripswift-black font-tripswift-medium">
+                    <p className="text-xs sm:text-sm text-tripswift-black/60 font-tripswift-medium">
+                      {t('BookingTabs.CancellationModal.totalAmount')}
+                    </p>
+                    <p className="text-sm sm:text-base text-tripswift-black font-tripswift-medium">
                       ₹{booking.amount.toFixed(2)}
                     </p>
                   </div>
@@ -274,35 +292,39 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
 
         {/* Cancellation Policy Card */}
         {policyLoading ? (
-          <div className="bg-tripswift-off-white border border-gray-200 shadow-sm rounded-xl p-6 mb-6 flex items-center justify-center">
-            <Loader2 className="h-8 w-8 text-tripswift-blue animate-spin" />
-            <span className="ml-3 text-tripswift-black/70 font-tripswift-medium">Calculating cancellation details...</span>
+          <div className="bg-tripswift-off-white border border-gray-200 shadow-sm rounded-xl p-4 sm:p-6 mb-4 sm:mb-6 flex items-center justify-center">
+            <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 text-tripswift-blue animate-spin" />
+            <span className="ml-2 sm:ml-3 text-sm sm:text-base text-tripswift-black/70 font-tripswift-medium">
+              {t('BookingTabs.CancellationModal.calculatingDetails')}
+            </span>
           </div>
         ) : (
-          <div className="bg-tripswift-off-white border border-gray-200 shadow-sm rounded-xl overflow-hidden mb-6">
-            <div className={`${policyStyling.headerBgColor} p-4 flex items-center justify-between`}>
+          <div className="bg-tripswift-off-white border border-gray-200 shadow-sm rounded-xl overflow-hidden mb-4 sm:mb-6">
+            <div className={`${policyStyling.headerBgColor} p-3 sm:p-4 flex items-center justify-between`}>
               <div className="flex items-center">
-                <Shield className={`h-5 w-5 ${policyStyling.textColor} mr-2`} />
-                <h4 className={`font-tripswift-bold ${policyStyling.textColor}`}>
-                  {policyType} Cancellation Policy
+                <Shield className={`h-4 w-4 sm:h-5 sm:w-5 ${policyStyling.textColor} mr-1.5 sm:mr-2`} />
+                <h4 className={`text-sm sm:text-base font-tripswift-bold ${policyStyling.textColor}`}>
+                  {t(`BookingTabs.CancellationModal.policyTypes.${policyType.toLowerCase()}`)}
                 </h4>
               </div>
-              <span className={`inline-block px-3 py-1 text-xs rounded-full ${policyStyling.bgColor} ${policyStyling.textColor} font-tripswift-medium`}>
-                {refundPercentage}% Refund Eligible
+              <span className={`inline-block px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs rounded-full ${policyStyling.bgColor} ${policyStyling.textColor} font-tripswift-medium`}>
+                {t('BookingTabs.CancellationModal.refundEligible', { percentage: refundPercentage })}
               </span>
             </div>
 
-            <div className="p-5">
+            <div className="p-3 sm:p-5">
               {/* Policy details in bullet points */}
-              <div className="mb-5">
-                <h5 className="text-sm font-tripswift-bold text-tripswift-black/80 mb-3">Policy Terms</h5>
-                <ul className="space-y-2.5">
+              <div className="mb-3 sm:mb-5">
+                <h5 className="text-xs sm:text-sm font-tripswift-bold text-tripswift-black/80 mb-2 sm:mb-3">
+                  {t('BookingTabs.CancellationModal.policyTerms')}
+                </h5>
+                <ul className="space-y-2 sm:space-y-2.5">
                   {policyBulletPoints.map((point, index) => (
                     <li key={index} className="flex items-start">
-                      <div className="w-5 h-5 rounded-full flex items-center justify-center mr-2 mt-0.5 flex-shrink-0 bg-gray-100">
-                        <div className="w-1.5 h-1.5 rounded-full bg-tripswift-blue"></div>
+                      <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center mr-1.5 sm:mr-2 mt-0.5 flex-shrink-0 bg-gray-100">
+                        <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-tripswift-blue"></div>
                       </div>
-                      <span className="text-sm text-tripswift-black/70">
+                      <span className="text-xs sm:text-sm text-tripswift-black/70">
                         <span className={`font-tripswift-bold ${point.color}`}>{point.text.split(':')[0]}:</span>
                         {point.text.split(':')[1]}
                       </span>
@@ -312,41 +334,53 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
               </div>
 
               {/* Your booking's refund calculation */}
-              <div className="bg-tripswift-blue/5 rounded-xl p-4 mb-5">
+              <div className="bg-tripswift-blue/5 rounded-xl p-3 sm:p-4 mb-3 sm:mb-5">
                 <div className="flex items-start">
-                  <div className="w-10 h-10 rounded-full bg-tripswift-blue/10 flex items-center justify-center mr-3 flex-shrink-0">
-                    <Clock className="h-4 w-4 text-tripswift-blue" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-tripswift-blue/10 flex items-center justify-center mr-2 sm:mr-3 flex-shrink-0">
+                    <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-tripswift-blue" />
                   </div>
                   <div>
-                    <h5 className="text-sm font-tripswift-bold text-tripswift-black mb-1">Your Refund Status</h5>
-                    <p className="text-sm text-tripswift-black/70">
-                      Based on your check-in date and the {policyType.toLowerCase()} policy,
-                      you will receive a <span className="font-tripswift-bold text-tripswift-blue">{refundPercentage}% refund</span>.
+                    <h5 className="text-xs sm:text-sm font-tripswift-bold text-tripswift-black mb-0.5 sm:mb-1">
+                      {t('BookingTabs.CancellationModal.yourRefundStatus')}
+                    </h5>
+                    <p className="text-xs sm:text-sm text-tripswift-black/70">
+                      {t('BookingTabs.CancellationModal.refundExplanation', {
+                        policyType: policyType.toLowerCase(),
+                        percentage: refundPercentage
+                      })}
                     </p>
                   </div>
                 </div>
               </div>
 
               {/* Financial breakdown */}
-              <div className="bg-gray-50 rounded-xl p-4">
-                <h5 className="text-sm font-tripswift-bold text-tripswift-black/80 mb-3">Financial Breakdown</h5>
-                <div className="space-y-3">
+              <div className="bg-gray-50 rounded-xl p-3 sm:p-4">
+                <h5 className="text-xs sm:text-sm font-tripswift-bold text-tripswift-black/80 mb-2 sm:mb-3">
+                  {t('BookingTabs.CancellationModal.financialBreakdown')}
+                </h5>
+                <div className="space-y-2 sm:space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-tripswift-black/70">Original Payment Amount</span>
-                    <span className="font-tripswift-bold text-tripswift-black">₹{booking.amount.toFixed(2)}</span>
+                    <span className="text-xs sm:text-sm text-tripswift-black/70">
+                      {t('BookingTabs.CancellationModal.originalPayment')}
+                    </span>
+                    <span className="text-sm sm:text-base font-tripswift-bold text-tripswift-black">₹{booking.amount.toFixed(2)}</span>
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-tripswift-black/70">Cancellation Fee</span>
-                    <span className={`font-tripswift-bold ${cancellationFee && cancellationFee > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                    <span className="text-xs sm:text-sm text-tripswift-black/70">
+                      {t('BookingTabs.CancellationModal.cancellationFee')}
+                    </span>
+                    <span className={`text-sm sm:text-base font-tripswift-bold ${cancellationFee && cancellationFee > 0 ? 'text-red-600' : 'text-green-600'}`}>
                       ₹{cancellationFee !== null ? cancellationFee.toFixed(2) : '0.00'}
                     </span>
                   </div>
 
-                  <div className="border-t border-gray-200 pt-3 mt-1">
+                  <div className="border-t border-gray-200 pt-2 sm:pt-3 mt-1">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-tripswift-bold text-tripswift-black">Refund Amount</span>
-                      <span className="font-tripswift-bold text-green-600 text-lg">
+                      <span className="text-xs sm:text-sm font-tripswift-bold text-tripswift-black">
+                        {t('BookingTabs.CancellationModal.refundAmount')}
+                      </span>
+                      <span className="font-tripswift-bold text-green-600 text-base sm:text-lg">
                         ₹{refundInfo ? refundInfo.amount.toFixed(2) : '0.00'}
                       </span>
                     </div>
@@ -358,49 +392,53 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
         )}
 
         {/* Cancellation reason input */}
-        <div className="bg-tripswift-off-white border border-gray-200 shadow-sm rounded-xl overflow-hidden mb-6">
-          <div className="bg-gray-50 p-4 border-b border-gray-200">
+        <div className="bg-tripswift-off-white border border-gray-200 shadow-sm rounded-xl overflow-hidden mb-4 sm:mb-6">
+          <div className="bg-gray-50 p-3 sm:p-4 border-b border-gray-200">
             <div className="flex items-center">
-              <FileQuestion className="h-5 w-5 text-tripswift-black/60 mr-2" />
-              <h4 className="font-tripswift-bold text-tripswift-black/80">Reason for Cancellation</h4>
+              <FileQuestion className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-black/60 mr-1.5 sm:mr-2" />
+              <h4 className="text-sm sm:text-base font-tripswift-bold text-tripswift-black/80">
+                {t('BookingTabs.CancellationModal.reasonForCancellation')}
+              </h4>
             </div>
           </div>
 
-          <div className="p-5">
+          <div className="p-3 sm:p-5">
             <textarea
               rows={3}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue transition-colors duration-300 bg-tripswift-off-white"
-              placeholder="Please tell us why you're cancelling (optional)..."
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue transition-colors duration-300 bg-tripswift-off-white text-sm"
+              placeholder={t('BookingTabs.CancellationModal.reasonPlaceholder')}
               value={cancellationReason}
               onChange={(e) => setCancellationReason(e.target.value)}
             ></textarea>
-            <p className="text-xs text-tripswift-black/50 mt-2">
-              Your feedback helps us improve our services. This information is only used internally.
+            <p className="text-[10px] sm:text-xs text-tripswift-black/50 mt-1 sm:mt-2">
+              {t('BookingTabs.CancellationModal.feedbackHelpsImprove')}
             </p>
           </div>
         </div>
 
         {/* Success/Error message */}
         {cancellationMessage && (
-          <div className={`rounded-xl shadow-sm overflow-hidden mb-6 ${cancellationMessage.type === 'success' ? 'border border-green-200' : 'border border-red-200'
+          <div className={`rounded-xl shadow-sm overflow-hidden mb-4 sm:mb-6 ${cancellationMessage.type === 'success' ? 'border border-green-200' : 'border border-red-200'
             }`}>
-            <div className={`p-3 ${cancellationMessage.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            <div className={`p-2 sm:p-3 ${cancellationMessage.type === 'success' ? 'bg-green-500' : 'bg-red-500'
               }`}>
               <div className="flex items-center">
                 {cancellationMessage.type === 'success' ? (
-                  <CheckCircle className="h-5 w-5 text-white mr-2" />
+                  <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-white mr-1.5 sm:mr-2" />
                 ) : (
-                  <XCircle className="h-5 w-5 text-white mr-2" />
+                  <XCircle className="h-4 w-4 sm:h-5 sm:w-5 text-white mr-1.5 sm:mr-2" />
                 )}
-                <h4 className="font-tripswift-bold text-white">
-                  {cancellationMessage.type === 'success' ? 'Success' : 'Error'}
+                <h4 className="text-sm sm:text-base font-tripswift-bold text-white">
+                  {cancellationMessage.type === 'success' 
+                    ? t('BookingTabs.CancellationModal.success') 
+                    : t('BookingTabs.CancellationModal.error')}
                 </h4>
               </div>
             </div>
 
-            <div className={`p-4 ${cancellationMessage.type === 'success' ? 'bg-green-50' : 'bg-red-50'
+            <div className={`p-3 sm:p-4 ${cancellationMessage.type === 'success' ? 'bg-green-50' : 'bg-red-50'
               }`}>
-              <p className={`${cancellationMessage.type === 'success' ? 'text-green-700' : 'text-red-700'
+              <p className={`text-sm ${cancellationMessage.type === 'success' ? 'text-green-700' : 'text-red-700'
                 } font-tripswift-medium`}>
                 {cancellationMessage.text}
               </p>
@@ -409,46 +447,47 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
         )}
 
         {/* Final Warning */}
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start">
-          <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center mr-3 flex-shrink-0">
-            <AlertCircle className="h-5 w-5 text-amber-600" />
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 sm:p-4 mb-4 sm:mb-6 flex items-start">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-100 flex items-center justify-center mr-2 sm:mr-3 flex-shrink-0">
+            <AlertCircle className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-amber-600" />
           </div>
           <div>
-            <p className="text-amber-800 font-tripswift-medium mb-1">This action cannot be undone</p>
-            <p className="text-sm text-amber-700">
-              Once you confirm cancellation, your reservation will be immediately cancelled and cannot be reinstated.
-              Any applicable refund will be processed according to the policy above.
+            <p className="text-sm text-amber-800 font-tripswift-medium mb-0.5 sm:mb-1">
+              {t('BookingTabs.CancellationModal.actionCannotBeUndone')}
+            </p>
+            <p className="text-xs sm:text-sm text-amber-700">
+              {t('BookingTabs.CancellationModal.cancellationWarning')}
             </p>
           </div>
         </div>
 
         {/* Action buttons */}
-        <div className="flex flex-col-reverse sm:flex-row justify-end gap-3">
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
           <button
-            className="px-6 py-3 border border-gray-200 rounded-xl text-tripswift-black/80 hover:bg-gray-50 font-tripswift-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 sm:px-6 py-2.5 sm:py-3 border border-gray-200 rounded-lg sm:rounded-xl text-sm sm:text-base text-tripswift-black/80 hover:bg-gray-50 font-tripswift-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={onClose}
             disabled={cancellationLoading}
           >
-            <span className="flex items-center justify-center gap-2">
-              <X className="h-4 w-4" />
-              <span>Keep My Reservation</span>
+            <span className="flex items-center justify-center gap-1.5 sm:gap-2">
+              <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span>{t('BookingTabs.CancellationModal.keepMyReservation')}</span>
             </span>
           </button>
 
           <button
-            className="px-6 py-3 bg-red-600 hover:bg-red-700 text-tripswift-off-white rounded-xl font-tripswift-medium shadow-sm hover:shadow-md transition-all duration-300 disabled:bg-gray-400 disabled:shadow-none disabled:cursor-not-allowed"
+            className="px-4 sm:px-6 py-2.5 sm:py-3 bg-red-600 hover:bg-red-700 text-sm sm:text-base text-tripswift-off-white rounded-lg sm:rounded-xl font-tripswift-medium shadow-sm hover:shadow-md transition-all duration-300 disabled:bg-gray-400 disabled:shadow-none disabled:cursor-not-allowed"
             onClick={confirmCancelBooking}
             disabled={cancellationLoading || policyLoading}
           >
             {cancellationLoading ? (
-              <span className="flex items-center justify-center gap-2">
-                <Loader2 className="h-5 w-5 animate-spin" />
-                <span>Processing...</span>
+              <span className="flex items-center justify-center gap-1.5 sm:gap-2">
+                <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                <span>{t('BookingTabs.CancellationModal.processing')}</span>
               </span>
             ) : (
-              <span className="flex items-center justify-center gap-2">
-                <AlertTriangle className="h-4 w-4" />
-                <span>Confirm Cancellation</span>
+              <span className="flex items-center justify-center gap-1.5 sm:gap-2">
+                <AlertTriangle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span>{t('BookingTabs.CancellationModal.confirmCancellationButton')}</span>
               </span>
             )}
           </button>
