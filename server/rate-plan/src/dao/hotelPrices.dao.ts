@@ -147,5 +147,14 @@ class HotelPricesDao {
             throw error;
         }
     }
+    public static async checkAvailabilityDao(hotelCode:string,invTypeCode:string,startDate:Date,endDate:Date){
+        try {
+            const availability=await Inventory.findOne({hotelCode:hotelCode,invTypeCode:invTypeCode,startDate:startDate,endDate:endDate})
+            return availability
+        } catch (error) {
+            console.log("Error occur while checking availability");
+            throw error;
+        }
+    }
 }
 export { HotelPricesDao }

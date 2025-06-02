@@ -54,5 +54,9 @@ route.get("/getRoomType/all",protect,async(req:Request,res:Response,next:NextFun
   const response=await RoomPrice.getAllRoomTypeController()
   res.status(200).json(response)
 })
+route.post("/checkAvailability",async(req:Request,res:Response,next:NextFunction)=>{
+  const response=await RoomPrice.checkAvailabilityController(req,res,next)
+  res.status(200).json(response)
+})
 
 export default route;

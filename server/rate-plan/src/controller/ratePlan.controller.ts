@@ -137,5 +137,19 @@ class RoomPrice {
         console.log(response)
         return response
     }
+    public static async checkAvailabilityController(req: Request, res: Response, next: NextFunction){
+        try {
+            const {hotelcode,invTypeCode,startDate,endDate,noOfRooms}=req.body
+            const response=await RoomPriceService.checkAvailabilityService(hotelcode,invTypeCode,startDate,endDate,noOfRooms)
+
+            return response
+        } catch (error:any) {
+            return {
+                success:false,
+                message:"Error occur while checking availability for this hotel",
+                error:error.message
+            }
+        }
+    }
 }
 export { RatePlanController, RoomPrice };

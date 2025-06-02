@@ -4,10 +4,10 @@ import { RatePlanDao } from "../dao/ratePlan.dao";
 import { HotelPricesDao } from "../dao/hotelPrices.dao";
 
 interface UpdatePlanData {
-  rateAmountId:string;
-  inventoryId:string;
-  price:number;
-  availability:number;
+  rateAmountId: string;
+  inventoryId: string;
+  price: number;
+  availability: number;
 }
 interface BaseGuestAmount {
   amountBeforeTax: number;
@@ -48,6 +48,12 @@ interface RateCalculationResult {
     requestedRooms: number;
   };
 }
+interface checkAvailabilityInterface {
+  message: string;
+  success: boolean,
+  isAvailable: boolean;
+  error?: string
+}
 class RatePlanService {
   public static async createRatePlan(ratePlanData: any) {
     // Extract scheduling fields
@@ -82,7 +88,7 @@ class RatePlanService {
 
   public static async updateRatePlan(ratePlanData: UpdatePlanData[]) {
     // Optional: Add validation or preprocessing here if needed
-    
+
     const updatedRatePlan = await RatePlanDao.updateRatePlan(ratePlanData);
     return {
       success: true,
@@ -131,19 +137,57 @@ class RoomPriceService {
     }
   }
   public static async getAllRoomTypeService() {
-   try {
-     const responses = await RatePlanDao.getAllRoomType()
-    return {
-      success:true,
-      roomTypes:responses
+    try {
+      const responses = await RatePlanDao.getAllRoomType()
+      return {
+        success: true,
+        roomTypes: responses
+      }
+    } catch (error: any) {
+      console.log(error.message)
+      return {
+        success: false,
+        message: error.message
+      }
     }
-   } catch (error:any) {
-    console.log(error.message)
-    return {
-      success:false,
-      message:error.message
+  }
+  public static async checkAvailabilityService(hotelcode: string,
+    invTypeCode: string,
+    startDate: Date,
+    endDate: Date,
+    noOfRooms: number
+  ) {
+    try {
+      const availability = await HotelPricesDao.checkAvailabilityDao(hotelcode, invTypeCode, startDate, endDate)
+      console.log("availability", availability)
+      if (availability.availability.count < noOfRooms) {
+        return {
+          success: true,
+          isAvailable: false,
+          message: `from ${startDate} to ${endDate} only ${availability.availability.count} room's are available`
+        }
+      }else{
+        return {
+          success:true,
+          isAvailable:true,
+          totalAvailableRooms:availability.availability.count,
+          demandedRooms:noOfRooms
+        }
+      }
+      if (!availability) {
+        return {
+          success: false,
+          message: ""
+        }
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: "Error occur while checking availability ",
+        error: error.message,
+
+      }
     }
-   }
   }
 }
 
@@ -580,111 +624,111 @@ class RoomRentCalculationService {
     }
   }
 
-  private static calculateSingleRateAmount(
-    rate: any,
-    noOfAdults: number,
-    noOfChildrens: number,
-    noOfRooms: number,
-    numberOfNights: number
-  ): any {
+  // private static calculateSingleRateAmount(
+  //   rate: any,
+  //   noOfAdults: number,
+  //   noOfChildrens: number,
+  //   noOfRooms: number,
+  //   numberOfNights: number
+  // ): any {
 
-    try {
-      const totalGuests = noOfAdults + noOfChildrens;
+  //   try {
+  //     const totalGuests = noOfAdults + noOfChildrens;
 
-      // Find the appropriate base rate
-      const baseByGuestAmts: BaseGuestAmount[] = rate.baseByGuestAmts || [];
+  //     // Find the appropriate base rate
+  //     const baseByGuestAmts: BaseGuestAmount[] = rate.baseByGuestAmts || [];
 
-      if (baseByGuestAmts.length === 0) {
-        return {
-          success: false,
-          message: "No base guest amounts found for this rate"
-        };
-      }
+  //     if (baseByGuestAmts.length === 0) {
+  //       return {
+  //         success: false,
+  //         message: "No base guest amounts found for this rate"
+  //       };
+  //     }
 
-      // Sort base rates by number of guests (ascending)
-      const sortedBaseRates = baseByGuestAmts.sort((a, b) => a.numberOfGuests - b.numberOfGuests);
+  //     // Sort base rates by number of guests (ascending)
+  //     const sortedBaseRates = baseByGuestAmts.sort((a, b) => a.numberOfGuests - b.numberOfGuests);
 
-      // Find the most appropriate base rate
-      let selectedBaseRate: BaseGuestAmount | null = null;
+  //     // Find the most appropriate base rate
+  //     let selectedBaseRate: BaseGuestAmount | null = null;
 
-      // Try to find exact match first
-      selectedBaseRate = sortedBaseRates.find(rate => rate.numberOfGuests === totalGuests) || null;
+  //     // Try to find exact match first
+  //     selectedBaseRate = sortedBaseRates.find(rate => rate.numberOfGuests === totalGuests) || null;
 
-      // If no exact match, find the highest base rate that's less than or equal to total guests
-      if (!selectedBaseRate) {
-        for (let i = sortedBaseRates.length - 1; i >= 0; i--) {
-          if (sortedBaseRates[i].numberOfGuests <= totalGuests) {
-            selectedBaseRate = sortedBaseRates[i];
-            break;
-          }
-        }
-      }
+  //     // If no exact match, find the highest base rate that's less than or equal to total guests
+  //     if (!selectedBaseRate) {
+  //       for (let i = sortedBaseRates.length - 1; i >= 0; i--) {
+  //         if (sortedBaseRates[i].numberOfGuests <= totalGuests) {
+  //           selectedBaseRate = sortedBaseRates[i];
+  //           break;
+  //         }
+  //       }
+  //     }
 
-      // If still no match, use the lowest base rate
-      if (!selectedBaseRate) {
-        selectedBaseRate = sortedBaseRates[0];
-      }
+  //     // If still no match, use the lowest base rate
+  //     if (!selectedBaseRate) {
+  //       selectedBaseRate = sortedBaseRates[0];
+  //     }
 
-      const baseRatePerNight = selectedBaseRate.amountBeforeTax;
-      const baseGuestsIncluded = selectedBaseRate.numberOfGuests;
+  //     const baseRatePerNight = selectedBaseRate.amountBeforeTax;
+  //     const baseGuestsIncluded = selectedBaseRate.numberOfGuests;
 
-      // Calculate additional guest charges
-      let additionalAdultCharges = 0;
-      let additionalChildCharges = 0;
+  //     // Calculate additional guest charges
+  //     let additionalAdultCharges = 0;
+  //     let additionalChildCharges = 0;
 
-      const additionalGuestAmounts: AdditionalGuestAmount[] = rate.additionalGuestAmounts || [];
+  //     const additionalGuestAmounts: AdditionalGuestAmount[] = rate.additionalGuestAmounts || [];
 
-      if (totalGuests > baseGuestsIncluded) {
-        const extraGuests = totalGuests - baseGuestsIncluded;
-        let remainingAdults = Math.max(0, noOfAdults - baseGuestsIncluded);
-        let remainingChildren = noOfChildrens;
+  //     if (totalGuests > baseGuestsIncluded) {
+  //       const extraGuests = totalGuests - baseGuestsIncluded;
+  //       let remainingAdults = Math.max(0, noOfAdults - baseGuestsIncluded);
+  //       let remainingChildren = noOfChildrens;
 
-        // If base rate covers some adults, reduce remaining children first
-        if (baseGuestsIncluded >= noOfAdults) {
-          remainingAdults = 0;
-          remainingChildren = Math.max(0, totalGuests - baseGuestsIncluded);
-        }
+  //       // If base rate covers some adults, reduce remaining children first
+  //       if (baseGuestsIncluded >= noOfAdults) {
+  //         remainingAdults = 0;
+  //         remainingChildren = Math.max(0, totalGuests - baseGuestsIncluded);
+  //       }
 
-        // Calculate additional adult charges
-        const adultRate = additionalGuestAmounts.find(aga => aga.ageQualifyingCode === '10');
-        if (adultRate && remainingAdults > 0) {
-          additionalAdultCharges = remainingAdults * adultRate.amount;
-        }
+  //       // Calculate additional adult charges
+  //       const adultRate = additionalGuestAmounts.find(aga => aga.ageQualifyingCode === '10');
+  //       if (adultRate && remainingAdults > 0) {
+  //         additionalAdultCharges = remainingAdults * adultRate.amount;
+  //       }
 
-        // Calculate additional child charges
-        const childRate = additionalGuestAmounts.find(aga => aga.ageQualifyingCode === '8');
-        if (childRate && remainingChildren > 0) {
-          additionalChildCharges = remainingChildren * childRate.amount;
-        }
-      }
+  //       // Calculate additional child charges
+  //       const childRate = additionalGuestAmounts.find(aga => aga.ageQualifyingCode === '8');
+  //       if (childRate && remainingChildren > 0) {
+  //         additionalChildCharges = remainingChildren * childRate.amount;
+  //       }
+  //     }
 
-      const totalAdditionalCharges = additionalAdultCharges + additionalChildCharges;
-      const totalPerNightPerRoom = baseRatePerNight + totalAdditionalCharges;
-      const totalPerNight = totalPerNightPerRoom * noOfRooms;
-      const totalForAllNights = totalPerNight * numberOfNights;
+  //     const totalAdditionalCharges = additionalAdultCharges + additionalChildCharges;
+  //     const totalPerNightPerRoom = baseRatePerNight + totalAdditionalCharges;
+  //     const totalPerNight = totalPerNightPerRoom * noOfRooms;
+  //     const totalForAllNights = totalPerNight * numberOfNights;
 
-      return {
-        success: true,
-        totalAmount: totalForAllNights,
-        baseRatePerNight,
-        additionalGuestCharges: totalAdditionalCharges,
-        breakdown: {
-          baseAmount: baseRatePerNight * noOfRooms,
-          additionalAdultCharges: additionalAdultCharges * noOfRooms,
-          additionalChildCharges: additionalChildCharges * noOfRooms,
-          totalPerNight,
-          totalForAllNights
-        }
-      };
+  //     return {
+  //       success: true,
+  //       totalAmount: totalForAllNights,
+  //       baseRatePerNight,
+  //       additionalGuestCharges: totalAdditionalCharges,
+  //       breakdown: {
+  //         baseAmount: baseRatePerNight * noOfRooms,
+  //         additionalAdultCharges: additionalAdultCharges * noOfRooms,
+  //         additionalChildCharges: additionalChildCharges * noOfRooms,
+  //         totalPerNight,
+  //         totalForAllNights
+  //       }
+  //     };
 
-    } catch (error) {
-      console.error('Error in calculateSingleRateAmount:', error);
-      return {
-        success: false,
-        message: "Error calculating single rate amount"
-      };
-    }
-  }
+  //   } catch (error) {
+  //     console.error('Error in calculateSingleRateAmount:', error);
+  //     return {
+  //       success: false,
+  //       message: "Error calculating single rate amount"
+  //     };
+  //   }
+  // }
 
   /**
    * Helper method to get detailed rate breakdown for debugging
