@@ -13,6 +13,11 @@ import { ThirdPartyBooking } from "../../../wincloud/src/model/reservationModel"
 import stripeService from "../services/stripe.service";
 import Customer from "../../../Customer-Authentication/src/models/customer.model";
 
+interface CancelRequestData {
+  reservationId: string;
+  customerEmail: string;
+  propertyCode: string;
+}
 
 // New controller function to create a reservation with stored card (Pay at Hotel)
 export const createReservationWithStoredCard = CatchAsyncError(
@@ -276,6 +281,8 @@ export const updateReservation = CatchAsyncError(
     }
   }
 );
+
+
 
 export const getReservation = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -830,13 +837,13 @@ export const getBookingDetailsOfUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const customerId = req.params.id;
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 10;
-      const skip = (page - 1) * limit;
       const { startDate, endDate, guestName } = req.query;
+      const page = req.query.page ? parseInt(req.query.page as string) : null;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : null;
+      const skip = page && limit ? (page - 1) * limit : 0;
 
       const matchCriteria: any = {
-        customer_id: customerId, // fixed key
+        customer_id: customerId,
       };
 
       if (startDate || endDate) {
@@ -862,19 +869,17 @@ export const getBookingDetailsOfUser = CatchAsyncError(
 
       const totalBookings = await Bookings.countDocuments(matchCriteria);
 
-      const bookingDetails = await Bookings.find(matchCriteria)
-        .populate({
-          path: "property",
-          select: "property_name",
-        })
-        .populate({
-          path: "room",
-          select: "room_name room_type",
-        })
+      let query = Bookings.find(matchCriteria)
+        .populate({ path: "property", select: "property_name" })
+        .populate({ path: "room", select: "room_name room_type" })
         .select("room booking_user_name booking_user_phone amount booking_dates status checkInDate checkOutDate guests")
-        .sort({ _id: -1 })
-        .skip(skip)
-        .limit(limit);
+        .sort({ _id: -1 });
+
+      if (page && limit) {
+        query = query.skip(skip).limit(limit);
+      }
+
+      const bookingDetails = await query;
 
       const totalRevenue = bookingDetails.reduce(
         (acc, booking) => acc + Number(booking.amount),
@@ -885,8 +890,8 @@ export const getBookingDetailsOfUser = CatchAsyncError(
         success: true,
         totalRevenue,
         bookingDetails,
-        currentPage: page,
-        totalPages: Math.ceil(totalBookings / limit),
+        currentPage: page || 1,
+        totalPages: limit ? Math.ceil(totalBookings / limit) : 1,
         totalBookings,
       });
     } catch (error: any) {
