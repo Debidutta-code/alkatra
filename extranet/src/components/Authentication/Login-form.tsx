@@ -148,7 +148,7 @@ const LoginForm: React.FC = () => {
               </Button>
             </div>
             {errors.password && (
-              <p className="text-sm text-destructive">{errors.password.message}</p>
+              <p className="text-sm text-destructive mt-2">{errors.password.message}</p>
             )}
           </div>
         </div>
