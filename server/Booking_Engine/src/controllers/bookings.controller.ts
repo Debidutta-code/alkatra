@@ -1034,67 +1034,61 @@ export const getRevenueByProperty = CatchAsyncError(
 export const getBookingDetailsOfUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const customerId = req.params.id;
+      const userId = req.params.id;
       const { startDate, endDate, guestName } = req.query;
-      const page = req.query.page ? parseInt(req.query.page as string) : null;
-      const limit = req.query.limit ? parseInt(req.query.limit as string) : null;
-      const skip = page && limit ? (page - 1) * limit : 0;
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+      const skip = (page - 1) * limit;
 
       const matchCriteria: any = {
-        customer_id: customerId,
+        userId,
       };
 
       if (startDate || endDate) {
         if (!startDate || !endDate) {
           return res.status(400).json({
             success: false,
-            message: "Both startDate and endDate are required for filtering",
+            message: "Both startDate and endDate are required for date filtering",
           });
         }
-        matchCriteria.booking_dates = {
+
+        matchCriteria.checkInDate = {
           $gte: new Date(startDate as string),
           $lte: new Date(endDate as string),
         };
       }
 
       if (guestName) {
-        matchCriteria.guests = {
+        matchCriteria.guestDetails = {
           $elemMatch: {
-            firstName: { $regex: guestName, $options: "i" },
+            firstName: { $regex: guestName as string, $options: "i" },
           },
         };
       }
 
-      const totalBookings = await Bookings.countDocuments(matchCriteria);
+      const totalBookings = await ThirdPartyBooking.countDocuments(matchCriteria);
 
-      let query = Bookings.find(matchCriteria)
-        .populate({ path: "property", select: "property_name" })
-        .populate({ path: "room", select: "room_name room_type" })
-        .select("room booking_user_name booking_user_phone amount booking_dates status checkInDate checkOutDate guests")
-        .sort({ _id: -1 });
+      const bookings = await ThirdPartyBooking.find(matchCriteria)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
 
-      if (page && limit) {
-        query = query.skip(skip).limit(limit);
-      }
-
-      const bookingDetails = await query;
-
-      const totalRevenue = bookingDetails.reduce(
-        (acc, booking) => acc + Number(booking.amount),
+      const totalRevenue = bookings.reduce(
+        (sum, booking) => sum + (booking.totalAmount || 0),
         0
       );
 
-      return res.json({
+      return res.status(200).json({
         success: true,
-        totalRevenue,
-        bookingDetails,
-        currentPage: page || 1,
-        totalPages: limit ? Math.ceil(totalBookings / limit) : 1,
         totalBookings,
+        currentPage: page,
+        totalPages: Math.ceil(totalBookings / limit),
+        totalRevenue,
+        bookings,
       });
     } catch (error: any) {
-      console.error("Error getting booking details:", error);
-      return next(new ErrorHandler(error.message, 400));
+      console.error("Error in getBookingDetailsOfUser:", error);
+      return next(new ErrorHandler(error.message || "Internal Server Error", 500));
     }
   }
 );
