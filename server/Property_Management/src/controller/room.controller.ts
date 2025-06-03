@@ -298,53 +298,124 @@ const getRoomsByPropertyId = catchAsync(async (req: Request, res: Response, next
 })
 
 
-const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const propertyInfoId = req.params.id;
-  const rooms = await Room.find({ propertyInfo_id: propertyInfoId }).exec();
-  const ratePlanList = await PropertyPrice.find({ property_id: propertyInfoId });
+const getRoomsByPropertyId2 = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const propertyInfoId = req.params.id;
+    const { startDate, endDate, hotelCode = "WINCLOUD" } = req.body;
 
-  if (!rooms || rooms.length === 0) {
-    return next(new AppError(`No property found with this id ${propertyInfoId}`, 404));
+    // Validate mandatory fields
+    if (!startDate) {
+      return next(new AppError("startDate is required", 400));
+    }
+
+    if (!endDate) {
+      return next(new AppError("endDate is required", 400));
+    }
+
+    if (!hotelCode) {
+      return next(new AppError("hotelCode is required", 400));
+    }
+
+    // Optimized aggregation pipeline
+    const roomsWithRates = await Room.aggregate([
+      // Match rooms for the specific property
+      {
+        $match: {
+          propertyInfo_id: new mongoose.Types.ObjectId(propertyInfoId)
+        }
+      },
+      
+      // Lookup and process rate information in one go
+      {
+        $lookup: {
+          from: "rateamountdatewises",
+          let: { roomType: "$room_type" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$invTypeCode", "$$roomType"] },
+                    { $eq: ["$hotelCode", hotelCode] },
+                    { $lte: ["$startDate", new Date(endDate)] },
+                    { $gte: ["$endDate", new Date(startDate)] }
+                  ]
+                }
+              }
+            },
+            { $sort: { startDate: 1 } },
+            { $limit: 1 },
+            {
+              $project: {
+                room_price: { $arrayElemAt: ["$baseByGuestAmts.amountBeforeTax", 0] },
+                currency_code: "$currencyCode",
+                rate_plan_code: "$ratePlanCode",
+                available_guest_rates: "$baseByGuestAmts"
+              }
+            }
+          ],
+          as: "rateInfo"
+        }
+      },
+      
+      // Final projection
+      {
+        $project: {
+          _id: 1,
+          room_name: 1,
+          room_type: 1,
+          room_description: 1,
+          room_amenities: 1,
+          room_images: 1,
+          max_occupancy: 1,
+          bed_type: 1,
+          room_size: 1,
+          propertyInfo_id: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          __v: 1,
+          room_price: { $arrayElemAt: ["$rateInfo.room_price", 0] },
+          currency_code: { $arrayElemAt: ["$rateInfo.currency_code", 0] },
+          rate_plan_code: { $arrayElemAt: ["$rateInfo.rate_plan_code", 0] },
+          
+          has_valid_rate: { $gt: [{ $size: "$rateInfo" }, 0] }
+        }
+      }
+    ]);
+
+    if (!roomsWithRates || roomsWithRates.length === 0) {
+      return next(
+        new AppError(`No property found with this id ${propertyInfoId}`, 404)
+      );
+    }
+
+    const couponCode = await generateCouponCode();
+    const deepLinkUrl = `${process.env.DEEP_LINK}/property/${propertyInfoId}?coupon=${couponCode.code}`;
+
+    let qrCodeData: string;
+    try {
+      qrCodeData = await QRCode.toDataURL(deepLinkUrl);
+    } catch (error) {
+      return next(new AppError("Failed to generate QR code", 500));
+    }
+
+    res.status(200).json({
+      status: "success",
+      error: false,
+      message: "Rooms fetched by property id with rate plan successfully",
+      data: roomsWithRates,
+      qrCode: qrCodeData,
+      couponCode: couponCode.code,
+      deepLink: deepLinkUrl,
+      searchCriteria: {
+        startDate,
+        endDate,
+        propertyId: propertyInfoId,
+        hotelCode,
+      },
+    });
   }
-
-  if (!ratePlanList || ratePlanList.length === 0) {
-    return next(new AppError(`No rate plans found for property with id ${propertyInfoId}`, 404));
-  }
-
-  const roomsWithPrices = rooms.map((room) => {
-    const ratePlan = ratePlanList.find(
-      (ratePlan) => ratePlan.property_id.toString() === room.propertyInfo_id.toString()
-    );
-    return {
-      ...room.toObject(),
-      room_price: ratePlan ? ratePlan.room_price : null,
-      meal_plan: ratePlan ? ratePlan.meal_plan : null,
-      rateplan_id: ratePlan ? ratePlan._id : null,
-    };
-  });
-
-  const couponCode = await generateCouponCode();
-
-  const deepLinkUrl = `${process.env.DEEP_LINK}/property/${propertyInfoId}?coupon=${couponCode.code}`;
-
-  let qrCodeData: string;
-  try {
-    qrCodeData = await QRCode.toDataURL(deepLinkUrl);
-  } 
-  catch (error) {
-    return next(new AppError("Failed to generate QR code", 500));
-  }
-
-  res.status(200).json({
-    status: "success",
-    error: false,
-    message: "Rooms fetched by property id with rate plan successfully",
-    data: roomsWithPrices,
-    qrCode: qrCodeData,
-    couponCode: couponCode.code, // For debug purpose
-    deepLink: deepLinkUrl   // For debug purpose
-  });
-});
+);
 
 
 export const getRoomsForBooking = catchAsync(async (req: Request, res: Response, next: NextFunction) => {

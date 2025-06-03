@@ -118,17 +118,17 @@ class RoomPrice {
         const { hotelCode, invTypeCode,
             startDate,
             endDate,
-            noOfDaysToStay,
             noOfChildrens,
             noOfAdults,
-            noOfRooms } = req.body
+            noOfRooms,children_ages } = req.body
         const response = await RoomRentCalculationService.getRoomRentService(hotelCode,
             invTypeCode,
             startDate,
             endDate,
             noOfChildrens,
             noOfAdults,
-            noOfRooms
+            noOfRooms,
+            children_ages
         )
         return response
     }
