@@ -114,20 +114,14 @@ class CustomerService {
     async updatePassword(
         email: string,
         newPassword: string,
-        customerId: string
+        // customerId: string
     ): Promise<void> {
         if (!email || !newPassword) {
             throw new Error("Email and new password are required");
         }
-        if (!customerId) {
-            throw new Error("Unauthorized: No customer ID provided");
-        }
         const customer = await customerRepository.findByEmail(email);
         if (!customer) {
             throw new Error("Customer not found");
-        }
-        if (customer.id !== customerId) {
-            throw new Error("You are not allowed to update this password");
         }
         if (!isValidPassword(newPassword)) {
             throw new Error(

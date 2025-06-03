@@ -15,13 +15,15 @@ interface IThirdPartyBooking extends Document {
     roomTypeCode: string;
     checkInDate: Date;
     checkOutDate: Date;
-    guestDetails: IGuestDetails[]; // Updated to array
-    amountBeforeTax: number;
+    guestDetails?: IGuestDetails[]; 
+    ageCodeSummary?: Record<string, number>;
+    numberOfRooms: number;
+    totalAmount: number;
     currencyCode: string;
-    userId: string;
-    propertyId: string;
-    roomIds: string[]; // Updated to array
-    status: string;
+    userId?: string;
+    propertyId?: string;
+    roomIds?: string[];
+    status?: string;
     thirdPartyReservationIdType8?: string;
     thirdPartyReservationIdType3?: string;
     createdAt: Date;
@@ -29,9 +31,17 @@ interface IThirdPartyBooking extends Document {
 
 interface IReservationLog extends Document {
     bookingId?: string;
+    reservationId: string;
+    hotelCode: string;
+    hotelName: string;
+    ratePlanCode: string;
+    roomTypeCode: string;
+    checkInDate: Date;
+    checkOutDate: Date;
     jsonInput: string;
     xmlSent: string;
     apiResponse: string;
+    process: 'Reservation' | 'Amend Reservation' | 'Cancellation';
     status: 'Success' | 'Failure';
     errorMessage?: string;
     timestamp: Date;
@@ -47,32 +57,38 @@ const guestDetailsSchema = new Schema<IGuestDetails>({
 const thirdPartyBookingSchema = new Schema<IThirdPartyBooking>({
     reservationId: { type: String, required: true, unique: true },
     hotelCode: { type: String, required: true },
-    hotelName: { type: String, required: true },
+    hotelName: { type: String, required: false },
     ratePlanCode: { type: String, required: true },
     roomTypeCode: { type: String, required: true },
     checkInDate: { type: Date, required: true },
     checkOutDate: { type: Date, required: true },
-    guestDetails: { type: [guestDetailsSchema], required: true }, // Updated to array
-    amountBeforeTax: { type: Number, required: true },
+    guestDetails: { type: [guestDetailsSchema], required: false },
+    ageCodeSummary: { type: Map, of: Number, required: true },
+    numberOfRooms: { type: Number, required: true },
+    totalAmount: { type: Number, required: true },
     currencyCode: { type: String, required: true },
     userId: { type: String, required: true },
-    propertyId: { type: String, required: true },
-    roomIds: { type: [String], required: true }, // Updated to array
-    status: { type: String, required: true, enum: ['Confirmed', 'Pending', 'Cancelled'] },
-    thirdPartyReservationIdType8: { type: String, required: false },
-    thirdPartyReservationIdType3: { type: String, required: false },
+    status: { type: String, required: false, enum: ['Confirmed', 'Pending', 'Cancelled'] },
     createdAt: { type: Date, default: Date.now },
 });
 
 const reservationLogSchema = new Schema<IReservationLog>({
     bookingId: { type: String, required: false },
+    reservationId: { type: String, required: true},
+    hotelCode: { type: String, required: true },
+    hotelName: { type: String, required: true },
+    ratePlanCode: { type: String, required: true },
+    roomTypeCode: { type: String, required: true },
+    checkInDate: { type: Date, required: true },
+    checkOutDate: { type: Date, required: true },
     jsonInput: { type: String, required: true },
     xmlSent: { type: String, required: true },
     apiResponse: { type: String, required: true },
     status: { type: String, required: true, enum: ['Success', 'Failure'] },
+    process: { type: String, required: true, enum: ['Reservation', 'Amend Reservation', 'Cancellation'] },
     errorMessage: { type: String, required: false },
     timestamp: { type: Date, default: Date.now },
 });
 
-export const ThirdPartyBooking = model<IThirdPartyBooking>('ReservationDetails', thirdPartyBookingSchema);
-export const ReservationLog = model<IReservationLog>('ReservationLog', reservationLogSchema);
+export const ThirdPartyBooking = model<IThirdPartyBooking>('WincloudReservation', thirdPartyBookingSchema);
+export const ReservationLog = model<IReservationLog>('WincloudReservationLog', reservationLogSchema);

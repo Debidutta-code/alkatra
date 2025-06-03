@@ -1,66 +1,88 @@
-import { AmendReservationLog } from '../model/amendReservationModel';
-import { ThirdPartyBooking } from '../model/reservationModel';
+import { ThirdPartyBooking, ReservationLog } from '../model/reservationModel';
 import { ThirdPartyAmendReservationData } from '../interface/amendReservationInterface';
 
 export class ThirdPartyAmendReservationRepository {
-    async createAmendReservation(data: ThirdPartyAmendReservationData, xmlSent: string, apiResponse: string): Promise<void> {
-        console.log(`@@@@@@@@@@@@@@@@@@@@@@\nRepository Updating third-party booking: ${JSON.stringify(data, null, 2)}`);
+  constructor() {
+    console.log('ThirdPartyCancelReservationRepository initialized.');
+  }
 
-        const updatedBooking = await ThirdPartyBooking.findOneAndUpdate(
-            { reservationId: data.reservationId },
-            {
-                $set: {
-                    hotelCode: data.hotelCode,
-                    hotelName: data.hotelName,
-                    ratePlanCode: data.ratePlanCode,
-                    roomTypeCode: data.roomTypeCode,
-                    checkInDate: new Date(data.checkInDate),
-                    checkOutDate: new Date(data.checkOutDate),
-                    guestDetails: data.guestDetails.map(guest => ({
-                        firstName: guest.firstName,
-                        lastName: guest.lastName,
-                        email: guest.email,
-                        phone: guest.phone,
-                    })), // Updated to handle array of guest details
-                    amountBeforeTax: data.amountBeforeTax,
-                    currencyCode: data.currencyCode,
-                    userId: data.userId,
-                    propertyId: data.propertyId,
-                    roomIds: data.roomIds, // Updated to handle array of room IDs
-                    status: data.status,
-                    thirdPartyReservationIdType8: data.thirdPartyReservationIdType8,
-                    thirdPartyReservationIdType3: data.thirdPartyReservationIdType3,
-                },
-            },
-            { new: true }
-        );
+  async createAmendReservation(
+    data: ThirdPartyAmendReservationData,
+    xmlRequest: string,
+    xmlResponse: string
+  ): Promise<any> {
+    try {
+      console.log('Updating booking to cancelled status...');
 
-        if (!updatedBooking) {
-            throw new Error('Booking not found for update');
-        }
+      const updatedBooking = await ThirdPartyBooking.findOneAndUpdate(
+        { reservationId: data.reservationId },
+        {
+          $set: {
+            status: data.status,
+            hotelCode: data.hotelCode,
+            hotelName: data.hotelName,
+            checkInDate: data.checkInDate,
+            checkOutDate: data.checkOutDate,
+            ageCodeSummary: data.ageCodeSummary,
+            xmlRequest,
+            xmlResponse,
+            updatedAt: new Date(),
+          },
+        },
+        { new: true }
+      );
 
-        await this.logAmendReservationAttempt(
-            { data },
-            xmlSent,
-            apiResponse,
-            true,
-            updatedBooking.reservationId
-        );
-    }
+      if (!updatedBooking) {
+        throw new Error('Booking not found for cancellation');
+      }
 
-    async logAmendReservationAttempt(jsonInput: any, xmlSent: string, apiResponse: string, success: boolean, bookingId?: string): Promise<void> {
-        console.log(`@@@@@@@@@@@@@@@@@@@@@@\nRepository Logging amend reservation attempt: ${success ? 'Success' : 'Failure'}`);
+      // Create log entry
+      await ReservationLog.create({
+        bookingId: updatedBooking._id?.toString(),
+        reservationId: updatedBooking.reservationId,
+        hotelCode: updatedBooking.hotelCode,
+        hotelName: updatedBooking.hotelName,
+        ratePlanCode: updatedBooking.ratePlanCode,
+        roomTypeCode: updatedBooking.roomTypeCode,
+        checkInDate: updatedBooking.checkInDate,
+        checkOutDate: updatedBooking.checkOutDate,
+        ageCodeSummary: data.ageCodeSummary,
+        jsonInput: JSON.stringify(data),
+        xmlSent: xmlRequest,
+        apiResponse: xmlResponse,
+        process: 'Amend Reservation',
+        status: 'Success',
+        timestamp: new Date(),
+      });
 
-        const log = new AmendReservationLog({
-            bookingId,
-            jsonInput: JSON.stringify(jsonInput),
-            xmlSent,
-            apiResponse,
-            status: success ? 'Success' : 'Failure',
-            errorMessage: success ? null : apiResponse,
-            timestamp: new Date(),
+      console.log('Booking and log updated successfully:', updatedBooking.reservationId);
+      return updatedBooking;
+    } catch (error: any) {
+      console.error('Error updating booking in repository:', error.message);
+
+      // Optional: log failure
+      try {
+        await ReservationLog.create({
+          reservationId: data.reservationId,
+          hotelCode: data.hotelCode,
+          hotelName: data.hotelName,
+          ratePlanCode: data.ratePlanCode,
+          roomTypeCode: data.roomTypeCode,
+          checkInDate: data.checkInDate,
+          checkOutDate: data.checkOutDate,
+          jsonInput: JSON.stringify(data),
+          xmlSent: xmlRequest,
+          apiResponse: xmlResponse,
+          process: 'Cancellation',
+          status: 'Failure',
+          errorMessage: error.message,
+          timestamp: new Date(),
         });
+      } catch (logError) {
+        console.error('Error logging failure:', logError);
+      }
 
-        await log.save();
+      throw new Error(`Failed to update booking: ${error.message}`);
     }
+  }
 }
