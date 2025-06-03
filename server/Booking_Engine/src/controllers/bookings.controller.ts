@@ -50,7 +50,7 @@ export const createReservationWithStoredCard = CatchAsyncError(
       roomTotalPrice,
       currencyCode,
       email,
-      phone, 
+      phone,
       guests,
     } = req.body;
 
@@ -155,6 +155,10 @@ export const updateThirdPartyReservation = CatchAsyncError(
     if (!existingReservation) {
       throw new Error(`Reservation with ID ${reservationId} not found in our record`);
     }
+    if (existingReservation.status === 'Cancelled') {
+      throw new Error(`Reservation with ID ${reservationId} is already cancelled`);
+    }
+
     const {
       checkInDate,
       checkOutDate,
@@ -268,6 +272,14 @@ export const cancelThirdPartyReservation = CatchAsyncError(
     if (!reservationId) {
       return res.status(400).json({ message: "Reservation ID is required" });
     }
+    const existingReservation = await ThirdPartyBooking.findOne({ reservationId });
+    if (!existingReservation) {
+      throw new Error(`Reservation with ID ${reservationId} not found in our record`);
+    }
+    if (existingReservation.status === 'Cancelled') {
+      throw new Error(`Reservation with ID ${reservationId} is already cancelled`);
+    }
+    
     const { firstName, lastName, email, hotelCode, hotelName, checkInDate, checkOutDate } = req.body;
     const requiredFields = { reservationId, firstName, lastName, email, hotelCode, hotelName, checkInDate, checkOutDate };
     const missingFields = Object.entries(requiredFields)

@@ -23,16 +23,13 @@ export class ThirdPartyAmendReservationService {
         let xml = '';
         try {
             console.log('Starting third-party amend reservation processing...');
-
-            const existingReservation = await ThirdPartyBooking.findOne({ reservationId: data.bookingDetails?.reservationId });
-            if (!existingReservation) {
-                throw new Error(`Reservation with ID ${data.bookingDetails?.reservationId} not found`);
-            }
+            console.log('@@@@@@@@@@@@@@@@@@The data we get from controller', data);
 
             const amendReservationData = await prepareAmendReservationData(data);
+            console.log('###########The amend reservation data is:', amendReservationData);
 
             xml = generateAmendReservationXML(amendReservationData);
-            console.log('Generated XML:', xml);
+            console.log('#@#@#@#@#@#@#@#@#Generated XML:', xml);
 
             const apiClient = new ApiClient();
             const apiResponse = await apiClient.sendToThirdParty(xml);
