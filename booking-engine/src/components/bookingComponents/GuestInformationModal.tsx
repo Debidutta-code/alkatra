@@ -19,7 +19,7 @@ import {
 import { formatDate, calculateNights } from "@/utils/dateUtils";
 import { useTranslation } from "react-i18next";
 
- export interface Guest {
+export interface Guest {
   firstName: string;
   lastName: string;
   dob?: string;
@@ -100,21 +100,44 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     (guestData?.guests || 1) +
     (guestData?.children || 0) +
     (guestData?.infants || 0);
+  const getFormattedDate = (date: Date) => date.toISOString().split("T")[0];
 
-  const [guests, setGuests] = useState<Guest[]>(
-    Array.from({ length: totalGuests }, (_, i) => ({
-      firstName: "",
-      lastName: "",
-      dob: "",
-      type:
+  const [guests, setGuests] = useState<Guest[]>(() => {
+    return Array.from({ length: totalGuests }, (_, i) => {
+      let type: Guest["type"] =
         i < (guestData?.guests || 1)
           ? "adult"
           : i < (guestData?.guests || 1) + (guestData?.children || 0)
           ? "child"
-          : "infant",
-    }))
-  );
-  console.log("guest data", guestData);
+          : "infant";
+
+      // Set default DOBs per type
+      const today = new Date();
+      let defaultDOB = "";
+
+      if (type === "child") {
+        const twoYearsAgo = new Date();
+        twoYearsAgo.setFullYear(today.getFullYear() - 2);
+        defaultDOB = getFormattedDate(twoYearsAgo);
+      } else if (type === "adult") {
+        const thirteenYearsAgo = new Date();
+        thirteenYearsAgo.setFullYear(today.getFullYear() - 13);
+        defaultDOB = getFormattedDate(thirteenYearsAgo);
+      } else {
+        // For adult, defaultDOB could be empty or a reasonable default
+        defaultDOB = ""; // or set some default if needed
+      }
+
+      return {
+        firstName: "",
+        lastName: "",
+        dob: defaultDOB,
+        type,
+      };
+    });
+  });
+
+  // console.log("guest data", guestData);
 
   const [email, setEmail] = useState<string>(authUser?.email || "");
   const [phone, setPhone] = useState<string | undefined>("");
@@ -129,6 +152,30 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
+
+  const getDefaultDOBByType = (type: "adult" | "child" | "infant") => {
+    const today = new Date();
+
+    if (type === "infant") {
+      const today = new Date();
+      today.setFullYear(today.getFullYear());
+      return getFormattedDate(today);
+    }
+
+    if (type === "child") {
+      const twoYearsAgo = new Date();
+      twoYearsAgo.setFullYear(today.getFullYear() - 2);
+      return getFormattedDate(twoYearsAgo);
+    }
+    if (type === "adult") {
+      const thirteenYearsAgo = new Date();
+      thirteenYearsAgo.setFullYear(today.getFullYear() - 13);
+      return getFormattedDate(thirteenYearsAgo);
+    }
+
+    return ""; // or default adult DOB if needed
+  };
+
   useEffect(() => {
     if (guestData) {
       const newTotalGuests =
@@ -137,20 +184,24 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         (guestData.infants || 0);
       setGuests(
         Array.from({ length: newTotalGuests }, (_, i) => {
+          const type: Guest["type"] =
+            i < (guestData?.guests || 1)
+              ? "adult"
+              : i < (guestData?.guests || 1) + (guestData?.children || 0)
+              ? "child"
+              : "infant";
+
           const guest = guests[i];
+
           return {
             firstName: guestData.firstName || guest?.firstName || "",
             lastName: guestData.lastName || guest?.lastName || "",
-            dob: guest?.dob || "",
-            type:
-              i < (guestData.guests || 1)
-                ? "adult"
-                : i < (guestData.guests || 1) + (guestData.children || 0)
-                ? "child"
-                : "infant",
+            dob: guest?.dob || getDefaultDOBByType(type), // <- 💡 key part
+            type,
           };
         })
       );
+
       setEmail(guestData.email || "");
       if (guestData.phone) {
         setPhone(
@@ -202,22 +253,11 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     setGuests(updatedGuests);
   };
 
-  // Helper function to calculate age from DOB
-  const calculateAge = (dob: string) => {
-    const birthDate = new Date(dob);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
-  };
-
   const handleUpdate = () => {
     let valid = true;
     setErrorMessage(null);
 
+    // Validate guests' firstName, lastName, dob
     for (let i = 0; i < guests.length; i++) {
       const guest = guests[i];
       if (!guest.firstName || !/^[A-Za-z\s]+$/.test(guest.firstName)) {
@@ -228,31 +268,62 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         valid = false;
         break;
       }
-      setUpdateMessage(
-        t("BookingComponents.GuestInformationModal.informationVerified")
-      );
-
-      dispatch(
-        setGuestDetails({
-          guests,
-          email,
-          phone,
-          rooms: guestData?.rooms || 1,
-          adults: guestData?.guests || 1,
-          children: guestData?.children || 0,
-          infants: guestData?.infants || 0,
-          childAges: guestData?.childAges || [],
-        })
-      );
-
-      if (valid) {
-        setIsFormUpdated(true);
+      if (!guest.lastName || !/^[A-Za-z\s]+$/.test(guest.lastName)) {
+        setErrorMessage(
+          t("BookingComponents.GuestInformationModal.lastNameError") +
+            ` (Guest ${i + 1})`
+        );
+        valid = false;
+        break;
       }
-
-      setTimeout(() => {
-        setActiveSection("review");
-      }, 800);
+      if (!guest.dob) {
+        setErrorMessage(
+          t("BookingComponents.GuestInformationModal.dobError") +
+            ` (Guest ${i + 1})`
+        );
+        valid = false;
+        break;
+      }
     }
+
+    // Validate email
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setErrorMessage(t("BookingComponents.GuestInformationModal.emailError"));
+      valid = false;
+    }
+
+    // Validate phone (basic check for length and digits)
+    if (!phone || phone.length < 10) {
+      setErrorMessage(t("BookingComponents.GuestInformationModal.phoneError"));
+      valid = false;
+    }
+
+    if (!valid) {
+      return;
+    }
+
+    setUpdateMessage(
+      t("BookingComponents.GuestInformationModal.informationVerified")
+    );
+
+    dispatch(
+      setGuestDetails({
+        guests,
+        email,
+        phone,
+        rooms: guestData?.rooms || 1,
+        adults: guestData?.guests || 1,
+        children: guestData?.children || 0,
+        infants: guestData?.infants || 0,
+        childAges: guestData?.childAges || [],
+      })
+    );
+
+    setIsFormUpdated(true);
+
+    setTimeout(() => {
+      setActiveSection("review");
+    }, 800);
   };
 
   const handleConfirmBooking = () => {
@@ -467,6 +538,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                               id={`firstName-adult-${index}`}
                               name={`firstName-adult-${index}`}
                               value={guest.firstName}
+                              required
                               onChange={(e) =>
                                 handleGuestChange(
                                   index,
@@ -499,6 +571,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                               id={`lastName-adult-${index}`}
                               name={`lastName-adult-${index}`}
                               value={guest.lastName}
+                              required
                               onChange={(e) =>
                                 handleGuestChange(
                                   index,
@@ -529,9 +602,17 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                               id={`dob-adult-${index}`}
                               name={`dob-adult-${index}`}
                               value={guest.dob}
+                              required
                               onChange={(e) =>
                                 handleGuestChange(index, "dob", e.target.value)
                               }
+                              max={getFormattedDate(
+                                new Date(
+                                  new Date().setFullYear(
+                                    new Date().getFullYear() - 13
+                                  )
+                                )
+                              )}
                               className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-tripswift-black/20 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-xs sm:text-sm font-tripswift-regular"
                             />
                           </div>
@@ -567,6 +648,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                               id={`firstName-child-${index}`}
                               name={`firstName-child-${index}`}
                               value={guest.firstName}
+                              required
                               onChange={(e) =>
                                 handleGuestChange(
                                   index + (guestData?.guests || 1),
@@ -599,6 +681,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                               id={`lastName-child-${index}`}
                               name={`lastName-child-${index}`}
                               value={guest.lastName}
+                              required
                               onChange={(e) =>
                                 handleGuestChange(
                                   index + (guestData?.guests || 1),
@@ -629,6 +712,21 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                               id={`dob-child-${index}`}
                               name={`dob-child-${index}`}
                               value={guest.dob}
+                              required
+                              max={getFormattedDate(
+                                new Date(
+                                  new Date().setFullYear(
+                                    new Date().getFullYear() - 2
+                                  )
+                                )
+                              )}
+                              min={getFormattedDate(
+                                new Date(
+                                  new Date().setFullYear(
+                                    new Date().getFullYear() - 13
+                                  )
+                                )
+                              )}
                               onChange={(e) =>
                                 handleGuestChange(
                                   index + (guestData?.guests || 1),
@@ -673,6 +771,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                               id={`firstName-infant-${index}`}
                               name={`firstName-infant-${index}`}
                               value={guest.firstName}
+                              required
                               onChange={(e) =>
                                 handleGuestChange(
                                   index +
@@ -707,6 +806,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                               id={`lastName-infant-${index}`}
                               name={`lastName-infant-${index}`}
                               value={guest.lastName}
+                              required
                               onChange={(e) =>
                                 handleGuestChange(
                                   index +
@@ -739,6 +839,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                               id={`dob-infant-${index}`}
                               name={`dob-infant-${index}`}
                               value={guest.dob}
+                              required
                               onChange={(e) =>
                                 handleGuestChange(
                                   index +
@@ -748,6 +849,14 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                                   e.target.value
                                 )
                               }
+                              max={getFormattedDate(new Date(new Date()))}
+                              min={getFormattedDate(
+                                new Date(
+                                  new Date().setFullYear(
+                                    new Date().getFullYear() - 2
+                                  )
+                                )
+                              )}
                               className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-tripswift-black/20 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-xs sm:text-sm font-tripswift-regular"
                             />
                           </div>
@@ -768,6 +877,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       id="email"
                       name="email"
                       value={email}
+                      required
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder={t(
                         "BookingComponents.GuestInformationModal.emailPlaceholder"
