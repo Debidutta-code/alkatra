@@ -127,8 +127,7 @@ class RoomPrice {
             endDate,
             noOfChildrens,
             noOfAdults,
-            noOfRooms,
-            children_ages
+            noOfRooms
         )
         return response
     }
