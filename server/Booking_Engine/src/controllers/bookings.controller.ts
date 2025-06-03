@@ -52,6 +52,7 @@ export const createReservationWithStoredCard = CatchAsyncError(
       email,
       phone,
       guests,
+      paymentInfo,
     } = req.body;
 
     const requiredFields = {
@@ -67,6 +68,7 @@ export const createReservationWithStoredCard = CatchAsyncError(
       email,
       phone,
       guests,
+      paymentInfo,
     };
 
     const missingFields = Object.entries(requiredFields)
@@ -103,6 +105,25 @@ export const createReservationWithStoredCard = CatchAsyncError(
       return { firstName, lastName, dob, age, category, ageCode };
     });
 
+    try {
+      const customerResult = await stripeService.createOrRetrieveCustomer(
+        email,
+        `${guests[0].firstName} ${guests[0].lastName}`,
+        phone,
+        paymentInfo.paymentMethodId
+      );
+
+      if (!customerResult.success) {
+        return next(new ErrorHandler(customerResult.error || "Stripe customer creation failed", 500));
+      }
+    }
+
+    catch (error) {
+      return res.status(500).json({
+        message: "Error while interacting with Stripe",
+        error: error instanceof Error ? error.message : error,
+      });
+    }
     const reservationInput: ReservationInput = {
       bookingDetails: {
         userId,
@@ -279,7 +300,7 @@ export const cancelThirdPartyReservation = CatchAsyncError(
     if (existingReservation.status === 'Cancelled') {
       throw new Error(`Reservation with ID ${reservationId} is already cancelled`);
     }
-    
+
     const { firstName, lastName, email, hotelCode, hotelName, checkInDate, checkOutDate } = req.body;
     const requiredFields = { reservationId, firstName, lastName, email, hotelCode, hotelName, checkInDate, checkOutDate };
     const missingFields = Object.entries(requiredFields)
