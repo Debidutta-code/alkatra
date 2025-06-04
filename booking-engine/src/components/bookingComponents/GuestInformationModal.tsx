@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { formatDate, calculateNights } from "@/utils/dateUtils";
 import { useTranslation } from "react-i18next";
+import axios from "axios";
 
 export interface Guest {
   firstName: string;
@@ -86,6 +87,33 @@ interface GuestInformationModalProps {
     phone?: string;
   };
 }
+interface DailyBreakDown {
+  date: string;
+  dayOfWeek: string;
+  ratePlanCode: string;
+  baseRate: number;
+  additionalCharges: number;
+  totalPerRoom: number;
+  totalForAllRooms: number;
+  currencyCode: string;
+  childrenChargesBreakdown: number[];
+}
+interface FinalPrice {
+  totalAmount: number;
+  numberOfNights: number;
+  baseRatePerNight: number;
+  additionalGuestCharges: number;
+  breakdown: {
+    totalBaseAmount: number;
+    totalAdditionalCharges: number;
+    totalAmount: number;
+    numberOfNights: number;
+    averagePerNight: number;
+  };
+  dailyBreakdown: DailyBreakDown | null;
+  availableRooms: number;
+  requestedRooms: number;
+}
 const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   isOpen,
   onClose,
@@ -148,11 +176,52 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   const [activeSection, setActiveSection] = useState<"details" | "review">(
     "details"
   );
-
+  const [finalPrice, setFinalPrice] = useState<FinalPrice | null>({
+    totalAmount: 0,
+    numberOfNights: 0,
+    baseRatePerNight: 0,
+    additionalGuestCharges: 0,
+    breakdown: {
+      totalBaseAmount: 0,
+      totalAdditionalCharges: 0,
+      totalAmount: 0,
+      numberOfNights: 0,
+      averagePerNight: 0,
+    },
+    dailyBreakdown: null,
+    availableRooms: 0,
+    requestedRooms: 0,
+  });
   const dispatch = useDispatch();
   const { t } = useTranslation();
-
-
+  const getFinalPrice = async (selectedRoom:any,checkInDate:string,checkOutDate:string,guestData:any) => {
+    console.log("getfinal price called")
+    try {
+      const finalPriceResponse = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomRentPrice`, {
+        hotelCode: "WINCLOUD",
+        invTypeCode: selectedRoom?.room_type,
+        startDate: checkInDate,
+        endDate: checkOutDate,
+        noOfChildrens: guestData?.children,
+        noOfAdults: guestData?.guests,
+        noOfRooms: guestData?.rooms,
+      },{
+        withCredentials:true
+      });
+      console.log("finalpricedata",finalPriceResponse.data)
+      if (finalPriceResponse.data.success) {
+        setFinalPrice(finalPriceResponse.data.data);
+      } else {
+        setErrorMessage(finalPriceResponse.data.message);
+      }
+    } catch (error: any) {
+      console.log("Error occure while getting the final price", error.message);
+      setErrorMessage(error.message);
+    }
+  };
+  // useEffect(() => {
+  //   getFinalPrice();
+  // },[checkInDate,checkOutDate,guestData,selectedRoom]);
   const getDefaultDOBByType = (type: "adult" | "child" | "infant") => {
     const today = new Date();
 
@@ -320,7 +389,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     );
 
     setIsFormUpdated(true);
-
+    getFinalPrice(selectedRoom,checkInDate,checkOutDate,guestData)
     setTimeout(() => {
       setActiveSection("review");
     }, 800);
@@ -342,22 +411,22 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
 
       const nightsCount = calculateNights(checkInDate, checkOutDate);
       const totalPrice = selectedRoom.room_price * nightsCount;
-      console.log("Booking Payload:", {
-        firstName: guests[0]?.firstName || "",
-        lastName: guests[0]?.lastName || "",
-        email,
-        phone: phone || "",
-        propertyId,
-        roomId: selectedRoom._id,
-        checkIn: checkInDate,
-        checkOut: checkOutDate,
-        amount: totalPrice.toString(),
-        uterId: authUser?._id,
-        rooms: guestData?.rooms || 1,
-        adults: guestData?.guests || 1,
-        children: guestData?.children || 0,
-        guests,
-      });
+      // console.log("Booking Payload:", {
+      //   firstName: guests[0]?.firstName || "",
+      //   lastName: guests[0]?.lastName || "",
+      //   email,
+      //   phone: phone || "",
+      //   propertyId,
+      //   roomId: selectedRoom._id,
+      //   checkIn: checkInDate,
+      //   checkOut: checkOutDate,
+      //   amount: totalPrice.toString(),
+      //   uterId: authUser?._id,
+      //   rooms: guestData?.rooms || 1,
+      //   adults: guestData?.guests || 1,
+      //   children: guestData?.children || 0,
+      //   guests,
+      // });
 
       onConfirmBooking({
         email,
@@ -1069,7 +1138,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                           )}
                         </span>
                         <span className="font-tripswift-bold text-lg sm:text-xl text-tripswift-black/70">
-                          ₹{selectedRoom.room_price * nightsCount}
+                          ₹{finalPrice?.totalAmount}
+                          {/* additional Charges {finalPrice?.baseRatePerNight} */}
                         </span>
                       </div>
                     </div>

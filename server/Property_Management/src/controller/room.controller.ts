@@ -350,7 +350,8 @@ const getRoomsByPropertyId2 = catchAsync(
                 room_price: { $arrayElemAt: ["$baseByGuestAmts.amountBeforeTax", 0] },
                 currency_code: "$currencyCode",
                 rate_plan_code: "$ratePlanCode",
-                available_guest_rates: "$baseByGuestAmts"
+                available_guest_rates: "$baseByGuestAmts",
+                rate_images: "$image" // Renamed to avoid confusion with room images
               }
             }
           ],
@@ -358,26 +359,41 @@ const getRoomsByPropertyId2 = catchAsync(
         }
       },
       
-      // Final projection
+      // Final projection - including ALL room model fields
       {
         $project: {
+          // Original room model fields
           _id: 1,
+          propertyInfo_id: 1,
           room_name: 1,
           room_type: 1,
-          room_description: 1,
-          room_amenities: 1,
-          room_images: 1,
-          max_occupancy: 1,
-          bed_type: 1,
+          total_room: 1,
+          available_rooms: 1,
+          floor: 1,
+          room_view: 1,
           room_size: 1,
-          propertyInfo_id: 1,
+          room_unit: 1,
+          smoking_policy: 1,
+          max_occupancy: 1,
+          max_number_of_adults: 1,
+          max_number_of_children: 1,
+          number_of_bedrooms: 1,
+          number_of_living_room: 1,
+          extra_bed: 1,
+          description: 1,
+          image: 1, // Room images from the room model
+          available: 1,
+          rateplan_created: 1,
           createdAt: 1,
           updatedAt: 1,
           __v: 1,
+          
+          // Rate information from lookup
           room_price: { $arrayElemAt: ["$rateInfo.room_price", 0] },
           currency_code: { $arrayElemAt: ["$rateInfo.currency_code", 0] },
           rate_plan_code: { $arrayElemAt: ["$rateInfo.rate_plan_code", 0] },
-          
+          available_guest_rates: { $arrayElemAt: ["$rateInfo.available_guest_rates", 0] },
+          rate_images: { $arrayElemAt: ["$rateInfo.rate_images", 0] }, // Images from rate info
           has_valid_rate: { $gt: [{ $size: "$rateInfo" }, 0] }
         }
       }
@@ -416,6 +432,7 @@ const getRoomsByPropertyId2 = catchAsync(
     });
   }
 );
+
 
 
 export const getRoomsForBooking = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
