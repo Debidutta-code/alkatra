@@ -66,7 +66,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
 
   const policyType = getPolicyType(data.cancellation_policy);
   const policyStyling = getPolicyStyling(policyType);
-  const policyBulletPoints = getPolicyBulletPoints(policyType);
+  const policyBulletPoints = getPolicyBulletPoints(policyType, t);
 
   // Handle discount display
   const hasOriginalPrice = !!data.original_price;

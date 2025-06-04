@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, X, Globe, ChevronDown, Settings, HelpCircle, LogOut, User } from 'lucide-react';
+import { Menu, X, Globe, ChevronDown, HelpCircle, LogOut, User } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { usePathname, useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 // Define types
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
+import { jwtDecode } from 'jwt-decode';
 
 interface RootState {
   auth: {
@@ -115,8 +116,8 @@ const Navbar: React.FC = () => {
   return (
     <div
       className={`sticky top-0 z-50 transition-all duration-300 font-noto-sans ${scrolled
-          ? 'bg-gray-100 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.06)]'
-          : 'bg-gray-100 border-b border-tripswift-black/5'
+        ? 'bg-gray-100 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.06)]'
+        : 'bg-gray-100 border-b border-tripswift-black/5'
         } ${pathname === '/login' || pathname === '/register' ? 'hidden' : ''}`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between h-20 px-4 sm:px-6 lg:px-8">
@@ -194,11 +195,11 @@ const Navbar: React.FC = () => {
                     isBordered
                     size="sm"
                     color="primary"
-                    className="transition-transform"
-                    src={user.firstName.charAt(0) + user.lastName.charAt(0)}
+                    className="transition-transform bg-tripswift-blue text-tripswift-off-white"
+                    name={`${user.firstName} ${user.lastName}`}  // This helps with accessibility
                     fallback={
                       <p className="text-lg font-tripswift-bold text-tripswift-off-white">
-                        {user.firstName.charAt(0)}
+                        {user.firstName.charAt(0) + user.lastName.charAt(0)}
                       </p>
                     }
                   />
@@ -326,7 +327,11 @@ const Navbar: React.FC = () => {
                   <Avatar
                     size="sm"
                     className="bg-tripswift-blue text-tripswift-off-white"
-                    src=""
+                    fallback={
+                      <p className="text-lg font-tripswift-bold text-tripswift-off-white">
+                        {user.firstName.charAt(0) + user.lastName.charAt(0)}
+                      </p>
+                    }
                   />
                   <div>
                     <p className="text-[18px] leading-[23px] tracking-[0px] text-tripswift-black font-tripswift-medium">

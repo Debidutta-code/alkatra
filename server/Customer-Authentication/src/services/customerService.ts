@@ -119,10 +119,12 @@ class CustomerService {
         if (!email || !newPassword) {
             throw new Error("Email and new password are required");
         }
+        
         const customer = await customerRepository.findByEmail(email);
         if (!customer) {
             throw new Error("Customer not found");
         }
+        
         if (!isValidPassword(newPassword)) {
             throw new Error(
                 "Password must be at least 8 characters long and include at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character."

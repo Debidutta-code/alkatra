@@ -12,6 +12,8 @@ interface GuestBoxProps {
     guests: number;
     children: number;
     childAges: number[];
+    infants: number;
+    infantAges: number[];
   }) => void;
 }
 
@@ -23,6 +25,8 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
   const [guests, setGuests] = useState(guestDetails?.guests || 1);
   const [children, setChildren] = useState(guestDetails?.children || 0);
   const [childAges, setChildAges] = useState(guestDetails?.childAges || Array.from({ length: 0 }, () => 0));
+  const [infants, setInfants] = useState(guestDetails?.infants || 0);
+  const [infantAges, setInfantAges] = useState(guestDetails?.infantAges || Array.from({ length: 0 }, () => 0));
   const [displayText, setDisplayText] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -36,10 +40,11 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
     const roomsToUse = guestDetails?.rooms || rooms || 1;
     const guestsToUse = guestDetails?.guests || guests || 1;
     const childrenToUse = guestDetails?.children || children || 0;
+    const infantsToUse = guestDetails?.infants || infants || 0;
 
     setDisplayText(
       `${roomsToUse} ${roomsToUse === 1 ? "Room" : "Rooms"} · ${guestsToUse} ${guestsToUse === 1 ? "Adult" : "Adults"
-      }${childrenToUse > 0 ? ` · ${childrenToUse} ${childrenToUse === 1 ? "Child" : "Children"}` : ""}`
+      }${childrenToUse > 0 ? ` · ${childrenToUse} ${childrenToUse === 1 ? "Child" : "Children"}` : ""}${infantsToUse > 0 ? ` · ${infantsToUse} ${infantsToUse === 1 ? "Infant" : "Infants"}` : ""}`
     );
   };
 
@@ -50,6 +55,8 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
       setGuests(guestDetails.guests || 1);
       setChildren(guestDetails.children || 0);
       setChildAges(guestDetails.childAges || []);
+      setInfants(guestDetails.infants || 0);
+      setInfantAges(guestDetails.infantAges || []);
       updateDisplayText();
     }
   }, [guestDetails]);
@@ -90,16 +97,31 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
     newChildAges[index] = age;
     setChildAges(newChildAges);
   };
+  const handleInfantsChange = (value: number) => {
+    setInfants(() => {
+      const newValue = Math.max(value, 0);
+      setInfantAges(Array.from({ length: newValue }, () => 0));
+      return newValue;
+    });
+  };
+  const handleInfantAgeChange = (index: number, age: number) => {
+    const newInfantAges = [...infantAges];
+    newInfantAges[index] = age;
+    setInfantAges(newInfantAges);
+  };
   const isChildAgeValid = () => {
     return childAges.every((age: number) => age > 0 && age < 14);
+  };
+  const isInfantAgeValid = () => {
+    return infantAges.every((age: number) => age >= 0 && age < 2);
   };
 
   const validateGuestCount = () => {
     // Typical max guests per room - 4 is standard for most hotels
     const maxGuestsPerRoom = 4;
 
-    // Total guests including children
-    const totalGuests = guests + children;
+    // Total guests including children and infants
+    const totalGuests = guests + children + infants;
 
     // Maximum allowed guests based on room count
     const maxAllowedGuests = rooms * maxGuestsPerRoom;
@@ -117,19 +139,21 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
       return;
     }
 
-    if (children === 0 || isChildAgeValid()) {
+    if ((children === 0 || isChildAgeValid()) && (infants === 0 || isInfantAgeValid())) {
       // Create guest data object
       const guestData = {
         rooms,
         guests,
         children,
         childAges,
+        infants,
+        infantAges,
       };
 
       // Update display text in OTA style
       setDisplayText(
         `${rooms} ${rooms === 1 ? "Room" : "Rooms"} · ${guests} ${guests === 1 ? "Adult" : "Adults"
-        }${children > 0 ? ` · ${children} ${children === 1 ? "Child" : "Children"}` : ""}`
+        }${children > 0 ? ` · ${children} ${children === 1 ? "Child" : "Children"}` : ""}${infants > 0 ? ` · ${infants} ${infants === 1 ? "Infant" : "Infants"}` : ""}`
       );
 
       // Dispatch to Redux
@@ -142,7 +166,7 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
 
       closeModal();
     } else {
-      setError("Please select the child's age");
+      setError("Please select the age for all children and infants");
     }
   };
 
@@ -217,7 +241,7 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
                 >
                   Children{" "}
                   <span className="text-xs text-tripswift-black/60">
-                    (ages 0-13)
+                    (ages 2-12)
                   </span>
                 </label>
                 <div className="flex items-center gap-3">
@@ -259,18 +283,85 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
                         onChange={(e) =>
                           handleChildAgeChange(index, parseInt(e.target.value))
                         }
-                        className="w-24 p-2 border border-tripswift-black/20 rounded-lg bg-tripswift-off-white focus:ring-2 focus:ring-tripswift-blue/30 focus:border-tripswift-blue outline-none text-sm text-tripswift-black font-tripswift-medium"
+                        className="w-30 p-2 border border-tripswift-black/20 rounded-lg bg-tripswift-off-white focus:ring-2 focus:ring-tripswift-blue/30 focus:border-tripswift-blue outline-none text-sm text-tripswift-black font-tripswift-medium"
                       >
                         <option value={0} disabled>
                           Select age
                         </option>
-                        {Array.from({ length: 14 }, (_, i) => i)
-                          .slice(1)
+                        {Array.from({ length: 13 }, (_, i) => i)
+                          .slice(2)
                           .map((age) => (
                             <option key={age} value={age}>
                               {age} {age === 1 ? "year" : "years"}
                             </option>
                           ))}
+                      </select>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            {/* Infants Section */}
+            <div className="space-y-3 pt-2 border-t border-tripswift-black/10">
+              <div className="flex items-center justify-between">
+                <label
+                  className="text-tripswift-black font-tripswift-medium uppercase"
+                  htmlFor="modalInfants"
+                >
+                  Infants{" "}
+                  <span className="text-xs text-tripswift-black/60">
+                    (ages 0-1)
+                  </span>
+                </label>
+                <div className="flex items-center gap-3">
+                  <button
+                    className="w-9 h-9 rounded-full border border-tripswift-black/20 text-tripswift-black/60 flex items-center justify-center transition-colors hover:bg-tripswift-blue/10 disabled:opacity-50"
+                    onClick={() => handleInfantsChange(infants - 1)}
+                    disabled={infants <= 0}
+                  >
+                    <span className="text-lg">-</span>
+                  </button>
+                  <span className="w-8 text-center text-tripswift-black font-tripswift-medium">
+                    {infants}
+                  </span>
+                  <button
+                    className="w-9 h-9 rounded-full border border-tripswift-black/20 text-tripswift-black/60 flex items-center justify-center transition-colors hover:bg-tripswift-blue/10"
+                    onClick={() => handleInfantsChange(infants + 1)}
+                  >
+                    <span className="text-lg">+</span>
+                  </button>
+                </div>
+              </div>
+              {/* Infant Age Selectors */}
+              {infants > 0 && (
+                <div className="space-y-3 mt-4 pl-4">
+                  {Array.from({ length: infants }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between"
+                    >
+                      <label
+                        className="text-tripswift-black/70 text-sm font-tripswift-medium"
+                        htmlFor={`infantAge${index + 1}`}
+                      >
+                        Infant {index + 1} age
+                      </label>
+                      <select
+                        id={`infantAge${index + 1}`}
+                        value={infantAges[index]}
+                        onChange={(e) =>
+                          handleInfantAgeChange(index, parseInt(e.target.value))
+                        }
+                        className="w-24 p-2 border border-tripswift-black/20 rounded-lg bg-tripswift-off-white focus:ring-2 focus:ring-tripswift-blue/30 focus:border-tripswift-blue outline-none text-sm text-tripswift-black font-tripswift-medium"
+                      >
+                        <option value={0} disabled>
+                          Select age
+                        </option>
+                        {[0, 1].map((age) => (
+                          <option key={age} value={age}>
+                            {age} {age === 1 ? "year" : "years"}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   ))}
@@ -324,11 +415,6 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
             </div>
           </div>
         </div>
-
-        {/* Indicator for custom selection */}
-        {/* {(rooms > 1 || guests > 1 || children > 0) && (
-          <div className="w-2 h-2 bg-tripswift-blue rounded-full mr-2"></div>
-        )} */}
       </div>
 
       {/* Render the modal using a portal */}
