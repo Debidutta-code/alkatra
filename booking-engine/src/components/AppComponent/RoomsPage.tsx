@@ -19,6 +19,7 @@ import { formatDate, calculateNights } from "@/utils/dateUtils";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import QRCodeDisplay from "./QRCodeDisplay";
+import { TRACE_OUTPUT_VERSION } from "next/dist/shared/lib/constants";
 
 interface Room {
   _id: string;
@@ -87,7 +88,7 @@ const [qrCodeData, setQrCodeData] = useState({
     qrCode: null,
     couponCode: null,
   });
-const [showPropertyDetails,setShowPropertyDetails]=useState<boolean>(true)
+const [showPropertyDetails,setShowPropertyDetails]=useState<boolean>(TRACE_OUTPUT_VERSION)
 const [selectedImage, setSelectedImage] = useState<number>(0);
   // Get guest details from Redux
   const { guestDetails } = useSelector((state) => state.hotel);
