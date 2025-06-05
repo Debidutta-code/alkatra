@@ -17,6 +17,7 @@ export interface ReservationInput {
     numberOfRooms: number;
     roomTotalPrice: number;
     currencyCode: string;
+    guests: any[];
     email: string;
     phone: string;
   };
@@ -31,6 +32,9 @@ export interface ThirdPartyReservationData {
   ratePlanName?: string;
   roomTypeCode: string;
   numberOfRooms: number;
+  guests: any[];
+  email: string;
+  phone: string;
   checkInDate: Date;
   checkOutDate: Date;
   // guestDetails: GuestDetails[];

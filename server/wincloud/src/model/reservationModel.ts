@@ -3,8 +3,7 @@ import { Schema, model, Document } from 'mongoose';
 interface IGuestDetails {
     firstName: string;
     lastName: string;
-    email: string;
-    phone: string;
+    dob: string;
 }
 
 interface IThirdPartyBooking extends Document {
@@ -16,6 +15,8 @@ interface IThirdPartyBooking extends Document {
     checkInDate: Date;
     checkOutDate: Date;
     guestDetails?: IGuestDetails[]; 
+    email: string;
+    phone: string;
     ageCodeSummary?: Record<string, number>;
     numberOfRooms: number;
     totalAmount: number;
@@ -36,6 +37,9 @@ interface IReservationLog extends Document {
     hotelName: string;
     ratePlanCode: string;
     roomTypeCode: string;
+    guestDetails?: IGuestDetails[]; 
+    email: string;
+    phone: string;
     checkInDate: Date;
     checkOutDate: Date;
     jsonInput: string;
@@ -50,8 +54,7 @@ interface IReservationLog extends Document {
 const guestDetailsSchema = new Schema<IGuestDetails>({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    email: { type: String, required: true },
-    phone: { type: String, required: true },
+    dob: {type: String, required: true},
 });
 
 const thirdPartyBookingSchema = new Schema<IThirdPartyBooking>({
@@ -63,6 +66,8 @@ const thirdPartyBookingSchema = new Schema<IThirdPartyBooking>({
     checkInDate: { type: Date, required: true },
     checkOutDate: { type: Date, required: true },
     guestDetails: { type: [guestDetailsSchema], required: false },
+    email: {type: String, required: false},
+    phone: {type: String, required: false},
     ageCodeSummary: { type: Map, of: Number, required: true },
     numberOfRooms: { type: Number, required: true },
     totalAmount: { type: Number, required: true },
@@ -79,6 +84,9 @@ const reservationLogSchema = new Schema<IReservationLog>({
     hotelName: { type: String, required: true },
     ratePlanCode: { type: String, required: true },
     roomTypeCode: { type: String, required: true },
+    guestDetails: { type: [guestDetailsSchema], required: false },
+    email: {type: String, required: false},
+    phone: {type: String, required: false},
     checkInDate: { type: Date, required: true },
     checkOutDate: { type: Date, required: true },
     jsonInput: { type: String, required: true },

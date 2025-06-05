@@ -14,6 +14,9 @@ export class ReservationProcessor {
             numberOfRooms,
             roomTotalPrice,
             currencyCode,
+            guests,
+            email,
+            phone,
         } = bookingDetails;
 
         console.log("@@@@@@@@@@@@@@@@@@ Reservation processor: Processing reservation input data:", JSON.stringify(data, null, 2));
@@ -28,6 +31,9 @@ export class ReservationProcessor {
             checkOutDate: new Date(checkOutDate),
             amountBeforeTax: roomTotalPrice,
             currencyCode, 
+            guests,
+            email,
+            phone,
             // userId: "someUserId", 
             // propertyId: "somePropertyId",
             // roomIds: ["room1", "room2"], 

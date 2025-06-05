@@ -8,6 +8,9 @@ export class XmlFormatter {
 
         const {
             userId,
+            guests,
+            email,
+            phone,
             reservationId,
             hotelCode,
             hotelName,

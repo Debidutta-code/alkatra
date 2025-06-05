@@ -11,6 +11,9 @@ export class ThirdPartyReservationRepository {
 
     const booking = new ThirdPartyBooking({
       userId: data.userId,
+      guestDetails: data.guests,
+      email: data.email,
+      phone: data.phone,
       reservationId: data.reservationId,
       hotelCode: data.hotelCode,
       hotelName: data.hotelName,
@@ -51,6 +54,9 @@ export class ThirdPartyReservationRepository {
       hotelName: jsonInput.hotelName,
       ratePlanCode: jsonInput.ratePlanCode,
       roomTypeCode: jsonInput.roomTypeCode,
+      guestDetails: jsonInput.guests,
+      email: jsonInput.email,
+      phone: jsonInput.phone,
       checkInDate: new Date(jsonInput.checkInDate),
       checkOutDate: new Date(jsonInput.checkOutDate),
       jsonInput: JSON.stringify(jsonInput, null, 2),

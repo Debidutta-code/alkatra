@@ -18,6 +18,7 @@ export interface AmendReservationInput {
     numberOfRooms: number;
     roomTotalPrice: number;
     currencyCode: string;
+    guests: any[];
     email: string;
     phone: string;
   };
@@ -30,6 +31,9 @@ export interface ThirdPartyAmendReservationData {
     hotelName: string;
     ratePlanCode: string;
     roomTypeCode: string;
+    guests: any[];
+    email: string;
+    phone: string;
     checkInDate: string;
     checkOutDate: string;
     ageCodeSummary: Record<string, number>; 

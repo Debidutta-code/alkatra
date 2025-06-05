@@ -8,6 +8,9 @@ export function generateAmendReservationXML(data: ThirdPartyAmendReservationData
     const hotelName = data.hotelName;
     const ratePlanCode = data.ratePlanCode;
     const roomTypeCode = data.roomTypeCode;
+    const guests = data.guests;
+    const email = data.email;
+    const phone = data.phone;
     const checkInDate = data.checkInDate ? new Date(data.checkInDate).toISOString() : '';
     const checkOutDate = data.checkOutDate ? new Date(data.checkOutDate).toISOString() : '';
     const amountBeforeTax = data.amountBeforeTax;
