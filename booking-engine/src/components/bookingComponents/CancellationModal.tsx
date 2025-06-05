@@ -127,11 +127,12 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
       const hoursUntilCheckIn = differenceInHours(checkInDate, now);
 
       // Use the utility function to calculate refund
-      const { refundPercentage, refundAmount, cancellationFee } = calculateRefund(
+      const { refundPercentage, refundAmount, cancellationFee, message } = calculateRefund(
         selectedPolicyType,
         booking.amount,
         daysUntilCheckIn,
-        hoursUntilCheckIn
+        hoursUntilCheckIn,
+        t 
       );
 
       setRefundPercentage(refundPercentage);
@@ -188,8 +189,8 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
   const policyStyling = getPolicyStyling(policyType);
 
   // Get bullet points for the policy
-  const policyBulletPoints = getPolicyBulletPoints(policyType);
-
+  const policyBulletPoints = getPolicyBulletPoints(policyType, t);
+  
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 font-noto-sans p-3 sm:p-5">
       <div className="bg-tripswift-off-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-3 sm:p-4 md:p-6">
@@ -462,7 +463,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
         </div>
 
         {/* Action buttons */}
-        <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
+        <div className="flex flex-col-reverse md:flex-row justify-end gap-2 sm:gap-3">
           <button
             className="px-4 sm:px-6 py-2.5 sm:py-3 border border-gray-200 rounded-lg sm:rounded-xl text-sm sm:text-base text-tripswift-black/80 hover:bg-gray-50 font-tripswift-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={onClose}

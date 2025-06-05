@@ -20,7 +20,7 @@ interface CompactSearchBarProps {
 }
 
 const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
-  initialLocation = "Bhubaneswar",
+  initialLocation = "Dubai",
   initialCheckin = "",
   initialCheckout = "",
   onSearch,
@@ -42,7 +42,7 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
     initialLocation ||
     searchParams.get("location") ||
     searchParams.get("destination") ||
-    "Bhubaneswar";
+    "Dubai";
   const checkinDate = initialCheckin || searchParams.get("checkin") || tomorrow;
   const checkoutDate =
     initialCheckout || searchParams.get("checkout") || dayAfterTomorrow;
@@ -90,7 +90,7 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
       toast.error(t("HotelListing.CompactSearchBar.errorSelectDates"));
       return;
     }
-
+console.log("guest details",guestDetails)
     setLoading(true);
     try {
       await getHotelsByCity(searchQuery);
@@ -103,7 +103,7 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
       } else {
         // Build guest details query parameters
         const guestParams = guestDetails ? 
-          `&rooms=${guestDetails.rooms || 1}&adults=${guestDetails.guests || 1}&children=${guestDetails.children || 0}` : 
+          `&rooms=${guestDetails.rooms || 1}&adults=${guestDetails.guests || 1}&children=${guestDetails.children || 0}infant=${guestDetails.infants || 0}` : 
           '';
         
         router.push(`/destination?location=${encodeURIComponent(searchQuery)}&checkin=${checkinDate}&checkout=${checkoutDate}${guestParams}`);

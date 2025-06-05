@@ -87,7 +87,8 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
         firstName: bookingDetails.firstName,
         lastName: bookingDetails.lastName,
         email: bookingDetails.email,
-        phone: bookingDetails.phone
+        phone: bookingDetails.phone,
+        guests: bookingDetails.guests // Pass all guest details here
       }, token);
 
       console.log("Setup intent response:", setupIntentResponse);

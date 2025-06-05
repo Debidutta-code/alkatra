@@ -146,11 +146,11 @@ const HotelListing: React.FC = () => {
       setIsLoading(false);
     }
   };
-
+// console.log("guest details",guestDetails)
   const handleSearch = (newLocation: string, checkin: string, checkout: string, guestData?: any) => {
     const guestToUse = guestData || guestDetails;
     const guestParams = guestToUse ?
-      `&rooms=${guestToUse.rooms || 1}&adults=${guestToUse.guests || 1}&children=${guestToUse.children || 0}` :
+      `&rooms=${guestToUse.rooms || 1}&adults=${guestToUse.guests || 1}&children=${guestToUse.children || 0}&infant=${guestToUse.infants || 0}` :
       '';
     router.push(`/destination?location=${encodeURIComponent(newLocation)}&checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(checkout)}${guestParams}`);
   };
@@ -191,7 +191,7 @@ const HotelListing: React.FC = () => {
 
     // Pass guest details in the URL
     const guestParams = guestDetails ?
-      `&rooms=${guestDetails.rooms || 1}&adults=${guestDetails.guests || 1}&children=${guestDetails.children || 0}` :
+      `&rooms=${guestDetails.rooms || 1}&adults=${guestDetails.guests || 1}&children=${guestDetails.children || 0}&infant=${guestDetails.infants || 0}` :
       '';
 
     window.location.href = `/hotel?id=${hotelId}&checkin=${checkinDate}&checkout=${checkoutDate}${guestParams}`;

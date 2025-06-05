@@ -257,7 +257,7 @@ class RoomRentCalculationService {
       if (minimumRoomAvailable < noOfRooms) {
         return {
           success: false,
-          message: `Only ${minimumRoomAvailable} rooms available, but ${noOfRooms} rooms requested from ${start.toDateString()} to ${endDate.toDateString()}`
+          message: `Only ${minimumRoomAvailable} rooms available, but ${noOfRooms} rooms requested from ${start.toDateString()} to ${endDate.toString()}`
         };
       }
 
@@ -409,7 +409,7 @@ class RoomRentCalculationService {
 
       console.log(`=== Date Generation Debug ===`);
       console.log(`Start Date: ${startDate.toDateString()}`);
-      console.log(`End Date: ${endDate.toDateString()}`);
+      console.log(`End Date: ${endDate.toString()}`);
       console.log(`Generated ${stayDates.length} nights: ${stayDates.map(d => d.toDateString()).join(', ')}`);
       console.log(`Expected nights: ${numberOfNights}`);
       console.log(`=== End Debug ===`);

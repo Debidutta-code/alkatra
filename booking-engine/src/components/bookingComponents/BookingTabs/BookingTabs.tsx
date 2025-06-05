@@ -228,7 +228,7 @@ export default function BookingTabs() {
       {/* Header Section */}
       <BookingHeader />
 
-      <div className="container mx-auto px-4 py-8 md:py-12 -mt-6">
+      <div className="container w-full mx-auto px-4 py-8 md:py-12 -mt-6">
         {/* Tabs Navigation */}
         <BookingTabsNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
@@ -240,7 +240,7 @@ export default function BookingTabs() {
           <EmptyState activeTab={activeTab} />
         ) : (
           <>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1  lg:grid-cols-2 gap-6">
               {filteredBookings.map((booking) => (
                 <BookingCard
                   key={booking._id}

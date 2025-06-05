@@ -55,7 +55,7 @@ const BookingPagination: React.FC<BookingPaginationProps> = ({
     pageNumbers.push(i);
   }
   return (
-    <div className="mt-8 flex flex-col sm:flex-row justify-between items-center bg-white rounded-lg shadow-md p-4">
+    <div className="mt-8 flex flex-col md:flex-row justify-between items-center bg-white rounded-lg shadow-md p-4">
       <div className="mb-2 sm:mb-0 flex items-center space-x-2">
         <span className="text-sm text-gray-700">{t('BookingTabs.BookingPagination.show')}</span>
         <div className="relative">
@@ -106,7 +106,8 @@ const BookingPagination: React.FC<BookingPaginationProps> = ({
             onClick={() => onPageChange(number)}
             className={`w-9 h-9 rounded-md ${currentPage === number
               ? 'bg-tripswift-blue text-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/50'
-              : 'bg-white border border-gray-300 text-gray-700 hover:border-tripswift-blue/30 hover:bg-tripswift-blue/5 focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20'}`}
+              : 'bg-white border border-gray-300 text-gray-700 hover:border-tripswift-blue/30 hover:bg-tripswift-blue/5 focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20'}
+               ${ number === 5 ? 'hidden md:block' : ''}${ number === 4 ? 'hidden sm:block' : ''}`}
           >
             {number}
           </button>

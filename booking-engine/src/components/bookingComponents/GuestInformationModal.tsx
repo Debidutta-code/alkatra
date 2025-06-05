@@ -18,7 +18,14 @@ import {
 } from "lucide-react";
 import { formatDate, calculateNights } from "@/utils/dateUtils";
 import { useTranslation } from "react-i18next";
+import axios from "axios";
 
+export interface Guest {
+  firstName: string;
+  lastName: string;
+  dob?: string;
+  type?: "adult" | "child" | "infant";
+}
 // User type definition
 interface UserType {
   firstName: string;
@@ -54,8 +61,6 @@ interface GuestInformationModalProps {
   checkInDate: string;
   checkOutDate: string;
   onConfirmBooking: (formData: {
-    firstName: string;
-    lastName: string;
     email: string;
     phone: string;
     propertyId: string;
@@ -67,11 +72,14 @@ interface GuestInformationModalProps {
     rooms?: number;
     adults?: number;
     children?: number;
+    infants?: number;
+    guests?: Guest[];
   }) => void;
   guestData?: {
     rooms?: number;
     guests?: number;
     children?: number;
+    infants?: number;
     childAges?: number[];
     firstName?: string;
     lastName?: string;
@@ -79,7 +87,33 @@ interface GuestInformationModalProps {
     phone?: string;
   };
 }
-
+interface DailyBreakDown {
+  date: string;
+  dayOfWeek: string;
+  ratePlanCode: string;
+  baseRate: number;
+  additionalCharges: number;
+  totalPerRoom: number;
+  totalForAllRooms: number;
+  currencyCode: string;
+  childrenChargesBreakdown: number[];
+}
+interface FinalPrice {
+  totalAmount: number;
+  numberOfNights: number;
+  baseRatePerNight: number;
+  additionalGuestCharges: number;
+  breakdown: {
+    totalBaseAmount: number;
+    totalAdditionalCharges: number;
+    totalAmount: number;
+    numberOfNights: number;
+    averagePerNight: number;
+  };
+  dailyBreakdown: DailyBreakDown | null;
+  availableRooms: number;
+  requestedRooms: number;
+}
 const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   isOpen,
   onClose,
@@ -90,19 +124,334 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   guestData,
 }) => {
   const authUser = useSelector((state: RootState) => state.auth.user);
-  const [firstName, setFirstName] = useState<string>(authUser?.firstName || "");
-  const [lastName, setLastName] = useState<string>(authUser?.lastName || "");
+  const totalGuests =
+    (guestData?.guests || 1) +
+    (guestData?.children || 0) +
+    (guestData?.infants || 0);
+  const getFormattedDate = (date: Date) => date.toISOString().split("T")[0];
+
+  const [guests, setGuests] = useState<Guest[]>(() => {
+    return Array.from({ length: totalGuests }, (_, i) => {
+      let type: Guest["type"] =
+        i < (guestData?.guests || 1)
+          ? "adult"
+          : i < (guestData?.guests || 1) + (guestData?.children || 0)
+          ? "child"
+          : "infant";
+
+      // Set default DOBs per type
+      const today = new Date();
+      let defaultDOB = "";
+
+      if (type === "child") {
+        const twoYearsAgo = new Date();
+        twoYearsAgo.setFullYear(today.getFullYear() - 2);
+        defaultDOB = getFormattedDate(twoYearsAgo);
+      } else if (type === "adult") {
+        const thirteenYearsAgo = new Date();
+        thirteenYearsAgo.setFullYear(today.getFullYear() - 13);
+        defaultDOB = getFormattedDate(thirteenYearsAgo);
+      } else {
+        // For adult, defaultDOB could be empty or a reasonable default
+        defaultDOB = ""; // or set some default if needed
+      }
+
+      return {
+        firstName: "",
+        lastName: "",
+        dob: defaultDOB,
+        type,
+      };
+    });
+  });
+
+  // console.log("guest data", guestData);
+
   const [email, setEmail] = useState<string>(authUser?.email || "");
   const [phone, setPhone] = useState<string | undefined>("");
+
   const [isFormUpdated, setIsFormUpdated] = useState(false);
   const [updateMessage, setUpdateMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<"details" | "review">(
     "details"
   );
-
+  const [finalPrice, setFinalPrice] = useState<FinalPrice | null>({
+    totalAmount: 0,
+    numberOfNights: 0,
+    baseRatePerNight: 0,
+    additionalGuestCharges: 0,
+    breakdown: {
+      totalBaseAmount: 0,
+      totalAdditionalCharges: 0,
+      totalAmount: 0,
+      numberOfNights: 0,
+      averagePerNight: 0,
+    },
+    dailyBreakdown: null,
+    availableRooms: 0,
+    requestedRooms: 0,
+  });
   const dispatch = useDispatch();
   const { t } = useTranslation();
+  const getFinalPrice = async (selectedRoom:any,checkInDate:string,checkOutDate:string,guestData:any) => {
+    console.log("getfinal price called")
+    try {
+      const finalPriceResponse = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomRentPrice`, {
+        hotelCode: "WINCLOUD",
+        invTypeCode: selectedRoom?.room_type,
+        startDate: checkInDate,
+        endDate: checkOutDate,
+        noOfChildrens: guestData?.children,
+        noOfAdults: guestData?.guests,
+        noOfRooms: guestData?.rooms,
+      },{
+        withCredentials:true
+      });
+      console.log("finalpricedata",finalPriceResponse.data)
+      if (finalPriceResponse.data.success) {
+        setFinalPrice(finalPriceResponse.data.data);
+      } else {
+        setErrorMessage(finalPriceResponse.data.message);
+      }
+    } catch (error: any) {
+      console.log("Error occure while getting the final price", error.message);
+      setErrorMessage(error.message);
+    }
+  };
+  // useEffect(() => {
+  //   getFinalPrice();
+  // },[checkInDate,checkOutDate,guestData,selectedRoom]);
+  const getDefaultDOBByType = (type: "adult" | "child" | "infant") => {
+    const today = new Date();
+
+    if (type === "infant") {
+      const today = new Date();
+      today.setFullYear(today.getFullYear());
+      return getFormattedDate(today);
+    }
+
+    if (type === "child") {
+      const twoYearsAgo = new Date();
+      twoYearsAgo.setFullYear(today.getFullYear() - 2);
+      return getFormattedDate(twoYearsAgo);
+    }
+    if (type === "adult") {
+      const thirteenYearsAgo = new Date();
+      thirteenYearsAgo.setFullYear(today.getFullYear() - 13);
+      return getFormattedDate(thirteenYearsAgo);
+    }
+
+    return ""; // or default adult DOB if needed
+  };
+
+  useEffect(() => {
+    if (guestData) {
+      const newTotalGuests =
+        (guestData.guests || 1) +
+        (guestData.children || 0) +
+        (guestData.infants || 0);
+      setGuests(
+        Array.from({ length: newTotalGuests }, (_, i) => {
+          const type: Guest["type"] =
+            i < (guestData?.guests || 1)
+              ? "adult"
+              : i < (guestData?.guests || 1) + (guestData?.children || 0)
+              ? "child"
+              : "infant";
+
+          const guest = guests[i];
+
+          return {
+            firstName: guestData.firstName || guest?.firstName || "",
+            lastName: guestData.lastName || guest?.lastName || "",
+            dob: guest?.dob || getDefaultDOBByType(type), // <- 💡 key part
+            type,
+          };
+        })
+      );
+
+      setEmail(guestData.email || "");
+      if (guestData.phone) {
+        setPhone(
+          guestData.phone.startsWith("+")
+            ? guestData.phone
+            : `+${guestData.phone}`
+        );
+      } else {
+        setPhone("");
+      }
+    } else if (authUser) {
+      setEmail(authUser.email);
+      if (authUser.phone) {
+        if (authUser.phone.startsWith("+")) {
+          setPhone(authUser.phone);
+        } else if (!isNaN(Number(authUser.phone))) {
+          setPhone(`+${authUser.phone}`);
+        } else {
+          setPhone("");
+        }
+      } else {
+        setPhone("");
+      }
+    }
+  }, [authUser, guestData]);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  const handleGuestChange = (
+    index: number,
+    field: keyof Guest,
+    value: string
+  ) => {
+    const updatedGuests = [...guests];
+    updatedGuests[index] = { ...updatedGuests[index], [field]: value };
+    setGuests(updatedGuests);
+  };
+
+  const handleUpdate = () => {
+    let valid = true;
+    setErrorMessage(null);
+
+    // Validate guests' firstName, lastName, dob
+    for (let i = 0; i < guests.length; i++) {
+      const guest = guests[i];
+      if (!guest.firstName || !/^[A-Za-z\s]+$/.test(guest.firstName)) {
+        setErrorMessage(
+          t("BookingComponents.GuestInformationModal.firstNameError") +
+            ` (Guest ${i + 1})`
+        );
+        valid = false;
+        break;
+      }
+      if (!guest.lastName || !/^[A-Za-z\s]+$/.test(guest.lastName)) {
+        setErrorMessage(
+          t("BookingComponents.GuestInformationModal.lastNameError") +
+            ` (Guest ${i + 1})`
+        );
+        valid = false;
+        break;
+      }
+      if (!guest.dob) {
+        setErrorMessage(
+          t("BookingComponents.GuestInformationModal.dobError") +
+            ` (Guest ${i + 1})`
+        );
+        valid = false;
+        break;
+      }
+    }
+
+    // Validate email
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setErrorMessage(t("BookingComponents.GuestInformationModal.emailError"));
+      valid = false;
+    }
+
+    // Validate phone (basic check for length and digits)
+    if (!phone || phone.length < 10) {
+      setErrorMessage(t("BookingComponents.GuestInformationModal.phoneError"));
+      valid = false;
+    }
+
+    if (!valid) {
+      return;
+    }
+
+    setUpdateMessage(
+      t("BookingComponents.GuestInformationModal.informationVerified")
+    );
+
+    dispatch(
+      setGuestDetails({
+        guests,
+        email,
+        phone,
+        rooms: guestData?.rooms || 1,
+        adults: guestData?.guests || 1,
+        children: guestData?.children || 0,
+        infants: guestData?.infants || 0,
+        childAges: guestData?.childAges || [],
+      })
+    );
+
+    setIsFormUpdated(true);
+    getFinalPrice(selectedRoom,checkInDate,checkOutDate,guestData)
+    setTimeout(() => {
+      setActiveSection("review");
+    }, 800);
+  };
+
+  const handleConfirmBooking = () => {
+    if (isFormUpdated && selectedRoom) {
+      const propertyId =
+        selectedRoom.propertyInfo_id ||
+        selectedRoom.property_id ||
+        selectedRoom.propertyId ||
+        "";
+      if (!propertyId) {
+        setErrorMessage(
+          t("BookingComponents.GuestInformationModal.propertyInfoMissing")
+        );
+        return;
+      }
+
+      const nightsCount = calculateNights(checkInDate, checkOutDate);
+      const totalPrice = selectedRoom.room_price * nightsCount;
+      // console.log("Booking Payload:", {
+      //   firstName: guests[0]?.firstName || "",
+      //   lastName: guests[0]?.lastName || "",
+      //   email,
+      //   phone: phone || "",
+      //   propertyId,
+      //   roomId: selectedRoom._id,
+      //   checkIn: checkInDate,
+      //   checkOut: checkOutDate,
+      //   amount: totalPrice.toString(),
+      //   uterId: authUser?._id,
+      //   rooms: guestData?.rooms || 1,
+      //   adults: guestData?.guests || 1,
+      //   children: guestData?.children || 0,
+      //   guests,
+      // });
+
+      onConfirmBooking({
+        email,
+        phone: phone || "",
+        propertyId,
+        roomId: selectedRoom._id,
+        checkIn: checkInDate,
+        checkOut: checkOutDate,
+        amount: totalPrice.toString(),
+        userId: authUser?._id,
+        rooms: guestData?.rooms || 1,
+        adults: guestData?.guests || 1,
+        children: guestData?.children || 0,
+        guests,
+      });
+    }
+  };
+
+  if (!isOpen || !selectedRoom) return null;
+
+  const nightsCount = calculateNights(checkInDate, checkOutDate);
+  const nightsText =
+    nightsCount === 1
+      ? t("BookingComponents.GuestInformationModal.nights")
+      : t("BookingComponents.GuestInformationModal.nightsPlural");
 
   // Helper function to get guest count display
   const getGuestCountDisplay = () => {
@@ -130,152 +479,6 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
 
     return display;
   };
-
-  useEffect(() => {
-    if (guestData) {
-      setFirstName(guestData.firstName || "");
-      setLastName(guestData.lastName || "");
-      setEmail(guestData.email || "");
-      if (guestData.phone) {
-        setPhone(
-          guestData.phone.startsWith("+")
-            ? guestData.phone
-            : `+${guestData.phone}`
-        );
-      } else {
-        setPhone("");
-      }
-    } else if (authUser) {
-      setFirstName(authUser.firstName);
-      setLastName(authUser.lastName);
-      setEmail(authUser.email);
-      if (authUser.phone) {
-        if (authUser.phone.startsWith("+")) {
-          setPhone(authUser.phone);
-        } else if (!isNaN(Number(authUser.phone))) {
-          setPhone(`+${authUser.phone}`);
-        } else {
-          setPhone("");
-        }
-      } else {
-        setPhone("");
-      }
-    }
-  }, [authUser, guestData]);
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-    }
-  
-    return () => {
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-    };
-  }, [isOpen]);
-
-  const handleUpdate = () => {
-    let valid = true;
-    setErrorMessage(null);
-
-    if (!firstName || !/^[A-Za-z\s]+$/.test(firstName)) {
-      setErrorMessage(
-        t("BookingComponents.GuestInformationModal.firstNameError")
-      );
-      valid = false;
-    }
-
-    if (!lastName || !/^[A-Za-z\s]+$/.test(lastName)) {
-      setErrorMessage(
-        t("BookingComponents.GuestInformationModal.lastNameError")
-      );
-      valid = false;
-    }
-
-    if (
-      !email ||
-      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)
-    ) {
-      setErrorMessage(t("BookingComponents.GuestInformationModal.emailError"));
-      valid = false;
-    }
-
-    if (!phone) {
-      setErrorMessage(t("BookingComponents.GuestInformationModal.phoneError"));
-      valid = false;
-    }
-
-    if (valid) {
-      setIsFormUpdated(true);
-      setUpdateMessage(
-        t("BookingComponents.GuestInformationModal.informationVerified")
-      );
-
-      dispatch(
-        setGuestDetails({
-          firstName,
-          lastName,
-          email,
-          phone,
-          rooms: guestData?.rooms || 1,
-          guests: guestData?.guests || 1,
-          children: guestData?.children || 0,
-          childAges: guestData?.childAges || [],
-        })
-      );
-
-      setTimeout(() => {
-        setActiveSection("review");
-      }, 800);
-    }
-  };
-
-  const handleConfirmBooking = () => {
-    if (isFormUpdated && selectedRoom) {
-      const propertyId =
-        selectedRoom.propertyInfo_id ||
-        selectedRoom.property_id ||
-        selectedRoom.propertyId ||
-        "";
-      if (!propertyId) {
-        setErrorMessage(
-          t("BookingComponents.GuestInformationModal.propertyInfoMissing")
-        );
-        return;
-      }
-
-      const nightsCount = calculateNights(checkInDate, checkOutDate);
-      const totalPrice = selectedRoom.room_price * nightsCount;
-
-      onConfirmBooking({
-        firstName,
-        lastName,
-        email,
-        phone: phone || "",
-        propertyId,
-        roomId: selectedRoom._id,
-        checkIn: checkInDate,
-        checkOut: checkOutDate,
-        amount: totalPrice.toString(),
-        userId: authUser?._id,
-        rooms: guestData?.rooms || 1,
-        adults: guestData?.guests || 1,
-        children: guestData?.children || 0,
-      });
-    }
-  };
-
-  if (!isOpen || !selectedRoom) return null;
-
-  const nightsCount = calculateNights(checkInDate, checkOutDate);
-  const nightsText =
-    nightsCount === 1
-      ? t("BookingComponents.GuestInformationModal.nights")
-      : t("BookingComponents.GuestInformationModal.nightsPlural");
 
   return (
     <>
@@ -306,10 +509,11 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
           <div className="flex justify-between mb-1 sm:mb-2">
             <div className="flex flex-col items-center">
               <div
-                className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-tripswift-medium ${activeSection === "details" || isFormUpdated
+                className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-tripswift-medium ${
+                  activeSection === "details" || isFormUpdated
                     ? "bg-tripswift-blue text-tripswift-off-white"
                     : "bg-tripswift-black/10 text-tripswift-black/60"
-                  }`}
+                }`}
               >
                 1
               </div>
@@ -319,16 +523,18 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
             </div>
             <div className="flex-1 flex items-center mx-2">
               <div
-                className={`h-1 w-full ${isFormUpdated ? "bg-tripswift-blue" : "bg-tripswift-black/10"
-                  }`}
+                className={`h-1 w-full ${
+                  isFormUpdated ? "bg-tripswift-blue" : "bg-tripswift-black/10"
+                }`}
               ></div>
             </div>
             <div className="flex flex-col items-center">
               <div
-                className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-tripswift-medium ${activeSection === "review" && isFormUpdated
+                className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-tripswift-medium ${
+                  activeSection === "review" && isFormUpdated
                     ? "bg-tripswift-blue text-tripswift-off-white"
                     : "bg-tripswift-black/10 text-tripswift-black/60"
-                  }`}
+                }`}
               >
                 2
               </div>
@@ -340,7 +546,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         </div>
 
         {/* Main Content with padding-bottom to prevent overlap with fixed footer */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 pb-20 sm:pb-24">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 pb-28 sm:pb-24 md:pb-28 ">
           {activeSection === "details" ? (
             <div className="space-y-4 sm:space-y-6">
               {/* Room Summary */}
@@ -374,53 +580,358 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                 </h3>
 
                 <div className="space-y-3 sm:space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                    <div className="space-y-1">
-                      <label
-                        htmlFor="firstName"
-                        className="text-xs sm:text-sm ml-1 font-tripswift-medium text-tripswift-black/80 flex items-center"
-                      >
-                        <User size={16} className="text-tripswift-blue mr-2" />
-                        {t(
-                          "BookingComponents.GuestInformationModal.firstNameLabel"
-                        )}
-                      </label>
-                      <input
-                        type="text"
-                        id="firstName"
-                        name="firstName"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        placeholder={t(
-                          "BookingComponents.GuestInformationModal.firstNamePlaceholder"
-                        )}
-                        className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-tripswift-black/20 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-xs sm:text-sm font-tripswift-regular"
-                      />
-                    </div>
+                  {/* Render Adults */}
+                  {guests
+                    .slice(0, guestData?.guests || 1)
+                    .map((guest, index) => (
+                      <div key={`adult-${index}`} className="mb-4">
+                        <h4 className="font-tripswift-bold text-tripswift-black mb-2">
+                          {`Adult ${index + 1}`}
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
+                          <div className="space-y-1">
+                            <label
+                              htmlFor={`firstName-adult-${index}`}
+                              className="text-xs sm:text-sm ml-1 font-tripswift-medium text-tripswift-black/80 flex items-center"
+                            >
+                              <User
+                                size={16}
+                                className="text-tripswift-blue mr-2"
+                              />
+                              {t(
+                                "BookingComponents.GuestInformationModal.firstNameLabel"
+                              )}
+                            </label>
+                            <input
+                              type="text"
+                              id={`firstName-adult-${index}`}
+                              name={`firstName-adult-${index}`}
+                              value={guest.firstName}
+                              required
+                              onChange={(e) =>
+                                handleGuestChange(
+                                  index,
+                                  "firstName",
+                                  e.target.value
+                                )
+                              }
+                              placeholder={t(
+                                "BookingComponents.GuestInformationModal.firstNamePlaceholder"
+                              )}
+                              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-tripswift-black/20 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-xs sm:text-sm font-tripswift-regular"
+                            />
+                          </div>
 
-                    <div className="space-y-1 ">
-                      <label
-                        htmlFor="lastName"
-                        className="text-xs sm:text-sm font-tripswift-medium ml-1 text-tripswift-black/80 flex items-center"
-                      >
-                        <User size={16} className="text-tripswift-blue mr-2" />
-                        {t(
-                          "BookingComponents.GuestInformationModal.lastNameLabel"
-                        )}
-                      </label>
-                      <input
-                        type="text"
-                        id="lastName"
-                        name="lastName"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        placeholder={t(
-                          "BookingComponents.GuestInformationModal.lastNamePlaceholder"
-                        )}
-                        className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-tripswift-black/20 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-xs sm:text-sm font-tripswift-regular"
-                      />
-                    </div>
-                  </div>
+                          <div className="space-y-1">
+                            <label
+                              htmlFor={`lastName-adult-${index}`}
+                              className="text-xs sm:text-sm font-tripswift-medium ml-1 text-tripswift-black/80 flex items-center"
+                            >
+                              <User
+                                size={16}
+                                className="text-tripswift-blue mr-2"
+                              />
+                              {t(
+                                "BookingComponents.GuestInformationModal.lastNameLabel"
+                              )}
+                            </label>
+                            <input
+                              type="text"
+                              id={`lastName-adult-${index}`}
+                              name={`lastName-adult-${index}`}
+                              value={guest.lastName}
+                              required
+                              onChange={(e) =>
+                                handleGuestChange(
+                                  index,
+                                  "lastName",
+                                  e.target.value
+                                )
+                              }
+                              placeholder={t(
+                                "BookingComponents.GuestInformationModal.lastNamePlaceholder"
+                              )}
+                              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-tripswift-black/20 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-xs sm:text-sm font-tripswift-regular"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <label
+                              htmlFor={`dob-adult-${index}`}
+                              className="text-xs sm:text-sm font-tripswift-medium ml-1 text-tripswift-black/80 flex items-center"
+                            >
+                              <Calendar
+                                size={16}
+                                className="text-tripswift-blue mr-2"
+                              />
+                              DOB
+                            </label>
+                            <input
+                              type="date"
+                              id={`dob-adult-${index}`}
+                              name={`dob-adult-${index}`}
+                              value={guest.dob}
+                              required
+                              onChange={(e) =>
+                                handleGuestChange(index, "dob", e.target.value)
+                              }
+                              max={getFormattedDate(
+                                new Date(
+                                  new Date().setFullYear(
+                                    new Date().getFullYear() - 13
+                                  )
+                                )
+                              )}
+                              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-tripswift-black/20 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-xs sm:text-sm font-tripswift-regular"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                  {/* Render Children */}
+                  {guests
+                    .slice(
+                      guestData?.guests || 1,
+                      (guestData?.guests || 1) + (guestData?.children || 0)
+                    )
+                    .map((guest, index) => (
+                      <div key={`child-${index}`} className="mb-4">
+                        <h4 className="font-tripswift-bold text-tripswift-black mb-2">
+                          {`Child ${index + 1}`}
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
+                          <div className="space-y-1">
+                            <label
+                              htmlFor={`firstName-child-${index}`}
+                              className="text-xs sm:text-sm ml-1 font-tripswift-medium text-tripswift-black/80 flex items-center"
+                            >
+                              <User
+                                size={16}
+                                className="text-tripswift-blue mr-2"
+                              />
+                              {`First Name`}
+                            </label>
+                            <input
+                              type="text"
+                              id={`firstName-child-${index}`}
+                              name={`firstName-child-${index}`}
+                              value={guest.firstName}
+                              required
+                              onChange={(e) =>
+                                handleGuestChange(
+                                  index + (guestData?.guests || 1),
+                                  "firstName",
+                                  e.target.value
+                                )
+                              }
+                              placeholder={t(
+                                "BookingComponents.GuestInformationModal.firstNamePlaceholder"
+                              )}
+                              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-tripswift-black/20 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-xs sm:text-sm font-tripswift-regular"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <label
+                              htmlFor={`lastName-child-${index}`}
+                              className="text-xs sm:text-sm font-tripswift-medium ml-1 text-tripswift-black/80 flex items-center"
+                            >
+                              <User
+                                size={16}
+                                className="text-tripswift-blue mr-2"
+                              />
+                              {t(
+                                "BookingComponents.GuestInformationModal.lastNameLabel"
+                              )}
+                            </label>
+                            <input
+                              type="text"
+                              id={`lastName-child-${index}`}
+                              name={`lastName-child-${index}`}
+                              value={guest.lastName}
+                              required
+                              onChange={(e) =>
+                                handleGuestChange(
+                                  index + (guestData?.guests || 1),
+                                  "lastName",
+                                  e.target.value
+                                )
+                              }
+                              placeholder={t(
+                                "BookingComponents.GuestInformationModal.lastNamePlaceholder"
+                              )}
+                              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-tripswift-black/20 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-xs sm:text-sm font-tripswift-regular"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <label
+                              htmlFor={`dob-child-${index}`}
+                              className="text-xs sm:text-sm font-tripswift-medium ml-1 text-tripswift-black/80 flex items-center"
+                            >
+                              <Calendar
+                                size={16}
+                                className="text-tripswift-blue mr-2"
+                              />
+                              DOB{" "}
+                            </label>
+                            <input
+                              type="date"
+                              id={`dob-child-${index}`}
+                              name={`dob-child-${index}`}
+                              value={guest.dob}
+                              required
+                              max={getFormattedDate(
+                                new Date(
+                                  new Date().setFullYear(
+                                    new Date().getFullYear() - 2
+                                  )
+                                )
+                              )}
+                              min={getFormattedDate(
+                                new Date(
+                                  new Date().setFullYear(
+                                    new Date().getFullYear() - 13
+                                  )
+                                )
+                              )}
+                              onChange={(e) =>
+                                handleGuestChange(
+                                  index + (guestData?.guests || 1),
+                                  "dob",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-tripswift-black/20 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-xs sm:text-sm font-tripswift-regular"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                  {/* Render Infants */}
+                  {guests
+                    .slice(
+                      (guestData?.guests || 1) + (guestData?.children || 0),
+                      (guestData?.guests || 1) +
+                        (guestData?.children || 0) +
+                        (guestData?.infants || 0)
+                    )
+                    .map((guest, index) => (
+                      <div key={`infant-${index}`} className="mb-4">
+                        <h4 className="font-tripswift-bold text-tripswift-black mb-2">
+                          {`Infant ${index + 1}`}
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
+                          <div className="space-y-1">
+                            <label
+                              htmlFor={`firstName-infant-${index}`}
+                              className="text-xs sm:text-sm ml-1 font-tripswift-medium text-tripswift-black/80 flex items-center"
+                            >
+                              <User
+                                size={16}
+                                className="text-tripswift-blue mr-2"
+                              />
+                              {`First Name`}
+                            </label>
+                            <input
+                              type="text"
+                              id={`firstName-infant-${index}`}
+                              name={`firstName-infant-${index}`}
+                              value={guest.firstName}
+                              required
+                              onChange={(e) =>
+                                handleGuestChange(
+                                  index +
+                                    (guestData?.guests || 1) +
+                                    (guestData?.children || 0),
+                                  "firstName",
+                                  e.target.value
+                                )
+                              }
+                              placeholder={t(
+                                "BookingComponents.GuestInformationModal.firstNamePlaceholder"
+                              )}
+                              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-tripswift-black/20 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-xs sm:text-sm font-tripswift-regular"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <label
+                              htmlFor={`lastName-infant-${index}`}
+                              className="text-xs sm:text-sm font-tripswift-medium ml-1 text-tripswift-black/80 flex items-center"
+                            >
+                              <User
+                                size={16}
+                                className="text-tripswift-blue mr-2"
+                              />
+                              {t(
+                                "BookingComponents.GuestInformationModal.lastNameLabel"
+                              )}
+                            </label>
+                            <input
+                              type="text"
+                              id={`lastName-infant-${index}`}
+                              name={`lastName-infant-${index}`}
+                              value={guest.lastName}
+                              required
+                              onChange={(e) =>
+                                handleGuestChange(
+                                  index +
+                                    (guestData?.guests || 1) +
+                                    (guestData?.children || 0),
+                                  "lastName",
+                                  e.target.value
+                                )
+                              }
+                              placeholder={t(
+                                "BookingComponents.GuestInformationModal.lastNamePlaceholder"
+                              )}
+                              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-tripswift-black/20 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-xs sm:text-sm font-tripswift-regular"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <label
+                              htmlFor={`dob-infant-${index}`}
+                              className="text-xs sm:text-sm font-tripswift-medium ml-1 text-tripswift-black/80 flex items-center"
+                            >
+                              <Calendar
+                                size={16}
+                                className="text-tripswift-blue mr-2"
+                              />
+                              DOB
+                            </label>
+                            <input
+                              type="date"
+                              id={`dob-infant-${index}`}
+                              name={`dob-infant-${index}`}
+                              value={guest.dob}
+                              required
+                              onChange={(e) =>
+                                handleGuestChange(
+                                  index +
+                                    (guestData?.guests || 1) +
+                                    (guestData?.children || 0),
+                                  "dob",
+                                  e.target.value
+                                )
+                              }
+                              max={getFormattedDate(new Date(new Date()))}
+                              min={getFormattedDate(
+                                new Date(
+                                  new Date().setFullYear(
+                                    new Date().getFullYear() - 2
+                                  )
+                                )
+                              )}
+                              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-tripswift-black/20 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-xs sm:text-sm font-tripswift-regular"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
 
                   <div className="space-y-1">
                     <label
@@ -435,6 +946,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       id="email"
                       name="email"
                       value={email}
+                      required
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder={t(
                         "BookingComponents.GuestInformationModal.emailPlaceholder"
@@ -451,7 +963,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       htmlFor="phone"
                       className="text-xs sm:text-sm font-tripswift-medium ml-1 text-tripswift-black/80 flex items-center"
                     >
-                      <Phone size={16} className="text-tripswift-blue mr-2" />
+                      <Phone size={14} className="text-tripswift-blue mr-2" />
                       {t("BookingComponents.GuestInformationModal.phoneLabel")}
                     </label>
                     <PhoneInput
@@ -472,41 +984,6 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                     </p>
                   </div>
                 </div>
-
-                <div className="mt-4 sm:mt-5 border-t border-tripswift-black/10 pt-4 sm:pt-6">
-                  <div className="space-y-3">
-                    <label
-                      htmlFor="guestDetails"
-                      className="text-xs sm:text-sm ml-1 font-tripswift-medium text-tripswift-black/80 flex items-center"
-                    >
-                      <Users size={16} className="text-tripswift-blue mr-2" />
-                      {t(
-                        "BookingComponents.GuestInformationModal.guestDetailsSection"
-                      )}
-                    </label>
-
-                    {/* <div className="bg-tripswift-blue/5 border border-tripswift-blue/10 rounded-lg p-3 mb-3">
-                      <p className="text-sm font-tripswift-medium text-tripswift-blue/80">
-                        {getGuestCountDisplay()}
-                      </p>
-                    </div> */}
-
-                    <GuestBox />
-                  </div>
-                </div>
-
-                {errorMessage && (
-                  <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-xs sm:text-sm font-tripswift-regular">
-                    {errorMessage}
-                  </div>
-                )}
-
-                {updateMessage && (
-                  <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-green-50 border border-green-200 rounded-md text-green-600 text-xs sm:text-sm font-tripswift-regular flex items-center">
-                    <CheckCircle size={16} className="mr-2" />
-                    {updateMessage}
-                  </div>
-                )}
               </div>
             </div>
           ) : (
@@ -602,7 +1079,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                             )}
                           </p>
                           <p className="text-sm sm:text-base font-tripswift-medium">
-                            {firstName} {lastName}
+                            {guests[0]?.firstName} {guests[0]?.lastName}
                           </p>
                         </div>
                         <div>
@@ -611,7 +1088,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                               "BookingComponents.GuestInformationModal.emailLabel"
                             )}
                           </p>
-                          <p className="text-sm sm:text-base font-tripswift-medium">{email}</p>
+                          <p className="text-sm sm:text-base font-tripswift-medium">
+                            {email}
+                          </p>
                         </div>
                         <div>
                           <p className="text-xs sm:text-sm text-tripswift-black/60">
@@ -619,66 +1098,73 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                               "BookingComponents.GuestInformationModal.phoneLabel"
                             )}
                           </p>
-                          <p className="text-sm sm:text-base font-tripswift-medium">{phone}</p>
+                          <p className="text-sm sm:text-base font-tripswift-medium">
+                            {phone}
+                          </p>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Price Summary Card */}
-              <div className="bg-tripswift-off-white rounded-lg shadow-sm border border-tripswift-black/10 overflow-hidden">
-                <div className="bg-tripswift-blue/5 border-b border-tripswift-black/10 p-3 sm:p-4">
-                  <h3 className="font-tripswift-bold text-tripswift-black text-base sm:text-lg">
-                    {t("BookingComponents.GuestInformationModal.priceDetails")}
-                  </h3>
-                </div>
+                {/* Price Summary Card */}
+                <div className="bg-tripswift-off-white rounded-lg shadow-sm border border-tripswift-black/10 overflow-hidden">
+                  <div className="bg-tripswift-blue/5 border-b border-tripswift-black/10 p-3 sm:p-4">
+                    <h3 className="font-tripswift-bold text-tripswift-black text-base sm:text-lg">
+                      {t(
+                        "BookingComponents.GuestInformationModal.priceDetails"
+                      )}
+                    </h3>
+                  </div>
 
-                <div className="p-3 sm:p-4 md:p-6">
-                  <div className="space-y-2 sm:space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs sm:text-sm text-tripswift-black/70">
-                        {t("BookingComponents.GuestInformationModal.roomRate")}{" "}
-                        ({nightsCount} {nightsText})
-                      </span>
-                      <span className="text-sm sm:text-base font-tripswift-medium">
-                        ₹{selectedRoom.room_price} × {nightsCount}
-                      </span>
-                    </div>
-                    <div className="border-t border-tripswift-black/10 my-2 sm:my-3 pt-2 sm:pt-3"></div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm sm:text-base font-tripswift-bold">
-                        {t(
-                          "BookingComponents.GuestInformationModal.totalAmount"
-                        )}
-                      </span>
-                      <span className="font-tripswift-bold text-lg sm:text-xl text-tripswift-black/70">
-                        ₹{selectedRoom.room_price * nightsCount}
-                      </span>
+                  <div className="p-3 sm:p-4 md:p-6">
+                    <div className="space-y-2 sm:space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs sm:text-sm text-tripswift-black/70">
+                          {t(
+                            "BookingComponents.GuestInformationModal.roomRate"
+                          )}{" "}
+                          ({nightsCount} {nightsText})
+                        </span>
+                        <span className="text-sm sm:text-base font-tripswift-medium">
+                          ₹{selectedRoom.room_price} × {nightsCount}
+                        </span>
+                      </div>
+                      <div className="border-t border-tripswift-black/10 my-2 sm:my-3 pt-2 sm:pt-3"></div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm sm:text-base font-tripswift-bold">
+                          {t(
+                            "BookingComponents.GuestInformationModal.totalAmount"
+                          )}
+                        </span>
+                        <span className="font-tripswift-bold text-lg sm:text-xl text-tripswift-black/70">
+                          ₹{finalPrice?.totalAmount}
+                          {/* additional Charges {finalPrice?.baseRatePerNight} */}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Payment Notice */}
-              <div className="bg-tripswift-blue/5 rounded-lg p-3 sm:p-4 border border-tripswift-blue/20">
-                <div className="flex items-start">
-                  <CreditCard
-                    className="text-tripswift-blue flex-shrink-0 mt-1 mr-2 sm:mr-3"
-                    size={18}
-                  />
-                  <div>
-                    <p className="text-xs sm:text-sm text-tripswift-black/80 font-tripswift-medium">
-                      {t(
-                        "BookingComponents.GuestInformationModal.paymentNoticeTitle"
-                      )}
-                    </p>
-                    <p className="text-[10px] sm:text-xs text-tripswift-black/60 mt-1">
-                      {t(
-                        "BookingComponents.GuestInformationModal.paymentNoticeDescription"
-                      )}
-                    </p>
+                {/* Payment Notice */}
+                <div className="bg-tripswift-blue/5 rounded-lg p-3 sm:p-4 border border-tripswift-blue/20">
+                  <div className="flex items-start">
+                    <CreditCard
+                      className="text-tripswift-blue flex-shrink-0 mt-1 mr-2 sm:mr-3"
+                      size={18}
+                    />
+                    <div>
+                      <p className="text-xs sm:text-sm text-tripswift-black/80 font-tripswift-medium">
+                        {t(
+                          "BookingComponents.GuestInformationModal.paymentNoticeTitle"
+                        )}
+                      </p>
+                      <p className="text-[10px] sm:text-xs text-tripswift-black/60 mt-1">
+                        {t(
+                          "BookingComponents.GuestInformationModal.paymentNoticeDescription"
+                        )}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -712,8 +1198,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
             <button
               onClick={handleConfirmBooking}
               disabled={!isFormUpdated}
-              className={`btn-tripswift-primary px-4 sm:px-6 py-2 sm:py-2.5 rounded-md transition-all duration-300 shadow-sm hover:shadow-md font-tripswift-medium flex items-center justify-center text-xs sm:text-sm ${!isFormUpdated ? "opacity-70 cursor-not-allowed" : ""
-                }`}
+              className={`btn-tripswift-primary px-4 sm:px-6 py-2 sm:py-2.5 rounded-md transition-all duration-300 shadow-sm hover:shadow-md font-tripswift-medium flex items-center justify-center text-xs sm:text-sm ${
+                !isFormUpdated ? "opacity-70 cursor-not-allowed" : ""
+              }`}
             >
               {t("BookingComponents.GuestInformationModal.proceedToPayment")}
             </button>

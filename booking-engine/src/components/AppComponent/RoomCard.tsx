@@ -14,7 +14,7 @@ import {
   FaCheckCircle, FaShoppingCart, FaPercent, FaTimes, FaInfoCircle, FaRulerCombined,
   FaShieldAlt,
 } from "react-icons/fa";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { getPolicyType, getPolicyStyling, getPolicyBulletPoints } from "@/utils/cancellationPolicies";
 
 interface RoomData {
@@ -66,7 +66,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
 
   const policyType = getPolicyType(data.cancellation_policy);
   const policyStyling = getPolicyStyling(policyType);
-  const policyBulletPoints = getPolicyBulletPoints(policyType);
+  const policyBulletPoints = getPolicyBulletPoints(policyType, t); // Pass translation function
 
   // Handle discount display
   const hasOriginalPrice = !!data.original_price;
@@ -236,7 +236,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
               {data.room_size > 0 && (
                 <div className="flex items-center text-xs font-tripswift-medium text-tripswift-black/70">
                   <FaRulerCombined className="mr-1.5 h-3 w-3 text-tripswift-blue" />
-                  <span>{data.room_size} {data.room_unit || "m2"}</span>
+                  <span>{data.room_size} {data.room_unit || "m²"}</span>
                 </div>
               )}
               
@@ -354,9 +354,9 @@ export const RoomCard: React.FC<RoomCardProps> = ({
                 <div className="mb-4">
                   <ul className="list-disc pl-5 space-y-1.5 text-description">
                     {policyBulletPoints.map((point, idx) => (
-                      <li key={idx}>
-                        <span className={point.color}>{point.text.split(':')[0]}:</span>
-                        {point.text.split(':')[1]}
+                      <li key={idx} className="flex">
+                        <span className={`font-medium ${point.color}`}>{point.text.split(':')[0]}:</span>
+                        <span className="ml-1">{point.text.split(':')[1]}</span>
                       </li>
                     ))}
                   </ul>
