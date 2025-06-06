@@ -223,7 +223,7 @@ function PaymentPageContent() {
                         <CheckCircle className="text-tripswift-blue flex-shrink-0" size={20} />
                         <div>
                           <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentPageContent.bookingSummary.guest')}</p>
-                          <p className="font-tripswift-medium">{firstName} {lastName}</p>
+                          <p className="font-tripswift-medium">{guests[0]?.firstName} {guests[0]?.lastName}</p>
                           <p className="text-sm text-tripswift-black/60 truncate max-w-[200px]">{email}</p>
                         </div>
                       </div>
