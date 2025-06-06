@@ -25,6 +25,7 @@ export class ThirdPartyReservationRepository {
       ageCodeSummary: data.ageCodeSummary,
       totalAmount: data.amountBeforeTax,
       currencyCode: data.currencyCode,
+      status: 'Confirmed',
     });
 
     const savedBooking = await booking.save();
@@ -60,10 +61,10 @@ export class ThirdPartyReservationRepository {
       checkInDate: new Date(jsonInput.checkInDate),
       checkOutDate: new Date(jsonInput.checkOutDate),
       jsonInput: JSON.stringify(jsonInput, null, 2),
+      status: 'Confirmed',
       xmlSent,
       apiResponse,
       process: 'Reservation',
-      status: success ? 'Success' : 'Failure',
       errorMessage: success ? null : apiResponse,
       timestamp: new Date(),
     });

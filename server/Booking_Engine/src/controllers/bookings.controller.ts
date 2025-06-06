@@ -124,6 +124,7 @@ export const createReservationWithStoredCard = CatchAsyncError(
         error: error instanceof Error ? error.message : error,
       });
     }
+    
     const reservationInput: ReservationInput = {
       bookingDetails: {
         userId,

@@ -46,7 +46,7 @@ interface IReservationLog extends Document {
     xmlSent: string;
     apiResponse: string;
     process: 'Reservation' | 'Amend Reservation' | 'Cancellation';
-    status: 'Success' | 'Failure';
+    status: string;
     errorMessage?: string;
     timestamp: Date;
 }
@@ -92,7 +92,7 @@ const reservationLogSchema = new Schema<IReservationLog>({
     jsonInput: { type: String, required: true },
     xmlSent: { type: String, required: true },
     apiResponse: { type: String, required: true },
-    status: { type: String, required: true, enum: ['Success', 'Failure'] },
+    status: { type: String, required: true },
     process: { type: String, required: true, enum: ['Reservation', 'Amend Reservation', 'Cancellation'] },
     errorMessage: { type: String, required: false },
     timestamp: { type: Date, default: Date.now },

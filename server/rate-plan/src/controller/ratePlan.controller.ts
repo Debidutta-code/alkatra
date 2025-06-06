@@ -115,7 +115,9 @@ class RoomPrice {
         return response
     }
     public static async getRoomRentController(req: Request, res: Response, next: NextFunction) {
-        const { hotelCode, invTypeCode,
+        const { 
+            hotelCode, 
+            invTypeCode,
             startDate,
             endDate,
             noOfChildrens,
