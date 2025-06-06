@@ -1,46 +1,51 @@
 export interface UserType {
-    _id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone?: string;
-  }
-  
-  export interface Booking {
-    _id: string;
-    property: {
-      _id: string;
-      property_name: string;
-      property_address?: string;
-    };
-    room: {
-      _id: string;
-      room_name: string;
-      room_type: string;
-      room_type_code?: string;
-    };
-    booking_user_name: string;
-    booking_user_phone: string;
-    amount: number;
-    booking_dates: string;
-    status: string;
-    payment?: string;
-    paymentType?: string;
-    checkInDate: string;
-    checkOutDate: string;
-    adultCount?: number;
-    childCount?: number;
-    specialRequests?: string;
-    ratePlanCode?: string;
-    ratePlanName?: string;
-    bookingId?: string;
-  }
-  
-  export interface PaginationResponse {
-    bookingDetails: Booking[];
-    totalBookings: number;
-    totalPages: number;
-    currentPage: number;
-  }
-  
-  export type BookingTabType = 'all' | 'upcoming' | 'completed' | 'cancelled';
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+}
+
+export interface GuestDetails {
+  type: "adult" | "child" | "infant";
+  _id?: string;
+  firstName: string;
+  lastName: string;
+  dob?: string;
+}
+
+// Matches backend response!
+export interface Booking {
+  _id: string;
+  reservationId: string;
+  hotelCode: string;
+  hotelName: string;
+  ratePlanCode: string;
+  roomTypeCode: string;
+  checkInDate: string;
+  checkOutDate: string;
+  guestDetails: GuestDetails[];
+  email: string;
+  phone: string;
+  ageCodeSummary?: { [key: string]: number };
+  numberOfRooms: number;
+  totalAmount: number;
+  currencyCode: string;
+  userId: string;
+  createdAt: string;
+  status?: string;
+  __v?: number;
+  paymentInfo?: {
+    paymentMethodId: string;
+    setupIntentId: string;
+  };
+}
+
+export interface PaginationResponse {
+  bookings: Booking[];
+  totalBookings: number;
+  totalPages: number;
+  currentPage: number;
+}
+
+export type BookingTabType = 'all' | 'upcoming' | 'completed' | 'cancelled';
