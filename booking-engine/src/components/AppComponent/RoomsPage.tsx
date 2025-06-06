@@ -358,6 +358,53 @@ const [selectedImage, setSelectedImage] = useState<number>(0);
         </div>
       </div>
       {/* Property Details Section - Using TripSwift classes */}
+      <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] text-tripswift-off-white">
+        <div className="container mx-auto px-4 py-5">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+            <button
+              onClick={() => router.back()}
+              className="inline-flex items-center text-sm font-tripswift-medium bg-tripswift-off-white/20 px-3.5 py-2 rounded-full hover:bg-tripswift-off-white/30 transition-colors mb-2 md:mb-0"
+            >
+              <ChevronLeft className="h-4 w-4 mr-1.5" /> {t('RoomsPage.backToSearch')}
+            </button>
+          </div>
+
+          <div className="flex flex-wrap gap-3 mt-3 items-center">
+            <div className="flex items-center bg-tripswift-off-white/10 backdrop-blur-sm pl-3.5 pr-4 py-2.5 rounded-xl">
+              <Calendar className="h-5 w-5 mr-2.5 text-tripswift-off-white/80" />
+              <div>
+                <div className="text-sm font-tripswift-medium">
+                  {formatDate(checkInDate)} - {formatDate(checkOutDate)}
+                </div>
+                <div className="text-xs text-tripswift-off-white/80 mt-0.5 font-tripswift-regular">
+                  {calculateNights(checkInDate, checkOutDate)} {calculateNights(checkInDate, checkOutDate) === 1 ? 'night' : 'nights'} stay
+                </div>
+              </div>
+            </div>
+
+            {/* Guest Information Display */}
+            <div className="flex items-center bg-tripswift-off-white/10 backdrop-blur-sm pl-3.5 pr-4 py-2.5 rounded-xl">
+              <Users className="h-5 w-5 mr-2.5 text-tripswift-off-white/80" />
+              <div>
+                <div className="text-sm font-tripswift-medium">
+                  {getGuestCountDisplay()}
+                </div>
+              </div>
+            </div>
+
+            {propertyDetails?.star_rating && (
+              <div className="flex items-center bg-tripswift-off-white/10 backdrop-blur-sm pl-3.5 pr-4 py-2.5 rounded-xl">
+                <Star className="h-5 w-5 mr-2.5 text-yellow-400" />
+                <div>
+                  <div className="text-sm font-tripswift-medium">
+                    {propertyDetails.star_rating} Star Hotel Rating
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
       <div className="container mx-auto px-4 py-4">
         <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           {/* Collapsible header - TripSwift branded */}

@@ -373,7 +373,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
               {...register("room_type")}
               onChange={(e) => setRoomDetails(prevDetails => ({ ...prevDetails!, room_type: e.target.value }))}
               type="string"
-              placeholder="Single Room"
+              // placeholder="Single Room"
             />
             {room_typeError && (
               <p className="text-red-500 text-sm mt-1">{room_typeError.message}</p>

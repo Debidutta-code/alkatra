@@ -50,7 +50,8 @@ const createPropertySchema = z.object({
   property_contact: z
     .string()
     // .refine((value) => /^\d{10}$/.test(value))
-    .refine((value) => /^[6-9]\d{9}$/.test(value), {
+    // .refine((value) => /^[6-9]\d{9}$/.test(value), {
+    .refine((value) => /^\d{10}$/.test(value), {
       message: "Please provide a valid 10-digit phone number ",
     }),
 
@@ -435,38 +436,38 @@ export default function PropertyInfo({ onNext }: Props) {
 
   // In the handleFormSubmit function where you update a property
   const handleFormSubmit: SubmitHandler<Inputs> = async (data) => {
-  try {
-    const imageUrls = propertyImageUrls
-      .filter((propertyImage) => propertyImage && propertyImage.url) // Add null checks
-      .map((propertyImage) => propertyImage.url);
+    try {
+      const imageUrls = propertyImageUrls
+        .filter((propertyImage) => propertyImage && propertyImage.url) // Add null checks
+        .map((propertyImage) => propertyImage.url);
 
-    const propertyCreateBody = {
-      ...data,
-      image: imageUrls,
-    };
+      const propertyCreateBody = {
+        ...data,
+        image: imageUrls,
+      };
 
-    const response = await axios.patch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`,
-      propertyCreateBody,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`,
+        propertyCreateBody,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
-    router.push(`${pathname}?property_id=${propertyId}`);
+      router.push(`${pathname}?property_id=${propertyId}`);
 
-    // Add success toast message
-    toast.success('Property updated successfully!');
+      // Add success toast message
+      toast.success('Property updated successfully!');
 
-    onNext();
+      onNext();
+    }
+    catch (error) {
+      console.error("Error updating property details:", error);
+      toast.error("Failed to update property details. Please try again later.");
+    }
   }
-  catch (error) {
-    console.error("Error updating property details:", error);
-    toast.error("Failed to update property details. Please try again later.");
-  }
-}
 
 
 
@@ -544,20 +545,20 @@ export default function PropertyInfo({ onNext }: Props) {
           </div>
 
           <div className="flex items-center justify-center gap-4">
-  <div className="w-full">
-    <Label htmlFor="description">
-      Property Description <span className="text-destructive">*</span>
-    </Label>
-    <Textarea
-      id="description"
-      {...register("description")}
-      className={propertydescription ? "border-red-500 focus-visible:ring-red-500" : ""}
-    />
-    {propertydescription && (
-      <p className="text-red-500 text-sm mt-1">{propertydescription.message}</p>
-    )}
-  </div>
-</div>
+            <div className="w-full">
+              <Label htmlFor="description">
+                Property Description <span className="text-destructive">*</span>
+              </Label>
+              <Textarea
+                id="description"
+                {...register("description")}
+                className={propertydescription ? "border-red-500 focus-visible:ring-red-500" : ""}
+              />
+              {propertydescription && (
+                <p className="text-red-500 text-sm mt-1">{propertydescription.message}</p>
+              )}
+            </div>
+          </div>
 
 
           <div className="items-center gap-4">
@@ -761,20 +762,20 @@ export default function PropertyInfo({ onNext }: Props) {
           </div>
 
           <div className="flex items-center justify-center gap-4">
-  <div className="w-full">
-    <Label htmlFor="description">
-      Property Description <span className="text-destructive">*</span>
-    </Label>
-    <Textarea
-      id="description"
-      {...register("description")}
-      className={propertydescription ? "border-red-500 focus-visible:ring-red-500" : ""}
-    />
-    {propertydescription && (
-      <p className="text-red-500 text-sm mt-1">{propertydescription.message}</p>
-    )}
-  </div>
-</div>
+            <div className="w-full">
+              <Label htmlFor="description">
+                Property Description <span className="text-destructive">*</span>
+              </Label>
+              <Textarea
+                id="description"
+                {...register("description")}
+                className={propertydescription ? "border-red-500 focus-visible:ring-red-500" : ""}
+              />
+              {propertydescription && (
+                <p className="text-red-500 text-sm mt-1">{propertydescription.message}</p>
+              )}
+            </div>
+          </div>
 
 
           <div className="items-center gap-4 mb-5">
