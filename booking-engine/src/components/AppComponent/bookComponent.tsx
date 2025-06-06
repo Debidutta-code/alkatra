@@ -8,7 +8,7 @@ import { useSearchParams } from 'next/navigation';
 // import { roomsById } from '@/api/hotel';
 import { Triangle } from 'react-loader-spinner';
 import CheckAuthentication from '@/components/check_authentication/CheckAuth';
-import {UserForm} from '@/components/forms/UserForm';
+import {UserForm} from '@/components/Forms/UserForm';
 // import { roomsById } from '@/api/hotel';
 
 const BookingComponent = () => {
