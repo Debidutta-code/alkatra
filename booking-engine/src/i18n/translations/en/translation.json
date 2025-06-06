@@ -620,7 +620,7 @@
       "invalidDate": "Invalid Date"
     },
     "AmendReservationModal": {
-      "title": "Amend Your Reservation",
+      "title": "Update Your Reservation",
       "subtitle": "Make changes to your upcoming stay at {{propertyName}}",
       "currentBookingDetails": "Current Booking Details",
       "stayDates": "Stay Dates",

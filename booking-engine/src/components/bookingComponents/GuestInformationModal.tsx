@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import GuestBox from "../HotelBox/GuestBox";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,8 +11,6 @@ import {
   Phone,
   Calendar,
   CreditCard,
-  CheckCircle,
-  Users,
   X,
 } from "lucide-react";
 import { formatDate, calculateNights } from "@/utils/dateUtils";
@@ -74,6 +71,9 @@ interface GuestInformationModalProps {
     children?: number;
     infants?: number;
     guests?: Guest[];
+    hotelName: string;
+    ratePlanCode: string;
+    roomType: string;
   }) => void;
   guestData?: {
     rooms?: number;
@@ -85,6 +85,7 @@ interface GuestInformationModalProps {
     lastName?: string;
     email?: string;
     phone?: string;
+    hotelName?: string;
   };
 }
 interface DailyBreakDown {
@@ -136,8 +137,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         i < (guestData?.guests || 1)
           ? "adult"
           : i < (guestData?.guests || 1) + (guestData?.children || 0)
-          ? "child"
-          : "infant";
+            ? "child"
+            : "infant";
 
       // Set default DOBs per type
       const today = new Date();
@@ -165,7 +166,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     });
   });
 
-  // console.log("guest data", guestData);
+  console.log("guest data", guestData);
 
   const [email, setEmail] = useState<string>(authUser?.email || "");
   const [phone, setPhone] = useState<string | undefined>("");
@@ -194,7 +195,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   });
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const getFinalPrice = async (selectedRoom:any,checkInDate:string,checkOutDate:string,guestData:any) => {
+  const getFinalPrice = async (selectedRoom: any, checkInDate: string, checkOutDate: string, guestData: any) => {
     console.log("getfinal price called")
     try {
       const finalPriceResponse = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomRentPrice`, {
@@ -205,10 +206,10 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         noOfChildrens: guestData?.children,
         noOfAdults: guestData?.guests,
         noOfRooms: guestData?.rooms,
-      },{
-        withCredentials:true
+      }, {
+        withCredentials: true
       });
-      console.log("finalpricedata",finalPriceResponse.data)
+      console.log("finalpricedata", finalPriceResponse.data)
       if (finalPriceResponse.data.success) {
         setFinalPrice(finalPriceResponse.data.data);
       } else {
@@ -219,6 +220,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       setErrorMessage(error.message);
     }
   };
+  
   // useEffect(() => {
   //   getFinalPrice();
   // },[checkInDate,checkOutDate,guestData,selectedRoom]);
@@ -257,8 +259,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
             i < (guestData?.guests || 1)
               ? "adult"
               : i < (guestData?.guests || 1) + (guestData?.children || 0)
-              ? "child"
-              : "infant";
+                ? "child"
+                : "infant";
 
           const guest = guests[i];
 
@@ -297,20 +299,26 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     }
   }, [authUser, guestData]);
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-      document.documentElement.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-      document.documentElement.style.overflow = "";
-    }
+  // useEffect(() => {
+  //   if (isOpen) {
+  //     document.body.style.overflow = "hidden";
+  //     document.documentElement.style.overflow = "hidden";
+  //   } else {
+  //     document.body.style.overflow = "";
+  //     document.documentElement.style.overflow = "";
+  //   }
 
-    return () => {
-      document.body.style.overflow = "";
-      document.documentElement.style.overflow = "";
-    };
-  }, [isOpen]);
+  //   return () => {
+  //     document.body.style.overflow = "";
+  //     document.documentElement.style.overflow = "";
+  //   };
+  // }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen && selectedRoom && checkInDate && checkOutDate && guestData) {
+      getFinalPrice(selectedRoom, checkInDate, checkOutDate, guestData);
+    }
+  }, [isOpen, selectedRoom, checkInDate, checkOutDate, guestData]);
 
   const handleGuestChange = (
     index: number,
@@ -332,7 +340,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       if (!guest.firstName || !/^[A-Za-z\s]+$/.test(guest.firstName)) {
         setErrorMessage(
           t("BookingComponents.GuestInformationModal.firstNameError") +
-            ` (Guest ${i + 1})`
+          ` (Guest ${i + 1})`
         );
         valid = false;
         break;
@@ -340,7 +348,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       if (!guest.lastName || !/^[A-Za-z\s]+$/.test(guest.lastName)) {
         setErrorMessage(
           t("BookingComponents.GuestInformationModal.lastNameError") +
-            ` (Guest ${i + 1})`
+          ` (Guest ${i + 1})`
         );
         valid = false;
         break;
@@ -348,7 +356,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       if (!guest.dob) {
         setErrorMessage(
           t("BookingComponents.GuestInformationModal.dobError") +
-            ` (Guest ${i + 1})`
+          ` (Guest ${i + 1})`
         );
         valid = false;
         break;
@@ -389,7 +397,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     );
 
     setIsFormUpdated(true);
-    getFinalPrice(selectedRoom,checkInDate,checkOutDate,guestData)
+    getFinalPrice(selectedRoom, checkInDate, checkOutDate, guestData)
     setTimeout(() => {
       setActiveSection("review");
     }, 800);
@@ -408,26 +416,28 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         );
         return;
       }
-
-      const nightsCount = calculateNights(checkInDate, checkOutDate);
-      const totalPrice = selectedRoom.room_price * nightsCount;
-      // console.log("Booking Payload:", {
-      //   firstName: guests[0]?.firstName || "",
-      //   lastName: guests[0]?.lastName || "",
-      //   email,
-      //   phone: phone || "",
-      //   propertyId,
-      //   roomId: selectedRoom._id,
-      //   checkIn: checkInDate,
-      //   checkOut: checkOutDate,
-      //   amount: totalPrice.toString(),
-      //   uterId: authUser?._id,
-      //   rooms: guestData?.rooms || 1,
-      //   adults: guestData?.guests || 1,
-      //   children: guestData?.children || 0,
-      //   guests,
-      // });
-
+      if (!finalPrice || !finalPrice.totalAmount) {
+        setErrorMessage(t("BookingComponents.GuestInformationModal.priceFetchError"));
+        return;
+      }
+      // const nightsCount = calculateNights(checkInDate, checkOutDate);
+      console.log("Booking Payload:", {
+        firstName: guests[0]?.firstName || "",
+        lastName: guests[0]?.lastName || "",
+        email,
+        phone: phone || "",
+        propertyId,
+        roomId: selectedRoom._id,
+        checkIn: checkInDate,
+        checkOut: checkOutDate,
+        amount: finalPrice?.totalAmount.toString(),
+        userId: authUser?._id,
+        rooms: guestData?.rooms || 1,
+        adults: guestData?.guests || 1,
+        children: guestData?.children || 0,
+        guests,
+      });
+  
       onConfirmBooking({
         email,
         phone: phone || "",
@@ -435,12 +445,15 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         roomId: selectedRoom._id,
         checkIn: checkInDate,
         checkOut: checkOutDate,
-        amount: totalPrice.toString(),
+        amount: finalPrice?.totalAmount.toString(),
         userId: authUser?._id,
         rooms: guestData?.rooms || 1,
         adults: guestData?.guests || 1,
         children: guestData?.children || 0,
         guests,
+        hotelName: guestData?.hotelName || "Unknown Hotel",
+        ratePlanCode: finalPrice?.dailyBreakdown?.ratePlanCode || "SUT",
+        roomType: selectedRoom?.room_type || "SUT",
       });
     }
   };
@@ -509,11 +522,10 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
           <div className="flex justify-between mb-1 sm:mb-2">
             <div className="flex flex-col items-center">
               <div
-                className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-tripswift-medium ${
-                  activeSection === "details" || isFormUpdated
-                    ? "bg-tripswift-blue text-tripswift-off-white"
-                    : "bg-tripswift-black/10 text-tripswift-black/60"
-                }`}
+                className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-tripswift-medium ${activeSection === "details" || isFormUpdated
+                  ? "bg-tripswift-blue text-tripswift-off-white"
+                  : "bg-tripswift-black/10 text-tripswift-black/60"
+                  }`}
               >
                 1
               </div>
@@ -523,18 +535,16 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
             </div>
             <div className="flex-1 flex items-center mx-2">
               <div
-                className={`h-1 w-full ${
-                  isFormUpdated ? "bg-tripswift-blue" : "bg-tripswift-black/10"
-                }`}
+                className={`h-1 w-full ${isFormUpdated ? "bg-tripswift-blue" : "bg-tripswift-black/10"
+                  }`}
               ></div>
             </div>
             <div className="flex flex-col items-center">
               <div
-                className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-tripswift-medium ${
-                  activeSection === "review" && isFormUpdated
-                    ? "bg-tripswift-blue text-tripswift-off-white"
-                    : "bg-tripswift-black/10 text-tripswift-black/60"
-                }`}
+                className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-tripswift-medium ${activeSection === "review" && isFormUpdated
+                  ? "bg-tripswift-blue text-tripswift-off-white"
+                  : "bg-tripswift-black/10 text-tripswift-black/60"
+                  }`}
               >
                 2
               </div>
@@ -815,8 +825,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                     .slice(
                       (guestData?.guests || 1) + (guestData?.children || 0),
                       (guestData?.guests || 1) +
-                        (guestData?.children || 0) +
-                        (guestData?.infants || 0)
+                      (guestData?.children || 0) +
+                      (guestData?.infants || 0)
                     )
                     .map((guest, index) => (
                       <div key={`infant-${index}`} className="mb-4">
@@ -844,8 +854,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                               onChange={(e) =>
                                 handleGuestChange(
                                   index +
-                                    (guestData?.guests || 1) +
-                                    (guestData?.children || 0),
+                                  (guestData?.guests || 1) +
+                                  (guestData?.children || 0),
                                   "firstName",
                                   e.target.value
                                 )
@@ -879,8 +889,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                               onChange={(e) =>
                                 handleGuestChange(
                                   index +
-                                    (guestData?.guests || 1) +
-                                    (guestData?.children || 0),
+                                  (guestData?.guests || 1) +
+                                  (guestData?.children || 0),
                                   "lastName",
                                   e.target.value
                                 )
@@ -912,8 +922,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                               onChange={(e) =>
                                 handleGuestChange(
                                   index +
-                                    (guestData?.guests || 1) +
-                                    (guestData?.children || 0),
+                                  (guestData?.guests || 1) +
+                                  (guestData?.children || 0),
                                   "dob",
                                   e.target.value
                                 )
@@ -1127,8 +1137,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                           ({nightsCount} {nightsText})
                         </span>
                         <span className="text-sm sm:text-base font-tripswift-medium">
-                          ₹{selectedRoom.room_price} × {nightsCount}
-                        </span>
+                        ₹{finalPrice?.baseRatePerNight || selectedRoom.room_price} × {nightsCount}                        </span>
                       </div>
                       <div className="border-t border-tripswift-black/10 my-2 sm:my-3 pt-2 sm:pt-3"></div>
                       <div className="flex justify-between items-center">
@@ -1198,9 +1207,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
             <button
               onClick={handleConfirmBooking}
               disabled={!isFormUpdated}
-              className={`btn-tripswift-primary px-4 sm:px-6 py-2 sm:py-2.5 rounded-md transition-all duration-300 shadow-sm hover:shadow-md font-tripswift-medium flex items-center justify-center text-xs sm:text-sm ${
-                !isFormUpdated ? "opacity-70 cursor-not-allowed" : ""
-              }`}
+              className={`btn-tripswift-primary px-4 sm:px-6 py-2 sm:py-2.5 rounded-md transition-all duration-300 shadow-sm hover:shadow-md font-tripswift-medium flex items-center justify-center text-xs sm:text-sm ${!isFormUpdated ? "opacity-70 cursor-not-allowed" : ""
+                }`}
             >
               {t("BookingComponents.GuestInformationModal.proceedToPayment")}
             </button>

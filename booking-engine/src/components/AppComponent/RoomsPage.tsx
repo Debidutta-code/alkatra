@@ -63,13 +63,6 @@ interface PropertyDetails {
   property_contact?: string;
   property_email?: string;
 }
-
-
-
-
-
-
-
 const RoomsPage: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -219,7 +212,7 @@ const [selectedImage, setSelectedImage] = useState<number>(0);
     rooms?: number;
     adults?: number;
     children?: number;
-    guests?: Guest[];    
+    guests?: Guest[]; // <--- make sure this is present
   }) => {
     const queryParams = new URLSearchParams({
       roomId: formData.roomId,
@@ -231,11 +224,15 @@ const [selectedImage, setSelectedImage] = useState<number>(0);
       email: formData.email,
       phone: formData.phone,
       userId: formData.userId || "",
+      hotelName: propertyDetails?.property_name || "Unknown Hotel",
+      ratePlanCode: selectedRoom?.rate_plan_code || "SUT",
+      roomType: selectedRoom?.room_type || "SUT",
       ...(formData.rooms ? { rooms: formData.rooms.toString() } : {}),
       ...(formData.adults ? { adults: formData.adults.toString() } : {}),
       ...(formData.children ? { children: formData.children.toString() } : {}),
+      ...(formData.guests ? { guests: encodeURIComponent(JSON.stringify(formData.guests)) } : {}) // ADD THIS LINE
     }).toString();
-
+  
     router.push(`/payment?${queryParams}`);
   };
 
