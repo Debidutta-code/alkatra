@@ -35,10 +35,6 @@ export interface Booking {
   createdAt: string;
   status?: string;
   __v?: number;
-  paymentInfo?: {
-    paymentMethodId: string;
-    setupIntentId: string;
-  };
 }
 
 export interface PaginationResponse {

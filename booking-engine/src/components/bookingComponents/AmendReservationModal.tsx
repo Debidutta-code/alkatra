@@ -325,12 +325,6 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         guestData
       );
 
-      // 3. Reuse paymentInfo from the original booking
-      const paymentInfo = booking.paymentInfo || {
-        paymentMethodId: "",
-        setupIntentId: "",
-      };
-
       // 4. Construct amendedData with paymentInfo
       const amendedData = {
         reservationId: booking.reservationId,
@@ -350,7 +344,6 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
           lastName: g.lastName,
           dob: g.dob || ""
         })),
-        paymentInfo,
       };
 
       const token = Cookies.get("accessToken");
