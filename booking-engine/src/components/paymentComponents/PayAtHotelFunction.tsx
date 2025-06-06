@@ -209,15 +209,17 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
   return (
     <form onSubmit={handleSubmit} className="font-noto-sans">
       <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
-        <p className="text-trips-black font-trips mb-2">{t('Payment.PaymentComponents.PayAtHotelFunction.infoTitle')}</p>
-        <p className="text-sm text-trips/70">{t('Payment.PaymentComponents.PayAtHotelFunction.infoMessage')}</p>
+        <p className="text-tripswift-black font-tripswift-semibold mb-2">{t('Payment.PaymentComponents.PayAtHotelFunction.infoTitle')}</p>
+        <p className="text-sm text-tripswift-black/70">
+          {t('Payment.PaymentComponents.PayAtHotelFunction.infoMessage')}
+        </p>
       </div>
 
       <div className="mb-4">
-        <label htmlFor="card-element" className="block text-sm font-trips-medium text-trips-black mb-2">
+        <label htmlFor="card-element" className="block text-sm font-tripswift-medium text-tripswift-black mb-2">
           {t('Payment.PaymentComponents.PayAtHotelFunction.cardDetailsLabel')}
         </label>
-        <div className="p-4 border border-gray-200 rounded-lg bg-white min-h-[48px]">
+        <div className="p-4 border border-gray-300 rounded-lg bg-tripswift-off-white min-h-[48px]">
           <CardElement
             id="card-element"
             options={{
@@ -247,15 +249,15 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
       </div>
 
       {errorMessage && (
-        <div className="bg-red-50 text-red-600 p-3 rounded-md mb-4 border border-red-200 font-trips-regular">
+        <div className="bg-red-50 text-red-600 p-3 rounded-md mb-4 border border-red-200 font-tripswift-regular">
           {errorMessage}
         </div>
       )}
 
       <div className="mb-6 flex items-start">
-        <Shield className="h-5 w-5 text-trips-blue mr-2 flex-shrink-0 mb-1.5" />
-        <p className="text-xs text-trips-black/70">
-          {t('Payment.PaymentComponents.PayAtHotelFunction.securityMessage')}
+        <Shield className="h-5 w-5 text-tripswift-blue mr-2 flex-shrink-0 mb-1.5" />
+        <p className="text-xs text-tripswift-black/70">
+          Your card details are encrypted and securely processed by Stripe. We never store your full card information on our servers.
         </p>
       </div>
 
@@ -263,13 +265,13 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
         type="submit"
         disabled={!stripe || isLoading || !!validationError}
         className={`w-full py-3 px-4 rounded-lg transition-all duration-300 ${isLoading || !stripe || validationError
-          ? 'bg-gray-300 cursor-not-allowed text-trips-black/50'
-          : 'bg-trips-blue hover:bg-[#054B8F] text-trips-off-white'
-          } font-trips-semibold`}
+          ? 'bg-gray-300 cursor-not-allowed text-tripswift-black/50'
+          : 'bg-tripswift-blue hover:bg-[#054B8F] text-tripswift-off-white'
+          } font-tripswift-semibold`}
       >
         {isLoading ? (
           <span className="flex items-center justify-center">
-            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-trips-off-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-tripswift-off-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
