@@ -1,4 +1,4 @@
-import { RateAmount } from "../../../wincloud/src/model/ratePlanModel"
+import RateAmount  from "../../../wincloud/src/model/ratePlanDateWise.model"
 import { Inventory } from "../../../wincloud/src/model/inventoryModel"
 class HotelPricesDao {
     public static async getHotelPlans(hotelCode: string, invTypeCode: string) {
@@ -50,11 +50,10 @@ class HotelPricesDao {
                     }]
                 }
             },
-
             // Stage 2: Lookup rates from RateAmount collection
             {
                 $lookup: {
-                    from: 'rateamounts', // MongoDB collection name (lowercase + plural)
+                    from: 'rateamountdatewises', // MongoDB collection name (lowercase + plural)
                     let: {
                         hotelCode: '$hotelCode',
                         invTypeCode: '$invTypeCode',
@@ -106,7 +105,6 @@ class HotelPricesDao {
                     as: 'rates'
                 }
             },
-
             // Stage 3: Project the final structure
             {
                 $project: {
