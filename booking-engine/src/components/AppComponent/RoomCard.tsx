@@ -198,7 +198,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
                 </h3>
               </div>
 
-              <div className="flex items-center text-yellow-400 gap-0.5 pt-1">
+              {/* <div className="flex items-center text-yellow-400 gap-0.5 pt-1">
                 {Array.from({ length: maxRating }).map((_, i) => (
                   i < Math.floor(rating) ? (
                     <FaStar key={i} className="h-3.5 w-3.5" />
@@ -208,7 +208,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
                     <FaRegStar key={i} className="h-3.5 w-3.5" />
                   )
                 ))}
-              </div>
+              </div> */}
             </div>
             <p className="text-description line-clamp-2 mt-1">
               {truncatedDescription}
@@ -299,16 +299,14 @@ export const RoomCard: React.FC<RoomCardProps> = ({
               </button>
             </div>
             
-            {/* Policy details link */}
-            <div className="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-2 sm:gap-0">
-              {data.cancellation_policy && (
-                <button
-                  onClick={() => setShowPolicyModal(true)}
-                  className="text-xs text-tripswift-black/60 hover:text-tripswift-blue transition-colors duration-300 flex items-center font-tripswift-regular"
-                >
-                  <FaInfoCircle className="mr-1.5 h-3 w-3" /> {t('RoomsPage.RoomCard.viewBookingPolicies')}
-                </button>
-              )}
+            {/* Policy details link - hidden on smallest screens, visible on sm and up */}
+            <div className=" pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-2 sm:gap-0">
+              <button
+                onClick={() => setShowPolicyModal(true)}
+                className="text-xs text-tripswift-black/60 hover:text-tripswift-blue transition-colors duration-300 flex items-center font-tripswift-regular"
+              >
+                <FaInfoCircle className="mr-1.5 h-3 w-3" /> {t('RoomsPage.RoomCard.viewBookingPolicies')}
+              </button>
 
               <div className="flex items-center text-xs text-tripswift-black/60 font-tripswift-regular">
                 <FaShieldAlt className="mr-1.5 h-3 w-3 text-green-600" />
