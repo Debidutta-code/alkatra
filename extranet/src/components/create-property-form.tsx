@@ -8,7 +8,7 @@ import PropertyAddress from "./property/property-address";
 import PropertyAmenities from "./property/property-amenities";
 import Rooms from "./property/room";
 import RoomAminity from './property/room-amenities';
-import RatePlan from "./property/ratePlan-property";
+// import RatePlan from "./property/ratePlan-property";
 import { RootState, useSelector } from "../redux/store";
 
 type Props = {};
@@ -44,12 +44,12 @@ const steps = [
     name: "Room Amenities",
     description: "Room Amenities availabilty",
   },
-  {
-    id: 6,
-    icon: <DollarSign size={20} />,
-    name: "Rate Plan",
-    desciption: "Add rates",
-  }
+  // {
+  //   id: 6,
+  //   icon: <DollarSign size={20} />,
+  //   name: "Rate Plan",
+  //   desciption: "Add rates",
+  // }
 ];
 
 export default function CreatePropertyForm({}: Props) {
@@ -90,8 +90,8 @@ export default function CreatePropertyForm({}: Props) {
       case 4:
         Component = <RoomAminity onNext={next} onPrevious={previous} />;
         break
-      case 5:
-        Component = <RatePlan onPrevious={previous} />;
+      // case 5:
+      //   Component = <RatePlan onPrevious={previous} />;
       default:
         break;
     }
