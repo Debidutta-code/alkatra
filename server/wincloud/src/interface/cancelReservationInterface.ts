@@ -1,11 +1,10 @@
 export interface ThirdPartyCancelReservationData {
-    hotelCode: string;
-    hotelName: string;
-    checkInDate: string;
-    checkOutDate: string;
-    guestFirstName: string;
-    guestLastName: string;
-    status: string;
-    reservationId: string;
-    thirdPartyReservationIdType8?: string;
-  }
+  reservationId: string;
+  hotelCode: string;
+  hotelName: string;
+  firstName: string;
+  lastName: string;
+  checkInDate?: string;
+  checkOutDate?: string;
+  status: string;
+}

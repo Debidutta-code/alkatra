@@ -5,7 +5,7 @@ import Image from "next/image";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux"; // or your Redux store hook
+import { useDispatch } from "react-redux";
 import { logout } from "@/Redux/slices/auth.slice";
 import { useTranslation } from "react-i18next";
 
@@ -14,50 +14,51 @@ import {
   FaCheckCircle, FaShoppingCart, FaPercent, FaTimes, FaInfoCircle, FaRulerCombined,
   FaShieldAlt,
 } from "react-icons/fa";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { getPolicyType, getPolicyStyling, getPolicyBulletPoints } from "@/utils/cancellationPolicies";
 
 interface RoomData {
   _id: string;
-  propertyInfo_id: string;
-  room_name: string;
-  room_type: string;
-  total_room: number;
-  floor: number;
-  room_view: string;
-  room_size: number;
-  room_unit: string;
-  smoking_policy: string;
+  currency_code: string;
+  has_valid_rate: boolean;
   max_occupancy: number;
-  max_number_of_adults: number;
-  max_number_of_children: number;
-  number_of_bedrooms: number;
-  number_of_living_room: number;
-  extra_bed: number;
-  description: string;
-  image: string[];
-  available: boolean;
-  rateplan_created: boolean;
+  propertyInfo_id: string;
+  rate_plan_code: string;
+  room_name: string;
+  room_price: number;
+  room_size: number;
+  room_type: string;
+  // Optional fields
+  image?: string[];
+  amenities?: { icon: string; name: string }[];
+  description?: string;
+  max_number_of_adults?: number;
+  max_number_of_children?: number;
+  room_unit?: string;
+  room_view?: string;
   cancellation_policy?: string;
   original_price?: number;
   discount_percentage?: number;
   rating?: number;
-  amenities?: { icon: string; name: string }[];
-  room_details_url?: string;
-  default_image_url?: string;
 }
 
 interface RoomCardProps {
   data: RoomData;
   price: string;
   onBookNow: () => void;
+  isPriceAvailable: boolean;
 }
 
-export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) => {
+export const RoomCard: React.FC<RoomCardProps> = ({ 
+  data, 
+  price, 
+  onBookNow,
+  isPriceAvailable 
+}) => {
   const { t } = useTranslation();
   const [showPolicyModal, setShowPolicyModal] = useState(false);
   
-  const DEFAULT_IMAGE = data.default_image_url || "https://images.unsplash.com/photo-1617104678098-de229db51175?q=80&w=1514&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+  const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1617104678098-de229db51175?q=80&w=1514&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
   const selectedImage = data.image && data.image.length > 0 ? data.image[0] : DEFAULT_IMAGE;
 
   const router = useRouter();
@@ -65,14 +66,12 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
 
   const policyType = getPolicyType(data.cancellation_policy);
   const policyStyling = getPolicyStyling(policyType);
-  const policyBulletPoints = getPolicyBulletPoints(policyType, t);
+  const policyBulletPoints = getPolicyBulletPoints(policyType, t); // Pass translation function
 
-  const numericPrice = parseFloat(price.replace(/[^0-9.]/g, ""));
+  // Handle discount display
   const hasOriginalPrice = !!data.original_price;
   const originalPrice = data.original_price || 0;
-  const discountPercentage = data.discount_percentage || (
-    hasOriginalPrice ? Math.round((1 - (numericPrice / originalPrice)) * 100) : 0
-  );
+  const discountPercentage = data.discount_percentage || 0;
   const hasDiscount = discountPercentage > 0 && hasOriginalPrice;
 
   const rating = data.rating !== undefined ? data.rating : 5;
@@ -85,16 +84,18 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
     return words.slice(0, wordLimit).join(" ") + "...";
   };
 
-  const truncatedDescription = truncateDescription(data.description);
+  const truncatedDescription = truncateDescription(data.description || "");
   
   const handleBookNow = () => {
+    if (!isPriceAvailable) return; // Don't proceed if price not available
+
     const accessToken = Cookies.get("accessToken");
 
     if (!accessToken) {
       const fullUrl = window.location.href;
       Cookies.set("redirectAfterLogin", fullUrl);
       router.push("/login");
-      dispatch(logout());  // <--- logout on no token
+      dispatch(logout());
       return;
     }
 
@@ -103,25 +104,22 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
       const currentTime = Math.floor(Date.now() / 1000);
 
       if (decodedToken.exp < currentTime) {
-        // Token expired
-        Cookies.remove("accessToken"); // Clear expired token
+        Cookies.remove("accessToken");
         const fullUrl = window.location.href;
         Cookies.set("redirectAfterLogin", fullUrl);
         router.push("/login");
-        dispatch(logout());  // <--- logout on expired token
+        dispatch(logout());
         return;
       }
 
-      // Token is valid, proceed with booking
       onBookNow();
 
     } catch (error) {
-      // Invalid token, remove and redirect
-      Cookies.remove("accessToken"); // Clear invalid token
+      Cookies.remove("accessToken");
       const fullUrl = window.location.href;
       Cookies.set("redirectAfterLogin", fullUrl);
       router.push("/login");
-      dispatch(logout());  // <--- logout on invalid token
+      dispatch(logout());
     }
   };
 
@@ -175,12 +173,20 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
           />
 
           {/* Discount tag */}
-          {hasDiscount && (
+          {isPriceAvailable && hasDiscount && (
             <div className="absolute top-3 left-3 z-20 bg-red-600 text-tripswift-off-white text-xs font-tripswift-semibold py-1 px-2.5 rounded-full flex items-center shadow-md">
               <FaPercent className="h-2.5 w-2.5 mr-1" /> {discountPercentage}% {t('RoomsPage.RoomCard.off')}
             </div>
           )}
+          
+          {/* Not Available Badge */}
+          {!isPriceAvailable && (
+            <div className="absolute top-3 left-3 z-20 bg-gray-600 text-tripswift-off-white text-xs font-tripswift-semibold py-1 px-2.5 rounded-full flex items-center shadow-md">
+              {t('RoomsPage.RoomCard.notAvailable')}
+            </div>
+          )}
         </div>
+        
         {/* Details Section */}
         <div className="w-full md:w-[55%] flex flex-col p-3 sm:p-4">
           {/* Header */}
@@ -192,7 +198,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
                 </h3>
               </div>
 
-              <div className="flex items-center text-yellow-400 gap-0.5 pt-1">
+              {/* <div className="flex items-center text-yellow-400 gap-0.5 pt-1">
                 {Array.from({ length: maxRating }).map((_, i) => (
                   i < Math.floor(rating) ? (
                     <FaStar key={i} className="h-3.5 w-3.5" />
@@ -202,7 +208,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
                     <FaRegStar key={i} className="h-3.5 w-3.5" />
                   )
                 ))}
-              </div>
+              </div> */}
             </div>
             <p className="text-description line-clamp-2 mt-1">
               {truncatedDescription}
@@ -215,20 +221,25 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 p-1.5 rounded-md">
               <div className="flex items-center text-xs font-tripswift-medium text-tripswift-black/70">
                 <FaUser className="mr-1.5 h-3 w-3 text-tripswift-blue" />
-                <span>{data.max_number_of_adults} {t('RoomsPage.RoomCard.adults')}</span>
+                <span>
+                  {data.max_number_of_adults || data.max_occupancy} {t('RoomsPage.RoomCard.adults')}
+                </span>
               </div>
-              {data.max_number_of_children > 0 && (
+              
+              {(data.max_number_of_children || 0) > 0 && (
                 <div className="flex items-center text-xs font-tripswift-medium text-tripswift-black/70">
                   <FaChild className="mr-1.5 h-3 w-3 text-tripswift-blue" />
                   <span>{data.max_number_of_children} {t('RoomsPage.RoomCard.children')}</span>
                 </div>
               )}
+              
               {data.room_size > 0 && (
                 <div className="flex items-center text-xs font-tripswift-medium text-tripswift-black/70">
                   <FaRulerCombined className="mr-1.5 h-3 w-3 text-tripswift-blue" />
                   <span>{data.room_size} {data.room_unit || "m²"}</span>
                 </div>
               )}
+              
               {data.room_view && (
                 <div className="flex flex-wrap gap-1.5">
                   <span className="bg-tripswift-blue/5 text-tripswift-black/70 text-xs px-0.5 py-1 rounded-full font-tripswift-medium inline-flex items-center">
@@ -252,21 +263,42 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
             {/* Price and Button */}
             <div className="mt-auto pt-2 border-t border-gray-100 flex items-center justify-between">
               <div className="flex flex-col">
-                {hasDiscount && (
-                  <span className="text-xs line-through text-tripswift-black/60 font-tripswift-regular">₹{originalPrice}</span>
+                {isPriceAvailable && hasDiscount && (
+                  <span className="text-xs line-through text-tripswift-black/60 font-tripswift-regular">
+                    {data.currency_code} {originalPrice}
+                  </span>
                 )}
                 <div className="flex items-baseline">
-                  <span className="text-price">{price}</span>
-                  <span className="text-tripswift-black/60 text-lg ml-1.5 font-tripswift-regular">/ {t('RoomsPage.RoomCard.night')}</span>
+                  <span className={`text-price ${!isPriceAvailable ? "text-gray-500" : ""}`}>
+                    {price}
+                  </span>
+                  {isPriceAvailable && (
+                    <span className="text-tripswift-black/60 text-lg ml-1.5 font-tripswift-regular">
+                      / {t('RoomsPage.RoomCard.night')}
+                    </span>
+                  )}
                 </div>
               </div>
               <button
                 onClick={handleBookNow}
-                className="bg-tripswift-blue hover:bg-[#054B8F] active:bg-[#03315c] text-tripswift-off-white font-tripswift-semibold py-2 px-4 rounded-md text-sm flex items-center transition-colors duration-300 shadow-sm hover:shadow-md"
+                disabled={!isPriceAvailable}
+                className={`font-tripswift-semibold py-2 px-4 rounded-md text-sm flex items-center transition-colors duration-300 shadow-sm hover:shadow-md
+                  ${isPriceAvailable 
+                    ? "bg-tripswift-blue hover:bg-[#054B8F] active:bg-[#03315c] text-tripswift-off-white" 
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"}
+                `}
               >
-                <FaShoppingCart className="mr-1.5 h-3 w-3" /> {t('RoomsPage.RoomCard.bookNow')}
+                {isPriceAvailable ? (
+                  <>
+                    <FaShoppingCart className="mr-1.5 h-3 w-3" /> 
+                    {t('RoomsPage.RoomCard.bookNow')}
+                  </>
+                ) : (
+                  t('RoomsPage.RoomCard.notAvailable')
+                )}
               </button>
             </div>
+            
             {/* Policy details link - hidden on smallest screens, visible on sm and up */}
             <div className=" pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-2 sm:gap-0">
               <button
@@ -320,9 +352,9 @@ export const RoomCard: React.FC<RoomCardProps> = ({ data, price, onBookNow }) =>
                 <div className="mb-4">
                   <ul className="list-disc pl-5 space-y-1.5 text-description">
                     {policyBulletPoints.map((point, idx) => (
-                      <li key={idx}>
-                        <span className={point.color}>{point.text.split(':')[0]}:</span>
-                        {point.text.split(':')[1]}
+                      <li key={idx} className="flex">
+                        <span className={`font-medium ${point.color}`}>{point.text.split(':')[0]}:</span>
+                        <span className="ml-1">{point.text.split(':')[1]}</span>
                       </li>
                     ))}
                   </ul>

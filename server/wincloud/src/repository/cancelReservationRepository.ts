@@ -1,4 +1,4 @@
-import { ThirdPartyBooking } from '../model/reservationModel';
+import { ReservationLog, ThirdPartyBooking } from '../model/reservationModel';
 import { ThirdPartyCancelReservationData } from '../interface/cancelReservationInterface';
 
 export class ThirdPartyCancelReservationRepository {
@@ -26,13 +26,10 @@ export class ThirdPartyCancelReservationRepository {
             checkOutDate: data.checkOutDate,
             guestDetails: [
               {
-                firstName: data.guestFirstName,
-                lastName: data.guestLastName,
-                email: '',
-                phone: '',
+                firstName: data.firstName,
+                lastName: data.lastName
               },
             ],
-            thirdPartyReservationIdType8: data.thirdPartyReservationIdType8 || '',
             xmlRequest,
             xmlResponse,
             updatedAt: new Date(),
@@ -44,7 +41,26 @@ export class ThirdPartyCancelReservationRepository {
       if (!updatedBooking) {
         throw new Error('Booking not found for cancellation');
       }
-
+      try {
+      await ReservationLog.create({
+              bookingId: updatedBooking._id?.toString(),
+              reservationId: updatedBooking.reservationId,
+              hotelCode: updatedBooking.hotelCode,
+              hotelName: updatedBooking.hotelName,
+              ratePlanCode: updatedBooking.ratePlanCode,
+              roomTypeCode: updatedBooking.roomTypeCode,
+              checkInDate: updatedBooking.checkInDate,
+              checkOutDate: updatedBooking.checkOutDate,
+              jsonInput: JSON.stringify(data),
+              xmlSent: xmlRequest,
+              apiResponse: xmlResponse,
+              process: 'Cancellation',
+              status: 'Success',
+              timestamp: new Date(),
+            });
+      } catch (logError) {
+        console.error('Error logging failure:', logError);
+      }
       console.log('Booking updated successfully:', updatedBooking.reservationId);
       return updatedBooking;
     } catch (error: any) {

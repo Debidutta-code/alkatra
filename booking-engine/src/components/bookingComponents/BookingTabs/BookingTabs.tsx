@@ -54,8 +54,8 @@ export default function BookingTabs() {
 
   const authUser = useSelector((state: RootState) => state.auth.user);
   const token = Cookies.get("accessToken");
-  const router =useRouter();
-   
+  const router = useRouter();
+
   //it helps us to 
   useEffect(() => {
     const handlePopState = () => {
@@ -91,14 +91,12 @@ export default function BookingTabs() {
             }
           }
         );
-
-        setBookings(response.data.bookingDetails);
-        console.log("booking details we get from backend ",response.data.bookingDetails)
+        // Backend sometimes returns .bookings, sometimes .bookingDetails
+        setBookings(response.data.bookings || []);
         setTotalBookings(response.data.totalBookings);
         setTotalPages(response.data.totalPages);
         setLoading(false);
       } catch (err) {
-        // Using translation for error message
         setError(t("BookingTabs.noBooking"));
         setLoading(false);
       }
@@ -110,7 +108,10 @@ export default function BookingTabs() {
   // Filter bookings based on active tab
   useEffect(() => {
     const today = new Date();
-
+    if (!bookings) {
+      setFilteredBookings([]);
+      return;
+    }
     if (activeTab === 'all') {
       setFilteredBookings(bookings);
     } else if (activeTab === 'upcoming') {
@@ -151,37 +152,33 @@ export default function BookingTabs() {
     setBookings(prevBookings => prevBookings.map(booking =>
       booking._id === bookingId
         ? {
-          ...booking,
-          checkInDate: amendedData.timeSpan.start,
-          checkOutDate: amendedData.timeSpan.end,
-          adultCount: amendedData.guestCounts.adultCount,
-          childCount: amendedData.guestCounts.childCount,
-          room: {
-            ...booking.room,
-            room_type: amendedData.roomType.roomTypeName,
-            room_type_code: amendedData.roomType.roomTypeCode
-          },
-          specialRequests: amendedData.comments,
-          ratePlanCode: amendedData.ratePlan.ratePlanCode,
-          ratePlanName: amendedData.ratePlan.ratePlanName,
-          amount: amendedData.rateInfo.totalBeforeTax
-        }
+            ...booking,
+            checkInDate: amendedData.checkInDate,
+            checkOutDate: amendedData.checkOutDate,
+            ratePlanCode: amendedData.ratePlanCode,
+            roomTypeCode: amendedData.roomTypeCode,
+            numberOfRooms: amendedData.numberOfRooms,
+            totalAmount: amendedData.roomTotalPrice,
+            currencyCode: amendedData.currencyCode,
+            guestDetails: amendedData.guests,
+          }
         : booking
     ));
-
+  
     if (selectedBooking && selectedBooking._id === bookingId) {
       setSelectedBooking({
         ...selectedBooking,
-        checkInDate: amendedData.timeSpan.start,
-        checkOutDate: amendedData.timeSpan.end,
-        room: {
-          ...selectedBooking.room,
-          room_type: amendedData.roomType.roomTypeName,
-          room_type_code: amendedData.roomType.roomTypeCode
-        }
+        checkInDate: amendedData.checkInDate,
+        checkOutDate: amendedData.checkOutDate,
+        ratePlanCode: amendedData.ratePlanCode,
+        roomTypeCode: amendedData.roomTypeCode,
+        numberOfRooms: amendedData.numberOfRooms,
+        totalAmount: amendedData.roomTotalPrice,
+        currencyCode: amendedData.currencyCode,
+        guestDetails: amendedData.guests,
       });
     }
-
+  
     setShowAmendUI(false);
   };
 
@@ -236,7 +233,7 @@ export default function BookingTabs() {
           <LoadingState />
         ) : error ? (
           <ErrorState errorMessage={error} />
-        ) : filteredBookings.length === 0 ? (
+        ) : !filteredBookings || filteredBookings.length === 0 ? (
           <EmptyState activeTab={activeTab} />
         ) : (
           <>

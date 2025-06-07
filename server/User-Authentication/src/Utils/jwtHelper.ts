@@ -1,12 +1,12 @@
 import jwt from "jsonwebtoken";
 import { Types } from "mongoose";
 
-export type Role = "super-admin" | "hotel-admin";
+export type Role = "superAdmin" | "groupManager" | "hotelManager";
 
 export type Payload = {
   id?: Types.ObjectId | string;
   email?: string;
-  role?: Role
+  role?: Role;
 };
 
 const expiresInSeconds = (days: number) => days * 24 * 60 * 60;
@@ -17,7 +17,10 @@ const assignToken = (payload: Payload, secret: string, expiresIn: string) => {
   });
 };
 
-const decodeToken = async ( token: string,secret: string): Promise<string | jwt.JwtPayload | any> => {
+const decodeToken = async (
+  token: string,
+  secret: string
+): Promise<string | jwt.JwtPayload | any> => {
   return new Promise((resolve, reject) => {
     jwt.verify(token, secret, (err, decoded) => {
       if (err) reject(err);

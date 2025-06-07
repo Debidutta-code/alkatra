@@ -28,39 +28,39 @@ const pmsHotelCardSlice = createSlice({
   initialState,
   reducers: {
     setPropertyId: (state, action: PayloadAction<string>) => {
-      console.log("1 setPropertyId called with:", action.payload);
+      // console.log("1 setPropertyId called with:", action.payload);
       state.property_id = action.payload;
-      console.log("2 setPropertyId called with:", state.property_id);
+      // console.log("2 setPropertyId called with:", state.property_id);
     },
     setRoomId: (state, action: PayloadAction<string>) => {
-      console.log("1 setRoomId called with:", action.payload);
+      // console.log("1 setRoomId called with:", action.payload);
       state.room_id = action.payload;
-      console.log("2 setRoomId called with:", state.room_id);
+      // console.log("2 setRoomId called with:", state.room_id);
     },
     setAmount: (state, action: PayloadAction<string>) => {
-      console.log("1 setAmount called with:", action.payload);
+      // console.log("1 setAmount called with:", action.payload);
       state.amount = action.payload;
-      console.log("2 setAmount called with:", state.amount);
+      // console.log("2 setAmount called with:", state.amount);
     },
     setUserId: (state, action: PayloadAction<string>) => {
-      console.log("1 setUserId called with:", action.payload);
+      // console.log("1 setUserId called with:", action.payload);
       state.user_id = action.payload;
-      console.log("2 setUserId called with:", state.user_id);
+      // console.log("2 setUserId called with:", state.user_id);
     },
     setCheckInDate: (state, action: PayloadAction<string>) => {
-      console.log("1 setCheckInDate called with:", action.payload);
+      // console.log("1 setCheckInDate called with:", action.payload);
       state.checkInDate = action.payload;
-      console.log("2 setCheckInDate called with:", state.checkInDate);
+      // console.log("2 setCheckInDate called with:", state.checkInDate);
     },
     setCheckOutDate: (state, action: PayloadAction<string>) => {
-      console.log("1 setCheckOutDate called with:", action.payload);
+      // console.log("1 setCheckOutDate called with:", action.payload);
       state.checkOutDate = action.payload;
-      console.log("2 setCheckOutDate called with:", state.checkOutDate);
+      // console.log("2 setCheckOutDate called with:", state.checkOutDate);
     },
     setGuestDetails: (state, action: PayloadAction<Record<string, any>>) => {
-      console.log("1 setGuestDetails called with:", action.payload);
+      // console.log("1 setGuestDetails called with:", action.payload);
       state.guestDetails = action.payload;
-      console.log("2 setGuestDetails called with:", state.guestDetails);
+      // console.log("2 setGuestDetails called with:", state.guestDetails);
     },
   },
 });

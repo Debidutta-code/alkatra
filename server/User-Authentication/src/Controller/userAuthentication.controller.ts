@@ -9,7 +9,7 @@ interface UpdateBody {
   firstName?: string;
   lastName?: string;
   email?: string;
-  role?: string;
+  role?: "superAdmin" | "groupManager" | "hotelManager";
 }
 
 export class UserController {
@@ -47,7 +47,12 @@ export class UserController {
           id,
           requestingUserId,
           requestingUserRole,
-          { firstName, lastName, email, role }
+          {
+            firstName,
+            lastName,
+            email,
+            role: role as "superAdmin" | "groupManager" | "hotelManager",
+          }
         );
         res.status(200).json({
           status: "success",
@@ -61,14 +66,16 @@ export class UserController {
       }
     }
   );
-
   getAllUsers = catchAsync(
     async (req: CustomRequest, res: Response, next: NextFunction) => {
-      const requestingUserRole = req.role as string;
+      const requestingUserRole = req.role as
+        | "superAdmin"
+        | "groupManager"
+        | "hotelManager";
       const page = parseInt(req.query.page as string, 10) || 1;
       const limit = parseInt(req.query.limit as string, 10) || 10;
       try {
-        const { users, total, totalPages} = await this.userService.getAllUsers(
+        const { users, total, totalPages } = await this.userService.getAllUsers(
           page,
           limit,
           requestingUserRole

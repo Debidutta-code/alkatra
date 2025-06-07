@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { makeBookingRequest } from "@/api/booking";
+// import { makeBookingRequest } from "@/api/booking";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -193,8 +193,8 @@ export default function PaymentSuccess() {
       try {
         isRequestSent.current = true;
         setIsLoading(true);
-        const response = await makeBookingRequest(payload, token as string);
-        setBooking(response);
+        // const response = await makeBookingRequest(payload, token as string);
+        // setBooking(response);
         // toast.success(t("Payment.PaymentSuccess.bookingConfirmedToast"));
       } catch (error: any) {
         console.error("Booking Error:", error);
@@ -569,7 +569,7 @@ export default function PaymentSuccess() {
                   </h2>
                   <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
                     {/* Add per-night rate */}
-                    <div className="flex justify-between mb-2">
+                    {/* <div className="flex justify-between mb-2">
                       <span className="text-sm sm:text-base text-tripswift-black/70">
                         {t("Payment.PaymentSuccess.roomRate")}
                       </span>
@@ -580,10 +580,10 @@ export default function PaymentSuccess() {
                         ).toLocaleString()}{" "}
                         {t("Payment.PaymentSuccess.perNight")}
                       </span>
-                    </div>
+                    </div> */}
 
                     {/* Show calculation */}
-                    <div className="flex justify-between mb-2">
+                    {/* <div className="flex justify-between mb-2">
                       <span className="text-sm sm:text-base text-tripswift-black/70">
                         {getBookingNights()}{" "}
                         {getBookingNights() === 1
@@ -597,7 +597,7 @@ export default function PaymentSuccess() {
                         ).toLocaleString()}{" "}
                         × {getBookingNights()}
                       </span>
-                    </div>
+                    </div> */}
 
                     <div className="border-t border-gray-200 my-2 pt-2"></div>
                     <div className="flex justify-between">

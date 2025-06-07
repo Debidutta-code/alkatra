@@ -9,77 +9,40 @@ import { useDispatch, useSelector } from "@/Redux/store";
 import { setAmount, setRoomId } from "@/Redux/slices/pmsHotelCard.slice";
 import { setGuestDetails } from "@/Redux/slices/hotelcard.slice";
 import {
-  Calendar, Search, Bed, ChevronRight, ChevronLeft, ChevronDown,
+Calendar, Search, Bed, ChevronRight, ChevronLeft, ChevronDown,
   MapPin, Star, Coffee, Wifi, Car, Waves, Droplets, Briefcase, Utensils, BellRing, CheckCircle,
   Bath, Dog, ImageIcon, Users, Filter
 } from "lucide-react";
+
 import LoadingSkeleton from "../hotelListingComponents/LoadingSkeleton";
 import { formatDate, calculateNights } from "@/utils/dateUtils";
-import QRCodeDisplay from "./QRCodeDisplay";
-
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
+import QRCodeDisplay from "./QRCodeDisplay";
 
 interface Room {
   _id: string;
-  propertyInfo_id: string;
-  room_name: string;
-  room_type: string;
-  total_room: number;
-  floor: number;
-  room_view: string;
-  room_size: number;
-  room_unit: string;
-  smoking_policy: string;
+  currency_code: string;
+  has_valid_rate: boolean;
   max_occupancy: number;
-  max_number_of_adults: number;
-  max_number_of_children: number;
-  number_of_bedrooms: number;
-  number_of_living_room: number;
-  extra_bed: number;
-  description: string;
-  image: string[];
-  available: boolean;
-  rateplan_created: boolean;
+  propertyInfo_id: string;
+  rate_plan_code: string;
+  room_name: string;
   room_price: number;
-  amenities?: string[];
-}
-
-interface RoomData {
-  _id: string;
-  propertyInfo_id: string;
-  room_name: string;
-  room_type: string;
-  total_room: number;
-  floor: number;
-  room_view: string;
   room_size: number;
-  room_unit: string;
-  smoking_policy: string;
-  max_occupancy: number;
-  max_number_of_adults: number;
-  max_number_of_children: number;
-  number_of_bedrooms: number;
-  number_of_living_room: number;
-  extra_bed: number;
-  description: string;
-  image: string[];
-  available: boolean;
-  rateplan_created: boolean;
-  cancellation_policy?: string;
-  original_price?: number;
-  discount_percentage?: number;
-  rating?: number;
-  amenities?: { icon: string; name: string; }[];
-  room_details_url?: string;
-  default_image_url?: string;
+  room_type: string;
+  image?: string[];
+  amenities?: string[];
+  description?: string;
+  max_number_of_adults?: number;
+  max_number_of_children?: number;
+  room_view?: string;
 }
 
 interface RoomResponse {
   success: boolean;
   data: Room[];
 }
-
 interface PropertyDetails {
   _id?: string;
   property_name: string;
@@ -100,7 +63,6 @@ interface PropertyDetails {
   property_contact?: string;
   property_email?: string;
 }
-
 const RoomsPage: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -111,35 +73,31 @@ const RoomsPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
-  const [propertyDetails, setPropertyDetails] = useState<PropertyDetails | null>(null);
-  const [filterType, setFilterType] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [showPropertyDetails, setShowPropertyDetails] = useState(true);
-  const [selectedImage, setSelectedImage] = useState<number>(0);
-  const [qrCodeData, setQrCodeData] = useState({
+  const [filterType, setFilterType] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+const [propertyDetails, setPropertyDetails] = useState<PropertyDetails | null>(null);
+const [qrCodeData, setQrCodeData] = useState({
     qrCode: null,
     couponCode: null,
   });
-
+const [showPropertyDetails,setShowPropertyDetails]=useState<boolean>(true)
+const [selectedImage, setSelectedImage] = useState<number>(0);
   // Get guest details from Redux
   const { guestDetails } = useSelector((state) => state.hotel);
 
   const { t } = useTranslation();
-
   const dispatch = useDispatch();
 
   // Initialize Redux with URL parameters
   useEffect(() => {
-    // Get guest details from URL parameters
-    const rooms = searchParams.get('rooms');
+    const roomsParam = searchParams.get('rooms');
     const adults = searchParams.get('adults');
     const children = searchParams.get('children');
     const infants = searchParams.get('infant');
 
-    if (rooms || adults || children ||infants) {
-      // Initialize Redux with URL parameters
+    if (roomsParam || adults || children || infants) {
       dispatch(setGuestDetails({
-        rooms: Number(rooms) || 1,
+        rooms: Number(roomsParam) || 1,
         guests: Number(adults) || 1,
         children: Number(children) || 0,
         infants: Number(infants) || 0,
@@ -148,7 +106,155 @@ const RoomsPage: React.FC = () => {
     }
   }, [searchParams, dispatch]);
 
-  // Helper function to format address
+  // Helper function to display guest count information
+  const getGuestCountDisplay = () => {
+    if (!guestDetails) return "1 Room · 1 Adult · 0 Children";
+
+    const rooms = guestDetails.rooms || 1;
+    const adults = guestDetails.guests || 1;
+    const children = guestDetails.children || 0;
+    const infants = guestDetails.infants || 0;
+
+    return `${rooms} ${rooms === 1 ? "Room" : "Rooms"} · ${adults} ${
+      adults === 1 ? "Adult" : "Adults"
+    }${
+      children > 0
+        ? ` · ${children} ${children === 1 ? "Child" : "Children"}`
+        : ""
+    }${
+      infants > 0
+        ? ` · ${infants} ${infants === 1 ? "Infant" : "Infants"}`
+        : ""
+    }`;
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!propertyId) return;
+      setIsLoading(true);
+      try {
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}`,
+          {
+            startDate: checkInDate,
+            endDate: checkOutDate,
+            hotelCode: "WINCLOUD"
+          }
+        );
+        setRooms(response.data);
+        const propertyResponse = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`
+        );
+         if (response.data.qrCode) {
+          setQrCodeData({
+            qrCode: response.data.qrCode,
+            couponCode: response.data.couponCode || "",
+          });
+        }
+        const propDetails = propertyResponse.data.property || propertyResponse.data.data || propertyResponse.data;
+        setPropertyDetails(propDetails);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setRooms({ success: true, data: [] });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [propertyId, checkInDate, checkOutDate]);
+
+  // Helper function to convert amenities to the expected format
+  const convertAmenities = (room: Room) => {
+    const convertedAmenities = room.amenities?.map((amenity) => {
+      const getIconName = (amenityName: string) => {
+        const amenityLower = amenityName.toLowerCase();
+        if (amenityLower.includes("wifi")) return "wifi";
+        if (amenityLower.includes("air") || amenityLower.includes("ac"))
+          return "snowflake";
+        if (amenityLower.includes("smoking")) return "smoking-ban";
+        if (amenityLower.includes("bed")) return "bed";
+        if (amenityLower.includes("view")) return "tree";
+        return "check-circle";
+      };
+
+      return {
+        icon: getIconName(amenity),
+        name: amenity,
+      };
+    });
+
+    return {
+      ...room,
+      amenities: convertedAmenities,
+      default_image_url: room.image?.[0] || ""
+    } as any;
+  };
+
+  const handleBookNow = (room: Room) => {
+    if (!room.has_valid_rate) return;
+    // console.log("room",room)
+    setSelectedRoom(room);
+    setIsModalOpen(true);
+    dispatch(setRoomId(room._id));
+    dispatch(setAmount(room.room_price.toString()));
+  };
+
+  const confirmBooking = (formData: {
+    email: string;
+    phone: string;
+    propertyId: string;
+    roomId: string;
+    checkIn: string;
+    checkOut: string;
+    amount: string;
+    userId?: string;
+    rooms?: number;
+    adults?: number;
+    children?: number;
+    guests?: Guest[]; // <--- make sure this is present
+  }) => {
+    const queryParams = new URLSearchParams({
+      roomId: formData.roomId,
+      propertyId: formData.propertyId,
+      amount: formData.amount,
+      currency: "INR",
+      checkIn: formData.checkIn,
+      checkOut: formData.checkOut,
+      email: formData.email,
+      phone: formData.phone,
+      userId: formData.userId || "",
+      hotelName: propertyDetails?.property_name || "Unknown Hotel",
+      ratePlanCode: selectedRoom?.rate_plan_code || "SUT",
+      roomType: selectedRoom?.room_type || "SUT",
+      ...(formData.rooms ? { rooms: formData.rooms.toString() } : {}),
+      ...(formData.adults ? { adults: formData.adults.toString() } : {}),
+      ...(formData.children ? { children: formData.children.toString() } : {}),
+      ...(formData.guests ? { guests: encodeURIComponent(JSON.stringify(formData.guests)) } : {}) // ADD THIS LINE
+    }).toString();
+  
+    router.push(`/payment?${queryParams}`);
+  };
+
+  // Get unique room types
+  const roomTypes = useMemo(() => {
+    if (!rooms?.data) return [];
+    const types = new Set(rooms.data.map((room) => room.room_type));
+    return ["all", ...Array.from(types)];
+  }, [rooms]);
+
+  // Filter rooms
+  const filteredRooms = useMemo(() => {
+    if (!rooms?.data) return [];
+    return rooms.data.filter((room) => {
+      if (filterType !== "all" && room.room_type !== filterType) return false;
+      if (searchQuery && !room.room_name.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return false;
+      }
+      return true;
+    });
+  }, [rooms, filterType, searchQuery]);
+// Helper function to format address
   const getFormattedAddress = (addressObj: any): string => {
     if (!addressObj) return "";
     if (typeof addressObj === 'string') return addressObj;
@@ -163,160 +269,6 @@ const RoomsPage: React.FC = () => {
 
     return parts.join(', ');
   };
-
-  // Helper function to display guest count information
-  const getGuestCountDisplay = () => {
-    if (!guestDetails) return "1 Room · 1 Adult · 0 Children";
-
-    const rooms = guestDetails.rooms || 1;
-    const adults = guestDetails.guests || 1;
-    const children = guestDetails.children || 0;
-
-    return `${rooms} ${rooms === 1 ? 'Room' : 'Rooms'} · ${adults} ${adults === 1 ? 'Adult' : 'Adults'}${children > 0 ? ` · ${children} ${children === 1 ? 'Child' : 'Children'}` : ''
-      }`;
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!propertyId) return;
-      setIsLoading(true);
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}`
-        );
-
-        // Fetch property details
-        const propertyResponse = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`
-        );
-
-        setRooms(response.data);
-
-        // Extract QR code data if available
-        if (response.data.qrCode) {
-          setQrCodeData({
-            qrCode: response.data.qrCode,
-            couponCode: response.data.couponCode || "",
-          });
-        }
-
-        // Handle different response formats
-        const propDetails = propertyResponse.data.property || propertyResponse.data.data || propertyResponse.data;
-        setPropertyDetails(propDetails);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setRooms({ success: true, data: [] });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [propertyId]);
-
-  // Helper function to convert string[] amenities to the expected format
-  const convertAmenities = (room: Room) => {
-    // Map string amenities to objects with icon and name properties
-    const convertedAmenities = room.amenities?.map(amenity => {
-      // Default mapping of amenity strings to icon names
-      const getIconName = (amenityName: string) => {
-        const amenityLower = amenityName.toLowerCase();
-        if (amenityLower.includes('wifi')) return 'wifi';
-        if (amenityLower.includes('air') || amenityLower.includes('ac')) return 'snowflake';
-        if (amenityLower.includes('smoking')) return 'smoking-ban';
-        if (amenityLower.includes('bed')) return 'bed';
-        if (amenityLower.includes('view')) return 'tree';
-        // Default icon if no match
-        return 'check-circle';
-      };
-
-      return {
-        icon: getIconName(amenity),
-        name: amenity
-      };
-    });
-
-    // Create a new object that matches the RoomData interface
-    return {
-      ...room,
-      amenities: convertedAmenities
-    } as unknown as RoomData;
-  };
-
-  const handleBookNow = (room: Room) => {
-    setSelectedRoom(room);
-    setIsModalOpen(true);
-    dispatch(setRoomId(room._id));
-    dispatch(setAmount(room.room_price?.toString() || room.room_size.toString()));
-  };
-
-  // In the parent component (RoomsPage.tsx or similar)
-  const confirmBooking = (formData: {
-    email: string;
-    phone: string;
-    propertyId: string;
-    roomId: string;
-    checkIn: string;
-    checkOut: string;
-    amount: string;
-    userId?: string;
-    rooms?: number;
-    adults?: number;
-    children?: number;
-    guests?:Guest[];    
-  }) => {
-      // console.log("🔍 Booking Payload Received in confirmBooking:", formData);
-
-    // Create the URL query params with all necessary data
-    const queryParams = new URLSearchParams({
-      roomId: formData.roomId,
-      propertyId: formData.propertyId,
-      amount: formData.amount,
-      currency: "INR",
-      checkIn: formData.checkIn,
-      checkOut: formData.checkOut,
-      email: formData.email,
-      phone: formData.phone,
-      userId: formData.userId || "",
-
-      // Add guest counts if available
-      ...(formData.rooms ? { rooms: formData.rooms.toString() } : {}),
-      ...(formData.adults ? { adults: formData.adults.toString() } : {}),
-      ...(formData.children ? { children: formData.children.toString() } : {})
-    }).toString();
-
-    // Navigate to the payment page with all parameters
-    router.push(`/payment?${queryParams}`);
-  };
-
-
-  // Get unique room types from all rooms - optimized with useMemo
-  const roomTypes = useMemo(() => {
-    if (!rooms?.data) return [];
-    const types = new Set(rooms.data.map(room => room.room_type));
-    return ['all', ...Array.from(types)];
-  }, [rooms]);
-
-  // Filter rooms based on selected filters and search query - optimized with useMemo
-  const filteredRooms = useMemo(() => {
-    if (!rooms?.data) return [];
-
-    return rooms.data.filter(room => {
-      // Apply room type filter
-      if (filterType !== 'all' && room.room_type !== filterType) {
-        return false;
-      }
-
-      // Apply search query
-      if (searchQuery && !room.room_name.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return false;
-      }
-
-      return true;
-    });
-  }, [rooms, filterType, searchQuery]);
-
-  // Function to get amenity icon based on amenity key (same as in HotelCardItem)
   const getAmenityIcon = (amenity: string) => {
     switch (amenity) {
       case 'wifi':
@@ -349,10 +301,9 @@ const RoomsPage: React.FC = () => {
         return <CheckCircle className="h-4 w-4 text-tripswift-blue" />;
     }
   };
-
   return (
     <div className="bg-[#F5F7FA] min-h-screen font-noto-sans">
-      {/* Property header - Using TripSwift gradient */}
+      {/* Property Details Section - Using TripSwift classes */}
       <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] text-tripswift-off-white">
         <div className="container mx-auto px-4 py-5">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
@@ -400,8 +351,6 @@ const RoomsPage: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Property Details Section - Using TripSwift classes */}
       <div className="container mx-auto px-4 py-4">
         <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           {/* Collapsible header - TripSwift branded */}
@@ -708,7 +657,7 @@ const RoomsPage: React.FC = () => {
                               className="flex items-center text-xs font-tripswift-medium text-tripswift-blue bg-tripswift-blue/5 border border-tripswift-blue/20 px-2 py-1 rounded-md"
                             >
                               {getAmenityIcon(amenity)}
-                              <span className="capitalize ml-1">{t(`RoomsPage.amenitiesList.${amenity}`)}</span>
+                              <span className="capitalize ml-1">{t(RoomsPage.amenitiesList.${amenity})}</span>
                             </div>
                           ))}
                       </div>
@@ -760,8 +709,8 @@ const RoomsPage: React.FC = () => {
 
       {/* Main content */}
       <div className="container mx-auto px-4">
-        {/* Filter and Search Section - TripSwift styled */}
-        <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
+        {/* Filter and Search Section */}
+        <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6 mt-4">
           <div className="flex flex-col md:flex-row gap-4 justify-between">
             {/* Room type filter */}
             <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
@@ -772,12 +721,13 @@ const RoomsPage: React.FC = () => {
                 <button
                   key={type}
                   onClick={() => setFilterType(type)}
-                  className={`px-3.5 py-1.5 rounded-lg text-sm whitespace-nowrap font-tripswift-medium transition-colors duration-300 ${filterType === type
-                    ? 'bg-tripswift-blue text-tripswift-off-white'
-                    : 'bg-gray-100 text-tripswift-black/70 hover:bg-gray-200'
-                    }`}
+                  className={`px-3.5 py-1.5 rounded-lg text-sm whitespace-nowrap font-tripswift-medium transition-colors duration-300 ${
+                    filterType === type
+                      ? "bg-tripswift-blue text-tripswift-off-white"
+                      : "bg-gray-100 text-tripswift-black/70 hover:bg-gray-200"
+                  }`}
                 >
-                  {type === 'all' ? t('RoomsPage.allRooms') : type}
+                  {type === "all" ? t("RoomsPage.allRooms") : type}
                 </button>
               ))}
             </div>
@@ -791,46 +741,29 @@ const RoomsPage: React.FC = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t('RoomsPage.searchRoomName')}
+                placeholder={t("RoomsPage.searchRoomName")}
                 className="pl-10 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-tripswift-regular bg-tripswift-off-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 focus:border-tripswift-blue transition-colors duration-300"
               />
             </div>
           </div>
         </div>
 
-        {/* Results count - TripSwift styled */}
+        {/* Results count */}
         <div className="flex justify-between items-center mb-5">
           <h2 className="text-section-heading">
-            {t('RoomsPage.availableRooms')}
+            {t("RoomsPage.availableRooms")}
           </h2>
           <div className="text-sm font-tripswift-medium text-tripswift-black/70 bg-tripswift-blue/5 px-3.5 py-1.5 rounded-lg">
-            {i18next.language === 'hi' && (
+            {i18next.language === "en" && (
               <span>
-                <span className="mr-1">
-                  {filteredRooms.length}
-                </span>
-                {filteredRooms.length > 1 ? (
-                  <span>{t('RoomsPage.showingRooms_other')}</span>
-                ) : (
-                  <span>{t('RoomsPage.showingRooms_one')}</span>
-                )}
-              </span>
-            )}
-            {i18next.language === 'en' && (
-              <span>
-                Showing {filteredRooms.length} {filteredRooms.length > 1 ? 'Rooms' : 'Room'}
-              </span>
-            )}
-            {/* Static text for Arabic */}
-            {i18next.language === 'ar' && (
-              <span>
-                عرض {filteredRooms.length} {filteredRooms.length > 1 ? 'غرف' : 'غرفة'}
+                Showing {filteredRooms.length}{" "}
+                {filteredRooms.length > 1 ? "Rooms" : "Room"}
               </span>
             )}
           </div>
         </div>
 
-        {/* Enhanced Loading state */}
+        {/* Loading state */}
         {isLoading && (
           <div className="space-y-4">
             <LoadingSkeleton type="room" count={3} />
@@ -840,44 +773,51 @@ const RoomsPage: React.FC = () => {
           </div>
         )}
 
-        {/* Empty state with TripSwift styling */}
+        {/* Empty state */}
         {!isLoading && (!filteredRooms || filteredRooms.length === 0) && (
           <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
             <div className="w-16 h-16 mx-auto bg-tripswift-blue/10 rounded-full flex items-center justify-center mb-4">
               <Bed className="h-8 w-8 text-tripswift-blue" />
             </div>
-            <h3 className="text-lg font-tripswift-semibold text-tripswift-black mb-2">{t('RoomsPage.noRoomsAvailableTitle')}</h3>
+            <h3 className="text-lg font-tripswift-semibold text-tripswift-black mb-2">
+              {t("RoomsPage.noRoomsAvailableTitle")}
+            </h3>
             <p className="text-description max-w-md mx-auto mb-6">
-              {t('RoomsPage.noRoomsAvailableMessage')}
+              {t("RoomsPage.noRoomsAvailableMessage")}
             </p>
             <button
               onClick={() => {
-                setFilterType('all');
-                setSearchQuery('');
+                setFilterType("all");
+                setSearchQuery("");
               }}
               className="btn-tripswift-primary px-6 py-2.5 rounded-lg text-sm font-tripswift-medium transition-all duration-300"
             >
-              {t('RoomsPage.clearFilters')}
+              {t("RoomsPage.clearFilters")}
             </button>
           </div>
         )}
 
-        {/* Rooms grid - Optimized with gap */}
+        {/* Rooms grid */}
         {!isLoading && filteredRooms.length > 0 && (
           <div className="space-y-3.5">
             {filteredRooms.map((room) => (
               <RoomCard
                 key={room._id}
-                data={convertAmenities(room)} // Convert to the expected format
-                price={`₹${room.room_price || room.room_size}`} // Format price with currency symbol
+                data={convertAmenities(room)}
+                price={
+                  room.has_valid_rate
+                    ? `${room.currency_code} ${room.room_price}`
+                    : t("RoomsPage.priceNotAvailable")
+                }
                 onBookNow={() => handleBookNow(room)}
+                isPriceAvailable={room.has_valid_rate}
               />
             ))}
           </div>
         )}
       </div>
 
-      {/* GuestInformationModal remains unchanged */}
+      {/* Guest Information Modal */}
       <GuestInformationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -886,6 +826,7 @@ const RoomsPage: React.FC = () => {
         checkOutDate={checkOutDate}
         onConfirmBooking={confirmBooking}
         guestData={guestDetails}
+
       />
     </div>
   );
