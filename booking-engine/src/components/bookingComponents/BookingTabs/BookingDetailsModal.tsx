@@ -119,7 +119,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.rooms')}</p>
+                  <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1"> {t("BookingTabs.BookingDetailsModal.rooms", { defaultValue: "Rooms" })}</p>
                   <p className="text-gray-800 font-tripswift-medium text-sm sm:text-base">{booking.numberOfRooms}</p>
                 </div>
               </div>
@@ -137,14 +137,14 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             <div className="space-y-4">
               {booking.guestDetails && booking.guestDetails.length > 0 ? (
                 booking.guestDetails.map((guest: GuestDetails, idx: number) => (
-                  <div key={guest._id || idx} className="flex flex-col sm:flex-row sm:items-center gap-2 border-b border-gray-100 pb-2 last:border-b-0 last:pb-0">
+                  <div key={guest._id || idx} className="flex flex-col sm:flex-row sm:items-center gap-4 border-b border-gray-100 pb-2 last:border-b-0 last:pb-0">
                     <div className="flex items-center gap-2 font-tripswift-medium">
                       <FaUser className="text-tripswift-blue" />
                       <span>{guest.firstName} {guest.lastName}</span>
                     </div>
                     {guest.dob && (
                       <div className="text-xs text-gray-500 sm:ml-4">
-                        {t('BookingTabs.BookingDetailsModal.dob')}: {guest.dob}
+                        {t("BookingTabs.BookingDetailsModal.dob", { defaultValue: "DOB" })}: {guest.dob}
                       </div>
                     )}
                   </div>
@@ -197,14 +197,14 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                   </span>
                 </div>
               </div>
-              {booking.ratePlanCode && (
+              {/* {booking.ratePlanCode && (
                 <div className="text-left sm:text-right">
                   <p className="text-xs sm:text-sm text-gray-500">{t('BookingTabs.BookingDetailsModal.ratePlan')}</p>
                   <div className="inline-block px-2 sm:px-3 py-0.5 sm:py-1 bg-blue-50 text-blue-700 rounded-md text-xs sm:text-sm font-tripswift-medium">
                     {booking.ratePlanCode}
                   </div>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
         </div>

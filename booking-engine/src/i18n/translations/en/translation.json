@@ -726,6 +726,8 @@
       "nightsStay_other": "{{count}} Nights",
       "roomType": "Room Type",
       "roomName": "Room Name",
+      "roomsSingular": "Room",
+      "roomsPlural": "Rooms",
       "guestDetails": "Guest Details",
       "guestName": "Guest Name",
       "contactNumber": "Contact Number",

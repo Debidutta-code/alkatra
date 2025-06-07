@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { DatePicker, Select, Input, Button } from "antd";
 import dayjs, { Dayjs } from "dayjs";
@@ -55,6 +55,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
   const [amendmentType, setAmendmentType] = useState<"dates" | "room" | "guests" | "requests">("dates");
   const [loading, setLoading] = useState(false);
   const [amendmentMessage, setAmendmentMessage] = useState<{ type: 'success' | 'error' | 'warning', text: string } | null>(null);
+  const modalContentRef = useRef<HTMLDivElement>(null);
 
   // Initialize guestBreakdown based on booking.guestDetails
   const [guestBreakdown, setGuestBreakdown] = useState(() => {
@@ -188,10 +189,33 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
 
   // Lock body scroll when modal opens, restore when closes
   useEffect(() => {
-    const originalStyle = window.getComputedStyle(document.body).overflow;
+    // Store the original styles
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    const originalBodyPosition = document.body.style.position;
+    const originalBodyWidth = document.body.style.width;
+    const originalBodyTop = document.body.style.top;
+
+    // Get the current scroll position to prevent jumping
+    const scrollPosition = window.scrollY;
+
+    // Lock the body and html scroll
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.width = "100%";
+    document.body.style.top = `-${scrollPosition}px`;
+
     return () => {
-      document.body.style.overflow = originalStyle;
+      // Restore the original styles
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+      document.body.style.position = originalBodyPosition;
+      document.body.style.width = originalBodyWidth;
+      document.body.style.top = originalBodyTop;
+
+      // Restore the scroll position
+      window.scrollTo(0, scrollPosition);
     };
   }, []);
 
@@ -383,8 +407,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 font-noto-sans p-3 sm:p-5">
-      <div className="bg-tripswift-off-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-3 sm:p-4 md:p-6">
-        {/* Header */}
+      <div ref={modalContentRef} className="bg-tripswift-off-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-3 sm:p-4 md:p-6">        {/* Header */}
         <div className="text-center mb-4 sm:mb-6 md:mb-8">
           <h3 className="text-xl sm:text-2xl font-tripswift-bold text-tripswift-black">
             {t('BookingTabs.AmendReservationModal.title')}
@@ -690,9 +713,9 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
             <div className="mt-4 p-3 sm:p-4 bg-tripswift-blue/10 rounded-lg border border-tripswift-blue/20 flex items-center gap-2">
               <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue flex-shrink-0" />
               <div>
-                <p className="text-xs sm:text-sm text-tripswift-black/70 font-tripswift-medium">
+                {/* <p className="text-xs sm:text-sm text-tripswift-black/70 font-tripswift-medium">
                   {t('BookingTabs.AmendReservationModal.estimatedTotal')}
-                </p>
+                </p> */}
                 <p className="text-base sm:text-lg font-tripswift-bold text-tripswift-black">
                   {finalPrice.currencyCode} {finalPrice.totalAmount.toFixed(2)}
                 </p>

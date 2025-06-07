@@ -10,8 +10,8 @@ import { logout } from "@/Redux/slices/auth.slice";
 import { useTranslation } from "react-i18next";
 
 import {
-  FaStar, FaRegStar, FaWifi, FaSnowflake, FaSmokingBan, FaBed, FaChild, FaUser, FaTree,
-  FaCheckCircle, FaShoppingCart, FaPercent, FaTimes, FaInfoCircle, FaRulerCombined,
+  FaStar, FaRegStar,FaShower, FaThermometerHalf, FaPhone, FaTv, FaCouch, FaChair, FaDoorClosed, FaDesktop, FaWifi, FaSnowflake, FaSmokingBan, FaBed, FaChild, FaUser, FaTree,
+  FaCheckCircle,FaTshirt, FaShoppingCart, FaPercent, FaTimes, FaInfoCircle, FaRulerCombined,FaBath,
   FaShieldAlt,
 } from "react-icons/fa";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -125,33 +125,43 @@ export const RoomCard: React.FC<RoomCardProps> = ({
 
   const getRoomAmenities = () => {
     if (data.amenities && data.amenities.length > 0) {
-      return data.amenities.slice(0, 3).map(amenity => ({
+      return data.amenities.map(amenity => ({
         icon: getIconComponent(amenity.icon),
         name: amenity.name
       }));
     }
 
     const defaultAmenities = [
-      { icon: <FaWifi className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.wifi') },
-      { icon: <FaSnowflake className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.airConditioning') },
-      { icon: <FaBed className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.kingBed') },
-    ];
-    return defaultAmenities;
-  };
+    { icon: <FaWifi className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.wifi') },
+    { icon: <FaSnowflake className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.airConditioning') },
+    { icon: <FaBed className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.kingBed') },
+  ];
+  return defaultAmenities;
+};
 
-  const getIconComponent = (iconName: string) => {
-    const iconClass = "text-tripswift-blue";
-    switch (iconName) {
-      case 'wifi': return <FaWifi className={iconClass} />;
-      case 'snowflake': return <FaSnowflake className={iconClass} />;
-      case 'smoking-ban': return <FaSmokingBan className={iconClass} />;
-      case 'bed': return <FaBed className={iconClass} />;
-      case 'tree': return <FaTree className={iconClass} />;
-      case 'user': return <FaUser className={iconClass} />;
-      case 'child': return <FaChild className={iconClass} />;
-      default: return <FaCheckCircle className={iconClass} />;
-    }
-  };
+const getIconComponent = (iconName: string) => {
+  const iconClass = "text-tripswift-blue";
+  switch (iconName) {
+    case 'wifi': return <FaWifi className={iconClass} />;
+    case 'snowflake': return <FaSnowflake className={iconClass} />;
+    case 'smoking-ban': return <FaSmokingBan className={iconClass} />;
+    case 'bed': return <FaBed className={iconClass} />;
+    case 'tree': return <FaTree className={iconClass} />;
+    case 'user': return <FaUser className={iconClass} />;
+    case 'child': return <FaChild className={iconClass} />;
+    // case 'bathroom': return <FaBath className={iconClass} />;
+    // case 'towels': return <FaShower className={iconClass} />;
+    case 'linens': return <FaBed className={iconClass} />;
+    // case 'tableChairs': return <FaChair className={iconClass} />;
+    case 'desk': return <FaDesktop className={iconClass} />;
+    case 'dresserWardrobe': return <FaDoorClosed className={iconClass} />;
+    case 'sofaSeating': return <FaCouch className={iconClass} />;
+    case 'television': return <FaTv className={iconClass} />;
+    case 'telephone': return <FaPhone className={iconClass} />;
+    case 'heating': return <FaThermometerHalf className={iconClass} />;
+    default: return <FaCheckCircle className={iconClass} />;
+  }
+};
 
   return (
     <>
@@ -290,7 +300,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
               >
                 {isPriceAvailable ? (
                   <>
-                    <FaShoppingCart className="mr-1.5 h-3 w-3" /> 
+                    {/* <FaShoppingCart className="mr-1.5 h-3 w-3" />  */}
                     {t('RoomsPage.RoomCard.bookNow')}
                   </>
                 ) : (

@@ -16,6 +16,7 @@ export interface GuestDetails {
 
 // Matches backend response!
 export interface Booking {
+  paymentType: string;
   _id: string;
   reservationId: string;
   hotelCode: string;

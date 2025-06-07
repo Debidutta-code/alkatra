@@ -528,7 +528,9 @@ export default function PaymentSuccess() {
                             {t("Payment.PaymentSuccess.guestNameLabel")}
                           </p>
                           <p className="text-sm sm:text-base font-tripswift-medium">
-                            {getGuestName()}
+                          {booking?.guests && booking.guests[0]?.firstName
+    ? `${booking.guests[0].firstName} ${booking.guests[0].lastName || ""}`.trim()
+    : t("Payment.PaymentSuccess.guestDefaultName")}
                           </p>
                         </div>
                       </div>
@@ -602,8 +604,8 @@ export default function PaymentSuccess() {
                     <div className="border-t border-gray-200 my-2 pt-2"></div>
                     <div className="flex justify-between">
 
-                    <span className="font-tripswift-bold text-base sm:text-lg text-tripswift-black">
-                    {t("Payment.PaymentSuccess.total")}
+                      <span className="font-tripswift-bold text-base sm:text-lg text-tripswift-black">
+                        {t("Payment.PaymentSuccess.total")}
                       </span>
                       <span className="font-tripswift-bold text-base sm:text-lg text-tripswift-blue">
                         ₹{amount.toLocaleString()}
@@ -620,13 +622,13 @@ export default function PaymentSuccess() {
 
                 {/* Action Buttons */}
                 <div className="pt-6 flex flex-col sm:flex-row gap-4">
-                <button
+                  <button
                     onClick={handleViewBookings}
                     className="btn-tripswift-primary py-3 px-6 rounded-lg flex-1 flex items-center justify-center gap-2 text-center font-tripswift-medium transition-all duration-300 hover:shadow-md"
                   >
                     <CheckCircle size={18} />
                     <span>{t("Payment.PaymentSuccess.viewMyBookings")}</span>
-                    </button>
+                  </button>
                   <button
                     onClick={handleViewHome}
 
