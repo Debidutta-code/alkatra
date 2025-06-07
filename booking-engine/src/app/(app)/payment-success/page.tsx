@@ -253,7 +253,7 @@ export default function PaymentSuccess() {
     const checkOut = formatDate(checkOutFinal);
 
     const hotelUrl = `/hotel?id=${propertyIdFinal}&checkin=${checkIn}&checkout=${checkOut}&rooms=${roomsFinal}&adults=${adultsFinal}&children=${childrenFinal}`;
-    const paymentSuccessUrl = `/payment-success?reference=${reference}&amount=${amount}&firstName=${firstName}&lastName=${lastName}&email=${email}&checkIn=${checkInDate}&checkOut=${checkOutDate}&propertyId=${property_id}&phone=${phone}&method=${paymentMethod}`;
+    const paymentSuccessUrl = `/payment-success?reference=${reference}&firstName=${firstName}&lastName=${lastName}&email=${email}&checkIn=${checkInDate}&checkOut=${checkOutDate}&propertyId=${property_id}&phone=${phone}&method=${paymentMethod}`;
 
     // Step 1: Push /hotel first (as previous page)
     window.history.pushState({}, "", hotelUrl);

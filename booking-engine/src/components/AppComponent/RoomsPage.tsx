@@ -217,7 +217,7 @@ const [selectedImage, setSelectedImage] = useState<number>(0);
     const queryParams = new URLSearchParams({
       roomId: formData.roomId,
       propertyId: formData.propertyId,
-      amount: formData.amount,
+      // amount: formData.amount,
       currency: "INR",
       checkIn: formData.checkIn,
       checkOut: formData.checkOut,

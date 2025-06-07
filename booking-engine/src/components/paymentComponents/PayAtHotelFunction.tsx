@@ -182,7 +182,7 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
       const checkIn = formatDate(checkInRaw);
       const checkOut = formatDate(checkOutRaw);
 
-      router.push(`/payment-success?reference=${bookingResponse?.savedBooking?.id ?? ""}&amount=${bookingDetails.amount}&firstName=${encodeURIComponent(bookingDetails.firstName)}&lastName=${encodeURIComponent(bookingDetails.lastName)}&email=${encodeURIComponent(bookingDetails.email)}&checkIn=${checkIn}&checkOut=${encodeURIComponent(checkOut)}&propertyId=${bookingDetails.propertyId}&phone=${encodeURIComponent(bookingDetails.phone)}&method=payAtHotel`);
+      router.push(`/payment-success?reference=${bookingResponse?.savedBooking?.id ?? ""}&firstName=${encodeURIComponent(bookingDetails.firstName)}&lastName=${encodeURIComponent(bookingDetails.lastName)}&email=${encodeURIComponent(bookingDetails.email)}&checkIn=${checkIn}&checkOut=${encodeURIComponent(checkOut)}&propertyId=${bookingDetails.propertyId}&phone=${encodeURIComponent(bookingDetails.phone)}&method=payAtHotel`);
     } catch (error: any) {
       console.error('Payment error:', error);
       setErrorMessage(error.message || t('Payment.PaymentComponents.PayAtHotelFunction.paymentProcessingError'));

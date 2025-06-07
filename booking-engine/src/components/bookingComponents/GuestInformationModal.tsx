@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { useDispatch, useSelector } from "react-redux";
-import { setGuestDetails } from "@/Redux/slices/pmsHotelCard.slice";
+import { setGuestDetails , setAmount } from "@/Redux/slices/pmsHotelCard.slice";
 import {
   User,
   Mail,
@@ -420,23 +420,26 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         setErrorMessage(t("BookingComponents.GuestInformationModal.priceFetchError"));
         return;
       }
-      // const nightsCount = calculateNights(checkInDate, checkOutDate);
-      console.log("Booking Payload:", {
-        firstName: guests[0]?.firstName || "",
-        lastName: guests[0]?.lastName || "",
-        email,
-        phone: phone || "",
-        propertyId,
-        roomId: selectedRoom._id,
-        checkIn: checkInDate,
-        checkOut: checkOutDate,
-        amount: finalPrice?.totalAmount.toString(),
-        userId: authUser?._id,
-        rooms: guestData?.rooms || 1,
-        adults: guestData?.guests || 1,
-        children: guestData?.children || 0,
-        guests,
-      });
+      const totalPrice =finalPrice?.totalAmount ?? 0;
+
+      // Dispatch amount to Redux store
+      dispatch(setAmount(totalPrice.toString()));
+      // console.log("Booking Payload:", {
+      //   firstName: guests[0]?.firstName || "",
+      //   lastName: guests[0]?.lastName || "",
+      //   email,
+      //   phone: phone || "",
+      //   propertyId,
+      //   roomId: selectedRoom._id,
+      //   checkIn: checkInDate,
+      //   checkOut: checkOutDate,
+      //   amount: finalPrice?.totalAmount.toString(),
+      //   userId: authUser?._id,
+      //   rooms: guestData?.rooms || 1,
+      //   adults: guestData?.guests || 1,
+      //   children: guestData?.children || 0,
+      //   guests,
+      // });
   
       onConfirmBooking({
         email,
@@ -445,7 +448,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         roomId: selectedRoom._id,
         checkIn: checkInDate,
         checkOut: checkOutDate,
-        amount: finalPrice?.totalAmount.toString(),
+        amount: totalPrice.toString(),
         userId: authUser?._id,
         rooms: guestData?.rooms || 1,
         adults: guestData?.guests || 1,
@@ -457,7 +460,6 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       });
     }
   };
-
   if (!isOpen || !selectedRoom) return null;
 
   const nightsCount = calculateNights(checkInDate, checkOutDate);
