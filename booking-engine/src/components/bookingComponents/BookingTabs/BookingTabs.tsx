@@ -161,6 +161,7 @@ export default function BookingTabs() {
             totalAmount: amendedData.roomTotalPrice,
             currencyCode: amendedData.currencyCode,
             guestDetails: amendedData.guests,
+            status: 'Modified',
           }
         : booking
     ));
@@ -176,6 +177,7 @@ export default function BookingTabs() {
         totalAmount: amendedData.roomTotalPrice,
         currencyCode: amendedData.currencyCode,
         guestDetails: amendedData.guests,
+        status: 'Modified',
       });
     }
   
