@@ -33,6 +33,16 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
     return () => { document.body.style.overflow = originalOverflow; };
   }, []);
 
+  // Format date to dd/mm/yyyy
+  const formatDOB = (dob: string): string => {
+    if (!dob) return '';
+    const date = new Date(dob);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
@@ -137,16 +147,16 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             <div className="space-y-4">
               {booking.guestDetails && booking.guestDetails.length > 0 ? (
                 booking.guestDetails.map((guest: GuestDetails, idx: number) => (
-                  <div key={guest._id || idx} className="flex flex-col sm:flex-row sm:items-center gap-4 border-b border-gray-100 pb-2 last:border-b-0 last:pb-0">
+                  <div key={guest._id || idx} className="flex flex-col sm:flex-row sm:items-center gap-24 border-b border-gray-100 pb-2 last:border-b-0 last:pb-0">
                     <div className="flex items-center gap-2 font-tripswift-medium">
                       <FaUser className="text-tripswift-blue" />
                       <span>{guest.firstName} {guest.lastName}</span>
                     </div>
-                    {guest.dob && (
-                      <div className="text-xs text-gray-500 sm:ml-4">
-                        {t("BookingTabs.BookingDetailsModal.dob", { defaultValue: "DOB" })}: {guest.dob}
+                    {/* {guest.dob && (
+                      <div className="text-xs text-gray-500 sm:ml-36">
+                        {t("BookingTabs.BookingDetailsModal.dob", { defaultValue: "DOB" })}: {formatDOB(guest.dob)}
                       </div>
-                    )}
+                    )} */}
                   </div>
                 ))
               ) : (
@@ -171,12 +181,27 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             {t('BookingTabs.BookingDetailsModal.paymentDetails')}
           </h3>
           <div className="bg-tripswift-off-white p-3 sm:p-4 md:p-5 rounded-xl">
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6">
+              <div>
+                <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.paymentMethod')}</p>
+                <p className="flex items-center font-tripswift-medium text-sm sm:text-base">
+                  {getPaymentMethodIcon(booking)} {formatCamelCase(booking.paymentType || "")}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.bookingDate')}</p>
+                <p className="flex items-center text-gray-800 font-tripswift-medium text-sm sm:text-base">
+                  <FaRegCalendarCheck className="mr-1.5 sm:mr-2 text-gray-500 text-sm sm:text-base" />
+                  {booking.createdAt ? formatDateString(booking.createdAt) : "-"}
+                </p>
+              </div>
+            </div> */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6">
               <div>
                 <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.paymentMethod')}</p>
-                {/* <p className="flex items-center font-tripswift-medium text-sm sm:text-base">
-                  {getPaymentMethodIcon(booking)} {formatCamelCase(booking.paymentType || "")}
-                </p> */}
+                <p className="text-gray-800 font-tripswift-medium text-sm sm:text-base">
+                  Pay at Hotel
+                </p>
               </div>
               <div>
                 <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.bookingDate')}</p>

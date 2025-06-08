@@ -293,66 +293,61 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     setGuests(updatedGuests);
   };
 
-  const handleUpdate = () => {
-    let valid = true;
-    setErrorMessage(null);
+const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-    for (let i = 0; i < guests.length; i++) {
-      const guest = guests[i];
-      if (!guest.firstName || !/^[A-Za-z\s]+$/.test(guest.firstName)) {
-        setErrorMessage(
-          t("BookingComponents.GuestInformationModal.firstNameError") + ` (Guest ${i + 1})`
-        );
-        valid = false;
-        break;
-      }
-      if (!guest.lastName || !/^[A-Za-z\s]+$/.test(guest.lastName)) {
-        setErrorMessage(
-          t("BookingComponents.GuestInformationModal.lastNameError") + ` (Guest ${i + 1})`
-        );
-        valid = false;
-        break;
-      }
-      if (!guest.dob) {
-        setErrorMessage(
-          t("BookingComponents.GuestInformationModal.dobError") + ` (Guest ${i + 1})`
-        );
-        valid = false;
-        break;
-      }
-    }
+const handleUpdate = () => {
+  let valid = true;
+  const newErrors: { [key: string]: string } = {};
 
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setErrorMessage(t("BookingComponents.GuestInformationModal.emailError"));
+  for (let i = 0; i < guests.length; i++) {
+    const guest = guests[i];
+    if (!guest.firstName || !/^[A-Za-z\s]+$/.test(guest.firstName)) {
+      newErrors[`firstName-${i}`] = t("BookingComponents.GuestInformationModal.firstNameError");
       valid = false;
     }
-
-    if (!phone || phone.length < 10) {
-      setErrorMessage(t("BookingComponents.GuestInformationModal.phoneError"));
+    if (!guest.lastName || !/^[A-Za-z\s]+$/.test(guest.lastName)) {
+      newErrors[`lastName-${i}`] = t("BookingComponents.GuestInformationModal.lastNameError");
       valid = false;
     }
+    if (!guest.dob) {
+      newErrors[`dob-${i}`] = t("BookingComponents.GuestInformationModal.dobError");
+      valid = false;
+    }
+  }
 
-    if (!valid) return;
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    newErrors["email"] = t("BookingComponents.GuestInformationModal.emailError");
+    valid = false;
+  }
 
-    setUpdateMessage(t("BookingComponents.GuestInformationModal.informationVerified"));
-    dispatch(
-      setGuestDetails({
-        guests,
-        email,
-        phone,
-        rooms: guestData?.rooms || 1,
-        adults: guestData?.guests || 1,
-        children: guestData?.children || 0,
-        infants: guestData?.infants || 0,
-        childAges: guestData?.childAges || [],
-      })
-    );
-    setIsFormUpdated(true);
-    getFinalPrice(selectedRoom, checkInDate, checkOutDate, guestData);
-    setTimeout(() => {
-      setActiveSection("review");
-    }, 800);
-  };
+  if (!phone || phone.length < 10) {
+    newErrors["phone"] = t("BookingComponents.GuestInformationModal.phoneError");
+    valid = false;
+  }
+
+  setErrors(newErrors);
+
+  if (!valid) return;
+
+  setUpdateMessage(t("BookingComponents.GuestInformationModal.informationVerified"));
+  dispatch(
+    setGuestDetails({
+      guests,
+      email,
+      phone,
+      rooms: guestData?.rooms || 1,
+      adults: guestData?.guests || 1,
+      children: guestData?.children || 0,
+      infants: guestData?.infants || 0,
+      childAges: guestData?.childAges || [],
+    })
+  );
+  setIsFormUpdated(true);
+  getFinalPrice(selectedRoom, checkInDate, checkOutDate, guestData);
+  setTimeout(() => {
+    setActiveSection("review");
+  }, 800);
+};
 
   const handleConfirmBooking = () => {
     if (isFormUpdated && selectedRoom) {
@@ -560,6 +555,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                               className="w-full px-3 py-2 border border-tripswift-black/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 text-sm transition-all duration-200"
                               required
                             />
+                            {errors[`firstName-${index}`] && (
+                              <p className="text-xs text-red-600 mt-1">{errors[`firstName-${index}`]}</p>
+                            )}
                           </div>
                           <div>
                             <label
@@ -578,6 +576,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                               className="w-full px-3 py-2 border border-tripswift-black/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 text-sm transition-all duration-200"
                               required
                             />
+                            {errors[`lastName-${index}`] && (
+                              <p className="text-xs text-red-600 mt-1">{errors[`lastName-${index}`]}</p>
+                            )}
                           </div>
                           <div>
                             <label
@@ -609,6 +610,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                               className="w-full px-3 py-2 border border-tripswift-black/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 text-sm transition-all duration-200"
                               required
                             />
+                            {errors[`dob-${index}`] && (
+                              <p className="text-xs text-red-600 mt-1">{errors[`dob-${index}`]}</p>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -630,6 +634,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         className="w-full px-3 py-2 border border-tripswift-black/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 text-sm transition-all duration-200"
                         required
                       />
+                      {errors["email"] && (
+                        <p className="text-xs text-red-600 mt-1">{errors["email"]}</p>
+                      )}
                       <p className="text-xs text-tripswift-black/50 mt-1">
                         {t("BookingComponents.GuestInformationModal.emailInfo")}
                       </p>
@@ -651,6 +658,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         className="w-full px-3 py-2 border border-tripswift-black/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 text-sm transition-all duration-200"
                         international
                       />
+                      {errors["phone"] && (
+                        <p className="text-xs text-red-600 mt-1">{errors["phone"]}</p>
+                      )}
                       <p className="text-xs text-tripswift-black/50 mt-1">
                         {t("BookingComponents.GuestInformationModal.phoneInfo")}
                       </p>

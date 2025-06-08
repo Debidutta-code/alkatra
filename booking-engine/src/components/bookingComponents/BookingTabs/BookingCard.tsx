@@ -15,7 +15,7 @@ import {
   getRoomTypeStyle,
   getRoomTypeIcon
 } from './utils';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { useTranslation } from 'react-i18next';
 import { formatDate, calculateNights } from "@/utils/dateUtils";
 
 interface BookingCardProps {
@@ -117,6 +117,9 @@ const BookingCard: React.FC<BookingCardProps> = ({
               {getPaymentMethodIcon(booking)}
               {getPaymentMethodText(booking)}
             </div> */}
+              <p className="text-xs font-tripswift-medium text-purple-700">
+                Pay at Hotel
+              </p>
           </div>
         </div>
 

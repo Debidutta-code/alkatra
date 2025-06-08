@@ -282,7 +282,7 @@ function PaymentPageContent() {
                           <Elements
                             stripe={stripePromise}
                             options={{
-                              clientSecret, // This is required for payment mode
+                              clientSecret,
                               appearance: {
                                 theme: 'stripe',
                               },
@@ -311,7 +311,7 @@ function PaymentPageContent() {
                             stripe={stripePromise}
                             options={{
                               mode: 'setup',
-                              currency: currency, // Added currency here - this fixes the error
+                              currency: currency,
                               appearance: {
                                 theme: 'stripe',
                               },

@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { Shield, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from '../../Redux/store';
+import { setGuestDetails } from '../../Redux/slices/pmsHotelCard.slice';
 
 interface Guest {
   firstName: string;
@@ -33,6 +35,7 @@ interface PayAtHotelProps {
     rooms?: number;
     adults?: number;
     children?: number;
+    // infants: number;
     currency?: string;
     guests: Guest[];
   };
@@ -43,6 +46,7 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
   const stripe = useStripe();
   const elements = useElements();
   const router = useRouter();
+  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -173,16 +177,24 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
       const bookingResponse = await confirmBookingWithStoredCard(bookingPayload, token);
       console.log("Booking response:", bookingResponse);
 
-      const checkInRaw = bookingResponse?.savedBooking?.checkInDate ?? '';
-      const checkOutRaw = bookingResponse?.savedBooking?.checkOutDate ?? '';
-      const formatDate = (dateStr: string | null) => {
-        if (!dateStr) return '';
-        return new Date(dateStr).toISOString().split('T')[0];
-      };
-      const checkIn = formatDate(checkInRaw);
-      const checkOut = formatDate(checkOutRaw);
+      // Dispatch guest details to Redux
+      dispatch(setGuestDetails({
+        guests: bookingResponse?.savedBooking?.guests || bookingDetails.guests,
+        rooms: bookingDetails.rooms || 1,
+        adults: bookingDetails.adults || 1,
+        children: bookingDetails.children || 0,
+        // infants: bookingDetails.infants || 0,
+        email: bookingDetails.email,
+        phone: bookingDetails.phone,
+        checkInDate: bookingResponse?.savedBooking?.checkInDate,
+        checkOutDate: bookingResponse?.savedBooking?.checkOutDate,
+        bookingId: bookingResponse?.savedBooking?.id,
+        hotelName: bookingDetails.hotelName,
+        ratePlanCode: bookingDetails.ratePlanCode,
+        roomType: bookingDetails.roomType,
+      }));
 
-      router.push(`/payment-success?reference=${bookingResponse?.savedBooking?.id ?? ""}&firstName=${encodeURIComponent(bookingDetails.firstName)}&lastName=${encodeURIComponent(bookingDetails.lastName)}&email=${encodeURIComponent(bookingDetails.email)}&checkIn=${checkIn}&checkOut=${encodeURIComponent(checkOut)}&propertyId=${bookingDetails.propertyId}&phone=${encodeURIComponent(bookingDetails.phone)}&method=payAtHotel`);
+      router.push(`/payment-success`);
     } catch (error: any) {
       console.error('Payment error:', error);
       setErrorMessage(error.message || t('Payment.PaymentComponents.PayAtHotelFunction.paymentProcessingError'));

@@ -73,9 +73,31 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
       infants: infants,
       infantAges: booking.guestDetails
         ?.filter(g => g.type === "infant" || (g.dob && dayjs().diff(dayjs(g.dob), 'year') < 2))
-        .map(g => dayjs().diff(dayjs(g.dob), 'year')) || []
+        .map(g => dayjs().diff(dayjs(g.dob), 'year')) || [],
+      childDOBs: booking.guestDetails
+        ?.filter(g => g.type === "child" || (g.dob && dayjs().diff(dayjs(g.dob), 'year') < 12 && dayjs().diff(dayjs(g.dob), 'year') >= 2))
+        .map(g => g.dob) || [],
+      infantDOBs: booking.guestDetails
+        ?.filter(g => g.type === "infant" || (g.dob && dayjs().diff(dayjs(g.dob), 'year') < 2))
+        .map(g => g.dob) || []
     };
   });
+
+  // Update useEffect to sync guests with DOBs from GuestBox
+  useEffect(() => {
+    if (booking.guestDetails && Array.isArray(booking.guestDetails) && booking.guestDetails.length > 0) {
+      dispatch(setGuestDetails({
+        rooms: booking.numberOfRooms || 1,
+        guests: guestBreakdown.guests,
+        children: guestBreakdown.children,
+        childAges: guestBreakdown.childAges,
+        infants: guestBreakdown.infants,
+        infantAges: guestBreakdown.infantAges,
+        childDOBs: guestBreakdown.childDOBs,
+        infantDOBs: guestBreakdown.infantDOBs
+      }));
+    }
+  }, [booking.guestDetails, guestBreakdown, dispatch]);
 
   // Initialize Redux guestDetails with booking.guestDetails
   useEffect(() => {
@@ -148,7 +170,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
           newGuests.push({
             firstName: "",
             lastName: "",
-            dob: getDefaultDOBByType("child"),
+            dob: guestBreakdown.childDOBs[i] || getDefaultDOBByType("child"),
             type: "child"
           });
         }
@@ -159,7 +181,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
           newGuests.push({
             firstName: "",
             lastName: "",
-            dob: getDefaultDOBByType("infant"),
+            dob: guestBreakdown.infantDOBs[i] || getDefaultDOBByType("infant"),
             type: "infant"
           });
         }
@@ -167,8 +189,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
     }
 
     setGuests(newGuests);
-  }, [guestBreakdown.guests, guestBreakdown.children, guestBreakdown.infants, booking.guestDetails]);
-
+  }, [guestBreakdown, booking.guestDetails]);
   // Guest count derived
   const adultCount = guests.filter(
     g => g.dob ? dayjs().diff(dayjs(g.dob), 'year') >= 12 : true
@@ -317,7 +338,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
       throw new Error(error.message || "Error while getting final price");
     }
   };
-
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   // --- Submit logic ---
   const handleSubmitAmendment = async () => {
     if (!dateRange || !dateRange[0] || !dateRange[1]) {
@@ -327,11 +348,57 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
       });
       return;
     }
+    let valid = true;
+    const newErrors: { [key: string]: string } = {};
+
+    // Validate Date Range
+    if (!dateRange || !dateRange[0] || !dateRange[1]) {
+      newErrors["dateRange"] = t('BookingTabs.AmendReservationModal.errors.selectValidDates');
+      valid = false;
+    } else if (dateRange[0].isSame(dateRange[1], 'day') || dateRange[0].isAfter(dateRange[1], 'day')) {
+      newErrors["dateRange"] = t('BookingTabs.AmendReservationModal.errors.invalidDateRange');
+      valid = false;
+    }
+
+    // Validate Guests
+    guests.forEach((guest, idx) => {
+      if (!guest.firstName || !/^[A-Za-z\s]+$/.test(guest.firstName)) {
+        newErrors[`firstName-${idx}`] = t('BookingTabs.AmendReservationModal.errors.invalidFirstName');
+        valid = false;
+      }
+      if (!guest.lastName || !/^[A-Za-z\s]+$/.test(guest.lastName)) {
+        newErrors[`lastName-${idx}`] = t('BookingTabs.AmendReservationModal.errors.invalidLastName');
+        valid = false;
+      }
+      if (!guest.dob) {
+        newErrors[`dob-${idx}`] = t('BookingTabs.AmendReservationModal.errors.dobRequired');
+        valid = false;
+      }
+    });
+
+    // Validate Room Type and Rate Plan (optional, assuming they are required)
+    if (!roomTypeCode) {
+      newErrors["roomTypeCode"] = t('BookingTabs.AmendReservationModal.errors.selectRoomType');
+      valid = false;
+    }
+    if (!ratePlanCode) {
+      newErrors["ratePlanCode"] = t('BookingTabs.AmendReservationModal.errors.selectRatePlan');
+      valid = false;
+    }
+
+    setErrors(newErrors);
+
+    if (!valid) {
+      setAmendmentMessage({
+        type: 'error',
+        text: t('BookingTabs.AmendReservationModal.errors.correctFormErrors'),
+      });
+      return;
+    }
 
     setLoading(true);
 
     try {
-      // 1. Prepare guestData for price API
       const guestData = {
         rooms: guestBreakdown.rooms,
         guests: guestBreakdown.guests,
@@ -339,17 +406,13 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         infants: guestBreakdown.infants,
       };
 
-      // 2. Call getFinalPrice
       const finalPrice = await getFinalPrice(
-        {
-          room_type: roomTypeCode,
-        },
+        { room_type: roomTypeCode },
         dateRange[0].format('YYYY-MM-DD'),
         dateRange[1].format('YYYY-MM-DD'),
         guestData
       );
 
-      // 4. Construct amendedData with paymentInfo
       const amendedData = {
         reservationId: booking.reservationId,
         hotelCode: booking.hotelCode,
@@ -385,7 +448,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
 
       setAmendmentMessage({
         type: 'success',
-        text: t('BookingTabs.AmendReservationModal.success.reservationAmended')
+        text: t('BookingTabs.AmendReservationModal.success.reservationAmended'),
       });
 
       setTimeout(() => {
@@ -395,7 +458,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
     } catch (error: any) {
       setAmendmentMessage({
         type: 'error',
-        text: error.message || t('BookingTabs.AmendReservationModal.errors.unableToAmend')
+        text: error.message || t('BookingTabs.AmendReservationModal.errors.unableToAmend'),
       });
     } finally {
       setLoading(false);
@@ -543,55 +606,51 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         <div className="bg-tripswift-off-white border border-gray-200 rounded-xl shadow-sm p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 transition duration-300">
           {/* Dates Amendment Form */}
           {amendmentType === "dates" && (
-            <div className="space-y-3 sm:space-y-5">
-              <div className="flex items-center gap-2 mb-2 sm:mb-4">
-                <CalendarDays className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
-                <h4 className="text-base sm:text-lg font-tripswift-bold text-tripswift-black">
+            <div className="space-y-4 sm:space-y-5 bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-tripswift-blue/20">
+              <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                <CalendarDays className="h-5 w-5 text-tripswift-blue flex-shrink-0" />
+                <h4 className="text-lg sm:text-xl font-tripswift-bold text-tripswift-black">
                   {t('BookingTabs.AmendReservationModal.changeDates')}
                 </h4>
               </div>
-              <div>
-                <label className="block text-xs sm:text-sm font-tripswift-medium text-tripswift-black/70 mb-1 sm:mb-2">
+              <div className="relative">
+                <label className="block text-sm font-tripswift-medium text-tripswift-black/70 mb-2">
                   {t('BookingTabs.AmendReservationModal.selectNewDates')}
                 </label>
-                <RangePicker
-                  value={dateRange}
-                  onChange={(dates) => setDateRange(dates as [Dayjs, Dayjs])}
-                  disabledDate={current => {
-                    if (!booking.checkInDate) return false;
-                    const minDate = dayjs(booking.checkInDate).startOf('day');
-                    return current && current < minDate;
-                  }}
-                  format="YYYY-MM-DD"
-                  className="w-full rounded-lg border-gray-200 py-1.5 sm:py-2 hover:border-tripswift-blue focus:border-tripswift-blue focus:ring focus:ring-tripswift-blue/20"
-                  style={{ height: '40px', fontSize: 'inherit' }}
-                  placeholder={[
-                    t('BookingTabs.AmendReservationModal.checkInDate'),
-                    t('BookingTabs.AmendReservationModal.checkOutDate')
-                  ]}
-                />
+                <div className="relative flex items-center gap-2 bg-tripswift-off-white rounded-lg p-2 border border-tripswift-blue/20 hover:border-tripswift-blue/50 transition-colors">
+                  <Calendar className="h-4 w-4 text-tripswift-blue/70 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <RangePicker
+                    value={dateRange}
+                    onChange={(dates) => {
+                      setDateRange(dates as [Dayjs, Dayjs]);
+                      setErrors((prev) => ({ ...prev, dateRange: '' }));
+                    }}
+                    disabledDate={current => {
+                      if (!booking.checkInDate) return false;
+                      const minDate = dayjs(booking.checkInDate).startOf('day');
+                      return current && current < minDate;
+                    }}
+                    format="DD/MM/YYYY"
+                    className="w-full pl-10 bg-transparent border-none focus:ring-0 hover:bg-tripswift-blue/5 transition-colors"
+                    style={{ height: '48px', fontSize: '16px', fontFamily: 'Noto Sans, sans-serif' }}
+                    placeholder={[
+                      t('BookingTabs.AmendReservationModal.checkInDate'),
+                      t('BookingTabs.AmendReservationModal.checkOutDate')
+                    ]}
+                    suffixIcon={null}
+                  />
+                </div>
+                {errors["dateRange"] && (
+                  <p className="text-xs text-red-600 mt-1">{errors["dateRange"]}</p>
+                )}
               </div>
               {dateRange && dateRange[0] && dateRange[1] && (
-                <div className="px-3 sm:px-4 py-2 sm:py-3 bg-tripswift-blue/5 rounded-lg text-xs sm:text-sm text-tripswift-blue/90 font-tripswift-medium flex items-start sm:items-center">
-                  <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 mt-0.5 sm:mt-0 flex-shrink-0" />
+                <div className="px-4 py-3 bg-tripswift-blue/10 rounded-lg text-sm text-tripswift-blue/90 font-tripswift-medium flex items-center">
+                  <Clock className="h-4 w-4 text-tripswift-blue mr-2 flex-shrink-0" />
                   <div>
                     {t('BookingTabs.AmendReservationModal.stayDuration', {
                       count: dateRange[1].diff(dateRange[0], 'day')
                     })}
-                    {/* {dateRange[1].diff(dayjs(booking.checkOutDate), 'day') > 0 && (
-                      <span className="block sm:inline sm:ml-2 text-tripswift-blue/70">
-                        {t('BookingTabs.AmendReservationModal.nightsAdded', {
-                          count: dateRange[1].diff(dayjs(booking.checkOutDate), 'day')
-                        })}
-                      </span>
-                    )}
-                    {dateRange[1].diff(dayjs(booking.checkOutDate), 'day') < 0 && (
-                      <span className="block sm:inline sm:ml-2 text-tripswift-blue/70">
-                        {t('BookingTabs.AmendReservationModal.nightsReduced', {
-                          count: Math.abs(dateRange[1].diff(dayjs(booking.checkOutDate), 'day'))
-                        })}
-                      </span>
-                    )} */}
                   </div>
                 </div>
               )}
@@ -610,56 +669,80 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                   return (
                     <div key={idx} className="flex flex-col sm:flex-row gap-2 border border-gray-200 rounded-md p-3 bg-white relative">
                       <div className="flex-1 flex flex-col sm:flex-row gap-2">
-                        <Input
-                          className="flex-1"
-                          placeholder={guestType === "adult" ? "Adult First Name" : guestType === "child" ? "Child First Name" : "Infant First Name"}
-                          value={guest.firstName}
-                          onChange={e => handleGuestChange(idx, 'firstName', e.target.value)}
-                          size="large"
-                        />
-                        <Input
-                          className="flex-1"
-                          placeholder={guestType === "adult" ? "Adult Last Name" : guestType === "child" ? "Child Last Name" : "Infant Last Name"}
-                          value={guest.lastName}
-                          onChange={e => handleGuestChange(idx, 'lastName', e.target.value)}
-                          size="large"
-                        />
-                        <DatePicker
-                          className="flex-1 w-full"
-                          placeholder="Date of Birth"
-                          value={guest.dob ? dayjs(guest.dob) : null}
-                          onChange={date => handleGuestChange(idx, 'dob', date?.format('YYYY-MM-DD') || "")}
-                          disabledDate={current => {
-                            if (!current) return false;
-                            if (guestType === "infant") {
-                              return current.isBefore(dayjs().subtract(2, "year"), "day") || current.isAfter(dayjs(), "day");
-                            } else if (guestType === "child") {
-                              return current.isBefore(dayjs().subtract(13, "year"), "day") || current.isAfter(dayjs().subtract(2, "year"), "day");
-                            } else {
-                              return current.isAfter(dayjs().subtract(13, "year"), "day");
-                            }
-                          }}
-                          format="YYYY-MM-DD"
-                          size="large"
-                        />
+                        <div className="flex-1">
+                          <Input
+                            className="flex-1"
+                            placeholder={guestType === "adult" ? "Adult First Name" : guestType === "child" ? "Child First Name" : "Infant First Name"}
+                            value={guest.firstName}
+                            onChange={e => {
+                              handleGuestChange(idx, 'firstName', e.target.value);
+                              setErrors(prev => ({ ...prev, [`firstName-${idx}`]: '' }));
+                            }}
+                            size="large"
+                          />
+                          {errors[`firstName-${idx}`] && (
+                            <p className="text-xs text-red-600 mt-1">{errors[`firstName-${idx}`]}</p>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <Input
+                            className="flex-1"
+                            placeholder={guestType === "adult" ? "Adult Last Name" : guestType === "child" ? "Child Last Name" : "Infant Last Name"}
+                            value={guest.lastName}
+                            onChange={e => {
+                              handleGuestChange(idx, 'lastName', e.target.value);
+                              setErrors(prev => ({ ...prev, [`lastName-${idx}`]: '' }));
+                            }}
+                            size="large"
+                          />
+                          {errors[`lastName-${idx}`] && (
+                            <p className="text-xs text-red-600 mt-1">{errors[`lastName-${idx}`]}</p>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <DatePicker
+                            className="flex-1 w-full"
+                            placeholder="Date of Birth"
+                            value={guest.dob ? dayjs(guest.dob) : null}
+                            onChange={date => {
+                              handleGuestChange(idx, 'dob', date?.format('YYYY-MM-DD') || "");
+                              setErrors(prev => ({ ...prev, [`dob-${idx}`]: '' }));
+                            }}
+                            disabledDate={current => {
+                              if (!current) return false;
+                              if (guestType === "infant") {
+                                return current.isBefore(dayjs().subtract(2, "year"), "day") || current.isAfter(dayjs(), "day");
+                              } else if (guestType === "child") {
+                                return current.isBefore(dayjs().subtract(13, "year"), "day") || current.isAfter(dayjs().subtract(2, "year"), "day");
+                              } else {
+                                return current.isAfter(dayjs().subtract(13, "year"), "day");
+                              }
+                            }}
+                            format="DD/MM/YYYY"
+                            size="large"
+                          />
+                          {errors[`dob-${idx}`] && (
+                            <p className="text-xs text-red-600 mt-1">{errors[`dob-${idx}`]}</p>
+                          )}
+                        </div>
                       </div>
                       {/* {guests.length > 1 && (
-                        <button
-                          onClick={() => handleRemoveGuest(idx)}
-                          className="absolute top-2 right-2 text-tripswift-black/50 hover:text-tripswift-black"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      )} */}
+            <button
+              onClick={() => handleRemoveGuest(idx)}
+              className="absolute top-2 right-2 text-tripswift-black/50 hover:text-tripswift-black"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )} */}
                     </div>
                   );
                 })}
                 {/* <Button
-                  onClick={handleAddGuest}
-                  className="mt-2 bg-tripswift-blue text-tripswift-off-white hover:bg-tripswift-blue/90"
-                >
-                  {t('BookingTabs.AmendReservationModal.addGuest')}
-                </Button> */}
+      onClick={handleAddGuest}
+      className="mt-2 bg-tripswift-blue text-tripswift-off-white hover:bg-tripswift-blue/90"
+    >
+      {t('BookingTabs.AmendReservationModal.addGuest')}
+    </Button> */}
               </div>
             </div>
           )}

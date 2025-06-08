@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "@/Redux/store";
 import { setGuestDetails } from "@/Redux/slices/hotelcard.slice";
 import { createPortal } from "react-dom";
 import { Users } from "lucide-react";
+import dayjs from "dayjs";
 
 // Define props interface
 interface GuestBoxProps {
@@ -14,6 +15,8 @@ interface GuestBoxProps {
     childAges: number[];
     infants: number;
     infantAges: number[];
+    childDOBs: string[];
+    infantDOBs: string[];
   }) => void;
 }
 
@@ -138,9 +141,9 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
     if (!validateGuestCount()) {
       return;
     }
-
+  
     if ((children === 0 || isChildAgeValid()) && (infants === 0 || isInfantAgeValid())) {
-      // Create guest data object
+      // Create guest data object with calculated DOBs
       const guestData = {
         rooms,
         guests,
@@ -148,22 +151,24 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
         childAges,
         infants,
         infantAges,
+        childDOBs: childAges.map((age: number) => dayjs().subtract(age, 'year').format('YYYY-MM-DD')),
+        infantDOBs: infantAges.map((age: number) => dayjs().subtract(age, 'year').format('YYYY-MM-DD'))
       };
-
+  
       // Update display text in OTA style
       setDisplayText(
         `${rooms} ${rooms === 1 ? "Room" : "Rooms"} · ${guests} ${guests === 1 ? "Adult" : "Adults"
         }${children > 0 ? ` · ${children} ${children === 1 ? "Child" : "Children"}` : ""}${infants > 0 ? ` · ${infants} ${infants === 1 ? "Infant" : "Infants"}` : ""}`
       );
-
+  
       // Dispatch to Redux
       dispatch(setGuestDetails(guestData));
-
+  
       // Call onChange callback if provided
       if (onChange) {
         onChange(guestData);
       }
-
+  
       closeModal();
     } else {
       setError("Please select the age for all children and infants");
