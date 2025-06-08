@@ -51,7 +51,7 @@ function PaymentPageContent() {
   const authUser = useSelector((state: RootState) => state.auth.user);
 
   // Get booking parameters from URL
-  const amount = isNaN(parseInt(searchParams.get("amount") || "0", 10)) ? 0 : parseInt(searchParams.get("amount") || "0", 10); 
+  // const amount = isNaN(parseInt(searchParams.get("amount") || "0", 10)) ? 0 : parseInt(searchParams.get("amount") || "0", 10); 
   const currency = searchParams.get("currency")?.toLowerCase() || "INR";
   const firstName = searchParams.get('firstName') || authUser?.firstName || '';
   const lastName = searchParams.get('lastName') || authUser?.lastName || '';
@@ -70,7 +70,10 @@ function PaymentPageContent() {
   const rooms = parseInt(searchParams.get('rooms') || '1', 10);
   const adults = parseInt(searchParams.get('adults') || '1', 10);
   const children = parseInt(searchParams.get('children') || '0', 10);
+ const amountFromRedux = useSelector((state: any) => state.pmsHotelCard.amount);
 
+  // Use amount from Redux only
+  const amount = amountFromRedux ? parseInt(amountFromRedux, 10) : 0;
   // Parse guests from query parameters
   const guests: Guest[] = (() => {
     try {

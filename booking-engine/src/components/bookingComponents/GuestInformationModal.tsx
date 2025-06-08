@@ -4,8 +4,15 @@ import React, { useState, useEffect } from "react";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { useDispatch, useSelector } from "react-redux";
-import { setGuestDetails } from "@/Redux/slices/pmsHotelCard.slice";
-import { User, Mail, Phone, Calendar, CreditCard, X } from "lucide-react";
+import { setGuestDetails,setAmount} from "@/Redux/slices/pmsHotelCard.slice";
+import {
+  User,
+  Mail,
+  Phone,
+  Calendar,
+  CreditCard,
+  X,
+} from "lucide-react";
 import { formatDate, calculateNights } from "@/utils/dateUtils";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
@@ -359,7 +366,13 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         setErrorMessage(t("BookingComponents.GuestInformationModal.priceFetchError"));
         return;
       }
-      onConfirmBooking({
+      const totalPrice =finalPrice?.totalAmount ?? 0;
+      // Dispatch amount to Redux store
+      dispatch(setAmount(totalPrice.toString()));
+      // const nightsCount = calculateNights(checkInDate, checkOutDate);
+      console.log("Booking Payload:", {
+        firstName: guests[0]?.firstName || "",
+        lastName: guests[0]?.lastName || "",
         email,
         phone: phone || "",
         propertyId,
@@ -372,13 +385,27 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         adults: guestData?.guests || 1,
         children: guestData?.children || 0,
         guests,
+      });
+  
+      onConfirmBooking({
+        email,
+        phone: phone || "",
+        propertyId,
+        roomId: selectedRoom._id,
+        checkIn: checkInDate,
+        checkOut: checkOutDate,
+        amount: totalPrice.toString(),
+        userId: authUser?._id,
+        rooms: guestData?.rooms || 1,
+        adults: guestData?.guests || 1,
+        children: guestData?.children || 0,
+        guests,
         hotelName: guestData?.hotelName || "Unknown Hotel",
         ratePlanCode: finalPrice?.dailyBreakdown?.ratePlanCode || "SUT",
         roomType: selectedRoom?.room_type || "SUT",
       });
     }
   };
-
   if (!isOpen || !selectedRoom) return null;
 
   const nightsCount = calculateNights(checkInDate, checkOutDate);
