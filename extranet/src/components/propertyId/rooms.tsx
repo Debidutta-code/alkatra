@@ -607,14 +607,15 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
   return (
     <Card className="w-full shadow-sm hover:shadow-md transition-shadow duration-300">
       <CardHeader className="flex flex-row items-center justify-between border-b pb-3">
-        <CardTitle className="text-primary font-semibold">Room Management</CardTitle>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleCreateRoom}
-        >
-          <Plus className="h-4 w-4 mr-1" /> Add Room
-        </Button>
+      <CardTitle className="text-primary font-semibold text-lg sm:text-xl">Room Management</CardTitle>
+  <Button
+    variant="outline"
+    size="sm"
+    onClick={handleCreateRoom}
+    aria-label="Add a new room"
+  >
+    <Plus className="h-4 w-4 mr-1" /> Add Room
+  </Button>
       </CardHeader>
 
       <CardContent className="pt-6">
@@ -666,19 +667,19 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
                             Room Details
                           </h3>
                           <div>
-                            <span className="text-sm text-muted-foreground">Room Name:</span>
+                            <span className="text-sm text-muted-foreground">Room Name</span>
                             <p className="font-medium text-lg">{room.room_name}</p>
                           </div>
                           <div>
-                            <span className="text-sm text-muted-foreground">Room Type:</span>
+                            <span className="text-sm text-muted-foreground">Room Type</span>
                             <p className="font-medium">{room.room_type}</p>
                           </div>
                           <div>
-                            <span className="text-sm text-muted-foreground">Floor:</span>
+                            <span className="text-sm text-muted-foreground">Floor</span>
                             <p className="font-medium">{room.floor}</p>
                           </div>
                           <div>
-                            <span className="text-sm text-muted-foreground">Room View:</span>
+                            <span className="text-sm text-muted-foreground">Room View</span>
                             <p className="font-medium">{room.room_view || "N/A"}</p>
                           </div>
                         </div>
@@ -689,19 +690,19 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
                             Capacity & Size
                           </h3>
                           <div>
-                            <span className="text-sm text-muted-foreground">Room Size:</span>
+                            <span className="text-sm text-muted-foreground">Room Size</span>
                             <p className="font-medium">{room.room_size} {room.room_unit}</p>
                           </div>
                           <div>
-                            <span className="text-sm text-muted-foreground">Max Occupancy:</span>
+                            <span className="text-sm text-muted-foreground">Max Occupancy</span>
                             <p className="font-medium">{room.max_occupancy}</p>
                           </div>
                           <div>
-                            <span className="text-sm text-muted-foreground">Max Adults:</span>
+                            <span className="text-sm text-muted-foreground">Max Adults</span>
                             <p className="font-medium">{room.max_number_of_adults}</p>
                           </div>
                           <div>
-                            <span className="text-sm text-muted-foreground">Max Children:</span>
+                            <span className="text-sm text-muted-foreground">Max Children</span>
                             <p className="font-medium">{room.max_number_of_children}</p>
                           </div>
                         </div>
@@ -712,19 +713,19 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
                             Additional Info
                           </h3>
                           <div>
-                            <span className="text-sm text-muted-foreground">Bedrooms:</span>
+                            <span className="text-sm text-muted-foreground">Bedrooms</span>
                             <p className="font-medium">{room.number_of_bedrooms}</p>
                           </div>
                           <div>
-                            <span className="text-sm text-muted-foreground">Extra Beds:</span>
+                            <span className="text-sm text-muted-foreground">Extra Beds</span>
                             <p className="font-medium">{room.extra_bed}</p>
                           </div>
                           <div>
-                            <span className="text-sm text-muted-foreground">Smoking Policy:</span>
+                            <span className="text-sm text-muted-foreground">Smoking Policy</span>
                             <p className="font-medium">{room.smoking_policy}</p>
                           </div>
                           <div>
-                            <span className="text-sm text-muted-foreground">Availability:</span>
+                            <span className="text-sm text-muted-foreground">Availability</span>
                             <p className={`font-medium ${room.available ? "text-green-600" : "text-red-600"}`}>
                               {room.available ? 'Available' : 'Not Available'}
                             </p>
@@ -743,7 +744,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
                             {getWordCount(room.description) > 10 && (
                               <span
                                 onClick={() => toggleDescription(room._id)}
-                                className="text-blue-600 hover:underline text-sm ml-2 cursor-pointer"
+                                className="text-tripswift-blue hover:underline text-sm ml-2 cursor-pointer"
                               >
                                 {expandedDescriptions[room._id] ? '(See Less)' : '(See More)'}
                               </span>
@@ -754,8 +755,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
 
 
                       {/* Action Buttons */}
-                      <div className="flex justify-end mt-6 space-x-4">
-                        <Button
+                      <div className="flex flex-col sm:flex-row sm:justify-end mt-6 space-y-2 sm:space-y-0 sm:space-x-4 px-4 sm:px-0">                        <Button
                           variant="destructive"
                           onClick={() => handleDeleteRoom(room._id, room.room_name)}
                         >

@@ -53,6 +53,10 @@ import { Button } from "./ui/button";
 export function ModeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
 
+  React.useEffect(() => {
+    setTheme("light");
+  }, []);
+
   return (
     <Button
       className="bg-gray-100 dark:bg-black border border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-900"

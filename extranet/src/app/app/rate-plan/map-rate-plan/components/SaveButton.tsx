@@ -4,7 +4,7 @@ interface SaveButtonProps {
   isLoading: boolean;
   editingRows: Set<number>;
   handleSave: () => void;
-  disabled:any
+  disabled: any;
 }
 
 export const SaveButton: React.FC<SaveButtonProps> = ({
@@ -16,8 +16,8 @@ export const SaveButton: React.FC<SaveButtonProps> = ({
   return (
     <button
       onClick={handleSave}
-      disabled={isLoading || editingRows.size === 0||disabled}
-      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+      disabled={isLoading || editingRows.size === 0 || disabled}
+      className="px-4 py-2 bg-tripswift-blue text-tripswift-off-white rounded-lg hover:bg-[#054B8F] disabled:opacity-50 font-tripswift-semibold transition-colors duration-200"
     >
       {isLoading ? 'Saving...' : 'Save Changes'}
     </button>

@@ -14,10 +14,11 @@ const notoSans = Noto_Sans({
 });
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#FFFDFF" },
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
-  ],
+  themeColor: "#FFFDFF",
+  // themeColor: [
+  //   { media: "(prefers-color-scheme: light)", color: "#FFFDFF" },
+  //   { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  // ],
 };
 
 export const metadata: Metadata = {
@@ -48,13 +49,15 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#076DB3" />
+        {/* <meta name="theme-color" content="#076DB3" /> */}
+        <meta name="theme-color" content="#FFFDFF" />
       </head>
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
           notoSans.variable,
-          "text-foreground bg-tripsyift-off-white"
+          // "text-foreground bg-tripsyift-off-white"
+          "text-foreground bg-tripswift-off-white"
         )}
       >
         <ThemeProvider

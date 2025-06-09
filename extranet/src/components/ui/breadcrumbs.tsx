@@ -17,10 +17,15 @@ const SEGMENT_TYPES = [
     icon: <LandPlot size={16} />,
   },
 
-  {
-    name: "rate-plan",
-    link: "/app/rate-plan",
-    icon: <Coins size={16} />,
+  // {
+  //   name: "rate-plan",
+  //   link: "/app/rate-plan",
+  //   icon: <Coins size={16} />,
+  // },
+  { 
+    name: "map-rate-plan",
+    link: "/app/rate-plan/map-rate-plan", 
+    icon: <MapPinned size={16} /> 
   },
 
   {
@@ -40,7 +45,7 @@ const SEGMENT_TYPES = [
   },
 ];
 
-export default function Breadcrumbs({}: Props) {
+export default function Breadcrumbs({ }: Props) {
   const pathname = usePathname();
   const segments = pathname.split("/").filter((segment) => segment !== "");
 
@@ -68,8 +73,8 @@ export default function Breadcrumbs({}: Props) {
   return (
     <NextUIBreadcrumbs>
       <NextUIBreadcrumbsItem
-       href={'/'}
-       startContent={<Home size={16} />}>
+        href={'/'}
+        startContent={<Home size={16} />}>
         Home
       </NextUIBreadcrumbsItem>
       {filteredSegments.map((segment, index) => {

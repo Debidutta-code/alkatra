@@ -30,7 +30,7 @@ export function PropertyDetails({
     }
 
     // Basic email regex pattern
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email)) {
       return { isValid: false, errorMessage: 'Please enter a valid email address' };
     }
@@ -43,9 +43,10 @@ export function PropertyDetails({
       property_name: !editedProperty.property_name || editedProperty.property_name.trim() === '',
       property_email: false, // Reset email error
       property_contact:
-      !editedProperty.property_contact ||
-      editedProperty.property_contact.trim().length !== 10 ||
-      !/^\d{10}$/.test(editedProperty.property_contact.trim())    };
+        !editedProperty.property_contact ||
+        editedProperty.property_contact.trim().length !== 10 ||
+        !/^\d{10}$/.test(editedProperty.property_contact.trim())
+    };
 
     // Perform specific email validation
     const emailValidation = validateEmail(editedProperty.property_email);
@@ -117,7 +118,7 @@ export function PropertyDetails({
           <div className="pt-4 space-y-6">
             <div className="grid grid-cols-[120px_1fr] items-center gap-4">
               <label className="text-sm text-gray-500">
-                Property Name<span className="text-red-500">*</span>
+                Property Name <span className="text-red-500">*</span>
               </label>
               <div>
                 <Input
@@ -135,7 +136,7 @@ export function PropertyDetails({
 
             <div className="grid grid-cols-[120px_1fr] items-center gap-4">
               <label className="text-sm text-gray-500">
-                Property Email<span className="text-red-500">*</span>
+                Property Email <span className="text-red-500">*</span>
               </label>
               <div>
                 <Input
@@ -160,7 +161,20 @@ export function PropertyDetails({
                   name="property_contact"
                   value={editedProperty.property_contact || ""}
                   maxLength={10}
-                  onChange={handleInputChange}
+                  onChange={(e) => {
+                    const digitsOnly = e.target.value.replace(/\D/g, '');
+                    const syntheticEvent = {
+                      target: {
+                        name: 'property_contact',
+                        value: digitsOnly
+                      }
+                    } as React.ChangeEvent<HTMLInputElement>;
+                    handleInputChange?.(syntheticEvent);
+                  }}
+                  onInput={(e) => {
+                    const target = e.target as HTMLInputElement;
+                    target.value = target.value.replace(/\D/g, '');
+                  }}
                   placeholder="Property Contact"
                   className={`w-full ${errors.property_contact ? 'border-red-500' : ''}`}
                 />
@@ -175,19 +189,19 @@ export function PropertyDetails({
             {property && property.data ? (
               <div>
                 <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">Name:</div>
+                  <div className="w-1/4 text-sm text-gray-500">Name</div>
                   <div className="w-3/4 text-sm font-medium break-words overflow-hidden">
                     {property.data.property_name || 'N/A'}
                   </div>
                 </div>
                 <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">Email:</div>
+                  <div className="w-1/4 text-sm text-gray-500">Email</div>
                   <div className="w-3/4 text-sm font-medium break-words overflow-hidden">
                     {property.data.property_email || 'N/A'}
                   </div>
                 </div>
                 <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">Contact:</div>
+                  <div className="w-1/4 text-sm text-gray-500">Contact</div>
                   <div className="w-3/4 text-sm font-medium break-words overflow-hidden">
                     {property.data.property_contact || 'N/A'}
                   </div>
