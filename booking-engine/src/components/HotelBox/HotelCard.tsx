@@ -98,12 +98,21 @@ const HotelCard = () => {
         className={`relative z-10 h-full flex flex-col items-center justify-center px-4 transition-all duration-1000 ${isLoaded ? "opacity-100" : "opacity-0 translate-y-10"
           }`}
       >
-        <div className="absolute top-32 right-8 bg-white shadow-lg rounded-lg p-4 w-64 flex flex-col items-center">
+        <div className="absolute hidden md:block top-0 right-0 md:top-2 lg:top-16 xl:w-52 lg:w-48 md:w-36 sm:w-32 w-16 h-auto md:right-4 shadow-lg rounded-lg   flex-col items-center">
           <QRCodeForAPP />
-          <h1 className="mt-3 text-center text-sm font-semibold font-tripswift-medium  text-gray-700">
-            Scan to download our app
-          </h1>
+ <div
+            style={{
+              backgroundImage:
+                "linear-gradient(90deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 57%, rgba(227,131,57,1) 100%)",
+            }}
+            className=" mt-2 md:tracking-tighter bg-gradient-to-r from-red-500 to-orange-600  backdrop-blur-sm  text-sm font-tripswift-medium px-4 py-1.5 rounded-full inline-flex items-center mb-2 shadow-lg"
+          >
+            <span className="text-tripswift-off-white text-md  text-center lg:text-xl font-tripswift-medium">
+              Download Our App
+            </span>
+          </div>
         </div>
+
 
         {/* Hero Text */}
         <div className="max-w-3xl text-center  sm:mb-10 animate-in slide-in-from-bottom duration-700">
@@ -111,8 +120,7 @@ const HotelCard = () => {
             <span className="inline-block w-2 h-2 bg-tripswift-blue rounded-full mr-2 animate-pulse"></span>
             <span className="text-[#e9d8fd]">{t("HotelCard.exclusiveOffers")}</span>
           </div>
-
-          <h1 className="text-2xl md:text-5xl mt-4 md:mt-10 lg:text-6xl font-tripswift-extrabold text-tripswift-off-white mb-5 leading-tight tracking-tight drop-shadow-lg">
+          <h1 className="text-2xl md-text-4xl lg:w-[90%] xl:w-[100%] mt-4 md:mt-10 lg:text-5xl xl:text-6xl font-tripswift-extrabold text-tripswift-off-white mb-5 leading-tight tracking-tight drop-shadow-lg">
             {t("HotelCard.heroTitle")}
           </h1>
 
@@ -125,7 +133,7 @@ const HotelCard = () => {
         <div className="w-[290px] md:w-full max-w-5xl animate-in slide-in-from-bottom duration-700 delay-200">
           {/* Search Box */}
           <CompactSearchBar
-            initialLocation="Dubai"
+            initialLocation="Bhubaneshwar"
             initialCheckin={tomorrow}
             initialCheckout={dayAfterTomorrow}
             onSearch={handleSearch}

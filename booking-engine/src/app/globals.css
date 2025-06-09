@@ -384,3 +384,10 @@ header p {
   background-color: var(--color-primary-off-white) !important;
   color: var(--color-secondary-black) !important;
 }
+/* Remove all borders and outlines from the inner input field of PhoneInput */
+.PhoneInputInput:focus {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+

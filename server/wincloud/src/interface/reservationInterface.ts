@@ -6,51 +6,52 @@ export interface GuestDetails {
 }
 
 export interface ReservationInput {
-    guests: Array<{
-        firstName: string;
-        lastName: string;
-        email: string;
-        phone: string;
-    }>;
-    roomAssociations: Array<{
-        roomId: string;
-    }>;
-    bookingDetails: {
-        propertyId: string;
-        userId: string;
-        checkInDate: string;
-        checkOutDate: string;
-        hotelCode: string;
-        hotelName: string;
-        ratePlanCode: string;
-        roomTypeCode: string;
-        currencyCode: string;
-        status: string;
-    };
-    payment: {
-        amount: string;
-        method: string;
-    };
-}
-
-export interface ThirdPartyReservationData {
+  bookingDetails: {
+    userId: string;
+    checkInDate: string;
+    checkOutDate: string;
     hotelCode: string;
     hotelName: string;
     ratePlanCode: string;
     roomTypeCode: string;
-    checkInDate: string;
-    checkOutDate: string;
-    guestDetails: GuestDetails[];
-    amountBeforeTax: number;
+    numberOfRooms: number;
+    roomTotalPrice: number;
     currencyCode: string;
-    userId: string;
-    propertyId: string;
-    roomIds: string[];
-    status: string;
-    reservationId: string;
-    thirdPartyReservationIdType8?: string;
-    thirdPartyReservationIdType3?: string;
+    guests: any[];
+    email: string;
+    phone: string;
+  };
+  ageCodeSummary: Record<string, number>;
 }
+
+
+export interface ThirdPartyReservationData {
+  hotelCode: string;
+  hotelName?: string;
+  ratePlanCode: string;
+  ratePlanName?: string;
+  roomTypeCode: string;
+  numberOfRooms: number;
+  guests: any[];
+  email: string;
+  phone: string;
+  checkInDate: Date;
+  checkOutDate: Date;
+  // guestDetails: GuestDetails[];
+  amountBeforeTax: number;
+  currencyCode: string;
+  userId: string;
+//   propertyId: string;
+//   roomIds: string[];
+//   status: string;
+  reservationId: string;
+//   thirdPartyReservationIdType8?: string;
+//   thirdPartyReservationIdType3?: string;
+
+  ageCodeSummary: Record<string, number>;
+  roomTotalPrice?: number;
+}
+
 
 export interface OTAHotelResNotifRQ {
     OTA_HotelResNotifRQ: {

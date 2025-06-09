@@ -1,14 +1,20 @@
-import mongoose, { HydratedDocument, Model, QueryWithHelpers, Schema, Types } from "mongoose";
+import mongoose, {
+  HydratedDocument,
+  Model,
+  QueryWithHelpers,
+  Schema,
+  Types,
+} from "mongoose";
 import { createHash } from "../Utils/bcryptHelper";
 
 export interface AuthType {
   _id: Types.ObjectId;
   firstName: string;
   lastName: string;
-  contact: number    
+  contact: number;
   email: string;
   password: string;
-  role: string;
+  role: "superAdmin" | "groupManager" | "hotelManager";
 }
 
 interface AuthQueryHelpers {
@@ -24,7 +30,7 @@ interface AuthQueryHelpers {
 type AuthModelType = Model<AuthType, AuthQueryHelpers>;
 
 const authSchema = new mongoose.Schema<AuthType, {}, {}, AuthQueryHelpers>(
-  {  
+  {
     firstName: {
       type: String,
       required: true,
@@ -46,6 +52,9 @@ const authSchema = new mongoose.Schema<AuthType, {}, {}, AuthQueryHelpers>(
     },
     role: {
       type: String,
+      required: true,
+      enum: ["superAdmin", "groupManager", "hotelManager"],
+      default: "superAdmin",
     },
   },
   {
@@ -60,5 +69,8 @@ authSchema.query.byEmail = function byEmail(
   return this.find({ email });
 };
 
-const UserModel = mongoose.model<AuthType, AuthModelType>("UserModel", authSchema);
+const UserModel = mongoose.model<AuthType, AuthModelType>(
+  "UserModel",
+  authSchema
+);
 export default UserModel;

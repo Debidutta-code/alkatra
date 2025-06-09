@@ -115,10 +115,11 @@ class RoomPrice {
         return response
     }
     public static async getRoomRentController(req: Request, res: Response, next: NextFunction) {
-        const { hotelCode, invTypeCode,
+        const { 
+            hotelCode, 
+            invTypeCode,
             startDate,
             endDate,
-            noOfDaysToStay,
             noOfChildrens,
             noOfAdults,
             noOfRooms } = req.body
@@ -130,12 +131,27 @@ class RoomPrice {
             noOfAdults,
             noOfRooms
         )
+        console.log(response)
         return response
     }
     public static async getAllRoomTypeController(){
         const response=await RoomPriceService.getAllRoomTypeService()
         console.log(response)
         return response
+    }
+    public static async checkAvailabilityController(req: Request, res: Response, next: NextFunction){
+        try {
+            const {hotelcode,invTypeCode,startDate,endDate,noOfRooms}=req.body
+            const response=await RoomPriceService.checkAvailabilityService(hotelcode,invTypeCode,startDate,endDate,noOfRooms)
+
+            return response
+        } catch (error:any) {
+            return {
+                success:false,
+                message:"Error occur while checking availability for this hotel",
+                error:error.message
+            }
+        }
     }
 }
 export { RatePlanController, RoomPrice };

@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 // Define types
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
+import { jwtDecode } from 'jwt-decode';
 
 interface RootState {
   auth: {
@@ -51,7 +52,8 @@ const Navbar: React.FC = () => {
 
   const user = useSelector((state: RootState) => state.auth.user);
   const accessToken = Cookies.get('accessToken');
-
+  console.log("access token",accessToken);
+  
   // Define handleScroll at the component top level
   const handleScroll = useCallback(() => {
     if (window.scrollY > 10) {
@@ -88,8 +90,28 @@ const Navbar: React.FC = () => {
   };
 
   useEffect(() => {
+    const persistedAccessToken = localStorage.getItem('persist:root')
+      ? JSON.parse(localStorage.getItem('persist:root') || '{}').auth
+      : null;
+
+    let persistedToken = null;
+    if (persistedAccessToken) {
+      try {
+        persistedToken = JSON.parse(persistedAccessToken).accessToken;
+      } catch {
+        persistedToken = null;
+      }
+    }
+
     if (accessToken) {
-      dispatch(getUser() as any);
+      if (persistedToken !== accessToken) {
+        // If persisted token and cookie token mismatch, logout
+        dispatch(logout() as any);
+      } else {
+        dispatch(getUser() as any);
+      }
+    } else {
+      dispatch(logout() as any);
     }
   }, [dispatch, accessToken]);
 

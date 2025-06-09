@@ -301,7 +301,7 @@ const getProperties = catchAsync(
       error: false,
       message: "Property  fetched successfully",
       length: property.length,
-      data: property
+      data: property.reverse(),
     });
   }
 );

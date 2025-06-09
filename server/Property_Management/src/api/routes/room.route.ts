@@ -16,7 +16,7 @@ export default (app: Router) => {
   app.use("/room", router);
 
   router.route("/rooms_by_propertyId/:id").get(getRoomsByPropertyId as any);
-  router.route("/rooms_by_propertyId2/:id").get(getRoomsByPropertyId2 as any);
+  router.route("/rooms_by_propertyId2/:id").post(getRoomsByPropertyId2 as any);
   router.route("/getRoomsForBooking/:id").get(getRoomsForBooking as any);
 
   router

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
+import 'react-phone-number-input/style.css'; // must come first
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import { Toaster } from "react-hot-toast";

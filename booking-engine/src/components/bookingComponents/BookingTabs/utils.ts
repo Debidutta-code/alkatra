@@ -85,60 +85,60 @@ export const getRoomTypeIcon = (roomType: string = ""): JSX.Element => {
   }
 };
 
-export const getPaymentMethodText = (booking: Booking): string => {
-  if (booking.payment === "payAtHotel" || booking.paymentType === "payAtHotel") {
-    return "Pay at Hotel";
-  }
-  if (booking.payment === "CREDIT_CARD" || booking.payment === "card") {
-    return "Credit Card (Prepaid)";
-  }
-  if (booking.payment === "cash") {
-    return "Cash";
-  }
-  if (booking.payment === "payNow") {
-    return "Paid Online";
-  }
-  if (booking.payment === "other") {
-    return "Other Payment Method";
-  }
+// export const getPaymentMethodText = (booking: Booking): string => {
+//   if (booking.payment === "payAtHotel" || booking.paymentType === "payAtHotel") {
+//     return "Pay at Hotel";
+//   }
+//   if (booking.payment === "CREDIT_CARD" || booking.payment === "card") {
+//     return "Credit Card (Prepaid)";
+//   }
+//   if (booking.payment === "cash") {
+//     return "Cash";
+//   }
+//   if (booking.payment === "payNow") {
+//     return "Paid Online";
+//   }
+//   if (booking.payment === "other") {
+//     return "Other Payment Method";
+//   }
   
-  if (booking.payment) {
-    const formatted = booking.payment
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/_/g, ' ')
-      .replace(/^\w/, c => c.toUpperCase());
-    return formatted;
-  }
+//   if (booking.payment) {
+//     const formatted = booking.payment
+//       .replace(/([A-Z])/g, ' $1')
+//       .replace(/_/g, ' ')
+//       .replace(/^\w/, c => c.toUpperCase());
+//     return formatted;
+//   }
   
-  if (booking.paymentType) {
-    const formatted = booking.paymentType
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/_/g, ' ')
-      .replace(/^\w/, c => c.toUpperCase());
-    return formatted;
-  }
+//   if (booking.paymentType) {
+//     const formatted = booking.paymentType
+//       .replace(/([A-Z])/g, ' $1')
+//       .replace(/_/g, ' ')
+//       .replace(/^\w/, c => c.toUpperCase());
+//     return formatted;
+//   }
   
-  return "Payment Method Not Specified";
-};
+//   return "Payment Method Not Specified";
+// };
 
-export const getPaymentMethodIcon = (booking: Booking): JSX.Element => {
-  if (booking.payment === "payAtHotel" || booking.paymentType === "payAtHotel") {
-    return React.createElement(FaMoneyBillWave, { className: "mr-1.5" });
-  }
+// export const getPaymentMethodIcon = (booking: Booking): JSX.Element => {
+//   if (booking.payment === "payAtHotel" || booking.paymentType === "payAtHotel") {
+//     return React.createElement(FaMoneyBillWave, { className: "mr-1.5" });
+//   }
   
-  if (booking.payment === "CREDIT_CARD" || booking.payment === "card" || booking.payment === "payNow") {
-    return React.createElement(FaCreditCard, { className: "mr-1.5" });
-  }
+//   if (booking.payment === "CREDIT_CARD" || booking.payment === "card" || booking.payment === "payNow") {
+//     return React.createElement(FaCreditCard, { className: "mr-1.5" });
+//   }
   
-  return React.createElement(FaCreditCard, { className: "mr-1.5" });
-};
+//   return React.createElement(FaCreditCard, { className: "mr-1.5" });
+// };
 
-export const getBookingId = (booking: Booking): string => {
-  if (booking.bookingId) return booking.bookingId;
+// export const getBookingId = (booking: Booking): string => {
+//   if (booking.bookingId) return booking.bookingId;
   
-  const id = booking._id || "";
-  if (id.length >= 8) {
-    return `${id.substring(0, 4)}...${id.substring(id.length - 4)}`.toUpperCase();
-  }
-  return (id).toUpperCase();
-};
+//   const id = booking._id || "";
+//   if (id.length >= 8) {
+//     return `${id.substring(0, 4)}...${id.substring(id.length - 4)}`.toUpperCase();
+//   }
+//   return (id).toUpperCase();
+// };

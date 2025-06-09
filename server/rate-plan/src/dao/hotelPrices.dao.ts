@@ -1,4 +1,4 @@
-import { RateAmount } from "../../../wincloud/src/model/ratePlanModel"
+import RateAmount  from "../../../wincloud/src/model/ratePlanDateWise.model"
 import { Inventory } from "../../../wincloud/src/model/inventoryModel"
 class HotelPricesDao {
     public static async getHotelPlans(hotelCode: string, invTypeCode: string) {
@@ -50,11 +50,10 @@ class HotelPricesDao {
                     }]
                 }
             },
-
             // Stage 2: Lookup rates from RateAmount collection
             {
                 $lookup: {
-                    from: 'rateamounts', // MongoDB collection name (lowercase + plural)
+                    from: 'rateamountdatewises', // MongoDB collection name (lowercase + plural)
                     let: {
                         hotelCode: '$hotelCode',
                         invTypeCode: '$invTypeCode',
@@ -106,7 +105,6 @@ class HotelPricesDao {
                     as: 'rates'
                 }
             },
-
             // Stage 3: Project the final structure
             {
                 $project: {
@@ -144,6 +142,15 @@ class HotelPricesDao {
             return results
         } catch (error) {
             console.error('Error in aggregation pipeline:', error);
+            throw error;
+        }
+    }
+    public static async checkAvailabilityDao(hotelCode:string,invTypeCode:string,startDate:Date,endDate:Date){
+        try {
+            const availability=await Inventory.findOne({hotelCode:hotelCode,invTypeCode:invTypeCode,startDate:startDate,endDate:endDate})
+            return availability
+        } catch (error) {
+            console.log("Error occur while checking availability");
             throw error;
         }
     }

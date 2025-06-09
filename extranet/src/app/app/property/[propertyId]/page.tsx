@@ -535,22 +535,31 @@ export default function Page({ params, searchParams }: Props) {
       <div className="flex items-center justify-between mb-8">
         <Breadcrumbs />
       </div>
+      
       {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> */}
       <div className="grid grid-cols-1 gap-4">
-
+      <div className="mt-2 flex justify-end">
+        <Button
+          variant="destructive"
+          onClick={handleDeleteClick}
+          className="bg-red-500 hover:bg-red-600"
+        >
+          <Trash2 className="mr-2 h-4 w-4" /> Delete Property
+        </Button>
+      </div>
         <div>
           <PropertyImageGallery image={property?.data?.image} />
         </div>
 
         <div className="flex flex-col md:flex-row gap-2 items-center">
           <div className="mt-4">
-            <Button
+            {/* <Button
               variant="default"
               onClick={() => router.push(`/app/rate-plan/get-rate-plan?propertyId=${propertyId}`)}
               className="bg-blue-500 hover:bg-blue-600 text-white"
             >
               Rate Plans
-            </Button>
+            </Button> */}
             <Button
               variant="default"
               onClick={() => router.push(`/app/rate-plan/map-rate-plan`)}
@@ -619,7 +628,7 @@ export default function Page({ params, searchParams }: Props) {
           />
 
           {/* Rate Plan Component */}
-          <RatePlan
+          {/* <RatePlan
             setRatePlanList={setRatePlanList}
             ratePlanList={ratePlanList}
             rooms={rooms}
@@ -633,11 +642,11 @@ export default function Page({ params, searchParams }: Props) {
           // ratePlan={ratePlan}
           // HandleUpdateRatePlan
           // HandleAddRatePlan={HandleAddRatePlan}
-          />
+          /> */}
         </div>
       </div>
       {/* Delete Property Button */}
-      <div className="mt-8 flex justify-end">
+      {/* <div className="mt-8 flex justify-end">
         <Button
           variant="destructive"
           onClick={handleDeleteClick}
@@ -645,7 +654,7 @@ export default function Page({ params, searchParams }: Props) {
         >
           <Trash2 className="mr-2 h-4 w-4" /> Delete Property
         </Button>
-      </div>
+      </div> */}
     </main>
   );
 }

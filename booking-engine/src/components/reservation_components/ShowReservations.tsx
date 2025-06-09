@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { GetReservationsOfUser } from "@/hooks/getReservations";
 import { useSelector } from "@/Redux/store";
-import { deleteBooking } from '@/api/booking';
+// import { deleteBooking } from '@/api/booking';
 import Cookies from 'js-cookie';
 
 export const ShowReservations = () => {
@@ -16,13 +16,13 @@ export const ShowReservations = () => {
     setActiveReservation(activeReservation === index ? null : index);
   };
 
-  const handleDeleteReservation = async (id: string) => {
-    const response = await deleteBooking(id, accessToken as string);
+  // const handleDeleteReservation = async (id: string) => {
+  //   const response = await deleteBooking(id, accessToken as string);
     
-    if (response) {
-      window.location.reload();
-    }
-  };
+  //   if (response) {
+  //     window.location.reload();
+  //   }
+  // };
 
   return (
     <>
@@ -60,9 +60,9 @@ export const ShowReservations = () => {
                 <li>
                   <span className="font-semibold">Email:</span> {item?.property?.property_email}
                 </li>
-                <button onClick={() => handleDeleteReservation(item?._id as string)} className="p-2 bg-red-500 text-white rounded-lg text-sm mt-2 w-full">
+                {/* <button onClick={() => handleDeleteReservation(item?._id as string)} className="p-2 bg-red-500 text-white rounded-lg text-sm mt-2 w-full">
                   Cancel
-                </button>
+                </button> */}
               </ul>
             </div>
           ))}

@@ -39,9 +39,9 @@ export const protect = catchAsync(
 );
 
 export const restrictTo =
-  (...roles: string[]) =>
+  (...roles: Array<"superAdmin" | "groupManager" | "hotelManager">) =>
   (req: CustomRequest, res: Response, next: NextFunction) => {
-    if (!req.role || !roles.includes(req.role)) {
+    if (!req.role || !roles.includes(req.role as any)) {
       throw formatError(ErrorMessages.UNAUTHORIZED_ACTION);
     }
     next();

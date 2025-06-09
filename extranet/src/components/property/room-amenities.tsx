@@ -243,11 +243,10 @@ export default function Rooms({ onNext, onPrevious }: Props) {
       console.log("NewRoom Data:", newRoom);
       setFormLoading(false);
   
-      toast.success('Room amenities submitted successfully!');
-  
+      toast.success('Room amenities submitted successfully!');  
       onNext();
   
-      // router.push("/app/property");
+      router.push("/app/property");
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setFormLoading(false);
