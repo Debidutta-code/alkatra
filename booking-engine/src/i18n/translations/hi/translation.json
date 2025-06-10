@@ -772,6 +772,8 @@
         "adults": "वयस्क",
         "child": "बच्चा",
         "children": "बच्चे",
+        "infant":"शिशु",
+        "infants":" शिशुओं",
         "guest": "अतिथि"
       },
       "paymentMethod": {

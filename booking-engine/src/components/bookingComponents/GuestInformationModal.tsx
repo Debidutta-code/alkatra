@@ -191,6 +191,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
 
   const getFinalPrice = async (selectedRoom: any, checkInDate: string, checkOutDate: string, guestData: any) => {
     try {
+      console.log("gust data",guestData)
       const finalPriceResponse = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomRentPrice`,
         {
@@ -201,6 +202,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
           noOfChildrens: guestData?.children,
           noOfAdults: guestData?.guests,
           noOfRooms: guestData?.rooms,
+          noOfInfants:guestData?.infants,
         },
         { withCredentials: true }
       );
@@ -414,6 +416,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         rooms: guestData?.rooms || 1,
         adults: guestData?.guests || 1,
         children: guestData?.children || 0,
+        infants:guestData?.infants || 0 ,
         guests,
         hotelName: guestData?.hotelName || "Unknown Hotel",
         ratePlanCode: finalPrice?.dailyBreakdown?.ratePlanCode || "SUT",

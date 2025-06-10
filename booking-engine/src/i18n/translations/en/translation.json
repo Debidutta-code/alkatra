@@ -781,6 +781,9 @@
         "adults": "Adults",
         "child": "Child",
         "children": "Children",
+        "infant":"Infant",
+        "infants":"Infants",
+
         "guest": "Guest"
       },
       "paymentMethod": {

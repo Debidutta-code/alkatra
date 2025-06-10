@@ -681,6 +681,8 @@
         "adults": "بالغون",
         "child": "طفل",
         "children": "أطفال",
+         "infant":" رضيع",
+         "infants":"رُضَّع",
         "guest": "الضيف"
       },
       "paymentMethod": {
