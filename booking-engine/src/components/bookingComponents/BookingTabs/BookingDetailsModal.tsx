@@ -137,7 +137,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
           </div>
         </div>
 
-        {/* Guest Details (all guests) */}
+        {/*  (all guests) */}
         <div className="border-t border-gray-200 mb-2 md:mb-3">
           <h3 className="text-lg sm:text-xl mt-2 font-tripswift-bold text-gray-800 flex items-center">
             <FaUser className="mr-1.5 sm:mr-2 text-tripswift-blue text-base sm:text-lg" />
@@ -147,16 +147,16 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             <div className="space-y-4">
               {booking.guestDetails && booking.guestDetails.length > 0 ? (
                 booking.guestDetails.map((guest: GuestDetails, idx: number) => (
-                  <div key={guest._id || idx} className="flex flex-col sm:flex-row sm:items-center gap-24 border-b border-gray-100 pb-2 last:border-b-0 last:pb-0">
-                    <div className="flex items-center gap-2 font-tripswift-medium">
+                  <div key={guest._id || idx} className="flex flex-col md:flex-row md:items-center md:gap-24 gap-2 border-b border-gray-100 pb-2 last:border-b-0 last:pb-0">
+                    <div className="flex md:w-1/3  sm:items-center gap-2 font-tripswift-medium">
                       <FaUser className="text-tripswift-blue" />
-                      <span>{guest.firstName} {guest.lastName}</span>
+                      <span className='w-full'>{guest.firstName} {guest.lastName}</span>
                     </div>
-                    {/* {guest.dob && (
-                      <div className="text-xs text-gray-500 sm:ml-36">
+                    {guest.dob && (
+                      <div className="text-xs md:ml-[32px] text-gray-500 ">
                         {t("BookingTabs.BookingDetailsModal.dob", { defaultValue: "DOB" })}: {formatDOB(guest.dob)}
                       </div>
-                    )} */}
+                    )}
                   </div>
                 ))
               ) : (

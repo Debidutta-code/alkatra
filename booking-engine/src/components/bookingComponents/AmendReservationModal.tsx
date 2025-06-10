@@ -142,50 +142,50 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
 
   // Sync guests state with guestBreakdown changes
   useEffect(() => {
-    const totalGuests = guestBreakdown.guests + guestBreakdown.children + guestBreakdown.infants;
+    // Helper function to filter guests by type
+    const filterGuestsByType = (type: "adult" | "child" | "infant") => {
+      return (booking.guestDetails || []).filter(g => (g.type || getGuestType(g.dob)) === type);
+    };
 
-    // Start with existing guests from booking.guestDetails
-    let newGuests: GuestDetails[] = [...(booking.guestDetails || [])].slice(0, totalGuests).map(g => ({
-      firstName: g.firstName || "",
-      lastName: g.lastName || "",
-      dob: g.dob || getDefaultDOBByType(g.type as "adult" | "child" | "infant"),
-      type: g.type || getGuestType(g.dob)
-    }));
+    // Get existing guests by type
+    const existingAdults = filterGuestsByType("adult");
+    const existingChildren = filterGuestsByType("child");
+    const existingInfants = filterGuestsByType("infant");
 
-    // Fill in any additional guests if guestBreakdown requires more
-    const existingCount = newGuests.length;
-    if (existingCount < totalGuests) {
-      // Adults
-      for (let i = existingCount; i < guestBreakdown.guests; i++) {
-        newGuests.push({
-          firstName: "",
-          lastName: "",
-          dob: getDefaultDOBByType("adult"),
-          type: "adult"
-        });
-      }
-      // Children
-      for (let i = 0; i < guestBreakdown.children; i++) {
-        if (newGuests.length < totalGuests) {
-          newGuests.push({
-            firstName: "",
-            lastName: "",
-            dob: guestBreakdown.childDOBs[i] || getDefaultDOBByType("child"),
-            type: "child"
-          });
-        }
-      }
-      // Infants
-      for (let i = 0; i < guestBreakdown.infants; i++) {
-        if (newGuests.length < totalGuests) {
-          newGuests.push({
-            firstName: "",
-            lastName: "",
-            dob: guestBreakdown.infantDOBs[i] || getDefaultDOBByType("infant"),
-            type: "infant"
-          });
-        }
-      }
+    let newGuests: GuestDetails[] = [];
+    console.log("new guest data",newGuests)
+
+    // Add adults preserving existing data or adding new default guests
+    for (let i = 0; i < guestBreakdown.guests; i++) {
+      const guest = existingAdults[i] || {
+        firstName: "",
+        lastName: "",
+        dob: getDefaultDOBByType("adult"),
+        type: "adult"
+      };
+      newGuests.push(guest);
+    }
+
+    // Add children preserving existing data or adding new default guests
+    for (let i = 0; i < guestBreakdown.children; i++) {
+      const guest = existingChildren[i] || {
+        firstName: "",
+        lastName: "",
+        dob: guestBreakdown.childDOBs[i] || getDefaultDOBByType("child"),
+        type: "child"
+      };
+      newGuests.push(guest);
+    }
+
+    // Add infants preserving existing data or adding new default guests
+    for (let i = 0; i < guestBreakdown.infants; i++) {
+      const guest = existingInfants[i] || {
+        firstName: "",
+        lastName: "",
+        dob: guestBreakdown.infantDOBs[i] || getDefaultDOBByType("infant"),
+        type: "infant"
+      };
+      newGuests.push(guest);
     }
 
     setGuests(newGuests);
@@ -297,7 +297,12 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
 
   // --- Guests UI handlers ---
   const handleGuestChange = (idx: number, field: keyof GuestDetails, value: string) => {
-    setGuests(gs => gs.map((g, i) => i === idx ? { ...g, [field]: value } : g));
+    console.log("handleGuestChange called with:", { idx, field, value });
+    setGuests(gs => {
+      const updatedGuests = gs.map((g, i) => i === idx ? { ...g, [field]: value } : g);
+      console.log("updated guests:", updatedGuests);
+      return updatedGuests;
+    });
   };
   const handleAddGuest = () => {
     setGuests(gs => [
@@ -308,7 +313,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
   const handleRemoveGuest = (idx: number) => {
     setGuests(gs => gs.filter((_, i) => i !== idx));
   };
-
+console.log("guests",guests)
   const getFinalPrice = async (
     selectedRoom: any,
     checkInDate: string,
