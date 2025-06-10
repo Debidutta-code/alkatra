@@ -315,8 +315,11 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       }
     }
 
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!email) {
       newErrors["email"] = t("BookingComponents.GuestInformationModal.emailError");
+      valid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors["email"] = t("BookingComponents.GuestInformationModal.emailInvalidError");
       valid = false;
     }
 

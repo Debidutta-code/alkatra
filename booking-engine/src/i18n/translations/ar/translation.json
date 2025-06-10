@@ -490,6 +490,7 @@
       "emailPlaceholder": "your.email@example.com",
       "emailInfo": "سيتم إرسال تأكيد الحجز إلى هذا البريد الإلكتروني",
       "emailError": "البريد الإلكتروني مطلوب",
+      "emailInvalidError":"يرجى إدخال عنوان بريد إلكتروني صالح",
       "phoneLabel": "رقم الهاتف",
       "phonePlaceholder": "أدخل رقم الهاتف",
       "phoneInfo": "لإشعارات متعلقة بالحجز",
