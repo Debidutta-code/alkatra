@@ -87,9 +87,10 @@ export const login =
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {
           toast.error("Invalid Email or Password");
-        } else {
-          toast.error(error.response?.data?.message || "Login failed");
-        }
+        } 
+        // else {
+        //   toast.error(error.response?.data?.message || "Login failed");
+        // }
       } else {
         toast.error("An unexpected error occurred");
       }
@@ -97,15 +98,30 @@ export const login =
     }
   };
 
-export const logout = () => async (dispatch: typeof store.dispatch) => {
-  try {
-    await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/logout`);
-  } catch (error) {
-    toast.error("Failed to logout. Please try again.");
-  } finally {
-    dispatch(removeAccessToken());
-  }
-};
+  export const logout = () => async (dispatch: typeof store.dispatch, getState: typeof store.getState) => {
+    const state = getState();
+    const accessToken = state.auth.accessToken;
+    
+    let logoutSuccess = false;
+    
+    try {
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/logout`, {}, {
+        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+      });
+      logoutSuccess = true;
+    } catch (error) {
+      console.error("Logout API call failed:", error);
+    } finally {
+      dispatch(removeAccessToken());
+      
+      if (logoutSuccess) {
+        toast.success("Successfully logged out!");
+      } else {
+        toast.success("Logged out successfully");
+        // Changed message to be more user-friendly
+      }
+    }
+  };
 
 export const getUser =
   () => async (dispatch: typeof store.dispatch, getState: typeof store.getState) => {

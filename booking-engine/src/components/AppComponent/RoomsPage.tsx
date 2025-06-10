@@ -62,14 +62,15 @@ interface PropertyDetails {
   };
   property_contact?: string;
   property_email?: string;
+  room_Aminity?: {
+    _id?: string;
+    propertyInfo_id?: string;
+    amenities?: {
+      [key: string]: { [key: string]: boolean }; // Generic structure for nested categories
+    };
+    __v?: number;
+  };
 }
-
-
-
-
-
-
-
 const RoomsPage: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -159,6 +160,7 @@ const [selectedImage, setSelectedImage] = useState<number>(0);
           });
         }
         const propDetails = propertyResponse.data.property || propertyResponse.data.data || propertyResponse.data;
+        console.log("Property Details:", propDetails); // Add this log
         setPropertyDetails(propDetails);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -172,31 +174,59 @@ const [selectedImage, setSelectedImage] = useState<number>(0);
   }, [propertyId, checkInDate, checkOutDate]);
 
   // Helper function to convert amenities to the expected format
-  const convertAmenities = (room: Room) => {
-    const convertedAmenities = room.amenities?.map((amenity) => {
-      const getIconName = (amenityName: string) => {
-        const amenityLower = amenityName.toLowerCase();
-        if (amenityLower.includes("wifi")) return "wifi";
-        if (amenityLower.includes("air") || amenityLower.includes("ac"))
-          return "snowflake";
-        if (amenityLower.includes("smoking")) return "smoking-ban";
-        if (amenityLower.includes("bed")) return "bed";
-        if (amenityLower.includes("view")) return "tree";
-        return "check-circle";
-      };
-
-      return {
-        icon: getIconName(amenity),
-        name: amenity,
-      };
+const convertAmenities = (room: Room) => {
+  // Map room amenities from propertyDetails.room_Aminity
+  let roomAmenities: string[] = [];
+  if (propertyDetails?.room_Aminity?.amenities) {
+    const amenities = propertyDetails.room_Aminity.amenities;
+    // Flatten all amenities into a single array of names
+    Object.values(amenities).forEach((category: any) => {
+      Object.entries(category).forEach(([key, value]) => {
+        if (value === true) {
+          // Convert camelCase keys to readable names (e.g., airConditioning -> Air Conditioning)
+          const readableName = key
+            .replace(/([A-Z])/g, " $1")
+            .replace(/^./, (str) => str.toUpperCase())
+            .trim();
+          roomAmenities.push(readableName);
+        }
+      });
     });
+  }
+
+  const convertedAmenities = roomAmenities.map((amenity) => {
+    const getIconName = (amenityName: string) => {
+      const amenityLower = amenityName.toLowerCase();
+      if (amenityLower.includes("wifi") || amenityLower.includes("internet")) return "wifi";
+      if (amenityLower.includes("air") || amenityLower.includes("ac")) return "snowflake";
+      if (amenityLower.includes("smoking")) return "smoking-ban";
+      if (amenityLower.includes("bed")) return "bed";
+      if (amenityLower.includes("view")) return "tree";
+      // if (amenityLower.includes("bathroom")) return "bathroom";
+      // if (amenityLower.includes("towels")) return "towels";
+      if (amenityLower.includes("linens")) return "linens";
+      // if (amenityLower.includes("table") || amenityLower.includes("chairs")) return "tableChairs";
+      if (amenityLower.includes("desk")) return "desk";
+      if (amenityLower.includes("dresser") || amenityLower.includes("wardrobe")) return "dresserWardrobe";
+      if (amenityLower.includes("sofa") || amenityLower.includes("seating")) return "sofaSeating";
+      if (amenityLower.includes("television")) return "television";
+      if (amenityLower.includes("telephone")) return "telephone";
+      if (amenityLower.includes("heating")) return "heating";
+      return "check-circle";
+    };
 
     return {
-      ...room,
-      amenities: convertedAmenities,
-      default_image_url: room.image?.[0] || ""
-    } as any;
-  };
+      icon: getIconName(amenity),
+      name: amenity,
+    };
+  });
+
+  return {
+    ...room,
+    amenities: convertedAmenities,
+    default_image_url: room.image?.[0] || "",
+  } as any;
+};
 
   const handleBookNow = (room: Room) => {
     if (!room.has_valid_rate) return;
@@ -219,23 +249,27 @@ const [selectedImage, setSelectedImage] = useState<number>(0);
     rooms?: number;
     adults?: number;
     children?: number;
-    guests?: Guest[];    
+    guests?: Guest[]; // <--- make sure this is present
   }) => {
     const queryParams = new URLSearchParams({
       roomId: formData.roomId,
       propertyId: formData.propertyId,
-      amount: formData.amount,
+      // amount: formData.amount,
       currency: "INR",
       checkIn: formData.checkIn,
       checkOut: formData.checkOut,
       email: formData.email,
       phone: formData.phone,
       userId: formData.userId || "",
+      hotelName: propertyDetails?.property_name || "Unknown Hotel",
+      ratePlanCode: selectedRoom?.rate_plan_code || "SUT",
+      roomType: selectedRoom?.room_type || "SUT",
       ...(formData.rooms ? { rooms: formData.rooms.toString() } : {}),
       ...(formData.adults ? { adults: formData.adults.toString() } : {}),
       ...(formData.children ? { children: formData.children.toString() } : {}),
+      ...(formData.guests ? { guests: encodeURIComponent(JSON.stringify(formData.guests)) } : {}) // ADD THIS LINE
     }).toString();
-
+  
     router.push(`/payment?${queryParams}`);
   };
 
@@ -615,30 +649,28 @@ const [selectedImage, setSelectedImage] = useState<number>(0);
                       </p>
                     </div>
                   )} */}
-                  <div className="mt-4">
+<div className="mt-4">
+  <h3 className="text-section-heading mb-3">{t('RoomsPage.propertyAmenities')}</h3>
 
-                    <h3 className="text-section-heading mb-3">{t('RoomsPage.propertyAmenities')}</h3>
-
-                    {propertyDetails?.property_amenities?.amenities &&
-                      Object.keys(propertyDetails.property_amenities.amenities).length > 0 ? (
-                      <div className="flex flex-wrap gap-2">
-                        {Object.entries(propertyDetails.property_amenities.amenities)
-                          .filter(([_, hasAmenity]) => hasAmenity)
-                          .slice(0, 8)
-                          .map(([amenity]) => (
-                            <div
-                              key={amenity}
-                              className="flex items-center text-xs font-tripswift-medium text-tripswift-blue bg-tripswift-blue/5 border border-tripswift-blue/20 px-2 py-1 rounded-md"
-                            >
-                              {getAmenityIcon(amenity)}
-                              <span className="capitalize ml-1">{t(`RoomsPage.amenitiesList.${amenity}`)}</span>
-                            </div>
-                          ))}
-                      </div>
-                    ) : (
-                      <p className="text-description">{t('RoomsPage.noAmenitiesSpecified')}</p>
-                    )}
-                  </div>
+  {propertyDetails?.property_amenities?.amenities &&
+    Object.keys(propertyDetails.property_amenities.amenities).length > 0 ? (
+      <div className="flex flex-wrap gap-2">
+        {Object.entries(propertyDetails.property_amenities.amenities)
+          .filter(([_, hasAmenity]) => hasAmenity)
+          .map(([amenity]) => (
+            <div
+              key={amenity}
+              className="flex items-center text-xs font-tripswift-medium text-tripswift-blue bg-tripswift-blue/5 border border-tripswift-blue/20 px-2 py-1 rounded-md"
+            >
+              {getAmenityIcon(amenity)}
+              <span className="capitalize ml-1">{t(`RoomsPage.amenitiesList.${amenity}`)}</span>
+            </div>
+          ))}
+      </div>
+    ) : (
+      <p className="text-description">{t('RoomsPage.noAmenitiesSpecified')}</p>
+    )}
+</div>
                 </div>
 
 

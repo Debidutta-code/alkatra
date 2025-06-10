@@ -1,51 +1,29 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
-import { DatePicker, Select, Input, Button, Alert, Spin } from "antd";
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import { DatePicker, Select, Input, Button } from "antd";
 import dayjs, { Dayjs } from "dayjs";
+import { Booking, GuestDetails } from '../bookingComponents/BookingTabs/types';
 import { useTranslation } from 'react-i18next';
-import { 
-  CalendarDays, 
-  Users, 
-  BedDouble, 
-  ClipboardEdit, 
-  ArrowRight, 
-  Check, 
-  X, 
+import { useDispatch } from 'react-redux';
+import { setGuestDetails } from '@/Redux/slices/hotelcard.slice';
+import GuestBox from "../HotelBox/GuestBox";
+import Cookies from "js-cookie";
+import { getDefaultDOBByType, getGuestType } from '../../utils/guestDobHelpers';
+import {
+  CalendarDays,
+  Users,
+  Clock,
+  BedDouble,
+  X,
+  Check,
   Info,
-  BadgeDollarSign,
   Calendar,
   BedIcon,
-  Clock,
   ShieldAlert,
   CreditCard
 } from "lucide-react";
-
-interface Booking {
-  _id: string;
-  property: {
-    _id: string;
-    property_name: string;
-  };
-  room: {
-    _id: string;
-    room_name: string;
-    room_type: string;
-    room_type_code?: string;
-  };
-  booking_user_name: string;
-  booking_user_phone: string;
-  amount: number;
-  booking_dates: string;
-  status: string;
-  checkInDate: string;
-  checkOutDate: string;
-  adultCount?: number;
-  childCount?: number;
-  specialRequests?: string;
-  ratePlanCode?: string;
-  ratePlanName?: string;
-}
 
 interface AmendReservationModalProps {
   booking: Booking;
@@ -63,43 +41,163 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
   onAmendComplete
 }) => {
   const { t } = useTranslation();
-  
+  const dispatch = useDispatch();
+
   // States for form fields
   const [dateRange, setDateRange] = useState<[Dayjs, Dayjs] | null>(null);
-  const [roomTypeCode, setRoomTypeCode] = useState(booking.room.room_type_code || "STD");
-  const [roomType, setRoomType] = useState(booking.room.room_type);
-  const [adultCount, setAdultCount] = useState(booking.adultCount || 2);
-  const [childCount, setChildCount] = useState(booking.childCount || 0);
-  const [specialRequests, setSpecialRequests] = useState(booking.specialRequests || "");
+  const [roomTypeCode, setRoomTypeCode] = useState(booking.roomTypeCode || "STD");
+  const [specialRequests, setSpecialRequests] = useState("");
   const [ratePlanCode, setRatePlanCode] = useState(booking.ratePlanCode || "BAR");
-  const [ratePlanName, setRatePlanName] = useState(booking.ratePlanName || t('BookingTabs.AmendReservationModal.bestAvailableRate'));
-  
+  const [guests, setGuests] = useState<GuestDetails[]>([]);
+  const [finalPrice, setFinalPrice] = useState<{ totalAmount: number; currencyCode: string } | null>(null);
+
   // UI control states
   const [amendmentType, setAmendmentType] = useState<"dates" | "room" | "guests" | "requests">("dates");
   const [loading, setLoading] = useState(false);
-  const [priceDifference, setPriceDifference] = useState<{amount: number, type: "increase" | "decrease" | "none"}>({
-    amount: 0,
-    type: "none"
+  const [amendmentMessage, setAmendmentMessage] = useState<{ type: 'success' | 'error' | 'warning', text: string } | null>(null);
+  const modalContentRef = useRef<HTMLDivElement>(null);
+
+  // Initialize guestBreakdown based on booking.guestDetails
+  const [guestBreakdown, setGuestBreakdown] = useState(() => {
+    const adults = booking.guestDetails?.filter(g => g.type === "adult" || (g.dob && dayjs().diff(dayjs(g.dob), 'year') >= 12))?.length || 1;
+    const children = booking.guestDetails?.filter(g => g.type === "child" || (g.dob && dayjs().diff(dayjs(g.dob), 'year') < 12 && dayjs().diff(dayjs(g.dob), 'year') >= 2))?.length || 0;
+    const infants = booking.guestDetails?.filter(g => g.type === "infant" || (g.dob && dayjs().diff(dayjs(g.dob), 'year') < 2))?.length || 0;
+
+    return {
+      rooms: booking.numberOfRooms || 1,
+      guests: adults,
+      children: children,
+      childAges: booking.guestDetails
+        ?.filter(g => g.type === "child" || (g.dob && dayjs().diff(dayjs(g.dob), 'year') < 12 && dayjs().diff(dayjs(g.dob), 'year') >= 2))
+        .map(g => dayjs().diff(dayjs(g.dob), 'year')) || [],
+      infants: infants,
+      infantAges: booking.guestDetails
+        ?.filter(g => g.type === "infant" || (g.dob && dayjs().diff(dayjs(g.dob), 'year') < 2))
+        .map(g => dayjs().diff(dayjs(g.dob), 'year')) || [],
+      childDOBs: booking.guestDetails
+        ?.filter(g => g.type === "child" || (g.dob && dayjs().diff(dayjs(g.dob), 'year') < 12 && dayjs().diff(dayjs(g.dob), 'year') >= 2))
+        .map(g => g.dob) || [],
+      infantDOBs: booking.guestDetails
+        ?.filter(g => g.type === "infant" || (g.dob && dayjs().diff(dayjs(g.dob), 'year') < 2))
+        .map(g => g.dob) || []
+    };
   });
-  const [amendmentMessage, setAmendmentMessage] = useState<{type: 'success' | 'error' | 'warning', text: string} | null>(null);
-  
-  // Available room types (mock data - would come from API)
-  const availableRoomTypes = [
-    { code: "STD", name: t('BookingTabs.AmendReservationModal.roomTypes.standard') },
-    { code: "DLX", name: t('BookingTabs.AmendReservationModal.roomTypes.deluxe') },
-    { code: "SUI", name: t('BookingTabs.AmendReservationModal.roomTypes.suite') },
-    { code: "EXE", name: t('BookingTabs.AmendReservationModal.roomTypes.executive') },
-    { code: "FAM", name: t('BookingTabs.AmendReservationModal.roomTypes.family') }
-  ];
-  
-  // Available rate plans (mock data - would come from API)
-  const availableRatePlans = [
-    { code: "BAR", name: t('BookingTabs.AmendReservationModal.ratePlans.bestAvailable') },
-    { code: "AAA", name: t('BookingTabs.AmendReservationModal.ratePlans.aaaMember') },
-    { code: "PKG", name: t('BookingTabs.AmendReservationModal.ratePlans.package') },
-    { code: "WKD", name: t('BookingTabs.AmendReservationModal.ratePlans.weekend') }
-  ];
-  
+
+  // Update useEffect to sync guests with DOBs from GuestBox
+  useEffect(() => {
+    if (booking.guestDetails && Array.isArray(booking.guestDetails) && booking.guestDetails.length > 0) {
+      dispatch(setGuestDetails({
+        rooms: booking.numberOfRooms || 1,
+        guests: guestBreakdown.guests,
+        children: guestBreakdown.children,
+        childAges: guestBreakdown.childAges,
+        infants: guestBreakdown.infants,
+        infantAges: guestBreakdown.infantAges,
+        childDOBs: guestBreakdown.childDOBs,
+        infantDOBs: guestBreakdown.infantDOBs
+      }));
+    }
+  }, [booking.guestDetails, guestBreakdown, dispatch]);
+
+  // Initialize Redux guestDetails with booking.guestDetails
+  useEffect(() => {
+    if (booking.guestDetails && Array.isArray(booking.guestDetails) && booking.guestDetails.length > 0) {
+      const adults = booking.guestDetails.filter(g => g.type === "adult" || (g.dob && dayjs().diff(dayjs(g.dob), 'year') >= 12)).length;
+      const children = booking.guestDetails.filter(g => g.type === "child" || (g.dob && dayjs().diff(dayjs(g.dob), 'year') < 12 && dayjs().diff(dayjs(g.dob), 'year') >= 2)).length;
+      const infants = booking.guestDetails.filter(g => g.type === "infant" || (g.dob && dayjs().diff(dayjs(g.dob), 'year') < 2)).length;
+
+      dispatch(setGuestDetails({
+        rooms: booking.numberOfRooms || 1,
+        guests: adults,
+        children: children,
+        childAges: booking.guestDetails
+          .filter(g => g.type === "child" || (g.dob && dayjs().diff(dayjs(g.dob), 'year') < 12 && dayjs().diff(dayjs(g.dob), 'year') >= 2))
+          .map(g => dayjs().diff(dayjs(g.dob), 'year')),
+        infants: infants,
+        infantAges: booking.guestDetails
+          .filter(g => g.type === "infant" || (g.dob && dayjs().diff(dayjs(g.dob), 'year') < 2))
+          .map(g => dayjs().diff(dayjs(g.dob), 'year'))
+      }));
+    }
+  }, [booking.guestDetails, dispatch]);
+
+  // Populate guests state from booking on mount
+  useEffect(() => {
+    if (booking.guestDetails && Array.isArray(booking.guestDetails) && booking.guestDetails.length > 0) {
+      setGuests(booking.guestDetails.map(g => ({
+        firstName: g.firstName || "",
+        lastName: g.lastName || "",
+        dob: g.dob || getDefaultDOBByType(g.type as "adult" | "child" | "infant"),
+        type: g.type || getGuestType(g.dob)
+      })));
+    } else {
+      setGuests([{
+        firstName: "",
+        lastName: "",
+        dob: getDefaultDOBByType("adult"),
+        type: "adult"
+      }]);
+    }
+  }, [booking.guestDetails]);
+
+  // Sync guests state with guestBreakdown changes
+  useEffect(() => {
+    const totalGuests = guestBreakdown.guests + guestBreakdown.children + guestBreakdown.infants;
+
+    // Start with existing guests from booking.guestDetails
+    let newGuests: GuestDetails[] = [...(booking.guestDetails || [])].slice(0, totalGuests).map(g => ({
+      firstName: g.firstName || "",
+      lastName: g.lastName || "",
+      dob: g.dob || getDefaultDOBByType(g.type as "adult" | "child" | "infant"),
+      type: g.type || getGuestType(g.dob)
+    }));
+
+    // Fill in any additional guests if guestBreakdown requires more
+    const existingCount = newGuests.length;
+    if (existingCount < totalGuests) {
+      // Adults
+      for (let i = existingCount; i < guestBreakdown.guests; i++) {
+        newGuests.push({
+          firstName: "",
+          lastName: "",
+          dob: getDefaultDOBByType("adult"),
+          type: "adult"
+        });
+      }
+      // Children
+      for (let i = 0; i < guestBreakdown.children; i++) {
+        if (newGuests.length < totalGuests) {
+          newGuests.push({
+            firstName: "",
+            lastName: "",
+            dob: guestBreakdown.childDOBs[i] || getDefaultDOBByType("child"),
+            type: "child"
+          });
+        }
+      }
+      // Infants
+      for (let i = 0; i < guestBreakdown.infants; i++) {
+        if (newGuests.length < totalGuests) {
+          newGuests.push({
+            firstName: "",
+            lastName: "",
+            dob: guestBreakdown.infantDOBs[i] || getDefaultDOBByType("infant"),
+            type: "infant"
+          });
+        }
+      }
+    }
+
+    setGuests(newGuests);
+  }, [guestBreakdown, booking.guestDetails]);
+  // Guest count derived
+  const adultCount = guests.filter(
+    g => g.dob ? dayjs().diff(dayjs(g.dob), 'year') >= 12 : true
+  ).length;
+  const childCount = guests.filter(
+    g => g.dob ? dayjs().diff(dayjs(g.dob), 'year') < 12 : false
+  ).length;
+
   // Initialize with current booking values
   useEffect(() => {
     if (booking.checkInDate && booking.checkOutDate) {
@@ -109,89 +207,139 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
       ]);
     }
   }, [booking]);
-  
+
   // Lock body scroll when modal opens, restore when closes
   useEffect(() => {
-    const originalStyle = window.getComputedStyle(document.body).overflow;
+    // Store the original styles
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    const originalBodyPosition = document.body.style.position;
+    const originalBodyWidth = document.body.style.width;
+    const originalBodyTop = document.body.style.top;
+
+    // Get the current scroll position to prevent jumping
+    const scrollPosition = window.scrollY;
+
+    // Lock the body and html scroll
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.width = "100%";
+    document.body.style.top = `-${scrollPosition}px`;
+
     return () => {
-      document.body.style.overflow = originalStyle;
+      // Restore the original styles
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+      document.body.style.position = originalBodyPosition;
+      document.body.style.width = originalBodyWidth;
+      document.body.style.top = originalBodyTop;
+
+      // Restore the scroll position
+      window.scrollTo(0, scrollPosition);
     };
   }, []);
 
-  // Calculate price difference when inputs change
+  // Fetch final price when dateRange, roomTypeCode, or guestBreakdown changes
   useEffect(() => {
-    calculatePriceDifference();
-  }, [dateRange, roomTypeCode, adultCount, childCount, ratePlanCode]);
-  
-  // Disable dates before today for the date picker
+    const fetchFinalPrice = async () => {
+      if (!dateRange || !dateRange[0] || !dateRange[1]) return;
+
+      try {
+        const guestData = {
+          rooms: guestBreakdown.rooms,
+          guests: guestBreakdown.guests,
+          children: guestBreakdown.children,
+          infants: guestBreakdown.infants,
+        };
+
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomRentPrice`,
+          {
+            hotelCode: "WINCLOUD",
+            invTypeCode: roomTypeCode,
+            startDate: dateRange[0].format('YYYY-MM-DD'),
+            endDate: dateRange[1].format('YYYY-MM-DD'),
+            noOfChildrens: guestData.children,
+            noOfAdults: guestData.guests,
+            noOfRooms: guestData.rooms,
+          },
+          { withCredentials: true }
+        );
+
+        if (response.data.success) {
+          setFinalPrice({
+            totalAmount: response.data.data.totalAmount,
+            currencyCode: response.data.data.dailyBreakdown[0]?.currencyCode || "INR",
+          });
+        } else {
+          setFinalPrice(null);
+          setAmendmentMessage({
+            type: 'error',
+            text: response.data.message || t('BookingTabs.AmendReservationModal.errors.unableToFetchPrice')
+          });
+        }
+      } catch (error: any) {
+        setFinalPrice(null);
+        setAmendmentMessage({
+          type: 'error',
+          text: error.message || t('BookingTabs.AmendReservationModal.errors.unableToFetchPrice')
+        });
+      }
+    };
+
+    fetchFinalPrice();
+  }, [dateRange, roomTypeCode, guestBreakdown, t]);
+
   const disabledDate = (current: Dayjs) => {
     return current && current < dayjs().startOf('day');
   };
-  
-  // Mock function to calculate price difference
-  const calculatePriceDifference = () => {
-    if (!dateRange || !dateRange[0] || !dateRange[1]) return;
-    
-    // Calculate original stay duration
-    const originalCheckIn = dayjs(booking.checkInDate);
-    const originalCheckOut = dayjs(booking.checkOutDate);
-    const originalDuration = originalCheckOut.diff(originalCheckIn, 'day');
-    
-    // Calculate new stay duration
-    const newDuration = dateRange[1].diff(dateRange[0], 'day');
-    
-    // Mock room rates
-    const getRoomRate = (typeCode: string) => {
-      switch (typeCode) {
-        case 'DLX': return 220;
-        case 'SUI': return 280;
-        case 'EXE': return 350;
-        case 'FAM': return 250;
-        default: return 180; // STD
-      }
-    };
-    
-    // Apply rate plan modifier
-    const getRatePlanModifier = (planCode: string) => {
-      switch (planCode) {
-        case 'AAA': return 0.9; // 10% discount
-        case 'PKG': return 1.1; // 10% premium
-        case 'WKD': return 1.2; // 20% premium
-        default: return 1.0; // BAR
-      }
-    };
-    
-    // Calculate costs
-    const originalRoomRate = getRoomRate(booking.room.room_type_code || "STD") * 
-                            getRatePlanModifier(booking.ratePlanCode || "BAR");
-    const newRoomRate = getRoomRate(roomTypeCode) * getRatePlanModifier(ratePlanCode);
-    
-    const originalCost = originalRoomRate * originalDuration;
-    const newCost = newRoomRate * newDuration;
-    
-    // Additional guest fee 
-    const originalGuestFee = (booking.adultCount || 2) > 2 ? ((booking.adultCount || 2) - 2) * 25 * originalDuration : 0;
-    const originalChildFee = (booking.childCount || 0) * 15 * originalDuration;
-    
-    const newGuestFee = adultCount > 2 ? (adultCount - 2) * 25 * newDuration : 0;
-    const newChildFee = childCount * 15 * newDuration;
-    
-    // Calculate final costs
-    const totalOriginalCost = originalCost + originalGuestFee + originalChildFee;
-    const totalNewCost = newCost + newGuestFee + newChildFee;
-    
-    // Calculate difference
-    const difference = totalNewCost - totalOriginalCost;
-    
-    // Set price difference state
-    setPriceDifference({
-      amount: Math.abs(difference),
-      type: difference > 0 ? "increase" : difference < 0 ? "decrease" : "none"
-    });
+
+  // --- Guests UI handlers ---
+  const handleGuestChange = (idx: number, field: keyof GuestDetails, value: string) => {
+    setGuests(gs => gs.map((g, i) => i === idx ? { ...g, [field]: value } : g));
   };
-  
-  // Handle form submission
+  const handleAddGuest = () => {
+    setGuests(gs => [
+      ...gs,
+      { firstName: "", lastName: "", dob: "", type: "adult" }
+    ]);
+  };
+  const handleRemoveGuest = (idx: number) => {
+    setGuests(gs => gs.filter((_, i) => i !== idx));
+  };
+
+  const getFinalPrice = async (
+    selectedRoom: any,
+    checkInDate: string,
+    checkOutDate: string,
+    guestData: any
+  ) => {
+    try {
+      const finalPriceResponse = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomRentPrice`,
+        {
+          hotelCode: "WINCLOUD",
+          invTypeCode: selectedRoom?.room_type,
+          startDate: checkInDate,
+          endDate: checkOutDate,
+          noOfChildrens: guestData?.children,
+          noOfAdults: guestData?.guests,
+          noOfRooms: guestData?.rooms,
+        },
+        { withCredentials: true }
+      );
+      if (finalPriceResponse.data.success) {
+        return finalPriceResponse.data.data.totalAmount;
+      } else {
+        throw new Error(finalPriceResponse.data.message);
+      }
+    } catch (error: any) {
+      throw new Error(error.message || "Error while getting final price");
+    }
+  };
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  // --- Submit logic ---
   const handleSubmitAmendment = async () => {
     if (!dateRange || !dateRange[0] || !dateRange[1]) {
       setAmendmentMessage({
@@ -200,144 +348,138 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
       });
       return;
     }
-    
-    setLoading(true);
-    
-    try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Create amendment data in a format similar to your XML structure
-      const amendedData = {
-        // Reservation info
-        reservationId: booking._id,
-        status: "Modify",
-        
-        // Room stay info
-        propertyInfo: {
-          hotelCode: booking.property._id,
-          hotelName: booking.property.property_name
-        },
-        
-        // Plan info
-        ratePlan: {
-          ratePlanCode: ratePlanCode,
-          ratePlanName: ratePlanName
-        },
-        
-        // Room info
-        roomType: {
-          roomTypeCode: roomTypeCode,
-          roomTypeName: roomType,
-          numberOfUnits: 1
-        },
-        
-        // Guest counts
-        guestCounts: {
-          adultCount: adultCount,
-          childCount: childCount
-        },
-        
-        // Dates
-        timeSpan: {
-          start: dateRange[0].format('YYYY-MM-DD'),
-          end: dateRange[1].format('YYYY-MM-DD')
-        },
-        
-        // Rate info
-        rateInfo: {
-          totalBeforeTax: booking.amount + (priceDifference.type === "increase" ? priceDifference.amount : -priceDifference.amount),
-          currency: "INR"
-        },
-        
-        // Comments
-        comments: specialRequests,
-        
-        // Modification info
-        modificationReason: getModificationReason(),
-        modificationDate: new Date().toISOString()
-      };
-      
-      // Show success message
-      let successMsg = '';
-      if (priceDifference.type === "increase") {
-        successMsg = t('BookingTabs.AmendReservationModal.success.additionalPayment', {
-          amount: priceDifference.amount.toFixed(2)
-        });
-      } else if (priceDifference.type === "decrease") {
-        successMsg = t('BookingTabs.AmendReservationModal.success.refundProcessed', {
-          amount: priceDifference.amount.toFixed(2)
-        });
-      } else {
-        successMsg = t('BookingTabs.AmendReservationModal.success.noChange');
+    let valid = true;
+    const newErrors: { [key: string]: string } = {};
+
+    // Validate Date Range
+    if (!dateRange || !dateRange[0] || !dateRange[1]) {
+      newErrors["dateRange"] = t('BookingTabs.AmendReservationModal.errors.selectValidDates');
+      valid = false;
+    } else if (dateRange[0].isSame(dateRange[1], 'day') || dateRange[0].isAfter(dateRange[1], 'day')) {
+      newErrors["dateRange"] = t('BookingTabs.AmendReservationModal.errors.invalidDateRange');
+      valid = false;
+    }
+
+    // Validate Guests
+    guests.forEach((guest, idx) => {
+      if (!guest.firstName || !/^[A-Za-z\s]+$/.test(guest.firstName)) {
+        newErrors[`firstName-${idx}`] = t('BookingTabs.AmendReservationModal.errors.invalidFirstName');
+        valid = false;
       }
-      
+      if (!guest.lastName || !/^[A-Za-z\s]+$/.test(guest.lastName)) {
+        newErrors[`lastName-${idx}`] = t('BookingTabs.AmendReservationModal.errors.invalidLastName');
+        valid = false;
+      }
+      if (!guest.dob) {
+        newErrors[`dob-${idx}`] = t('BookingTabs.AmendReservationModal.errors.dobRequired');
+        valid = false;
+      }
+    });
+
+    // Validate Room Type and Rate Plan (optional, assuming they are required)
+    if (!roomTypeCode) {
+      newErrors["roomTypeCode"] = t('BookingTabs.AmendReservationModal.errors.selectRoomType');
+      valid = false;
+    }
+    if (!ratePlanCode) {
+      newErrors["ratePlanCode"] = t('BookingTabs.AmendReservationModal.errors.selectRatePlan');
+      valid = false;
+    }
+
+    setErrors(newErrors);
+
+    if (!valid) {
+      setAmendmentMessage({
+        type: 'error',
+        text: t('BookingTabs.AmendReservationModal.errors.correctFormErrors'),
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const guestData = {
+        rooms: guestBreakdown.rooms,
+        guests: guestBreakdown.guests,
+        children: guestBreakdown.children,
+        infants: guestBreakdown.infants,
+      };
+
+      const finalPrice = await getFinalPrice(
+        { room_type: roomTypeCode },
+        dateRange[0].format('YYYY-MM-DD'),
+        dateRange[1].format('YYYY-MM-DD'),
+        guestData
+      );
+
+      const amendedData = {
+        reservationId: booking.reservationId,
+        hotelCode: booking.hotelCode,
+        hotelName: booking.hotelName,
+        ratePlanCode: ratePlanCode,
+        numberOfRooms: guestBreakdown.rooms,
+        roomTypeCode: roomTypeCode,
+        roomTotalPrice: finalPrice,
+        currencyCode: booking.currencyCode,
+        email: booking.email,
+        phone: booking.phone,
+        checkInDate: dateRange[0].format('YYYY-MM-DD'),
+        checkOutDate: dateRange[1].format('YYYY-MM-DD'),
+        guests: guests.map(g => ({
+          firstName: g.firstName,
+          lastName: g.lastName,
+          dob: g.dob || ""
+        })),
+      };
+
+      const token = Cookies.get("accessToken");
+
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/booking/update-reservation/${booking.reservationId}`,
+        amendedData,
+        {
+          withCredentials: true,
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          }
+        }
+      );
+
       setAmendmentMessage({
         type: 'success',
-        text: t('BookingTabs.AmendReservationModal.success.reservationAmended') + ' ' + successMsg
+        text: t('BookingTabs.AmendReservationModal.success.reservationAmended'),
       });
-      
-      // Notify parent component
+
       setTimeout(() => {
         onAmendComplete(booking._id, amendedData);
       }, 2000);
-      
-    } catch (error) {
-      console.error('Error amending booking:', error);
+
+    } catch (error: any) {
       setAmendmentMessage({
         type: 'error',
-        text: t('BookingTabs.AmendReservationModal.errors.unableToAmend')
+        text: error.message || t('BookingTabs.AmendReservationModal.errors.unableToAmend'),
       });
     } finally {
       setLoading(false);
     }
   };
-  
-  // Generate modification reason based on changes
-  const getModificationReason = () => {
-    const reasons = [];
-    
-    if (dateRange) {
-      const originalCheckIn = dayjs(booking.checkInDate);
-      const originalCheckOut = dayjs(booking.checkOutDate);
-      
-      if (!dateRange[0].isSame(originalCheckIn, 'day')) {
-        reasons.push(t('BookingTabs.AmendReservationModal.modifications.changedCheckIn'));
-      }
-      
-      if (!dateRange[1].isSame(originalCheckOut, 'day')) {
-        reasons.push(t('BookingTabs.AmendReservationModal.modifications.changedCheckOut'));
-      }
-    }
-    
-    if (roomTypeCode !== (booking.room.room_type_code || "STD")) {
-      reasons.push(t('BookingTabs.AmendReservationModal.modifications.changedRoomType', { roomType }));
-    }
-    
-    if (adultCount !== (booking.adultCount || 2) || childCount !== (booking.childCount || 0)) {
-      reasons.push(t('BookingTabs.AmendReservationModal.modifications.changedGuestCount'));
-    }
-    
-    if (ratePlanCode !== (booking.ratePlanCode || "BAR")) {
-      reasons.push(t('BookingTabs.AmendReservationModal.modifications.changedRatePlan', { ratePlanName }));
-    }
-    
-    return reasons.join(", ");
-  };
-  
+
+  // Existing reason logic - not used in backend payload, kept for UI
+  const getModificationReason = () => "";
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 font-noto-sans p-3 sm:p-5">
-      <div className="bg-tripswift-off-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-3 sm:p-4 md:p-6">
-        {/* Header */}
+      <div ref={modalContentRef} className="bg-tripswift-off-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-3 sm:p-4 md:p-6">        {/* Header */}
         <div className="text-center mb-4 sm:mb-6 md:mb-8">
           <h3 className="text-xl sm:text-2xl font-tripswift-bold text-tripswift-black">
             {t('BookingTabs.AmendReservationModal.title')}
           </h3>
           <p className="text-sm sm:text-base text-tripswift-black/60 mt-1 sm:mt-2 max-w-lg mx-auto">
-            {t('BookingTabs.AmendReservationModal.subtitle', { propertyName: booking.property.property_name })}
+            {booking.hotelName}
           </p>
         </div>
-        
+
         {/* Original booking details */}
         <div className="bg-gradient-to-r from-tripswift-blue/10 to-tripswift-blue/5 rounded-xl p-3 sm:p-4 md:p-5 mb-4 sm:mb-6">
           <h4 className="text-base sm:text-lg font-tripswift-bold text-tripswift-blue mb-3 sm:mb-4 flex items-center">
@@ -365,25 +507,8 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                   </p>
                 </div>
               </div>
-              
-              <div className="flex items-start">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 sm:mr-3 shadow-sm flex-shrink-0">
-                  <Users className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
-                </div>
-                <div>
-                  <p className="text-xs sm:text-sm text-tripswift-black/60 font-tripswift-medium">
-                    {t('BookingTabs.AmendReservationModal.guests')}
-                  </p>
-                  <p className="text-sm sm:text-base text-tripswift-black font-tripswift-medium">
-                    {t('BookingTabs.AmendReservationModal.guestsCount', {
-                      adults: booking.adultCount || 2, 
-                      children: booking.childCount || 0
-                    })}
-                  </p>
-                </div>
-              </div>
             </div>
-            
+
             {/* Right column */}
             <div className="space-y-3 sm:space-y-4">
               <div className="flex items-start">
@@ -395,14 +520,11 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                     {t('BookingTabs.AmendReservationModal.roomDetails')}
                   </p>
                   <p className="text-sm sm:text-base text-tripswift-black font-tripswift-medium">
-                    {booking.room.room_name}
-                  </p>
-                  <p className="text-[10px] sm:text-xs text-tripswift-black/50 mt-0.5 sm:mt-1">
-                    {booking.room.room_type}
+                    {roomTypeCode}
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-start">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 sm:mr-3 shadow-sm flex-shrink-0">
                   <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
@@ -412,17 +534,17 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                     {t('BookingTabs.AmendReservationModal.ratePlan')}
                   </p>
                   <p className="text-sm sm:text-base text-tripswift-black font-tripswift-medium">
-                    {booking.ratePlanName || t('BookingTabs.AmendReservationModal.bestAvailableRate')}
+                    {ratePlanCode}
                   </p>
-                  <p className="text-[10px] sm:text-xs text-tripswift-black/50 mt-0.5 sm:mt-1">
-                    ₹{booking.amount.toFixed(2)} {t('BookingTabs.AmendReservationModal.total')}
-                  </p>
+                  {/* <p className="text-[10px] sm:text-xs text-tripswift-black/50 mt-0.5 sm:mt-1">
+                    ₹{booking.totalAmount.toFixed(2)} {t('BookingTabs.AmendReservationModal.total')}
+                  </p> */}
                 </div>
               </div>
             </div>
           </div>
         </div>
-        
+
         {/* Amendment type selector */}
         <div className="mb-4 sm:mb-6">
           <h4 className="font-tripswift-medium text-tripswift-black mb-2 sm:mb-3 text-sm sm:text-base">
@@ -433,167 +555,198 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
               onClick={() => setAmendmentType("dates")}
               className={`
                 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border transition-all duration-300 text-xs sm:text-sm
-                ${amendmentType === "dates" 
+                ${amendmentType === "dates"
                   ? "bg-tripswift-blue text-tripswift-off-white border-tripswift-blue"
-                  :"bg-tripswift-off-white text-tripswift-black/70 border-gray-200 hover:border-tripswift-blue/50 hover:bg-tripswift-blue/5"}
+                  : "bg-tripswift-off-white text-tripswift-black/70 border-gray-200 hover:border-tripswift-blue/50 hover:bg-tripswift-blue/5"}
               `}
             >
               <CalendarDays className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <span className="font-tripswift-medium">{t('BookingTabs.AmendReservationModal.amendmentTypes.dates')}</span>
             </button>
-            
             <button
               onClick={() => setAmendmentType("guests")}
               className={`
                 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border transition-all text-xs sm:text-sm
-                ${amendmentType === "guests" 
-                  ? "bg-tripswift-blue text-white border-tripswift-blue" 
+                ${amendmentType === "guests"
+                  ? "bg-tripswift-blue text-white border-tripswift-blue"
                   : "bg-white text-tripswift-black/70 border-gray-200 hover:border-tripswift-blue/50 hover:bg-tripswift-blue/5"}
               `}
             >
               <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <span className="font-tripswift-medium">{t('BookingTabs.AmendReservationModal.amendmentTypes.guests')}</span>
             </button>
-            
-            <button
+            {/* <button
               onClick={() => setAmendmentType("room")}
               className={`
                 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border transition-all text-xs sm:text-sm
-                ${amendmentType === "room" 
-                  ? "bg-tripswift-blue text-white border-tripswift-blue" 
+                ${amendmentType === "room"
+                  ? "bg-tripswift-blue text-white border-tripswift-blue"
                   : "bg-white text-tripswift-black/70 border-gray-200 hover:border-tripswift-blue/50 hover:bg-tripswift-blue/5"}
               `}
             >
               <BedDouble className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <span className="font-tripswift-medium">{t('BookingTabs.AmendReservationModal.amendmentTypes.roomType')}</span>
-            </button>
-            
-            <button
+            </button> */}
+            {/* <button
               onClick={() => setAmendmentType("requests")}
               className={`
                 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border transition-all text-xs sm:text-sm
-                ${amendmentType === "requests" 
-                  ? "bg-tripswift-blue text-white border-tripswift-blue" 
+                ${amendmentType === "room"
+                  ? "bg-tripswift-blue text-white border-tripswift-blue"
                   : "bg-white text-tripswift-black/70 border-gray-200 hover:border-tripswift-blue/50 hover:bg-tripswift-blue/5"}
               `}
             >
               <ClipboardEdit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <span className="font-tripswift-medium">{t('BookingTabs.AmendReservationModal.amendmentTypes.specialRequests')}</span>
-            </button>
+            </button> */}
           </div>
         </div>
-        
+
         {/* Amendment form fields */}
         <div className="bg-tripswift-off-white border border-gray-200 rounded-xl shadow-sm p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 transition duration-300">
           {/* Dates Amendment Form */}
           {amendmentType === "dates" && (
-            <div className="space-y-3 sm:space-y-5">
-              <div className="flex items-center gap-2 mb-2 sm:mb-4">
-                <CalendarDays className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
-                <h4 className="text-base sm:text-lg font-tripswift-bold text-tripswift-black">
+            <div className="space-y-4 sm:space-y-5 bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-tripswift-blue/20">
+              <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                <CalendarDays className="h-5 w-5 text-tripswift-blue flex-shrink-0" />
+                <h4 className="text-lg sm:text-xl font-tripswift-bold text-tripswift-black">
                   {t('BookingTabs.AmendReservationModal.changeDates')}
                 </h4>
               </div>
-              
-              <div>
-                <label className="block text-xs sm:text-sm font-tripswift-medium text-tripswift-black/70 mb-1 sm:mb-2">
+              <div className="relative">
+                <label className="block text-sm font-tripswift-medium text-tripswift-black/70 mb-2">
                   {t('BookingTabs.AmendReservationModal.selectNewDates')}
                 </label>
-                <RangePicker
-                  value={dateRange}
-                  onChange={(dates) => setDateRange(dates as [Dayjs, Dayjs])}
-                  disabledDate={disabledDate}
-                  format="YYYY-MM-DD"
-                  className="w-full rounded-lg border-gray-200 py-1.5 sm:py-2 hover:border-tripswift-blue focus:border-tripswift-blue focus:ring focus:ring-tripswift-blue/20"
-                  style={{ height: '40px', fontSize: 'inherit' }}
-                  placeholder={[
-                    t('BookingTabs.AmendReservationModal.checkInDate'),
-                    t('BookingTabs.AmendReservationModal.checkOutDate')
-                  ]}
-                />
+                <div className="relative flex items-center gap-2 bg-tripswift-off-white rounded-lg p-2 border border-tripswift-blue/20 hover:border-tripswift-blue/50 transition-colors">
+                  <Calendar className="h-4 w-4 text-tripswift-blue/70 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <RangePicker
+                    value={dateRange}
+                    onChange={(dates) => {
+                      setDateRange(dates as [Dayjs, Dayjs]);
+                      setErrors((prev) => ({ ...prev, dateRange: '' }));
+                    }}
+                    disabledDate={current => {
+                      if (!booking.checkInDate) return false;
+                      const minDate = dayjs(booking.checkInDate).startOf('day');
+                      return current && current < minDate;
+                    }}
+                    format="DD/MM/YYYY"
+                    className="w-full pl-10 bg-transparent border-none focus:ring-0 hover:bg-tripswift-blue/5 transition-colors"
+                    style={{ height: '48px', fontSize: '16px', fontFamily: 'Noto Sans, sans-serif' }}
+                    placeholder={[
+                      t('BookingTabs.AmendReservationModal.checkInDate'),
+                      t('BookingTabs.AmendReservationModal.checkOutDate')
+                    ]}
+                    suffixIcon={null}
+                  />
+                </div>
+                {errors["dateRange"] && (
+                  <p className="text-xs text-red-600 mt-1">{errors["dateRange"]}</p>
+                )}
               </div>
-              
               {dateRange && dateRange[0] && dateRange[1] && (
-                <div className="px-3 sm:px-4 py-2 sm:py-3 bg-tripswift-blue/5 rounded-lg text-xs sm:text-sm text-tripswift-blue/90 font-tripswift-medium flex items-start sm:items-center">
-                  <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 mt-0.5 sm:mt-0 flex-shrink-0" />
+                <div className="px-4 py-3 bg-tripswift-blue/10 rounded-lg text-sm text-tripswift-blue/90 font-tripswift-medium flex items-center">
+                  <Clock className="h-4 w-4 text-tripswift-blue mr-2 flex-shrink-0" />
                   <div>
                     {t('BookingTabs.AmendReservationModal.stayDuration', {
                       count: dateRange[1].diff(dateRange[0], 'day')
                     })}
-                    {dateRange[1].diff(dayjs(booking.checkOutDate), 'day') > 0 && (
-                      <span className="block sm:inline sm:ml-2 text-tripswift-blue/70">
-                        {t('BookingTabs.AmendReservationModal.nightsAdded', {
-                          count: dateRange[1].diff(dayjs(booking.checkOutDate), 'day')
-                        })}
-                      </span>
-                    )}
-                    {dateRange[1].diff(dayjs(booking.checkOutDate), 'day') < 0 && (
-                      <span className="block sm:inline sm:ml-2 text-tripswift-blue/70">
-                        {t('BookingTabs.AmendReservationModal.nightsReduced', {
-                          count: Math.abs(dateRange[1].diff(dayjs(booking.checkOutDate), 'day'))
-                        })}
-                      </span>
-                    )}
                   </div>
                 </div>
               )}
             </div>
           )}
-          
+
           {/* Guests Amendment Form */}
           {amendmentType === "guests" && (
             <div className="space-y-3 sm:space-y-5">
-              <div className="flex items-center gap-2 mb-2 sm:mb-4">
-                <Users className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
-                <h4 className="text-base sm:text-lg font-tripswift-bold text-tripswift-black">
-                  {t('BookingTabs.AmendReservationModal.changeGuests')}
-                </h4>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                <div>
-                  <label className="block text-xs sm:text-sm font-tripswift-medium text-tripswift-black/70 mb-1 sm:mb-2">
-                    {t('BookingTabs.AmendReservationModal.numberOfAdults')}
-                  </label>
-                  <Select
-                    value={adultCount}
-                    onChange={value => setAdultCount(value)}
-                    className="w-full rounded-lg"
-                    size={window.innerWidth < 640 ? "middle" : "large"}
-                  >
-                    {[1, 2, 3, 4, 5, 6].map(num => (
-                      <Option key={`adult-${num}`} value={num}>
-                        {num} {t('BookingTabs.AmendReservationModal.adult', { count: num })}
-                      </Option>
-                    ))}
-                  </Select>
-                </div>
-                <div>
-                  <label className="block text-xs sm:text-sm font-tripswift-medium text-tripswift-black/70 mb-1 sm:mb-2">
-                    {t('BookingTabs.AmendReservationModal.numberOfChildren')}
-                  </label>
-                  <Select
-                    value={childCount}
-                    onChange={value => setChildCount(value)}
-                    className="w-full rounded-lg"
-                    size={window.innerWidth < 640 ? "middle" : "large"}
-                  >
-                    {[0, 1, 2, 3, 4].map(num => (
-                      <Option key={`child-${num}`} value={num}>
-                        {num} {t('BookingTabs.AmendReservationModal.child', { count: num })}
-                      </Option>
-                    ))}
-                  </Select>
-                </div>
-              </div>
-              
-              <div className="px-3 sm:px-4 py-2 sm:py-3 bg-tripswift-blue/5 rounded-lg text-xs sm:text-sm text-tripswift-blue/90 font-tripswift-medium flex items-start">
-                <Info className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 mt-0.5 flex-shrink-0" />
-                <span>{t('BookingTabs.AmendReservationModal.guestsNote')}</span>
+              <GuestBox
+                onChange={(breakdown) => setGuestBreakdown(breakdown)}
+              />
+              <div className="flex flex-col gap-3 mt-4">
+                {guests.map((guest, idx) => {
+                  const guestType: "adult" | "child" | "infant" = guest.type || getGuestType(guest.dob);
+                  return (
+                    <div key={idx} className="flex flex-col sm:flex-row gap-2 border border-gray-200 rounded-md p-3 bg-white relative">
+                      <div className="flex-1 flex flex-col sm:flex-row gap-2">
+                        <div className="flex-1">
+                          <Input
+                            className="flex-1"
+                            placeholder={guestType === "adult" ? "Adult First Name" : guestType === "child" ? "Child First Name" : "Infant First Name"}
+                            value={guest.firstName}
+                            onChange={e => {
+                              handleGuestChange(idx, 'firstName', e.target.value);
+                              setErrors(prev => ({ ...prev, [`firstName-${idx}`]: '' }));
+                            }}
+                            size="large"
+                          />
+                          {errors[`firstName-${idx}`] && (
+                            <p className="text-xs text-red-600 mt-1">{errors[`firstName-${idx}`]}</p>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <Input
+                            className="flex-1"
+                            placeholder={guestType === "adult" ? "Adult Last Name" : guestType === "child" ? "Child Last Name" : "Infant Last Name"}
+                            value={guest.lastName}
+                            onChange={e => {
+                              handleGuestChange(idx, 'lastName', e.target.value);
+                              setErrors(prev => ({ ...prev, [`lastName-${idx}`]: '' }));
+                            }}
+                            size="large"
+                          />
+                          {errors[`lastName-${idx}`] && (
+                            <p className="text-xs text-red-600 mt-1">{errors[`lastName-${idx}`]}</p>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <DatePicker
+                            className="flex-1 w-full"
+                            placeholder="Date of Birth"
+                            value={guest.dob ? dayjs(guest.dob) : null}
+                            onChange={date => {
+                              handleGuestChange(idx, 'dob', date?.format('YYYY-MM-DD') || "");
+                              setErrors(prev => ({ ...prev, [`dob-${idx}`]: '' }));
+                            }}
+                            disabledDate={current => {
+                              if (!current) return false;
+                              if (guestType === "infant") {
+                                return current.isBefore(dayjs().subtract(2, "year"), "day") || current.isAfter(dayjs(), "day");
+                              } else if (guestType === "child") {
+                                return current.isBefore(dayjs().subtract(13, "year"), "day") || current.isAfter(dayjs().subtract(2, "year"), "day");
+                              } else {
+                                return current.isAfter(dayjs().subtract(13, "year"), "day");
+                              }
+                            }}
+                            format="DD/MM/YYYY"
+                            size="large"
+                          />
+                          {errors[`dob-${idx}`] && (
+                            <p className="text-xs text-red-600 mt-1">{errors[`dob-${idx}`]}</p>
+                          )}
+                        </div>
+                      </div>
+                      {/* {guests.length > 1 && (
+            <button
+              onClick={() => handleRemoveGuest(idx)}
+              className="absolute top-2 right-2 text-tripswift-black/50 hover:text-tripswift-black"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )} */}
+                    </div>
+                  );
+                })}
+                {/* <Button
+      onClick={handleAddGuest}
+      className="mt-2 bg-tripswift-blue text-tripswift-off-white hover:bg-tripswift-blue/90"
+    >
+      {t('BookingTabs.AmendReservationModal.addGuest')}
+    </Button> */}
               </div>
             </div>
           )}
-          
+
           {/* Room Type Amendment Form */}
           {amendmentType === "room" && (
             <div className="space-y-3 sm:space-y-5">
@@ -603,57 +756,15 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                   {t('BookingTabs.AmendReservationModal.changeRoomType')}
                 </h4>
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                <div>
-                  <label className="block text-xs sm:text-sm font-tripswift-medium text-tripswift-black/70 mb-1 sm:mb-2">
-                    {t('BookingTabs.AmendReservationModal.roomType')}
-                  </label>
-                  <Select
-                    value={roomTypeCode}
-                    onChange={value => {
-                      setRoomTypeCode(value);
-                      const selectedRoom = availableRoomTypes.find(r => r.code === value);
-                      if (selectedRoom) setRoomType(selectedRoom.name);
-                    }}
-                    className="w-full rounded-lg"
-                    size={window.innerWidth < 640 ? "middle" : "large"}
-                  >
-                    {availableRoomTypes.map(type => (
-                      <Option key={type.code} value={type.code}>{type.name}</Option>
-                    ))}
-                  </Select>
-                </div>
-                <div>
-                  <label className="block text-xs sm:text-sm font-tripswift-medium text-tripswift-black/70 mb-1 sm:mb-2">
-                    {t('BookingTabs.AmendReservationModal.ratePlan')}
-                  </label>
-                  <Select
-                    value={ratePlanCode}
-                    onChange={value => {
-                      setRatePlanCode(value);
-                      const selectedPlan = availableRatePlans.find(p => p.code === value);
-                      if (selectedPlan) setRatePlanName(selectedPlan.name);
-                    }}
-                    className="w-full rounded-lg"
-                    size={window.innerWidth < 640 ? "middle" : "large"}
-                  >
-                    {availableRatePlans.map(plan => (
-                      <Option key={plan.code} value={plan.code}>{plan.name}</Option>
-                    ))}
-                  </Select>
-                </div>
-              </div>
-              
               <div className="px-3 sm:px-4 py-2 sm:py-3 bg-tripswift-blue/5 rounded-lg text-xs sm:text-sm text-tripswift-blue/90 font-tripswift-medium flex items-start">
                 <Info className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 mt-0.5 flex-shrink-0" />
                 <span>{t('BookingTabs.AmendReservationModal.roomTypeNote')}</span>
               </div>
             </div>
           )}
-          
+
           {/* Special Requests Amendment Form */}
-          {amendmentType === "requests" && (
+          {/* {amendmentType === "requests" && (
             <div className="space-y-3 sm:space-y-5">
               <div className="flex items-center gap-2 mb-2 sm:mb-4">
                 <ClipboardEdit className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
@@ -661,7 +772,6 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                   {t('BookingTabs.AmendReservationModal.updateSpecialRequests')}
                 </h4>
               </div>
-              
               <div>
                 <label className="block text-xs sm:text-sm font-tripswift-medium text-tripswift-black/70 mb-1 sm:mb-2">
                   {t('BookingTabs.AmendReservationModal.specialRequestsLabel')}
@@ -674,83 +784,39 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                   className="w-full rounded-lg border-gray-200 hover:border-tripswift-blue focus:border-tripswift-blue focus:ring focus:ring-tripswift-blue/20 text-sm"
                 />
               </div>
-              
               <div className="px-3 sm:px-4 py-2 sm:py-3 bg-tripswift-blue/5 rounded-lg text-xs sm:text-sm text-tripswift-blue/90 font-tripswift-medium flex items-start">
                 <Info className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 mt-0.5 flex-shrink-0" />
                 <span>{t('BookingTabs.AmendReservationModal.specialRequestsNote')}</span>
               </div>
             </div>
-          )}
-        </div>
-        
-        {/* Price difference */}
-        {priceDifference.type !== "none" && (
-          <div className={`rounded-xl shadow-sm overflow-hidden mb-4 sm:mb-6`}>
-            <div className={`py-2 sm:py-3 px-3 sm:px-4 ${
-              priceDifference.type === "increase" 
-                ? "bg-amber-500 text-white" 
-                : "bg-green-500 text-white"
-            }`}>
-              <h4 className="font-tripswift-bold text-sm sm:text-base">
-                {t('BookingTabs.AmendReservationModal.priceAdjustment')}
-              </h4>
-            </div>
-            
-            <div className={`p-3 sm:p-5 border border-t-0 ${
-              priceDifference.type === "increase"
-                ? "border-amber-200 bg-amber-50" 
-                : "border-green-200 bg-green-50"
-            }`}>
-              <div className="flex items-center gap-3 sm:gap-4">
-                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center ${
-                  priceDifference.type === "increase"
-                    ? "bg-amber-100 text-amber-700" 
-                    : "bg-green-100 text-green-700"
-                }`}>
-                  <BadgeDollarSign className="h-5 w-5 sm:h-6 sm:w-6" />
-                </div>
-                
-                <div>
-                  {priceDifference.type === "increase" ? (
-                    <>
-                      <p className="text-sm sm:text-base text-tripswift-black font-tripswift-medium mb-0.5 sm:mb-1">
-                        {t('BookingTabs.AmendReservationModal.additionalPayment')}
-                      </p>
-                      <p className="text-xs sm:text-sm text-tripswift-black/70">
-                        {t('BookingTabs.AmendReservationModal.additionalChargeExplanation', {
-                          amount: priceDifference.amount.toFixed(2)
-                        })}
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <p className="text-sm sm:text-base text-tripswift-black font-tripswift-medium mb-0.5 sm:mb-1">
-                        {t('BookingTabs.AmendReservationModal.refundToBeProcessed')}
-                      </p>
-                      <p className="text-xs sm:text-sm text-tripswift-black/70">
-                        {t('BookingTabs.AmendReservationModal.refundExplanation', {
-                          amount: priceDifference.amount.toFixed(2)
-                        })}
-                      </p>
-                    </>
-                  )}
-                </div>
+          )} */}
+
+          {/* Display Final Price */}
+          {finalPrice && (
+            <div className="mt-4 p-3 sm:p-4 bg-tripswift-blue/10 rounded-lg border border-tripswift-blue/20 flex items-center gap-2">
+              <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue flex-shrink-0" />
+              <div>
+                {/* <p className="text-xs sm:text-sm text-tripswift-black/70 font-tripswift-medium">
+                  {t('BookingTabs.AmendReservationModal.estimatedTotal')}
+                </p> */}
+                <p className="text-base sm:text-lg font-tripswift-bold text-tripswift-black">
+                  {finalPrice.currencyCode} {finalPrice.totalAmount.toFixed(2)}
+                </p>
               </div>
             </div>
-          </div>
-        )}
-        
+          )}
+        </div>
+
         {/* Amendment policies */}
         <div className="bg-gray-50 rounded-xl border border-gray-200 mb-4 sm:mb-6 overflow-hidden">
           <div className="py-2 sm:py-3 px-3 sm:px-4 bg-gray-100 border-b border-gray-200">
-            <div className="flex items-center gap-1.5 sm:gap-2"> 
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <ShieldAlert className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-tripswift-black/60" />
               <h4 className="font-tripswift-bold text-sm sm:text-base text-tripswift-black/80">
                 {t('BookingTabs.AmendReservationModal.amendmentPolicies')}
               </h4>
             </div>
           </div>
-          
           <div className="p-3 sm:p-5">
             <ul className="space-y-2 sm:space-y-2.5 text-xs sm:text-sm text-tripswift-black/70">
               <li className="flex items-start gap-2">
@@ -772,23 +838,21 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
             </ul>
           </div>
         </div>
-        
+
         {/* Message display area */}
         {amendmentMessage && (
-          <div className={`mb-4 sm:mb-6 p-3 sm:p-4 rounded-xl border flex items-start sm:items-center gap-3 sm:gap-4 ${
-            amendmentMessage.type === 'success' 
-              ? 'bg-green-50 border-green-200 text-green-700' 
-              : amendmentMessage.type === 'warning' 
-                ? 'bg-amber-50 border-amber-200 text-amber-700'
-                : 'bg-red-50 border-red-200 text-red-700'
-          }`}>
-            <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-              amendmentMessage.type === 'success' 
-                ? 'bg-green-100' 
-                : amendmentMessage.type === 'warning' 
-                  ? 'bg-amber-100'
-                  : 'bg-red-100'
+          <div className={`mb-4 sm:mb-6 p-3 sm:p-4 rounded-xl border flex items-start sm:items-center gap-3 sm:gap-4 ${amendmentMessage.type === 'success'
+            ? 'bg-green-50 border-green-200 text-green-700'
+            : amendmentMessage.type === 'warning'
+              ? 'bg-amber-50 border-amber-200 text-amber-700'
+              : 'bg-red-50 border-red-200 text-red-700'
             }`}>
+            <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${amendmentMessage.type === 'success'
+              ? 'bg-green-100'
+              : amendmentMessage.type === 'warning'
+                ? 'bg-amber-100'
+                : 'bg-red-100'
+              }`}>
               {amendmentMessage.type === 'success' ? (
                 <Check className="h-4 w-4 sm:h-5 sm:w-5" />
               ) : (
@@ -798,18 +862,17 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
             <p className="text-xs sm:text-sm font-tripswift-medium">{amendmentMessage.text}</p>
           </div>
         )}
-        
+
         {/* Action buttons */}
         <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
-          <button 
+          <button
             onClick={onClose}
             disabled={loading}
             className="px-4 sm:px-6 py-2.5 sm:py-3 border border-gray-200 rounded-lg sm:rounded-xl text-tripswift-black/80 hover:bg-gray-50 font-tripswift-medium transition-colors text-sm sm:text-base mt-2 sm:mt-0"
           >
             {t('BookingTabs.AmendReservationModal.cancel')}
           </button>
-          
-          <button 
+          <button
             onClick={handleSubmitAmendment}
             disabled={loading}
             className="px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-tripswift-blue to-[#054B8F] hover:from-[#054B8F] hover:to-tripswift-blue text-tripswift-off-white rounded-lg sm:rounded-xl font-tripswift-medium shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden flex items-center justify-center text-sm sm:text-base"

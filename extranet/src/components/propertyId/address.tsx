@@ -132,8 +132,8 @@ export function Address({
         return !stringValue.trim()
           ? "Zip Code is required"
           : !/^\d{6}$/.test(stringValue)
-          ? "Zip Code must be 6 digits"
-          : null;
+            ? "Zip Code must be 6 digits"
+            : null;
       default:
         return null;
     }
@@ -299,11 +299,9 @@ export function Address({
           name={name}
           value={value}
           onChange={onChange}
-          className={`block appearance-none w-full border ${
-            error ? "border-destructive" : "border-input"
-          } bg-background py-2 px-3 pr-8 rounded-md leading-tight focus:outline-none focus:ring-2 ${
-            error ? "focus:ring-destructive" : "focus:ring-primary"
-          }`}
+          className={`block appearance-none w-full border ${error ? "border-destructive" : "border-input"
+            } bg-background py-2 px-3 pr-8 rounded-md leading-tight focus:outline-none focus:ring-2 ${error ? "focus:ring-destructive" : "focus:ring-primary"
+            }`}
         >
           <option value="">{placeholder}</option>
           {options.map((option) => (
@@ -333,9 +331,8 @@ export function Address({
             value={editedAddress?.address_line_1 || ""}
             onChange={handleValidatedInputChange}
             placeholder="Address Line 1"
-            className={`w-full ${
-              validationErrors.address_line_1 ? "border-destructive" : ""
-            }`}
+            className={`w-full ${validationErrors.address_line_1 ? "border-destructive" : ""
+              }`}
           />
           {validationErrors.address_line_1 && (
             <p className="text-destructive text-sm mt-1">
@@ -354,9 +351,8 @@ export function Address({
             value={editedAddress?.address_line_2 || ""}
             onChange={handleValidatedInputChange}
             placeholder="Address Line 1"
-            className={`w-full ${
-              validationErrors.address_line_2 ? "border-destructive" : ""
-            }`}
+            className={`w-full ${validationErrors.address_line_2 ? "border-destructive" : ""
+              }`}
           />
           {validationErrors.address_line_2 && (
             <p className="text-destructive text-sm mt-1">
@@ -375,9 +371,8 @@ export function Address({
             value={editedAddress?.landmark || ""}
             onChange={handleValidatedInputChange}
             placeholder="landmark"
-            className={`w-full ${
-              validationErrors.landmark ? "border-destructive" : ""
-            }`}
+            className={`w-full ${validationErrors.landmark ? "border-destructive" : ""
+              }`}
           />
           {validationErrors.landmark && (
             <p className="text-destructive text-sm mt-1">
@@ -443,11 +438,22 @@ export function Address({
             name="zip_code"
             value={editedAddress?.zip_code || ""}
             maxLength={6}
-            onChange={handleValidatedInputChange}
+            onChange={(e) => {
+              const digitsOnly = e.target.value.replace(/\D/g, '');
+              const syntheticEvent = {
+                target: {
+                  name: 'zip_code',
+                  value: digitsOnly
+                }
+              } as React.ChangeEvent<HTMLInputElement>;
+              handleValidatedInputChange(syntheticEvent);
+            }}
+            onInput={(e) => {
+              const target = e.target as HTMLInputElement;
+              target.value = target.value.replace(/\D/g, '');
+            }}
             placeholder="Zip Code"
-            className={`w-full ${
-              validationErrors.zip_code ? "border-destructive" : ""
-            }`}
+            className={`w-full ${validationErrors.zip_code ? "border-destructive" : ""}`}
           />
           {validationErrors.zip_code && (
             <p className="text-destructive text-sm mt-1">
@@ -472,9 +478,8 @@ export function Address({
             value={editedAddress?.address_line_1 || ""}
             onChange={handleValidatedInputChange}
             placeholder="Address Line 1"
-            className={`w-full ${
-              validationErrors.address_line_1 ? "border-destructive" : ""
-            }`}
+            className={`w-full ${validationErrors.address_line_1 ? "border-destructive" : ""
+              }`}
           />
           {validationErrors.address_line_1 && (
             <p className="text-destructive text-sm mt-1">
@@ -493,9 +498,8 @@ export function Address({
             value={editedAddress?.address_line_2 || ""}
             onChange={handleValidatedInputChange}
             placeholder="Address Line 2"
-            className={`w-full ${
-              validationErrors.address_line_2 ? "border-destructive" : ""
-            }`}
+            className={`w-full ${validationErrors.address_line_2 ? "border-destructive" : ""
+              }`}
           />
           {validationErrors.address_line_2 && (
             <p className="text-destructive text-sm mt-1">
@@ -578,9 +582,8 @@ export function Address({
             maxLength={6}
             onChange={handleValidatedInputChange}
             placeholder="Zip Code"
-            className={`w-full ${
-              validationErrors.zip_code ? "border-destructive" : ""
-            }`}
+            className={`w-full ${validationErrors.zip_code ? "border-destructive" : ""
+              }`}
           />
           {validationErrors.zip_code && (
             <p className="text-destructive text-sm mt-1">
@@ -668,61 +671,52 @@ export function Address({
           <div className="space-y-0">
             {address ? (
               <div className="">
-                <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">
-                    Address Line 1:
-                  </div>
-                  <div className="w-3/4 text-sm font-medium break-words overflow-hidden">
+                <div className="py-2 flex flex-col sm:flex-row sm:items-start">
+                  <div className="w-full sm:w-1/4 text-sm text-gray-500 sm:pr-2">Address Line 1</div>
+                  <div className="w-full sm:w-3/4 text-sm font-medium break-words sm:pl-2">
                     {address.address_line_1 || "N/A"}
                   </div>
                 </div>
-                <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">
-                    Address Line 2:
-                  </div>
-                  <div className="w-3/4  text-sm font-medium break-words overflow-hidden">
+                <div className="py-2 flex flex-col sm:flex-row sm:items-start">
+                  <div className="w-full sm:w-1/4 text-sm text-gray-500 sm:pr-2">Address Line 2</div>
+                  <div className="w-full sm:w-3/4 text-sm font-medium break-words sm:pl-2">
                     {address.address_line_2 || "N/A"}
                   </div>
                 </div>
-                <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">Landmark:</div>
-                  <div className="w-3/4  text-sm font-medium break-words overflow-hidden">
+                <div className="py-2 flex flex-col sm:flex-row sm:items-start">
+                  <div className="w-full sm:w-1/4 text-sm text-gray-500 sm:pr-2">Landmark</div>
+                  <div className="w-full sm:w-3/4 text-sm font-medium break-words sm:pl-2">
                     {address.landmark || "N/A"}
                   </div>
                 </div>
-                <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">City:</div>
-                  <div className="w-3/4  text-sm font-medium break-words overflow-hidden">
+                <div className="py-2 flex flex-col sm:flex-row sm:items-start">
+                  <div className="w-full sm:w-1/4 text-sm text-gray-500 sm:pr-2">City</div>
+                  <div className="w-full sm:w-3/4 text-sm font-medium break-words sm:pl-2">
                     {address.city || "N/A"}
                   </div>
                 </div>
-                <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">State:</div>
-                  <div className="w-3/4  text-sm font-medium break-words overflow-hidden">
-                    {states.find((s) => s.isoCode === address.state)?.name ||
-                      address.state ||
-                      "N/A"}
+                <div className="py-2 flex flex-col sm:flex-row sm:items-start">
+                  <div className="w-full sm:w-1/4 text-sm text-gray-500 sm:pr-2">State</div>
+                  <div className="w-full sm:w-3/4 text-sm font-medium break-words sm:pl-2">
+                    {states.find((s) => s.isoCode === address.state)?.name || address.state || "N/A"}
                   </div>
                 </div>
-                <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">Country:</div>
-                  <div className="w-3/4  text-sm font-medium break-words overflow-hidden">
-                    {countries.find((c) => c.isoCode === address.country)
-                      ?.name || "N/A"}
+                <div className="py-2 flex flex-col sm:flex-row sm:items-start">
+                  <div className="w-full sm:w-1/4 text-sm text-gray-500 sm:pr-2">Country</div>
+                  <div className="w-full sm:w-3/4 text-sm font-medium break-words sm:pl-2">
+                    {countries.find((c) => c.isoCode === address.country)?.name || "N/A"}
                   </div>
                 </div>
-                <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">Zip Code:</div>
-                  <div className="w-3/4  text-sm font-medium break-words overflow-hidden">
+                <div className="py-2 flex flex-col sm:flex-row sm:items-start">
+                  <div className="w-full sm:w-1/4 text-sm text-gray-500 sm:pr-2">Zip Code</div>
+                  <div className="w-full sm:w-3/4 text-sm font-medium break-words sm:pl-2">
                     {address.zip_code || "N/A"}
                   </div>
                 </div>
               </div>
             ) : (
               <div className="bg-muted/50 rounded-lg p-6 text-center">
-                <p className="text-muted-foreground">
-                  No address details found
-                </p>
+                <p className="text-muted-foreground">No address details found</p>
               </div>
             )}
           </div>

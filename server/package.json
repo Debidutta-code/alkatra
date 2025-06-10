@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
+    "clean":"rimraf ./dist",
     "dev": "nodemon index.ts",
     "clean": "rimraf ./dist",
     "build": "rimraf ./dist && tsc",

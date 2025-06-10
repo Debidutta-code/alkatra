@@ -730,14 +730,17 @@ export default function PropertyInfo({ onNext }: Props) {
               <Input
                 id="property_contact"
                 size={"md"}
-                variant={propertyContactError ? "error" : undefined}
+                variant={propertyContactError && "error"}
                 {...register("property_contact")}
-                type="text"
+                type="tel"
+                inputMode="numeric" 
+                pattern="[0-9]{10}" 
                 maxLength={10}
                 onChange={(e) => {
-                  const value = e.target.value;
+                  // Only allow numbers
+                  const value = e.target.value.replace(/\D/g, '');
                   if (value.length <= 10) {
-                    setValue("property_contact", value); // Update the form state
+                    setValue("property_contact", value);
                   }
                 }}
               />

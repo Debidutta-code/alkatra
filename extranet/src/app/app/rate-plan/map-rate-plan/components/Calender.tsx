@@ -86,7 +86,7 @@ export const Calendar: React.FC<CalendarProps> = ({
           key={day}
           onClick={() => handleDateClick(date)}
           className={`h-8 w-8 text-sm rounded hover:bg-blue-100 ${
-            isSelected ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'
+            isSelected ? 'bg-tripswift-blue text-white' : 'hover:bg-gray-100'
           }`}
         >
           {day}

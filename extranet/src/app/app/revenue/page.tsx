@@ -164,7 +164,7 @@ const RevenuePage: React.FC = () => {
                     <ol className="inline-flex items-center space-x-1 md:space-x-3">
                         <li className="inline-flex items-center">
                             <Link
-                                href="/app"
+                                href="/app/property"
                                 className="inline-flex items-center text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
                             >
                                 <Home className="w-4 h-4 mr-2" />

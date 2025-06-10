@@ -1,14 +1,25 @@
 import React from "react";
 import LoginForm from "./Login-form";
-type Props = {};
-export default function Login({}: Props) {
+
+export default function Login() {
   return (
-    <div className="flex ">
-      <div className="bg-[url('/assets/login-bg.jpg')] repeat-0 bg-cover h-screen lg:w-1/2 hidden lg:flex justify-center items-center min-h-screen" >
+    <div className="flex flex-col lg:flex-row w-full min-h-screen">
+      {/* Background Image Section - Hidden on mobile, visible on lg+ */}
+      <div 
+        className="hidden lg:block lg:w-1/2 bg-[url('/assets/login-bg.jpg')] bg-cover bg-center"
+        style={{
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          minHeight: '100vh'
+        }}
+      />
+      
+      {/* Form Section - Full width on mobile, half on desktop */}
+      <div className="w-full lg:w-1/2 flex justify-center items-center p-4 sm:p-8">
+        <div className="w-full max-w-md">
+          <LoginForm />
+        </div>
       </div>
-      <div className="px-4 py-24 md:px-14 lg:px-24 mx-8 my-8 md:place-content-center place-self-center md:place-items-center lg:w-1/2 md:w-1/2 lg:grid-cols-2 grid-cols-1 ">
-        <LoginForm />
-      </div>
-       </div>
+    </div>
   );
 }

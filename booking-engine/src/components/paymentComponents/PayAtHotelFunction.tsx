@@ -7,10 +7,38 @@ import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { Shield, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from '../../Redux/store';
+import { setGuestDetails } from '../../Redux/slices/pmsHotelCard.slice';
 
+interface Guest {
+  firstName: string;
+  lastName: string;
+  dob?: string;
+  type?: "adult" | "child" | "infant";
+}
 
 interface PayAtHotelProps {
-  bookingDetails: any;
+  bookingDetails: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    roomId: string;
+    propertyId: string;
+    checkIn: string;
+    checkOut: string;
+    amount: string;
+    userId?: string;
+    hotelName?: string;
+    ratePlanCode?: string;
+    roomType?: string;
+    rooms?: number;
+    adults?: number;
+    children?: number;
+    // infants: number;
+    currency?: string;
+    guests: Guest[];
+  };
 }
 
 const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
@@ -18,32 +46,33 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
   const stripe = useStripe();
   const elements = useElements();
   const router = useRouter();
+  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const auth = useSelector((state: any) => state.auth);
-  const token = auth?.token || auth?.accessToken; // Try both possible token names
-
+  const token = auth?.token || auth?.accessToken;
 
   // Validate booking details on component mount
   useEffect(() => {
-    // Add validation before proceeding
-    const requiredFields = [
+    const requiredFields: (keyof typeof bookingDetails)[] = [
       'firstName', 'lastName', 'email', 'phone',
       'roomId', 'propertyId', 'checkIn', 'checkOut', 'amount'
     ];
 
-    const missingFields = requiredFields.filter(field => !bookingDetails?.[field]);
+    const missingFields = requiredFields.filter(field => !bookingDetails[field]);
 
     if (missingFields.length > 0) {
       console.error('Missing required booking details:', missingFields);
       setValidationError(`Missing required booking information: ${missingFields.join(', ')}`);
+    } else if (!Array.isArray(bookingDetails.guests)) {
+      console.error('Guests data is not an array:', bookingDetails.guests);
+      setValidationError('Invalid guest information provided.');
     } else {
       setValidationError(null);
     }
 
-    // Log booking details for debugging (exclude sensitive info)
     console.log("PayAtHotel initialized with booking details:", {
       ...bookingDetails,
       stripeAvailable: !!stripe,
@@ -52,11 +81,9 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
     });
   }, [bookingDetails, stripe, elements, token]);
 
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    // Don't proceed if there are validation errors
     if (validationError) {
       setErrorMessage(validationError);
       return;
@@ -80,15 +107,16 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
         firstName: bookingDetails.firstName,
         lastName: bookingDetails.lastName,
         email: bookingDetails.email,
-        phone: bookingDetails.phone
+        phone: bookingDetails.phone,
+        guests: bookingDetails.guests
       });
-      // 1. Create a SetupIntent to securely store card details
+
       const setupIntentResponse = await createSetupIntent({
         firstName: bookingDetails.firstName,
         lastName: bookingDetails.lastName,
         email: bookingDetails.email,
         phone: bookingDetails.phone,
-        guests: bookingDetails.guests // Pass all guest details here
+        guests: bookingDetails.guests
       }, token);
 
       console.log("Setup intent response:", setupIntentResponse);
@@ -121,54 +149,52 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
       }
       console.log("Card setup successful, creating booking...");
 
-      // 3. Create the booking with stored card information
       const bookingPayload = {
-        data: {
-          guests: [{
-            firstName: bookingDetails.firstName,
-            lastName: bookingDetails.lastName,
-            email: bookingDetails.email,
-            phone: bookingDetails.phone
-          }],
-          roomAssociations: [{
-            roomId: bookingDetails.roomId
-          }],
-          bookingDetails: {
-            userId: bookingDetails.userId || "",
-            propertyId: bookingDetails.propertyId,
-            checkInDate: bookingDetails.checkIn,
-            checkOutDate: bookingDetails.checkOut,
-            // Add these fields if they exist in your booking details
-            rooms: bookingDetails.rooms,
-            adults: bookingDetails.adults,
-            children: bookingDetails.children
-          },
-          payment: {
-            amount: parseFloat(bookingDetails.amount),
-            currency: bookingDetails.currency || "INR",
-            method: "payAtHotel"
-          },
-          paymentInfo: {
-            paymentMethodId: setupIntent.payment_method,
-            setupIntentId: setupIntent.id
-          }
+        checkInDate: bookingDetails.checkIn,
+        checkOutDate: bookingDetails.checkOut,
+        hotelCode: "WINCLOUD",
+        hotelName: bookingDetails.hotelName || "Unknown Hotel",
+        ratePlanCode: bookingDetails.ratePlanCode || "SUT",
+        numberOfRooms: bookingDetails.rooms || 1,
+        roomTypeCode: bookingDetails.roomType || "",
+        roomTotalPrice: isNaN(parseFloat(bookingDetails.amount)) ? 0 : parseFloat(bookingDetails.amount),
+        currencyCode: bookingDetails.currency?.toUpperCase() || "INR",
+        email: bookingDetails.email,
+        phone: bookingDetails.phone,
+        guests: bookingDetails.guests.map((guest: Guest) => ({
+          firstName: guest.firstName || '',
+          lastName: guest.lastName || '',
+          dob: guest.dob || '',
+          type: guest.type || 'adult'
+        })),
+        paymentInfo: {
+          paymentMethodId: setupIntent.payment_method as string,
+          setupIntentId: setupIntent.id
         }
       };
 
       console.log("Sending booking payload:", bookingPayload);
       const bookingResponse = await confirmBookingWithStoredCard(bookingPayload, token);
       console.log("Booking response:", bookingResponse);
-      const checkInRaw = bookingResponse.savedBooking.checkInDate
-      const checkOutRaw= bookingResponse.savedBooking.checkOutDate
-       const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return '';
-    return new Date(dateStr).toISOString().split('T')[0]; // "YYYY-MM-DD"
-  };
-  const checkIn = formatDate(checkInRaw);
-  const checkOut = formatDate(checkOutRaw);
 
-      // Handle success
-      router.push(`/payment-success?reference=${bookingResponse.savedBooking._id || bookingResponse.savedBooking.id || ""}&amount=${bookingDetails.amount}&firstName=${bookingDetails.firstName}&lastName=${bookingDetails.lastName}&email=${bookingDetails.email}&checkIn=${checkIn}&checkOut=${checkOut}&ropertyId=${bookingDetails.propertyId}&phone=${bookingDetails.phone}&method=payAtHotel`);
+      // Dispatch guest details to Redux
+      dispatch(setGuestDetails({
+        guests: bookingResponse?.savedBooking?.guests || bookingDetails.guests,
+        rooms: bookingDetails.rooms || 1,
+        adults: bookingDetails.adults || 1,
+        children: bookingDetails.children || 0,
+        // infants: bookingDetails.infants || 0,
+        email: bookingDetails.email,
+        phone: bookingDetails.phone,
+        checkInDate: bookingResponse?.savedBooking?.checkInDate,
+        checkOutDate: bookingResponse?.savedBooking?.checkOutDate,
+        bookingId: bookingResponse?.savedBooking?.id,
+        hotelName: bookingDetails.hotelName,
+        ratePlanCode: bookingDetails.ratePlanCode,
+        roomType: bookingDetails.roomType,
+      }));
+
+      router.push(`/payment-success`);
     } catch (error: any) {
       console.error('Payment error:', error);
       setErrorMessage(error.message || t('Payment.PaymentComponents.PayAtHotelFunction.paymentProcessingError'));
@@ -177,16 +203,15 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
     }
   };
 
-  // If we have validation errors, show a friendly message
   if (validationError) {
     return (
       <div className="bg-red-50 p-6 rounded-lg border border-red-200">
         <div className="flex items-start">
-          <AlertCircle className="h-6 w-6 text-red-500 mr-3 flex-shrink-0 mt-0.5" />
+          <AlertCircle className="h-6 w-6 text-red-600 mr-3 flex-shrink-0 mt-0.5" />
           <div>
-            <h3 className="text-lg font-tripswift-semibold text-red-700 mb-2">Unable to Process Payment</h3>
-            <p className="text-red-600 mb-4">{validationError}</p>
-            <p className="text-sm text-red-600">Please return to the previous page and try again, or contact customer support if the issue persists.</p>
+            <h3 className="text-lg font-trips-bold text-red-700 mb-2">{t('Payment.PaymentComponents.PayAtHotelFunction.errorTitle')}</h3>
+            <p className="text-red-600 mb-2">{validationError}</p>
+            <p className="text-sm text-red-600">{t('Payment.PaymentComponents.PayAtHotelFunction.errorMessage')}</p>
           </div>
         </div>
       </div>
