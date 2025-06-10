@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { useDispatch, useSelector } from "react-redux";
-import { setGuestDetails,setAmount} from "@/Redux/slices/pmsHotelCard.slice";
+import { setGuestDetails, setAmount } from "@/Redux/slices/pmsHotelCard.slice";
 import {
   User,
   Mail,
@@ -293,61 +293,78 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     setGuests(updatedGuests);
   };
 
-const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-const handleUpdate = () => {
-  let valid = true;
-  const newErrors: { [key: string]: string } = {};
+  const handleUpdate = () => {
+    let valid = true;
+    const newErrors: { [key: string]: string } = {};
 
-  for (let i = 0; i < guests.length; i++) {
-    const guest = guests[i];
-    if (!guest.firstName || !/^[A-Za-z\s]+$/.test(guest.firstName)) {
-      newErrors[`firstName-${i}`] = t("BookingComponents.GuestInformationModal.firstNameError");
+    for (let i = 0; i < guests.length; i++) {
+      const guest = guests[i];
+      if (!guest.firstName || !/^[A-Za-z\s]+$/.test(guest.firstName)) {
+        newErrors[`firstName-${i}`] = t("BookingComponents.GuestInformationModal.firstNameError");
+        valid = false;
+      }
+      if (!guest.lastName || !/^[A-Za-z\s]+$/.test(guest.lastName)) {
+        newErrors[`lastName-${i}`] = t("BookingComponents.GuestInformationModal.lastNameError");
+        valid = false;
+      }
+      if (!guest.dob) {
+        newErrors[`dob-${i}`] = t("BookingComponents.GuestInformationModal.dobError");
+        valid = false;
+      }
+    }
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors["email"] = t("BookingComponents.GuestInformationModal.emailError");
       valid = false;
     }
-    if (!guest.lastName || !/^[A-Za-z\s]+$/.test(guest.lastName)) {
-      newErrors[`lastName-${i}`] = t("BookingComponents.GuestInformationModal.lastNameError");
+
+    // In your handleUpdate function:
+    if (!phone) {
+      newErrors["phone"] = t("BookingComponents.GuestInformationModal.phoneError");
       valid = false;
-    }
-    if (!guest.dob) {
-      newErrors[`dob-${i}`] = t("BookingComponents.GuestInformationModal.dobError");
+    } else if (phone.startsWith('+91') && phone.replace(/\D/g, '').length !== 12) {
+      newErrors["phone"] = "Indian phone number must be 10 digits";
       valid = false;
+    } else {
+      const numericPhone = phone.replace(/\D/g, '');
+      if (phone.startsWith('+91')) { // India specific validation
+        if (numericPhone.length !== 12) { // +91 plus 10 digits = 12 total
+          newErrors["phone"] = t("BookingComponents.GuestInformationModal.phoneIndiaError");
+          valid = false;
+        }
+      } else {
+        // Basic international validation (minimum 8 digits)
+        if (numericPhone.length < 8) {
+          newErrors["phone"] = t("BookingComponents.GuestInformationModal.phoneInternationalError");
+          valid = false;
+        }
+      }
     }
-  }
 
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    newErrors["email"] = t("BookingComponents.GuestInformationModal.emailError");
-    valid = false;
-  }
+    setErrors(newErrors);
+    if (!valid) return;
 
-  if (!phone || phone.length < 10) {
-    newErrors["phone"] = t("BookingComponents.GuestInformationModal.phoneError");
-    valid = false;
-  }
-
-  setErrors(newErrors);
-
-  if (!valid) return;
-
-  setUpdateMessage(t("BookingComponents.GuestInformationModal.informationVerified"));
-  dispatch(
-    setGuestDetails({
-      guests,
-      email,
-      phone,
-      rooms: guestData?.rooms || 1,
-      adults: guestData?.guests || 1,
-      children: guestData?.children || 0,
-      infants: guestData?.infants || 0,
-      childAges: guestData?.childAges || [],
-    })
-  );
-  setIsFormUpdated(true);
-  getFinalPrice(selectedRoom, checkInDate, checkOutDate, guestData);
-  setTimeout(() => {
-    setActiveSection("review");
-  }, 800);
-};
+    setUpdateMessage(t("BookingComponents.GuestInformationModal.informationVerified"));
+    dispatch(
+      setGuestDetails({
+        guests,
+        email,
+        phone,
+        rooms: guestData?.rooms || 1,
+        adults: guestData?.guests || 1,
+        children: guestData?.children || 0,
+        infants: guestData?.infants || 0,
+        childAges: guestData?.childAges || [],
+      })
+    );
+    setIsFormUpdated(true);
+    getFinalPrice(selectedRoom, checkInDate, checkOutDate, guestData);
+    setTimeout(() => {
+      setActiveSection("review");
+    }, 800);
+  };
 
   const handleConfirmBooking = () => {
     if (isFormUpdated && selectedRoom) {
@@ -361,7 +378,7 @@ const handleUpdate = () => {
         setErrorMessage(t("BookingComponents.GuestInformationModal.priceFetchError"));
         return;
       }
-      const totalPrice =finalPrice?.totalAmount ?? 0;
+      const totalPrice = finalPrice?.totalAmount ?? 0;
       // Dispatch amount to Redux store
       dispatch(setAmount(totalPrice.toString()));
       // const nightsCount = calculateNights(checkInDate, checkOutDate);
@@ -381,7 +398,7 @@ const handleUpdate = () => {
         children: guestData?.children || 0,
         guests,
       });
-  
+
       onConfirmBooking({
         email,
         phone: phone || "",
@@ -433,6 +450,19 @@ const handleUpdate = () => {
     return display;
   };
 
+      const handlePhoneChange = (value: string | undefined) => {
+      if (value && value.startsWith('+91')) {
+        // Remove all non-digit characters
+        const digits = value.replace(/\D/g, '');
+        // If more than 12 characters (+91 + 10 digits), truncate
+        const formattedValue = digits.length > 12
+          ? `+${digits.substring(0, 12)}`
+          : value;
+        setPhone(formattedValue);
+      } else {
+        setPhone(value);
+      }
+    };
   return (
     <>
       {/* Backdrop */}
@@ -461,8 +491,8 @@ const handleUpdate = () => {
               <div className="flex flex-col items-center">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-tripswift-bold ${activeSection === "details" || isFormUpdated
-                      ? "bg-tripswift-blue text-tripswift-off-white"
-                      : "bg-tripswift-black/10 text-tripswift-black/60"
+                    ? "bg-tripswift-blue text-tripswift-off-white"
+                    : "bg-tripswift-black/10 text-tripswift-black/60"
                     }`}
                 >
                   1
@@ -480,8 +510,8 @@ const handleUpdate = () => {
               <div className="flex flex-col items-center">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-tripswift-bold ${activeSection === "review" && isFormUpdated
-                      ? "bg-tripswift-blue text-tripswift-off-white"
-                      : "bg-tripswift-black/10 text-tripswift-black/60"
+                    ? "bg-tripswift-blue text-tripswift-off-white"
+                    : "bg-tripswift-black/10 text-tripswift-black/60"
                     }`}
                 >
                   2
@@ -652,11 +682,12 @@ const handleUpdate = () => {
                       <PhoneInput
                         id="phone"
                         value={phone}
-                        onChange={setPhone}
+                        onChange={handlePhoneChange}
                         defaultCountry="IN"
                         placeholder={t("BookingComponents.GuestInformationModal.phonePlaceholder")}
                         className="w-full px-3 py-2 border border-tripswift-black/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 text-sm transition-all duration-200"
                         international
+                        limitMaxLength={true}  // This enforces max length based on country
                       />
                       {errors["phone"] && (
                         <p className="text-xs text-red-600 mt-1">{errors["phone"]}</p>
@@ -794,8 +825,8 @@ const handleUpdate = () => {
               onClick={activeSection === "details" ? handleUpdate : handleConfirmBooking}
               disabled={activeSection === "review" && !isFormUpdated}
               className={`px-6 py-2.5 rounded-lg text-sm font-tripswift-medium transition-all duration-200 ${activeSection === "review" && !isFormUpdated
-                  ? "bg-tripswift-blue/50 text-tripswift-off-white cursor-not-allowed"
-                  : "bg-tripswift-blue text-tripswift-off-white hover:bg-tripswift-blue/90"
+                ? "bg-tripswift-blue/50 text-tripswift-off-white cursor-not-allowed"
+                : "bg-tripswift-blue text-tripswift-off-white hover:bg-tripswift-blue/90"
                 }`}
             >
               {activeSection === "details"
