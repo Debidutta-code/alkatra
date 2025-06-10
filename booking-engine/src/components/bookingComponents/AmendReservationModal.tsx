@@ -461,10 +461,13 @@ console.log("guests",guests)
       }, 2000);
 
     } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || t('BookingTabs.AmendReservationModal.errors.unableToAmend');
       setAmendmentMessage({
         type: 'error',
-        text: error.message || t('BookingTabs.AmendReservationModal.errors.unableToAmend'),
+        text: errorMessage,
       });
+      // Optionally, you can also log the error or handle specific error codes here
+      console.error("Amendment submission error:", errorMessage);
     } finally {
       setLoading(false);
     }
