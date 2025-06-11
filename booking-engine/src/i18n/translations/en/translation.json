@@ -379,6 +379,7 @@
     "noRoomsAvailableTitle": "No Rooms Available",
     "noRoomsAvailableMessage": "We couldn't find any rooms matching your criteria. Try adjusting your search filters or dates.",
     "clearFilters": "Clear Filters",
+    "priceNotAvailable":"",
     "qrCode": {
       "discountTitle": "Use Your Discount",
       "qrCodeAlt": "Discount QR Code",
@@ -397,6 +398,7 @@
       "night": "night",
       "bookNow": "Book Now",
       "viewBookingPolicies": "View booking policies",
+      "notAvailable":"Not Available",
       "securePayment": "Secure payment",
       "amenities": {
         "wifi": "Free WiFi",
