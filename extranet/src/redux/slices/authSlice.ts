@@ -11,6 +11,7 @@ export type User = {
   email: string;
   role: string;
   _id: string;
+  noOfProperties:number;
 };
 
 type InitialState = {

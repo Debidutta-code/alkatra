@@ -20,12 +20,16 @@ export const protect = catchAsync(
 
     try {
       const decoded = await decodeToken(token, process.env.JWT_SECRET_KEY_DEV!);
-      if (!decoded || !decoded.id || !decoded.role) {
+      // console.log("decoded",decoded)
+      if (!decoded || !decoded.id || !decoded.role || !decoded.email) {
         throw formatError(ErrorMessages.INVALID_TOKEN);
       }
 
       req.jwt = token;
-      req.user = decoded.id;
+      req.user = {
+        id: decoded.id,
+        email: decoded.email,
+      };
       req.role = decoded.role;
 
       next();

@@ -9,7 +9,7 @@ import PropertyPrice from "../model/ratePlan.model";
 import QRCode from 'qrcode';
 import { v4 as uuidv4 } from "uuid";
 import { generateCouponCode } from "../../../Coupon_Management/services/couponService";
-
+import RoomType from "../model/RoomTypes.model"
 
 interface UpdateFields {
   room_name?: string;
@@ -489,5 +489,13 @@ export const getRoomsForBooking = catchAsync(async (req: Request, res: Response,
   });
 })
 
-export { createRoom, updateRoom, deleteRoom, getRoomById, getRooms, getRoomsByPropertyId, getRoomsByPropertyId2 };
+const getAllRoomTypes = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const response = await RoomType.find().exec()
+    return res.status(200).json({ data: response, success: true })
+  } catch (error:any) {
+    return res.status(200).json({ success: false, message: "Error occur while getting all the roomTypes", error: error.message })
+  }
+})
+export { createRoom, getAllRoomTypes, updateRoom, deleteRoom, getRoomById, getRooms, getRoomsByPropertyId, getRoomsByPropertyId2 };
 

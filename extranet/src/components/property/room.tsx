@@ -70,7 +70,10 @@ type Inputs = {
 interface IFileWithPreview extends File {
   preview: string;
 }
-
+interface RoomTypes {
+  roomTypeCode: string;
+  description: string
+}
 interface RoomDetails {
   room_name: string;
   room_type: string;
@@ -113,6 +116,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
   const [formLoading, setFormLoading] = useState<boolean>(false);
   const [priceCategory, setPriceCategory] = useState<any[]>([]);
   const [category, setCategory] = useState<any[]>([]);
+  const [allRoomTypes, setAllRoomTypes] = useState<RoomTypes[]>([])
 
 
   const form = useForm<Inputs>({
@@ -179,7 +183,25 @@ export default function XRooms({ onNext, onPrevious }: Props) {
 
   //   getAllPrice()
   // }, [])
-
+  const getAllRoomTypes = async () => {
+    try {
+      setLoading(true)
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/getAllRoomTypes`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      setAllRoomTypes(response.data.data)
+      console.log(response.data.data)
+    } catch (error: any) {
+      console.log("Error occur while getting all the room types", error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+  useEffect(() => {
+    getAllRoomTypes()
+  }, [])
   function handleCategoryChange(e: any) {
     const price_list = priceCategory.filter((category: any) => category.price_category == e.target.value)
     setCategory(price_list)
@@ -364,7 +386,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
           </div>
 
           {/* Room Type field */}
-          <div className="w-full">
+          {/* <div className="w-full">
             <Label htmlFor="room_type">Room Type <span className="text-destructive">*</span></Label>
             <Input
               id="room_type"
@@ -378,48 +400,55 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             {room_typeError && (
               <p className="text-red-500 text-sm mt-1">{room_typeError.message}</p>
             )}
-          </div>
-
-          {/* <div className="self-end w-full relative">
-            <Label htmlFor="Name">Room Name </Label>
-            <div className="inline-block relative w-full">
-              <select
-                {...register("room_name")}
-                onChange={(e) => setRoomDetails(prevDetails => ({ ...prevDetails!, name: e.target.value }))}
-                className={`block appearance-none w-full border ${room_nameError ? "border-red-500" : "border-gray-300"
-                  } text-white-700py-2 px-3 md:h-12.1 md:px-3 md:py-3 rounded-md leading-tight focus:outline-none focus:border-blue-500`}
-              >
-                <option value="SINGLE ROOM" className="bg-white-300 text-white-800">SINGLE ROOM</option>
-                <option value="DOUBLE ROOM" className="bg-white-300 text-white-800">DOUBLE ROOM</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white-700">
-                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 0 1 1.414-1.414L10 8.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4z" />
-                </svg>
-              </div>
-            </div>
           </div> */}
 
-          {/* <div className="self-end w-full relative">
-            <Label htmlFor="type">Room Type </Label>
-            <div className="inline-block relative w-full">
-              <select
-                {...register("room_type")}
-                onChange={(e) => setRoomDetails(prevDetails => ({ ...prevDetails!, type: e.target.value }))}
-                className={`block appearance-none w-full border ${room_typeError ? "border-red-500" : "border-gray-300"
-                  } text-white-700py-2 px-3 md:h-12.1 md:px-3 md:py-3 rounded-md leading-tight focus:outline-none focus:border-blue-500`}
-              >
-                <option value="QUEEN ROOM" className="bg-white-300 text-white-800">QUEEN ROOM</option>
-                <option value="KING ROOM" className="bg-white-300 text-white-800">KING ROOM</option>
-                <option value=" TWIN ROOM" className="bg-white-300 text-white-800">TWIN ROOM</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white-700">
-                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 0 1 1.414-1.414L10 8.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4z" />
-                </svg>
-              </div>
-            </div>
-          </div> */}
+
+
+         <div className="self-end w-full relative">
+  <Label htmlFor="type">Room Type</Label>
+  <div className="inline-block relative w-full">
+    <select
+      {...register("room_type")}
+      value={roomDetails?.room_type || ""} // Set the default value
+      onChange={(e) =>
+        setRoomDetails((prevDetails) => ({
+          ...prevDetails!,
+          room_type: e.target.value, // Update the state with the selected value
+        }))
+      }
+      className={`block appearance-none w-full border ${
+        room_typeError ? "border-red-500" : "border-gray-300"
+      } text-gray-700 py-2 px-3 md:h-12 md:px-4 rounded-md leading-tight focus:outline-none focus:border-blue-500`}
+    >
+      <option value="" disabled>
+        Select a Room Type
+      </option>
+      {allRoomTypes.map((item, index) => (
+        <option
+          value={item.roomTypeCode}
+          key={index}
+          className="bg-white text-gray-800"
+        >
+          {item.roomTypeCode} - {item.description}
+        </option>
+      ))}
+    </select>
+    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+      <svg
+        className="fill-current h-4 w-4"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 20 20"
+      >
+        <path
+          fillRule="evenodd"
+          d="M5.293 7.293a1 1 0 0 1 1.414-1.414L10 8.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4z"
+        />
+      </svg>
+    </div>
+  </div>
+</div>
+
+
         </div>
 
         {/* box 2 */}

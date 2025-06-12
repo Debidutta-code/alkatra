@@ -98,7 +98,6 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
   const { accessToken } = useSelector((state: RootState) => state.auth);
   const property_id = useSearchParams().get("property_id");
   const router = useRouter();
-
   const form = useForm<Inputs>({
     defaultValues: {
       destination_type: "",
@@ -120,7 +119,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
     },
     resolver: zodResolver(createPropertyAmenitiesSchema),
   });
-
+  
   const { register, control, handleSubmit, setValue, formState, getValues, formState: { errors, isSubmitting }, } = form;
   const {
     errors: {

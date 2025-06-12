@@ -44,12 +44,6 @@ const steps = [
     name: "Room Amenities",
     description: "Room Amenities availabilty",
   },
-  // {
-  //   id: 6,
-  //   icon: <DollarSign size={20} />,
-  //   name: "Rate Plan",
-  //   desciption: "Add rates",
-  // }
 ];
 
 export default function CreatePropertyForm({}: Props) {

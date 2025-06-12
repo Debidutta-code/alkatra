@@ -42,23 +42,32 @@ export class UserRepository {
     limit: number,
     userRole: "superAdmin" | "groupManager" | "hotelManager"
   ): Promise<PaginatedUsers> {
-    if (userRole !== "superAdmin") {
-      throw formatError(ErrorMessages.SUPERADMIN_ROLE_ONLY);
+    if (userRole !== "superAdmin" && userRole !== "groupManager") {
+      throw formatError(ErrorMessages.UNAUTHORIZED_ACTION);
     }
     if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
       throw formatError(ErrorMessages.INVALID_QUERY_PARAM);
     }
     const skip = (page - 1) * limit;
-    const users = await UserModel.find({ role: "hotelManager" })
-      .skip(skip)
-      .limit(limit);
-    const total = await UserModel.countDocuments({ role: "hotelManager" });
+
+    // Define query based on user role
+    let query = {};
+    if (userRole === "superAdmin") {
+      // superAdmin can see both hotelManager and groupManager users
+      query = { role: { $in: ["hotelManager", "groupManager"] } };
+    } else if (userRole === "groupManager") {
+      // groupManager can only see hotelManager users
+      query = { role: "hotelManager" };
+    }
+
+    const users = await UserModel.find(query).skip(skip).limit(limit);
+    const total = await UserModel.countDocuments(query);
     const totalPages = Math.ceil(total / limit);
     return { users, total, totalPages };
   }
 
   async findUserByEmail(email: string): Promise<AuthType | null> {
-    const user = await UserModel.findOne({ email });
+    const user = await UserModel.findOne({ email }).select("+password");
     return user;
   }
 
@@ -76,6 +85,7 @@ export class UserRepository {
 
   async createUser(userData: Partial<AuthType>): Promise<AuthType> {
     const user = await UserModel.create(userData);
+    console.log("User in auth",user)
     return user;
   }
 
@@ -92,5 +102,40 @@ export class UserRepository {
       throw formatError(ErrorMessages.EMAIL_NOT_FOUND);
     }
     return updatedUser;
+  }
+
+  async getAllUsersCreatedBy(
+    page: number,
+    limit: number,
+    creatorEmail: string
+  ): Promise<PaginatedUsers> {
+    if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
+      throw formatError(ErrorMessages.INVALID_QUERY_PARAM);
+    }
+    const skip = (page - 1) * limit;
+
+    // Find users created by the specified email
+    const users = await UserModel.find({ createdBy: creatorEmail })
+      .skip(skip)
+      .limit(limit);
+
+    const total = await UserModel.countDocuments({ createdBy: creatorEmail });
+    const totalPages = Math.ceil(total / limit);
+
+    return { users, total, totalPages };
+  }
+
+  async deleteUser(userId: string): Promise<boolean> {
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      throw formatError(ErrorMessages.INVALID_ID);
+    }
+
+    const result = await UserModel.findByIdAndDelete(userId);
+
+    if (!result) {
+      throw formatError(ErrorMessages.USER_NOT_FOUND);
+    }
+
+    return true;
   }
 }

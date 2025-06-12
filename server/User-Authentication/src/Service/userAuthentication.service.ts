@@ -1,5 +1,5 @@
 import { ErrorMessages, formatError } from "../Error/errorMessages";
-import { AuthType } from "../Model/auth.model";
+import UserModel, { AuthType } from "../Model/auth.model";
 import { UserRepository } from "../Repository/userAuthorization.repository";
 import { compareHash, createHash } from "../Utils/bcryptHelper";
 import { assignToken, Role } from "../Utils/jwtHelper";
@@ -9,6 +9,7 @@ interface UpdateBody {
   lastName?: string;
   email?: string;
   role?: "superAdmin" | "groupManager" | "hotelManager";
+  password?:string
 }
 
 interface RegisterBody {
@@ -17,6 +18,7 @@ interface RegisterBody {
   email: string;
   password: string;
   role?: "superAdmin" | "groupManager" | "hotelManager";
+  createdBy?: string; // Added createdBy field which is set in createUser endpoint
 }
 
 interface LoginBody {
@@ -35,8 +37,10 @@ export class UserService {
   constructor() {
     this.userRepository = new UserRepository();
   }
-
-  async getUserById(userId: string): Promise<AuthType> {
+  async getUserById(userId: string | undefined): Promise<AuthType> {
+    if (!userId) {
+      throw formatError(ErrorMessages.INVALID_ID);
+    }
     const user = await this.userRepository.findUserById(userId);
     if (!user) {
       throw formatError(ErrorMessages.USER_NOT_FOUND);
@@ -58,21 +62,26 @@ export class UserService {
       if (updates.role) {
         throw formatError(ErrorMessages.ROLE_UPDATE_NOT_ALLOWED);
       }
+      console.log("If condition")
     } else if (
       requestingUserId !== userId &&
       requestingUserRole === "superAdmin"
     ) {
+      console.log("Else Idf  condition")
+      // SuperAdmin can update all fields of any user
       if (updates.role)
         filteredUpdates.role = updates.role as
           | "superAdmin"
           | "groupManager"
           | "hotelManager";
-      if (updates.firstName || updates.lastName || updates.email) {
-        throw formatError(ErrorMessages.SUPERADMIN_ROLE_ONLY);
-      }
+      if (updates.firstName) filteredUpdates.firstName = updates.firstName;
+      if (updates.lastName) filteredUpdates.lastName = updates.lastName;
+      if (updates.email) filteredUpdates.email = updates.email;
+      if(updates.password)filteredUpdates.password=await createHash(updates.password)
     } else {
       throw formatError(ErrorMessages.UNAUTHORIZED_ACTION);
     }
+    console.log(filteredUpdates)
     const updatedUser = await this.userRepository.updateUser(
       userId,
       filteredUpdates
@@ -82,17 +91,26 @@ export class UserService {
     }
     return updatedUser;
   }
-
   async getAllUsers(
     page: number,
     limit: number,
-    userRole: "superAdmin" | "groupManager" | "hotelManager"
+    userRole: "superAdmin" | "groupManager" | "hotelManager",
+    userEmail?: string
   ) {
-    return await this.userRepository.getAllUsers(page, limit, userRole);
+    // For groupManager, only show users created by them
+    if (userRole === "groupManager" && userEmail) {
+      return await this.userRepository.getAllUsersCreatedBy(
+        page,
+        limit,
+        userEmail
+      );
+    } else {
+      // Otherwise, show users based on role permissions
+      return await this.userRepository.getAllUsers(page, limit, userRole);
+    }
   }
-
   async registerUser(data: RegisterBody): Promise<AuthType> {
-    const { firstName, lastName, email, password, role } = data;
+    const { firstName, lastName, email, password, role, createdBy } = data;
     if (!firstName || !lastName || !email || !password) {
       throw formatError(ErrorMessages.MISSING_REGISTRATION_FIELDS);
     }
@@ -114,7 +132,8 @@ export class UserService {
       lastName,
       email,
       password: hashedPassword,
-      role: role || "hotelManager", // Default to hotelManager for users created through /create-user
+      role, // Use the role provided by the controller
+      createdBy, // Add createdBy field from the data
     };
     return await this.userRepository.createUser(userData);
   }
@@ -127,7 +146,13 @@ export class UserService {
       throw formatError(ErrorMessages.MISSING_LOGIN_CREDENTIALS);
     }
     const user = await this.userRepository.findUserByEmailWithPassword(email);
-    if (!user || !compareHash(password, user.password)) {
+    console.log("User from login ",user)
+    if (!user ) {
+      throw formatError(ErrorMessages.INVALID_LOGIN_CREDENTIALS);
+    }
+    const isValidPassword=await compareHash(password, user.password)
+    console.log("Va;id Passwpd",isValidPassword)
+    if(!isValidPassword) {
       throw formatError(ErrorMessages.INVALID_LOGIN_CREDENTIALS);
     }
     const accessToken = assignToken(
@@ -166,5 +191,13 @@ export class UserService {
       throw formatError(ErrorMessages.EMAIL_NOT_FOUND);
     }
     return updatedUser;
+  }
+  async deleteUser(userId: string): Promise<boolean> {
+    if (!userId) {
+      throw formatError(ErrorMessages.INVALID_ID);
+    }
+
+    // Attempt to delete the user using the repository
+    return await this.userRepository.deleteUser(userId);
   }
 }

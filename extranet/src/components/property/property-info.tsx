@@ -25,6 +25,7 @@ import toast from "react-hot-toast";
 import { cn } from "./../../lib/utils";
 import { Textarea } from "./../ui/textarea";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+// import { RootState } from "@src/redux/store";
 // import { RootState, useSelector } from "../../redux/store";
 // import {
 //   DropdownMenu,
@@ -50,8 +51,7 @@ const createPropertySchema = z.object({
   property_contact: z
     .string()
     // .refine((value) => /^\d{10}$/.test(value))
-    // .refine((value) => /^[6-9]\d{9}$/.test(value), {
-    .refine((value) => /^\d{10}$/.test(value), {
+    .refine((value) => /^[6-9]\d{9}$/.test(value), {
       message: "Please provide a valid 10-digit phone number ",
     }),
 
@@ -67,9 +67,9 @@ const createPropertySchema = z.object({
     ),
 
   // property_code: z.string().min(1, "Property code is required"),
-  property_code: z.string().refine((value) => /^\d{6}$/.test(value), {
-    message: "Please provide a valid 6-digit property code",
-  }),
+  // property_code: z.string().refine((value) => /^\d{6}$/.test(value), {
+  //   message: "Please provide a valid 6-digit property code",
+  // }),
   description: z.string().min(1, "Description is required"),
 
   property_category: z.string().min(1, "Property category is required"),
@@ -81,7 +81,7 @@ type Inputs = {
   property_email: string;
   property_contact: string;
   star_rating: string;
-  property_code: string;
+  // property_code: string;
   description: string;
   property_category: string;
   property_type: string;
@@ -137,7 +137,8 @@ export default function PropertyInfo({ onNext }: Props) {
 
   const [propertyImagePreviewDialog, setPropertyImagePreviewDialog] =
     useState(false);
-
+useEffect(()=>{
+},[])
   const [files, setFiles] = useState<IFileWithPreview[]>([]);
   const [rejected, setRejected] = useState<FileRejection[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -172,6 +173,12 @@ export default function PropertyInfo({ onNext }: Props) {
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`
       );
       setPropertyDetails(response.data.data);
+      const propertyCode=localStorage.get("propertyCode");
+      if(propertyCode){
+        localStorage.removeItem("propertyCode")
+      }
+      console.log("",response.data.data.property_code)
+      localStorage.setItem("propertyCode",response.data.data.property_code)
       setLoading(false);
     } catch (error: any) {
       if (error.code === 'ECONNRESET') {
@@ -211,7 +218,7 @@ export default function PropertyInfo({ onNext }: Props) {
       property_email: "",
       property_contact: "",
       star_rating: "1",
-      property_code: "",
+      // property_code: "",
       description: "",
       property_category: "",
       property_type: "",
@@ -226,7 +233,7 @@ export default function PropertyInfo({ onNext }: Props) {
       property_name: propertyNameError,
       property_contact: propertyContactError,
       star_rating: starRatingError,
-      property_code: propertyCodeError,
+      // property_code: propertyCodeError,
       property_category: propertyCategoryError,
       property_type: propertyTypeError,
       description: propertydescription
@@ -258,7 +265,7 @@ export default function PropertyInfo({ onNext }: Props) {
       setValue("property_name", propertyDetails.property_name || "");
       setValue("property_email", propertyDetails.property_email || "");
       setValue("property_contact", propertyDetails.property_contact || "");
-      setValue("property_code", propertyDetails.property_code || "");
+      // setValue("property_code", propertyDetails.property_code || "");
       setValue("description", propertyDetails.description || "");
       setValue("property_category", propertyDetails?.property_category || "");
       setValue("property_type", propertyDetails?.property_type || "");
@@ -436,38 +443,38 @@ export default function PropertyInfo({ onNext }: Props) {
 
   // In the handleFormSubmit function where you update a property
   const handleFormSubmit: SubmitHandler<Inputs> = async (data) => {
-    try {
-      const imageUrls = propertyImageUrls
-        .filter((propertyImage) => propertyImage && propertyImage.url) // Add null checks
-        .map((propertyImage) => propertyImage.url);
+  try {
+    const imageUrls = propertyImageUrls
+      .filter((propertyImage) => propertyImage && propertyImage.url) // Add null checks
+      .map((propertyImage) => propertyImage.url);
 
-      const propertyCreateBody = {
-        ...data,
-        image: imageUrls,
-      };
+    const propertyCreateBody = {
+      ...data,
+      image: imageUrls,
+    };
 
-      const response = await axios.patch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`,
-        propertyCreateBody,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+    const response = await axios.patch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`,
+      propertyCreateBody,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
 
-      router.push(`${pathname}?property_id=${propertyId}`);
+    router.push(`${pathname}?property_id=${propertyId}`);
 
-      // Add success toast message
-      toast.success('Property updated successfully!');
+    // Add success toast message
+    toast.success('Property updated successfully!');
 
-      onNext();
-    }
-    catch (error) {
-      console.error("Error updating property details:", error);
-      toast.error("Failed to update property details. Please try again later.");
-    }
+    onNext();
   }
+  catch (error) {
+    console.error("Error updating property details:", error);
+    toast.error("Failed to update property details. Please try again later.");
+  }
+}
 
 
 
@@ -528,7 +535,7 @@ export default function PropertyInfo({ onNext }: Props) {
               )}
             </div>
 
-            <div className="w-full">
+            {/* <div className="w-full">
               <Label htmlFor="property_code">Property Code <span className="text-destructive">*</span></Label>
               <Input
                 variant={propertyCodeError && "error"}
@@ -541,24 +548,24 @@ export default function PropertyInfo({ onNext }: Props) {
               {propertyCodeError && (
                 <p className="text-red-500 text-sm mt-1">{propertyCodeError.message}</p>
               )}
-            </div>
+            </div> */}
           </div>
 
           <div className="flex items-center justify-center gap-4">
-            <div className="w-full">
-              <Label htmlFor="description">
-                Property Description <span className="text-destructive">*</span>
-              </Label>
-              <Textarea
-                id="description"
-                {...register("description")}
-                className={propertydescription ? "border-red-500 focus-visible:ring-red-500" : ""}
-              />
-              {propertydescription && (
-                <p className="text-red-500 text-sm mt-1">{propertydescription.message}</p>
-              )}
-            </div>
-          </div>
+  <div className="w-full">
+    <Label htmlFor="description">
+      Property Description <span className="text-destructive">*</span>
+    </Label>
+    <Textarea
+      id="description"
+      {...register("description")}
+      className={propertydescription ? "border-red-500 focus-visible:ring-red-500" : ""}
+    />
+    {propertydescription && (
+      <p className="text-red-500 text-sm mt-1">{propertydescription.message}</p>
+    )}
+  </div>
+</div>
 
 
           <div className="items-center gap-4">
@@ -730,17 +737,14 @@ export default function PropertyInfo({ onNext }: Props) {
               <Input
                 id="property_contact"
                 size={"md"}
-                variant={propertyContactError && "error"}
+                variant={propertyContactError ? "error" : undefined}
                 {...register("property_contact")}
-                type="tel"
-                inputMode="numeric" 
-                pattern="[0-9]{10}" 
+                type="text"
                 maxLength={10}
                 onChange={(e) => {
-                  // Only allow numbers
-                  const value = e.target.value.replace(/\D/g, '');
+                  const value = e.target.value;
                   if (value.length <= 10) {
-                    setValue("property_contact", value);
+                    setValue("property_contact", value); // Update the form state
                   }
                 }}
               />
@@ -748,7 +752,7 @@ export default function PropertyInfo({ onNext }: Props) {
                 <p className="text-red-500 text-sm mt-1">{propertyContactError.message}</p>
               )}
             </div>
-            <div className="w-full my-2">
+            {/* <div className="w-full my-2">
               <Label htmlFor="property_code">Property Code <span className="text-destructive">*</span></Label>
               <Input
                 variant={propertyCodeError && "error"}
@@ -761,24 +765,24 @@ export default function PropertyInfo({ onNext }: Props) {
               {propertyCodeError && (
                 <p className="text-red-500 text-sm mt-1">{propertyCodeError.message}</p>
               )}
-            </div>
+            </div> */}
           </div>
 
           <div className="flex items-center justify-center gap-4">
-            <div className="w-full">
-              <Label htmlFor="description">
-                Property Description <span className="text-destructive">*</span>
-              </Label>
-              <Textarea
-                id="description"
-                {...register("description")}
-                className={propertydescription ? "border-red-500 focus-visible:ring-red-500" : ""}
-              />
-              {propertydescription && (
-                <p className="text-red-500 text-sm mt-1">{propertydescription.message}</p>
-              )}
-            </div>
-          </div>
+  <div className="w-full">
+    <Label htmlFor="description">
+      Property Description <span className="text-destructive">*</span>
+    </Label>
+    <Textarea
+      id="description"
+      {...register("description")}
+      className={propertydescription ? "border-red-500 focus-visible:ring-red-500" : ""}
+    />
+    {propertydescription && (
+      <p className="text-red-500 text-sm mt-1">{propertydescription.message}</p>
+    )}
+  </div>
+</div>
 
 
           <div className="items-center gap-4 mb-5">

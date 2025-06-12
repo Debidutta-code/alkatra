@@ -7,6 +7,7 @@ import {
   deleteProperty,
   getMyProperties,
   getProperties,
+  getAdminProperties
 } from "../../controller/propertyInfo.controller";
 import {
   createPropertyAddress,
@@ -49,6 +50,7 @@ export default (app: Router) => {
   router.route("/getStateDetails/:regionName/:countryName/:stateName").get(getStateDetailsAccordingToCountry as any);
   router.route("/getCityDetails/:regionName/:countryName/:stateName/:cityName").get(getCityDetailsAccordingToState as any);
   router.route("/region-location/:regionName?/:countryName?/:stateName?/:cityName?").get(getLocationDetails as any);
+  router.route("/getAdminProperties").get(protect as any,getAdminProperties as any)
 
   // Get hotel details 
   router.route("/hotels").get(getHotelDetails as any);
@@ -123,5 +125,4 @@ export default (app: Router) => {
     .delete(protect as any, deleteRoomRatePlan as any);
 
   router.route("/location/:location").get(getAllHotelDetailsAccordingToLocation as any);
-  
 };

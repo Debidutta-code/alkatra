@@ -15,6 +15,7 @@ export interface AuthType {
   email: string;
   password: string;
   role: "superAdmin" | "groupManager" | "hotelManager";
+  createdBy?: string; // Email of the user who created this account
 }
 
 interface AuthQueryHelpers {
@@ -55,6 +56,10 @@ const authSchema = new mongoose.Schema<AuthType, {}, {}, AuthQueryHelpers>(
       required: true,
       enum: ["superAdmin", "groupManager", "hotelManager"],
       default: "superAdmin",
+    },
+    createdBy: {
+      type: String,
+      required: false, // Optional for superAdmin
     },
   },
   {

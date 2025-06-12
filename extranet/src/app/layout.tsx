@@ -5,6 +5,8 @@ import { cn } from "../lib/utils";
 import { ThemeProvider } from "../components/theme-provider";
 import { Toaster } from "react-hot-toast";
 import { Providers } from "./providers";
+import { SidebarProvider } from "@src/components/ui/sidebar";
+import AppSidebar from "@src/components/Sidebar";
 
 const notoSans = Noto_Sans({
   subsets: ["latin"],
@@ -67,19 +69,22 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Providers>
-            <div className="flex flex-col min-h-screen">
-              {children}
-            </div>
-            <Toaster 
-              position="top-right"
-              toastOptions={{
-                className: 'font-sans',
-                style: {
-                  background: 'var(--color-primary-blue)',
-                  color: 'var(--color-primary-off-white)',
-                },
-              }}
-            />
+            <SidebarProvider>
+              <div className="flex flex-col min-h-screen">
+                
+                {children}
+              </div>
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  className: 'font-sans',
+                  style: {
+                    background: 'var(--color-primary-blue)',
+                    color: 'var(--color-primary-off-white)',
+                  },
+                }}
+              />
+            </SidebarProvider>
           </Providers>
         </ThemeProvider>
       </body>

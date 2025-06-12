@@ -19,6 +19,7 @@ import { RootState } from "@src/redux/store";
 const Home: React.FC = () => {
   const [properties, setProperties] = useState<any[]>([]);
   const [draftProperties, setDraftProperties] = useState<any[]>([]);
+
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
   useEffect(() => {
@@ -48,6 +49,7 @@ const Home: React.FC = () => {
   return (
     <main className="min-h-screen bg-tripswift-off-white dark:bg-tripswift-black">
       {/* Header Section */}
+      
       <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] px-4 sm:px-6 md:px-8 py-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row items-center justify-between">
@@ -93,16 +95,16 @@ const Home: React.FC = () => {
                 </Link>
               </div>
             </CardHeader>
-            
+
             <CardContent className="p-0">
               {/* Draft Properties Section */}
-              {draftProperties.length > 0 && (
+              {draftProperties?.length > 0 && (
                 <div className="p-6 border-b border-gray-100 dark:border-gray-600">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-3 h-3 bg-tripswift-blue rounded-full"></div>
                     <h3 className="text-base sm:text-lg font-tripswift-semibold text-tripswift-black dark:text-gray-200">Properties</h3>
                     <span className="bg-blue-100 dark:bg-blue-900 text-tripswift-blue dark:text-blue-300 px-2 py-1 rounded-full text-xs font-tripswift-medium">
-                      {draftProperties.length}
+                      {draftProperties?.length}
                     </span>
                   </div>
                   <div className="overflow-x-auto">
@@ -114,7 +116,7 @@ const Home: React.FC = () => {
               )}
 
               {/* Empty State */}
-              {properties.length === 0 && draftProperties.length === 0 && (
+              {properties?.length === 0 && draftProperties?.length === 0 && (
                 <div className="p-12 text-center">
                   <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Building2 size={32} className="text-gray-400 dark:text-gray-300" />
