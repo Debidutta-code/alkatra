@@ -121,7 +121,15 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
     resolver: zodResolver(createPropertyAmenitiesSchema),
   });
 
-  const { register, control, handleSubmit, setValue, formState, getValues, formState: { errors, isSubmitting }, } = form;
+  const {
+    register,
+    control,
+    handleSubmit,
+    setValue,
+    formState,
+    getValues,
+    formState: { errors, isSubmitting },
+  } = form;
   const {
     errors: {
       destination_type: destinationTypeError,
@@ -130,7 +138,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
     },
   } = formState;
 
-  console.log('-----#########_______', errors)
+  console.log("-----#########_______", errors);
 
   // useEffect(() => {
   //   destinationTypeError && toast.error(destinationTypeError.message!);
@@ -139,7 +147,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
   // }, [destinationTypeError, propertyTypeError, noOfRoomsAvailableError]);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    console.log('on submit called')
+    console.log("on submit called");
     const amenities = {
       wifi: !!data.wifi,
       swimming_pool: !!data.swimming_pool,
@@ -156,7 +164,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
       child_friendly_facilities: !!data.child_friendly_facilities,
     };
 
-    console.log('_____+_+_+_+_+_+_+_+_+_+_+_+_+_+_', amenities)
+    console.log("_____+_+_+_+_+_+_+_+_+_+_+_+_+_+_", amenities);
 
     setFormLoading(true);
 
@@ -182,7 +190,10 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
           }
         );
         propertyAmenitiesCreateResponse = updatedPropertyResponse;
-        console.log('propertyAmenitiesCreateResponse ========', propertyAmenitiesCreateResponse)
+        console.log(
+          "propertyAmenitiesCreateResponse ========",
+          propertyAmenitiesCreateResponse
+        );
         toast.success("Property Amenities updated successfully!");
       } else {
         const propertyCreateBody = {
@@ -213,7 +224,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
 
       onNext();
     } catch (err) {
-      console.log("error from update aminity", err)
+      console.log("error from update aminity", err);
       if (axios.isAxiosError(err)) {
         setFormLoading(false);
         toast.error(err?.response?.data?.message);
@@ -231,10 +242,16 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
         "Featching  From PropertyAminity",
         response.data.data.property_amenities
       );
-      console.log('~~~~~~~~~~~~~~~~~~~~~~', response.data.data.property_amenities)
-      console.log("!response.data.data.property_amenities._id", !response.data.data?.property_amenities)
+      console.log(
+        "~~~~~~~~~~~~~~~~~~~~~~",
+        response.data.data.property_amenities
+      );
+      console.log(
+        "!response.data.data.property_amenities._id",
+        !response.data.data?.property_amenities
+      );
       if (!response.data.data.property_amenities) {
-        console.log("new called_)_)_)_)_)_)___)_)_)_)_)_)__)_))_")
+        console.log("new called_)_)_)_)_)_)___)_)_)_)_)_)__)_))_");
         setnewPropertyAminity(true);
       }
       setPropertyAminity(response.data.data.property_amenities);
@@ -244,10 +261,10 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
       setLoading(false);
     }
   };
-  console.log("setnewPropertyAminity", newPropertyAminity)
+  console.log("setnewPropertyAminity", newPropertyAminity);
   useEffect(() => {
     if (property_id) {
-      console.log('fetch property called');
+      console.log("fetch property called");
       featchPropertyAminity();
     }
   }, []);
@@ -257,7 +274,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
 
   useEffect(() => {
     if (propertyAminity) {
-      console.log('set values %^%^%^%^%^%^%^%^%^%^%^5')
+      console.log("set values %^%^%^%^%^%^%^%^%^%^%^5");
       setValue("destination_type", propertyAminity.destination_type || "");
       setValue("property_type", propertyAminity.property_type || "");
       setValue(
@@ -265,17 +282,44 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
         propertyAminity?.no_of_rooms_available?.toString() || "1"
       );
       setValue("wifi", propertyAminity?.amenities?.wifi || false);
-      setValue("swimming_pool", propertyAminity?.amenities?.swimming_pool || false);
-      setValue("fitness_center", propertyAminity?.amenities?.fitness_center || false);
-      setValue("spa_and_wellness", propertyAminity?.amenities?.spa_and_wellness || false);
+      setValue(
+        "swimming_pool",
+        propertyAminity?.amenities?.swimming_pool || false
+      );
+      setValue(
+        "fitness_center",
+        propertyAminity?.amenities?.fitness_center || false
+      );
+      setValue(
+        "spa_and_wellness",
+        propertyAminity?.amenities?.spa_and_wellness || false
+      );
       setValue("restaurant", propertyAminity?.amenities?.restaurant || false);
-      setValue("room_service", propertyAminity?.amenities?.room_service || false);
-      setValue("bar_and_lounge", propertyAminity?.amenities?.bar_and_lounge || false);
+      setValue(
+        "room_service",
+        propertyAminity?.amenities?.room_service || false
+      );
+      setValue(
+        "bar_and_lounge",
+        propertyAminity?.amenities?.bar_and_lounge || false
+      );
       setValue("parking", propertyAminity?.amenities?.parking || false);
-      setValue("concierge_services", propertyAminity?.amenities?.concierge_services || false);
-      setValue("pet_friendly", propertyAminity?.amenities?.pet_friendly || false);
-      setValue("business_facilities", propertyAminity?.amenities?.business_facilities || false);
-      setValue("laundry_services", propertyAminity?.amenities?.laundry_services || false);
+      setValue(
+        "concierge_services",
+        propertyAminity?.amenities?.concierge_services || false
+      );
+      setValue(
+        "pet_friendly",
+        propertyAminity?.amenities?.pet_friendly || false
+      );
+      setValue(
+        "business_facilities",
+        propertyAminity?.amenities?.business_facilities || false
+      );
+      setValue(
+        "laundry_services",
+        propertyAminity?.amenities?.laundry_services || false
+      );
       setValue(
         "child_friendly_facilities",
         propertyAminity?.amenities?.child_friendly_facilities || false
@@ -284,25 +328,37 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
   }, [propertyAminity]);
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-2 ">
         <CardTitle>Property Amenities</CardTitle>
-        <div className="items-center gap-4 pr-4">
+        <div className="items-center flex flex-col md:flex-row md:gap-4 ">
           {/* Destination Type Select */}
-          <div className="self-end w-full relative mb-2">
-            <Label htmlFor="destination_type">Destination Type <span className="text-destructive">*</span></Label>
-            <div className="inline-block relative w-full mt-2">
+          <div className=" inline self-end w-full md:w-1/2 relative">
+            <Label htmlFor="destination_type">
+              Destination Type <span className="text-destructive">*</span>
+            </Label>
+            <div className="inline-block relative w-full mt-1">
               <select
                 {...register("destination_type")}
-                onChange={(e) => setPropertyAminity((prev: any) => ({ ...prev, destination_type: e.target.value }))}
-                className={`block appearance-none w-full bg-background border ${destinationTypeError ? "border-red-500" : "border-input"
-                  } py-2 px-3 md:h-12.1 md:px-3 md:py-3 rounded-md leading-tight focus:outline-none focus:border-blue-500`}
+                onChange={(e) =>
+                  setPropertyAminity((prev: any) => ({
+                    ...prev,
+                    destination_type: e.target.value,
+                  }))
+                }
+                className={`block appearance-none w-full bg-background border ${
+                  destinationTypeError ? "border-red-500" : "border-input"
+                } py-2 px-3 h-10  rounded-md leading-tight focus:outline-none focus:border-blue-500`}
               >
-                <option value="" disabled>Select Destination Type</option>
+                <option value="" disabled>
+                  Select Destination Type
+                </option>
                 <option value="RESORT">RESORT</option>
                 <option value="VACATION RENTAL">VACATION RENTAL</option>
               </select>
               {destinationTypeError && (
-                <p className="text-red-500 text-sm mt-1">{destinationTypeError.message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {destinationTypeError.message}
+                </p>
               )}
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground">
                 <svg
@@ -320,21 +376,33 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
           </div>
 
           {/* Property Type Select */}
-          <div className="self-end w-full relative">
-            <Label htmlFor="property_type">Property Type <span className="text-destructive">*</span></Label>
-            <div className="inline-block relative w-full mt-2">
+          <div className="self-end w-full md:w-1/2 relative">
+            <Label htmlFor="property_type">
+              Property Type <span className="text-destructive">*</span>
+            </Label>
+            <div className="inline-block relative w-full  mt-1">
               <select
                 {...register("property_type")}
-                onChange={(e) => setPropertyAminity((prev: any) => ({ ...prev, property_type: e.target.value }))}
-                className={`block appearance-none w-full bg-background border ${propertyTypeError ? "border-red-500" : "border-input"
-                  } py-2 px-3 md:h-12.1 md:px-3 md:py-3 rounded-md leading-tight focus:outline-none focus:border-blue-500`}
+                onChange={(e) =>
+                  setPropertyAminity((prev: any) => ({
+                    ...prev,
+                    property_type: e.target.value,
+                  }))
+                }
+                className={`block appearance-none w-full bg-background border ${
+                  propertyTypeError ? "border-red-500" : "border-input"
+                } py-2 px-3 h-10 rounded-md leading-tight focus:outline-none focus:border-blue-500`}
               >
-                <option value="" disabled>Select Property Type</option>
+                <option value="" disabled>
+                  Select Property Type
+                </option>
                 <option value="COMMERCIAL PROPERTY">COMMERCIAL PROPERTY</option>
                 <option value="INDUSTRIAL PROPERTY">INDUSTRIAL PROPERTY</option>
               </select>
               {propertyTypeError && (
-                <p className="text-red-500 text-sm mt-1">{propertyTypeError.message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {propertyTypeError.message}
+                </p>
               )}
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground">
                 <svg
@@ -353,19 +421,27 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
         </div>
         <div className="flex items-center gap-4 pr-4">
           <div className="min-w-max">
-            <Label htmlFor="no_of_rooms_available">No. Of Rooms Available <span className="text-destructive">*</span></Label>
+            <Label htmlFor="no_of_rooms_available">
+              No. Of Rooms Available <span className="text-destructive">*</span>
+            </Label>
             <Input
               id="no_of_rooms_available"
-              size={"md"}
               type="number"
-            min={1}
+              min={1}
               variant={noOfRoomsAvailableError && "error"}
               {...register("no_of_rooms_available")}
               value={propertyAminity?.no_of_rooms_available}
-              onChange={(e) => setPropertyAminity((prev: any) => ({ ...propertyAminity, no_of_rooms_available: e.target.value.toString() }))}
+              onChange={(e) =>
+                setPropertyAminity((prev: any) => ({
+                  ...propertyAminity,
+                  no_of_rooms_available: e.target.value.toString(),
+                }))
+              }
             />
             {noOfRoomsAvailableError && (
-              <p className="text-red-500 text-sm mt-1">{noOfRoomsAvailableError.message}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {noOfRoomsAvailableError.message}
+              </p>
             )}
           </div>
         </div>
@@ -373,19 +449,20 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
           <CardHeader>
             <CardTitle>Other Amenities</CardTitle>
           </CardHeader>
-          <CardContent className="flex gap-4 flex-wrap">
+          <CardContent className="flex lg:gap-4 gap-2 flex-wrap">
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="wifi"
                 checked={propertyAminity?.amenities?.wifi || false}
                 {...register("wifi")}
                 onCheckedChange={(value: boolean) => {
-                  setValue("wifi", value)
+                  setValue("wifi", value);
                   setPropertyAminity((prev: any) => {
-                    const newAmenities = prev?.amenities ? { ...prev.amenities, wifi: value } : { wifi: value };
+                    const newAmenities = prev?.amenities
+                      ? { ...prev.amenities, wifi: value }
+                      : { wifi: value };
                     return { ...prev, amenities: newAmenities };
                   });
-
                 }}
               />
               <label
@@ -401,13 +478,14 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 {...register("swimming_pool")}
                 checked={propertyAminity?.amenities?.swimming_pool}
                 onCheckedChange={(value: boolean) => {
-                  setValue("swimming_pool", value)
+                  setValue("swimming_pool", value);
                   setPropertyAminity((prev: any) => {
-                    const newAmenities = prev?.amenities ? { ...prev.amenities, swimming_pool: value } : { swimming_pool: value };
+                    const newAmenities = prev?.amenities
+                      ? { ...prev.amenities, swimming_pool: value }
+                      : { swimming_pool: value };
                     return { ...prev, amenities: newAmenities };
                   });
-                }
-                }
+                }}
               />
               <label
                 htmlFor="swimming_pool"
@@ -422,13 +500,14 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 checked={propertyAminity?.amenities?.fitness_center}
                 {...register("fitness_center")}
                 onCheckedChange={(value: boolean) => {
-                  setValue("fitness_center", value)
+                  setValue("fitness_center", value);
                   setPropertyAminity((prev: any) => {
-                    const newAmenities = prev?.amenities ? { ...prev.amenities, fitness_center: value } : { fitness_center: value };
+                    const newAmenities = prev?.amenities
+                      ? { ...prev.amenities, fitness_center: value }
+                      : { fitness_center: value };
                     return { ...prev, amenities: newAmenities };
                   });
-                }
-                }
+                }}
               />
               <label
                 htmlFor="fitness_center"
@@ -443,13 +522,14 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 checked={propertyAminity?.amenities?.spa_and_wellness}
                 {...register("spa_and_wellness")}
                 onCheckedChange={(value: boolean) => {
-                  setValue("spa_and_wellness", value)
+                  setValue("spa_and_wellness", value);
                   setPropertyAminity((prev: any) => {
-                    const newAmenities = prev?.amenities ? { ...prev.amenities, spa_and_wellness: value } : { spa_and_wellness: value };
+                    const newAmenities = prev?.amenities
+                      ? { ...prev.amenities, spa_and_wellness: value }
+                      : { spa_and_wellness: value };
                     return { ...prev, amenities: newAmenities };
                   });
-                }
-                }
+                }}
               />
               <label
                 htmlFor="spa_and_wellness"
@@ -464,13 +544,14 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 checked={propertyAminity?.amenities?.restaurant}
                 {...register("restaurant")}
                 onCheckedChange={(value: boolean) => {
-                  setValue("restaurant", value)
+                  setValue("restaurant", value);
                   setPropertyAminity((prev: any) => {
-                    const newAmenities = prev?.amenities ? { ...prev.amenities, restaurant: value } : { restaurant: value };
+                    const newAmenities = prev?.amenities
+                      ? { ...prev.amenities, restaurant: value }
+                      : { restaurant: value };
                     return { ...prev, amenities: newAmenities };
                   });
-                }
-                }
+                }}
               />
               <label
                 htmlFor="restaurant"
@@ -485,13 +566,14 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 checked={propertyAminity?.amenities?.room_service}
                 {...register("room_service")}
                 onCheckedChange={(value: boolean) => {
-                  setValue("room_service", value)
+                  setValue("room_service", value);
                   setPropertyAminity((prev: any) => {
-                    const newAmenities = prev?.amenities ? { ...prev.amenities, room_service: value } : { room_service: value };
+                    const newAmenities = prev?.amenities
+                      ? { ...prev.amenities, room_service: value }
+                      : { room_service: value };
                     return { ...prev, amenities: newAmenities };
                   });
-                }
-                }
+                }}
               />
               <label
                 htmlFor="room_service"
@@ -506,13 +588,14 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 checked={propertyAminity?.amenities?.bar_and_lounge}
                 {...register("bar_and_lounge")}
                 onCheckedChange={(value: boolean) => {
-                  setValue("bar_and_lounge", value)
+                  setValue("bar_and_lounge", value);
                   setPropertyAminity((prev: any) => {
-                    const newAmenities = prev?.amenities ? { ...prev.amenities, bar_and_lounge: value } : { bar_and_lounge: value };
+                    const newAmenities = prev?.amenities
+                      ? { ...prev.amenities, bar_and_lounge: value }
+                      : { bar_and_lounge: value };
                     return { ...prev, amenities: newAmenities };
                   });
-                }
-                }
+                }}
               />
               <label
                 htmlFor="bar_and_lounge"
@@ -527,9 +610,11 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 checked={propertyAminity?.amenities?.parking}
                 {...register("parking")}
                 onCheckedChange={(value: boolean) => {
-                  setValue("parking", value)
+                  setValue("parking", value);
                   setPropertyAminity((prev: any) => {
-                    const newAmenities = prev?.amenities ? { ...prev.amenities, parking: value } : { parking: value };
+                    const newAmenities = prev?.amenities
+                      ? { ...prev.amenities, parking: value }
+                      : { parking: value };
                     return { ...prev, amenities: newAmenities };
                   });
                 }}
@@ -547,13 +632,14 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 checked={propertyAminity?.amenities?.concierge_services}
                 {...register("concierge_services")}
                 onCheckedChange={(value: boolean) => {
-                  setValue("concierge_services", value)
+                  setValue("concierge_services", value);
                   setPropertyAminity((prev: any) => {
-                    const newAmenities = prev?.amenities ? { ...prev.amenities, concierge_services: value } : { concierge_services: value };
+                    const newAmenities = prev?.amenities
+                      ? { ...prev.amenities, concierge_services: value }
+                      : { concierge_services: value };
                     return { ...prev, amenities: newAmenities };
                   });
-                }
-                }
+                }}
               />
               <label
                 htmlFor="concierge_services"
@@ -568,13 +654,14 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 checked={propertyAminity?.amenities?.pet_friendly}
                 {...register("pet_friendly")}
                 onCheckedChange={(value: boolean) => {
-                  setValue("pet_friendly", value)
+                  setValue("pet_friendly", value);
                   setPropertyAminity((prev: any) => {
-                    const newAmenities = prev?.amenities ? { ...prev.amenities, pet_friendly: value } : { pet_friendly: value };
+                    const newAmenities = prev?.amenities
+                      ? { ...prev.amenities, pet_friendly: value }
+                      : { pet_friendly: value };
                     return { ...prev, amenities: newAmenities };
                   });
-                }
-                }
+                }}
               />
               <label
                 htmlFor="pet_friendly"
@@ -589,13 +676,14 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 checked={propertyAminity?.amenities?.business_facilities}
                 {...register("business_facilities")}
                 onCheckedChange={(value: boolean) => {
-                  setValue("business_facilities", value)
+                  setValue("business_facilities", value);
                   setPropertyAminity((prev: any) => {
-                    const newAmenities = prev?.amenities ? { ...prev.amenities, business_facilities: value } : { business_facilities: value };
+                    const newAmenities = prev?.amenities
+                      ? { ...prev.amenities, business_facilities: value }
+                      : { business_facilities: value };
                     return { ...prev, amenities: newAmenities };
                   });
-                }
-                }
+                }}
               />
               <label
                 htmlFor="business_facilities"
@@ -610,14 +698,15 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 checked={propertyAminity?.amenities?.laundry_services}
                 {...register("laundry_services")}
                 onCheckedChange={(value: boolean) => {
-                  console.log('00000', value)
-                  setValue("laundry_services", value)
+                  console.log("00000", value);
+                  setValue("laundry_services", value);
                   setPropertyAminity((prev: any) => {
-                    const newAmenities = prev?.amenities ? { ...prev.amenities, laundry_services: value } : { laundry_services: value };
+                    const newAmenities = prev?.amenities
+                      ? { ...prev.amenities, laundry_services: value }
+                      : { laundry_services: value };
                     return { ...prev, amenities: newAmenities };
                   });
-                }
-                }
+                }}
               />
               <label
                 htmlFor="laundry_services"
@@ -632,15 +721,15 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 checked={propertyAminity?.amenities?.child_friendly_facilities}
                 {...register("child_friendly_facilities")}
                 onCheckedChange={(value: boolean) => {
-                  console.log('value', getValues('child_friendly_facilities'))
-                  setValue("child_friendly_facilities", value)
+                  console.log("value", getValues("child_friendly_facilities"));
+                  setValue("child_friendly_facilities", value);
                   setPropertyAminity((prev: any) => {
-                    const newAmenities = prev?.amenities ? { ...prev.amenities, child_friendly_facilities: value } : { child_friendly_facilities: value };
+                    const newAmenities = prev?.amenities
+                      ? { ...prev.amenities, child_friendly_facilities: value }
+                      : { child_friendly_facilities: value };
                     return { ...prev, amenities: newAmenities };
                   });
                 }}
-
-
               />
               <label
                 htmlFor="child_friendly_facilities"
@@ -651,23 +740,28 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
             </div>
           </CardContent>
         </Card>
-        <div className="flex items-center gap-2">
-          <div className="self-end gap-2 flex w-full">
+        <div className="flex justify-end gap-4 w-full mt-4">
+          <div className="mt-2">
             <Button
-              className="w-[200px]"
+              className="lg:w-[180px] md:w-[120px] w-[100px] text-right"
               onClick={onPrevious}
               variant={"secondary"}
               type="button"
             >
               Back
             </Button>
-            <Button className="w-[200px]" type="submit">
-              Submit
+          </div>
+
+          <div className="mt-2">
+            <Button
+              className="lg:w-[180px] md:w-[120px] w-[100px]"
+              type="submit"
+            >
+              Next
             </Button>
-            {/* <SubmitButton content="Next" loading={formLoading} /> */}
           </div>
         </div>
       </form>
     </>
-  ); 
+  );
 }

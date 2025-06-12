@@ -65,7 +65,7 @@ import { RootState, useSelector } from "../../redux/store";
 import Cookies from "js-cookie";
 import { City, Country, State } from "country-state-city";
 import error from "next/error";
-import { ICountry, IState, ICity } from 'country-state-city'
+import { ICountry, IState, ICity } from "country-state-city";
 
 const createPropertyAddressSchema = z.object({
   address_line_1: z.string().min(1, "Address line 1 is required"),
@@ -140,14 +140,17 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
   useEffect(() => {
     if (selectedCountry) {
       const fetchedStates = State.getStatesOfCountry(selectedCountry);
-      console.log("States - ", fetchedStates)
+      console.log("States - ", fetchedStates);
       setStates(fetchedStates);
     }
   }, [selectedCountry]);
 
   useEffect(() => {
     if (selectedState && selectedCountry) {
-      const fetchedCities: any = City.getCitiesOfState(selectedCountry, selectedState);
+      const fetchedCities: any = City.getCitiesOfState(
+        selectedCountry,
+        selectedState
+      );
       setCities(fetchedCities);
     }
   }, [selectedState, selectedCountry]);
@@ -200,7 +203,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
       state: "",
       city: "",
       landmark: "",
-      zip_code: "0",
+      zip_code: "",
     },
     resolver: zodResolver(createPropertyAddressSchema),
   });
@@ -231,8 +234,8 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
       setProppertyAddress(response.data.data.property_address);
       setLoading(false);
     } catch (error: any) {
-      if (error.code === 'ECONNRESET') {
-        console.log('Connection reset, retrying...');
+      if (error.code === "ECONNRESET") {
+        console.log("Connection reset, retrying...");
         // Retry logic here
         featPropertyAddress();
       } else {
@@ -276,17 +279,16 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
       const stateName = selectedStateObj ? selectedStateObj.isoCode : "";
       setValue("state", stateName);
       console.log("Selected state Object:", selectedStateObj);
-      setSelectedState(selectedStateObj?.isoCode)
+      setSelectedState(selectedStateObj?.isoCode);
 
       const selectedCityObj = cities.find(
         (city) => city.name === propertyAddress.city
       );
       const cityName = selectedCityObj ? selectedCityObj.name : "";
-      console.log('city name _________________________', cityName)
+      console.log("city name _________________________", cityName);
       setValue("city", cityName);
       console.log("Selected city Object:", selectedCityObj);
-      setSelectedCity(cityName)
-
+      setSelectedCity(cityName);
 
       console.log("States Array:", states);
       console.log("Property Address State:", propertyAddress.state);
@@ -422,116 +424,245 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
         <CardTitle>Property Address</CardTitle>
-        <div className="items-center justify-center gap-4">
-          <div className="w-full mb-3">
-            <Label htmlFor="address_line_1">Address Line 1 <span className="text-destructive"><span className="text-destructive">*</span></span></Label>
+        <div className="items-center justify-center">
+          <div className="w-full mb-1">
+            <Label htmlFor="address_line_1">
+              Address Line 1{" "}
+              <span className="text-destructive">
+                <span className="text-destructive">*</span>
+              </span>
+            </Label>
             <Input
               id="address_line_1"
+              className="mt-1"
               {...register("address_line_1")}
-              size={"md"}
               type="text"
               variant={addressLine1Error && "error"}
             />
             {addressLine1Error && (
-              <p className="text-red-500 text-sm mt-1">{addressLine1Error.message}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {addressLine1Error.message}
+              </p>
             )}
           </div>
           <div className="w-full">
-            <Label htmlFor="address_line_2">Address Line 2 <span className="text-destructive"><span className="text-destructive">*</span></span></Label>
+            <Label htmlFor="address_line_2 ">
+              Address Line 2{" "}
+              <span className="text-destructive">
+                <span className="text-destructive">*</span>
+              </span>
+            </Label>
             <Input
               id="address_line_2"
-              size={"md"}
+              className="mt-1"
               variant={addressLine2Error && "error"}
               {...register("address_line_2")}
               type="text"
             />
             {addressLine2Error && (
-              <p className="text-red-500 text-sm mt-1">{addressLine2Error.message}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {addressLine2Error.message}
+              </p>
             )}
           </div>
         </div>
 
-        <div className="items-center justify-center gap-4">
+        <div className=" flex md:flex-row w-full flex-col justify-center md:gap-3">
           {/* Commented inputs for country and state */}
 
-          <div className="self-end w-full relative mb-3">
-            <Label htmlFor="country" className="text-gray-700 dark:text-gray-300">Country <span className="text-destructive">*</span></Label>
-            <div className="inline-block relative w-full">
-              <select
-                {...register("country")}
-                className={`block appearance-none w-full border ${countryError ? "border-red-500" : "border-gray-300 dark:border-gray-600"
-                  } bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-2 px-3 md:h-12.1 md:px-3 md:py-4 rounded-md leading-tight focus:outline-none focus:border-primary-500`}
-                value={selectedCountry}
-                onChange={(e) => handleCountryChange(e.target.value)}
+          <div className=" md:w-2/3  relative flex flex-col md:flex-row md:gap-3 ">
+            <div className="md:w-1/2 w-full">
+              <Label
+                htmlFor="country"
+                className="text-gray-700  dark:text-gray-300"
               >
-                {loading ? (
-                  <option value="" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Loading...</option>
-                ) : error ? (
-                  <option value="" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Error: {error}</option>
-                ) : (
-                  countries.map((country) => (
-                    <option key={country.name} value={country.isoCode} className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
-                      {country.name}
-                    </option>
-                  ))
-                )}
-              </select>
-              {countryError && (
-                <p className="text-red-500 text-sm mt-1">{countryError.message}</p>
-              )}
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
-                <svg
-                  className="fill-current h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
+                Country <span className="text-destructive">*</span>
+              </Label>
+              <div className=" mt-1 relative">
+                <select
+                  {...register("country")}
+                  className={`block appearance-none w-full border  ${
+                    countryError
+                      ? "border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 md:h-12.1 md:px-3 text-sm  rounded-md leading-tight focus:outline-none focus:border-primary-500`}
+                  value={selectedCountry}
+                  onChange={(e) => handleCountryChange(e.target.value)}
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M5.293 7.293a1 1 0 0 1 1.414-1.414L10 8.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4z"
-                  />
-                </svg>
+                  {loading ? (
+                    <option
+                      value=""
+                      className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                    >
+                      Loading...
+                    </option>
+                  ) : error ? (
+                    <option
+                      value=""
+                      className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                    >
+                      Error: {error}
+                    </option>
+                  ) : (
+                    countries.map((country) => (
+                      <option
+                        key={country.name}
+                        value={country.isoCode}
+                        className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                      >
+                        {country.name}
+                      </option>
+                    ))
+                  )}
+                </select>
+                {countryError && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {countryError.message}
+                  </p>
+                )}
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
+                  <svg
+                    className="fill-current h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.293 7.293a1 1 0 0 1 1.414-1.414L10 8.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4z"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className=" md:w-1/2 w-full relative">
+              <Label
+                htmlFor="state"
+                className="text-gray-700 dark:text-gray-300"
+              >
+                State <span className="text-destructive">*</span>
+              </Label>
+              <div className="inline-block mt-1 relative w-full">
+                <select
+                  {...register("state")}
+                  className={`block appearance-none w-full border ${
+                    stateError
+                      ? "border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 md:h-12.1 md:px-3 rounded-md leading-tight focus:outline-none focus:border-primary-500`}
+                  value={selectedState}
+                  onChange={(e) => setSelectedState(e.target.value)}
+                >
+                  {loading ? (
+                    <option
+                      value=""
+                      className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                    >
+                      Loading...
+                    </option>
+                  ) : error ? (
+                    <option
+                      value=""
+                      className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                    >
+                      Error: {error}
+                    </option>
+                  ) : (
+                    states?.map((state) => (
+                      <option
+                        key={state.isoCode}
+                        value={state.isoCode}
+                        className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                      >
+                        {state.name}
+                      </option>
+                    ))
+                  )}
+                </select>
+                {stateError && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {stateError.message}
+                  </p>
+                )}
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
+                  <svg
+                    className="fill-current h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.293 7.293a1 1 0 0 1 1.414-1.414L10 8.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4z"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
-
-          <div className="self-end w-full relative">
-            <Label htmlFor="state" className="text-gray-700 dark:text-gray-300">State <span className="text-destructive">*</span></Label>
-            <div className="inline-block relative w-full">
-              <select
-                {...register("state")}
-                className={`block appearance-none w-full border ${stateError ? "border-red-500" : "border-gray-300 dark:border-gray-600"
-                  } bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-2 px-3 md:h-12.1 md:px-3 md:py-4 rounded-md leading-tight focus:outline-none focus:border-primary-500`}
-                value={selectedState}
-                onChange={(e) => setSelectedState(e.target.value)}
+          <div className="md:w-1/3 w-full">
+            <div className="self-end w-full relative">
+              <Label
+                htmlFor="city"
+                className="text-gray-700 dark:text-gray-300"
               >
-                {loading ? (
-                  <option value="" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Loading...</option>
-                ) : error ? (
-                  <option value="" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Error: {error}</option>
-                ) : (
-                  states?.map((state) => (
-                    <option key={state.isoCode} value={state.isoCode} className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
-                      {state.name}
-                    </option>
-                  ))
-                )}
-              </select>
-              {stateError && (
-                <p className="text-red-500 text-sm mt-1">{stateError.message}</p>
-              )}
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
-                <svg
-                  className="fill-current h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
+                City <span className="text-destructive">*</span>
+              </Label>
+              <div className="inline-block mt-1 relative w-full">
+                <select
+                  {...register("city")}
+                  className={`block appearance-none w-full border ${
+                    stateError
+                      ? "border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 md:h-12.1 md:px-3 rounded-md leading-tight focus:outline-none focus:border-primary-500`}
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.target.value)}
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M5.293 7.293a1 1 0 0 1 1.414-1.414L10 8.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4z"
-                  />
-                </svg>
+                  {loading ? (
+                    <option
+                      value=""
+                      className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                    >
+                      Loading...
+                    </option>
+                  ) : error ? (
+                    <option
+                      value=""
+                      className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                    >
+                      Error: {error}
+                    </option>
+                  ) : (
+                    cities?.map((city) => (
+                      <option
+                        key={city.name}
+                        value={city.name}
+                        className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                      >
+                        {city.name}
+                      </option>
+                    ))
+                  )}
+                </select>
+                {cityError && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {cityError.message}
+                  </p>
+                )}
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
+                  <svg
+                    className="fill-current h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.293 7.293a1 1 0 0 1 1.414-1.414L10 8.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4z"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
@@ -539,86 +670,62 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
 
         <div className="items-center justify-center gap-4">
           {/* Commented city input */}
-
-          <div className="self-end w-full relative mb-3">
-            <Label htmlFor="city" className="text-gray-700 dark:text-gray-300">City <span className="text-destructive">*</span></Label>
-            <div className="inline-block relative w-full">
-              <select
-                {...register("city")}
-                className={`block appearance-none w-full border ${stateError ? "border-red-500" : "border-gray-300 dark:border-gray-600"
-                  } bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-2 px-3 md:h-12.1 md:px-3 md:py-4 rounded-md leading-tight focus:outline-none focus:border-primary-500`}
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
-              >
-                {loading ? (
-                  <option value="" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Loading...</option>
-                ) : error ? (
-                  <option value="" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Error: {error}</option>
-                ) : (
-                  cities?.map((city) => (
-                    <option key={city.name} value={city.name} className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
-                      {city.name}
-                    </option>
-                  ))
-                )}
-              </select>
-              {cityError && (
-                <p className="text-red-500 text-sm mt-1">{cityError.message}</p>
+          <div className="flex md:flex-row flex-col md:gap-3  ">
+            <div className="w-full md:w-1/2 ">
+              <Label htmlFor="landmark">
+                Landmark <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                variant={landmarkError && "error"}
+                className="mt-1"
+                id="landmark"
+                {...register("landmark")}
+                type="text"
+              />
+              {landmarkError && (
+                <p className="text-red-500 text-sm mt-1">
+                  {landmarkError.message}
+                </p>
               )}
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
-                <svg
-                  className="fill-current h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5.293 7.293a1 1 0 0 1 1.414-1.414L10 8.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4z"
-                  />
-                </svg>
-              </div>
+            </div>
+
+            <div className="items-center w-full md:w-1/2 ">
+              <Label htmlFor="zip_code">
+                Zip Code <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="zip_code"
+                type="text"
+                className="mt-1"
+                maxLength={6}
+                variant={zipCodeError && "error"}
+                {...register("zip_code")}
+              />
+              {zipCodeError && (
+                <p className="text-red-500 text-sm mt-1">
+                  {zipCodeError.message}
+                </p>
+              )}
             </div>
           </div>
-
-          <div className="w-full mb-3">
-            <Label htmlFor="landmark">Landmark <span className="text-destructive">*</span></Label>
-            <Input
-              variant={landmarkError && "error"}
-              id="landmark"
-              {...register("landmark")}
-              type="text"
-              size={"md"}
-            />
-            {landmarkError && (
-              <p className="text-red-500 text-sm mt-1">{landmarkError.message}</p>
-            )}
-          </div>
-
-          <div className="items-center gap-2">
-            <Label htmlFor="zip_code">Zip Code <span className="text-destructive">*</span></Label>
-            <Input
-              size={"md"}
-              id="zip_code"
-              type="text"
-              maxLength={6}
-              variant={zipCodeError && "error"}
-              {...register("zip_code")}
-            />
-            {zipCodeError && (
-              <p className="text-red-500 text-sm mt-1">{zipCodeError.message}</p>
-            )}
-          </div>
-          <div className="self-end flex w-full justify-between mt-4">
+        </div>
+        <div className="flex justify-end gap-4 w-full mt-4">
+          <div className="mt-2">
             <Button
-              className="w-[200px]"
+              className="lg:w-[180px] md:w-[120px] w-[100px] text-right"
               onClick={() => handlePrevious(property_id)}
               variant={"secondary"}
               type="button"
             >
               Back
             </Button>
+          </div>
 
-            <Button className="w-[200px]" type="submit">
+          <div className="mt-2">
+            <Button
+              className="lg:w-[180px] md:w-[120px] w-[100px]"
+              type="submit"
+            >
               Next
             </Button>
           </div>
