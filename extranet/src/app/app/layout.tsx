@@ -4,7 +4,32 @@ import Navbar from "../../components/navbar/navbar";
 import CheckAuthentication from "../../components/CheckAuthentication/CheckAuthentication";
 import { Triangle } from "react-loader-spinner";
 import AppSidebar from "../../components/Sidebar";
-import { RootState, store, useSelector, useDispatch } from "../../redux/store";
+import {
+  SidebarProvider,
+  useSidebar,
+} from "../../components/ui/sidebar";
+import { RootState, useSelector } from "../../redux/store";
+import { cn } from "../../lib/utils";
+
+function MainContent({ children }: { children: React.ReactNode }) {
+  const { open, isMobile } = useSidebar();
+  const currentUser = useSelector((state: RootState) => state.auth.user);
+  const isSuperAdmin = currentUser?.role === "superAdmin";
+
+  return (
+    <div className="flex flex-1">
+      {isSuperAdmin && <AppSidebar />}
+      <div
+        className={cn(
+          "flex-1 overflow-auto transition-all duration-300",
+          open && !isMobile ? "ml-[250px]" : "ml-0"
+        )}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export default function RootLayout({
   children,
@@ -12,19 +37,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [loading, setLoading] = useState(true);
-  const [isSuperAdmin, setSuperAdmin] = useState<boolean>(false)
   const currentUser = useSelector((state: RootState) => state.auth.user);
 
   useEffect(() => {
-    if (currentUser?.role === "superAdmin") {
-      setSuperAdmin(true);
-    } else {
-      setSuperAdmin(false);
-    }
-  }, [currentUser]);
-  useEffect(() => {
-    // Simulate authentication check completion
-
     const timeout = setTimeout(() => setLoading(false), 1000);
     return () => clearTimeout(timeout);
   }, []);
@@ -32,29 +47,24 @@ export default function RootLayout({
   return (
     <CheckAuthentication setLoading={setLoading}>
       {loading ? (
-        <div className="h-screen w-screen flex justify-center items-center overflow-hidden">
+        <div className="h-screen w-screen flex items-center justify-center">
           <Triangle
-            visible={true}
-            height={100}
-            width={100}
-            color="#282D4D"
+            height="80"
+            width="80"
+            color="#4fa94d"
             ariaLabel="triangle-loading"
+            visible={true}
           />
         </div>
       ) : (
-        <>
-
-          <div className="h-screen w-screen overflow-y-auto overflow-x-hidden">
-            {isSuperAdmin && (
-                <AppSidebar />
-            )}
-            <div>
-
-              <Navbar />
-              {children}
+        <SidebarProvider>
+          <div className="flex flex-col h-screen">
+            <Navbar />
+            <div className="flex flex-1 overflow-hidden">
+              <MainContent>{children}</MainContent>
             </div>
           </div>
-        </>
+        </SidebarProvider>
       )}
     </CheckAuthentication>
   );
