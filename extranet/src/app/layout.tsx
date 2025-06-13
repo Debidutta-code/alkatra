@@ -17,10 +17,7 @@ const notoSans = Noto_Sans({
 
 export const viewport: Viewport = {
   themeColor: "#FFFDFF",
-  // themeColor: [
-  //   { media: "(prefers-color-scheme: light)", color: "#FFFDFF" },
-  //   { media: "(prefers-color-scheme: dark)", color: "#000000" },
-  // ],
+
 };
 
 export const metadata: Metadata = {
@@ -58,7 +55,6 @@ export default function RootLayout({
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
           notoSans.variable,
-          // "text-foreground bg-tripsyift-off-white"
           "text-foreground bg-tripswift-off-white"
         )}
       >

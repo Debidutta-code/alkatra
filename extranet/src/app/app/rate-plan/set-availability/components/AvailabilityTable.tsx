@@ -1,0 +1,165 @@
+// components/InventoryTable.tsx
+"use client";
+import React from "react";
+import { Edit2, X, Check } from "lucide-react";
+import { format } from "../utils/dateUtils";
+import { InventoryInterFace } from "../types";
+
+interface InventoryTableProps {
+  filteredData: InventoryInterFace[];
+  editingRows: Set<number>;
+  handleAvailabilityChange: (index: number, newAvailability: number) => void;
+  toggleEditRow: (index: number) => void;
+  toggleEditButton: () => void;
+  editButtonVal: boolean;
+}
+
+const TABLE_HEADERS = [
+  { key: "date", label: "Date" },
+  { key: "roomType", label: "Room Type" },
+  { key: "availability", label: "Availability" },
+  { key: "actions", label: "Actions" },
+];
+
+export const InventoryTable: React.FC<InventoryTableProps> = ({
+  filteredData,
+  editingRows,
+  handleAvailabilityChange,
+  toggleEditRow,
+  toggleEditButton,
+  editButtonVal,
+}) => {
+  const handleEditClick = (index: number) => {
+    if (!editButtonVal) {
+      toggleEditButton();
+    }
+    toggleEditRow(index);
+  };
+
+  const handleCancelEdit = (index: number) => {
+    toggleEditRow(index);
+  };
+
+  const isRowEditable = (index: number) => {
+    return editButtonVal && editingRows.has(index);
+  };
+
+  return (
+    <div className="bg-white rounded-xl shadow-md">
+      <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+        <h2 className="text-lg font-semibold text-gray-800">
+          Inventory Data ({filteredData.length} items)
+        </h2>
+        {editButtonVal && (
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-blue-600 font-medium">
+              Edit Mode Active
+            </span>
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+          </div>
+        )}
+      </div>
+
+      {filteredData.length === 0 ? (
+        <div className="p-8 text-center text-gray-500">
+          No data found. Try adjusting your filters.
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead className="bg-gray-100">
+              <tr>
+                {TABLE_HEADERS.map((header) => (
+                  <th
+                    key={header.key}
+                    className={`px-6 py-3 text-${
+                      header.key === "actions" ? "right" : "left"
+                    } text-xs font-semibold text-gray-600 uppercase tracking-wider border-b border-gray-200`}
+                  >
+                    {header.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {filteredData.map((item, index) => (
+                <tr
+                  key={`${item._id}-${item.invTypeCode}`}
+                  className={`transition-colors duration-150 ${
+                    isRowEditable(index)
+                      ? "bg-blue-50 hover:bg-blue-100"
+                      : "hover:bg-gray-50"
+                  }`}
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {format(new Date(item?.availability?.startDate), "PPP")}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        to {format(new Date(item?.availability?.endDate), "PPP")}
+                      </div>
+                    </div>
+                  </td>
+
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {item.invTypeCode}
+                      </div>
+                    </div>
+                  </td>
+
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <input
+                      type="number"
+                      value={item?.availability?.count}
+                      onChange={(e) =>
+                        handleAvailabilityChange(
+                          index,
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      className={`w-16 px-2 py-1 text-sm rounded transition-all duration-200 ${
+                        isRowEditable(index)
+                          ? "border-2 border-blue-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                          : "border-none bg-transparent focus:outline-none"
+                      }`}
+                      min={0}
+                      disabled={!isRowEditable(index)}
+                      readOnly={!isRowEditable(index)}
+                    />
+                  </td>
+
+                  <td className="px-6 py-4 whitespace-nowrap text-right">
+                    <div className="flex justify-end space-x-1">
+                      {isRowEditable(index) ? (
+                        <>
+                          <button
+                            onClick={() => handleCancelEdit(index)}
+                            className="p-2 hover:bg-red-100 text-red-600 rounded-full transition-colors duration-150"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                          
+                        </>
+                      ) : (
+                        <button
+                          onClick={() => handleEditClick(index)}
+                          className="p-2 hover:bg-blue-100 text-blue-600 rounded-full transition-colors duration-150"
+                          aria-label="Edit row"
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};

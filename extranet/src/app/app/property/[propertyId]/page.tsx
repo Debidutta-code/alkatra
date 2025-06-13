@@ -553,19 +553,41 @@ export default function Page({ params, searchParams }: Props) {
 
         {/* <div className="flex flex-col md:flex-row gap-2 items-center"> */}
           <div className="mb-4 mt-4">
+            
             {/* <Button
               variant="default"
-              onClick={() => router.push(`/app/rate-plan/get-rate-plan?propertyId=${propertyId}`)}
-              className="bg-blue-500 hover:bg-blue-600 text-white"
-            >
-              Rate Plans
+              onClick={() => router.push(`/app/rate-plan/map-rate-plan`)}
+              className="bg-tripswift-blue hover:bg-tripswift-blue-600 text-white mx-2"
+              >
+              Add Rate Plan
             </Button> */}
             <Button
               variant="default"
               onClick={() => router.push(`/app/rate-plan/map-rate-plan`)}
-              className="bg-tripswift-blue hover:bg-tripswift-blue-600 text-white"
+              className="bg-tripswift-blue hover:bg-tripswift-blue-600 text-white mx-2"
               >
               Rate and Inventory Allotment
+            </Button>
+            <Button
+              variant="default"
+              onClick={() => router.push(`/app/rate-plan/set-availability`)}
+              className="bg-tripswift-blue hover:bg-tripswift-blue-600 text-white mx-2"
+              >
+              Add Inventory
+            </Button>
+            <Button
+              variant="default"
+              onClick={() => router.push(`/app/rate-plan/create-rate-plan`)}
+              className="bg-tripswift-blue hover:bg-tripswift-blue-600 text-white mx-2"
+              >
+              Create Rate Plan
+            </Button>
+            <Button
+              variant="default"
+              onClick={() => router.push(`/app/rate-plan/map-rate-plan`)}
+              className="bg-tripswift-blue hover:bg-tripswift-blue-600 text-white mx-2"
+              >
+              Map Rate Plan
             </Button>
           </div>
         {/* </div> */}

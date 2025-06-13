@@ -1,4 +1,4 @@
-// Updated AppSidebar component with mobile-friendly positioning
+// Enhanced AppSidebar component with modern UI design
 "use client";
 import Image from "next/image"
 import {
@@ -31,7 +31,11 @@ import {
   MapPin,
   Bed,
   Bath,
-  Car
+  Car,
+  Hotel,
+  Sparkles,
+  ArrowRight,
+  Search
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -55,9 +59,9 @@ interface GroupedHotels {
   hotels: Hotel[];
 }
 
-interface DirectProperty extends Hotel {}
+interface DirectProperty extends Hotel { }
 
-export default function AppSidebar() {
+export default function AppSidebar({ role }: { role: string }) {
   const pathname = usePathname();
   const { user } = useSelector((state: RootState) => state.auth);
   const { isMobile, open, toggleSidebar } = useSidebar();
@@ -68,6 +72,7 @@ export default function AppSidebar() {
   const [directProperties, setDirectProperties] = useState<DirectProperty[]>([]);
   const [groupedProperties, setGroupedProperties] = useState<GroupedHotels[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     if (!open) {
@@ -102,26 +107,56 @@ export default function AppSidebar() {
     }
   }, [accessToken]);
 
-  const navigationItems = [
-    {
-      title: "Single Properties",
-      icon: Building2,
-      hasSubmenu: true,
-      submenuItems: directProperties
-    },
-    {
-      title: "Grouped Properties",
-      icon: Building2,
-      hasSubmenu: true,
-      submenuItems: groupedProperties
-    },
-  ];
+  // Filter navigation items based on role
+  const getNavigationItems = () => {
+    interface NavigationItem {
+      title: string;
+      icon: any;
+      hasSubmenu: boolean;
+      submenuItems: DirectProperty[] | GroupedHotels[];
+      gradient: string;
+      bgColor: string;
+      iconColor: string;
+      type: 'direct' | 'grouped';
+    }
+
+    const baseItems: NavigationItem[] = [
+      {
+        title: "Single Properties",
+        icon: Building2,
+        hasSubmenu: true,
+        submenuItems: directProperties,
+        gradient: "from-blue-500 to-indigo-600",
+        bgColor: "bg-blue-50 dark:bg-blue-950/20",
+        iconColor: "text-blue-600 dark:text-blue-400",
+        type: 'direct'
+      }
+    ];
+
+    // Only add Grouped Properties if user is superAdmin
+    if (role === "superAdmin") {
+      baseItems.push({
+        title: "Grouped Properties",
+        icon: Hotel,
+        hasSubmenu: true,
+        submenuItems: groupedProperties,
+        gradient: "from-emerald-500 to-teal-600",
+        bgColor: "bg-emerald-50 dark:bg-emerald-950/20",
+        iconColor: "text-emerald-600 dark:text-emerald-400",
+        type: 'grouped'
+      });
+    }
+
+    return baseItems;
+  };
+
+  const navigationItems = getNavigationItems();
 
   const handleMouseEnter = (itemTitle: string) => {
-    if (isMobile) return; // Disable hover on mobile
-    
+    if (isMobile) return;
+
     setHoveredItem(itemTitle);
-    
+
     const menuItemElement = menuItemRefs.current[itemTitle];
     if (menuItemElement) {
       const rect = menuItemElement.getBoundingClientRect();
@@ -135,34 +170,73 @@ export default function AppSidebar() {
     }
   };
 
- 
+  const filterProperties = (properties: any[], term: string) => {
+    if (!term) return properties;
+    return properties.filter(property =>
+      property.name.toLowerCase().includes(term.toLowerCase())
+    );
+  };
 
   const renderDirectProperties = () => {
-    return directProperties.map((property, index) => {
-      const propertyUrl = `app/property/${property._id}`;
+    const filteredProperties = filterProperties(directProperties, searchTerm);
+
+    return filteredProperties.map((property, index) => {
+      const propertyUrl = `/app/property/${property._id}`;
       const isSubActive = pathname === propertyUrl;
 
       return (
         <Link
           key={property._id}
           href={propertyUrl}
-          className="block mb-1"
+          className="block"
           onClick={() => isMobile && toggleSidebar()}
         >
-          <Button
-            variant={isSubActive ? "secondary" : "ghost"}
-            className="w-full justify-start p-3 h-auto"
-          >
-            <div className="flex items-center gap-3 w-full">
-              <div className="p-1.5 rounded-md bg-blue-100 dark:bg-blue-900/20">
-                <Building className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+          <div className={cn(
+            "group relative overflow-hidden rounded-lg p-3 transition-all duration-300 hover:scale-[1.02] hover:shadow-md",
+            isSubActive
+              ? "bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border border-blue-200 dark:border-blue-800"
+              : "hover:bg-blue-50/50 dark:hover:bg-blue-950/20"
+          )}>
+            <div className="flex items-center gap-3 relative z-10">
+              <div className={cn(
+                "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300",
+                isSubActive
+                  ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg"
+                  : "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 group-hover:scale-110"
+              )}>
+                <Building className="h-4 w-4" />
               </div>
-              <div className="flex-1 text-left">
-                <span className="text-sm font-medium block truncate">{property.name}</span>
-                <span className="text-xs text-muted-foreground">Direct Property</span>
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className={cn(
+                    "text-sm font-semibold truncate transition-colors",
+                    isSubActive ? "text-blue-700 dark:text-blue-300" : "text-gray-900 dark:text-gray-100"
+                  )}>
+                    {property.name}
+                  </span>
+                  {isSubActive && <Sparkles className="h-3 w-3 text-blue-500 animate-pulse" />}
+                </div>
+                {/* <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div>
+                  Direct Property
+                </span> */}
               </div>
+
+              <ArrowRight className={cn(
+                "h-4 w-4 transition-all duration-300",
+                isSubActive
+                  ? "text-blue-600 dark:text-blue-400 translate-x-0 opacity-100"
+                  : "text-gray-400 -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
+              )} />
             </div>
-          </Button>
+
+            {/* Animated background gradient */}
+            <div className={cn(
+              "absolute inset-0 bg-gradient-to-r from-blue-500/5 to-indigo-500/5 opacity-0 transition-opacity duration-300",
+              "group-hover:opacity-100"
+            )} />
+          </div>
         </Link>
       );
     });
@@ -170,55 +244,94 @@ export default function AppSidebar() {
 
   const renderGroupedProperties = () => {
     return groupedProperties.map((group) => (
-      <div key={group.id} className="mb-3">
-        <div className="px-2 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-          {group.groupManagerName}
+      <div key={group.id} className="mb-4">
+        <div className="flex items-center gap-2 px-3 py-2 mb-2 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20 rounded-lg border border-emerald-100 dark:border-emerald-900/30">
+          <div className="w-2 h-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500"></div>
+          <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
+            {group.groupManagerName}
+          </span>
+          <div className="flex-1 h-px bg-gradient-to-r from-emerald-200 to-transparent dark:from-emerald-800"></div>
         </div>
-        {group.hotels.map((hotel) => {
-          const hotelUrl = `app/property/grouped/${hotel._id}`;
-          const isSubActive = pathname === hotelUrl;
 
-          return (
-            <Link
-              key={hotel._id}
-              href={hotelUrl}
-              className="block mb-1"
-              onClick={() => isMobile && toggleSidebar()}
-            >
-              <Button
-                variant={isSubActive ? "secondary" : "ghost"}
-                className="w-full justify-start p-3 h-auto ml-2"
+        <div className="space-y-1 pl-2">
+          {group.hotels.filter(hotel =>
+            !searchTerm || hotel.name.toLowerCase().includes(searchTerm.toLowerCase())
+          ).map((hotel) => {
+            const hotelUrl = `/app/property/${hotel._id}`;
+            const isSubActive = pathname === hotelUrl;
+
+            return (
+              <Link
+                key={hotel._id}
+                href={hotelUrl}
+                className="block"
+                onClick={() => isMobile && toggleSidebar()}
               >
-                <div className="flex items-center gap-3 w-full">
-                  <div className="p-1.5 rounded-md bg-green-100 dark:bg-green-900/20">
-                    <Building className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
+                <div className={cn(
+                  "group relative overflow-hidden rounded-lg p-3 transition-all duration-300 hover:scale-[1.02] hover:shadow-md",
+                  isSubActive
+                    ? "bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-200 dark:border-emerald-800"
+                    : "hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20"
+                )}>
+                  <div className="flex items-center gap-3 relative z-10">
+                    <div className={cn(
+                      "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300",
+                      isSubActive
+                        ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg"
+                        : "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 group-hover:scale-110"
+                    )}>
+                      <Hotel className="h-4 w-4" />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className={cn(
+                          "text-sm font-semibold truncate transition-colors",
+                          isSubActive ? "text-emerald-700 dark:text-emerald-300" : "text-gray-900 dark:text-gray-100"
+                        )}>
+                          {hotel.name}
+                        </span>
+                        {isSubActive && <Sparkles className="h-3 w-3 text-emerald-500 animate-pulse" />}
+                      </div>
+                    </div>
+
+                    <ArrowRight className={cn(
+                      "h-4 w-4 transition-all duration-300",
+                      isSubActive
+                        ? "text-emerald-600 dark:text-emerald-400 translate-x-0 opacity-100"
+                        : "text-gray-400 -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
+                    )} />
                   </div>
-                  <div className="flex-1 text-left">
-                    <span className="text-sm font-medium block truncate">{hotel.name}</span>
-                  </div>
+
+                  {/* Animated background gradient */}
+                  <div className={cn(
+                    "absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-teal-500/5 opacity-0 transition-opacity duration-300",
+                    "group-hover:opacity-100"
+                  )} />
                 </div>
-              </Button>
-            </Link>
-          );
-        })}
+              </Link>
+            );
+          })}
+        </div>
       </div>
     ));
   };
 
   return (
     <div className="">
-      <Sidebar>
-        <SidebarHeader className="border-b p-4">
+      <Sidebar className="border-r border-gray-200 dark:border-gray-800">
+        <SidebarHeader className="border-b border-gray-200 dark:border-gray-800 h-[10vh] bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-900">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Image
-                src="/assets/TRIP-1.png"
-                alt="Logo"
-                width={32}
-                height={32}
-                className="rounded"
-              />
-              <span className="font-semibold text-lg">Trip Swift</span>
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <Image
+                  src="/assets/TRIP-1.png"
+                  alt="Logo"
+                  width={120}
+                  height={40}
+                  className="rounded-lg shadow-sm"
+                />
+              </div>
             </div>
 
             {open && (
@@ -226,7 +339,7 @@ export default function AppSidebar() {
                 variant="ghost"
                 size="sm"
                 onClick={toggleSidebar}
-                className="h-8 w-8 p-0"
+                className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600 transition-colors"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -234,13 +347,16 @@ export default function AppSidebar() {
           </div>
         </SidebarHeader>
 
-        <SidebarContent>
+        <SidebarContent className="bg-gradient-to-b from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-950/50">
           <SidebarGroup>
-            <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
+            
+            <SidebarGroupContent className="px-2">
+              <SidebarMenu className="space-y-2">
                 {navigationItems.map((item) => {
                   const hasItems = item.submenuItems && item.submenuItems.length > 0;
+                  const totalCount = item.title === "Single Properties"
+                    ? directProperties.length
+                    : groupedProperties.reduce((acc, group) => acc + group.hotels.length, 0);
 
                   return (
                     <SidebarMenuItem key={item.title}>
@@ -252,33 +368,71 @@ export default function AppSidebar() {
                       >
                         <SidebarMenuButton
                           className={cn(
-                            "w-full justify-between",
-                            hoveredItem === item.title && "bg-accent text-accent-foreground"
+                            "w-full group relative overflow-hidden rounded-xl p-3 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg",
+                            hoveredItem === item.title
+                              ? `bg-gradient-to-r ${item.gradient} text-white shadow-lg`
+                              : `${item.bgColor} hover:shadow-md`
                           )}
                         >
-                          <div className="flex items-center justify-between w-full cursor-pointer">
+                          <div className="flex items-center justify-between w-full cursor-pointer relative z-10">
                             <div className="flex items-center gap-3">
-                              <item.icon className="h-4 w-4" />
-                              <span>{item.title}</span>
-                              {loading && <span className="text-xs text-muted-foreground">(Loading...)</span>}
-                              {!loading && hasItems && (
-                                <span className="text-xs text-muted-foreground">
-                                  ({item.title === "Single Properties" ? directProperties.length : 
-                                    groupedProperties.reduce((acc, group) => acc + group.hotels.length, 0)})
+                              <div className={cn(
+                                "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300",
+                                hoveredItem === item.title
+                                  ? "bg-white/20 text-white"
+                                  : `${item.iconColor} group-hover:scale-110`
+                              )}>
+                                <item.icon className="h-4 w-4" />
+                              </div>
+                              <div className="flex flex-col">
+                                <span className={cn(
+                                  "font-semibold text-sm transition-colors",
+                                  hoveredItem === item.title ? "text-white" : "text-gray-900 dark:text-gray-100"
+                                )}>
+                                  {item.title}
                                 </span>
-                              )}
+                                {loading ? (
+                                  <span className="text-xs opacity-70">Loading...</span>
+                                ) : hasItems && (
+                                  <span className="text-xs opacity-70">
+                                    {totalCount} {totalCount === 1 ? 'property' : 'properties'}
+                                  </span>
+                                )}
+                              </div>
                             </div>
+
                             {hasItems && (
-                              isMobile ? (
-                                <ChevronDown className={cn(
-                                  "h-4 w-4 transition-transform",
-                                  hoveredItem === item.title && "rotate-180"
-                                )} />
-                              ) : (
-                                <ChevronRight className="h-4 w-4" />
-                              )
+                              <div className="flex items-center gap-2">
+                                {!loading && totalCount > 0 && (
+                                  <div className={cn(
+                                    "px-2 py-1 rounded-full text-xs font-bold transition-colors",
+                                    hoveredItem === item.title
+                                      ? "bg-white/20 text-white"
+                                      : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                                  )}>
+                                    {totalCount}
+                                  </div>
+                                )}
+                                {isMobile ? (
+                                  <ChevronDown className={cn(
+                                    "h-4 w-4 transition-all duration-300",
+                                    hoveredItem === item.title && "rotate-180"
+                                  )} />
+                                ) : (
+                                  <ChevronRight className={cn(
+                                    "h-4 w-4 transition-all duration-300",
+                                    hoveredItem === item.title && "translate-x-1"
+                                  )} />
+                                )}
+                              </div>
                             )}
                           </div>
+
+                          {/* Hover effect background */}
+                          <div className={cn(
+                            "absolute inset-0 bg-gradient-to-r opacity-0 transition-opacity duration-300",
+                            `${item.gradient} group-hover:opacity-10`
+                          )} />
                         </SidebarMenuButton>
                       </div>
                     </SidebarMenuItem>
@@ -293,10 +447,10 @@ export default function AppSidebar() {
       {hoveredItem && !loading && (
         <div
           className={cn(
-            "bg-background border-r border-border shadow-lg z-50 rounded-r-lg overflow-y-auto",
-            isMobile ? "w-full relative" : "fixed w-80"
+            "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-2xl z-50 rounded-r-2xl overflow-hidden backdrop-blur-sm",
+            isMobile ? "w-full relative" : "fixed w-96"
           )}
-          style={!isMobile ? { 
+          style={!isMobile ? {
             top: `${submenuPosition.top}px`,
             left: open ? "256px" : "64px",
             maxHeight: 'calc(100vh - 120px)',
@@ -304,24 +458,43 @@ export default function AppSidebar() {
           onMouseEnter={() => !isMobile && setHoveredItem(hoveredItem)}
           onMouseLeave={() => !isMobile && setHoveredItem(null)}
         >
-          <div className="p-2">
+          {/* Header with search */}
+          <div className="p-4 border-b border-gray-200 dark:border-gray-800 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-900">
+            <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100 mb-3">
+              {hoveredItem}
+            </h3>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search properties..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="p-4 overflow-y-auto max-h-96 space-y-2">
             {hoveredItem === "Single Properties" && (
               <>
                 {directProperties.length === 0 ? (
-                  <div className="text-center text-muted-foreground py-4">
-                    No direct properties found
+                  <div className="text-center text-gray-500 dark:text-gray-400 py-8">
+                    <Building2 className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p className="text-sm">No direct properties found</p>
                   </div>
                 ) : (
                   renderDirectProperties()
                 )}
               </>
             )}
-
             {hoveredItem === "Grouped Properties" && (
               <>
                 {groupedProperties.length === 0 ? (
-                  <div className="text-center text-muted-foreground py-4">
-                    No grouped properties found
+                  <div className="text-center text-gray-500 dark:text-gray-400 py-8">
+                    <Hotel className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p className="text-sm">No grouped properties found</p>
                   </div>
                 ) : (
                   renderGroupedProperties()
