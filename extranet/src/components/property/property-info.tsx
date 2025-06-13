@@ -734,10 +734,7 @@ export default function PropertyInfo({ onNext }: Props) {
                     </p>
                   )}
                 </div>
-                <div className="h-15 mt-1 relative">
-                  <p className="text-sm font-medium mb-[3px] ml-1">
-                    Upload Image
-                  </p>
+                <div className="h-15 mt-7 relative">
                   {propertyImageUrls?.length ? (
                     <PreviewPropertyImages
                       open={propertyImagePreviewDialog}
@@ -760,7 +757,7 @@ export default function PropertyInfo({ onNext }: Props) {
                 </div>
               </div>
               <div className=" text-right">
-                <div className="inline-block lg:mt-6 w-full lg:w-auto">
+                <div className="inline-block lg:mt-7 w-full lg:w-auto">
                   <Button className="w-[120px] rounded-full" type="submit">
                     Next
                   </Button>
@@ -884,6 +881,7 @@ export default function PropertyInfo({ onNext }: Props) {
                       ? "border-red-500 focus-visible:ring-red-500"
                       : ""
                   }
+                  style={{resize:"none"}}
                 />
               </div>
               {propertydescription && (
@@ -1041,10 +1039,7 @@ export default function PropertyInfo({ onNext }: Props) {
                     </p>
                   )}
                 </div>
-                <div className="h-15 mt-1 relative">
-                  <p className="text-sm font-medium mb-[3px] ml-1">
-                    Upload Image
-                  </p>
+                <div className="h-15 mt-7 relative">
                   {propertyImageUrls?.length ? (
                     <PreviewPropertyImages
                       open={propertyImagePreviewDialog}
@@ -1067,7 +1062,7 @@ export default function PropertyInfo({ onNext }: Props) {
                 </div>
               </div>
               <div className=" text-right">
-                <div className="inline-block lg:mt-6 w-full lg:w-auto">
+                <div className="inline-block lg:mt-7 w-full lg:w-auto">
                   <Button className="w-[120px] rounded-full" type="submit">
                     Next
                   </Button>

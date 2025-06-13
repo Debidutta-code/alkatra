@@ -489,7 +489,9 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                       : "border-gray-300 dark:border-gray-600"
                   } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 md:h-12.1 md:px-3 text-sm  rounded-md leading-tight focus:outline-none focus:border-primary-500`}
                   value={selectedCountry}
-                  onChange={(e) => handleCountryChange(e.target.value)}
+                  onChange={(e) =>{ handleCountryChange(e.target.value);
+                    setValue("country",e.target.value);
+                  }}
                 >
                   {loading ? (
                     <option
@@ -553,7 +555,9 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                       : "border-gray-300 dark:border-gray-600"
                   } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 md:h-12.1 md:px-3 rounded-md leading-tight focus:outline-none focus:border-primary-500`}
                   value={selectedState}
-                  onChange={(e) => setSelectedState(e.target.value)}
+                  onChange={(e) => {setSelectedState(e.target.value);
+                     setValue("state",e.target.value);
+                  }}
                 >
                   {loading ? (
                     <option
@@ -618,7 +622,9 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                       : "border-gray-300 dark:border-gray-600"
                   } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 md:h-12.1 md:px-3 rounded-md leading-tight focus:outline-none focus:border-primary-500`}
                   value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.target.value)}
+                  onChange={(e) => {setSelectedCity(e.target.value);
+                    setValue("city",e.target.value);
+                  }}
                 >
                   {loading ? (
                     <option

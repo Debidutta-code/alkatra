@@ -215,7 +215,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
           }
         );
         propertyAmenitiesCreateResponse = createdPropertyResponse;
-        toast.success("Property Aminity Create successfully!");
+        toast.success("Property Amenities Created Successfully!");
       }
 
       console.log("property data:", data);

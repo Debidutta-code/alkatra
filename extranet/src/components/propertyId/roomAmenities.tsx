@@ -53,14 +53,18 @@ const amenityCategories = {
   technology: ["television", "telephone", "wifiInternet"],
   climateControl: ["airConditioning", "heating"],
   kitchenetteMiniBar: ["smallRefrigerator", "microwave", "coffeeMaker"],
-  safetySecurity: ["cctv", "smokeDetectors", "fireExtinguisher"],
-  toiletries: ["shampooConditioner", "soap", "hairdryer"],
+  safetySecurity: ["CCTV", "smokeDetectors", "fireExtinguisher"],
+  toiletries: ["shampooConditioner", "soap", "hairDryer"],
   workLeisure: ["workDesk", "readingChair", "additionalLighting"],
   accessibilityFeatures: ["accessibleBathroom", "wheelchairAccessibility"],
 };
 
 // Utility function to convert camelCase or snake_case to Title Case
 const formatAmenityName = (amenity: string): string => {
+  // If the whole string is uppercase, assume it's an acronym and return as-is
+  if (amenity === amenity.toUpperCase()) {
+    return amenity;
+  }
   return amenity
     .replace(/([A-Z])/g, ' $1')  // Add space before capital letters
     .replace(/^./, char => char.toUpperCase())  // Capitalize first letter

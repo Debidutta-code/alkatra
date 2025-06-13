@@ -105,7 +105,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
     if (newRoom.max_number_of_children < 0) errors.max_number_of_children = "Max number of children cannot be negative.";
     if (newRoom.number_of_bedrooms <= 0) errors.number_of_bedrooms = "Number of bedrooms is required.";
     if (newRoom.number_of_living_room < 0) errors.number_of_living_room = "Number of living rooms cannot be negative.";
-    if (newRoom.extra_bed < 0) errors.extra_bed = "Extra Bed cannot be negative.";
+    if (newRoom.extra_bed <= 0) errors.extra_bed = "Extra Bed cannot be negative.";
     // if (!newRoom.description) errors.description = "Description is required.";
     // if (newRoom.image.length === 0) errors.image = "Room image is required.";
     setValidationErrors(errors);

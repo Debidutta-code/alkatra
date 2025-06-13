@@ -80,14 +80,14 @@ const roomSchema = z.object({
     .number({ required_error:"Enter max adults" })
     .nonnegative("Adults cannot be negative"),
   max_number_of_children: z
-    .number({required_error:"Enter max children"})
+    .number()
     .nonnegative("Children cannot be negative")
     .optional(), // Changed to min(1) - required
   number_of_bedrooms: z
     .number({ required_error: "Enter number of bedrooms" })
     .nonnegative("Bedrooms can't be negative"), // Changed to min(1) - required
   number_of_living_room: z
-    .number({required_error :"Enter number of Livingrooms"})
+    .number()
     .nonnegative("Living rooms can't be negative")
     .optional(), // Changed to min(1) - required
   extra_bed: z
@@ -110,10 +110,10 @@ type Inputs = {
   smoking_policy: string;
   max_occupancy: number;
   max_number_of_adults: number;
-  max_number_of_children: number;
+  max_number_of_children?: number;
   number_of_bedrooms: number;
-  number_of_living_room: number;
-  extra_bed: number;
+  number_of_living_room?: number;
+  extra_bed?: number;
   description?: string;
   image?: string[];
   available: boolean;
@@ -403,7 +403,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)} className="">
+      <form onSubmit={handleSubmit(onSubmit)}>
         <CardTitle>Rooms</CardTitle>
 
         {/* box 1 */}
@@ -511,6 +511,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             <Input
               id="total_room"
               className="h-9"
+              min={0}
               value={roomDetails?.total_room}
               {...register("total_room", { valueAsNumber: true })}
               onChange={(e) =>
@@ -534,6 +535,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             <Input
               id="floor"
               className="h-9"
+              min={0}
               value={roomDetails?.floor}
               {...register("floor", { valueAsNumber: true })}
               onChange={(e) =>
@@ -584,6 +586,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             <Input
               id="room_size"
               className="h-9"
+              min={0}
               value={roomDetails?.room_size}
               {...register("room_size", { valueAsNumber: true })}
               onChange={(e) =>
@@ -714,6 +717,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             <Input
               id="max_occupancy"
               className="h-9"
+              min={0}
               value={roomDetails?.max_occupancy}
               {...register("max_occupancy", { valueAsNumber: true })}
               onChange={(e) =>
@@ -742,6 +746,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             <Input
               id="max_number_of_adults"
               className="h-9"
+              min={0}
               value={roomDetails?.max_number_of_adults}
               {...register("max_number_of_adults", { valueAsNumber: true })}
               onChange={(e) =>
@@ -770,6 +775,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             <Input
               id="max_number_of_children"
               className="h-9"
+              min={0}
               value={roomDetails?.max_number_of_children}
               {...register("max_number_of_children", { valueAsNumber: true })}
               onChange={(e) =>
@@ -798,6 +804,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             <Input
               id="number_of_bedrooms"
               className="h-9"
+              min={0}
               value={roomDetails?.number_of_bedrooms}
               {...register("number_of_bedrooms", { valueAsNumber: true })}
               onChange={(e) =>
@@ -826,6 +833,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             <Input
               id="number_of_living_room"
               className="h-9"
+              min={0}
               value={roomDetails?.number_of_living_room}
               {...register("number_of_living_room", { valueAsNumber: true })}
               onChange={(e) =>
@@ -849,6 +857,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             <Input
               id="extra_bed"
               className="h-9"
+              min={0}
               value={roomDetails?.extra_bed}
               {...register("extra_bed", { valueAsNumber: true })}
               onChange={(e) =>
@@ -887,7 +896,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
 
         {/* Image field  */}
         <div className="flex w-full lg:flex-row flex-col gap-2">
-          <div className="flex mt-1 lg:w-1/2 w-full lg:gap-3 gap-2 items-center">
+          <div className="flex mt-2 lg:w-1/2 w-full lg:gap-3 gap-2 items-center">
             <div className="lg:w-2/3 w-full">
               {propertyImageUrls?.length ? (
                 <PreviewPropertyImages
@@ -928,7 +937,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
 
           {/* Submit button */}
           <div className="flex md:w-1/2 md:items-start lg:justify-end gap-4 w-full">
-            <div className="mt-1">
+            <div className="mt-2">
               <Button
                 className=" md:w-[120px] w-[134px] text-right"
                 onClick={onPrevious}
@@ -939,7 +948,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
               </Button>
             </div>
 
-            <div className="mt-1">
+            <div className="mt-2">
               <Button className=" md:w-[120px]  w-[134px]" type="submit">
                 Next
               </Button>

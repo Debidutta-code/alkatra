@@ -121,7 +121,7 @@ export function Address({
       case "address_line_2":
         return !stringValue.trim() ? "Address Line 2 is required" : null;
       case "landmark":
-        return !stringValue.trim() ? "landmark is required" : null;
+        return !stringValue.trim() ? "Landmark is required" : null;
       case "city":
         return !stringValue.trim() ? "City is required" : null;
       case "state":
@@ -350,7 +350,7 @@ export function Address({
             name="address_line_2"
             value={editedAddress?.address_line_2 || ""}
             onChange={handleValidatedInputChange}
-            placeholder="Address Line 1"
+            placeholder="Address Line 2"
             className={`w-full ${validationErrors.address_line_2 ? "border-destructive" : ""
               }`}
           />
@@ -370,7 +370,7 @@ export function Address({
             name="landmark"
             value={editedAddress?.landmark || ""}
             onChange={handleValidatedInputChange}
-            placeholder="landmark"
+            placeholder="Landmark"
             className={`w-full ${validationErrors.landmark ? "border-destructive" : ""
               }`}
           />
