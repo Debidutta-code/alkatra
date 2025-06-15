@@ -52,7 +52,7 @@ const Navbar: React.FC = () => {
 
   const user = useSelector((state: RootState) => state.auth.user);
   const accessToken = Cookies.get('accessToken');
-  console.log("access token",accessToken);
+  // console.log("access token",accessToken);
   
   // Define handleScroll at the component top level
   const handleScroll = useCallback(() => {

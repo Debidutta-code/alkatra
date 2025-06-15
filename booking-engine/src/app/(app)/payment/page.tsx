@@ -70,6 +70,7 @@ function PaymentPageContent() {
   const rooms = parseInt(searchParams.get('rooms') || '1', 10);
   const adults = parseInt(searchParams.get('adults') || '1', 10);
   const children = parseInt(searchParams.get('children') || '0', 10);
+  const infants = parseInt(searchParams.get('infants') || '0', 10);
  const amountFromRedux = useSelector((state: any) => state.pmsHotelCard.amount);
 
   // Use amount from Redux only
@@ -124,6 +125,7 @@ function PaymentPageContent() {
     rooms,
     adults,
     children,
+    infants,
     guests
   };
   console.log("Booking details:", JSON.stringify(bookingDetails, null, 2));
@@ -211,13 +213,13 @@ function PaymentPageContent() {
                         </div>
                       </div>
 
-                      <div className="flex items-start space-x-3">
+                      <div className="flex items-start space-x-4">
                         <Users className="text-tripswift-blue flex-shrink-0" size={20} />
                         <div>
                           <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentPageContent.bookingSummary.guests')}</p>
-                          <p className="font-tripswift-medium">
+                          <p className="font-tripswift-medium ">
                             {rooms} {rooms === 1 ? t('Payment.PaymentPageContent.bookingSummary.room') : t('Payment.PaymentPageContent.bookingSummary.rooms')} · {adults} {adults === 1 ? t('Payment.PaymentPageContent.bookingSummary.adult') : t('Payment.PaymentPageContent.bookingSummary.adults')}
-                            {children > 0 ? ` · ${children} ${children === 1 ? t('Payment.PaymentPageContent.bookingSummary.child') : t('Payment.PaymentPageContent.bookingSummary.children')}` : ''}
+                            {children > 0 ? ` · ${children} ${children === 1 ? t('Payment.PaymentPageContent.bookingSummary.child') : t('Payment.PaymentPageContent.bookingSummary.children')}` : ''} · {infants > 0 ? ` ${infants} ${infants === 1 ? t('Payment.PaymentPageContent.bookingSummary.infant') : t('Payment.PaymentPageContent.bookingSummary.infants')}` : ''}
                           </p>
                         </div>
                       </div>

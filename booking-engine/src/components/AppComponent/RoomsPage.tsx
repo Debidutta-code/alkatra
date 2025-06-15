@@ -236,7 +236,6 @@ const convertAmenities = (room: Room) => {
     dispatch(setRoomId(room._id));
     dispatch(setAmount(room.room_price.toString()));
   };
-
   const confirmBooking = (formData: {
     email: string;
     phone: string;
@@ -249,8 +248,10 @@ const convertAmenities = (room: Room) => {
     rooms?: number;
     adults?: number;
     children?: number;
+    infants?:number;
     guests?: Guest[]; // <--- make sure this is present
   }) => {
+    console.log("form data",formData)
     const queryParams = new URLSearchParams({
       roomId: formData.roomId,
       propertyId: formData.propertyId,
@@ -267,6 +268,7 @@ const convertAmenities = (room: Room) => {
       ...(formData.rooms ? { rooms: formData.rooms.toString() } : {}),
       ...(formData.adults ? { adults: formData.adults.toString() } : {}),
       ...(formData.children ? { children: formData.children.toString() } : {}),
+      ...(formData.infants ? { infants: formData.infants.toString() } : {}),
       ...(formData.guests ? { guests: encodeURIComponent(JSON.stringify(formData.guests)) } : {}) // ADD THIS LINE
     }).toString();
   

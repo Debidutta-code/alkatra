@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "@/Redux/store";
 import { setGuestDetails } from "@/Redux/slices/hotelcard.slice";
 import { createPortal } from "react-dom";
-import { Users } from "lucide-react";
+import { ChevronDown, Users } from "lucide-react";
 import dayjs from "dayjs";
 
 // Define props interface
@@ -268,39 +268,33 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
                   </button>
                 </div>
               </div>
-              {/* Child Age Selectors */}
-              {children > 0 && (
+                   {/* Custom Child Age Selectors */}
+                   {children > 0 && (
                 <div className="space-y-3 mt-4 pl-4">
                   {Array.from({ length: children }).map((_, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between"
-                    >
-                      <label
-                        className="text-tripswift-black/70 text-sm font-tripswift-medium"
-                        htmlFor={`childAge${index + 1}`}
-                      >
+                    <div key={index} className="flex items-center justify-between">
+                      <label className="text-tripswift-black/70 text-sm font-tripswift-medium">
                         Child {index + 1} age
                       </label>
-                      <select
-                        id={`childAge${index + 1}`}
-                        value={childAges[index]}
-                        onChange={(e) =>
-                          handleChildAgeChange(index, parseInt(e.target.value))
-                        }
-                        className="w-30 p-2 border border-tripswift-black/20 rounded-lg bg-tripswift-off-white focus:ring-2 focus:ring-tripswift-blue/30 focus:border-tripswift-blue outline-none text-sm text-tripswift-black font-tripswift-medium"
-                      >
-                        <option value={0} disabled>
-                          Select age
-                        </option>
-                        {Array.from({ length: 13 }, (_, i) => i)
-                          .slice(2)
-                          .map((age) => (
-                            <option key={age} value={age}>
-                              {age} {age === 1 ? "year" : "years"}
-                            </option>
-                          ))}
-                      </select>
+                      <div className="relative w-30">
+                        <select
+                          value={childAges[index]}
+                          onChange={(e) => handleChildAgeChange(index, parseInt(e.target.value))}
+                          className="appearance-none w-full p-2 pr-8 border border-tripswift-black/20 rounded-lg bg-tripswift-off-white focus:ring-2 focus:ring-tripswift-blue/30 focus:border-tripswift-blue outline-none text-sm text-tripswift-black font-tripswift-medium cursor-pointer"
+                        >
+                          <option value={0} disabled>Select age</option>
+                          {Array.from({ length: 13 }, (_, i) => i)
+                            .slice(2)
+                            .map((age) => (
+                              <option key={age} value={age}>
+                                {age} {age === 1 ? "year" : "years"}
+                              </option>
+                            ))}
+                        </select>
+                        <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+                          <ChevronDown className="h-4 w-4 text-tripswift-black/40" />
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -341,33 +335,27 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
               {infants > 0 && (
                 <div className="space-y-3 mt-4 pl-4">
                   {Array.from({ length: infants }).map((_, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between"
-                    >
-                      <label
-                        className="text-tripswift-black/70 text-sm font-tripswift-medium"
-                        htmlFor={`infantAge${index + 1}`}
-                      >
+                    <div key={index} className="flex items-center justify-between">
+                      <label className="text-tripswift-black/70 text-sm font-tripswift-medium">
                         Infant {index + 1} age
                       </label>
-                      <select
-                        id={`infantAge${index + 1}`}
-                        value={infantAges[index]}
-                        onChange={(e) =>
-                          handleInfantAgeChange(index, parseInt(e.target.value))
-                        }
-                        className="w-24 p-2 border border-tripswift-black/20 rounded-lg bg-tripswift-off-white focus:ring-2 focus:ring-tripswift-blue/30 focus:border-tripswift-blue outline-none text-sm text-tripswift-black font-tripswift-medium"
-                      >
-                        <option value={0} disabled>
-                          Select age
-                        </option>
-                        {[0, 1].map((age) => (
-                          <option key={age} value={age}>
-                            {age} {age === 1 ? "year" : "years"}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="relative w-30">
+                        <select
+                          value={infantAges[index]}
+                          onChange={(e) => handleInfantAgeChange(index, parseInt(e.target.value))}
+                          className="appearance-none w-full p-2 pr-8 border border-tripswift-black/20 rounded-lg bg-tripswift-off-white focus:ring-2 focus:ring-tripswift-blue/30 focus:border-tripswift-blue outline-none text-sm text-tripswift-black font-tripswift-medium cursor-pointer"
+                        >
+                          <option value={0} disabled>Select age</option>
+                          {[0, 1].map((age) => (
+                            <option key={age} value={age}>
+                              {age} {age === 1 ? "year" : "years"}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+                          <ChevronDown className="h-4 w-4 text-tripswift-black/40" />
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
