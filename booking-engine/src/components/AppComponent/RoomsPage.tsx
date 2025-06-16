@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "@/Redux/store";
 import { setAmount, setRoomId } from "@/Redux/slices/pmsHotelCard.slice";
 import { setGuestDetails } from "@/Redux/slices/hotelcard.slice";
 import {
-Calendar, Search, Bed, ChevronRight, ChevronLeft, ChevronDown,
+  Calendar, Search, Bed, ChevronRight, ChevronLeft, ChevronDown,
   MapPin, Star, Coffee, Wifi, Car, Waves, Droplets, Briefcase, Utensils, BellRing, CheckCircle,
   Bath, Dog, ImageIcon, Users, Filter
 } from "lucide-react";
@@ -83,13 +83,13 @@ const RoomsPage: React.FC = () => {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [filterType, setFilterType] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
-const [propertyDetails, setPropertyDetails] = useState<PropertyDetails | null>(null);
-const [qrCodeData, setQrCodeData] = useState({
+  const [propertyDetails, setPropertyDetails] = useState<PropertyDetails | null>(null);
+  const [qrCodeData, setQrCodeData] = useState({
     qrCode: null,
     couponCode: null,
   });
-const [showPropertyDetails,setShowPropertyDetails]=useState<boolean>(true)
-const [selectedImage, setSelectedImage] = useState<number>(0);
+  const [showPropertyDetails, setShowPropertyDetails] = useState<boolean>(true)
+  const [selectedImage, setSelectedImage] = useState<number>(0);
   // Get guest details from Redux
   const { guestDetails } = useSelector((state) => state.hotel);
 
@@ -123,17 +123,14 @@ const [selectedImage, setSelectedImage] = useState<number>(0);
     const children = guestDetails.children || 0;
     const infants = guestDetails.infants || 0;
 
-    return `${rooms} ${rooms === 1 ? "Room" : "Rooms"} · ${adults} ${
-      adults === 1 ? "Adult" : "Adults"
-    }${
-      children > 0
+    return `${rooms} ${rooms === 1 ? "Room" : "Rooms"} · ${adults} ${adults === 1 ? "Adult" : "Adults"
+      }${children > 0
         ? ` · ${children} ${children === 1 ? "Child" : "Children"}`
         : ""
-    }${
-      infants > 0
+      }${infants > 0
         ? ` · ${infants} ${infants === 1 ? "Infant" : "Infants"}`
         : ""
-    }`;
+      }`;
   };
 
   useEffect(() => {
@@ -153,7 +150,7 @@ const [selectedImage, setSelectedImage] = useState<number>(0);
         const propertyResponse = await axios.get(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`
         );
-         if (response.data.qrCode) {
+        if (response.data.qrCode) {
           setQrCodeData({
             qrCode: response.data.qrCode,
             couponCode: response.data.couponCode || "",
@@ -174,59 +171,59 @@ const [selectedImage, setSelectedImage] = useState<number>(0);
   }, [propertyId, checkInDate, checkOutDate]);
 
   // Helper function to convert amenities to the expected format
-const convertAmenities = (room: Room) => {
-  // Map room amenities from propertyDetails.room_Aminity
-  let roomAmenities: string[] = [];
-  if (propertyDetails?.room_Aminity?.amenities) {
-    const amenities = propertyDetails.room_Aminity.amenities;
-    // Flatten all amenities into a single array of names
-    Object.values(amenities).forEach((category: any) => {
-      Object.entries(category).forEach(([key, value]) => {
-        if (value === true) {
-          // Convert camelCase keys to readable names (e.g., airConditioning -> Air Conditioning)
-          const readableName = key
-            .replace(/([A-Z])/g, " $1")
-            .replace(/^./, (str) => str.toUpperCase())
-            .trim();
-          roomAmenities.push(readableName);
-        }
+  const convertAmenities = (room: Room) => {
+    // Map room amenities from propertyDetails.room_Aminity
+    let roomAmenities: string[] = [];
+    if (propertyDetails?.room_Aminity?.amenities) {
+      const amenities = propertyDetails.room_Aminity.amenities;
+      // Flatten all amenities into a single array of names
+      Object.values(amenities).forEach((category: any) => {
+        Object.entries(category).forEach(([key, value]) => {
+          if (value === true) {
+            // Convert camelCase keys to readable names (e.g., airConditioning -> Air Conditioning)
+            const readableName = key
+              .replace(/([A-Z])/g, " $1")
+              .replace(/^./, (str) => str.toUpperCase())
+              .trim();
+            roomAmenities.push(readableName);
+          }
+        });
       });
-    });
-  }
+    }
 
-  const convertedAmenities = roomAmenities.map((amenity) => {
-    const getIconName = (amenityName: string) => {
-      const amenityLower = amenityName.toLowerCase();
-      if (amenityLower.includes("wifi") || amenityLower.includes("internet")) return "wifi";
-      if (amenityLower.includes("air") || amenityLower.includes("ac")) return "snowflake";
-      if (amenityLower.includes("smoking")) return "smoking-ban";
-      if (amenityLower.includes("bed")) return "bed";
-      if (amenityLower.includes("view")) return "tree";
-      // if (amenityLower.includes("bathroom")) return "bathroom";
-      // if (amenityLower.includes("towels")) return "towels";
-      if (amenityLower.includes("linens")) return "linens";
-      // if (amenityLower.includes("table") || amenityLower.includes("chairs")) return "tableChairs";
-      if (amenityLower.includes("desk")) return "desk";
-      if (amenityLower.includes("dresser") || amenityLower.includes("wardrobe")) return "dresserWardrobe";
-      if (amenityLower.includes("sofa") || amenityLower.includes("seating")) return "sofaSeating";
-      if (amenityLower.includes("television")) return "television";
-      if (amenityLower.includes("telephone")) return "telephone";
-      if (amenityLower.includes("heating")) return "heating";
-      return "check-circle";
-    };
+    const convertedAmenities = roomAmenities.map((amenity) => {
+      const getIconName = (amenityName: string) => {
+        const amenityLower = amenityName.toLowerCase();
+        if (amenityLower.includes("wifi") || amenityLower.includes("internet")) return "wifi";
+        if (amenityLower.includes("air") || amenityLower.includes("ac")) return "snowflake";
+        if (amenityLower.includes("smoking")) return "smoking-ban";
+        if (amenityLower.includes("bed")) return "bed";
+        if (amenityLower.includes("view")) return "tree";
+        // if (amenityLower.includes("bathroom")) return "bathroom";
+        // if (amenityLower.includes("towels")) return "towels";
+        if (amenityLower.includes("linens")) return "linens";
+        // if (amenityLower.includes("table") || amenityLower.includes("chairs")) return "tableChairs";
+        if (amenityLower.includes("desk")) return "desk";
+        if (amenityLower.includes("dresser") || amenityLower.includes("wardrobe")) return "dresserWardrobe";
+        if (amenityLower.includes("sofa") || amenityLower.includes("seating")) return "sofaSeating";
+        if (amenityLower.includes("television")) return "television";
+        if (amenityLower.includes("telephone")) return "telephone";
+        if (amenityLower.includes("heating")) return "heating";
+        return "check-circle";
+      };
+
+      return {
+        icon: getIconName(amenity),
+        name: amenity,
+      };
+    });
 
     return {
-      icon: getIconName(amenity),
-      name: amenity,
-    };
-  });
-
-  return {
-    ...room,
-    amenities: convertedAmenities,
-    default_image_url: room.image?.[0] || "",
-  } as any;
-};
+      ...room,
+      amenities: convertedAmenities,
+      default_image_url: room.image?.[0] || "",
+    } as any;
+  };
 
   const handleBookNow = (room: Room) => {
     if (!room.has_valid_rate) return;
@@ -248,10 +245,10 @@ const convertAmenities = (room: Room) => {
     rooms?: number;
     adults?: number;
     children?: number;
-    infants?:number;
+    infants?: number;
     guests?: Guest[]; // <--- make sure this is present
   }) => {
-    console.log("form data",formData)
+    console.log("form data", formData)
     const queryParams = new URLSearchParams({
       roomId: formData.roomId,
       propertyId: formData.propertyId,
@@ -271,7 +268,7 @@ const convertAmenities = (room: Room) => {
       ...(formData.infants ? { infants: formData.infants.toString() } : {}),
       ...(formData.guests ? { guests: encodeURIComponent(JSON.stringify(formData.guests)) } : {}) // ADD THIS LINE
     }).toString();
-  
+
     router.push(`/payment?${queryParams}`);
   };
 
@@ -293,7 +290,7 @@ const convertAmenities = (room: Room) => {
       return true;
     });
   }, [rooms, filterType, searchQuery]);
-// Helper function to format address
+  // Helper function to format address
   const getFormattedAddress = (addressObj: any): string => {
     if (!addressObj) return "";
     if (typeof addressObj === 'string') return addressObj;
@@ -651,28 +648,28 @@ const convertAmenities = (room: Room) => {
                       </p>
                     </div>
                   )} */}
-<div className="mt-4">
-  <h3 className="text-section-heading mb-3">{t('RoomsPage.propertyAmenities')}</h3>
+                  <div className="mt-4">
+                    <h3 className="text-section-heading mb-3">{t('RoomsPage.propertyAmenities')}</h3>
 
-  {propertyDetails?.property_amenities?.amenities &&
-    Object.keys(propertyDetails.property_amenities.amenities).length > 0 ? (
-      <div className="flex flex-wrap gap-2">
-        {Object.entries(propertyDetails.property_amenities.amenities)
-          .filter(([_, hasAmenity]) => hasAmenity)
-          .map(([amenity]) => (
-            <div
-              key={amenity}
-              className="flex items-center text-xs font-tripswift-medium text-tripswift-blue bg-tripswift-blue/5 border border-tripswift-blue/20 px-2 py-1 rounded-md"
-            >
-              {getAmenityIcon(amenity)}
-              <span className="capitalize ml-1">{t(`RoomsPage.amenitiesList.${amenity}`)}</span>
-            </div>
-          ))}
-      </div>
-    ) : (
-      <p className="text-description">{t('RoomsPage.noAmenitiesSpecified')}</p>
-    )}
-</div>
+                    {propertyDetails?.property_amenities?.amenities &&
+                      Object.keys(propertyDetails.property_amenities.amenities).length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {Object.entries(propertyDetails.property_amenities.amenities)
+                          .filter(([_, hasAmenity]) => hasAmenity)
+                          .map(([amenity]) => (
+                            <div
+                              key={amenity}
+                              className="flex items-center text-xs font-tripswift-medium text-tripswift-blue bg-tripswift-blue/5 border border-tripswift-blue/20 px-2 py-1 rounded-md"
+                            >
+                              {getAmenityIcon(amenity)}
+                              <span className="capitalize ml-1">{t(`RoomsPage.amenitiesList.${amenity}`)}</span>
+                            </div>
+                          ))}
+                      </div>
+                    ) : (
+                      <p className="text-description">{t('RoomsPage.noAmenitiesSpecified')}</p>
+                    )}
+                  </div>
                 </div>
 
 
@@ -758,11 +755,10 @@ const convertAmenities = (room: Room) => {
                 <button
                   key={type}
                   onClick={() => setFilterType(type)}
-                  className={`px-3.5 py-1.5 rounded-lg text-sm whitespace-nowrap font-tripswift-medium transition-colors duration-300 ${
-                    filterType === type
+                  className={`px-3.5 py-1.5 rounded-lg text-sm whitespace-nowrap font-tripswift-medium transition-colors duration-300 ${filterType === type
                       ? "bg-tripswift-blue text-tripswift-off-white"
                       : "bg-gray-100 text-tripswift-black/70 hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   {type === "all" ? t("RoomsPage.allRooms") : type}
                 </button>

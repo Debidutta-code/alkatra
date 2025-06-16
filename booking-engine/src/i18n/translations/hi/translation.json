@@ -317,34 +317,11 @@
       }
     },
     "ExploreDestinations": {
-      "title": "गंतव्य स्थान देखें",
-      "exploreNow": "अभी एक्सप्लोर करें",
-      "destinations": {
-        "maldives": {
-          "name": "मालदीव",
-          "category": "समुद्र तटीय स्वर्ग"
-        },
-        "swissAlps": {
-          "name": "स्विस आल्प्स",
-          "category": "साहसिक"
-        },
-        "santorini": {
-          "name": "सैंटोरिनी",
-          "category": "रोमांटिक गेटअवे"
-        },
-        "dubai": {
-          "name": "दुबई",
-          "category": "लक्जरी"
-        },
-        "bali": {
-          "name": "बाली",
-          "category": "सांस्कृतिक"
-        },
-        "tokyo": {
-          "name": "टोक्यो",
-          "category": "शहरी जीवन"
-        }
-      }
+      "title": "गंतव्यों की खोज करें",
+      "descriptionTemplate": "{{city}} में होटल खोजें",
+      "imageAlt": "{{name}} गंतव्य",
+      "goToGroup": "समूह {{count}} पर जाएँ",
+      "exploreNow": "अभी खोजें"
     }
   },
   "RoomsPage": {
@@ -490,7 +467,7 @@
       "emailPlaceholder": "आपका.ईमेल@उदाहरण.com",
       "emailInfo": "यह ई‑मेल आपकी बुकिंग की पुष्टि भेजने के लिए प्रयोग की जाएगी",
       "emailError": "ईमेल आवश्यक है।",
-      "emailInvalidError":"कृपया एक मान्य ईमेल पता दर्ज करें।",
+      "emailInvalidError": "कृपया एक मान्य ईमेल पता दर्ज करें।",
       "phoneLabel": "फ़ोन नंबर",
       "phonePlaceholder": "फ़ोन नंबर दर्ज करें",
       "phoneInfo": "बुकिंग संबंधी सूचनाओं के लिए",
@@ -503,6 +480,8 @@
       "adultsPlural": "वयस्कों",
       "childSingular": "बालक",
       "childrenPlural": "बच्चे",
+      "infantSingular": "शिशु",
+      "infantsPlural": "शिशुओं",
       "guestDisplayFormat": "कक्ष और अतिथि",
       "childrenPartFormat": "बच्चे",
       "informationVerified": "जानकारी सफलतापूर्वक सत्यापित!",
@@ -772,8 +751,8 @@
         "adults": "वयस्क",
         "child": "बच्चा",
         "children": "बच्चे",
-        "infant":"शिशु",
-        "infants":" शिशुओं",
+        "infant": "शिशु",
+        "infants": " शिशुओं",
         "guest": "अतिथि"
       },
       "paymentMethod": {

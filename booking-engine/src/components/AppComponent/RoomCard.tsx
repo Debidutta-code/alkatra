@@ -10,8 +10,8 @@ import { logout } from "@/Redux/slices/auth.slice";
 import { useTranslation } from "react-i18next";
 
 import {
-  FaStar, FaRegStar,FaShower, FaThermometerHalf, FaPhone, FaTv, FaCouch, FaChair, FaDoorClosed, FaDesktop, FaWifi, FaSnowflake, FaSmokingBan, FaBed, FaChild, FaUser, FaTree,
-  FaCheckCircle,FaTshirt, FaShoppingCart, FaPercent, FaTimes, FaInfoCircle, FaRulerCombined,FaBath,
+  FaStar, FaRegStar, FaShower, FaThermometerHalf, FaPhone, FaTv, FaCouch, FaChair, FaDoorClosed, FaDesktop, FaWifi, FaSnowflake, FaSmokingBan, FaBed, FaChild, FaUser, FaTree,
+  FaCheckCircle, FaTshirt, FaShoppingCart, FaPercent, FaTimes, FaInfoCircle, FaRulerCombined, FaBath,
   FaShieldAlt,
 } from "react-icons/fa";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -49,15 +49,15 @@ interface RoomCardProps {
   isPriceAvailable: boolean;
 }
 
-export const RoomCard: React.FC<RoomCardProps> = ({ 
-  data, 
-  price, 
+export const RoomCard: React.FC<RoomCardProps> = ({
+  data,
+  price,
   onBookNow,
-  isPriceAvailable 
+  isPriceAvailable
 }) => {
   const { t } = useTranslation();
   const [showPolicyModal, setShowPolicyModal] = useState(false);
-  
+
   const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1617104678098-de229db51175?q=80&w=1514&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
   const selectedImage = data.image && data.image.length > 0 ? data.image[0] : DEFAULT_IMAGE;
 
@@ -85,7 +85,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
   };
 
   const truncatedDescription = truncateDescription(data.description || "");
-  
+
   const handleBookNow = () => {
     if (!isPriceAvailable) return; // Don't proceed if price not available
 
@@ -132,40 +132,43 @@ export const RoomCard: React.FC<RoomCardProps> = ({
     }
 
     const defaultAmenities = [
-    { icon: <FaWifi className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.wifi') },
-    { icon: <FaSnowflake className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.airConditioning') },
-    { icon: <FaBed className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.kingBed') },
-  ];
-  return defaultAmenities;
-};
+      { icon: <FaWifi className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.wifi') },
+      { icon: <FaSnowflake className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.airConditioning') },
+      { icon: <FaBed className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.kingBed') },
+    ];
+    return defaultAmenities;
+  };
 
-const getIconComponent = (iconName: string) => {
-  const iconClass = "text-tripswift-blue";
-  switch (iconName) {
-    case 'wifi': return <FaWifi className={iconClass} />;
-    case 'snowflake': return <FaSnowflake className={iconClass} />;
-    case 'smoking-ban': return <FaSmokingBan className={iconClass} />;
-    case 'bed': return <FaBed className={iconClass} />;
-    case 'tree': return <FaTree className={iconClass} />;
-    case 'user': return <FaUser className={iconClass} />;
-    case 'child': return <FaChild className={iconClass} />;
-    // case 'bathroom': return <FaBath className={iconClass} />;
-    // case 'towels': return <FaShower className={iconClass} />;
-    case 'linens': return <FaBed className={iconClass} />;
-    // case 'tableChairs': return <FaChair className={iconClass} />;
-    case 'desk': return <FaDesktop className={iconClass} />;
-    case 'dresserWardrobe': return <FaDoorClosed className={iconClass} />;
-    case 'sofaSeating': return <FaCouch className={iconClass} />;
-    case 'television': return <FaTv className={iconClass} />;
-    case 'telephone': return <FaPhone className={iconClass} />;
-    case 'heating': return <FaThermometerHalf className={iconClass} />;
-    default: return <FaCheckCircle className={iconClass} />;
-  }
-};
+  const getIconComponent = (iconName: string) => {
+    const iconClass = "text-tripswift-blue";
+    switch (iconName) {
+      case 'wifi': return <FaWifi className={iconClass} />;
+      case 'snowflake': return <FaSnowflake className={iconClass} />;
+      case 'smoking-ban': return <FaSmokingBan className={iconClass} />;
+      case 'bed': return <FaBed className={iconClass} />;
+      case 'tree': return <FaTree className={iconClass} />;
+      case 'user': return <FaUser className={iconClass} />;
+      case 'child': return <FaChild className={iconClass} />;
+      // case 'bathroom': return <FaBath className={iconClass} />;
+      // case 'towels': return <FaShower className={iconClass} />;
+      case 'linens': return <FaBed className={iconClass} />;
+      // case 'tableChairs': return <FaChair className={iconClass} />;
+      case 'desk': return <FaDesktop className={iconClass} />;
+      case 'dresserWardrobe': return <FaDoorClosed className={iconClass} />;
+      case 'sofaSeating': return <FaCouch className={iconClass} />;
+      case 'television': return <FaTv className={iconClass} />;
+      case 'telephone': return <FaPhone className={iconClass} />;
+      case 'heating': return <FaThermometerHalf className={iconClass} />;
+      default: return <FaCheckCircle className={iconClass} />;
+    }
+  };
 
   return (
     <>
-      <Card className="w-full min-h-48 shadow-sm hover:shadow-md transition-shadow duration-300 bg-tripswift-off-white border border-gray-200 rounded-xl flex flex-col md:flex-row overflow-hidden font-noto-sans">        
+      <Card
+        className="w-full min-h-48 shadow-sm hover:shadow-md transition-shadow duration-300 bg-tripswift-off-white border border-gray-200 rounded-xl flex flex-col md:flex-row overflow-hidden font-noto-sans cursor-pointer"
+        onClick={handleBookNow}
+      >
         {/* Image Section */}
         <div className="relative w-full md:w-[45%] h-48 md:h-auto flex-shrink-0 overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10"></div>
@@ -188,7 +191,7 @@ const getIconComponent = (iconName: string) => {
               <FaPercent className="h-2.5 w-2.5 mr-1" /> {discountPercentage}% {t('RoomsPage.RoomCard.off')}
             </div>
           )}
-          
+
           {/* Not Available Badge */}
           {!isPriceAvailable && (
             <div className="absolute top-3 left-3 z-20 bg-gray-600 text-tripswift-off-white text-xs font-tripswift-semibold py-1 px-2.5 rounded-full flex items-center shadow-md">
@@ -196,7 +199,7 @@ const getIconComponent = (iconName: string) => {
             </div>
           )}
         </div>
-        
+
         {/* Details Section */}
         <div className="w-full md:w-[55%] flex flex-col p-3 sm:p-4">
           {/* Header */}
@@ -235,21 +238,21 @@ const getIconComponent = (iconName: string) => {
                   {data.max_number_of_adults || data.max_occupancy} {t('RoomsPage.RoomCard.adults')}
                 </span>
               </div>
-              
+
               {(data.max_number_of_children || 0) > 0 && (
                 <div className="flex items-center text-xs font-tripswift-medium text-tripswift-black/70">
                   <FaChild className="mr-1.5 h-3 w-3 text-tripswift-blue" />
                   <span>{data.max_number_of_children} {t('RoomsPage.RoomCard.children')}</span>
                 </div>
               )}
-              
+
               {data.room_size > 0 && (
                 <div className="flex items-center text-xs font-tripswift-medium text-tripswift-black/70">
                   <FaRulerCombined className="mr-1.5 h-3 w-3 text-tripswift-blue" />
                   <span>{data.room_size} {data.room_unit || "m²"}</span>
                 </div>
               )}
-              
+
               {data.room_view && (
                 <div className="flex flex-wrap gap-1.5">
                   <span className="bg-tripswift-blue/5 text-tripswift-black/70 text-xs px-0.5 py-1 rounded-full font-tripswift-medium inline-flex items-center">
@@ -293,8 +296,8 @@ const getIconComponent = (iconName: string) => {
                 onClick={handleBookNow}
                 disabled={!isPriceAvailable}
                 className={`font-tripswift-semibold py-2 px-4 rounded-md text-sm flex items-center transition-colors duration-300 shadow-sm hover:shadow-md
-                  ${isPriceAvailable 
-                    ? "bg-tripswift-blue hover:bg-[#054B8F] active:bg-[#03315c] text-tripswift-off-white" 
+                  ${isPriceAvailable
+                    ? "bg-tripswift-blue hover:bg-[#054B8F] active:bg-[#03315c] text-tripswift-off-white"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"}
                 `}
               >
@@ -308,7 +311,7 @@ const getIconComponent = (iconName: string) => {
                 )}
               </button>
             </div>
-            
+
             {/* Policy details link - hidden on smallest screens, visible on sm and up */}
             <div className=" pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-2 sm:gap-0">
               <button
