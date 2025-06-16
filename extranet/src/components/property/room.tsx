@@ -1,13 +1,39 @@
 "use client";
 
-import React, { MouseEventHandler, useCallback, useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "./../ui/card";
+import React, {
+  MouseEventHandler,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./../ui/card";
 import { Label } from "./../ui/label";
 import { Input } from "./../ui/input";
 import { Button, buttonVariants } from "./../ui/button";
 import { ReloadIcon } from "@radix-ui/react-icons";
-import { Select, SelectContent, SelectItem, SelectLabel, SelectTrigger, SelectValue, } from "./../ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "./../ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "./../ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./../ui/dialog";
 import Image from "next/image";
 import { FileRejection, useDropzone } from "react-dropzone";
 import Dropzone from "../dropzone";
@@ -22,28 +48,55 @@ import { cn } from "./../../lib/utils";
 import { Textarea } from "./../ui/textarea";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { RootState, useSelector } from "../../redux/store";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "./../ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "./../ui/accordion";
 import { ScrollArea } from "./../ui/scrollarea";
 import Cookies from "js-cookie";
 
-const roomSchema = z.object({
+export const roomSchema = z.object({
   room_name: z.string().min(1, "Room name is required"),
   room_type: z.string().min(1, "Room type is required"),
-  total_room: z.number().min(1, "Total rooms is required").nonnegative("Total room must be a positive number"),
-  floor: z.number().min(0).nonnegative("Floor must be a positive number").optional(),
+  total_room: z
+    .number( {required_error : "Total rooms is required"})
+    .nonnegative("Room count must be positive"),
+  floor: z
+    .number()
+    .nonnegative("Floor must be a positive number")
+    .optional(),
   room_view: z.string().optional(),
-  room_size: z.number().min(1, "Room size is required").nonnegative("Room size must be a positive number"),
+  room_size: z
+    .number({required_error : "Room size is required"})
+    .nonnegative("Room size must be positive"),
   room_unit: z.string().min(1, "Room unit is required"),
   smoking_policy: z.string().min(1, "Smoking policy is required"),
-  max_occupancy: z.number().min(1, "Max occupancy is required").nonnegative("Max occupancy must be a positive number"),
-  max_number_of_adults: z.number().min(1, "Max number of adults is required").nonnegative("Max number of adults must be a positive number"),
-  max_number_of_children: z.number().min(0).nonnegative("Max number of children must be a positive number").optional(), // Changed to min(1) - required
-  number_of_bedrooms: z.number().min(1, "Number of bedrooms is required").nonnegative("Number of bedrooms must be a positive number"), // Changed to min(1) - required
-  number_of_living_room: z.number().min(0).nonnegative("Number of living room must be a positive number").optional(), // Changed to min(1) - required
-  extra_bed: z.number().min(0).nonnegative("Extra bed must be a positive number").optional(), // Changed to min(1) - required
+  max_occupancy: z
+    .number({required_error:"Max occupancy is required"})
+    .nonnegative("Max occupancy must be positive"),
+  max_number_of_adults: z
+    .number({ required_error:"Enter max adults" })
+    .nonnegative("Adults cannot be negative"),
+  max_number_of_children: z
+    .number()
+    .nonnegative("Children cannot be negative")
+    .optional(), // Changed to min(1) - required
+  number_of_bedrooms: z
+    .number({ required_error: "Enter number of bedrooms" })
+    .nonnegative("Bedrooms can't be negative"), // Changed to min(1) - required
+  number_of_living_room: z
+    .number()
+    .nonnegative("Living rooms can't be negative")
+    .optional(), // Changed to min(1) - required
+  extra_bed: z
+    .number()
+    .nonnegative("Provide a positive bed count")
+    .optional(), // Changed to min(1) - required
   description: z.string().optional(),
   image: z.array(z.string()).optional(),
-  available: z.boolean()
+  available: z.boolean(),
 });
 
 type Inputs = {
@@ -57,10 +110,10 @@ type Inputs = {
   smoking_policy: string;
   max_occupancy: number;
   max_number_of_adults: number;
-  max_number_of_children: number;
+  max_number_of_children?: number;
   number_of_bedrooms: number;
-  number_of_living_room: number;
-  extra_bed: number;
+  number_of_living_room?: number;
+  extra_bed?: number;
   description?: string;
   image?: string[];
   available: boolean;
@@ -105,15 +158,17 @@ export default function XRooms({ onNext, onPrevious }: Props) {
   const [roomDetails, setRoomDetails] = useState<RoomDetails | null>(null);
   const [newRoomDetails, setNewRoomDetails] = useState<boolean>(true);
 
-  const [propertyImageUrls, setPropertyImageUrls] = useState<{ public_id: string; url: string; secure_url: string; }[]>([]);
-  const [propertyImagePreviewDialog, setPropertyImagePreviewDialog] = useState(false);
+  const [propertyImageUrls, setPropertyImageUrls] = useState<
+    { public_id: string; url: string; secure_url: string }[]
+  >([]);
+  const [propertyImagePreviewDialog, setPropertyImagePreviewDialog] =
+    useState(false);
   const [files, setFiles] = useState<IFileWithPreview[]>([]);
   const [rejected, setRejected] = useState<FileRejection[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [formLoading, setFormLoading] = useState<boolean>(false);
   const [priceCategory, setPriceCategory] = useState<any[]>([]);
   const [category, setCategory] = useState<any[]>([]);
-
 
   const form = useForm<Inputs>({
     defaultValues: {
@@ -133,7 +188,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
       extra_bed: 0,
       description: "",
       image: [],
-      available: false
+      available: false,
     },
     resolver: zodResolver(roomSchema),
   });
@@ -181,8 +236,10 @@ export default function XRooms({ onNext, onPrevious }: Props) {
   // }, [])
 
   function handleCategoryChange(e: any) {
-    const price_list = priceCategory.filter((category: any) => category.price_category == e.target.value)
-    setCategory(price_list)
+    const price_list = priceCategory.filter(
+      (category: any) => category.price_category == e.target.value
+    );
+    setCategory(price_list);
   }
 
   // useEffect(() => {
@@ -214,7 +271,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
   }, [formState.errors]);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    console.log(data)
+    console.log(data);
     try {
       const imageUrls = propertyImageUrls.map(
         (propertyImage) => propertyImage.url
@@ -243,11 +300,15 @@ export default function XRooms({ onNext, onPrevious }: Props) {
       } else {
         const {
           data: { data: newRoom },
-        } = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room`, roomBody, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
+        } = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room`,
+          roomBody,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
         console.log({ newRoom });
         toast.success("Room created successfully!");
       }
@@ -305,7 +366,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${property_id}`
         );
         if (response.data.data.property_room) {
-          setNewRoomDetails(false)
+          setNewRoomDetails(false);
         }
         setRoomDetails(response.data.data.property_room);
         console.log("Room details", response.data.data.property_room);
@@ -323,18 +384,18 @@ export default function XRooms({ onNext, onPrevious }: Props) {
     if (roomDetails) {
       setValue("room_name", roomDetails.room_name || "");
       setValue("room_type", roomDetails.room_type || "");
-      setValue("total_room", roomDetails.total_room || 0);
-      setValue("floor", roomDetails.floor || 0);
+      setValue("total_room", roomDetails.total_room);
+      setValue("floor", roomDetails.floor);
       setValue("room_view", roomDetails.room_view || "");
-      setValue("room_size", roomDetails.room_size || 0);
+      setValue("room_size", roomDetails.room_size);
       setValue("room_unit", roomDetails.room_unit || "");
       setValue("smoking_policy", roomDetails.smoking_policy || "");
-      setValue("max_occupancy", roomDetails.max_occupancy || 0);
-      setValue("max_number_of_adults", roomDetails.max_number_of_adults || 0);
-      setValue("max_number_of_children", roomDetails.max_number_of_children || 0);
-      setValue("number_of_bedrooms", roomDetails.number_of_bedrooms || 0);
-      setValue("number_of_living_room", roomDetails.number_of_living_room || 0);
-      setValue("extra_bed", roomDetails.extra_bed || 0);
+      setValue("max_occupancy", roomDetails.max_occupancy);
+      setValue("max_number_of_adults", roomDetails.max_number_of_adults);
+      setValue("max_number_of_children", roomDetails.max_number_of_children);
+      setValue("number_of_bedrooms", roomDetails.number_of_bedrooms);
+      setValue("number_of_living_room", roomDetails.number_of_living_room);
+      setValue("extra_bed", roomDetails.extra_bed);
       setValue("description", roomDetails.description || "");
       setValue("image", roomDetails.image || []);
     }
@@ -342,41 +403,59 @@ export default function XRooms({ onNext, onPrevious }: Props) {
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)}>
         <CardTitle>Rooms</CardTitle>
 
         {/* box 1 */}
-        <div className="items-center justify-center gap-4">
+        <div className=" flex md:flex-row flex-col justify-center mt-1  md:gap-1 lg:gap-3 ">
           {/* Room Name field */}
-          <div className="w-full">
-            <Label htmlFor="room_name">Room Name <span className="text-destructive">*</span></Label>
+          <div className="w-full md:w-1/2">
+            <Label htmlFor="room_name">
+              Room Name <span className="text-destructive">*</span>
+            </Label>
             <Input
               id="room_name"
-              size={"md"}
+              className="h-9"
               value={roomDetails?.room_name}
               {...register("room_name")}
-              onChange={(e) => setRoomDetails(prevDetails => ({ ...prevDetails!, room_name: e.target.value }))}
+              onChange={(e) =>
+                setRoomDetails((prevDetails) => ({
+                  ...prevDetails!,
+                  room_name: e.target.value,
+                }))
+              }
               placeholder="Business Suite"
             />
             {room_nameError && (
-              <p className="text-red-500 text-sm mt-1">{room_nameError.message}</p>
+              <p className="text-red-500 text-sm">
+                {room_nameError.message}
+              </p>
             )}
           </div>
 
           {/* Room Type field */}
-          <div className="w-full">
-            <Label htmlFor="room_type">Room Type <span className="text-destructive">*</span></Label>
+          <div className="w-full md:w-1/2">
+            <Label htmlFor="room_type">
+              Room Type <span className="text-destructive">*</span>
+            </Label>
             <Input
               id="room_type"
-              size={"md"}
+              className="h-9"
               value={roomDetails?.room_type}
               {...register("room_type")}
-              onChange={(e) => setRoomDetails(prevDetails => ({ ...prevDetails!, room_type: e.target.value }))}
+              onChange={(e) =>
+                setRoomDetails((prevDetails) => ({
+                  ...prevDetails!,
+                  room_type: e.target.value,
+                }))
+              }
               type="string"
               // placeholder="Single Room"
             />
             {room_typeError && (
-              <p className="text-red-500 text-sm mt-1">{room_typeError.message}</p>
+              <p className="text-red-500 text-sm ">
+                {room_typeError.message}
+              </p>
             )}
           </div>
 
@@ -423,20 +502,30 @@ export default function XRooms({ onNext, onPrevious }: Props) {
         </div>
 
         {/* box 2 */}
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex items-start md:flex-row flex-col justify-center  md:gap-1 lg:gap-3">
           {/* Total Room field */}
           <div className="w-full">
-            <Label htmlFor="total_room">Total Room <span className="text-destructive">*</span></Label>
+            <Label htmlFor="total_room">
+              Total Room <span className="text-destructive">*</span>
+            </Label>
             <Input
               id="total_room"
-              size={"md"}
+              className="h-9"
+              min={0}
               value={roomDetails?.total_room}
               {...register("total_room", { valueAsNumber: true })}
-              onChange={(e) => setRoomDetails(prevDetails => ({ ...prevDetails!, total_room: parseInt(e.target.value) }))}
+              onChange={(e) =>
+                setRoomDetails((prevDetails) => ({
+                  ...prevDetails!,
+                  total_room: parseInt(e.target.value),
+                }))
+              }
               type="number"
             />
             {total_roomError && (
-              <p className="text-red-500 text-sm mt-1">{total_roomError.message}</p>
+              <p className="text-red-500 text-sm">
+                {total_roomError.message}
+              </p>
             )}
           </div>
 
@@ -445,14 +534,20 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             <Label htmlFor="floor">Floor</Label>
             <Input
               id="floor"
-              size={"md"}
+              className="h-9"
+              min={0}
               value={roomDetails?.floor}
               {...register("floor", { valueAsNumber: true })}
-              onChange={(e) => setRoomDetails(prevDetails => ({ ...prevDetails!, floor: parseInt(e.target.value) }))}
+              onChange={(e) =>
+                setRoomDetails((prevDetails) => ({
+                  ...prevDetails!,
+                  floor: parseInt(e.target.value),
+                }))
+              }
               type="number"
             />
             {floorError && (
-              <p className="text-red-500 text-sm mt-1">{floorError.message}</p>
+              <p className="text-red-500 text-sm ">{floorError.message}</p>
             )}
           </div>
 
@@ -461,61 +556,100 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             <Label htmlFor="room_view">Room View</Label>
             <Input
               id="room_view"
-              size={"md"}
+              className="h-9"
               value={roomDetails?.room_view}
               {...register("room_view")}
-              onChange={(e) => setRoomDetails(prevDetails => ({ ...prevDetails!, room_view: e.target.value }))}
+              onChange={(e) =>
+                setRoomDetails((prevDetails) => ({
+                  ...prevDetails!,
+                  room_view: e.target.value,
+                }))
+              }
               type="string"
               placeholder="Sea facing, Garden etc."
             />
             {room_viewError && (
-              <p className="text-red-500 text-sm mt-1">{room_viewError.message}</p>
+              <p className="text-red-500 text-sm ">
+                {room_viewError.message}
+              </p>
             )}
           </div>
         </div>
 
         {/* box 3 */}
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex items-start md:flex-row flex-col justify-center  md:gap-1 lg:gap-3">
           {/* Room Size field */}
           <div className="w-full ">
-            <Label htmlFor="room_size">Room Size <span className="text-destructive">*</span></Label>
+            <Label htmlFor="room_size">
+              Room Size <span className="text-destructive">*</span>
+            </Label>
             <Input
               id="room_size"
-              size={"md"}
+              className="h-9"
+              min={0}
               value={roomDetails?.room_size}
               {...register("room_size", { valueAsNumber: true })}
-              onChange={(e) => setRoomDetails(prevDetails => ({ ...prevDetails!, room_size: parseInt(e.target.value) }))}
+              onChange={(e) =>
+                setRoomDetails((prevDetails) => ({
+                  ...prevDetails!,
+                  room_size: parseInt(e.target.value),
+                }))
+              }
               type="number"
             />
             {room_sizeError && (
-              <p className="text-red-500 text-sm mt-1">{room_sizeError.message}</p>
+              <p className="text-red-500 text-sm ">
+                {room_sizeError.message}
+              </p>
             )}
           </div>
 
           {/* Room unit field */}
           <div className="w-full">
-            <Label htmlFor="room_unit">Room Unit <span className="text-destructive">*</span></Label>
+            <Label htmlFor="room_unit">
+              Room Unit <span className="text-destructive">*</span>
+            </Label>
             <div className="relative w-full">
               <select
                 {...register("room_unit")}
-                onChange={(e) => setRoomDetails(prevDetails => ({ ...prevDetails!, room_unit: e.target.value }))}
+                onChange={(e) =>
+                  setRoomDetails((prevDetails) => ({
+                    ...prevDetails!,
+                    room_unit: e.target.value,
+                  }))
+                }
                 className={`block appearance-none w-full border 
-        ${room_unitError ? "border-red-500" : "border-gray-300 dark:border-gray-600"}
+        ${
+          room_unitError
+            ? "border-red-500"
+            : "border-gray-300 dark:border-gray-600"
+        }
         bg-white dark:bg-gray-800 
         text-gray-700 dark:text-gray-200 
-        py-2 px-3 h-12 rounded-md 
+        py-2 px-3 h-9 rounded-md 
         leading-tight focus:outline-none focus:border-blue-500`}
               >
-                <option value="" disabled>Select Room Unit</option>
+                <option value="" disabled>
+                  Select Unit
+                </option>
                 <option value="sq. ft">Sq. Ft</option>
                 <option value="sq. mtr.">Sq. Mtr.</option>
               </select>
               {room_unitError && (
-                <p className="text-red-500 text-sm mt-1">{room_unitError.message}</p>
+                <p className="text-red-500 text-sm ">
+                  {room_unitError.message}
+                </p>
               )}
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
-                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 0 1 1.414-1.414L10 8.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4z" />
+                <svg
+                  className="fill-current h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5.293 7.293a1 1 0 0 1 1.414-1.414L10 8.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4z"
+                  />
                 </svg>
               </div>
             </div>
@@ -523,28 +657,50 @@ export default function XRooms({ onNext, onPrevious }: Props) {
 
           {/* Smoking policy field */}
           <div className="w-full">
-            <Label htmlFor="smoking_policy">Smoking Policy <span className="text-destructive">*</span></Label>
+            <Label htmlFor="smoking_policy">
+              Smoking Policy <span className="text-destructive">*</span>
+            </Label>
             <div className="relative w-full">
               <select
                 {...register("smoking_policy")}
-                onChange={(e) => setRoomDetails(prevDetails => ({ ...prevDetails!, smoking_policy: e.target.value }))}
+                onChange={(e) =>
+                  setRoomDetails((prevDetails) => ({
+                    ...prevDetails!,
+                    smoking_policy: e.target.value,
+                  }))
+                }
                 className={`block appearance-none w-full border 
-        ${smoking_policyError ? "border-red-500" : "border-gray-300 dark:border-gray-600"}
+        ${
+          smoking_policyError
+            ? "border-red-500"
+            : "border-gray-300 dark:border-gray-600"
+        }
         bg-white dark:bg-gray-800 
         text-gray-700 dark:text-gray-200 
-        py-2 px-3 h-12 rounded-md 
+        py-2 px-3 h-9 rounded-md 
         leading-tight focus:outline-none focus:border-blue-500`}
               >
-                <option value="" disabled>Select Smoking Policy</option>
+                <option value="" disabled>
+                  Select Policy
+                </option>
                 <option value="No-Smoking">No-Smoking</option>
                 <option value="Smoking allowed">Smoking allowed</option>
               </select>
               {smoking_policyError && (
-                <p className="text-red-500 text-sm mt-1">{smoking_policyError.message}</p>
+                <p className="text-red-500 text-sm ">
+                  {smoking_policyError.message}
+                </p>
               )}
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
-                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 0 1 1.414-1.414L10 8.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4z" />
+                <svg
+                  className="fill-current h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5.293 7.293a1 1 0 0 1 1.414-1.414L10 8.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4z"
+                  />
                 </svg>
               </div>
             </div>
@@ -552,103 +708,170 @@ export default function XRooms({ onNext, onPrevious }: Props) {
         </div>
 
         {/* box 4 */}
-        <div className="items-center justify-center gap-2">
+        <div className="flex w-full flex-col md:flex-row items-start justify-center md:gap-1 lg:gap-3 ">
           {/* Max Occupancy field */}
-          <div className="w-full ">
-            <Label htmlFor="max_occupancy" className="whitespace-nowrap">Max Occupancy <span className="text-destructive">*</span></Label>
+          <div className="w-full md:1/3 ">
+            <Label htmlFor="max_occupancy" className="whitespace-nowrap">
+              Max Occupancy <span className="text-destructive">*</span>
+            </Label>
             <Input
               id="max_occupancy"
-              size={"md"}
+              className="h-9"
+              min={0}
               value={roomDetails?.max_occupancy}
               {...register("max_occupancy", { valueAsNumber: true })}
-              onChange={(e) => setRoomDetails(prevDetails => ({ ...prevDetails!, max_occupancy: parseInt(e.target.value) }))}
+              onChange={(e) =>
+                setRoomDetails((prevDetails) => ({
+                  ...prevDetails!,
+                  max_occupancy: parseInt(e.target.value),
+                }))
+              }
               type="number"
             />
             {max_occupancyError && (
-              <p className="text-red-500 text-sm mt-1">{max_occupancyError.message}</p>
+              <p className="text-red-500 text-sm ">
+                {max_occupancyError.message}
+              </p>
             )}
           </div>
 
           {/* Max number of Adults field */}
-          <div className="w-full ">
-            <Label htmlFor="max_number_of_adults" className="whitespace-nowrap pr-1">Max no. of Adults <span className="text-destructive">*</span></Label>
+          <div className="w-full md:1/3 ">
+            <Label
+              htmlFor="max_number_of_adults"
+              className="whitespace-nowrap pr-1"
+            >
+              Max Adults <span className="text-destructive">*</span>
+            </Label>
             <Input
               id="max_number_of_adults"
-              size={"md"}
+              className="h-9"
+              min={0}
               value={roomDetails?.max_number_of_adults}
               {...register("max_number_of_adults", { valueAsNumber: true })}
-              onChange={(e) => setRoomDetails(prevDetails => ({ ...prevDetails!, max_number_of_adults: parseInt(e.target.value) }))}
+              onChange={(e) =>
+                setRoomDetails((prevDetails) => ({
+                  ...prevDetails!,
+                  max_number_of_adults: parseInt(e.target.value),
+                }))
+              }
               type="number"
             />
             {max_number_of_adultsError && (
-              <p className="text-red-500 text-sm mt-1">{max_number_of_adultsError.message}</p>
+              <p className="text-red-500 text-sm ">
+                {max_number_of_adultsError.message}
+              </p>
             )}
           </div>
 
           {/* Max number of Children field */}
-          <div className="w-full">
-            <Label htmlFor="max_number_of_children" className="whitespace-nowrap pr-1">Max no. of Children </Label>
+          <div className="w-full md:1/3">
+            <Label
+              htmlFor="max_number_of_children"
+              className="whitespace-nowrap pr-1"
+            >
+              Max Children{" "}
+            </Label>
             <Input
               id="max_number_of_children"
-              size={"md"}
+              className="h-9"
+              min={0}
               value={roomDetails?.max_number_of_children}
               {...register("max_number_of_children", { valueAsNumber: true })}
-              onChange={(e) => setRoomDetails(prevDetails => ({ ...prevDetails!, max_number_of_children: parseInt(e.target.value) }))}
+              onChange={(e) =>
+                setRoomDetails((prevDetails) => ({
+                  ...prevDetails!,
+                  max_number_of_children: parseInt(e.target.value),
+                }))
+              }
               type="number"
             />
             {max_number_of_childrenError && (
-              <p className="text-red-500 text-sm mt-1">{max_number_of_childrenError.message}</p>
+              <p className="text-red-500 text-sm ">
+                {max_number_of_childrenError.message}
+              </p>
             )}
           </div>
         </div>
 
         {/* box 5 */}
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex md:flex-row flex-col items-start justify-center md:gap-1 lg:gap-3">
           {/* Number of Bedrooms field */}
-          <div className="w-full">
-            <Label htmlFor="number_of_bedrooms" className="whitespace-nowrap">No. of Bedrooms <span className="text-destructive">*</span></Label>
+          <div className="w-full md:w-1/3">
+            <Label htmlFor="number_of_bedrooms" className="whitespace-nowrap">
+              Bedrooms <span className="text-destructive">*</span>
+            </Label>
             <Input
               id="number_of_bedrooms"
-              size={"md"}
+              className="h-9"
+              min={0}
               value={roomDetails?.number_of_bedrooms}
               {...register("number_of_bedrooms", { valueAsNumber: true })}
-              onChange={(e) => setRoomDetails(prevDetails => ({ ...prevDetails!, number_of_bedrooms: parseInt(e.target.value) }))}
+              onChange={(e) =>
+                setRoomDetails((prevDetails) => ({
+                  ...prevDetails!,
+                  number_of_bedrooms: parseInt(e.target.value),
+                }))
+              }
               type="number"
             />
             {number_of_bedroomsError && (
-              <p className="text-red-500 text-sm mt-1">{number_of_bedroomsError.message}</p>
+              <p className="text-red-500 text-sm ">
+                {number_of_bedroomsError.message}
+              </p>
             )}
           </div>
 
           {/* Number of Living Room field */}
-          <div className="w-full">
-            <Label htmlFor="number_of_living_room" className="whitespace-nowrap">No. of Living Room</Label>
+          <div className="w-full md:w-1/3">
+            <Label
+              htmlFor="number_of_living_room"
+              className="whitespace-nowrap"
+            >
+              Living Rooms
+            </Label>
             <Input
               id="number_of_living_room"
-              size={"md"}
+              className="h-9"
+              min={0}
               value={roomDetails?.number_of_living_room}
               {...register("number_of_living_room", { valueAsNumber: true })}
-              onChange={(e) => setRoomDetails(prevDetails => ({ ...prevDetails!, number_of_living_room: parseInt(e.target.value) }))}
+              onChange={(e) =>
+                setRoomDetails((prevDetails) => ({
+                  ...prevDetails!,
+                  number_of_living_room: parseInt(e.target.value),
+                }))
+              }
               type="number"
             />
             {number_of_living_roomError && (
-              <p className="text-red-500 text-sm mt-1">{number_of_living_roomError.message}</p>
+              <p className="text-red-500 text-sm ">
+                {number_of_living_roomError.message}
+              </p>
             )}
           </div>
 
           {/* Extra Bed field */}
-          <div className="w-full ">
+          <div className="w-full md:w-1/3">
             <Label htmlFor="extra_bed">Extra Bed</Label>
             <Input
               id="extra_bed"
-              size={"md"}
+              className="h-9"
+              min={0}
               value={roomDetails?.extra_bed}
               {...register("extra_bed", { valueAsNumber: true })}
-              onChange={(e) => setRoomDetails(prevDetails => ({ ...prevDetails!, extra_bed: parseInt(e.target.value) }))}
+              onChange={(e) =>
+                setRoomDetails((prevDetails) => ({
+                  ...prevDetails!,
+                  extra_bed: parseInt(e.target.value),
+                }))
+              }
               type="number"
             />
             {extra_bedError && (
-              <p className="text-red-500 text-sm mt-1">{extra_bedError.message}</p>
+              <p className="text-red-500 text-sm">
+                {extra_bedError.message}
+              </p>
             )}
           </div>
         </div>
@@ -660,68 +883,76 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             id="description"
             value={roomDetails?.description}
             {...register("description")}
-            onChange={(e) => setRoomDetails(prevDetails => ({ ...prevDetails!, description: e.target.value }))}
-            rows={4}
-            style={{ resize: "vertical" }}
+            onChange={(e) =>
+              setRoomDetails((prevDetails) => ({
+                ...prevDetails!,
+                description: e.target.value,
+              }))
+            }
+            style={{ resize: "none" }}
             placeholder="Enter room description..."
           />
         </div>
 
         {/* Image field  */}
-        <div className="self-end">
-          {propertyImageUrls?.length ? (
-            <PreviewPropertyImages
-              open={propertyImagePreviewDialog}
-              setOpen={setPropertyImagePreviewDialog}
-              files={propertyImageUrls}
-            />
-          ) : (
-            <UploadPropertyImages
-              files={files}
-              setFiles={setFiles}
-              rejected={rejected}
-              loading={loading}
-              setLoading={setLoading}
-              setRejected={setRejected}
-              open={openDialog}
-              setOpen={setOpenDialog}
-              handlePropertyImageUpload={handlePropertyImageUpload}
-            />
-          )}
-        </div>
+        <div className="flex w-full lg:flex-row flex-col gap-2">
+          <div className="flex mt-2 lg:w-1/2 w-full lg:gap-3 gap-2 items-center">
+            <div className="lg:w-2/3 w-full">
+              {propertyImageUrls?.length ? (
+                <PreviewPropertyImages
+                  open={propertyImagePreviewDialog}
+                  setOpen={setPropertyImagePreviewDialog}
+                  files={propertyImageUrls}
+                />
+              ) : (
+                <UploadPropertyImages
+                  files={files}
+                  setFiles={setFiles}
+                  rejected={rejected}
+                  loading={loading}
+                  setLoading={setLoading}
+                  setRejected={setRejected}
+                  open={openDialog}
+                  setOpen={setOpenDialog}
+                  handlePropertyImageUpload={handlePropertyImageUpload}
+                />
+              )}
+            </div>
 
-        <div className="flex items-center space-x-4">
-          <Label htmlFor="available">Available</Label>
-          <Checkbox
-            id="available"
-            {...register("available")}
-            checked={roomDetails?.available || false}
-            onCheckedChange={(value: boolean) => {
-              setValue("available", value)
-              setRoomDetails((prev: any) => {
-                return { ...prev, available: value };
-              });
-            }}
-          />
-        </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="available"
+                {...register("available")}
+                checked={roomDetails?.available || false}
+                onCheckedChange={(value: boolean) => {
+                  setValue("available", value);
+                  setRoomDetails((prev: any) => {
+                    return { ...prev, available: value };
+                  });
+                }}
+              />
+              <Label htmlFor="available">Available</Label>
+            </div>
+          </div>
 
+          {/* Submit button */}
+          <div className="flex md:w-1/2 md:items-start lg:justify-end gap-4 w-full">
+            <div className="mt-2">
+              <Button
+                className=" md:w-[120px] w-[134px] text-right"
+                onClick={onPrevious}
+                variant={"secondary"}
+                type="button"
+              >
+                Back
+              </Button>
+            </div>
 
-        {/* Submit button */}
-        <div className="flex items-center gap-2">
-          <div className="self-end gap-2 flex w-full mb-4">
-            <Button
-              className="w-[250px]"
-              onClick={onPrevious}
-              //  onClick={handleBack}
-              variant={"secondary"}
-              type="button"
-            >
-              Back
-            </Button>
-            <Button className="w-[250px]" type="submit">
-              Next
-            </Button>
-            {/* <SubmitButton content="Next" loading={formLoading} /> */}
+            <div className="mt-2">
+              <Button className=" md:w-[120px]  w-[134px]" type="submit">
+                Next
+              </Button>
+            </div>
           </div>
         </div>
       </form>
@@ -781,20 +1012,20 @@ function PreviewPropertyImages({
           {!files.length
             ? "No preview available"
             : files?.map((file, i) => (
-              <div
-                key={`${JSON.stringify(file) + i}`}
-                onClick={() => setCurrentImage(i)}
-                className="rounded-md cursor-pointer overflow-hidden"
-              >
-                <Image
-                  key={file?.public_id}
-                  src={file?.url}
-                  height={60}
-                  width={60}
-                  alt=""
-                />
-              </div>
-            ))}
+                <div
+                  key={`${JSON.stringify(file) + i}`}
+                  onClick={() => setCurrentImage(i)}
+                  className="rounded-md cursor-pointer overflow-hidden"
+                >
+                  <Image
+                    key={file?.public_id}
+                    src={file?.url}
+                    height={60}
+                    width={60}
+                    alt=""
+                  />
+                </div>
+              ))}
         </div>
         <div className="rounded-md min-h-[250px] max-h-[350px] overflow-hidden">
           <Image
@@ -928,7 +1159,7 @@ function UploadPropertyImages({
             getInputProps={getInputProps}
             isDragActive={isDragActive}
           />
-          <div className="mt-4 flex items-center justify-center">
+          <div className="mt-4 flex  items-center justify-center">
             <Button
               type="button"
               className="mr-2 w-2/5"
@@ -960,14 +1191,14 @@ function UploadPropertyImages({
               {!files.length
                 ? "No preview available"
                 : files?.map((file) => (
-                  <Image
-                    key={file?.name}
-                    src={file?.preview}
-                    height={60}
-                    width={60}
-                    alt=""
-                  />
-                ))}
+                    <Image
+                      key={file?.name}
+                      src={file?.preview}
+                      height={60}
+                      width={60}
+                      alt=""
+                    />
+                  ))}
             </CardContent>
           </Card>
         </div>
@@ -975,74 +1206,13 @@ function UploadPropertyImages({
     </Dialog>
   );
 }
-{/* <div class="p-2 pt-0"><div class="space-y-2"><div class="gap-10 tracking-normal"><div class="gap-2"><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 whitespace-nowrap">Property ID :</p><p class="font-semibold">66e41c557a463a764b29723c</p></div><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 ">Name :</p><p class="font-semibold">Kafil's Plaza</p></div><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 ">Email :</p><p class="font-semibold">kafils@gmail.com</p></div><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 ">Contact :</p><p class="font-semibold">6371545555</p></div></div></div></div></div> */ }
-
-{/* <div class="p-2 pt-0"><div class="space-y-2"><div class="gap-10 tracking-normal"><div class="gap-2"><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 whitespace-nowrap">Property ID :</p><p class="font-semibold">66e41c557a463a764b29723c</p></div><div class=" flex flex-row gap-6 "><p class="dark:text-gray-300 ">Name :</p><p class="font-semibold flex">Kafil's Plaza</p></div><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 ">Email :</p><p class="font-semibold">kafils@gmail.com</p></div><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 ">Contact :</p><p class="font-semibold">6371545555</p></div></div></div></div></div> */ }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+{
+  /* <div class="p-2 pt-0"><div class="space-y-2"><div class="gap-10 tracking-normal"><div class="gap-2"><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 whitespace-nowrap">Property ID :</p><p class="font-semibold">66e41c557a463a764b29723c</p></div><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 ">Name :</p><p class="font-semibold">Kafil's Plaza</p></div><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 ">Email :</p><p class="font-semibold">kafils@gmail.com</p></div><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 ">Contact :</p><p class="font-semibold">6371545555</p></div></div></div></div></div> */
+}
+
+{
+  /* <div class="p-2 pt-0"><div class="space-y-2"><div class="gap-10 tracking-normal"><div class="gap-2"><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 whitespace-nowrap">Property ID :</p><p class="font-semibold">66e41c557a463a764b29723c</p></div><div class=" flex flex-row gap-6 "><p class="dark:text-gray-300 ">Name :</p><p class="font-semibold flex">Kafil's Plaza</p></div><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 ">Email :</p><p class="font-semibold">kafils@gmail.com</p></div><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 ">Contact :</p><p class="font-semibold">6371545555</p></div></div></div></div></div> */
+}
 
 // const roomSchema = z.object({
 //   name: z.string().min(1, "Room name is required"),
@@ -1089,7 +1259,6 @@ function UploadPropertyImages({
 //   total_room: string;
 // }
 
-
 // const form = useForm<Inputs>({
 //   defaultValues: {
 //     name: "",
@@ -1102,7 +1271,6 @@ function UploadPropertyImages({
 //   },
 //   resolver: zodResolver(roomSchema),
 // });
-
 
 // const onSubmit: SubmitHandler<Inputs> = async (data) => {
 //   /////////////
@@ -1138,11 +1306,8 @@ function UploadPropertyImages({
 //   }
 // };
 
-
-
-
-
-{/* <div className="w-full">
+{
+  /* <div className="w-full">
             <Label htmlFor="price">Price</Label>
             <Input
               id="price"
@@ -1155,9 +1320,11 @@ function UploadPropertyImages({
               }))}
               type="number"
             />
-          </div> */}
+          </div> */
+}
 
-{/* <div className="self-end w-full relative">
+{
+  /* <div className="self-end w-full relative">
             <Label htmlFor="price">Price</Label>
             <Input
               id="price"
@@ -1170,9 +1337,11 @@ function UploadPropertyImages({
               }))}
               type="number"
             />
-          </div> */}
+          </div> */
+}
 
-{/* <div className="self-end w-full relative">
+{
+  /* <div className="self-end w-full relative">
             <Label htmlFor="roomPlan">Room Plan</Label>
             <div className="inline-block relative w-full">
               <select
@@ -1205,9 +1374,11 @@ function UploadPropertyImages({
                 </svg>
               </div>
             </div>
-          </div> */}
+          </div> */
+}
 
-{/* <div className="w-full">
+{
+  /* <div className="w-full">
             <Label htmlFor="capacity">Capacity</Label>
             <Input
               // variant={capacityError && "error"}
@@ -1235,12 +1406,12 @@ function UploadPropertyImages({
               type="number"
               size="md"
             />
-          </div> */}
+          </div> */
+}
 // </div>
 
-
-
-{/* <div className="w-full flex items-center justify-between">
+{
+  /* <div className="w-full flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Label htmlFor="available">Available</Label>
               <Checkbox
@@ -1255,4 +1426,5 @@ function UploadPropertyImages({
                 }}
               />
             </div>
-          </div> */}
+          </div> */
+}

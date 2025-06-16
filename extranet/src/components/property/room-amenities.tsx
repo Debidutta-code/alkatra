@@ -1,15 +1,7 @@
 "use client";
 
-import React, {
-  useEffect,
-  useState,
-} from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "./../ui/card";
+import React, { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "./../ui/card";
 import { Label } from "./../ui/label";
 import { Button } from "./../ui/button";
 import {
@@ -113,8 +105,6 @@ export default function Rooms({ onNext, onPrevious }: Props) {
   const [openDialog, setOpenDialog] = useState(false);
   const [currenStep, setCurrentStep] = useState(0);
 
-
-
   const [loading, setLoading] = useState<boolean>(false);
   const [formLoading, setFormLoading] = useState<boolean>(false);
   const [roomDetails, setroomDetails] = useState<any>(null);
@@ -162,7 +152,8 @@ export default function Rooms({ onNext, onPrevious }: Props) {
     resolver: zodResolver(roomSchema),
   });
 
-  const { register, control, handleSubmit, setValue, formState, getValues } = form;
+  const { register, control, handleSubmit, setValue, formState, getValues } =
+    form;
 
   useEffect(() => {
     console.log({ errors: formState.errors });
@@ -210,14 +201,14 @@ export default function Rooms({ onNext, onPrevious }: Props) {
         soap: !!data.soap,
         hairdryer: !!data.hairdryer,
       },
-  
+
       workLeisure: {
         workDesk: !!data.workDesk,
         readingChair: !!data.readingChair,
         additionalLighting: !!data.additionalLighting,
       },
     };
-  
+
     const roomBody = {
       ...data,
       propertyInfo_id: property_id,
@@ -225,7 +216,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
       amenities,
     };
     setFormLoading(true);
-  
+
     console.log("onSubmit data:", data);
     try {
       const {
@@ -239,13 +230,13 @@ export default function Rooms({ onNext, onPrevious }: Props) {
           },
         }
       );
-  
+
       console.log("NewRoom Data:", newRoom);
       setFormLoading(false);
-  
-      toast.success('Room amenities submitted successfully!');  
+
+      toast.success("Room amenities submitted successfully!");
       onNext();
-  
+
       router.push("/app/property");
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -255,10 +246,9 @@ export default function Rooms({ onNext, onPrevious }: Props) {
     }
   };
 
-
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
         <CardTitle>Room Amenities</CardTitle>
         <Card className="w-full">
           <CardHeader>
@@ -268,21 +258,21 @@ export default function Rooms({ onNext, onPrevious }: Props) {
             <ScrollArea className="h-72 w-full px-6">
               <Accordion type="multiple" className="w-full">
                 <AccordionItem value="amenity-1">
-                  <AccordionTrigger >Room Amenities</AccordionTrigger>
-                  <AccordionContent className="flex gap-4 items-center justify-between">
+                  <AccordionTrigger>Room Amenities</AccordionTrigger>
+                  <AccordionContent className="flex flex-col gap-4 items-start justify-between">
                     <div className="w-full">
                       <Label>Bed Type</Label>
-                      <Select 
-                        value={roomDetails?.bed || ''}
+                      <Select
+                        value={roomDetails?.bed || ""}
                         onValueChange={(value: any) => {
-                          setroomDetails({ ...roomDetails, bed: value })
-                          setValue("bed", value as any)
+                          setroomDetails({ ...roomDetails, bed: value });
+                          setValue("bed", value as any);
                         }}
                       >
-                        <SelectTrigger >
+                        <SelectTrigger>
                           <SelectValue placeholder="Select bed type" />
                         </SelectTrigger>
-                        <SelectContent >
+                        <SelectContent>
                           {["single", "double", "king", "twin", "queen"]?.map(
                             (item, index) => (
                               <SelectItem key={`${item + index}`} value={item}>
@@ -296,31 +286,37 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                     </div>
 
                     <div className="w-full">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="bathroom"
-                          checked={roomDetails?.bathroom}
-                          {...register("bathroom")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, bathroom: value })
-                            setValue("bathroom", value as any);
-
-                          }}
-
-                        />
-                        <label
-                          htmlFor="bathroom"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Bathroom
-                        </label>
+                      <div className="flex flex-col space-y-2">
+                        {" "}
+                        {/* Bathroom */}
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="bathroom"
+                            checked={roomDetails?.bathroom}
+                            {...register("bathroom")}
+                            onCheckedChange={(value: boolean) => {
+                              setroomDetails({
+                                ...roomDetails,
+                                bathroom: value,
+                              });
+                              setValue("bathroom", value as any);
+                            }}
+                          />
+                          <label
+                            htmlFor="bathroom"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            Bathroom
+                          </label>
+                        </div>
+                        {/* Towels */}
                         <div className="flex items-center space-x-2">
                           <Checkbox
                             id="towels"
                             checked={roomDetails?.towels}
                             {...register("towels")}
                             onCheckedChange={(value: boolean) => {
-                              setroomDetails({ ...roomDetails, towels: value })
+                              setroomDetails({ ...roomDetails, towels: value });
                               setValue("towels", value as any);
                             }}
                           />
@@ -331,13 +327,17 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                             Towels
                           </label>
                         </div>
+                        {/* Linens Bedding */}
                         <div className="flex items-center space-x-2">
                           <Checkbox
                             id="linensBedding"
                             checked={roomDetails?.linensBedding}
                             {...register("linensBedding")}
                             onCheckedChange={(value: boolean) => {
-                              setroomDetails({ ...roomDetails, linensBedding: value })
+                              setroomDetails({
+                                ...roomDetails,
+                                linensBedding: value,
+                              });
                               setValue("linensBedding", value);
                             }}
                           />
@@ -354,20 +354,21 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                 </AccordionItem>
 
                 <AccordionItem value="amenity-2">
-                  <AccordionTrigger >Furniture Amenities</AccordionTrigger>
-                  <AccordionContent >
+                  <AccordionTrigger>Furniture Amenities</AccordionTrigger>
+                  <AccordionContent>
                     <div>
-
                       <div className="flex items-center space-x-2 mb-2">
                         <Checkbox
                           id="tableChairs"
                           checked={roomDetails?.tableChairs}
                           {...register("tableChairs")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, tableChairs: value })
-                            setValue("tableChairs", value)
-                          }
-                          }
+                            setroomDetails({
+                              ...roomDetails,
+                              tableChairs: value,
+                            });
+                            setValue("tableChairs", value);
+                          }}
                         />
                         <Label
                           htmlFor="tableChairs"
@@ -377,17 +378,15 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                         </Label>
                       </div>
 
-
                       <div className="flex items-center space-x-2 mb-2">
                         <Checkbox
                           id="desk"
                           checked={roomDetails?.desk}
                           {...register("desk")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, desk: value })
-                            setValue("desk", value)
-                          }
-                          }
+                            setroomDetails({ ...roomDetails, desk: value });
+                            setValue("desk", value);
+                          }}
                         />
                         <Label
                           htmlFor="desk"
@@ -402,10 +401,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.dresserWardrobe}
                           {...register("dresserWardrobe")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, dresserWardrobe: value })
-                            setValue("dresserWardrobe", value)
-                          }
-                          }
+                            setroomDetails({
+                              ...roomDetails,
+                              dresserWardrobe: value,
+                            });
+                            setValue("dresserWardrobe", value);
+                          }}
                         />
                         <Label
                           htmlFor="dresserWardrobe"
@@ -420,10 +421,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.sofaSeating}
                           {...register("sofaSeating")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, sofaSeating: value })
-                            setValue("sofaSeating", value)
-                          }
-                          }
+                            setroomDetails({
+                              ...roomDetails,
+                              sofaSeating: value,
+                            });
+                            setValue("sofaSeating", value);
+                          }}
                         />
                         <Label
                           htmlFor="sofaSeating"
@@ -446,10 +449,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.television}
                           {...register("television")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, television: value })
-                            setValue("television", value)
-                          }
-                          }
+                            setroomDetails({
+                              ...roomDetails,
+                              television: value,
+                            });
+                            setValue("television", value);
+                          }}
                         />
                         <Label
                           htmlFor="television"
@@ -464,10 +469,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.telephone}
                           {...register("telephone")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, telephone: value })
-                            setValue("telephone", value)
-                          }
-                          }
+                            setroomDetails({
+                              ...roomDetails,
+                              telephone: value,
+                            });
+                            setValue("telephone", value);
+                          }}
                         />
                         <Label
                           htmlFor="telephone"
@@ -482,10 +489,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.wifiInternet}
                           {...register("wifiInternet")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, wifiInternet: value })
-                            setValue("wifiInternet", value)
-                          }
-                          }
+                            setroomDetails({
+                              ...roomDetails,
+                              wifiInternet: value,
+                            });
+                            setValue("wifiInternet", value);
+                          }}
                         />
                         <Label
                           htmlFor="wifiInternet"
@@ -498,7 +507,6 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                   </AccordionContent>
                 </AccordionItem>
 
-
                 <AccordionItem value="amenity-4">
                   <AccordionTrigger>Climate Control Amenities</AccordionTrigger>
                   <AccordionContent>
@@ -509,10 +517,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.airConditioning}
                           {...register("airConditioning")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, airConditioning: value })
-                            setValue("airConditioning", value)
-                          }
-                          }
+                            setroomDetails({
+                              ...roomDetails,
+                              airConditioning: value,
+                            });
+                            setValue("airConditioning", value);
+                          }}
                         />
                         <Label
                           htmlFor="airConditioning"
@@ -527,10 +537,9 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.heating}
                           {...register("heating")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, heating: value })
-                            setValue("heating", value)
-                          }
-                          }
+                            setroomDetails({ ...roomDetails, heating: value });
+                            setValue("heating", value);
+                          }}
                         />
                         <Label
                           htmlFor="heating"
@@ -554,10 +563,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.smallRefrigerator}
                           {...register("smallRefrigerator")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, smallRefrigerator: value })
-                            setValue("smallRefrigerator", value)
-                          }
-                          }
+                            setroomDetails({
+                              ...roomDetails,
+                              smallRefrigerator: value,
+                            });
+                            setValue("smallRefrigerator", value);
+                          }}
                         />
                         <Label
                           htmlFor="smallRefrigerator"
@@ -572,10 +583,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.microwave}
                           {...register("microwave")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, microwave: value })
-                            setValue("microwave", value)
-                          }
-                          }
+                            setroomDetails({
+                              ...roomDetails,
+                              microwave: value,
+                            });
+                            setValue("microwave", value);
+                          }}
                         />
                         <Label
                           htmlFor="microwave"
@@ -590,10 +603,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.coffeeMaker}
                           {...register("coffeeMaker")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, coffeeMaker: value })
-                            setValue("coffeeMaker", value)
-                          }
-                          }
+                            setroomDetails({
+                              ...roomDetails,
+                              coffeeMaker: value,
+                            });
+                            setValue("coffeeMaker", value);
+                          }}
                         />
                         <Label
                           htmlFor="coffeeMaker"
@@ -615,10 +630,9 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.cctv}
                           {...register("cctv")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, cctv: value })
-                            setValue("cctv", value)
-                          }
-                          }
+                            setroomDetails({ ...roomDetails, cctv: value });
+                            setValue("cctv", value);
+                          }}
                         />
                         <Label
                           htmlFor="cctv"
@@ -633,10 +647,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.smokeDetectors}
                           {...register("smokeDetectors")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, smokeDetectors: value })
-                            setValue("smokeDetectors", value)
-                          }
-                          }
+                            setroomDetails({
+                              ...roomDetails,
+                              smokeDetectors: value,
+                            });
+                            setValue("smokeDetectors", value);
+                          }}
                         />
                         <Label
                           htmlFor="smokeDetectors"
@@ -651,10 +667,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.fireExtinguisher}
                           {...register("fireExtinguisher")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, fireExtinguisher: value })
-                            setValue("fireExtinguisher", value)
-                          }
-                          }
+                            setroomDetails({
+                              ...roomDetails,
+                              fireExtinguisher: value,
+                            });
+                            setValue("fireExtinguisher", value);
+                          }}
                         />
                         <Label
                           htmlFor="fireExtinguisher"
@@ -676,10 +694,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.shampooConditioner}
                           {...register("shampooConditioner")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, shampooConditioner: value })
-                            setValue("shampooConditioner", value)
-                          }
-                          }
+                            setroomDetails({
+                              ...roomDetails,
+                              shampooConditioner: value,
+                            });
+                            setValue("shampooConditioner", value);
+                          }}
                         />
                         <Label
                           htmlFor="shampooConditioner"
@@ -694,10 +714,9 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.soap}
                           {...register("soap")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, soap: value })
-                            setValue("soap", value)
-                          }
-                          }
+                            setroomDetails({ ...roomDetails, soap: value });
+                            setValue("soap", value);
+                          }}
                         />
                         <Label
                           htmlFor="soap"
@@ -712,10 +731,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.hairdryer}
                           {...register("hairdryer")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, hairdryer: value })
-                            setValue("hairdryer", value)
-                          }
-                          }
+                            setroomDetails({
+                              ...roomDetails,
+                              hairdryer: value,
+                            });
+                            setValue("hairdryer", value);
+                          }}
                         />
                         <Label
                           htmlFor="hairdryer"
@@ -738,10 +759,9 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.workDesk}
                           {...register("workDesk")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, workDesk: value })
-                            setValue("workDesk", value)
-                          }
-                          }
+                            setroomDetails({ ...roomDetails, workDesk: value });
+                            setValue("workDesk", value);
+                          }}
                         />
                         <Label
                           htmlFor="workDesk"
@@ -756,10 +776,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.readingChair}
                           {...register("readingChair")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, readingChair: value })
-                            setValue("readingChair", value)
-                          }
-                          }
+                            setroomDetails({
+                              ...roomDetails,
+                              readingChair: value,
+                            });
+                            setValue("readingChair", value);
+                          }}
                         />
                         <Label
                           htmlFor="readingChair"
@@ -774,10 +796,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.additionalLighting}
                           {...register("additionalLighting")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, additionalLighting: value })
-                            setValue("additionalLighting", value)
-                          }
-                          }
+                            setroomDetails({
+                              ...roomDetails,
+                              additionalLighting: value,
+                            });
+                            setValue("additionalLighting", value);
+                          }}
                         />
                         <Label
                           htmlFor="additionalLighting"
@@ -801,10 +825,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.accessibleBathroom}
                           {...register("accessibleBathroom")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, accessibleBathroom: value })
-                            setValue("accessibleBathroom", value)
-                          }
-                          }
+                            setroomDetails({
+                              ...roomDetails,
+                              accessibleBathroom: value,
+                            });
+                            setValue("accessibleBathroom", value);
+                          }}
                         />
                         <Label
                           htmlFor="accessibleBathroom"
@@ -819,10 +845,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           checked={roomDetails?.wheelchairAccessibility}
                           {...register("wheelchairAccessibility")}
                           onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, wheelchairAccessibility: value })
-                            setValue("wheelchairAccessibility", value)
-                          }
-                          }
+                            setroomDetails({
+                              ...roomDetails,
+                              wheelchairAccessibility: value,
+                            });
+                            setValue("wheelchairAccessibility", value);
+                          }}
                         />
                         <Label
                           htmlFor="wheelchairAccessibility"
@@ -838,21 +866,25 @@ export default function Rooms({ onNext, onPrevious }: Props) {
             </ScrollArea>
           </CardContent>
         </Card>
-        <div className="flex items-center gap-2">
-          <div className="self-end gap-2 flex w-full">
+        <div className="flex justify-end gap-4 w-full mt-4">
+          <div className="mt-2">
             <Button
-              className="w-[200px]"
+              className="lg:w-[180px] md:w-[120px] w-[100px] text-right"
               onClick={onPrevious}
-
               variant={"secondary"}
               type="button"
             >
               Back
             </Button>
-            <Button className="w-[200px]" type="submit">
-              Submit
+          </div>
+
+          <div className="mt-2">
+            <Button
+              className="lg:w-[180px] md:w-[120px] w-[100px]"
+              type="submit"
+            >
+              Next
             </Button>
-            {/* <SubmitButton content="Next" loading={formLoading} /> */}
           </div>
         </div>
       </form>
