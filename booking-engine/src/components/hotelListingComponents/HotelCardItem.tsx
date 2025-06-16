@@ -87,23 +87,23 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
             return dateString;
         }
     };
+    const defaultHotelImage = "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300&q=80";
 
     return (
-        <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300 group font-noto-sans">
-            <div className="flex flex-col md:flex-row">
+        <div
+            className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300 group font-noto-sans cursor-pointer"
+            onClick={() => onViewRoom(hotel._id)}
+        >            <div className="flex flex-col md:flex-row">
                 {/* Hotel image */}
                 <div className="md:w-1/3 h-52 md:h-auto relative overflow-hidden">
-                    {hotel.image && hotel.image.length > 0 ? (
-                        <img
-                            src={hotel.image[0]}
-                            alt={hotel.property_name}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                    ) : (
-                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-gray-400 font-tripswift-regular">{t('HotelListing.HotelCardItem.noImage')}</span>
-                        </div>
-                    )}
+                    <img
+                        src={hotel.image && hotel.image.length > 0 ? hotel.image[0] : defaultHotelImage}
+                        alt={hotel.property_name}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        onError={(e) => {
+                            (e.target as HTMLImageElement).src = defaultHotelImage;
+                        }}
+                    />
 
                     {/* Rating badge with TripSwift styling */}
                     <div className="absolute top-3 right-3 bg-tripswift-blue bg-opacity-90 text-tripswift-off-white px-2 py-1 rounded text-sm font-tripswift-medium flex items-center shadow-sm">
@@ -166,7 +166,10 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
                         </div>
 
                         <button
-                            onClick={() => onViewRoom(hotel._id)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onViewRoom(hotel._id);
+                            }}
                             className="btn-tripswift-primary px-6 py-2 rounded-lg text-sm font-tripswift-medium transition-all duration-300 hover:shadow-md"
                             aria-label={t('HotelListing.HotelCardItem.viewRoomButton')}
                         >

@@ -191,7 +191,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
 
   const getFinalPrice = async (selectedRoom: any, checkInDate: string, checkOutDate: string, guestData: any) => {
     try {
-      console.log("gust data",guestData)
+      console.log("gust data", guestData)
       const finalPriceResponse = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomRentPrice`,
         {
@@ -202,7 +202,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
           noOfChildrens: guestData?.children,
           noOfAdults: guestData?.guests,
           noOfRooms: guestData?.rooms,
-          noOfInfants:guestData?.infants,
+          noOfInfants: guestData?.infants,
         },
         { withCredentials: true }
       );
@@ -416,11 +416,11 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         rooms: guestData?.rooms || 1,
         adults: guestData?.guests || 1,
         children: guestData?.children || 0,
-        infants:guestData?.infants || 0 ,
+        infants: guestData?.infants || 0,
         guests,
-        hotelName: guestData?.hotelName || "Unknown Hotel",
-        ratePlanCode: finalPrice?.dailyBreakdown?.ratePlanCode || "SUT",
-        roomType: selectedRoom?.room_type || "SUT",
+        hotelName: guestData?.hotelName || "",
+        ratePlanCode: finalPrice?.dailyBreakdown?.ratePlanCode || "",
+        roomType: selectedRoom?.room_type || "",
       });
     }
   };
@@ -436,6 +436,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     const rooms = guestData?.rooms || 1;
     const adults = guestData?.guests || 1;
     const children = guestData?.children || 0;
+    const infants = guestData?.infants || 0;
     const roomText =
       rooms === 1
         ? t("BookingComponents.GuestInformationModal.roomSingular")
@@ -448,27 +449,34 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       children === 1
         ? t("BookingComponents.GuestInformationModal.childSingular")
         : t("BookingComponents.GuestInformationModal.childrenPlural");
+    const infantText =
+      infants === 1
+        ? t("BookingComponents.GuestInformationModal.infantSingular")
+        : t("BookingComponents.GuestInformationModal.infantsPlural");
 
     let display = `${rooms} ${roomText} · ${adults} ${adultText}`;
     if (children > 0) {
       display += ` · ${children} ${childText}`;
     }
+    if (infants > 0) {
+      display += ` · ${infants} ${infantText}`;
+    }
     return display;
   };
 
-      const handlePhoneChange = (value: string | undefined) => {
-      if (value && value.startsWith('+91')) {
-        // Remove all non-digit characters
-        const digits = value.replace(/\D/g, '');
-        // If more than 12 characters (+91 + 10 digits), truncate
-        const formattedValue = digits.length > 12
-          ? `+${digits.substring(0, 12)}`
-          : value;
-        setPhone(formattedValue);
-      } else {
-        setPhone(value);
-      }
-    };
+  const handlePhoneChange = (value: string | undefined) => {
+    if (value && value.startsWith('+91')) {
+      // Remove all non-digit characters
+      const digits = value.replace(/\D/g, '');
+      // If more than 12 characters (+91 + 10 digits), truncate
+      const formattedValue = digits.length > 12
+        ? `+${digits.substring(0, 12)}`
+        : value;
+      setPhone(formattedValue);
+    } else {
+      setPhone(value);
+    }
+  };
   return (
     <>
       {/* Backdrop */}
@@ -492,7 +500,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
           </div>
 
           {/* Progress Bar */}
-          <div className="bg-tripswift-off-white px-4 py-3 border-b border-tripswift-black/10">
+          <div className="bg-tripswift-off-white px-4 py-2 border-b border-tripswift-black/10">
             <div className="flex items-center justify-between">
               <div className="flex flex-col items-center">
                 <div
@@ -530,32 +538,32 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {errorMessage && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm font-tripswift-medium">
+              <div className="bg-red-50 text-red-600 p-2 rounded-lg text-sm font-tripswift-medium">
                 {errorMessage}
               </div>
             )}
             {updateMessage && (
-              <div className="bg-green-50 text-green-600 p-3 rounded-lg text-sm font-tripswift-medium">
+              <div className="bg-green-50 text-green-600 p-2 rounded-lg text-sm font-tripswift-medium">
                 {updateMessage}
               </div>
             )}
 
             {activeSection === "details" ? (
-              <div className="space-y-6">
+              <div className="space-y-3">
                 {/* Room Summary Card */}
-                <div className="bg-tripswift-off-white rounded-xl p-4 shadow-sm border border-tripswift-black/10">
-                  <h3 className="text-lg font-tripswift-bold text-tripswift-black mb-3">
+                <div className="bg-tripswift-off-white rounded-xl px-4 py-2 shadow-sm border border-tripswift-black/10">
+                  <h3 className="text-lg font-tripswift-bold text-tripswift-black mb-2">
                     {selectedRoom.room_name}
                   </h3>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center py-1">
                     <Calendar className="text-tripswift-blue h-5 w-5" />
-                    <div className="flex flex-wrap gap-2">
-                      <span className="text-sm bg-tripswift-blue/10 px-3 py-1.5 rounded-full font-tripswift-medium text-tripswift-black/80">
+                    <div className="flex flex-wrap">
+                      <span className="text-sm bg-tripswift-blue/10 px-3 rounded-full font-tripswift-medium text-tripswift-black/80">
                         {formatDate(checkInDate)} - {formatDate(checkOutDate)}
                       </span>
-                      <span className="text-sm bg-tripswift-blue/10 px-3 py-1.5 rounded-full font-tripswift-medium text-tripswift-black/80">
+                      <span className="text-sm bg-tripswift-blue/10 px-3 rounded-full font-tripswift-medium text-tripswift-black/80">
                         {nightsCount} {nightsText}
                       </span>
                     </div>
@@ -563,13 +571,13 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                 </div>
 
                 {/* Guest Information Form */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-tripswift-black/10">
-                  <h3 className="text-lg font-tripswift-bold text-tripswift-black mb-4">
+                <div className="bg-white rounded-xl px-4 py-2 shadow-sm border border-tripswift-black/10">
+                  <h3 className="text-lg font-tripswift-bold text-tripswift-black mb-2">
                     {t("BookingComponents.GuestInformationModal.guestInformation")}
                   </h3>
-                  <div className="space-y-6">
+                  <div className="space-y-3">
                     {guests.map((guest, index) => (
-                      <div key={`${guest.type}-${index}`} className="space-y-4">
+                      <div key={`${guest.type}-${index}`} className="space-y-2">
                         <h4 className="text-base font-tripswift-bold text-tripswift-black capitalize">
                           {guest.type} {index - (guest.type === "child" ? guestData?.guests || 1 : guest.type === "infant" ? (guestData?.guests || 1) + (guestData?.children || 0) : 0) + 1}
                         </h4>
@@ -706,21 +714,21 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-3">
                 {/* Booking Summary Card */}
                 <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-tripswift-black/10">
-                  <div className="bg-tripswift-blue/10 p-4 rounded-t-xl">
+                  <div className="bg-tripswift-blue/10 px-4 py-2 rounded-t-xl">
                     <h3 className="text-lg font-tripswift-bold text-tripswift-black">
                       {t("BookingComponents.GuestInformationModal.bookingSummary")}
                     </h3>
                   </div>
-                  <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="px-4 pb-3 grid grid-cols-1 md:grid-cols-2">
                     <div>
-                      <h4 className="text-base font-tripswift-medium text-tripswift-black mb-3 flex items-center">
+                      <h4 className="text-base font-tripswift-medium text-tripswift-black mb-1 flex items-center">
                         <Calendar size={16} className="text-tripswift-blue mr-2" />
                         {t("BookingComponents.GuestInformationModal.stayDetails")}
                       </h4>
-                      <div className="space-y-3">
+                      <div className="space-y-3 ml-6">
                         <div>
                           <p className="text-xs text-tripswift-black/60">Room Type</p>
                           <p className="text-sm font-tripswift-medium">
@@ -748,11 +756,11 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       </div>
                     </div>
                     <div>
-                      <h4 className="text-base font-tripswift-medium text-tripswift-black mb-3 flex items-center">
+                      <h4 className="text-base font-tripswift-medium text-tripswift-black mb-1 flex items-center">
                         <User size={16} className="text-tripswift-blue mr-2" />
                         {t("BookingComponents.GuestInformationModal.guestInformation")}
                       </h4>
-                      <div className="space-y-3">
+                      <div className="space-y-3 ml-6">
                         <div>
                           <p className="text-xs text-tripswift-black/60">Primary Guest</p>
                           <p className="text-sm font-tripswift-medium">
@@ -774,12 +782,12 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
 
                 {/* Price Summary Card */}
                 <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-tripswift-black/10">
-                  <div className="bg-tripswift-blue/10 p-4 rounded-t-xl">
+                  <div className="bg-tripswift-blue/10 px-4 py-2 rounded-t-xl">
                     <h3 className="text-lg font-tripswift-bold text-tripswift-black">
                       {t("BookingComponents.GuestInformationModal.priceDetails")}
                     </h3>
                   </div>
-                  <div className="p-6 space-y-4">
+                  <div className="px-4 pb-2 space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-tripswift-black/70">
                         Room Rate ({nightsCount} {nightsText})
@@ -800,7 +808,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                 </div>
 
                 {/* Payment Notice */}
-                <div className="bg-tripswift-blue/5 rounded-xl p-4 border border-tripswift-blue/20">
+                <div className="bg-tripswift-blue/5 rounded-xl px-4 py-3 border border-tripswift-blue/20">
                   <div className="flex items-start gap-3">
                     <CreditCard className="text-tripswift-blue flex-shrink-0 mt-1" size={18} />
                     <div>
@@ -818,7 +826,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
           </div>
 
           {/* Footer */}
-          <div className="bg-tripswift-off-white border-t border-tripswift-black/10 p-4 flex justify-end gap-3">
+          <div className="bg-tripswift-off-white border-t border-tripswift-black/10 px-4 py-2 flex justify-end gap-3">
             <button
               onClick={() => (activeSection === "review" ? setActiveSection("details") : onClose())}
               className="px-6 py-2.5 bg-tripswift-black/10 text-tripswift-black rounded-lg hover:bg-tripswift-black/20 transition-all duration-200 text-sm font-tripswift-medium"

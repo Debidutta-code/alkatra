@@ -318,33 +318,10 @@
     },
     "ExploreDestinations": {
       "title": "استكشف الوجهات",
-      "exploreNow": "استكشف الآن",
-      "destinations": {
-        "maldives": {
-          "name": "جزر المالديف",
-          "category": "جنة الشاطئ"
-        },
-        "swissAlps": {
-          "name": "جبال الألب السويسرية",
-          "category": "مغامرة"
-        },
-        "santorini": {
-          "name": "سانتوريني",
-          "category": "هروب رومانسي"
-        },
-        "dubai": {
-          "name": "دبي",
-          "category": "فخامة"
-        },
-        "bali": {
-          "name": "بالي",
-          "category": "ثقافي"
-        },
-        "tokyo": {
-          "name": "طوكيو",
-          "category": "حياة المدينة"
-        }
-      }
+      "descriptionTemplate": "استكشف الفنادق في {{city}}",
+      "imageAlt": "وجهة {{name}}",
+      "goToGroup": "الانتقال إلى المجموعة {{count}}",
+      "exploreNow": "استكشف الآن"
     }
   },
   "RoomsPage": {
@@ -490,7 +467,7 @@
       "emailPlaceholder": "your.email@example.com",
       "emailInfo": "سيتم إرسال تأكيد الحجز إلى هذا البريد الإلكتروني",
       "emailError": "البريد الإلكتروني مطلوب",
-      "emailInvalidError":"يرجى إدخال عنوان بريد إلكتروني صالح",
+      "emailInvalidError": "يرجى إدخال عنوان بريد إلكتروني صالح",
       "phoneLabel": "رقم الهاتف",
       "phonePlaceholder": "أدخل رقم الهاتف",
       "phoneInfo": "لإشعارات متعلقة بالحجز",
@@ -503,6 +480,8 @@
       "adultsPlural": "بالغون",
       "childSingular": "طفل",
       "childrenPlural": "أطفال",
+      "infantSingular": "رضيع",
+      "infantsPlural": "رضع",
       "guestDisplayFormat": "الغرف والضيوف",
       "childrenPartFormat": "أطفال",
       "informationVerified": "تم التحقق من المعلومات بنجاح!",
@@ -681,8 +660,8 @@
         "adults": "بالغون",
         "child": "طفل",
         "children": "أطفال",
-         "infant":" رضيع",
-         "infants":"رُضَّع",
+        "infant": " رضيع",
+        "infants": "رُضَّع",
         "guest": "الضيف"
       },
       "paymentMethod": {

@@ -211,11 +211,44 @@ const updatePropertyAddressBypropertyid = async (
     return next(error);
   }
 };
+const getUniqueCities = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const uniqueCities = await PropertyAddress.aggregate([
+      {
+          $match: { city: { $ne: null } }
+      },
+      {
+          $group: {
+              _id: "$city",
+              count: { $sum: 1 }
+          }
+      },
+      {
+          $project: {
+              _id: 0,
+              city: "$_id"
+          }
+      },
+      {
+          $sort: { city: 1 }
+      }
+  ]);
 
+  if (uniqueCities.length === 0) {
+      return next(new AppError("No cities found in property addresses", 404));
+  }
+
+  res.status(200).json({
+      status: "success",
+      error: false,
+      message: "Unique cities fetched successfully",
+      data: uniqueCities.map(item => item.city)
+  });
+});
 export {
   createPropertyAddress,
   updatePropertyAddress,
   deletePropertyAddress,
   getPropertyAddressById,
   updatePropertyAddressBypropertyid,
+  getUniqueCities
 };
