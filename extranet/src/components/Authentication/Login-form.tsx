@@ -28,7 +28,8 @@ const loginSchema = z.object({
     .min(1, "Password is required")
     .regex(
       /^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*\d.*\d.*\d).{8,}$/,
-      "Password must contain at least 8 characters including one uppercase letter, one lower case letter, one number and one special character."    ),
+      "Password must contain at least 8 characters including one uppercase letter, one lower case letter, one number and one special character."
+    ),
 });
 
 type Inputs = {
@@ -46,7 +47,7 @@ const LoginForm: React.FC = () => {
   const form = useForm<Inputs>({
     defaultValues: { email: "", password: "" },
     resolver: zodResolver(loginSchema),
-    mode: "onChange"
+    mode: "onChange",
   });
 
   const { register, handleSubmit, formState } = form;
@@ -69,7 +70,7 @@ const LoginForm: React.FC = () => {
 
   if (isForgotPassword) {
     return <VerifyEmailForm onBack={() => setIsForgotPassword(false)} />;
-  }  
+  }
 
   return (
     <div className="w-full max-w-md p-6 sm:p-8 bg-card rounded-xl shadow-lg border border-border mx-auto my-8">
@@ -77,10 +78,12 @@ const LoginForm: React.FC = () => {
         <CardTitle className="text-3xl font-bold text-foreground">
           Welcome Back
         </CardTitle>
-        <p className="text-muted-foreground">Sign in to your TripSwift account</p>
+        <p className="text-muted-foreground">
+          Sign in to your TripSwift account
+        </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
         <div className="space-y-2">
           <div className="space-y-2">
             <Label htmlFor="email" className="text-sm font-medium">
@@ -104,19 +107,10 @@ const LoginForm: React.FC = () => {
           </div>
 
           <div className="">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center mb-1 justify-between">
               <Label htmlFor="password" className="text-sm font-medium">
                 Password
               </Label>
-              <Button
-                type="button"
-                variant="link"
-                size="sm"
-                className="text-primary hover:text-primary/80 px-0"
-                onClick={() => setIsForgotPassword(true)}
-              >
-                Forgot password?
-              </Button>
             </div>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -130,6 +124,7 @@ const LoginForm: React.FC = () => {
                 type={isVisible ? "text" : "password"}
                 variant={errors.password ? "error" : undefined}
               />
+
               <Button
                 type="button"
                 variant="ghost"
@@ -148,11 +143,22 @@ const LoginForm: React.FC = () => {
               </Button>
             </div>
             {errors.password && (
-              <p className="text-sm text-destructive mt-2">{errors.password.message}</p>
+              <p className="text-sm text-destructive mt-2">
+                {errors.password.message}
+              </p>
             )}
           </div>
         </div>
-
+        <div className="text-right">
+          <Button
+          type="button"
+          variant="link"
+          className="text-primary hover:text-primary/80 px-0"
+          onClick={() => setIsForgotPassword(true)}
+        >
+          Forgot password?
+        </Button>
+        </div>
         <div className="space-y-4 pt-2">
           <NextUIButton
             type="submit"

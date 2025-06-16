@@ -29,8 +29,8 @@ export default function RootLayout({
             ariaLabel="triangle-loading"
           />
         </div>
-      ) : (
-        <div className="h-screen w-screen overflow-y-auto overflow-x-hidden">
+    ) : (
+        <div className="min-h-screen  min-w-screen overflow-y-auto overflow-x-hidden pb-6 lg:pb-0 ">
           <Navbar />
           {children}
         </div>
