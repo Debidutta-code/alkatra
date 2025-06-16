@@ -9,7 +9,7 @@ router.post("/login", CustomerController.loginCustomer);
 router.get("/all", authenticateCustomer, CustomerController.getAllCustomers);
 router.get("/me", authenticateCustomer, CustomerController.getCustomerOwnData);
 router.patch("/update", authenticateCustomer, CustomerController.updateCustomerProfile); 
-router.post("/verify-email", CustomerController.checkEmailExists);
+router.get("/verify-email", CustomerController.checkEmailExists);
 router.patch("/reset-password", CustomerController.updatePassword);
 
 export default router; 

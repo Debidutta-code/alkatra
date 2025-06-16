@@ -15,6 +15,7 @@ export async function prepareAmendReservationData(data: AmendReservationInput): 
         hotelName: data.bookingDetails?.hotelName,
         ratePlanCode: data.bookingDetails?.ratePlanCode,
         roomTypeCode: data.bookingDetails?.roomTypeCode,
+        numberOfRooms: data.bookingDetails?.numberOfRooms,
         guests: data.bookingDetails?.guests,
         email: data.bookingDetails?.email,
         phone: data.bookingDetails?.phone,

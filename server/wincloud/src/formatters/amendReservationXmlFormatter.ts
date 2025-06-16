@@ -8,6 +8,7 @@ export function generateAmendReservationXML(data: ThirdPartyAmendReservationData
     const hotelName = data.hotelName;
     const ratePlanCode = data.ratePlanCode;
     const roomTypeCode = data.roomTypeCode;
+    const numberOfRooms = data.numberOfRooms;
     const guests = data.guests;
     const email = data.email;
     const phone = data.phone;
@@ -47,7 +48,7 @@ export function generateAmendReservationXML(data: ThirdPartyAmendReservationData
                                 'RatePlan': { '@RatePlanCode': ratePlanCode },
                             },
                             'RoomTypes': {
-                                'RoomType': { '@RoomTypeCode': roomTypeCode, '@NumberOfUnits': '1' },
+                                'RoomType': { '@RoomTypeCode': roomTypeCode, '@NumberOfUnits': numberOfRooms },
                             },
                             'GuestCounts': {
                                 'GuestCount': Object.entries(ageCodeSummary)
