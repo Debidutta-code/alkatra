@@ -94,18 +94,44 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
     const errors: { [key: string]: string } = {};
     if (!newRoom.room_name) errors.room_name = "Room Name is required.";
     if (!newRoom.room_type) errors.room_type = "Room Type is required.";
-    if (newRoom.total_room <= 0) errors.total_room = "Total Room is required.";
-    if (newRoom.floor < 0) errors.floor = "Floor cannot be negative.";
+    if (newRoom.total_room === 0) {
+      errors.total_room = "Total Room is required."
+    }
+    else if(newRoom.total_room < 0){
+      errors.total_room = "Value must be greater than or equal to zero"
+    }
+    ;
+    if (newRoom.floor < 0) errors.floor = "Value must be greater than or equal to zero";
     // if (!newRoom.room_view) errors.room_view = "Room View is required.";
-    if (newRoom.room_size <= 0) errors.room_size = "Room Size is required.";
+    if (newRoom.room_size === 0){
+       errors.room_size = "Room Size is required."
+    }
+    else if(newRoom.room_size < 0){
+      errors.room_size = "Value must be greater than or equal to zero"
+    };
     if (!newRoom.room_unit) errors.room_unit = "Room Unit is required.";
     if (!newRoom.smoking_policy) errors.smoking_policy = "Smoking Policy is required.";
-    if (newRoom.max_occupancy <= 0) errors.max_occupancy = "Max Occupancy is required.";
-    if (newRoom.max_number_of_adults <= 0) errors.max_number_of_adults = "Max number of adults is required.";
-    if (newRoom.max_number_of_children < 0) errors.max_number_of_children = "Max number of children cannot be negative.";
-    if (newRoom.number_of_bedrooms <= 0) errors.number_of_bedrooms = "Number of bedrooms is required.";
-    if (newRoom.number_of_living_room < 0) errors.number_of_living_room = "Number of living rooms cannot be negative.";
-    if (newRoom.extra_bed < 0) errors.extra_bed = "Extra Bed cannot be negative.";
+    if (newRoom.max_occupancy === 0) {
+      errors.max_occupancy = "Max Occupancy is required."
+    }
+    else if(newRoom.max_occupancy < 0){
+      errors.max_occupancy = "Value must be greater than or equal to zero"
+
+    };
+    if (newRoom.max_number_of_adults === 0){
+       errors.max_number_of_adults = "Max number of adults is required."
+    }
+    else if(newRoom.max_number_of_adults < 0){
+             errors.max_number_of_adults = "Value must be greater than or equal to zero"
+
+    };
+    if (newRoom.max_number_of_children < 0) errors.max_number_of_children = "Value must be greater than or equal to zero";
+    if (newRoom.number_of_bedrooms === 0) {errors.number_of_bedrooms = "Number of bedrooms is required."}
+    else if(newRoom.number_of_bedrooms < 0){
+      errors.number_of_bedrooms ="Value must be greater than or equal to zero"
+    };
+    if (newRoom.number_of_living_room < 0) errors.number_of_living_room = "Value must be greater than or equal to zero";
+    if (newRoom.extra_bed < 0) errors.extra_bed = "Value must be greater than or equal to zero";
     // if (!newRoom.description) errors.description = "Description is required.";
     // if (newRoom.image.length === 0) errors.image = "Room image is required.";
     setValidationErrors(errors);
@@ -270,10 +296,10 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
   // Render the Room Form in Dialog
   const renderRoomForm = () => (
     <>
-      <div className="space-y-4">
+      <div className="space-y-1">
         {/* Room Name and Room Type */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="room_name">Room Name <span className="text-destructive">*</span></Label>
             <Input
               id="room_name"
@@ -286,7 +312,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
             {validationErrors.room_name && <p className="text-destructive text-sm">{validationErrors.room_name}</p>}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="room_type">Room Type <span className="text-destructive">*</span></Label>
             <Input
               id="room_type"
@@ -302,7 +328,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
 
         {/* Total Rooms, Floor and Room View */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="total_room">Total Room <span className="text-destructive">*</span></Label>
             <Input
               id="total_room"
@@ -317,7 +343,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
             {validationErrors.total_room && <p className="text-destructive text-sm">{validationErrors.total_room}</p>}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="floor">Floor </Label>
             <Input
               id="floor"
@@ -332,7 +358,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
             {validationErrors.floor && <p className="text-destructive text-sm">{validationErrors.floor}</p>}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="room_view">Room View </Label>
             <Input
               id="room_view"
@@ -348,7 +374,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
 
         {/* Room Size, Room Unit and Smoking Policy */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="room_size">Room Size <span className="text-destructive">*</span></Label>
             <Input
               id="room_size"
@@ -363,7 +389,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
             {validationErrors.room_size && <p className="text-destructive text-sm">{validationErrors.room_size}</p>}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="room_unit">Room Unit <span className="text-destructive">*</span></Label>
             <Select
               value={newRoom.room_unit}
@@ -380,7 +406,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
             {validationErrors.room_unit && <p className="text-destructive text-sm">{validationErrors.room_unit}</p>}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="smoking_policy">Smoking Policy <span className="text-destructive">*</span></Label>
             <Select
               value={newRoom.smoking_policy}
@@ -400,7 +426,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
 
         {/* Occupancy Information */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="max_occupancy">Max Occupancy <span className="text-destructive">*</span></Label>
             <Input
               id="max_occupancy"
@@ -415,7 +441,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
             {validationErrors.max_occupancy && <p className="text-destructive text-sm">{validationErrors.max_occupancy}</p>}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="max_number_of_adults">Max Adults <span className="text-destructive">*</span></Label>
             <Input
               id="max_number_of_adults"
@@ -430,7 +456,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
             {validationErrors.max_number_of_adults && <p className="text-destructive text-sm">{validationErrors.max_number_of_adults}</p>}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="max_number_of_children">Max Children </Label>
             <Input
               id="max_number_of_children"
@@ -448,7 +474,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
 
         {/* Room Layout */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="number_of_bedrooms">Bedrooms <span className="text-destructive">*</span></Label>
             <Input
               id="number_of_bedrooms"
@@ -463,7 +489,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
             {validationErrors.number_of_bedrooms && <p className="text-destructive text-sm">{validationErrors.number_of_bedrooms}</p>}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="number_of_living_room">Living Rooms </Label>
             <Input
               id="number_of_living_room"
@@ -478,7 +504,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
             {validationErrors.number_of_living_room && <p className="text-destructive text-sm">{validationErrors.number_of_living_room}</p>}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="extra_bed">Extra Bed </Label>
             <Input
               id="extra_bed"
@@ -495,7 +521,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
         </div>
 
         {/* Description Input */}
-        <div className="space-y-2">
+        <div className="space-y-1">
           <Label htmlFor="description" className="flex items-center">
             Description
             <span className="ml-2 text-xs text-muted-foreground">
@@ -506,6 +532,8 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
             id="description"
             name="description"
             value={newRoom.description}
+            style={{resize:"none"}}
+            rows={3}
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
               // Create a synthetic event object compatible with handleInputChange
               const syntheticEvent = {
@@ -522,7 +550,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
               }
             }}
             placeholder="Provide a detailed description of the room (max 500 characters)"
-            className={`w-full p-2 border rounded-md ${validationErrors.description ? "border-destructive" : ""} ${newRoom.description.length > 450 ? "border-yellow-500" : ""} h-24 resize-y`}
+            className={`w-full p-2 border rounded-md ${validationErrors.description ? "border-destructive" : ""} ${newRoom.description.length > 450 ? "border-yellow-500" : ""} sm:h-20 h-24`}
           />
           {validationErrors.description && (
             <p className="text-destructive text-sm">{validationErrors.description}</p>
@@ -535,7 +563,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
         </div>
 
         {/* Availability and Image Upload */}
-        <div className="flex flex-col md:flex-row justify-between gap-4 pt-2">
+        <div className="flex flex-row justify-between gap-4 pt-2 md:pt-0">
           <div className="flex items-center space-x-2">
             <Checkbox
               id="available"
@@ -582,7 +610,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
         </div>
       </div>
 
-      <DialogFooter className="mt-6 flex-col sm:flex-row gap-2">
+      <DialogFooter className="flex-col sm:flex-row gap-2">
         <Button
           variant="outline"
           type="button"
@@ -631,7 +659,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
       <CardContent className="pt-6">
         {/* Create/Edit Room Dialog */}
         <Dialog open={showModal} onOpenChange={setShowModal}>
-          <DialogContent className="max-w-[95vw] md:max-w-[80vw] lg:max-w-[65vw] xl:max-w-[50vw] max-h-[90vh] overflow-y-auto"
+          <DialogContent className="max-w-[95vw] md:max-w-[80vw] lg:max-w-[65vw] xl:max-w-[50vw] max-h-[95vh] overflow-y-auto"
           onInteractOutside={(e) => e.preventDefault()}
     onPointerDownOutside={(e) => e.preventDefault()}>
             <DialogHeader>
@@ -767,7 +795,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
 
 
                       {/* Action Buttons */}
-                      <div className="flex flex-col sm:flex-row sm:justify-end mt-6 space-y-2 sm:space-y-0 sm:space-x-4 px-4 sm:px-0">                        <Button
+                      <div className="flex flex-col sm:flex-row sm:justify-end mt-6 space-y-1 sm:space-y-0 sm:space-x-4 px-4 sm:px-0">                        <Button
                           variant="destructive"
                           onClick={() => handleDeleteRoom(room._id, room.room_name)}
                         >
