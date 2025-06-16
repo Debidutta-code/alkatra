@@ -17,45 +17,60 @@
 
 "use client";
 import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { NextUIProvider } from "@nextui-org/react";
 import { useSelector, useDispatch } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import ReduxProvider from "../redux/ReduxProvider";
-import { RootState, AppDispatch } from "../redux/store"; // Import AppDispatch
+import { RootState, AppDispatch } from "../redux/store";
 import { logout } from "../redux/slices/authSlice";
+import Cookies from "js-cookie";
 
-// Separate component to ensure Redux context is available before calling useSelector/useDispatch
+// Auth Checker
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>(); // Correctly typed dispatch
+  const pathname = usePathname();
+  const dispatch = useDispatch<AppDispatch>();
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
   useEffect(() => {
-    if (typeof window === "undefined") return; // Ensure this runs only on the client
+    const cookieToken = Cookies.get("accessToken");
 
-    if (accessToken) {
+    // 1. Token mismatch
+    if (accessToken && cookieToken && accessToken !== cookieToken) {
+      console.warn("Token mismatch. Logging out...");
+      dispatch(logout()).then(() => router.push("/login"));
+      return;
+    }
+
+    // 2. Cookie deleted
+    if (accessToken && !cookieToken) {
+      console.warn("Access token cookie missing. Logging out...");
+      dispatch(logout()).then(() => router.push("/login"));
+      return;
+    }
+
+    // 3. Expired token
+    if (accessToken && cookieToken && accessToken === cookieToken) {
       try {
-        const decodedToken: any = jwtDecode(accessToken);
-        const currentTime = Date.now() / 1000; // Convert to seconds
+        const decoded: any = jwtDecode(cookieToken);
+        const now = Date.now() / 1000;
 
-        if (decodedToken.exp < currentTime) {
-          console.log("Token expired. Logging out...");
+        if (decoded.exp < now) {
+          console.warn("Token expired. Logging out...");
           dispatch(logout()).then(() => router.push("/login"));
         }
-      } catch (error) {
-        console.error("Error decoding token:", error);
+      } catch (err) {
+        console.error("Failed to decode token. Logging out...");
         dispatch(logout()).then(() => router.push("/login"));
       }
-    } else {
-      router.push("/login"); // Redirect if no token is found
     }
-  }, [accessToken, router, dispatch]);
+  }, [pathname, accessToken, dispatch, router]);
 
   return <>{children}</>;
 }
 
-// Main Providers component
+// Main Providers
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ReduxProvider>
@@ -65,3 +80,4 @@ export function Providers({ children }: { children: React.ReactNode }) {
     </ReduxProvider>
   );
 }
+
