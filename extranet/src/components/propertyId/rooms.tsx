@@ -105,7 +105,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
     if (newRoom.max_number_of_children < 0) errors.max_number_of_children = "Max number of children cannot be negative.";
     if (newRoom.number_of_bedrooms <= 0) errors.number_of_bedrooms = "Number of bedrooms is required.";
     if (newRoom.number_of_living_room < 0) errors.number_of_living_room = "Number of living rooms cannot be negative.";
-    if (newRoom.extra_bed <= 0) errors.extra_bed = "Extra Bed cannot be negative.";
+    if (newRoom.extra_bed < 0) errors.extra_bed = "Extra Bed cannot be negative.";
     // if (!newRoom.description) errors.description = "Description is required.";
     // if (newRoom.image.length === 0) errors.image = "Room image is required.";
     setValidationErrors(errors);
@@ -265,6 +265,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
       document.body.style.overflow = "auto"; // Cleanup when component unmounts
     };
   }, [showModal]);
+  
 
   // Render the Room Form in Dialog
   const renderRoomForm = () => (
@@ -306,8 +307,9 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
             <Input
               id="total_room"
               name="total_room"
+              min={0}
               type="number"
-              value={newRoom.total_room}
+              value={newRoom.total_room === 0 ? "" : newRoom.total_room}
               onChange={handleInputChange}
               placeholder="Total rooms"
               className={validationErrors.total_room ? "border-destructive" : ""}
@@ -320,8 +322,9 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
             <Input
               id="floor"
               name="floor"
+              min={0}
               type="number"
-              value={newRoom.floor}
+              value={newRoom.floor ===0 ? "":newRoom.floor}
               onChange={handleInputChange}
               placeholder="Floor"
               className={validationErrors.floor ? "border-destructive" : ""}
@@ -351,7 +354,8 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
               id="room_size"
               name="room_size"
               type="number"
-              value={newRoom.room_size}
+              min={0}
+              value={newRoom.room_size===0 ? "": newRoom.room_size}
               onChange={handleInputChange}
               placeholder="Room Size"
               className={validationErrors.room_size ? "border-destructive" : ""}
@@ -402,7 +406,8 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
               id="max_occupancy"
               name="max_occupancy"
               type="number"
-              value={newRoom.max_occupancy}
+              min={0}
+              value={newRoom.max_occupancy ===0 ? "" : newRoom.max_occupancy}
               onChange={handleInputChange}
               placeholder="Max Occupancy"
               className={validationErrors.max_occupancy ? "border-destructive" : ""}
@@ -416,7 +421,8 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
               id="max_number_of_adults"
               name="max_number_of_adults"
               type="number"
-              value={newRoom.max_number_of_adults}
+              min={0}
+              value={newRoom.max_number_of_adults === 0 ? "":newRoom.max_number_of_adults}
               onChange={handleInputChange}
               placeholder="Max number of adults"
               className={validationErrors.max_number_of_adults ? "border-destructive" : ""}
@@ -430,7 +436,8 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
               id="max_number_of_children"
               name="max_number_of_children"
               type="number"
-              value={newRoom.max_number_of_children}
+              min={0}
+              value={newRoom.max_number_of_children === 0 ? "": newRoom.max_number_of_children}
               onChange={handleInputChange}
               placeholder="Max number of children"
               className={validationErrors.max_number_of_children ? "border-destructive" : ""}
@@ -447,7 +454,8 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
               id="number_of_bedrooms"
               name="number_of_bedrooms"
               type="number"
-              value={newRoom.number_of_bedrooms}
+              min={0}
+              value={newRoom.number_of_bedrooms=== 0 ?"" : newRoom.number_of_bedrooms}
               onChange={handleInputChange}
               placeholder="Number of bedrooms"
               className={validationErrors.number_of_bedrooms ? "border-destructive" : ""}
@@ -461,7 +469,8 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
               id="number_of_living_room"
               name="number_of_living_room"
               type="number"
-              value={newRoom.number_of_living_room}
+              min={0}
+              value={newRoom.number_of_living_room===0 ?"":newRoom.number_of_living_room}
               onChange={handleInputChange}
               placeholder="Number of living rooms"
               className={validationErrors.number_of_living_room ? "border-destructive" : ""}
@@ -475,7 +484,8 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
               id="extra_bed"
               name="extra_bed"
               type="number"
-              value={newRoom.extra_bed}
+              min={0}
+              value={newRoom.extra_bed ===0 ? "":newRoom.extra_bed}
               onChange={handleInputChange}
               placeholder="Extra Bed"
               className={validationErrors.extra_bed ? "border-destructive" : ""}
@@ -621,7 +631,9 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
       <CardContent className="pt-6">
         {/* Create/Edit Room Dialog */}
         <Dialog open={showModal} onOpenChange={setShowModal}>
-          <DialogContent className="max-w-[95vw] md:max-w-[80vw] lg:max-w-[65vw] xl:max-w-[50vw] max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-[95vw] md:max-w-[80vw] lg:max-w-[65vw] xl:max-w-[50vw] max-h-[90vh] overflow-y-auto"
+          onInteractOutside={(e) => e.preventDefault()}
+    onPointerDownOutside={(e) => e.preventDefault()}>
             <DialogHeader>
               <DialogTitle>
                 {editMode ? 'Edit Room' : 'Add New Room'}

@@ -57,7 +57,7 @@ import {
 import { ScrollArea } from "./../ui/scrollarea";
 import Cookies from "js-cookie";
 
-const roomSchema = z.object({
+export const roomSchema = z.object({
   room_name: z.string().min(1, "Room name is required"),
   room_type: z.string().min(1, "Room type is required"),
   total_room: z

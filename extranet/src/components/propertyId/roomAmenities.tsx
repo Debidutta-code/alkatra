@@ -423,7 +423,9 @@ export function RoomAmenities({
         if (!open) handleCancel();
         setShowModal(open);
       }}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto"
+        onInteractOutside={(e) => e.preventDefault()}
+    onPointerDownOutside={(e) => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle>
               {currentRoomAmenity ? 'Edit Room Amenities' : 'Create Room Amenities'}
