@@ -708,15 +708,15 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
                           </h3>
                           <div>
                             <span className="text-sm text-muted-foreground">Room Name</span>
-                            <p className="font-medium text-lg">{room.room_name}</p>
+                            <p className="font-medium text-lg">{room.room_name || "N/A"}</p>
                           </div>
                           <div>
                             <span className="text-sm text-muted-foreground">Room Type</span>
-                            <p className="font-medium">{room.room_type}</p>
+                            <p className="font-medium">{room.room_type || "N/A"}</p>
                           </div>
                           <div>
                             <span className="text-sm text-muted-foreground">Floor</span>
-                            <p className="font-medium">{room.floor}</p>
+                            <p className="font-medium">{room.floor || "N/A"}</p>
                           </div>
                           <div>
                             <span className="text-sm text-muted-foreground">Room View</span>
@@ -731,19 +731,19 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
                           </h3>
                           <div>
                             <span className="text-sm text-muted-foreground">Room Size</span>
-                            <p className="font-medium">{room.room_size} {room.room_unit}</p>
+                            <p className="font-medium">{room.room_size || "N/A"} {room.room_unit || "N/A"}</p>
                           </div>
                           <div>
                             <span className="text-sm text-muted-foreground">Max Occupancy</span>
-                            <p className="font-medium">{room.max_occupancy}</p>
+                            <p className="font-medium">{room.max_occupancy || "N/A"}</p>
                           </div>
                           <div>
                             <span className="text-sm text-muted-foreground">Max Adults</span>
-                            <p className="font-medium">{room.max_number_of_adults}</p>
+                            <p className="font-medium">{room.max_number_of_adults || "N/A"}</p>
                           </div>
                           <div>
                             <span className="text-sm text-muted-foreground">Max Children</span>
-                            <p className="font-medium">{room.max_number_of_children}</p>
+                            <p className="font-medium">{room.max_number_of_children || "N/A"}</p>
                           </div>
                         </div>
 
@@ -754,15 +754,15 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
                           </h3>
                           <div>
                             <span className="text-sm text-muted-foreground">Bedrooms</span>
-                            <p className="font-medium">{room.number_of_bedrooms}</p>
+                            <p className="font-medium">{room.number_of_bedrooms || "N/A"}</p>
                           </div>
                           <div>
                             <span className="text-sm text-muted-foreground">Extra Beds</span>
-                            <p className="font-medium">{room.extra_bed}</p>
+                            <p className="font-medium">{room.extra_bed || "N/A"}</p>
                           </div>
                           <div>
                             <span className="text-sm text-muted-foreground">Smoking Policy</span>
-                            <p className="font-medium">{room.smoking_policy}</p>
+                            <p className="font-medium">{room.smoking_policy || "N/A"}</p>
                           </div>
                           <div>
                             <span className="text-sm text-muted-foreground">Availability</span>
