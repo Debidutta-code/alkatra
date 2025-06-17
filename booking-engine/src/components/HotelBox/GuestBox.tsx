@@ -5,6 +5,7 @@ import { setGuestDetails } from "@/Redux/slices/hotelcard.slice";
 import { createPortal } from "react-dom";
 import { ChevronDown, Users } from "lucide-react";
 import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 
 // Define props interface
 interface GuestBoxProps {
@@ -32,6 +33,7 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
   const [infantAges, setInfantAges] = useState(guestDetails?.infantAges || Array.from({ length: 0 }, () => 0));
   const [displayText, setDisplayText] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const {t}=useTranslation();
 
   // Update display text when component mounts or guestDetails changes
   useEffect(() => {
@@ -187,12 +189,12 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
         <div className="w-full max-w-md bg-tripswift-off-white rounded-xl shadow-xl p-6 overflow-y-auto max-h-[80vh] animate-fadeIn">
           <div className="space-y-6">
             <h3 className="text-lg font-tripswift-extrabold text-tripswift-black pb-2 border-b border-tripswift-black/10">
-              Select guests
+              {t("GuestBox.selectGuests")}
             </h3>
             {/* Rooms Section */}
             <div className="flex items-center justify-between">
               <label className="text-tripswift-black font-tripswift-medium uppercase">
-                Rooms
+                {t("GuestBox.roomsPlural")}
               </label>
               <div className="flex items-center gap-3">
                 <button
@@ -216,7 +218,7 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
             {/* Guests Section */}
             <div className="flex items-center  justify-between">
               <label className="text-tripswift-black font-tripswift-medium uppercase">
-                Adults
+                {t("GuestBox.adultsPlural")}
               </label>
               <div className="flex items-center gap-3">
                 <button
@@ -244,9 +246,9 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
                   className="text-tripswift-black font-tripswift-medium uppercase"
                   htmlFor="modalChildren"
                 >
-                  Children{" "}
+                  {t("GuestBox.childrenPlural")}{" "}
                   <span className="text-xs text-tripswift-black/60">
-                    (ages 2-12)
+                    ({t("GuestBox.ages")} 2-12)
                   </span>
                 </label>
                 <div className="flex items-center gap-3">
@@ -274,7 +276,7 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
                   {Array.from({ length: children }).map((_, index) => (
                     <div key={index} className="flex items-center justify-between">
                       <label className="text-tripswift-black/70 text-sm font-tripswift-medium">
-                        Child {index + 1} age
+                        {t("GuestBox.child")} {index + 1} {t("GuestBox.age")}
                       </label>
                       <div className="relative w-30">
                         <select
@@ -282,12 +284,12 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
                           onChange={(e) => handleChildAgeChange(index, parseInt(e.target.value))}
                           className="appearance-none w-full p-2 pr-8 border border-tripswift-black/20 rounded-lg bg-tripswift-off-white focus:ring-2 focus:ring-tripswift-blue/30 focus:border-tripswift-blue outline-none text-sm text-tripswift-black font-tripswift-medium cursor-pointer"
                         >
-                          <option value={0} disabled>Select age</option>
+                          <option value={0} disabled>{t("GuestBox.selectAge")}</option>
                           {Array.from({ length: 13 }, (_, i) => i)
                             .slice(2)
                             .map((age) => (
                               <option key={age} value={age}>
-                                {age} {age === 1 ? "year" : "years"}
+                                {age} {age === 1 ? t("GuestBox.year") : t("GuestBox.year_plural")}
                               </option>
                             ))}
                         </select>
@@ -307,9 +309,9 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
                   className="text-tripswift-black font-tripswift-medium uppercase"
                   htmlFor="modalInfants"
                 >
-                  Infants{" "}
+                  {t("GuestBox.infantsPlural")}{" "}
                   <span className="text-xs text-tripswift-black/60">
-                    (ages 0-1)
+                    ({t("GuestBox.ages")} 0-1)
                   </span>
                 </label>
                 <div className="flex items-center gap-3">
@@ -337,7 +339,7 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
                   {Array.from({ length: infants }).map((_, index) => (
                     <div key={index} className="flex items-center justify-between">
                       <label className="text-tripswift-black/70 text-sm font-tripswift-medium">
-                        Infant {index + 1} age
+                        {t("GuestBox.infant")} {index + 1} {t("GuestBox.age")}
                       </label>
                       <div className="relative w-30">
                         <select
@@ -345,10 +347,10 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
                           onChange={(e) => handleInfantAgeChange(index, parseInt(e.target.value))}
                           className="appearance-none w-full p-2 pr-8 border border-tripswift-black/20 rounded-lg bg-tripswift-off-white focus:ring-2 focus:ring-tripswift-blue/30 focus:border-tripswift-blue outline-none text-sm text-tripswift-black font-tripswift-medium cursor-pointer"
                         >
-                          <option value={0} disabled>Select age</option>
+                          <option value={0} disabled>{t("GuestBox.selectAge")}</option>
                           {[0, 1].map((age) => (
                             <option key={age} value={age}>
-                              {age} {age === 1 ? "year" : "years"}
+                              {age} {age === 1 ? t("GuestBox.year") : t("GuestBox.year_plural")}
                             </option>
                           ))}
                         </select>

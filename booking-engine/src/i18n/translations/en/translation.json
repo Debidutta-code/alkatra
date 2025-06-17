@@ -368,6 +368,7 @@
     "nights": "Night",
     "nightsPlural": "Nights",
     "stay": "stay",
+    "filter":"Filter",
     "amenitiesList": {
       "wifi": "Free Wifi",
       "swimming_pool": "Swimming Pool",
@@ -491,11 +492,12 @@
       "reviewAndPayStep": "Review & Pay",
       "roomSummary": "Room Summary",
       "roomType": "Room Type",
-      "checkIn": "Check-in",
-      "checkOut": "Check-out",
+      "checkIn": "Check-In",
+      "checkOut": "Check-Out",
       "nights": "Night",
       "nightsPlural": "Nights",
       "guestInformation": "Guest Information",
+      "dob":"Date Of Birth",
       "firstNameLabel": "First Name",
       "firstNamePlaceholder": "Enter your first name",
       "firstNameError": "First Name is required",
@@ -528,6 +530,9 @@
       "bookingSummary": "Booking Summary",
       "stayDetails": "Stay Details",
       "primaryGuest": "Primary Guest",
+      "guests": "Guests",
+  "email": "Email",
+  "phone": "Phone",
       "priceDetails": "Price Details",
       "roomRate": "Room Rate",
       "totalAmount": "Total Amount",
@@ -746,8 +751,8 @@
         "cancelled": "Cancelled"
       },
       "stayDetails": "Stay Details",
-      "checkIn": "Check-in",
-      "checkOut": "Check-out",
+      "checkIn": "Check-In",
+      "checkOut": "Check-Out",
       "duration": "Duration",
       "nightsStay_one": "{{count}} Night",
       "nightsStay_other": "{{count}} Nights",
@@ -777,7 +782,10 @@
       "ratePlan": "Rate Plan",
       "modifyBooking": "Modify Booking",
       "cancelBooking": "Cancel Booking",
-      "printItinerary": "Print Itinerary"
+      "printItinerary": "Print Itinerary",
+      "rooms": "Rooms",
+       "dob":"Date Of Birth"
+
     }
   },
   "Payment": {
@@ -846,7 +854,8 @@
         "cardSetupFailedError": "Card setup failed",
         "processing": "Processing...",
         "confirmBooking": "Confirm Booking",
-        "paymentProcessingError": "An error occurred during payment processing"
+        "paymentProcessingError": "An error occurred during payment processing",
+        "footer": "Your card details are encrypted and securely processed by Stripe. We never store your full card information on our servers."
       }
     },
     "PaymentSuccess": {
@@ -890,5 +899,21 @@
       "contactSupportButton": "Contact Support",
       "exploreMoreHotels": "Explore more hotel options"
     }
+  },
+  "GuestBox" :{
+    "guests": "Guests",
+    "adultsPlural": "Adults",
+    "infantsPlural": "Infants",
+    "infant": "Infant",
+    "roomsPlural": "Rooms",
+    "child": "Child",
+    "childrenPlural": "Children",
+    "age":"Age",
+    "year": "year",
+  "year_plural": "years",
+  "selectAge": "Select age",
+    "selectGuests": "Select Guests",
+        "ages": "Ages"
+
   }
 }

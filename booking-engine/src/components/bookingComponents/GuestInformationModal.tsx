@@ -730,7 +730,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                                   i18n.language === "ar" ? "ml-2" : "mr-2"
                                 }`}
                               />
-                              DOB
+                             {t(
+                                "BookingComponents.GuestInformationModal.dob"
+                              )}
                             </label>
                             <input
                               type="date"
@@ -897,7 +899,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       <div className="space-y-3 ml-6">
                         <div>
                           <p className="text-xs text-tripswift-black/60">
-                            Room Type
+                            {t(
+                          "BookingComponents.GuestInformationModal.roomType"
+                        )}
                           </p>
                           <p className="text-sm font-tripswift-medium">
                             {selectedRoom.room_name} ({selectedRoom.room_type})
@@ -905,7 +909,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         </div>
                         <div>
                           <p className="text-xs text-tripswift-black/60">
-                            Check-In
+                             {t(
+                          "BookingComponents.GuestInformationModal.checkIn"
+                        )}
                           </p>
                           <p className="text-sm font-tripswift-medium">
                             {formatDate(checkInDate)}
@@ -913,7 +919,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         </div>
                         <div>
                           <p className="text-xs text-tripswift-black/60">
-                            Check-Out
+                            {t(
+                          "BookingComponents.GuestInformationModal.checkOut"
+                        )}
                           </p>
                           <p className="text-sm font-tripswift-medium">
                             {formatDate(checkOutDate)}
@@ -921,7 +929,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         </div>
                         <div>
                           <p className="text-xs text-tripswift-black/60">
-                            Nights
+                            {t(
+                        "BookingComponents.GuestInformationModal.nightsPlural"
+                      )}
                           </p>
                           <p className="text-sm font-tripswift-medium">
                             {nightsCount} {nightsText}
@@ -929,7 +939,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         </div>
                         <div>
                           <p className="text-xs text-tripswift-black/60">
-                            Guests
+                            {t(
+                          "BookingComponents.GuestInformationModal.guests"
+                        )}
                           </p>
                           <p className="text-sm font-tripswift-medium">
                             {getGuestCountDisplay()}
@@ -952,7 +964,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       <div className="space-y-3 ml-6">
                         <div>
                           <p className="text-xs text-tripswift-black/60">
-                            Primary Guest
+                            {t(
+                          "BookingComponents.GuestInformationModal.primaryGuest"
+                        )}
                           </p>
                           <p className="text-sm font-tripswift-medium">
                             {guests[0]?.firstName} {guests[0]?.lastName}
@@ -960,7 +974,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         </div>
                         <div>
                           <p className="text-xs text-tripswift-black/60">
-                            Email
+                           {t(
+                          "BookingComponents.GuestInformationModal.email"
+                        )}
                           </p>
                           <p className="text-sm font-tripswift-medium">
                             {email}
@@ -968,7 +984,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         </div>
                         <div>
                           <p className="text-xs text-tripswift-black/60">
-                            Phone
+                            {t(
+                          "BookingComponents.GuestInformationModal.phone"
+                        )}
                           </p>
                           <p
                             className={`text-sm font-tripswift-medium  ${i18n.language === "ar"?"text-right":""}`}
@@ -994,7 +1012,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                   <div className="px-4 pb-2 space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-tripswift-black/70">
-                        Room Rate ({nightsCount} {nightsText})
+                       {t(
+                          "BookingComponents.GuestInformationModal.roomRate"
+                        )}({nightsCount} {nightsText})
                       </span>
                       <span className="text-sm font-tripswift-medium">
                         ₹
@@ -1006,7 +1026,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                     <div className="border-t border-tripswift-black/10 pt-4">
                       <div className="flex justify-between items-center">
                         <span className="text-base font-tripswift-bold">
-                          Total Amount
+                          {t(
+                          "BookingComponents.GuestInformationModal.totalAmount"
+                        )}
                         </span>
                         <span className="text-xl font-tripswift-bold text-tripswift-blue">
                           ₹{finalPrice?.totalAmount}
