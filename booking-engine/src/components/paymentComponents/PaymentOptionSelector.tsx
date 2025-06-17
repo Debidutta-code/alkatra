@@ -14,7 +14,7 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
   selectedOption,
   onChange
 }) => {
-  const { t } = useTranslation();
+  const { t , i18n } = useTranslation();
 
   // Set default selection to 'payAtHotel' when component mounts
   useEffect(() => {
@@ -61,7 +61,7 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
             value="payAtHotel"
             // checked={selectedOption === 'payAtHotel' || !selectedOption}
             onChange={() => onChange('payAtHotel')}
-            className="mr-3 mt-1 text-tripswift-blue flex-shrink-0"
+            className={`mr-3 mt-1 text-tripswift-blue flex-shrink-0  ${i18n.language==="ar" ?"ml-3":"mr-3"}`}
             defaultChecked
           />
           <div className="flex flex-col">

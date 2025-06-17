@@ -57,7 +57,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, onEmailVerified
     try {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/verify-email`, { email });
       console.log("API Response:", response.data);
-      if (response.data.message === "You are authorized") {
+      if (response.status === 200) {
         setMessage(t('Auth.ForgotPassword.successMessage'));
         console.log("Calling onEmailVerified with email:", email);
         onEmailVerified(email);

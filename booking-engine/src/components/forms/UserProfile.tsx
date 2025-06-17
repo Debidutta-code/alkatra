@@ -8,6 +8,7 @@ import { logout, getUser, updateProfile } from "@/Redux/slices/auth.slice";
 import { AppDispatch, RootState } from "@/Redux/store";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 // Types
 interface UserProfile {
@@ -160,11 +161,13 @@ const ProfileSection = ({ title, children, defaultOpen = true }: ProfileSectionP
 const EditProfileModal = ({
   user,
   onSave,
-  onClose
+  onClose,
+  t // Pass t function as a prop
 }: {
   user: UserProfile;
   onSave: (updatedUser: Partial<UserProfile> & { password?: string }) => Promise<void>;
   onClose: () => void;
+  t: (key: string, options?: any) => string; // Type for t function
 }) => {
   const [formData, setFormData] = useState({
     firstName: user.firstName,
@@ -178,26 +181,31 @@ const EditProfileModal = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
-    if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
-    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
+    if (!formData.firstName.trim()) newErrors.firstName = t("Auth.Validation.firstNameRequired", { defaultValue: "First Name is required" });
+    if (!formData.lastName.trim()) newErrors.lastName = t("Auth.Validation.lastNameRequired", { defaultValue: "Last Name is required" });
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = t("Auth.Validation.emailRequired", { defaultValue: "Email is required" });
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Invalid email format";
+      newErrors.email = t("Auth.Validation.emailInvalid", { defaultValue: "Please enter a valid email address" });
     }
     if (!formData.phone.trim()) {
-      newErrors.phone = "Phone number is required";
+      newErrors.phone = t("BookingComponents.GuestInformationModal.phoneError", { defaultValue: "Phone number is required" });
     } else if (!/^\d{10}$/.test(formData.phone)) {
-      newErrors.phone = "Phone number must be 10 digits";
+      newErrors.phone = t("BookingComponents.GuestInformationModal.phoneLengthError", { defaultValue: "Phone number for India must be exactly 10 digits." });
     }
     if (formData.password && formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
+      newErrors.confirmPassword = t("Auth.Validation.passwordsDoNotMatch", { defaultValue: "Passwords do not match" });
     }
     if (formData.password && formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+      newErrors.password = t("Auth.Validation.minLength", { defaultValue: "Must be at least {{count}} characters", count: 6 });
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -217,7 +225,7 @@ const EditProfileModal = ({
         });
         onClose();
       } catch (error: any) {
-        toast.error(error || "Failed to update profile");
+        toast.error(error || t("Profile.profileUpdateFailed", { defaultValue: "Failed to update profile" }));
       } finally {
         setIsSubmitting(false);
       }
@@ -225,12 +233,12 @@ const EditProfileModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
-        <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-secondary-black)] mb-4">Edit Profile</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2">
+      <Card className="w-full max-w-md p-4 sm:p-4 max-h-[90vh] overflow-y-auto">
+        <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-secondary-black)] mb-2">{t("Profile.editProfile", { defaultValue: "Edit Profile" })}</h2>
+        <form onSubmit={handleSubmit} className="space-y-2">
           <div>
-            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">First Name</label>
+            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">{t("Auth.Register.firstNameLabel", { defaultValue: "First Name" })}</label>
             <input
               type="text"
               value={formData.firstName}
@@ -240,7 +248,7 @@ const EditProfileModal = ({
             {errors.firstName && <p className="text-xs text-red-600 mt-1">{errors.firstName}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">Last Name</label>
+            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">{t("Auth.Register.lastNameLabel", { defaultValue: "Last Name" })}</label>
             <input
               type="text"
               value={formData.lastName}
@@ -250,7 +258,7 @@ const EditProfileModal = ({
             {errors.lastName && <p className="text-xs text-red-600 mt-1">{errors.lastName}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">Email</label>
+            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">{t("Auth.Register.emailLabel", { defaultValue: "Email" })}</label>
             <input
               type="email"
               value={formData.email}
@@ -260,12 +268,11 @@ const EditProfileModal = ({
             {errors.email && <p className="text-xs text-red-600 mt-1">{errors.email}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">Phone Number</label>
+            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">{t("BookingComponents.GuestInformationModal.phoneLabel", { defaultValue: "Phone Number" })}</label>
             <input
               type="tel"
               value={formData.phone}
               onChange={(e) => {
-                // Only allow numbers and limit to 10 digits
                 const value = e.target.value.replace(/\D/g, '').slice(0, 10);
                 setFormData({ ...formData, phone: value });
               }}
@@ -277,13 +284,11 @@ const EditProfileModal = ({
             />
             {errors.phone && <p className="text-xs text-red-600 mt-1">{errors.phone}</p>}
             {formData.phone.length !== 10 && formData.phone.length > 0 && (
-              <p className="text-xs text-red-600 mt-1">Phone number must be 10 digits</p>
+              <p className="text-xs text-red-600 mt-1">{t("BookingComponents.GuestInformationModal.phoneLengthError", { defaultValue: "Phone number for India must be exactly 10 digits." })}</p>
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">
-              New Password (optional)
-            </label>
+            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">{t("Profile.newPasswordOptional", { defaultValue: "New Password (optional)" })}</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -305,12 +310,8 @@ const EditProfileModal = ({
             </div>
             {errors.password && <p className="text-xs text-red-600 mt-1">{errors.password}</p>}
           </div>
-
-          {/* Updated Confirm Password Field */}
           <div>
-            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">
-              Confirm New Password
-            </label>
+            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">{t("Profile.confirmNewPassword", { defaultValue: "Confirm New Password" })}</label>
             <div className="relative">
               <input
                 type={showConfirmPassword ? "text" : "password"}
@@ -333,23 +334,11 @@ const EditProfileModal = ({
             {errors.confirmPassword && <p className="text-xs text-red-600 mt-1">{errors.confirmPassword}</p>}
           </div>
           <div className="flex flex-col sm:flex-row gap-3 mt-6">
-            <Button
-              variant="primary"
-              size="md"
-              type="submit"
-              className="w-full sm:w-auto"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Saving..." : "Save Changes"}
+            <Button variant="primary" size="md" type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
+              {isSubmitting ? t("Auth.Button.processing", { defaultValue: "Processing..." }) : t("Auth.Register.createAccountButton", { defaultValue: "Save Changes" })}
             </Button>
-            <Button
-              variant="outline"
-              size="md"
-              onClick={onClose}
-              className="w-full sm:w-auto"
-              disabled={isSubmitting}
-            >
-              Cancel
+            <Button variant="outline" size="md" onClick={onClose} className="w-full sm:w-auto" disabled={isSubmitting}>
+              {t("BookingComponents.GuestInformationModal.cancel", { defaultValue: "Cancel" })}
             </Button>
           </div>
         </form>
@@ -360,13 +349,13 @@ const EditProfileModal = ({
 
 // Main Component
 const UserProfile: React.FC = () => {
+  const { t } = useTranslation(); // Add useTranslation hook here
   const dispatch = useDispatch<AppDispatch>();
-  const router = useRouter(); // Add useRouter
+  const router = useRouter();
   const { user: authUser } = useSelector((state: RootState) => state.auth);
   const [activeTab, setActiveTab] = useState<'overview' | 'bookings' | 'preferences' | 'security' | 'notifications' | 'help'>('overview');
   const [isEditing, setIsEditing] = useState(false);
 
-  // Initialize with Redux user data or fallback to default
   const [user, setUser] = useState<UserProfile>({
     firstName: authUser?.firstName || "Guest",
     lastName: authUser?.lastName || "User",
@@ -381,14 +370,12 @@ const UserProfile: React.FC = () => {
   });
 
   useEffect(() => {
-    // Fetch user data when component mounts
     if (Cookies.get("accessToken")) {
       dispatch(getUser());
     }
   }, [dispatch]);
 
   useEffect(() => {
-    // Update local state when Redux user data changes
     if (authUser) {
       setUser(prev => ({
         ...prev,
@@ -401,18 +388,25 @@ const UserProfile: React.FC = () => {
   }, [authUser]);
 
   const stats: StatsCardProps[] = [
-    { icon: Calendar, title: "Trips Completed", value: "23", description: "Since joining" },
-    { icon: Star, title: "Average Rating", value: "4.8", description: "From hosts" },
-    { icon: Bookmark, title: "Saved Places", value: "47", description: "Wishlisted" }
+    { icon: Calendar, title: t("Profile.tripsCompleted", { defaultValue: "Trips Completed" }), value: "23", description: t("Profile.sinceJoining", { defaultValue: "Since joining" }) },
+    { icon: Star, title: t("Profile.averageRating", { defaultValue: "Average Rating" }), value: "4.8", description: t("Profile.fromHosts", { defaultValue: "From hosts" }) },
+    { icon: Bookmark, title: t("Profile.savedPlaces", { defaultValue: "Saved Places" }), value: "47", description: t("Profile.wishlisted", { defaultValue: "Wishlisted" }) }
   ];
-
+  const tabTranslationKeys: Record<typeof activeTab, string> = {
+    overview: "Profile.overview",
+    bookings: "Profile.myTrips",
+    preferences: "Profile.preferences",
+    security: "Profile.security",
+    notifications: "Profile.notifications",
+    help: "Profile.helpCenter"
+  };
   const menuItems = [
-    { id: 'overview' as const, label: 'Overview', icon: User },
-    { id: 'bookings' as const, label: 'My Trips', icon: Calendar },
-    { id: 'preferences' as const, label: 'Preferences', icon: Heart },
-    { id: 'security' as const, label: 'Security', icon: Shield },
-    { id: 'notifications' as const, label: 'Notifications', icon: Bell },
-    { id: 'help' as const, label: 'Help Center', icon: HelpCircle }
+    { id: 'overview' as const, label: t("Profile.overview", { defaultValue: "Overview" }), icon: User },
+    { id: 'bookings' as const, label: t("Profile.myTrips", { defaultValue: "My Trips" }), icon: Calendar },
+    { id: 'preferences' as const, label: t("Profile.preferences", { defaultValue: "Preferences" }), icon: Heart },
+    { id: 'security' as const, label: t("Profile.security", { defaultValue: "Security" }), icon: Shield },
+    { id: 'notifications' as const, label: t("Profile.notifications", { defaultValue: "Notifications" }), icon: Bell },
+    { id: 'help' as const, label: t("Profile.helpCenter", { defaultValue: "Help Center" }), icon: HelpCircle }
   ];
 
   const handleSaveProfile = async (updatedUser: Partial<UserProfile> & { password?: string }) => {
@@ -424,10 +418,7 @@ const UserProfile: React.FC = () => {
         phone: updatedUser.phone || user.phone,
         ...(updatedUser.password && { password: updatedUser.password })
       })).unwrap();
-  
-      // Refresh user data from server
       await dispatch(getUser());
-  
       setUser(prev => ({
         ...prev,
         firstName: updatedUser.firstName || prev.firstName,
@@ -435,10 +426,10 @@ const UserProfile: React.FC = () => {
         email: updatedUser.email || prev.email,
         phone: updatedUser.phone || prev.phone
       }));
-      toast.success("Profile updated successfully");
+      toast.success(t("Profile.profileUpdatedSuccess", { defaultValue: "Profile updated successfully" }));
     } catch (error: any) {
       console.error("Failed to update profile:", error);
-      toast.error(error || "Failed to update profile");
+      toast.error(error || t("Profile.profileUpdateFailed", { defaultValue: "Failed to update profile" }));
       if (error === "Session expired. Please log in again.") {
         window.location.href = "/login";
       }
@@ -469,7 +460,7 @@ const UserProfile: React.FC = () => {
               ))}
             </div>
             <Card className="p-4 sm:p-6">
-              <h3 className="text-base sm:text-lg font-semibold text-[var(--color-secondary-black)] mb-4">Quick Actions</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-[var(--color-secondary-black)] mb-4">{t("Profile.quickActions", { defaultValue: "Quick Actions" })}</h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                 <Button
                   variant="outline"
@@ -478,89 +469,65 @@ const UserProfile: React.FC = () => {
                   onClick={() => router.push('/')}
                 >
                   <Calendar className="h-4 w-4 sm:h-5 sm:w-5 mb-2 text-[var(--color-secondary-black)]" />
-                  <span className="text-xs text-[var(--color-secondary-black)]">Book Trip</span>
+                  <span className="text-xs text-[var(--color-secondary-black)]">{t("Profile.bookTrip", { defaultValue: "Book Trip" })}</span>
                 </Button>
                 <Button variant="outline" size="md" className="flex flex-col items-center p-3 sm:p-4 h-auto" onClick={() => { }}>
                   <Heart className="h-4 w-4 sm:h-5 sm:w-5 mb-2 text-[var(--color-secondary-black)]" />
-                  <span className="text-xs text-[var(--color-secondary-black)]">Saved Places</span>
+                  <span className="text-xs text-[var(--color-secondary-black)]">{t("Profile.savedPlacesAction", { defaultValue: "Saved Places" })}</span>
                 </Button>
                 <Button variant="outline" size="md" className="flex flex-col items-center p-3 sm:p-4 h-auto" onClick={() => { }}>
                   <Gift className="h-4 w-4 sm:h-5 sm:w-5 mb-2 text-[var(--color-secondary-black)]" />
-                  <span className="text-xs text-[var(--color-secondary-black)]">Rewards</span>
+                  <span className="text-xs text-[var(--color-secondary-black)]">{t("Profile.rewards", { defaultValue: "Rewards" })}</span>
                 </Button>
                 <Button variant="outline" size="md" className="flex flex-col items-center p-3 sm:p-4 h-auto" onClick={() => { }}>
                   <Percent className="h-4 w-4 sm:h-5 sm:w-5 mb-2 text-[var(--color-secondary-black)]" />
-                  <span className="text-xs text-[var(--color-secondary-black)]">Deals</span>
+                  <span className="text-xs text-[var(--color-secondary-black)]">{t("Profile.deals", { defaultValue: "Deals" })}</span>
                 </Button>
               </div>
             </Card>
-            {/* Remove Recent Bookings section since it's handled on /my-trip */}
           </div>
         );
-
       case 'bookings':
-        return null; // No content needed since redirect happens
-
+        return null;
       case 'security':
         return (
           <div className="space-y-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-secondary-black)]">Security Settings</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-secondary-black)]">{t("Profile.securitySettings", { defaultValue: "Security Settings" })}</h2>
             <Card className="p-4 sm:p-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 space-y-3 sm:space-y-0">
                 <div>
-                  <h3 className="text-base sm:text-lg font-semibold text-[var(--color-secondary-black)]">Password</h3>
-                  <p className="text-sm text-[var(--color-secondary-black)]/60"> Update your password</p>
+                  <h3 className="text-base sm:text-lg font-semibold text-[var(--color-secondary-black)]">{t("Profile.changePassword", { defaultValue: "Password" })}</h3>
+                  <p className="text-sm text-[var(--color-secondary-black)]/60">{t("Profile.updatePassword", { defaultValue: "Update your password" })}</p>
                 </div>
                 <Button variant="outline" size="md" className="flex items-center border-[var(--color-primary-blue)]/30 bg-[var(--color-primary-blue)]/5 text-[var(--color-primary-blue)] w-full sm:w-auto justify-center" onClick={() => setIsEditing(true)}>
                   <Lock className="h-4 w-4 mr-2" />
-                  Change Password
+                  {t("Profile.changePassword", { defaultValue: "Change Password" })}
                 </Button>
               </div>
             </Card>
             <Card className="p-4 sm:p-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 space-y-3 sm:space-y-0">
                 <div>
-                  <h3 className="text-base sm:text-lg font-semibold text-[var(--color-secondary-black)]">Two-Factor Authentication</h3>
-                  <p className="text-sm text-[var(--color-secondary-black)]/60">Add an extra layer of security to your account</p>
+                  <h3 className="text-base sm:text-lg font-semibold text-[var(--color-secondary-black)]">{t("Profile.twoFactorAuth", { defaultValue: "Two-Factor Authentication" })}</h3>
+                  <p className="text-sm text-[var(--color-secondary-black)]/60">{t("Profile.twoFactorDesc", { defaultValue: "Add an extra layer of security to your account" })}</p>
                 </div>
                 <Button variant="primary" size="md" onClick={() => { }} className="w-full sm:w-auto">
-                  Enable 2FA
+                  {t("Profile.enable2FA", { defaultValue: "Enable 2FA" })}
                 </Button>
               </div>
             </Card>
-            {/* <Card className="p-4 sm:p-6">
-              <h3 className="text-base sm:text-lg font-semibold text-[var(--color-secondary-black)] mb-4">Recent Activity</h3>
-              <div className="space-y-3">
-                {[
-                  { action: "Logged in", location: "New York, NY", time: "2 hours ago" },
-                  { action: "Password changed", location: "New York, NY", time: "3 months ago" },
-                  { action: "New device login", location: "Boston, MA", time: "6 months ago" }
-                ].map((activity, index) => (
-                  <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-[var(--color-secondary-black)] truncate">{activity.action}</p>
-                      <p className="text-sm text-[var(--color-secondary-black)]/60 truncate">{activity.location}</p>
-                    </div>
-                    <span className="text-xs sm:text-sm text-[var(--color-secondary-black)]/60 ml-2 flex-shrink-0">{activity.time}</span>
-                  </div>
-                ))}
-              </div>
-            </Card> */}
           </div>
         );
-
       default:
         return (
           <div className="text-center py-12">
-            <p className="text-[var(--color-secondary-black)]/60">Content for {activeTab} coming soon...</p>
-          </div>
+            <p className="text-[var(--color-secondary-black)]/60">{t("Profile.contentComingSoon", { defaultValue: "Content for {{tab}} coming soon...", tab: t(tabTranslationKeys[activeTab], { defaultValue: activeTab }) })}</p>          </div>
         );
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4 sm:py-6">
@@ -568,7 +535,7 @@ const UserProfile: React.FC = () => {
               <div className="relative flex-shrink-0">
                 <Avatar
                   size="lg"
-                  alt="User profile avatar"
+                  alt={t("Profile.avatarAlt", { defaultValue: "User profile avatar" })}
                   fallback={
                     <span className="text-lg sm:text-xl font-bold text-[var(--color-primary-off-white)]">
                       {user.firstName.charAt(0)}{user.lastName.charAt(0)}
@@ -585,10 +552,7 @@ const UserProfile: React.FC = () => {
                     <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 flex-shrink-0" />
                   )}
                 </div>
-                <p className="text-xs sm:text-sm text-[var(--color-secondary-black)]/60 truncate">Joined {user.joinDate}</p>
-                {/* {user.phone && (
-                  <p className="text-xs sm:text-sm text-[var(--color-secondary-black)]/60 truncate mt-1">{user.phone}</p>
-                )} */}
+                <p className="text-xs sm:text-sm text-[var(--color-secondary-black)]/60 truncate">{t("Profile.joined", { defaultValue: "Joined {{date}}", date: user.joinDate })}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
@@ -598,7 +562,7 @@ const UserProfile: React.FC = () => {
                 className="hidden sm:flex items-center border-[var(--color-primary-blue)]/30 bg-[var(--color-primary-blue)]/5 text-[var(--color-primary-blue)]"
                 onClick={() => setIsEditing(true)}
               >
-                <span className="hidden sm:inline">Edit Profile</span>
+                <span className="hidden sm:inline">{t("Profile.editProfile", { defaultValue: "Edit Profile" })}</span>
                 <Edit3 className="w-4 h-4 sm:ml-2" />
               </Button>
               {/* <Button
@@ -607,7 +571,7 @@ const UserProfile: React.FC = () => {
                 className="flex items-center border-[var(--color-primary-blue)]/30 bg-[var(--color-primary-blue)]/5 text-[var(--color-primary-blue)]"
                 onClick={handleLogout}
               >
-                <span className="hidden sm:inline">Sign Out</span>
+                <span className="hidden sm:inline">{t("Profile.signOut", { defaultValue: "Sign Out" })}</span>
                 <LogOut className="h-4 w-4 sm:ml-2" />
               </Button> */}
               <Button
@@ -622,13 +586,10 @@ const UserProfile: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        {/* Mobile Tab Navigation */}
         <div className="w-full mb-4">
           <div className="bg-white rounded-lg border border-gray-200 p-1">
-            <div className="flex overflow-x-auto space-x-1">
+            <div className="flex overflow-x-auto space-x-1 rtl:space-x-reverse">
               {menuItems.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -641,26 +602,23 @@ const UserProfile: React.FC = () => {
                       }`}
                   >
                     <Icon className="h-4 w-4" />
-                    <span className="truncate">{item.label.split(' ')[0]}</span>
+                    <span className="truncate">{item.label}</span>
                   </button>
                 );
               })}
             </div>
           </div>
         </div>
-
-        {/* Content Area */}
         <div className="flex-1 min-w-0">
           {renderContent()}
         </div>
       </div>
-
-      {/* Edit Profile Modal */}
       {isEditing && (
         <EditProfileModal
           user={user}
           onSave={handleSaveProfile}
           onClose={() => setIsEditing(false)}
+          t={t} // Pass t function to EditProfileModal
         />
       )}
     </div>

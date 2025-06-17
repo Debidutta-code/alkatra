@@ -141,7 +141,7 @@ console.log("guest details",guestDetails)
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
               placeholder={t("HotelListing.CompactSearchBar.locationPlaceholder")}
-              className={`block w-[262px] md:w-full  h-11 sm:pl-12 pl-8 pr-2 sm:pr-10 py-2 rounded-md border ${
+              className={`block w-[262px] md:w-full  h-11 sm:pl-12 pl-8 pr-4 sm:pr-8 py-2 rounded-md border ${
                 isSearchFocused
                   ? "border-tripswift-blue ring-2 ring-tripswift-blue/10"
                   : "border-tripswift-black/10 hover:border-tripswift-blue/30"
