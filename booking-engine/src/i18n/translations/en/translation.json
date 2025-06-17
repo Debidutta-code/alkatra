@@ -169,7 +169,8 @@
     "errorSelectDates": "Please select both check-in and check-out dates.",
     "exclusiveOffers": "Exclusive Offers Available",
     "freeCancellation": "Free Cancellation",
-    "bestPriceGuarantee": "Best Price Guarantee"
+    "bestPriceGuarantee": "Best Price Guarantee",
+    "downloadourapp": "Download Our App"
   },
   "HotelListing": {
     "CompactSearchBar": {
@@ -331,6 +332,9 @@
     "aboutThisProperty": "About this property",
     "noImagesAvailable": "No images available",
     "propertyAmenities": "Property Amenities",
+    "nights": "Night",
+    "nightsPlural": "Nights",
+    "stay": "stay",
     "amenitiesList": {
       "wifi": "Free Wifi",
       "swimming_pool": "Swimming Pool",

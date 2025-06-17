@@ -56,7 +56,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
   const [policyLoading, setPolicyLoading] = useState(true);
   const [policyType, setPolicyType] = useState<PolicyType>("Moderate");
   const [refundPercentage, setRefundPercentage] = useState(0);
-
+  const {i18n}=useTranslation();
   useEffect(() => {
     checkCancellationPolicy();
   }, []);
@@ -198,7 +198,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
         <div className="bg-tripswift-off-white border border-gray-200 shadow-sm rounded-xl overflow-hidden mb-4 sm:mb-6">
           <div className="bg-tripswift-blue/10 p-3 sm:p-4 border-b border-gray-200">
             <div className="flex items-center">
-              <Info className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue mr-1.5 sm:mr-2" />
+              <Info className={`h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue  ${i18n.language==="ar"?"ml-1.5 sm:ml-2":"mr-1.5 sm:mr-2"}`} />
               <h4 className="text-sm sm:text-base font-tripswift-bold text-tripswift-black/80">
                 {t('BookingTabs.CancellationModal.bookingDetails')}
               </h4>
@@ -287,7 +287,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
           <div className="bg-tripswift-off-white border border-gray-200 shadow-sm rounded-xl overflow-hidden mb-4 sm:mb-6">
             <div className={`${policyStyling.headerBgColor} p-3 sm:p-4 flex items-center justify-between`}>
               <div className="flex items-center">
-                <Shield className={`h-4 w-4 sm:h-5 sm:w-5 ${policyStyling.textColor} mr-1.5 sm:mr-2`} />
+                <Shield className={`h-4 w-4 sm:h-5 sm:w-5 ${policyStyling.textColor}  ${i18n.language==="ar"?"ml-1.5 sm:ml-2":"mr-1.5 sm:mr-2"}`} />
                 <h4 className={`text-sm sm:text-base font-tripswift-bold ${policyStyling.textColor}`}>
                   {t(`BookingTabs.CancellationModal.policyTypes.${policyType.toLowerCase()}`)}
                 </h4>
@@ -305,7 +305,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
                 <ul className="space-y-2 sm:space-y-2.5">
                   {policyBulletPoints.map((point, index) => (
                     <li key={index} className="flex items-start">
-                      <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center mr-1.5 sm:mr-2 mt-0.5 flex-shrink-0 bg-gray-100">
+                      <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0 bg-gray-100   ${i18n.language==="ar"?"ml-1.5 sm:ml-2":"mr-1.5 sm:mr-2"}`}>
                         <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-tripswift-blue"></div>
                       </div>
                       <span className="text-xs sm:text-sm text-tripswift-black/70">
@@ -378,7 +378,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
         <div className="bg-tripswift-off-white border border-gray-200 shadow-sm rounded-xl overflow-hidden mb-4 sm:mb-6">
           <div className="bg-gray-50 p-3 sm:p-4 border-b border-gray-200">
             <div className="flex items-center">
-              <FileQuestion className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-black/60 mr-1.5 sm:mr-2" />
+              <FileQuestion className={`h-4 w-4 sm:h-5 sm:w-5 text-tripswift-black/60  ${i18n.language==="ar"?"ml-1.5 sm:ml-2":"mr-1.5 sm:mr-2"}`} />
               <h4 className="text-sm sm:text-base font-tripswift-bold text-tripswift-black/80">
                 {t('BookingTabs.CancellationModal.reasonForCancellation')}
               </h4>
@@ -407,9 +407,9 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
               }`}>
               <div className="flex items-center">
                 {cancellationMessage.type === 'success' ? (
-                  <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-white mr-1.5 sm:mr-2" />
+                  <CheckCircle className={`h-4 w-4 sm:h-5 sm:w-5 text-white ${i18n.language==="ar"?"ml-1.5 sm:ml-2":"mr-1.5 sm:mr-2"}`} />
                 ) : (
-                  <XCircle className="h-4 w-4 sm:h-5 sm:w-5 text-white mr-1.5 sm:mr-2" />
+                  <XCircle className={`h-4 w-4 sm:h-5 sm:w-5 text-white ${i18n.language==="ar"?"ml-1.5 sm:ml-2":"mr-1.5 sm:mr-2"}`}  />
                 )}
                 <h4 className="text-sm sm:text-base font-tripswift-bold text-white">
                   {cancellationMessage.type === 'success'
@@ -431,7 +431,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
 
         {/* Final Warning */}
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 sm:p-4 mb-4 sm:mb-6 flex items-start">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-100 flex items-center justify-center mr-2 sm:mr-3 flex-shrink-0">
+          <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0   ${i18n.language==="ar"?"ml-2 sm:ml-3":"mr-2 sm:mr-3"}`}>
             <AlertCircle className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-amber-600" />
           </div>
           <div>

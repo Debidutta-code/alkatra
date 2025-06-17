@@ -169,7 +169,8 @@
     "errorSelectDates": "कृपया चेक-इन और चेक-आउट दोनों तारीखें चुनें।",
     "exclusiveOffers": "विशेष ऑफर उपलब्ध",
     "freeCancellation": "मुफ्त रद्दीकरण",
-    "bestPriceGuarantee": "सर्वोत्तम मूल्य की गारंटी"
+    "bestPriceGuarantee": "सर्वोत्तम मूल्य की गारंटी",
+    "downloadourapp": " हमारा ऐप डाउनलोड करें"
   },
   "HotelListing": {
     "CompactSearchBar": {
@@ -331,6 +332,9 @@
     "aboutThisProperty": "इस संपत्ति के बारे में",
     "noImagesAvailable": "कोई छवि उपलब्ध नहीं है",
     "propertyAmenities": "संपत्ति की सुविधाएँ",
+    "nights": "रात",
+    "nightsPlural": "रातें",
+    "stay":"प्रवास",
     "amenitiesList": {
       "wifi": "मुफ्त वाईफाई",
       "swimming_pool": "स्विमिंग पूल",

@@ -23,7 +23,7 @@ import { formatDate, calculateNights } from "@/utils/dateUtils";
 import { useTranslation } from "react-i18next";
 
 export default function PaymentSuccess() {
-  const { t } = useTranslation();
+  const { t , i18n } = useTranslation();
   const searchParams = useSearchParams();
   const firstName = searchParams.get("firstName") || "";
   const lastName = searchParams.get("lastName") || "";
@@ -457,7 +457,7 @@ export default function PaymentSuccess() {
                   <div className="bg-tripswift-off-white/20 p-2 sm:p-3 rounded-full">
                     <CheckCircle size={24} className="sm:w-8 sm:h-8" />
                   </div>
-                  <div className="ml-3 sm:ml-4">
+                  <div className={` ${i18n.language === "ar"?"mr-3 sm:mr-4":"ml-3 sm:ml-4"}`}>
                     <h1 className="text-xl sm:text-2xl md:text-3xl font-tripswift-bold text-tripswift-off-white">
                       {t("Payment.PaymentSuccess.bookingConfirmedTitle")}
                     </h1>
@@ -479,7 +479,7 @@ export default function PaymentSuccess() {
                     <div className="space-y-3 sm:space-y-4">
                       <div className="flex items-start">
                         <Calendar
-                          className="text-tripswift-blue mr-2 sm:mr-3 flex-shrink-0 mt"
+                          className={`text-tripswift-blue flex-shrink-0 ${i18n.language === "ar"?"ml-2 sm:ml-3":"mr-2 sm:mr-3"} `}
                           size={18}
                         />
                         <div>
@@ -493,7 +493,7 @@ export default function PaymentSuccess() {
                       </div>
                       <div className="flex items-start">
                         <Calendar
-                          className="text-tripswift-blue mr-2 sm:mr-3 flex-shrink-0"
+                          className={`text-tripswift-blue flex-shrink-0 ${i18n.language === "ar"?"ml-2 sm:ml-3":"mr-2 sm:mr-3"}`}
                           size={18}
                         />
                         <div>
@@ -513,7 +513,7 @@ export default function PaymentSuccess() {
                       </div>
                       <div className="flex items-start">
                         <Users
-                          className="text-tripswift-blue mr-2 sm:mr-3 flex-shrink-0"
+                          className={`text-tripswift-blue flex-shrink-0 ${i18n.language === "ar"?"ml-2 sm:ml-3":"mr-2 sm:mr-3"}`}
                           size={18}
                         />
                         <div>
@@ -535,7 +535,7 @@ export default function PaymentSuccess() {
                     <div className="space-y-3 sm:space-y-4">
                       <div className="flex items-start">
                         <User
-                          className="text-tripswift-blue mr-2 sm:mr-3 flex-shrink-0"
+                          className={`text-tripswift-blue flex-shrink-0 ${i18n.language === "ar"?"ml-2 sm:ml-3":"mr-2 sm:mr-3"}`}
                           size={18}
                         />
                         <div>
@@ -549,7 +549,7 @@ export default function PaymentSuccess() {
                       </div>
                       <div className="flex items-start">
                         <Mail
-                          className="text-tripswift-blue mr-2 sm:mr-3 flex-shrink-0 mb-1"
+                          className={`text-tripswift-blue flex-shrink-0 ${i18n.language === "ar"?"ml-2 sm:ml-3":"mr-2 sm:mr-3"}`}
                           size={18}
                         />
                         <div>
@@ -563,14 +563,14 @@ export default function PaymentSuccess() {
                       </div>
                       <div className="flex items-start">
                         <Phone // Added phone number display
-                          className="text-tripswift-blue mr-2 sm:mr-3 flex-shrink-0 mb-1"
+                          className={`text-tripswift-blue mb-1 flex-shrink-0 ${i18n.language === "ar"?"ml-2 sm:ml-3":"mr-2 sm:mr-3"}`}
                           size={18}
                         />
                         <div>
                           <p className="text-xs sm:text-sm text-tripswift-black/60">
                             {t("Payment.PaymentSuccess.phoneLabel")}
                           </p>
-                          <p className="text-sm sm:text-base font-tripswift-medium">
+                          <p className="text-sm sm:text-base font-tripswift-medium"  dir="ltr">
                             {reduxPhone}
                           </p>
                         </div>
@@ -591,7 +591,7 @@ export default function PaymentSuccess() {
                       </div> */}
                       <div className="flex items-start">
                         <CreditCard
-                          className="text-tripswift-blue mr-2 sm:mr-3 flex-shrink-0 mb-1"
+                          className={`text-tripswift-blue mb-1 flex-shrink-0 ${i18n.language === "ar"?"ml-2 sm:ml-3":"mr-2 sm:mr-3"}`}
                           size={18}
                         />
                         <div>
@@ -661,7 +661,7 @@ export default function PaymentSuccess() {
                 </h3>
                 <ul className="space-y-2 sm:space-y-3 text-sm sm:text-base text-tripswift-black/70">
                   <li className="flex items-start">
-                    <span className="inline-block bg-green-100 rounded-full p-1 mr-2 mt-0.5">
+                    <span className={`inline-block bg-green-100 rounded-full p-1  mt-0.5 ${i18n.language === "ar"?"ml-2":"mr-2"}`}>
                       <CheckCircle
                         size={12}
                         className="sm:w-[14px] sm:h-[14px] text-green-600"
@@ -670,7 +670,7 @@ export default function PaymentSuccess() {
                     {t("Payment.PaymentSuccess.confirmationEmailSent")}
                   </li>
                   <li className="flex items-start">
-                    <span className="inline-block bg-green-100 rounded-full p-1 mr-2 mt-0.5">
+                    <span className={`inline-block bg-green-100 rounded-full p-1  mt-0.5 ${i18n.language === "ar"?"ml-2":"mr-2"}`}>
                       <CheckCircle
                         size={12}
                         className="sm:w-[14px] sm:h-[14px] text-green-600"
@@ -679,7 +679,7 @@ export default function PaymentSuccess() {
                     {t("Payment.PaymentSuccess.viewBookingDetails")}
                   </li>
                   <li className="flex items-start">
-                    <span className="inline-block bg-green-100 rounded-full p-1 mr-2 mt-0.5">
+                    <span className={`inline-block bg-green-100 rounded-full p-1  mt-0.5 ${i18n.language === "ar"?"ml-2":"mr-2"}`}>
                       <CheckCircle
                         size={12}
                         className="sm:w-[14px] sm:h-[14px] text-green-600"

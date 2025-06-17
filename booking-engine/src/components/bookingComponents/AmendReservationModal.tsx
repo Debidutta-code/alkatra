@@ -40,7 +40,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
   onClose,
   onAmendComplete
 }) => {
-  const { t } = useTranslation();
+  const { t ,i18n } = useTranslation();
   const dispatch = useDispatch();
 
   // States for form fields
@@ -56,7 +56,6 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [amendmentMessage, setAmendmentMessage] = useState<{ type: 'success' | 'error' | 'warning', text: string } | null>(null);
   const modalContentRef = useRef<HTMLDivElement>(null);
-
   // Initialize guestBreakdown based on booking.guestDetails
   const [guestBreakdown, setGuestBreakdown] = useState(() => {
     const adults = booking.guestDetails?.filter(g => g.type === "adult" || (g.dob && dayjs().diff(dayjs(g.dob), 'year') >= 12))?.length || 1;
@@ -491,7 +490,7 @@ console.log("guests",guests)
         {/* Original booking details */}
         <div className="bg-gradient-to-r from-tripswift-blue/10 to-tripswift-blue/5 rounded-xl p-3 sm:p-4 md:p-5 mb-4 sm:mb-6">
           <h4 className="text-base sm:text-lg font-tripswift-bold text-tripswift-blue mb-3 sm:mb-4 flex items-center">
-            <Info className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
+            <Info className={`h-4 w-4 sm:h-5 sm:w-5  ${i18n.language === "ar"?"ml-1.5 sm:ml-2":"mr-1.5 sm:mr-2"}`} />
             {t('BookingTabs.AmendReservationModal.currentBookingDetails')}
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
@@ -654,7 +653,7 @@ console.log("guests",guests)
               </div>
               {dateRange && dateRange[0] && dateRange[1] && (
                 <div className="px-4 py-3 bg-tripswift-blue/10 rounded-lg text-sm text-tripswift-blue/90 font-tripswift-medium flex items-center">
-                  <Clock className="h-4 w-4 text-tripswift-blue mr-2 flex-shrink-0" />
+                  <Clock className={`h-4 w-4 text-tripswift-blue mr-2 flex-shrink-0 ${i18n.language === "ar"?"ml-2":"mr-2"}`} />
                   <div>
                     {t('BookingTabs.AmendReservationModal.stayDuration', {
                       count: dateRange[1].diff(dateRange[0], 'day')

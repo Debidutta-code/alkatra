@@ -42,7 +42,7 @@ interface PayAtHotelProps {
 }
 
 const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
-  const { t } = useTranslation();
+  const { t , i18n } = useTranslation();
   const stripe = useStripe();
   const elements = useElements();
   const router = useRouter();
@@ -53,6 +53,7 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
 
   const auth = useSelector((state: any) => state.auth);
   const token = auth?.token || auth?.accessToken;
+
 
   // Validate booking details on component mount
   useEffect(() => {
@@ -267,7 +268,7 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
       )}
 
       <div className="mb-6 flex items-start">
-        <Shield className="h-5 w-5 text-tripswift-blue mr-2 flex-shrink-0 mb-1.5" />
+        <Shield className={`h-5 w-5 text-tripswift-blue flex-shrink-0 mb-1.5 ${i18n.language === "ar"?"ml-2":"mr-2"}`} />
         <p className="text-xs text-tripswift-black/70">
           Your card details are encrypted and securely processed by Stripe. We never store your full card information on our servers.
         </p>
