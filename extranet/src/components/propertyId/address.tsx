@@ -49,7 +49,6 @@ interface AddressProps {
   handleAddressEditClick: () => void;
   handleAddressAddClick: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;
 }
-
 export function Address({
   address,
   editedAddress,
@@ -121,7 +120,7 @@ export function Address({
       case "address_line_2":
         return !stringValue.trim() ? "Address Line 2 is required" : null;
       case "landmark":
-        return !stringValue.trim() ? "landmark is required" : null;
+        return !stringValue.trim() ? "Landmark is required" : null;
       case "city":
         return !stringValue.trim() ? "City is required" : null;
       case "state":
@@ -353,7 +352,7 @@ export function Address({
             name="address_line_2"
             value={editedAddress?.address_line_2 || ""}
             onChange={handleValidatedInputChange}
-            placeholder="Address Line 1"
+            placeholder="Address Line 2"
             className={`w-full ${
               validationErrors.address_line_2 ? "border-destructive" : ""
             }`}
@@ -374,7 +373,7 @@ export function Address({
             name="landmark"
             value={editedAddress?.landmark || ""}
             onChange={handleValidatedInputChange}
-            placeholder="landmark"
+            placeholder="Landmark"
             className={`w-full ${
               validationErrors.landmark ? "border-destructive" : ""
             }`}
@@ -443,7 +442,20 @@ export function Address({
             name="zip_code"
             value={editedAddress?.zip_code || ""}
             maxLength={6}
-            onChange={handleValidatedInputChange}
+            onChange={(e) => {
+              const digitsOnly = e.target.value.replace(/\D/g, "");
+              const syntheticEvent = {
+                target: {
+                  name: "zip_code",
+                  value: digitsOnly,
+                },
+              } as React.ChangeEvent<HTMLInputElement>;
+              handleValidatedInputChange(syntheticEvent);
+            }}
+            onInput={(e) => {
+              const target = e.target as HTMLInputElement;
+              target.value = target.value.replace(/\D/g, "");
+            }}
             placeholder="Zip Code"
             className={`w-full ${
               validationErrors.zip_code ? "border-destructive" : ""
@@ -461,9 +473,9 @@ export function Address({
 
   // Render address form for modal
   const renderAddressFormDialog = () => (
-    <div className="space-y-4 w-full">
-      <div className="grid grid-cols-1">
-        <label className="mb-1 text-sm text-muted-foreground">
+    <div className="lg:max-h-[90vh] max-h-[70vh] overflow-y-auto px-4 space-y-2 w-full">
+      <div className="grid mt-3 grid-cols-1">
+        <label className="mb-1  text-sm text-muted-foreground">
           Address Line 1 <span className="text-destructive">*</span>
         </label>
         <div>
@@ -505,7 +517,9 @@ export function Address({
         </div>
       </div>
       <div className="grid grid-cols-1">
-        <label className="mb-1 text-sm text-muted-foreground">Landmark</label>
+        <label className="mb-1 text-sm text-muted-foreground">
+          Landmark <span className="text-destructive">*</span>
+          </label>
         <Input
           name="landmark"
           value={editedAddress?.landmark || ""}
@@ -519,7 +533,8 @@ export function Address({
           </p>
         )}
       </div>
-      <div className="grid grid-cols-1">
+      <div className="md:flex md:gap-3">
+        <div className="grid md:w-1/2 grid-cols-1">
         <label className="mb-1 text-sm text-muted-foreground">
           Country <span className="text-destructive">*</span>
         </label>
@@ -535,7 +550,7 @@ export function Address({
           error={validationErrors.country}
         />
       </div>
-      <div className="grid grid-cols-1">
+      <div className="grid md:w-1/2 grid-cols-1">
         <label className="mb-1 text-sm text-muted-foreground">
           State <span className="text-destructive">*</span>
         </label>
@@ -551,8 +566,10 @@ export function Address({
           error={validationErrors.state}
         />
       </div>
-      <div className="grid grid-cols-1">
-        <label className="mb-1 text-sm text-muted-foreground">
+      </div>
+      <div className="md:flex md:gap-3">
+        <div className="grid md:w-1/2 grid-cols-1">
+        <label className="mb-1  text-sm text-muted-foreground">
           City <span className="text-destructive">*</span>
         </label>
         <SelectDropdown
@@ -589,6 +606,7 @@ export function Address({
           )}
         </div>
       </div>
+      </div>
     </div>
   );
 
@@ -603,6 +621,7 @@ export function Address({
             <Button
               variant="outline"
               size="sm"
+              className="mt-2 md:mt-0"
               onClick={handleAddressEditClick}
             >
               Cancel
@@ -640,7 +659,11 @@ export function Address({
 
       <CardContent className="pt-0">
         <Dialog open={showModal} onOpenChange={setShowModal}>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent
+            className="sm:max-w-md"
+            onInteractOutside={(e) => e.preventDefault()}
+            onPointerDownOutside={(e) => e.preventDefault()}
+          >
             <form onSubmit={handleAddWithValidation}>
               <DialogHeader>
                 <DialogTitle>Add Address</DialogTitle>
@@ -650,6 +673,7 @@ export function Address({
                 <DialogFooter className="mt-6">
                   <Button
                     type="button"
+                    className="mt-2 md:mt-0"
                     onClick={() => setShowModal(false)}
                     variant="outline"
                   >
@@ -668,52 +692,62 @@ export function Address({
           <div className="space-y-0">
             {address ? (
               <div className="">
-                <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">
-                    Address Line 1:
+                <div className="py-2 flex flex-col sm:flex-row sm:items-start">
+                  <div className="w-full sm:w-1/4 text-sm text-gray-500 sm:pr-2">
+                    Address Line 1
                   </div>
-                  <div className="w-3/4 text-sm font-medium break-words overflow-hidden">
-                    {address.address_line_1 || "N/A"}
+                  <div className="w-full sm:w-3/4 text-sm font-medium break-words sm:pl-2">
+                    {address.address_line_1 ||  "N/A"}
                   </div>
                 </div>
-                <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">
-                    Address Line 2:
+                <div className="py-2 flex flex-col sm:flex-row sm:items-start">
+                  <div className="w-full sm:w-1/4 text-sm text-gray-500 sm:pr-2">
+                    Address Line 2
                   </div>
-                  <div className="w-3/4  text-sm font-medium break-words overflow-hidden">
+                  <div className="w-full sm:w-3/4 text-sm font-medium break-words sm:pl-2">
                     {address.address_line_2 || "N/A"}
                   </div>
                 </div>
-                <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">Landmark:</div>
-                  <div className="w-3/4  text-sm font-medium break-words overflow-hidden">
+                <div className="py-2 flex flex-col sm:flex-row sm:items-start">
+                  <div className="w-full sm:w-1/4 text-sm text-gray-500 sm:pr-2">
+                    Landmark
+                  </div>
+                  <div className="w-full sm:w-3/4 text-sm font-medium break-words sm:pl-2">
                     {address.landmark || "N/A"}
                   </div>
                 </div>
-                <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">City:</div>
-                  <div className="w-3/4  text-sm font-medium break-words overflow-hidden">
+                <div className="py-2 flex flex-col sm:flex-row sm:items-start">
+                  <div className="w-full sm:w-1/4 text-sm text-gray-500 sm:pr-2">
+                    City
+                  </div>
+                  <div className="w-full sm:w-3/4 text-sm font-medium break-words sm:pl-2">
                     {address.city || "N/A"}
                   </div>
                 </div>
-                <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">State:</div>
-                  <div className="w-3/4  text-sm font-medium break-words overflow-hidden">
+                <div className="py-2 flex flex-col sm:flex-row sm:items-start">
+                  <div className="w-full sm:w-1/4 text-sm text-gray-500 sm:pr-2">
+                    State
+                  </div>
+                  <div className="w-full sm:w-3/4 text-sm font-medium break-words sm:pl-2">
                     {states.find((s) => s.isoCode === address.state)?.name ||
                       address.state ||
                       "N/A"}
                   </div>
                 </div>
-                <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">Country:</div>
-                  <div className="w-3/4  text-sm font-medium break-words overflow-hidden">
+                <div className="py-2 flex flex-col sm:flex-row sm:items-start">
+                  <div className="w-full sm:w-1/4 text-sm text-gray-500 sm:pr-2">
+                    Country
+                  </div>
+                  <div className="w-full sm:w-3/4 text-sm font-medium break-words sm:pl-2">
                     {countries.find((c) => c.isoCode === address.country)
                       ?.name || "N/A"}
                   </div>
                 </div>
-                <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">Zip Code:</div>
-                  <div className="w-3/4  text-sm font-medium break-words overflow-hidden">
+                <div className="py-2 flex flex-col sm:flex-row sm:items-start">
+                  <div className="w-full sm:w-1/4 text-sm text-gray-500 sm:pr-2">
+                    Zip Code
+                  </div>
+                  <div className="w-full sm:w-3/4 text-sm font-medium break-words sm:pl-2">
                     {address.zip_code || "N/A"}
                   </div>
                 </div>

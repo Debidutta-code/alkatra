@@ -31,6 +31,7 @@ export interface ThirdPartyAmendReservationData {
     hotelName: string;
     ratePlanCode: string;
     roomTypeCode: string;
+    numberOfRooms: number;
     guests: any[];
     email: string;
     phone: string;

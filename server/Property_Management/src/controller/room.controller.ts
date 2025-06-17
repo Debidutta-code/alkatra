@@ -37,7 +37,7 @@ interface RedirectParams {
 
 interface RedirectQuery {
   coupon?: string;
-} 
+}
 
 // create room
 const createRoom = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -302,7 +302,7 @@ const getRoomsByPropertyId2 = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const propertyInfoId = req.params.id;
     const { startDate, endDate, hotelCode = "WINCLOUD" } = req.body;
-
+    console.log(startDate, endDate)
     // Validate mandatory fields
     if (!startDate) {
       return next(new AppError("startDate is required", 400));
@@ -324,7 +324,7 @@ const getRoomsByPropertyId2 = catchAsync(
           propertyInfo_id: new mongoose.Types.ObjectId(propertyInfoId)
         }
       },
-      
+
       // Lookup and process rate information in one go
       {
         $lookup: {
@@ -337,8 +337,7 @@ const getRoomsByPropertyId2 = catchAsync(
                   $and: [
                     { $eq: ["$invTypeCode", "$$roomType"] },
                     { $eq: ["$hotelCode", hotelCode] },
-                    { $lte: ["$startDate", new Date(endDate)] },
-                    { $gte: ["$endDate", new Date(startDate)] }
+                    { $eq: ["$startDate", new Date(startDate)] },
                   ]
                 }
               }
@@ -358,7 +357,7 @@ const getRoomsByPropertyId2 = catchAsync(
           as: "rateInfo"
         }
       },
-      
+
       // Final projection - including ALL room model fields
       {
         $project: {
@@ -387,7 +386,7 @@ const getRoomsByPropertyId2 = catchAsync(
           createdAt: 1,
           updatedAt: 1,
           __v: 1,
-          
+
           // Rate information from lookup
           room_price: { $arrayElemAt: ["$rateInfo.room_price", 0] },
           currency_code: { $arrayElemAt: ["$rateInfo.currency_code", 0] },

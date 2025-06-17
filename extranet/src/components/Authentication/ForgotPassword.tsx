@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AtSign, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { AtSign, Loader2, CheckCircle2, AlertCircle, ArrowLeft } from "lucide-react";
 import UpdatePasswordForm from "./UpdatePassword";
 
 const verifyEmailSchema = z.object({
@@ -28,41 +28,31 @@ export default function VerifyEmailForm({ onBack }: VerifyEmailFormProps) {
   const [loading, setLoading] = useState(false);
   const [showUpdatePasswordForm, setShowUpdatePasswordForm] = useState(false);
   const [verifiedEmail, setVerifiedEmail] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const [messageType, setMessageType] = useState<"success" | "error" | null>(null);
+  const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
   const form = useForm<VerifyInputs>({
     defaultValues: { email: "" },
     resolver: zodResolver(verifyEmailSchema),
   });
 
-  const { register, handleSubmit, formState, reset } = form;
-  const { errors } = formState;
+  const { register, handleSubmit, formState: { errors }, reset } = form;
 
   const onSubmit = async (data: VerifyInputs) => {
     setLoading(true);
     setMessage(null);
-    setMessageType(null);
+
     try {
       const response = await verifyEmail(data);
       if (response.status === "success") {
-        setMessage("Email verification successful!");
-        setMessageType("success");
+        setMessage({ text: "Verification email sent! Check your inbox.", type: "success" });
         setVerifiedEmail(data.email);
         reset();
-        setShowUpdatePasswordForm(true);
-        setTimeout(() => {
-          setMessage(null);
-          setMessageType(null);
-        }, 1500);
+        setTimeout(() => setShowUpdatePasswordForm(true), 1500);
       } else {
-        setMessage("Email not found. Please try again.");
-        setMessageType("error");
+        setMessage({ text: "Email not found. Please try again.", type: "error" });
       }
     } catch (err) {
-      console.error("Verification failed!", err);
-      setMessage("Email verification failed. Please try again.");
-      setMessageType("error");
+      setMessage({ text: "Verification failed. Please try again.", type: "error" });
     } finally {
       setLoading(false);
     }
@@ -73,103 +63,114 @@ export default function VerifyEmailForm({ onBack }: VerifyEmailFormProps) {
   }
 
   return (
-    <div className="">
-      <div className="mb-10 text-center">
-        <CardTitle className="text-5xl">Forgot Password?</CardTitle>
-        <CardDescription>Enter your email</CardDescription>
-      </div>
-      {message && (
-        <div
-          className={`
-            flex items-center p-4 mb-4 rounded-lg 
-            ${messageType === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}
-          `}
+    <div className="w-full max-w-md space-y-6 p-6 sm:p-8 bg-card rounded-xl shadow-lg border border-border mx-auto">
+      <div className="text-center space-y-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute left-4 top-4 md:left-8 md:top-8"
+          onClick={() => onBack("login")}
         >
-          {messageType === "success" ? (
-            <CheckCircle2 className="mr-2 text-green-600" />
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+
+        <CardTitle className="text-3xl font-bold">Forgot Password?</CardTitle>
+        <CardDescription className="text-muted-foreground">
+          Enter your email to reset your password
+        </CardDescription>
+      </div>
+
+      {message && (
+        <div className={`rounded-lg p-4 flex items-start gap-3 ${message.type === "success"
+          ? "bg-green-50 text-green-800"
+          : "bg-red-50 text-red-800"
+          }`}>
+          {message.type === "success" ? (
+            <CheckCircle2 className="h-5 w-5 mt-0.5 text-green-600" />
           ) : (
-            <AlertCircle className="mr-2 text-red-600" />
+            <AlertCircle className="h-5 w-5 mt-0.5 text-red-600" />
           )}
-          {message}
+          <p className="text-sm">{message.text}</p>
         </div>
       )}
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-        <div className="mb-10 space-y-4">
-          <div>
-            <Label htmlFor="email">Email</Label>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email">Email Address</Label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <AtSign className="h-5 w-5 text-muted-foreground" />
+            </div>
             <Input
-              withIcon
-              startIcon={<AtSign size={20} />}
-              size="lg"
+              id="email"
+              placeholder="your@email.com"
+              className="pl-10"
               {...register("email")}
               variant={errors.email ? "error" : undefined}
-              type="email"
             />
-            {errors.email && <p className="text-red-500">{errors.email.message}</p>}
           </div>
+          {errors.email && (
+            <p className="text-sm text-destructive">{errors.email.message}</p>
+          )}
         </div>
-        <div className="flex gap-4">
-          <SubmitButton loading={loading} />
+
+        <div className="flex gap-3 pt-2">
+          <Button
+            type="submit"
+            className="w-full"
+            size="lg"
+            disabled={loading}
+          >
+            {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Continue"}
+          </Button>
           <Button
             type="button"
             variant="outline"
-            onClick={() => {
-              reset();
-              onBack("login");
-            }}
+            className="w-full"
             size="lg"
-            className="w-full py-3 px-6"
+            onClick={() => onBack("login")}
           >
             Cancel
           </Button>
         </div>
       </form>
-      <div className="mt-6 text-center">
-        <span>
-          Back to{" "}
-          <Button type="button" className="px-0" onClick={() => onBack("login")} variant="link">
-            Login
-          </Button>
-        </span>
-        <div className="relative flex items-center justify-center w-full mt-9 border border-t">
-          <div className="absolute px-5 bg-transparent">Or</div>
+      <div className="space-y-2 pt-1">
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="px-2 text-muted-foreground bg-background">
+              Or continue with
+            </span>
+          </div>
         </div>
-        <span>
+
+        <div className="text-center text-sm text-muted-foreground">
           Don't have an account?{" "}
-          <Button type="button" className="px-0" onClick={() => router.push("/register")} variant="link">
-            Register
+          <Button
+            variant="link"
+            className="px-0 text-primary h-auto"
+            onClick={() => router.push("/register")}
+          >
+            Sign up
           </Button>
-        </span>
+        </div>
       </div>
     </div>
   );
 }
 
-function SubmitButton({ loading }: { loading: boolean }) {
-  return (
-    <Button
-      size="lg"
-      type="submit"
-      variant="default"
-      className="bg-primary text-primary-foreground hover:bg-primary/90 w-full py-3 px-6"
-      disabled={loading}
-    >
-      {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Send"}
-    </Button>
-  );
-}
-
 async function verifyEmail(data: VerifyInputs) {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/verify/email`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-    });
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/verify/email`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
 
   if (!response.ok) {
     const errorData = await response.json();
-    console.error("Verification failed with response:", errorData);
-    throw new Error("Verification failed");
+    throw new Error(errorData.message || "Verification failed");
   }
 
   return response.json();

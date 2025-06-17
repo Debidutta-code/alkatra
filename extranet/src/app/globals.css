@@ -1,59 +1,192 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 262.1 83.3% 57.8%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 262.1 83.3% 57.8%;
-    --radius: 0.75rem;
-  }
-
-  .dark {
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 263.4 70% 50.4%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 263.4 70% 50.4%;
-  }
+:root {
+  /* TripSwift Brand Colors */
+  --color-primary-blue: #076DB3;
+  --color-primary-off-white: #FFFDFF;
+  --color-primary-black: #000000;
+  --color-secondary-off-white: #FFFDFF;
+  --color-secondary-black: #000000;
+  --color-gray-800: #1f2937;
+  
+  /* Typography */
+  --font-primary: 'Noto Sans', sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  
+  /* Gradient */
+  --gradient: linear-gradient(163.95deg, var(--color-primary-blue) 4.74%, #054B8F 88.83%);
+  --shadow: 0px 39px 60px 0px #00000024;
 }
 
 @layer base {
-  * {
-    @apply border-border;
+  :root {
+    /* Base colors in HSL format for Tailwind */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+    
+    /* Primary is mapped to TripSwift blue */
+    --primary: 216 43% 46%; /* HSL for #076DB3 */
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary is mapped to TripSwift black */
+    --secondary: 0 0% 0%;
+    --secondary-foreground: 0 0% 100%;
+    
+    /* Other UI colors */
+    --muted: 216 20% 90%;
+    --muted-foreground: 216 20% 30%;
+    --accent: 216 40% 87%;
+    --accent-foreground: 216 43% 46%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 216 20% 85%;
+    --input: 216 20% 85%;
+    --ring: 216 43% 46%;
+    
+    --radius: 0.5rem;
   }
-  body {
-    @apply bg-background text-foreground;
+  
+  .dark {
+    --background: 0 0% 0%;
+    --foreground: 60 2% 99%;
+    --card: 0 0% 0%;
+    --card-foreground: 60 2% 99%;
+    --popover: 0 0% 0%;
+    --popover-foreground: 60 2% 99%;
+    --primary: 216 43% 46%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 60 2% 99%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 216 20% 20%;
+    --muted-foreground: 216 20% 70%;
+    --accent: 216 40% 20%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 60 2% 99%;
+    --border: 216 20% 30%;
+    --input: 216 20% 30%;
+    --ring: 216 43% 70%;
   }
+
+  /* Define the font family at the base layer */
+  html {
+    font-family: var(--font-primary);
+  }
+}
+
+@layer components {
+  .text-property-title {
+    @apply font-medium text-lg text-gray-800 tracking-normal;
+  }
+  
+  .text-room-title {
+    @apply font-medium text-base text-gray-800 tracking-normal;
+  }
+  
+  .text-section-heading {
+    @apply font-medium text-base text-gray-800 tracking-normal;
+  }
+  
+  .text-price {
+    @apply font-bold text-lg text-[--color-primary-blue];
+  }
+  
+  .text-description {
+    @apply text-sm text-gray-600 tracking-normal;
+  }
+}
+
+@layer utilities {
+  /* Text colors */
+  .text-tripswift-blue {
+    color: var(--color-primary-blue);
+  }
+  .text-tripswift-black {
+    color: var(--color-primary-black);
+  }
+  .text-tripswift-off-white {
+    color: var(--color-primary-off-white);
+  }
+  
+  /* Background colors */
+  .bg-tripswift-blue {
+    background-color: var(--color-primary-blue);
+  }
+  .bg-tripswift-black {
+    background-color: var(--color-primary-black);
+  }
+  .bg-tripswift-off-white {
+    background-color: var(--color-primary-off-white);
+  }
+  
+  /* Border colors */
+  .border-tripswift-blue {
+    border-color: var(--color-primary-blue);
+  }
+  .border-tripswift-black {
+    border-color: var(--color-primary-black);
+  }
+  .border-tripswift-off-white {
+    border-color: var(--color-primary-off-white);
+  }
+  
+  /* Font weights */
+  .font-tripswift-regular {
+    font-weight: var(--font-weight-regular);
+  }
+  .font-tripswift-medium {
+    font-weight: var(--font-weight-medium);
+  }
+  .font-tripswift-semibold {
+    font-weight: var(--font-weight-semibold);
+  }
+  .font-tripswift-bold {
+    font-weight: var(--font-weight-bold);
+  }
+  .font-tripswift-extrabold {
+    font-weight: var(--font-weight-extrabold);
+  }
+}
+
+/* Button styling */
+.btn-tripswift-primary {
+  background-color: var(--color-primary-blue);
+  color: var(--color-primary-off-white);
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.btn-tripswift-primary:hover {
+  background-color: #054B8F;
+}
+
+.btn-tripswift-secondary {
+  background-color: var(--color-primary-off-white);
+  color: var(--color-primary-blue);
+  border: 1px solid var(--color-primary-blue);
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-tripswift-secondary:hover {
+  background-color: var(--color-primary-blue);
+  color: var(--color-primary-off-white);
 }

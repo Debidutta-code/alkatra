@@ -296,10 +296,10 @@ const HotelListing: React.FC = () => {
 
       {/* Main content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
+        <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between ml-2">
           <div>
             <div className="flex items-center">
-              <MapPin className="h-5 w-5 mr-2 text-tripswift-blue" />
+              <MapPin className={`h-5 w-5 mr-3 text-tripswift-blue ${i18n.language==="ar" ?"ml-2":"mr-3"}`} />
               <h1 className="text-xl font-tripswift-bold text-tripswift-black">
                 {i18n.language === 'hi'
                   ? `${params.location || params.destination} ${t('HotelListing.hotelsIn')}`
@@ -307,16 +307,16 @@ const HotelListing: React.FC = () => {
               </h1>
             </div>
 
-            <div className="flex flex-wrap items-center text-sm font-tripswift-regular text-tripswift-black/70 mt-2 ml-7">
-              <div className="flex items-center mr-4">
-                <Calendar className="h-4 w-4 mr-1 text-tripswift-blue" />
+            <div className="flex flex-wrap items-center  text-sm font-tripswift-regular text-tripswift-black/70 mt-2 ">
+              <div className={`flex items-center  mr-4`}>
+                <Calendar className={`h-4 w-4 text-tripswift-blue ${i18n.language==="ar" ?"ml-2":"mr-2"}`} />
                 {checkinDate && checkoutDate ? (
                   <span>{formatDate(checkinDate, { month: "short", day: "numeric" })} - {formatDate(checkoutDate, { month: "short", day: "numeric" })}</span>
                 ) : (
                   <span>{t("HotelListing.selectDates", { defaultValue: "Select dates" })}</span>
                 )}
               </div>
-              <span className="mr-4 text-tripswift-black/40">•</span>
+              <span className={`mr-4 text-tripswift-black/40 ${i18n.language==="ar" ?"ml-4":"mr-4"}`}>•</span>
               {checkinDate && checkoutDate ? (
                 <span>{calculateNights(checkinDate, checkoutDate)} nights</span>
               ) : (
@@ -459,20 +459,20 @@ const HotelListing: React.FC = () => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={t("HotelListing.searchPropertyName", { defaultValue: "Search property name" })}
+                  placeholder={t("HotelListing.searchPropertyName", { defaultValue: "Search property by name" })}
                   className="pl-10 w-full border border-gray-200 rounded-md px-3 py-1.5 text-sm bg-tripswift-off-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue transition-all duration-300"
                 />
               </div>
 
-              <div className="flex items-center space-x-3">
-                <span className="text-sm font-tripswift-medium text-tripswift-black/70">
+              <div className="flex items-center">
+                <span className={`text-sm font-tripswift-medium text-tripswift-black/70 ${i18n.language === "ar" ? "ml-3":"mr-3"}`}>
                   {t("HotelListing.sortBy", { defaultValue: "Sort by" })}
                 </span>
                 <div className="relative">
                   <select
                     value={filters.sortOrder}
                     onChange={(e) => handleSortChange(e.target.value)}
-                    className="appearance-none border border-gray-200 rounded-md pl-3 pr-8 py-1.5 text-sm bg-tripswift-off-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue transition-all duration-300"
+                    className={`appearance-none border border-gray-200 rounded-md pl-3 pr-8 py-1.5 text-sm bg-tripswift-off-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue transition-all duration-300 `}
                   >
                     <option value="">{t("HotelListing.recommended", { defaultValue: "Recommended" })}</option>
                     <option value="rating_desc">{t("HotelListing.highestRating", { defaultValue: "Highest Rating" })}</option>
@@ -518,7 +518,7 @@ const HotelListing: React.FC = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="flex items-start">
-                    <div className="bg-tripswift-blue/10 p-1 rounded-full mr-3 mt-0.5">
+                    <div className={`bg-tripswift-blue/10 p-1 rounded-full  mt-0.5 ${i18n.language==="ar"?"mr-0":"mr-3"} `}>
                       <CreditCard className="h-5 w-5 text-tripswift-blue" />
                     </div>
                     <div className="mt-1">

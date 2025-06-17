@@ -51,7 +51,7 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
         </h2>
         {editButtonVal && (
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-blue-600 font-medium">Edit Mode Active</span>
+            <span className="text-sm text-tripswift-blue font-medium">Edit Mode Active</span>
             <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
           </div>
         )}
@@ -83,7 +83,7 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
                   key={`${item._id}-${item.invTypeCode}-${item.hotelCode}`}
                   className={`transition-colors duration-150 ${
                     isRowEditable(index) 
-                      ? 'bg-blue-50 hover:bg-blue-100' 
+                      ? 'bg-tripswift-blue/10 hover:bg-blue-100' 
                       : 'hover:bg-gray-50'
                   }`}
                 >
@@ -118,7 +118,7 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
                         onChange={(e) => handlePriceChange(index, parseFloat(e.target.value) || 0)}
                         className={`w-20 px-2 py-1 text-sm rounded transition-all duration-200 ${
                           isRowEditable(index)
-                            ? 'border-2 border-blue-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm'
+                            ? 'border-2 border-tripswift-blue bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm'
                             : 'border-none bg-transparent focus:outline-none'
                         }`}
                         step="0.01"
@@ -137,7 +137,7 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
                       onChange={(e) => handleAvailabilityChange(index, parseInt(e.target.value) || 0)}
                       className={`w-16 px-2 py-1 text-sm rounded transition-all duration-200 ${
                         isRowEditable(index)
-                          ? 'border-2 border-blue-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm'
+                          ? 'border-2 border-tripswift-blue bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm'
                           : 'border-none bg-transparent focus:outline-none'
                       }`}
                       min={0}
@@ -162,7 +162,7 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
                       ) : (
                         <button
                           onClick={() => handleEditClick(index)}
-                          className="p-2 hover:bg-blue-100 text-blue-600 rounded-full transition-colors duration-150"
+                          className="p-2 hover:bg-blue-100 text-tripswift-blue rounded-full transition-colors duration-150"
                           aria-label="Edit row"
                           title="Edit this row"
                         >

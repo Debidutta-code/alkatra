@@ -11,12 +11,11 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSelector } from "react-redux";
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
 import { Shield, CreditCard, CheckCircle, Clock, CalendarRange, Users, Loader2 } from "lucide-react";
 import Link from "next/link";
 import axios from "axios";
 
-// Define RootState type based on your store's state shape
 interface RootState {
   auth: {
     user: UserType | null;
@@ -24,7 +23,6 @@ interface RootState {
   };
 }
 
-// Define UserType
 interface UserType {
   firstName: string;
   lastName: string;
@@ -33,11 +31,15 @@ interface UserType {
   _id?: string;
 }
 
-// Don't create Stripe promise at module level
-// Instead, create it on demand when user selects payment method
+interface Guest {
+  firstName: string;
+  lastName: string;
+  dob?: string;
+  type?: "adult" | "child" | "infant";
+}
 
 function PaymentPageContent() {
-  const { t } = useTranslation(); // Initialize useTranslation hook
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [paymentOption, setPaymentOption] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
@@ -49,8 +51,8 @@ function PaymentPageContent() {
   const authUser = useSelector((state: RootState) => state.auth.user);
 
   // Get booking parameters from URL
-  const amount = parseInt(searchParams.get("amount") || "0", 10);
-  const currency = searchParams.get("currency")?.toLowerCase() || "inr";
+  // const amount = isNaN(parseInt(searchParams.get("amount") || "0", 10)) ? 0 : parseInt(searchParams.get("amount") || "0", 10); 
+  const currency = searchParams.get("currency")?.toLowerCase() || "INR";
   const firstName = searchParams.get('firstName') || authUser?.firstName || '';
   const lastName = searchParams.get('lastName') || authUser?.lastName || '';
   const email = searchParams.get('email') || authUser?.email || '';
@@ -60,11 +62,43 @@ function PaymentPageContent() {
   const checkIn = searchParams.get('checkIn') || '';
   const checkOut = searchParams.get('checkOut') || '';
   const userId = authUser?._id || searchParams.get('userId') || '';
+  const hotelName = searchParams.get('hotelName') || 'Unknown Hotel';
+  const ratePlanCode = searchParams.get('ratePlanCode')?.toUpperCase() || 'SUT';
+  const roomType = searchParams.get('roomType') || 'SUT';
 
   // Get guest counts from URL parameters
   const rooms = parseInt(searchParams.get('rooms') || '1', 10);
   const adults = parseInt(searchParams.get('adults') || '1', 10);
   const children = parseInt(searchParams.get('children') || '0', 10);
+  const infants = parseInt(searchParams.get('infants') || '0', 10);
+ const amountFromRedux = useSelector((state: any) => state.pmsHotelCard.amount);
+ const {i18n} =useTranslation();
+  // Use amount from Redux only
+  const amount = amountFromRedux ? parseInt(amountFromRedux, 10) : 0;
+  // Parse guests from query parameters
+  const guests: Guest[] = (() => {
+    try {
+      const guestsStr = searchParams.get('guests');
+      if (!guestsStr) {
+        console.warn('No guests query parameter provided');
+        return [{ firstName: firstName || 'Guest', lastName: lastName || 'User', type: 'adult', dob: '' }];
+      }
+      const parsed = JSON.parse(decodeURIComponent(guestsStr));
+      if (!Array.isArray(parsed) || parsed.length === 0) {
+        console.warn('Guests query parameter is empty or not an array:', parsed);
+        return [{ firstName: firstName || 'Guest', lastName: lastName || 'User', type: 'adult', dob: '' }];
+      }
+      return parsed.map((guest: any) => ({
+        firstName: guest.firstName || '',
+        lastName: guest.lastName || '',
+        dob: guest.dob || '',
+        type: ['adult', 'child', 'infant'].includes(guest.type) ? guest.type : 'adult'
+      }));
+    } catch (error) {
+      console.error('Failed to parse guests:', error);
+      return [{ firstName: firstName || 'Guest', lastName: lastName || 'User', type: 'adult', dob: '' }];
+    }
+  })();
 
   // Calculate nights between check-in and check-out
   const nights = calculateNights(checkIn, checkOut);
@@ -85,10 +119,16 @@ function PaymentPageContent() {
     email,
     phone,
     userId,
+    hotelName,
+    ratePlanCode,
+    roomType,
     rooms,
     adults,
-    children
+    children,
+    infants,
+    guests
   };
+  console.log("Booking details:", JSON.stringify(bookingDetails, null, 2));
 
   // Initialize payment when payment method is selected
   const handleInitializePayment = async (option: string) => {
@@ -114,9 +154,6 @@ function PaymentPageContent() {
 
         setClientSecret(response.data.clientSecret);
       }
-
-      // We don't need to create a setup intent here for payAtHotel
-      // That will be handled by the PayAtHotelFunction component
 
       setPaymentOption(option);
     } catch (err: any) {
@@ -163,9 +200,9 @@ function PaymentPageContent() {
                   </div>
                   <div className="p-6">
                     <div className="flex flex-col md:flex-row md:justify-between gap-6">
-                      <div className="flex items-start space-x-3">
-                        <CalendarRange className="text-tripswift-blue flex-shrink-0" size={20} />
-                        <div>
+                      <div className={`flex  items-start `}>
+                        <CalendarRange className={`text-tripswift-blue flex-shrink-0`} size={20} />
+                        <div className={` ${i18n.language==="ar" ?"mr-3":"ml-3"}`}>
                           <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentPageContent.bookingSummary.stayDates')}</p>
                           <p className="font-tripswift-medium">
                             {formatDate(checkIn, { weekday: 'short', month: 'short', day: 'numeric' })} - {formatDate(checkOut, { weekday: 'short', month: 'short', day: 'numeric' })}
@@ -176,22 +213,22 @@ function PaymentPageContent() {
                         </div>
                       </div>
 
-                      <div className="flex items-start space-x-3">
+                      <div className="flex items-start ">
                         <Users className="text-tripswift-blue flex-shrink-0" size={20} />
-                        <div>
+                        <div className={` ${i18n.language==="ar" ?"mr-3":"ml-3"}`}>
                           <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentPageContent.bookingSummary.guests')}</p>
-                          <p className="font-tripswift-medium">
+                          <p className="font-tripswift-medium ">
                             {rooms} {rooms === 1 ? t('Payment.PaymentPageContent.bookingSummary.room') : t('Payment.PaymentPageContent.bookingSummary.rooms')} · {adults} {adults === 1 ? t('Payment.PaymentPageContent.bookingSummary.adult') : t('Payment.PaymentPageContent.bookingSummary.adults')}
-                            {children > 0 ? ` · ${children} ${children === 1 ? t('Payment.PaymentPageContent.bookingSummary.child') : t('Payment.PaymentPageContent.bookingSummary.children')}` : ''}
+                            {children > 0 ? ` · ${children} ${children === 1 ? t('Payment.PaymentPageContent.bookingSummary.child') : t('Payment.PaymentPageContent.bookingSummary.children')}` : ''} · {infants > 0 ? ` ${infants} ${infants === 1 ? t('Payment.PaymentPageContent.bookingSummary.infant') : t('Payment.PaymentPageContent.bookingSummary.infants')}` : ''}
                           </p>
                         </div>
                       </div>
 
-                      <div className="flex items-start space-x-3">
+                      <div className="flex items-start ">
                         <CheckCircle className="text-tripswift-blue flex-shrink-0" size={20} />
-                        <div>
+                        <div className={` ${i18n.language==="ar" ?"mr-3":"ml-3"}`}>
                           <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentPageContent.bookingSummary.guest')}</p>
-                          <p className="font-tripswift-medium">{firstName} {lastName}</p>
+                          <p className="font-tripswift-medium">{guests[0]?.firstName} {guests[0]?.lastName}</p>
                           <p className="text-sm text-tripswift-black/60 truncate max-w-[200px]">{email}</p>
                         </div>
                       </div>
@@ -247,7 +284,7 @@ function PaymentPageContent() {
                           <Elements
                             stripe={stripePromise}
                             options={{
-                              clientSecret, // This is required for payment mode
+                              clientSecret,
                               appearance: {
                                 theme: 'stripe',
                               },
@@ -276,7 +313,7 @@ function PaymentPageContent() {
                             stripe={stripePromise}
                             options={{
                               mode: 'setup',
-                              currency: currency, // Added currency here - this fixes the error
+                              currency: currency,
                               appearance: {
                                 theme: 'stripe',
                               },
@@ -303,7 +340,7 @@ function PaymentPageContent() {
                     </div>
                     <div className="p-6">
                       <div className="space-y-4">
-                        <div className="flex justify-between items-center">
+                        {/* <div className="flex justify-between items-center">
 
                           <div className="text-tripswift-black/70">{t('Payment.PaymentPageContent.priceDetails.roomRate')}</div>
                           <div className="font-tripswift-medium">{currency.toUpperCase()} {ratePerNight.toLocaleString()} {t('Payment.PaymentPageContent.priceDetails.perNight')}</div>
@@ -313,11 +350,11 @@ function PaymentPageContent() {
                         <div className="flex justify-between items-center">
                           <div className="text-tripswift-black/70">{nights} {nights === 1 ? t('Payment.PaymentPageContent.bookingSummary.night') : t('Payment.PaymentPageContent.bookingSummary.nights')}</div>
                           <div className="font-tripswift-medium">{currency.toUpperCase()} {ratePerNight.toLocaleString()} × {nights}</div>
-                        </div>
+                        </div> */}
 
                         <div className="border-t border-gray-200 my-4"></div>
                         <div className="flex justify-between items-center">
-                        <div className="font-tripswift-bold text-lg">{t('Payment.PaymentPageContent.priceDetails.total')}</div>
+                          <div className="font-tripswift-bold text-lg">{t('Payment.PaymentPageContent.priceDetails.total')}</div>
                           <div className="font-tripswift-bold text-xl text-tripswift-blue">
                             {currency.toUpperCase()} {amount.toLocaleString()}
                           </div>
@@ -326,7 +363,7 @@ function PaymentPageContent() {
                         {paymentOption === 'payAtHotel' && (
                           <div className="bg-blue-50 p-3 rounded-lg mt-4">
                             <div className="flex items-start">
-                              <Clock className="text-tripswift-blue flex-shrink-0 mt-0.5 mr-2" size={16} />
+                              <Clock className={`text-tripswift-blue flex-shrink-0 mt-0.5  ${i18n.language==="ar" ?"ml-2":"mr-2"}`} size={16} />
                               <p className="text-sm text-tripswift-black/70">
                                 {t('Payment.PaymentPageContent.priceDetails.payAtHotelInfo')}
                               </p>
@@ -339,15 +376,15 @@ function PaymentPageContent() {
                       <div className="mt-8 pt-4 border-t border-gray-200">
                         <div className="flex flex-col space-y-3">
                           <div className="flex items-center">
-                            <Shield className="h-5 w-5 text-green-600 mr-2" />
+                            <Shield className={`h-5 w-5 text-green-600 ${i18n.language==="ar" ?"ml-2":"mr-2"}`} />
                             <span className="text-sm text-tripswift-black/70">{t('Payment.PaymentPageContent.securityBadges.securePayments')}</span>
                           </div>
                           <div className="flex items-center">
-                            <CreditCard className="h-5 w-5 text-green-600 mr-2" />
+                            <CreditCard className={`h-5 w-5 text-green-600 ${i18n.language==="ar" ?"ml-2":"mr-2"}`} />
                             <span className="text-sm text-tripswift-black/70">{t('Payment.PaymentPageContent.securityBadges.noCardStorage')}</span>
                           </div>
                           <div className="flex items-center">
-                            <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                            <CheckCircle className={`h-5 w-5 text-green-600 ${i18n.language==="ar" ?"ml-2":"mr-2"}`} />
                             <span className="text-sm text-tripswift-black/70">{t('Payment.PaymentPageContent.securityBadges.freeCancellation')}</span>
                           </div>
                         </div>
@@ -383,7 +420,7 @@ function PaymentPageContent() {
 }
 
 export default function Home() {
-  const { t } = useTranslation(); // Initialize useTranslation hook
+  const { t } = useTranslation();
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8]">

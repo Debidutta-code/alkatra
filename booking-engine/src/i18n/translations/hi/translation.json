@@ -43,7 +43,7 @@
       "emailLabel": "ईमेल पता",
       "emailPlaceholder": "आप@example.com",
       "passwordLabel": "पासवर्ड",
-      "passwordHelp": "पासवर्ड में कम से कम 8 कैरेक्टर होने चाहिए, जिसमें एक अपरकेस लेटर, एक स्पेशल कैरेक्टर और तीन नंबर शामिल हों।",
+      "passwordHelp": "पासवर्ड में कम से कम 8 कैरेक्टर होने चाहिए जिसमें एक अपरकेस लेटर, एक लोअरकेस लेटर, एक नंबर और एक स्पेशल कैरेक्टर शामिल हो।",
       "createAccountButton": "खाता बनाएं",
       "alreadyHaveAccount": "क्या आपके पास पहले से ही खाता है?",
       "signIn": "साइन इन करें",
@@ -158,6 +158,39 @@
     "subscribeButton": "सदस्यता लें",
     "copyright": "{year} ट्रिपस्विफ्ट - सर्वाधिकार सुरक्षित"
   },
+  "Profile": {
+    "editProfile": "प्रोफ़ाइल संपादित करें",
+    "signOut": "साइन आउट",
+    "overview": "अवलोकन",
+    "myTrips": "मेरी यात्राएँ",
+    "preferences": "प्राथमिकताएँ",
+    "security": "सुरक्षा",
+    "notifications": "सूचनाएँ",
+    "helpCenter": "सहायता केंद्र",
+    "tripsCompleted": "यात्राएँ पूरी कीं",
+    "sinceJoining": "शामिल होने के बाद से",
+    "averageRating": "औसत रेटिंग",
+    "fromHosts": "होस्ट्स से",
+    "savedPlaces": "सहेजे गए स्थान",
+    "wishlisted": "विशलिस्ट में",
+    "quickActions": "त्वरित कार्य",
+    "bookTrip": "यात्रा बुक करें",
+    "savedPlacesAction": "सहेजे गए स्थान",
+    "rewards": "पुरस्कार",
+    "deals": "डील्स",
+    "securitySettings": "सुरक्षा सेटिंग्स",
+    "changePassword": "पासवर्ड बदलें",
+    "updatePassword": "अपना पासवर्ड अपडेट करें",
+    "twoFactorAuth": "दो-कारक प्रमाणीकरण",
+    "twoFactorDesc": "अपने खाते में अतिरिक्त सुरक्षा परत जोड़ें",
+    "enable2FA": "2FA सक्षम करें",
+    "profileUpdatedSuccess": "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई",
+    "profileUpdateFailed": "प्रोफ़ाइल अपडेट करने में विफल",
+    "contentComingSoon": "{{tab}} के लिए सामग्री जल्द ही उपलब्ध होगी...",
+    "newPasswordOptional": "नया पासवर्ड (वैकल्पिक)",
+    "confirmNewPassword": "नए पासवर्ड की पुष्टि करें",
+    "joined": "{{date}} को शामिल हुए"
+  },
   "HotelCard": {
     "heroTitle": "अपनी यात्रा के लिए सही ठहरने की जगह खोजें",
     "heroSubtitle": "विशेष कीमतों पर शानदार आवास खोजें",
@@ -169,7 +202,8 @@
     "errorSelectDates": "कृपया चेक-इन और चेक-आउट दोनों तारीखें चुनें।",
     "exclusiveOffers": "विशेष ऑफर उपलब्ध",
     "freeCancellation": "मुफ्त रद्दीकरण",
-    "bestPriceGuarantee": "सर्वोत्तम मूल्य की गारंटी"
+    "bestPriceGuarantee": "सर्वोत्तम मूल्य की गारंटी",
+    "downloadourapp": " हमारा ऐप डाउनलोड करें"
   },
   "HotelListing": {
     "CompactSearchBar": {
@@ -317,34 +351,11 @@
       }
     },
     "ExploreDestinations": {
-      "title": "गंतव्य स्थान देखें",
-      "exploreNow": "अभी एक्सप्लोर करें",
-      "destinations": {
-        "maldives": {
-          "name": "मालदीव",
-          "category": "समुद्र तटीय स्वर्ग"
-        },
-        "swissAlps": {
-          "name": "स्विस आल्प्स",
-          "category": "साहसिक"
-        },
-        "santorini": {
-          "name": "सैंटोरिनी",
-          "category": "रोमांटिक गेटअवे"
-        },
-        "dubai": {
-          "name": "दुबई",
-          "category": "लक्जरी"
-        },
-        "bali": {
-          "name": "बाली",
-          "category": "सांस्कृतिक"
-        },
-        "tokyo": {
-          "name": "टोक्यो",
-          "category": "शहरी जीवन"
-        }
-      }
+      "title": "गंतव्यों की खोज करें",
+      "descriptionTemplate": "{{city}} में होटल खोजें",
+      "imageAlt": "{{name}} गंतव्य",
+      "goToGroup": "समूह {{count}} पर जाएँ",
+      "exploreNow": "अभी खोजें"
     }
   },
   "RoomsPage": {
@@ -354,6 +365,9 @@
     "aboutThisProperty": "इस संपत्ति के बारे में",
     "noImagesAvailable": "कोई छवि उपलब्ध नहीं है",
     "propertyAmenities": "संपत्ति की सुविधाएँ",
+    "nights": "रात",
+    "nightsPlural": "रातें",
+    "stay":"प्रवास",
     "amenitiesList": {
       "wifi": "मुफ्त वाईफाई",
       "swimming_pool": "स्विमिंग पूल",
@@ -472,48 +486,52 @@
     "GuestInformationModal": {
       "completeYourBooking": "अपनी बुकिंग पूरी करें",
       "guestDetailsStep": "अतिथि विवरण",
-      "reviewAndPayStep": "समीक्षा और भुगतान",
-      "roomSummary": "कमरा सारांश",
+      "reviewAndPayStep": "समीक्षा एवं भुगतान",
+      "roomSummary": "कक्ष सारांश",
       "roomType": "कमरे का प्रकार",
-      "checkIn": "चेक-इन",
-      "checkOut": "चेक-आउट",
+      "checkIn": "चेक‑इन",
+      "checkOut": "चेक‑आउट",
       "nights": "रात",
       "nightsPlural": "रातें",
       "guestInformation": "अतिथि जानकारी",
-      "firstNameLabel": "पहला नाम",
-      "firstNamePlaceholder": "अपना पहला नाम दर्ज करें",
-      "firstNameError": "पहला नाम आवश्यक है और इसमें केवल अक्षर और रिक्त स्थान होने चाहिए।",
+      "firstNameLabel": "प्रथम नाम",
+      "firstNamePlaceholder": "अपना प्रथम नाम दर्ज करें",
+      "firstNameError": "प्रथम नाम आवश्यक है",
       "lastNameLabel": "अंतिम नाम",
       "lastNamePlaceholder": "अपना अंतिम नाम दर्ज करें",
-      "lastNameError": "अंतिम नाम आवश्यक है और इसमें केवल अक्षर और रिक्त स्थान होने चाहिए।",
-      "emailLabel": "ईमेल पता",
-      "emailPlaceholder": "your.email@example.com",
-      "emailInfo": "आपकी बुकिंग की पुष्टि इस ईमेल पते पर भेजी जाएगी",
-      "emailError": "कृपया एक मान्य ईमेल पता दर्ज करें।",
-      "phoneLabel": "फोन नंबर",
-      "phonePlaceholder": "फोन नंबर दर्ज करें",
-      "phoneInfo": "बुकिंग से संबंधित सूचनाओं के लिए",
-      "phoneError": "फोन नंबर आवश्यक है",
+      "lastNameError": "अंतिम नाम आवश्यक है",
+      "emailLabel": "ई‑मेल पता",
+      "emailPlaceholder": "आपका.ईमेल@उदाहरण.com",
+      "emailInfo": "यह ई‑मेल आपकी बुकिंग की पुष्टि भेजने के लिए प्रयोग की जाएगी",
+      "emailError": "ईमेल आवश्यक है।",
+      "emailInvalidError": "कृपया एक मान्य ईमेल पता दर्ज करें।",
+      "phoneLabel": "फ़ोन नंबर",
+      "phonePlaceholder": "फ़ोन नंबर दर्ज करें",
+      "phoneInfo": "बुकिंग संबंधी सूचनाओं के लिए",
+      "phoneError": "फ़ोन नंबर आवश्यक है",
+      "phoneLengthError": "भारत के लिए फ़ोन नंबर ठीक 10 अंकों का होना चाहिए।",
       "guestDetailsSection": "अतिथि विवरण",
       "roomSingular": "कमरा",
       "roomsPlural": "कमरे",
       "adultSingular": "वयस्क",
-      "adultsPlural": "वयस्क",
-      "childSingular": "बच्चा",
+      "adultsPlural": "वयस्कों",
+      "childSingular": "बालक",
       "childrenPlural": "बच्चे",
-      "guestDisplayFormat": "कमरे और अतिथि",
+      "infantSingular": "शिशु",
+      "infantsPlural": "शिशुओं",
+      "guestDisplayFormat": "कक्ष और अतिथि",
       "childrenPartFormat": "बच्चे",
       "informationVerified": "जानकारी सफलतापूर्वक सत्यापित!",
-      "propertyInfoMissing": "प्रॉपर्टी जानकारी अनुपस्थित है। कृपया पुनः प्रयास करें।",
+      "propertyInfoMissing": "संपत्ति जानकारी गायब है। कृपया पुनः प्रयास करें।",
       "bookingSummary": "बुकिंग सारांश",
-      "stayDetails": "ठहरने का विवरण",
+      "stayDetails": "रहने का विवरण",
       "primaryGuest": "प्राथमिक अतिथि",
       "priceDetails": "मूल्य विवरण",
-      "roomRate": "कमरे की दर",
+      "roomRate": "कमरे का दर",
       "totalAmount": "कुल राशि",
       "paymentNoticeTitle": "भुगतान सुरक्षित रूप से संसाधित किया जाएगा",
-      "paymentNoticeDescription": "आगे बढ़ने से, आप हमारी शर्तों और गोपनीयता नीति से सहमत होते हैं।",
-      "backToDetails": "विवरण पर वापस",
+      "paymentNoticeDescription": "आगे बढ़ने पर आप हमारी नियम और शर्तें एवं गोपनीयता नीति से सहमत होते हैं।",
+      "backToDetails": "विवरण पर वापस जाएं",
       "cancel": "रद्द करें",
       "continueToReview": "समीक्षा के लिए जारी रखें",
       "proceedToPayment": "भुगतान के लिए आगे बढ़ें"
@@ -770,6 +788,8 @@
         "adults": "वयस्क",
         "child": "बच्चा",
         "children": "बच्चे",
+        "infant": "शिशु",
+        "infants": " शिशुओं",
         "guest": "अतिथि"
       },
       "paymentMethod": {

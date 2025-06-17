@@ -390,4 +390,26 @@ header p {
   border: none;
   box-shadow: none;
 }
+/* This sets overall RTL direction */
+[dir="rtl"] .PhoneInput {
+  direction: rtl;
+}
 
+/* This aligns text to the right inside the input */
+[dir="rtl"] .PhoneInputInput {
+  text-align: right;
+}
+
+/* Optional: shift flag spacing */
+[dir="rtl"] .PhoneInputCountry {
+  margin-left: 1rem;
+}
+
+.PhoneInput {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem; /* Adjust spacing */
+}
+[dir="rtl"] .PhoneInputCountrySelectArrow{
+  margin-right: 8px;
+}

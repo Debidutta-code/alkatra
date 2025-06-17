@@ -4,7 +4,7 @@ import { Button } from "../../../components/ui/button";
 import { CardTitle } from "../../../components/ui/card";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
-import { ReloadIcon } from "@radix-ui/react-icons/";
+import { ReloadIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
@@ -12,17 +12,14 @@ import { AtSign, Eye, EyeOff, Lock, User } from "lucide-react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Button as NextUIButton,
-} from "@nextui-org/react";
+import { Button as NextUIButton } from "@nextui-org/react";
 import axios from "axios";
 
-type Props = {};
 const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
 
 const registerSchema = z.object({
-  firstName: z.string().min(1, "First Name is required"),
-  lastName: z.string().min(1, "Last Name is required"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
   email: z
     .string()
     .min(1, "Email is required")
@@ -32,7 +29,7 @@ const registerSchema = z.object({
     .min(1, "Password is required")
     .regex(
       /^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*\d.*\d.*\d).{8,}$/,
-      "Password must contain at least 8 characters including one uppercase letter, one lower case letter, one number and one special character."
+      "Password must contain at least 8 characters including one uppercase letter, one lower case letter, one number and one special character"
     ),
 });
 
@@ -43,9 +40,8 @@ type Inputs = {
   password: string;
 };
 
-export default function RegisterForm({ }: Props) {
-  const [isVisible, setIsVisible] = React.useState(false);
-  const [formSubmitted, setFormSubmitted] = useState(false);
+export default function RegisterForm() {
+  const [isVisible, setIsVisible] = useState(false);
   const router = useRouter();
 
   const form = useForm<Inputs>({
@@ -56,141 +52,176 @@ export default function RegisterForm({ }: Props) {
       password: "",
     },
     resolver: zodResolver(registerSchema),
-    mode: "onSubmit" // Only validate on submit
+    mode: "onChange" // Validate on change for better UX
   });
 
   const { register, handleSubmit, formState } = form;
-  const { errors, isSubmitting } = formState;
+  const { errors, isSubmitting, isValid } = formState;
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
       await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/register`,
-        {
-          ...data,
-        }
+        data
       );
       toast.success("Registration successful!");
       router.push("/login");
     } catch (err: any) {
-      console.log("Axios Error - ", err.response?.data?.message);
-      if (axios.isAxiosError(err)) {
-        toast.error(err.response?.data?.message);
-      }
-      return;
+      const errorMsg = err.response?.data?.err?.errors[0]?.detail|| "Registration failed";
+      toast.error(errorMsg);
     }
   };
 
-  const handleFormSubmit = () => {
-    setFormSubmitted(true);
-    handleSubmit(onSubmit)();
-  };
-
   return (
-    <div className="w-[500px]">
-      <div className="mb-10">
-        <CardTitle className="text-5xl">
-          Register | <span className="font-normal text-xl">TripSwift</span>
+    <div className="w-full max-w-md space-y-6 sm:p-8 bg-card rounded-xl shadow-lg border border-border">
+      <div className="text-center space-y-2">
+        <CardTitle className="text-3xl font-bold text-foreground">
+          Create Your Account
         </CardTitle>
+        <p className="text-muted-foreground">
+          Join TripSwift to manage your properties
+        </p>
       </div>
-      <form onSubmit={(e) => { e.preventDefault(); handleFormSubmit(); }} className="flex flex-col">
-        <div className="mb-10 space-y-4">
-          <div>
-            <Label htmlFor="firstName">First Name</Label>
-            <Input
-              withIcon
-              startIcon={<User size={20} />}
-              size={"lg"}
-              type="text"
-              variant={formSubmitted && errors.firstName ? "error" : undefined}
-              {...register("firstName")}
-            />
-            {formSubmitted && errors.firstName && (
-              <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="firstName" className="text-sm font-medium">
+              First Name
+            </Label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <User className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <Input
+                id="firstName"
+                placeholder="John"
+                className="pl-10"
+                {...register("firstName")}
+                variant={errors.firstName ? "error" : undefined}
+              />
+            </div>
+            {errors.firstName && (
+              <p className="text-sm text-destructive">{errors.firstName.message}</p>
             )}
           </div>
-          <div>
-            <Label htmlFor="lastName">Last Name</Label>
-            <Input
-              withIcon
-              startIcon={<User size={20} />}
-              size={"lg"}
-              variant={formSubmitted && errors.lastName ? "error" : undefined}
-              {...register("lastName")}
-              type="text"
-            />
-            {formSubmitted && errors.lastName && (
-              <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              withIcon
-              startIcon={<AtSign size={20} />}
-              size={"lg"}
-              {...register("email")}
-              variant={formSubmitted && errors.email ? "error" : undefined}
-              type="email"
-            />
-            {formSubmitted && errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <Input
-              {...register("password")}
-              withIcon
-              startIcon={<Lock size={20} />}
-              variant={formSubmitted && errors.password ? "error" : undefined}
-              endIcon={
-                <Button
-                  variant={"ghost"}
-                  onClick={() => setIsVisible((prev) => !prev)}
-                  className="px-0 py-0 hover:bg-transparent"
-                  type="button"
-                >
-                  {isVisible ? <Eye size={20} /> : <EyeOff size={20} />}
-                </Button>
-              }
-              size={"lg"}
-              type={isVisible ? "text" : "password"}
-            />
-            {formSubmitted && errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+
+          <div className="space-y-2">
+            <Label htmlFor="lastName" className="text-sm font-medium">
+              Last Name
+            </Label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <User className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <Input
+                id="lastName"
+                placeholder="Doe"
+                className="pl-10"
+                {...register("lastName")}
+                variant={errors.lastName ? "error" : undefined}
+              />
+            </div>
+            {errors.lastName && (
+              <p className="text-sm text-destructive">{errors.lastName.message}</p>
             )}
           </div>
         </div>
-        <div className="flex flex-col items-center">
-          <span>
-            Already have an account?{" "}
-            <Button
-              type="button"
-              className="px-0"
-              onClick={() => router.push("/login")}
-              variant={"link"}
-            >
-              Login
-            </Button>
-          </span>
-          <SubmitButton loading={isSubmitting} />
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-medium">
+              Email
+            </Label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <AtSign className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <Input
+                id="email"
+                placeholder="your@gmail.com"
+                className="pl-10"
+                {...register("email")}
+                variant={errors.email ? "error" : undefined}
+              />
+            </div>
+            {errors.email && (
+              <p className="text-sm text-destructive">{errors.email.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-sm font-medium">
+              Password
+            </Label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <Input
+                id="password"
+                placeholder="••••••••"
+                className="pl-10 pr-10"
+                {...register("password")}
+                type={isVisible ? "text" : "password"}
+                variant={errors.password ? "error" : undefined}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                onClick={() => setIsVisible(!isVisible)}
+              >
+                {isVisible ? (
+                  <EyeOff className="h-5 w-5 text-muted-foreground" />
+                ) : (
+                  <Eye className="h-5 w-5 text-muted-foreground" />
+                )}
+                <span className="sr-only">
+                  {isVisible ? "Hide password" : "Show password"}
+                </span>
+              </Button>
+            </div>
+            {errors.password && (
+              <p className="text-sm text-destructive">{errors.password.message}</p>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-4 pt-2">
+          <NextUIButton
+            type="submit"
+            size="lg"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+            isLoading={isSubmitting}
+            isDisabled={!isValid || isSubmitting}
+          >
+            {isSubmitting && <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />}
+            Create Account
+          </NextUIButton>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">
+                Already have an account?
+              </span>
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={() => router.push("/login")}
+          >
+            Sign In
+          </Button>
         </div>
       </form>
     </div>
-  );
-}
-
-function SubmitButton({ loading }: { loading: boolean }) {
-  return (
-    <NextUIButton
-      size="lg"
-      type="submit"
-      variant="solid"
-      className="bg-primary text-primary-foreground hover:bg-primary/90 w-full"
-    >
-      {loading && <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />}
-      Register
-    </NextUIButton>
   );
 }

@@ -31,7 +31,6 @@ const MapRatePlanPage: React.FC = () => {
   const [modifiedValues, setModifiedValues] = useState<{[key: string]: any}>({});
   const [originalData, setOriginalData] = useState<RatePlanInterFace[]>([]);
 
-  // Load room types once on component mount
   useEffect(() => {
     const fetchRoomTypes = async () => {
       try {
@@ -42,21 +41,30 @@ const MapRatePlanPage: React.FC = () => {
         }
       } catch (error) {
         console.error('Error fetching room types:', error);
-        setRoomTypesLoaded(true); // Set to true even on error to prevent infinite loading
+        setRoomTypesLoaded(true);
       }
     };
 
     fetchRoomTypes();
   }, []);
 
-  // Load rate plans data
   const fetchRatePlans = async () => {
     try {
+      setIsLoading(true);
       const response = await ratePlanServices("WINCLOUD", currentPage, selectedRoomType, dateRange?.from, dateRange?.to);
+      
       setData(response.data);
-      setOriginalData([...response.data]); // Keep a copy of original data
+      setOriginalData([...response.data]);
+      
+      setEditingRows(new Set());
+      setEditButtonClicked(false);
+      setModifiedValues({});
+      
     } catch (error) {
       console.error('Error fetching rate plans:', error);
+      toast.error('Failed to fetch rate plans data');
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -136,26 +144,26 @@ const MapRatePlanPage: React.FC = () => {
   };
 
   const handleSave = async () => {
-    setIsLoading(true);
-    console.log(editingRows)
     try {
       // Only save the rows that were being edited
       const rowsToSave = data.filter((_, index) => editingRows.has(index));
       
       if (rowsToSave.length > 0) {
+        // Save the data
         await saveData(rowsToSave);
-        setEditingRows(new Set());
-        setEditButtonClicked(false);
-        setModifiedValues({});
+        
+        // Show success message
         toast.success(`Successfully saved ${rowsToSave.length} row(s)!`);
+        
+        // Fetch fresh data from server to reload UI
+        await fetchRatePlans();
+        
       } else {
-        // toast.info('No changes to save');
+        toast.error('No changes to save');
       }
     } catch (error) {
       toast.error('Failed to save data');
       console.error('Save error:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -218,11 +226,7 @@ const MapRatePlanPage: React.FC = () => {
         )}
         
         <div className="flex justify-end items-center mt-4">
-          
-          
           <div className="flex items-center space-x-2">
-            
-            
             <SaveButton
               isLoading={isLoading}
               editingRows={editingRows}

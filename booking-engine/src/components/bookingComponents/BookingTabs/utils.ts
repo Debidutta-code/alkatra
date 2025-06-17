@@ -45,16 +45,17 @@ export const getStatusClass = (status: string): string => {
   }
 };
 
-export const getStatusIcon = (status: string): JSX.Element => {
+export const getStatusIcon = (status: string , lang : string ="eg"): JSX.Element => {
+      const directionClass = lang === "ar" ? "ml-1.5" : "mr-1.5";
     switch (status) {
       case "Confirmed":
-        return React.createElement(FaRegCalendarCheck, { className: "mr-1.5 text-green-600" });
+        return React.createElement(FaRegCalendarCheck, { className: ` text-green-600 ${directionClass}` });
       case "Pending":
-        return React.createElement(FaRegClock, { className: "mr-1.5 text-yellow-600" });
+        return React.createElement(FaRegClock, { className: ` text-yellow-600 ${directionClass}` });
       case "Cancelled":
-        return React.createElement(FaRegTimesCircle, { className: "mr-1.5 text-red-600" });
+        return React.createElement(FaRegTimesCircle, { className: ` text-red-600 ${directionClass}` });
       default:
-        return React.createElement(FaRegCalendarAlt, { className: "mr-1.5 text-gray-600" });
+        return React.createElement(FaRegCalendarAlt, { className: ` text-gray-600 ${directionClass}` });
     }
 };
 
@@ -73,72 +74,73 @@ export const getRoomTypeStyle = (roomType: string = ""): string => {
 };
 
 // Added the missing getRoomTypeIcon function
-export const getRoomTypeIcon = (roomType: string = ""): JSX.Element => {
+export const getRoomTypeIcon = (roomType: string = "", lang: string = "en"): JSX.Element => {
   const type = roomType?.toLowerCase() || "";
-  
+    const directionClass = lang === "ar" ? "ml-1.5" : "mr-1.5";
+
   if (type.includes("deluxe") || type.includes("premium")) {
-    return React.createElement(FaConciergeBell, { className: "mr-1.5 text-tripswift-blue" });
+    return React.createElement(FaConciergeBell, { className: ` text-tripswift-blue ${directionClass}`});
   } else if (type.includes("suite")) {
-    return React.createElement(FaStar, { className: "mr-1.5 text-tripswift-blue" });
+    return React.createElement(FaStar, { className:  ` text-tripswift-blue ${directionClass}` });
   } else {
-    return React.createElement(FaBed, { className: "mr-1.5 text-tripswift-blue" });
+    return React.createElement(FaBed, { className:  ` text-tripswift-blue ${directionClass}` });
   }
 };
 
-export const getPaymentMethodText = (booking: Booking): string => {
-  if (booking.payment === "payAtHotel" || booking.paymentType === "payAtHotel") {
-    return "Pay at Hotel";
-  }
-  if (booking.payment === "CREDIT_CARD" || booking.payment === "card") {
-    return "Credit Card (Prepaid)";
-  }
-  if (booking.payment === "cash") {
-    return "Cash";
-  }
-  if (booking.payment === "payNow") {
-    return "Paid Online";
-  }
-  if (booking.payment === "other") {
-    return "Other Payment Method";
-  }
+// export const getPaymentMethodText = (booking: Booking): string => {
+//   if (booking.payment === "payAtHotel" || booking.paymentType === "payAtHotel") {
+//     return "Pay at Hotel";
+//   }
+//   if (booking.payment === "CREDIT_CARD" || booking.payment === "card") {
+//     return "Credit Card (Prepaid)";
+//   }
+//   if (booking.payment === "cash") {
+//     return "Cash";
+//   }
+//   if (booking.payment === "payNow") {
+//     return "Paid Online";
+//   }
+//   if (booking.payment === "other") {
+//     return "Other Payment Method";
+//   }
   
-  if (booking.payment) {
-    const formatted = booking.payment
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/_/g, ' ')
-      .replace(/^\w/, c => c.toUpperCase());
-    return formatted;
-  }
+//   if (booking.payment) {
+//     const formatted = booking.payment
+//       .replace(/([A-Z])/g, ' $1')
+//       .replace(/_/g, ' ')
+//       .replace(/^\w/, c => c.toUpperCase());
+//     return formatted;
+//   }
   
-  if (booking.paymentType) {
-    const formatted = booking.paymentType
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/_/g, ' ')
-      .replace(/^\w/, c => c.toUpperCase());
-    return formatted;
-  }
+//   if (booking.paymentType) {
+//     const formatted = booking.paymentType
+//       .replace(/([A-Z])/g, ' $1')
+//       .replace(/_/g, ' ')
+//       .replace(/^\w/, c => c.toUpperCase());
+//     return formatted;
+//   }
   
-  return "Payment Method Not Specified";
-};
+//   return "Payment Method Not Specified";
+// };
 
-export const getPaymentMethodIcon = (booking: Booking): JSX.Element => {
-  if (booking.payment === "payAtHotel" || booking.paymentType === "payAtHotel") {
-    return React.createElement(FaMoneyBillWave, { className: "mr-1.5" });
-  }
+// export const getPaymentMethodIcon = (booking: Booking): JSX.Element => {
+//   if (booking.payment === "payAtHotel" || booking.paymentType === "payAtHotel") {
+//     return React.createElement(FaMoneyBillWave, { className: "mr-1.5" });
+//   }
   
-  if (booking.payment === "CREDIT_CARD" || booking.payment === "card" || booking.payment === "payNow") {
-    return React.createElement(FaCreditCard, { className: "mr-1.5" });
-  }
+//   if (booking.payment === "CREDIT_CARD" || booking.payment === "card" || booking.payment === "payNow") {
+//     return React.createElement(FaCreditCard, { className: "mr-1.5" });
+//   }
   
-  return React.createElement(FaCreditCard, { className: "mr-1.5" });
-};
+//   return React.createElement(FaCreditCard, { className: "mr-1.5" });
+// };
 
-export const getBookingId = (booking: Booking): string => {
-  if (booking.bookingId) return booking.bookingId;
+// export const getBookingId = (booking: Booking): string => {
+//   if (booking.bookingId) return booking.bookingId;
   
-  const id = booking._id || "";
-  if (id.length >= 8) {
-    return `${id.substring(0, 4)}...${id.substring(id.length - 4)}`.toUpperCase();
-  }
-  return (id).toUpperCase();
-};
+//   const id = booking._id || "";
+//   if (id.length >= 8) {
+//     return `${id.substring(0, 4)}...${id.substring(id.length - 4)}`.toUpperCase();
+//   }
+//   return (id).toUpperCase();
+// };

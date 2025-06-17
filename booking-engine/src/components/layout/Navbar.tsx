@@ -52,7 +52,9 @@ const Navbar: React.FC = () => {
 
   const user = useSelector((state: RootState) => state.auth.user);
   const accessToken = Cookies.get('accessToken');
-
+  const {i18n} = useTranslation();
+  // console.log("access token",accessToken);
+  
   // Define handleScroll at the component top level
   const handleScroll = useCallback(() => {
     if (window.scrollY > 10) {
@@ -89,8 +91,28 @@ const Navbar: React.FC = () => {
   };
 
   useEffect(() => {
+    const persistedAccessToken = localStorage.getItem('persist:root')
+      ? JSON.parse(localStorage.getItem('persist:root') || '{}').auth
+      : null;
+
+    let persistedToken = null;
+    if (persistedAccessToken) {
+      try {
+        persistedToken = JSON.parse(persistedAccessToken).accessToken;
+      } catch {
+        persistedToken = null;
+      }
+    }
+
     if (accessToken) {
-      dispatch(getUser() as any);
+      if (persistedToken !== accessToken) {
+        // If persisted token and cookie token mismatch, logout
+        dispatch(logout() as any);
+      } else {
+        dispatch(getUser() as any);
+      }
+    } else {
+      dispatch(logout() as any);
     }
   }, [dispatch, accessToken]);
 
@@ -171,7 +193,7 @@ const Navbar: React.FC = () => {
             onClick={() => (window.location.href = process.env.NEXT_PUBLIC_EXTRANET_URL || '')}
             className="flex items-center cursor-pointer px-3 py-2 rounded-full text-tripswift-black hover:text-tripswift-blue hover:bg-tripswift-blue/5 text-[15px] leading-[20px] tracking-tight font-tripswift-medium transition-all duration-300"
           >
-            <Globe size={16} className="mr-2 text-tripswift-blue" />
+            <Globe size={16} className={` text-tripswift-blue ${i18n.language ==="ar"?"ml-2":"mr-2"}`} />
             <span>{t('Navbar.becomeHost')}</span>
           </div>
 
@@ -180,7 +202,7 @@ const Navbar: React.FC = () => {
             onClick={handleMyTripClick}
             className="flex items-center cursor-pointer px-3 py-2 rounded-full text-tripswift-black hover:text-tripswift-blue hover:bg-tripswift-blue/5 text-[15px] leading-[20px] tracking-tight font-tripswift-medium transition-all duration-300"
           >
-            <Image src={MTrip} width={16} height={16} alt={t('Navbar.myTrip')} className="mr-2" />
+            <Image src={MTrip} width={16} height={16} alt={t('Navbar.myTrip')} className={` text-tripswift-blue ${i18n.language ==="ar"?"ml-2":"mr-2"}`} />
             <span>{t('Navbar.myTrip')}</span>
           </div>
 
