@@ -1060,7 +1060,7 @@ export const getBookingDetailsOfUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.params.id;
-      const { startDate, endDate, guestName } = req.query;
+      const { filterData, startDate, endDate, guestName } = req.query;
       const page = req.query.page ? parseInt(req.query.page as string) : 1;
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
       const skip = (page - 1) * limit;
@@ -1069,6 +1069,7 @@ export const getBookingDetailsOfUser = CatchAsyncError(
         userId,
       };
 
+      // Date filtering
       if (startDate || endDate) {
         if (!startDate || !endDate) {
           return res.status(400).json({
@@ -1083,12 +1084,46 @@ export const getBookingDetailsOfUser = CatchAsyncError(
         };
       }
 
+      // Guest name filtering
       if (guestName) {
         matchCriteria.guestDetails = {
           $elemMatch: {
             firstName: { $regex: guestName as string, $options: "i" },
           },
         };
+      }
+
+      // Status filtering based on filterData
+      if (filterData && filterData !== 'null' && filterData !== '') {
+        const validFilters = ['upcoming', 'completed', 'cancelled'];
+        if (!validFilters.includes(filterData as string)) {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid filterData. Must be one of: upcoming, completed, cancelled",
+          });
+        }
+
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0); // Normalize to start of day
+
+        if (filterData === 'upcoming') {
+          matchCriteria.checkInDate = {
+            ...matchCriteria.checkInDate,
+            $gt: currentDate,
+          };
+          matchCriteria.status = { $ne: 'Cancelled' };
+        } else if (filterData === 'completed') {
+          matchCriteria.checkInDate = {
+            ...matchCriteria.checkInDate,
+            $lte: currentDate,
+          };
+          matchCriteria.status = { $in: ['Confirmed', 'Pending'] };
+        } else if (filterData === 'cancelled') {
+          matchCriteria.status = 'Cancelled';
+        }
+      } else {
+        // If filterData is not provided, null, or empty, return all bookings for the user
+        // Only userId and optional startDate/endDate/guestName filters will apply
       }
 
       const totalBookings = await ThirdPartyBooking.countDocuments(matchCriteria);
