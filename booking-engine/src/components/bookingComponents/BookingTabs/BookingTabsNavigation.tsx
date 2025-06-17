@@ -10,7 +10,7 @@ interface BookingTabsNavigationProps {
 }
 
 const BookingTabsNavigation: React.FC<BookingTabsNavigationProps> = ({ activeTab, setActiveTab }) => {
-  const { t } = useTranslation(); // Initialize useTranslation
+  const { t ,i18n } = useTranslation(); // Initialize useTranslation
 
   return (
     <div className="bg-tripswift-off-white rounded-xl shadow-md mb-6 overflow-hidden font-noto-sans">
@@ -23,7 +23,7 @@ const BookingTabsNavigation: React.FC<BookingTabsNavigationProps> = ({ activeTab
           onClick={() => setActiveTab('all')}
         >
           <span className="flex items-center justify-center">
-            <FaTicketAlt className="mr-2 h-4 w-4" />
+            <FaTicketAlt className={` h-4 w-4 ${i18n.language === "ar" ?"ml-2":"mr-2"}`} />
             {t('BookingTabs.BookingTabsNavigation.allBookings')} {/* Translated text */}
           </span>
         </button>
@@ -35,7 +35,7 @@ const BookingTabsNavigation: React.FC<BookingTabsNavigationProps> = ({ activeTab
           onClick={() => setActiveTab('upcoming')}
         >
           <span className="flex items-center justify-center">
-            <FaRegCalendarCheck className="mr-2 h-4 w-4" />
+            <FaRegCalendarCheck className={` h-4 w-4 ${i18n.language === "ar" ?"ml-2":"mr-2"}`} />
             {t('BookingTabs.BookingTabsNavigation.upcoming')} {/* Translated text */}
           </span>
         </button>
@@ -47,7 +47,7 @@ const BookingTabsNavigation: React.FC<BookingTabsNavigationProps> = ({ activeTab
           onClick={() => setActiveTab('completed')}
         >
           <span className="flex items-center justify-center">
-            <FaHistory className="mr-2 h-4 w-4" />
+            <FaHistory className={` h-4 w-4 ${i18n.language === "ar" ?"ml-2":"mr-2"}`} />
             {t('BookingTabs.BookingTabsNavigation.completed')} {/* Translated text */}
           </span>
         </button>
@@ -59,7 +59,7 @@ const BookingTabsNavigation: React.FC<BookingTabsNavigationProps> = ({ activeTab
           onClick={() => setActiveTab('cancelled')}
         >
           <span className="flex items-center justify-center">
-            <FaRegTimesCircle className="mr-2 h-4 w-4" />
+            <FaRegTimesCircle className={` h-4 w-4 ${i18n.language === "ar" ?"ml-2":"mr-2"}`} />
             {t('BookingTabs.BookingTabsNavigation.cancelled')} {/* Translated text */}
           </span>
         </button>

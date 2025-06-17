@@ -4,14 +4,35 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import { RoomCard } from "@/components/AppComponent/RoomCard";
-import GuestInformationModal, { Guest } from "@/components/bookingComponents/GuestInformationModal";
+import GuestInformationModal, {
+  Guest,
+} from "@/components/bookingComponents/GuestInformationModal";
 import { useDispatch, useSelector } from "@/Redux/store";
 import { setAmount, setRoomId } from "@/Redux/slices/pmsHotelCard.slice";
 import { setGuestDetails } from "@/Redux/slices/hotelcard.slice";
 import {
-  Calendar, Search, Bed, ChevronRight, ChevronLeft, ChevronDown,
-  MapPin, Star, Coffee, Wifi, Car, Waves, Droplets, Briefcase, Utensils, BellRing, CheckCircle,
-  Bath, Dog, ImageIcon, Users, Filter
+  Calendar,
+  Search,
+  Bed,
+  ChevronRight,
+  ChevronLeft,
+  ChevronDown,
+  MapPin,
+  Star,
+  Coffee,
+  Wifi,
+  Car,
+  Waves,
+  Droplets,
+  Briefcase,
+  Utensils,
+  BellRing,
+  CheckCircle,
+  Bath,
+  Dog,
+  ImageIcon,
+  Users,
+  Filter,
 } from "lucide-react";
 
 import LoadingSkeleton from "../hotelListingComponents/LoadingSkeleton";
@@ -46,14 +67,16 @@ interface RoomResponse {
 interface PropertyDetails {
   _id?: string;
   property_name: string;
-  property_address: string | {
-    address_line_1?: string;
-    address_line_2?: string;
-    city?: string;
-    state?: string;
-    country?: string;
-    zip_code?: number;
-  };
+  property_address:
+    | string
+    | {
+        address_line_1?: string;
+        address_line_2?: string;
+        city?: string;
+        state?: string;
+        country?: string;
+        zip_code?: number;
+      };
   star_rating: number | string;
   image?: string[];
   description?: string;
@@ -83,12 +106,13 @@ const RoomsPage: React.FC = () => {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [filterType, setFilterType] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [propertyDetails, setPropertyDetails] = useState<PropertyDetails | null>(null);
+  const [propertyDetails, setPropertyDetails] =
+    useState<PropertyDetails | null>(null);
   const [qrCodeData, setQrCodeData] = useState({
     qrCode: null,
     couponCode: null,
   });
-  const [showPropertyDetails, setShowPropertyDetails] = useState<boolean>(true)
+  const [showPropertyDetails, setShowPropertyDetails] = useState<boolean>(true);
   const [selectedImage, setSelectedImage] = useState<number>(0);
   // Get guest details from Redux
   const { guestDetails } = useSelector((state) => state.hotel);
@@ -98,19 +122,21 @@ const RoomsPage: React.FC = () => {
 
   // Initialize Redux with URL parameters
   useEffect(() => {
-    const roomsParam = searchParams.get('rooms');
-    const adults = searchParams.get('adults');
-    const children = searchParams.get('children');
-    const infants = searchParams.get('infant');
+    const roomsParam = searchParams.get("rooms");
+    const adults = searchParams.get("adults");
+    const children = searchParams.get("children");
+    const infants = searchParams.get("infant");
 
     if (roomsParam || adults || children || infants) {
-      dispatch(setGuestDetails({
-        rooms: Number(roomsParam) || 1,
-        guests: Number(adults) || 1,
-        children: Number(children) || 0,
-        infants: Number(infants) || 0,
-        childAges: Array(Number(children) || 0).fill(0)
-      }));
+      dispatch(
+        setGuestDetails({
+          rooms: Number(roomsParam) || 1,
+          guests: Number(adults) || 1,
+          children: Number(children) || 0,
+          infants: Number(infants) || 0,
+          childAges: Array(Number(children) || 0).fill(0),
+        })
+      );
     }
   }, [searchParams, dispatch]);
 
@@ -123,14 +149,15 @@ const RoomsPage: React.FC = () => {
     const children = guestDetails.children || 0;
     const infants = guestDetails.infants || 0;
 
-    return `${rooms} ${rooms === 1 ? "Room" : "Rooms"} · ${adults} ${adults === 1 ? "Adult" : "Adults"
-      }${children > 0
+    return `${rooms} ${rooms === 1 ? "Room" : "Rooms"} · ${adults} ${
+      adults === 1 ? "Adult" : "Adults"
+    }${
+      children > 0
         ? ` · ${children} ${children === 1 ? "Child" : "Children"}`
         : ""
-      }${infants > 0
-        ? ` · ${infants} ${infants === 1 ? "Infant" : "Infants"}`
-        : ""
-      }`;
+    }${
+      infants > 0 ? ` · ${infants} ${infants === 1 ? "Infant" : "Infants"}` : ""
+    }`;
   };
 
   useEffect(() => {
@@ -143,7 +170,7 @@ const RoomsPage: React.FC = () => {
           {
             startDate: checkInDate,
             endDate: checkOutDate,
-            hotelCode: "WINCLOUD"
+            hotelCode: "WINCLOUD",
           }
         );
         setRooms(response.data);
@@ -156,7 +183,10 @@ const RoomsPage: React.FC = () => {
             couponCode: response.data.couponCode || "",
           });
         }
-        const propDetails = propertyResponse.data.property || propertyResponse.data.data || propertyResponse.data;
+        const propDetails =
+          propertyResponse.data.property ||
+          propertyResponse.data.data ||
+          propertyResponse.data;
         console.log("Property Details:", propDetails); // Add this log
         setPropertyDetails(propDetails);
       } catch (error) {
@@ -194,8 +224,10 @@ const RoomsPage: React.FC = () => {
     const convertedAmenities = roomAmenities.map((amenity) => {
       const getIconName = (amenityName: string) => {
         const amenityLower = amenityName.toLowerCase();
-        if (amenityLower.includes("wifi") || amenityLower.includes("internet")) return "wifi";
-        if (amenityLower.includes("air") || amenityLower.includes("ac")) return "snowflake";
+        if (amenityLower.includes("wifi") || amenityLower.includes("internet"))
+          return "wifi";
+        if (amenityLower.includes("air") || amenityLower.includes("ac"))
+          return "snowflake";
         if (amenityLower.includes("smoking")) return "smoking-ban";
         if (amenityLower.includes("bed")) return "bed";
         if (amenityLower.includes("view")) return "tree";
@@ -204,8 +236,13 @@ const RoomsPage: React.FC = () => {
         if (amenityLower.includes("linens")) return "linens";
         // if (amenityLower.includes("table") || amenityLower.includes("chairs")) return "tableChairs";
         if (amenityLower.includes("desk")) return "desk";
-        if (amenityLower.includes("dresser") || amenityLower.includes("wardrobe")) return "dresserWardrobe";
-        if (amenityLower.includes("sofa") || amenityLower.includes("seating")) return "sofaSeating";
+        if (
+          amenityLower.includes("dresser") ||
+          amenityLower.includes("wardrobe")
+        )
+          return "dresserWardrobe";
+        if (amenityLower.includes("sofa") || amenityLower.includes("seating"))
+          return "sofaSeating";
         if (amenityLower.includes("television")) return "television";
         if (amenityLower.includes("telephone")) return "telephone";
         if (amenityLower.includes("heating")) return "heating";
@@ -248,7 +285,7 @@ const RoomsPage: React.FC = () => {
     infants?: number;
     guests?: Guest[]; // <--- make sure this is present
   }) => {
-    console.log("form data", formData)
+    console.log("form data", formData);
     const queryParams = new URLSearchParams({
       roomId: formData.roomId,
       propertyId: formData.propertyId,
@@ -266,7 +303,9 @@ const RoomsPage: React.FC = () => {
       ...(formData.adults ? { adults: formData.adults.toString() } : {}),
       ...(formData.children ? { children: formData.children.toString() } : {}),
       ...(formData.infants ? { infants: formData.infants.toString() } : {}),
-      ...(formData.guests ? { guests: encodeURIComponent(JSON.stringify(formData.guests)) } : {}) // ADD THIS LINE
+      ...(formData.guests
+        ? { guests: encodeURIComponent(JSON.stringify(formData.guests)) }
+        : {}), // ADD THIS LINE
     }).toString();
 
     router.push(`/payment?${queryParams}`);
@@ -284,7 +323,10 @@ const RoomsPage: React.FC = () => {
     if (!rooms?.data) return [];
     return rooms.data.filter((room) => {
       if (filterType !== "all" && room.room_type !== filterType) return false;
-      if (searchQuery && !room.room_name.toLowerCase().includes(searchQuery.toLowerCase())) {
+      if (
+        searchQuery &&
+        !room.room_name.toLowerCase().includes(searchQuery.toLowerCase())
+      ) {
         return false;
       }
       return true;
@@ -293,80 +335,107 @@ const RoomsPage: React.FC = () => {
   // Helper function to format address
   const getFormattedAddress = (addressObj: any): string => {
     if (!addressObj) return "";
-    if (typeof addressObj === 'string') return addressObj;
+    if (typeof addressObj === "string") return addressObj;
 
     const parts = [
       addressObj.address_line_1,
       addressObj.address_line_2,
       addressObj.city,
       addressObj.state,
-      addressObj.country
+      addressObj.country,
     ].filter(Boolean);
 
-    return parts.join(', ');
+    return parts.join(", ");
   };
   const getAmenityIcon = (amenity: string) => {
     switch (amenity) {
-      case 'wifi':
+      case "wifi":
         return <Wifi className="h-4 w-4 text-tripswift-blue" />;
-      case 'swimming_pool':
+      case "swimming_pool":
         return <Waves className="h-4 w-4 text-tripswift-blue" />;
-      case 'fitness_center':
+      case "fitness_center":
         return <Droplets className="h-4 w-4 text-tripswift-blue" />;
-      case 'spa_and_wellness':
+      case "spa_and_wellness":
         return <Bath className="h-4 w-4 text-tripswift-blue" />;
-      case 'restaurant':
+      case "restaurant":
         return <Utensils className="h-4 w-4 text-tripswift-blue" />;
-      case 'room_service':
+      case "room_service":
         return <BellRing className="h-4 w-4 text-tripswift-blue" />;
-      case 'bar_and_lounge':
+      case "bar_and_lounge":
         return <Coffee className="h-4 w-4 text-tripswift-blue" />;
-      case 'parking':
+      case "parking":
         return <Car className="h-4 w-4 text-tripswift-blue" />;
-      case 'concierge_services':
+      case "concierge_services":
         return <BellRing className="h-4 w-4 text-tripswift-blue" />;
-      case 'pet_friendly':
+      case "pet_friendly":
         return <Dog className="h-4 w-4 text-tripswift-blue" />;
-      case 'business_facilities':
+      case "business_facilities":
         return <Briefcase className="h-4 w-4 text-tripswift-blue" />;
-      case 'laundry_services':
+      case "laundry_services":
         return <Droplets className="h-4 w-4 text-tripswift-blue" />;
-      case 'child_friendly_facilities':
+      case "child_friendly_facilities":
         return <Star className="h-4 w-4 text-tripswift-blue" />;
       default:
         return <CheckCircle className="h-4 w-4 text-tripswift-blue" />;
     }
   };
+  const { i18n } = useTranslation();
   return (
     <div className="bg-[#F5F7FA] min-h-screen font-noto-sans">
       {/* Property Details Section - Using TripSwift classes */}
       <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] text-tripswift-off-white">
         <div className="container mx-auto px-4 py-5">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+          <div className="flex flex-col md:flex-row items-start  md:items-center gap-4">
             <button
               onClick={() => router.back()}
-              className="inline-flex items-center text-sm font-tripswift-medium bg-tripswift-off-white/20 px-3.5 py-2 rounded-full hover:bg-tripswift-off-white/30 transition-colors mb-2 md:mb-0"
+              className={`inline-flex items-center text-sm font-tripswift-medium bg-tripswift-off-white/20 px-3.5 py-2 rounded-full hover:bg-tripswift-off-white/30 transition-colors mb-2 md:mb-0 ${
+                i18n.language === "ar" ? "flex-row-reverse" : ""
+              }`}
             >
-              <ChevronLeft className="h-4 w-4 mr-1.5" /> {t('RoomsPage.backToSearch')}
+              <ChevronLeft
+                className={`h-4 w-4  ${
+                  i18n.language === "ar" ? "ml-1.5" : "mr-1.5"
+                }`}
+              />{" "}
+              {t("RoomsPage.backToSearch")}
             </button>
           </div>
 
           <div className="flex flex-wrap gap-3 mt-3 items-center">
             <div className="flex items-center bg-tripswift-off-white/10 backdrop-blur-sm pl-3.5 pr-4 py-2.5 rounded-xl">
-              <Calendar className="h-5 w-5 mr-2.5 text-tripswift-off-white/80" />
+              <Calendar
+                className={` h-5 w-5 text-tripswift-off-white/80 ${
+                  i18n.language === "ar" ? "ml-2.5" : "mr-2.5"
+                }`}
+              />
               <div>
                 <div className="text-sm font-tripswift-medium">
                   {formatDate(checkInDate)} - {formatDate(checkOutDate)}
                 </div>
                 <div className="text-xs text-tripswift-off-white/80 mt-0.5 font-tripswift-regular">
-                  {calculateNights(checkInDate, checkOutDate)} {calculateNights(checkInDate, checkOutDate) === 1 ? 'night' : 'nights'} stay
+                  {(() => {
+                    const nights = calculateNights(checkInDate, checkOutDate);
+                    return (
+                      <>
+                        {nights}{" "}
+                        {nights === 1
+                          ? t("RoomsPage.nights")
+                          : t("RoomsPage.nightsPlural")}{" "}
+                        {t("RoomsPage.stay")}
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
             </div>
 
             {/* Guest Information Display */}
             <div className="flex items-center bg-tripswift-off-white/10 backdrop-blur-sm pl-3.5 pr-4 py-2.5 rounded-xl">
-              <Users className="h-5 w-5 mr-2.5 text-tripswift-off-white/80" />
+              <Users
+                className={`h-5 w-5 text-tripswift-off-white/80 ${
+                  i18n.language === "ar" ? "ml-2.5" : "mr-2.5"
+                }`}
+              />
               <div>
                 <div className="text-sm font-tripswift-medium">
                   {getGuestCountDisplay()}
@@ -376,10 +445,15 @@ const RoomsPage: React.FC = () => {
 
             {propertyDetails?.star_rating && (
               <div className="flex items-center bg-tripswift-off-white/10 backdrop-blur-sm pl-3.5 pr-4 py-2.5 rounded-xl">
-                <Star className="h-5 w-5 mr-2.5 text-yellow-400" />
+                <Star
+                  className={`h-5 w-5 text-yellow-400 ${
+                    i18n.language === "ar" ? "ml-2.5" : "mr-2.5"
+                  }`}
+                />
                 <div>
                   <div className="text-sm font-tripswift-medium">
-                    {propertyDetails.star_rating} Star Hotel Rating
+                    {propertyDetails.star_rating}{" "}
+                    {t("RoomsPage.starHotelRating")}
                   </div>
                 </div>
               </div>
@@ -396,11 +470,12 @@ const RoomsPage: React.FC = () => {
           >
             <div>
               <h1 className="text-property-title">
-                {propertyDetails?.property_name || t('RoomsPage.viewPropertyDetails')}
+                {propertyDetails?.property_name ||
+                  t("RoomsPage.viewPropertyDetails")}
               </h1>
               {propertyDetails?.property_address && (
                 <div className="text-location flex items-center text-gray-600 mt-1.5">
-                  <MapPin className="h-4 w-4 mr-1.5 text-tripswift-blue flex-shrink-0" />
+                  <MapPin className={`h-4 w-4  text-tripswift-blue flex-shrink-0 ${i18n.language==="ar"?"ml-2":"mr-2"}`} />
                   <span className="font-tripswift-regular text-sm">
                     {getFormattedAddress(propertyDetails.property_address)}
                   </span>
@@ -408,7 +483,9 @@ const RoomsPage: React.FC = () => {
               )}
             </div>
             <ChevronDown
-              className={`h-5 w-5 text-tripswift-black/70 transform transition-transform duration-300 ${showPropertyDetails ? 'rotate-180' : ''}`}
+              className={`h-5 w-5 text-tripswift-black/70 transform transition-transform duration-300 ${
+                showPropertyDetails ? "rotate-180" : ""
+              }`}
             />
           </div>
 
@@ -419,7 +496,9 @@ const RoomsPage: React.FC = () => {
                 <div className="lg:col-span-2">
                   {/* Main container with padding to allow for inner rounded images */}
                   <div className="relative rounded-xl overflow-hidden bg-white shadow-sm p-1.5">
-                    {propertyDetails?.image && Array.isArray(propertyDetails.image) && propertyDetails.image.length > 0 ? (
+                    {propertyDetails?.image &&
+                    Array.isArray(propertyDetails.image) &&
+                    propertyDetails.image.length > 0 ? (
                       <>
                         {/* Different layouts based on image count */}
                         {propertyDetails.image.length === 1 ? (
@@ -435,10 +514,15 @@ const RoomsPage: React.FC = () => {
                           /* Two images layout - EACH with 4-sided curve */
                           <div className="grid grid-cols-2 gap-2 h-[280px]">
                             {propertyDetails.image.map((img, index) => (
-                              <div key={index} className="relative h-full rounded-xl overflow-hidden">
+                              <div
+                                key={index}
+                                className="relative h-full rounded-xl overflow-hidden"
+                              >
                                 <img
                                   src={img}
-                                  alt={`${propertyDetails.property_name || "Property"} view ${index + 1}`}
+                                  alt={`${
+                                    propertyDetails.property_name || "Property"
+                                  } view ${index + 1}`}
                                   className="w-full h-full object-cover"
                                 />
                                 {index === selectedImage && (
@@ -454,7 +538,9 @@ const RoomsPage: React.FC = () => {
                             <div className="col-span-2 md:col-span-1 row-span-2 relative h-full rounded-xl overflow-hidden">
                               <img
                                 src={propertyDetails.image[selectedImage]}
-                                alt={propertyDetails.property_name || "Property"}
+                                alt={
+                                  propertyDetails.property_name || "Property"
+                                }
                                 className="w-full h-full object-cover"
                               />
                             </div>
@@ -472,8 +558,11 @@ const RoomsPage: React.FC = () => {
                                       className="relative cursor-pointer h-[138px] rounded-xl overflow-hidden"
                                       onClick={() => {
                                         if (images && Array.isArray(images)) {
-                                          const newIndex = images.findIndex(i => i === img);
-                                          if (newIndex !== -1) setSelectedImage(newIndex);
+                                          const newIndex = images.findIndex(
+                                            (i) => i === img
+                                          );
+                                          if (newIndex !== -1)
+                                            setSelectedImage(newIndex);
                                         }
                                       }}
                                     >
@@ -485,18 +574,19 @@ const RoomsPage: React.FC = () => {
                                     </div>
                                   );
                                 })}
-                              {propertyDetails.image.length > 3 && selectedImage !== 3 && (
-                                <div
-                                  className="relative cursor-pointer h-[138px] rounded-xl overflow-hidden"
-                                  onClick={() => setSelectedImage(3)}
-                                >
-                                  <img
-                                    src={propertyDetails.image[3]}
-                                    alt={`Property view 4`}
-                                    className="w-full h-full object-cover hover:opacity-90 transition-opacity"
-                                  />
-                                </div>
-                              )}
+                              {propertyDetails.image.length > 3 &&
+                                selectedImage !== 3 && (
+                                  <div
+                                    className="relative cursor-pointer h-[138px] rounded-xl overflow-hidden"
+                                    onClick={() => setSelectedImage(3)}
+                                  >
+                                    <img
+                                      src={propertyDetails.image[3]}
+                                      alt={`Property view 4`}
+                                      className="w-full h-full object-cover hover:opacity-90 transition-opacity"
+                                    />
+                                  </div>
+                                )}
                             </div>
                           </div>
                         ) : (
@@ -506,7 +596,9 @@ const RoomsPage: React.FC = () => {
                             <div className="col-span-4 md:col-span-2 md:row-span-2 relative h-full rounded-xl overflow-hidden">
                               <img
                                 src={propertyDetails.image[selectedImage]}
-                                alt={propertyDetails.property_name || "Property"}
+                                alt={
+                                  propertyDetails.property_name || "Property"
+                                }
                                 className="w-full h-full object-cover"
                               />
                             </div>
@@ -524,8 +616,11 @@ const RoomsPage: React.FC = () => {
                                       className="relative cursor-pointer rounded-xl overflow-hidden"
                                       onClick={() => {
                                         if (images && Array.isArray(images)) {
-                                          const newIndex = images.findIndex(i => i === img);
-                                          if (newIndex !== -1) setSelectedImage(newIndex);
+                                          const newIndex = images.findIndex(
+                                            (i) => i === img
+                                          );
+                                          if (newIndex !== -1)
+                                            setSelectedImage(newIndex);
                                         }
                                       }}
                                     >
@@ -548,7 +643,9 @@ const RoomsPage: React.FC = () => {
                                 <div className="absolute inset-0 flex items-center justify-center text-tripswift-off-white">
                                   <div className="text-center">
                                     <ImageIcon className="h-6 w-6 mx-auto mb-1" />
-                                    <span className="font-tripswift-medium">+{propertyDetails.image.length - 4}</span>
+                                    <span className="font-tripswift-medium">
+                                      +{propertyDetails.image.length - 4}
+                                    </span>
                                   </div>
                                 </div>
                               </div>
@@ -563,7 +660,11 @@ const RoomsPage: React.FC = () => {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 const images = propertyDetails.image;
-                                if (images && Array.isArray(images) && images.length > 0) {
+                                if (
+                                  images &&
+                                  Array.isArray(images) &&
+                                  images.length > 0
+                                ) {
                                   setSelectedImage((prev) =>
                                     prev <= 0 ? images.length - 1 : prev - 1
                                   );
@@ -577,7 +678,11 @@ const RoomsPage: React.FC = () => {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 const images = propertyDetails.image;
-                                if (images && Array.isArray(images) && images.length > 0) {
+                                if (
+                                  images &&
+                                  Array.isArray(images) &&
+                                  images.length > 0
+                                ) {
                                   setSelectedImage((prev) =>
                                     prev >= images.length - 1 ? 0 : prev + 1
                                   );
@@ -590,7 +695,8 @@ const RoomsPage: React.FC = () => {
 
                             {/* Counter */}
                             <div className="absolute bottom-4 right-4 bg-tripswift-off-white/70 backdrop-blur-sm text-tripswift-black text-xs py-1.5 px-4 rounded-full font-tripswift-medium shadow-sm">
-                              {selectedImage + 1} / {propertyDetails.image.length}
+                              {selectedImage + 1} /{" "}
+                              {propertyDetails.image.length}
                             </div>
                           </>
                         )}
@@ -604,40 +710,48 @@ const RoomsPage: React.FC = () => {
                               // Implement fullscreen gallery view
                             }}
                           >
-                            <ImageIcon className="h-3.5 w-3.5 mr-1.5" /> View all photos
+                            <ImageIcon className="h-3.5 w-3.5 mr-1.5" /> View
+                            all photos
                           </button>
                         )}
                       </>
                     ) : (
                       <div className="w-full h-[280px] rounded-xl flex items-center justify-center">
                         <ImageIcon className="h-12 w-12 text-gray-300" />
-                        <span className="ml-2 text-gray-400 font-tripswift-medium">{t('RoomsPage.noImagesAvailable')}</span>
+                        <span className="ml-2 text-gray-400 font-tripswift-medium">
+                          {t("RoomsPage.noImagesAvailable")}
+                        </span>
                       </div>
                     )}
                   </div>
 
                   {/* Image thumbnails with 4-sided curve */}
-                  {propertyDetails?.image && Array.isArray(propertyDetails.image) && propertyDetails.image.length >= 3 && (
-                    <div className="flex mt-3 space-x-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-                      {propertyDetails.image.map((img, index) => (
-                        <div
-                          key={index}
-                          onClick={() => setSelectedImage(index)}
-                          className={`w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-xl overflow-hidden cursor-pointer relative transition-all duration-300 ${selectedImage === index ? 'shadow-md scale-105' : 'opacity-70 hover:opacity-90'
+                  {propertyDetails?.image &&
+                    Array.isArray(propertyDetails.image) &&
+                    propertyDetails.image.length >= 3 && (
+                      <div className="flex mt-3 space-x-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                        {propertyDetails.image.map((img, index) => (
+                          <div
+                            key={index}
+                            onClick={() => setSelectedImage(index)}
+                            className={`w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-xl overflow-hidden cursor-pointer relative transition-all duration-300 ${
+                              selectedImage === index
+                                ? "shadow-md scale-105"
+                                : "opacity-70 hover:opacity-90"
                             }`}
-                        >
-                          <img
-                            src={img}
-                            alt={`Thumbnail ${index + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                          {selectedImage === index && (
-                            <div className="absolute bottom-0 left-0 right-0 h-1 bg-tripswift-blue"></div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                          >
+                            <img
+                              src={img}
+                              alt={`Thumbnail ${index + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                            {selectedImage === index && (
+                              <div className="absolute bottom-0 left-0 right-0 h-1 bg-tripswift-blue"></div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
 
                   {/* Property description */}
                   {/* {propertyDetails?.description && (
@@ -649,12 +763,17 @@ const RoomsPage: React.FC = () => {
                     </div>
                   )} */}
                   <div className="mt-4">
-                    <h3 className="text-section-heading mb-3">{t('RoomsPage.propertyAmenities')}</h3>
+                    <h3 className="text-section-heading mb-3">
+                      {t("RoomsPage.propertyAmenities")}
+                    </h3>
 
                     {propertyDetails?.property_amenities?.amenities &&
-                      Object.keys(propertyDetails.property_amenities.amenities).length > 0 ? (
+                    Object.keys(propertyDetails.property_amenities.amenities)
+                      .length > 0 ? (
                       <div className="flex flex-wrap gap-2">
-                        {Object.entries(propertyDetails.property_amenities.amenities)
+                        {Object.entries(
+                          propertyDetails.property_amenities.amenities
+                        )
                           .filter(([_, hasAmenity]) => hasAmenity)
                           .map(([amenity]) => (
                             <div
@@ -662,16 +781,19 @@ const RoomsPage: React.FC = () => {
                               className="flex items-center text-xs font-tripswift-medium text-tripswift-blue bg-tripswift-blue/5 border border-tripswift-blue/20 px-2 py-1 rounded-md"
                             >
                               {getAmenityIcon(amenity)}
-                              <span className="capitalize ml-1">{t(`RoomsPage.amenitiesList.${amenity}`)}</span>
+                              <span className={`capitalize ${i18n.language==="ar" ? "mr-2":"ml-2"}`}>
+                                {t(`RoomsPage.amenitiesList.${amenity}`)}
+                              </span>
                             </div>
                           ))}
                       </div>
                     ) : (
-                      <p className="text-description">{t('RoomsPage.noAmenitiesSpecified')}</p>
+                      <p className="text-description">
+                        {t("RoomsPage.noAmenitiesSpecified")}
+                      </p>
                     )}
                   </div>
                 </div>
-
 
                 {/* Property amenities and contact info */}
                 <div className="lg:col-span-1">
@@ -700,36 +822,60 @@ const RoomsPage: React.FC = () => {
                     )} */}
                     {/* QR Code Section - Add this */}
                     {qrCodeData.qrCode && qrCodeData.couponCode && (
-                      <QRCodeDisplay
-                        qrCode={qrCodeData.qrCode}
-                      />
+                      <QRCodeDisplay qrCode={qrCodeData.qrCode} />
                     )}
                   </div>
 
                   {/* Contact information */}
                   <div className="bg-tripswift-off-white p-4 rounded-xl border border-gray-100">
-                    <h3 className="text-section-heading mb-3">{t('RoomsPage.contactInformation')}</h3>
+                    <h3 className="text-section-heading mb-3">
+                      {t("RoomsPage.contactInformation")}
+                    </h3>
                     <div className="space-y-2">
                       {propertyDetails?.property_contact && (
                         <div className="flex items-center text-description">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-tripswift-blue mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className={`h-4 w-4 text-tripswift-blue ${i18n.language==="ar"?"ml-2":"mr-2"}`}
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                            />
                           </svg>
                           {propertyDetails.property_contact}
                         </div>
                       )}
                       {propertyDetails?.property_email && (
                         <div className="flex items-center text-description">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-tripswift-blue mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className={`h-4 w-4 text-tripswift-blue ${i18n.language==="ar"?"ml-2":"mr-2"}`}
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                            />
                           </svg>
                           {propertyDetails.property_email}
                         </div>
                       )}
                       {propertyDetails?.property_address && (
                         <div className="flex items-center text-description">
-                          <MapPin className="h-4 w-4 text-tripswift-blue mr-2 flex-shrink-0 mb-0.5" />
-                          {getFormattedAddress(propertyDetails.property_address)}
+                          <MapPin className={`h-4 w-4 text-tripswift-blue  flex-shrink-0 mb-0.5 ${i18n.language==="ar"?"ml-2":"mr-2"}`} />
+                          {getFormattedAddress(
+                            propertyDetails.property_address
+                          )}
                         </div>
                       )}
                     </div>
@@ -755,10 +901,11 @@ const RoomsPage: React.FC = () => {
                 <button
                   key={type}
                   onClick={() => setFilterType(type)}
-                  className={`px-3.5 py-1.5 rounded-lg text-sm whitespace-nowrap font-tripswift-medium transition-colors duration-300 ${filterType === type
+                  className={`px-3.5 py-1.5 rounded-lg text-sm whitespace-nowrap font-tripswift-medium transition-colors duration-300 ${
+                    filterType === type
                       ? "bg-tripswift-blue text-tripswift-off-white"
                       : "bg-gray-100 text-tripswift-black/70 hover:bg-gray-200"
-                    }`}
+                  }`}
                 >
                   {type === "all" ? t("RoomsPage.allRooms") : type}
                 </button>
@@ -859,7 +1006,6 @@ const RoomsPage: React.FC = () => {
         checkOutDate={checkOutDate}
         onConfirmBooking={confirmBooking}
         guestData={guestDetails}
-
       />
     </div>
   );

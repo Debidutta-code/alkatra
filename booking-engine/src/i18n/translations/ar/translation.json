@@ -202,7 +202,8 @@
     "errorSelectDates": "يرجى تحديد تاريخي الوصول والمغادرة.",
     "exclusiveOffers": "عروض حصرية متاحة",
     "freeCancellation": "إلغاء مجاني",
-    "bestPriceGuarantee": "ضمان أفضل الأسعار"
+    "bestPriceGuarantee": "ضمان أفضل الأسعار",
+    "downloadourapp": "حمّل تطبيقنا"
   },
   "HotelListing": {
     "CompactSearchBar": {
@@ -364,6 +365,9 @@
     "aboutThisProperty": "عن هذا العقار",
     "noImagesAvailable": "لا توجد صور متاحة",
     "propertyAmenities": "مرافق العقار",
+    "nights": "ليلة",
+    "nightsPlural": "ليالي",
+    "stay": "إقامة",
     "amenitiesList": {
       "wifi": "واي فاي مجاني",
       "swimming_pool": "حمام سباحة",
@@ -633,6 +637,105 @@
       "confirmCancellationButton": "تأكيد الإلغاء",
       "invalidDate": "تاريخ غير صالح"
     },
+    "AmendReservationModal": {
+  "title": "تحديث الحجز الخاص بك",
+  "subtitle": "قم بإجراء تغييرات على إقامتك القادمة في {{propertyName}}",
+  "currentBookingDetails": "تفاصيل الحجز الحالية",
+  "stayDates": "تواريخ الإقامة",
+  "nightsCount_one": "{{count}} ليلة",
+  "nightsCount_other": "{{count}} ليالٍ",
+  "guests": "الضيوف",
+  "guestsCount": "{{adults}} بالغ، {{children}} طفل",
+  "roomDetails": "تفاصيل الغرفة",
+  "ratePlan": "خطة السعر",
+  "bestAvailableRate": "أفضل سعر متاح",
+  "total": "الإجمالي",
+  "whatToChange": "ما الذي ترغب في تغييره؟",
+  "amendmentTypes": {
+    "dates": "التواريخ",
+    "guests": "الضيوف",
+    "roomType": "نوع الغرفة",
+    "specialRequests": "الطلبات الخاصة"
+  },
+  "changeDates": "تغيير التواريخ",
+  "selectNewDates": "اختر تواريخ إقامة جديدة",
+  "checkInDate": "تاريخ تسجيل الوصول",
+  "checkOutDate": "تاريخ تسجيل المغادرة",
+  "stayDuration_one": "مدة الإقامة: {{count}} ليلة",
+  "stayDuration_other": "مدة الإقامة: {{count}} ليالٍ",
+  "nightsAdded_one": "(+{{count}} ليلة)",
+  "nightsAdded_other": "(+{{count}} ليالٍ)",
+  "nightsReduced_one": "(-{{count}} ليلة)",
+  "nightsReduced_other": "(-{{count}} ليالٍ)",
+  "changeGuests": "تغيير الضيوف",
+  "numberOfAdults": "عدد البالغين",
+  "numberOfChildren": "عدد الأطفال",
+  "adult_one": "بالغ",
+  "adult_other": "بالغين",
+  "child_one": "طفل",
+  "child_other": "أطفال",
+  "guestsNote": "قد يتم تطبيق رسوم إضافية على الضيوف الإضافيين. تختلف السعة القصوى حسب نوع الغرفة.",
+  "changeRoomType": "تغيير نوع الغرفة",
+  "roomType": "نوع الغرفة",
+  "roomTypeNote": "تخضع تغييرات نوع الغرفة للتوافر وقد تؤثر على السعر الإجمالي.",
+  "updateSpecialRequests": "تحديث الطلبات الخاصة",
+  "specialRequestsLabel": "الطلبات أو التفضيلات الخاصة",
+  "specialRequestsPlaceholder": "أدخل أي طلبات خاصة أو تفضيلات مثل الطابق العلوي، تسجيل وصول مبكر، إلخ.",
+  "specialRequestsNote": "الطلبات الخاصة تخضع للتوافر ولا يمكن ضمان تلبيتها.",
+  "priceAdjustment": "تعديل السعر",
+  "additionalPayment": "مطلوب دفعة إضافية",
+  "additionalChargeExplanation": "ستؤدي تغييراتك إلى رسوم إضافية قدرها ₹{{amount}}",
+  "refundToBeProcessed": "سيتم معالجة استرداد",
+  "refundExplanation": "ستؤدي تغييراتك إلى استرداد قدره ₹{{amount}}",
+  "amendmentPolicies": "سياسات التعديل",
+  "policies": {
+    "dateChanges": "تغييرات التواريخ تخضع للتوافر",
+    "changes72Hours": "قد تؤدي التغييرات خلال 72 ساعة من تسجيل الوصول إلى رسوم إضافية",
+    "roomUpgrades": "ترقيات الغرف تخضع للتوافر والرسوم الإضافية",
+    "reducingStay": "قد يخضع تقليص مدة الإقامة لسياسة الإلغاء الخاصة بالحجز الأصلي"
+  },
+  "cancel": "إلغاء",
+  "processing": "جارٍ المعالجة...",
+  "confirmAmendment": "تأكيد التعديل",
+  "errors": {
+    "selectValidDates": "يرجى اختيار تواريخ تسجيل وصول ومغادرة صالحة.",
+    "unableToAmend": "تعذر تحديث الحجز. يرجى المحاولة مرة أخرى أو التواصل مع الدعم.",
+    "invalidFirstName": "الاسم الأول مطلوب",
+    "invalidLastName": "اسم العائلة مطلوب",
+    "dobRequired": "تاريخ الميلاد مطلوب.",
+    "selectRoomType": "يرجى اختيار نوع الغرفة.",
+    "selectRatePlan": "يرجى اختيار خطة السعر.",
+    "invalidDateRange": "يجب أن يكون تاريخ تسجيل المغادرة بعد تاريخ تسجيل الوصول.",
+    "correctFormErrors": "يرجى تصحيح الأخطاء في النموذج قبل الإرسال."
+  },
+  "success": {
+    "reservationAmended": "تم تحديث الحجز بنجاح.",
+    "additionalPayment": "سيتم معالجة دفعة إضافية قدرها ₹{{amount}}.",
+    "refundProcessed": "سيتم معالجة استرداد قدره ₹{{amount}}.",
+    "noChange": "لم يحدث أي تغيير في السعر الإجمالي."
+  },
+  "roomTypes": {
+    "standard": "غرفة قياسية",
+    "deluxe": "غرفة ديلوكس",
+    "suite": "جناح",
+    "executive": "جناح تنفيذي",
+    "family": "غرفة عائلية"
+  },
+  "ratePlans": {
+    "bestAvailable": "أفضل سعر متاح",
+    "aaaMember": "سعر أعضاء AAA",
+    "package": "سعر الباقة",
+    "weekend": "عرض نهاية الأسبوع"
+  },
+  "modifications": {
+    "changedCheckIn": "تم تغيير تاريخ تسجيل الوصول",
+    "changedCheckOut": "تم تغيير تاريخ تسجيل المغادرة",
+    "changedRoomType": "تم تغيير نوع الغرفة إلى {{roomType}}",
+    "changedGuestCount": "تم تغيير عدد الضيوف",
+    "changedRatePlan": "تم تغيير خطة السعر إلى {{ratePlanName}}"
+  }
+} ,
+
     "BookingDetailsModal": {
       "bookingNumber": "الحجز #{{id}}",
       "closeModal": "إغلاق النافذة",
