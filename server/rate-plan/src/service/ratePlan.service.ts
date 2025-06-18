@@ -257,7 +257,7 @@ class RoomRentCalculationService {
       if (minimumRoomAvailable < noOfRooms) {
         return {
           success: false,
-          message: `Only ${minimumRoomAvailable} rooms available, but ${noOfRooms} rooms requested from ${start.toDateString()} to ${endDate.toString()}`
+          message: `Only ${minimumRoomAvailable} rooms available, but ${noOfRooms} rooms requested from ${startDate.toString()} to ${endDate.toString()}`
         };
       }
 

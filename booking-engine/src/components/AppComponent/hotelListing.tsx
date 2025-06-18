@@ -23,10 +23,9 @@ import {
   MapIcon,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { useSelector } from '@/Redux/store';
+import { useSelector } from "@/Redux/store";
 import { formatDate, calculateNights } from "@/utils/dateUtils";
 import { useTranslation } from "react-i18next";
-
 
 import CompactSearchBar from "@/components/HotelBox/CompactSearchBar";
 import HotelCardItem from "@/components/hotelListingComponents/HotelCardItem";
@@ -75,7 +74,7 @@ const HotelListing: React.FC = () => {
   const [filters, setFilters] = useState<FilterState>({
     amenities: {},
     sortOrder: "",
-    rating: null
+    rating: null,
   });
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [ratingFilter, setRatingFilter] = useState<number | null>(null);
@@ -132,27 +131,50 @@ const HotelListing: React.FC = () => {
       setHotelData(hotelsResponse);
 
       if (hotelsResponse.data.length === 0) {
-        toast.error(t("HotelListing.noHotelsError", { defaultValue: "No hotels found." }));
+        toast.error(
+          t("HotelListing.noHotelsError", { defaultValue: "No hotels found." })
+        );
       }
     } catch (error) {
-      setError(error instanceof Error ? error : new Error("An unknown error occurred"));
+      setError(
+        error instanceof Error ? error : new Error("An unknown error occurred")
+      );
       setHotelData({ success: false, message: "", data: [] });
 
       if (!errorToastShown) {
-        toast.error(t("HotelListing.tryModifyingSearch", { defaultValue: "Try modifying your search." }));
+        toast.error(
+          t("HotelListing.tryModifyingSearch", {
+            defaultValue: "Try modifying your search.",
+          })
+        );
         setErrorToastShown(true);
       }
     } finally {
       setIsLoading(false);
     }
   };
-// console.log("guest details",guestDetails)
-  const handleSearch = (newLocation: string, checkin: string, checkout: string, guestData?: any) => {
+  // console.log("guest details",guestDetails)
+  const handleSearch = (
+    newLocation: string,
+    checkin: string,
+    checkout: string,
+    guestData?: any
+  ) => {
     const guestToUse = guestData || guestDetails;
-    const guestParams = guestToUse ?
-      `&rooms=${guestToUse.rooms || 1}&adults=${guestToUse.guests || 1}&children=${guestToUse.children || 0}&infant=${guestToUse.infants || 0}` :
-      '';
-    router.push(`/destination?location=${encodeURIComponent(newLocation)}&checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(checkout)}${guestParams}`);
+    const guestParams = guestToUse
+      ? `&rooms=${guestToUse.rooms || 1}&adults=${
+          guestToUse.guests || 1
+        }&children=${guestToUse.children || 0}&infant=${
+          guestToUse.infants || 0
+        }`
+      : "";
+    router.push(
+      `/destination?location=${encodeURIComponent(
+        newLocation
+      )}&checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(
+        checkout
+      )}${guestParams}`
+    );
   };
 
   // Function to handle filters
@@ -186,16 +208,20 @@ const HotelListing: React.FC = () => {
 
     // Store guest details in localStorage for consistency
     if (guestDetails && Object.keys(guestDetails).length > 0) {
-      localStorage.setItem('guest_details', JSON.stringify(guestDetails));
+      localStorage.setItem("guest_details", JSON.stringify(guestDetails));
     }
 
     // Pass guest details in the URL
-    const guestParams = guestDetails ?
-      `&rooms=${guestDetails.rooms || 1}&adults=${guestDetails.guests || 1}&children=${guestDetails.children || 0}&infant=${guestDetails.infants || 0}` :
-      '';
+    const guestParams = guestDetails
+      ? `&rooms=${guestDetails.rooms || 1}&adults=${
+          guestDetails.guests || 1
+        }&children=${guestDetails.children || 0}&infant=${
+          guestDetails.infants || 0
+        }`
+      : "";
 
     window.location.href = `/hotel?id=${hotelId}&checkin=${checkinDate}&checkout=${checkoutDate}${guestParams}`;
-  }
+  };
 
   // Apply filters to hotel data
   const applyFilters = (hotels: Hotel[]): Hotel[] => {
@@ -203,8 +229,9 @@ const HotelListing: React.FC = () => {
 
     if (Object.keys(filters.amenities).length > 0) {
       filteredHotels = filteredHotels.filter((hotel) =>
-        Object.entries(filters.amenities).every(([amenityKey, isSelected]) =>
-          !isSelected || hotel.amenities[amenityKey]
+        Object.entries(filters.amenities).every(
+          ([amenityKey, isSelected]) =>
+            !isSelected || hotel.amenities[amenityKey]
         )
       );
     }
@@ -234,7 +261,9 @@ const HotelListing: React.FC = () => {
     }
 
     return filteredHotels.reduce((acc: Hotel[], currentHotel: Hotel) => {
-      if (!acc.find((hotel) => hotel.property_name === currentHotel.property_name)) {
+      if (
+        !acc.find((hotel) => hotel.property_name === currentHotel.property_name)
+      ) {
         acc.push(currentHotel);
       }
       return acc;
@@ -257,7 +286,6 @@ const HotelListing: React.FC = () => {
     setRatingFilter(null);
   };
 
-
   const filteredHotels = applyFilters(hotelData.data);
 
   const activeFilterCount =
@@ -275,10 +303,14 @@ const HotelListing: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
           <div className="text-tripswift-off-white mb-6 flex-col items-center">
             <h1 className="text-2xl md:text-3xl font-tripswift-bold text-tripswift-off-white">
-              {t("HotelListing.heroTitle", { defaultValue: "Find Your Perfect Stay" })}
+              {t("HotelListing.heroTitle", {
+                defaultValue: "Find Your Perfect Stay",
+              })}
             </h1>
             <p className="mt-2 font-tripswift-regular opacity-90">
-              {t("HotelListing.heroSubtitle", { defaultValue: "Book accommodations at the best prices" })}
+              {t("HotelListing.heroSubtitle", {
+                defaultValue: "Book accommodations at the best prices",
+              })}
             </p>
           </div>
 
@@ -299,24 +331,50 @@ const HotelListing: React.FC = () => {
         <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between ml-2">
           <div>
             <div className="flex items-center">
-              <MapPin className={`h-5 w-5 mr-3 text-tripswift-blue ${i18n.language==="ar" ?"ml-2":"mr-3"}`} />
+              <MapPin
+                className={`h-5 w-5  text-tripswift-blue ${
+                  i18n.language === "ar" ? "ml-3" : "mr-3"
+                }`}
+              />
               <h1 className="text-xl font-tripswift-bold text-tripswift-black">
-                {i18n.language === 'hi'
-                  ? `${params.location || params.destination} ${t('HotelListing.hotelsIn')}`
-                  : `${t('HotelListing.hotelsIn')} ${params.location || params.destination}`}
+                {i18n.language === "hi"
+                  ? `${params.location || params.destination} ${t(
+                      "HotelListing.hotelsIn"
+                    )}`
+                  : `${t("HotelListing.hotelsIn")} ${
+                      params.location || params.destination
+                    }`}
               </h1>
             </div>
 
             <div className="flex flex-wrap items-center  text-sm font-tripswift-regular text-tripswift-black/70 mt-2 ">
-              <div className={`flex items-center  mr-4`}>
-                <Calendar className={`h-4 w-4 text-tripswift-blue ${i18n.language==="ar" ?"ml-2":"mr-2"}`} />
+              <div className={`flex items-center `}>
+                <Calendar
+                  className={`h-5 w-5  text-tripswift-blue ${
+                    i18n.language === "ar" ? "ml-3" : "mr-3"
+                  }`}
+                />
                 {checkinDate && checkoutDate ? (
-                  <span>{formatDate(checkinDate, { month: "short", day: "numeric" })} - {formatDate(checkoutDate, { month: "short", day: "numeric" })}</span>
+                  <span>
+                    {formatDate(checkinDate, {
+                      month: "short",
+                      day: "numeric",
+                    })}{" "}
+                    -{" "}
+                    {formatDate(checkoutDate, {
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </span>
                 ) : (
-                  <span>{t("HotelListing.selectDates", { defaultValue: "Select dates" })}</span>
+                  <span>
+                    {t("HotelListing.selectDates", {
+                      defaultValue: "Select dates",
+                    })}
+                  </span>
                 )}
               </div>
-              <span className={`mr-4 text-tripswift-black/40 ${i18n.language==="ar" ?"ml-4":"mr-4"}`}>•</span>
+              <span className={` text-tripswift-black/40 mx-4`}>•</span>
               {checkinDate && checkoutDate ? (
                 <span>{calculateNights(checkinDate, checkoutDate)} nights</span>
               ) : (
@@ -324,7 +382,10 @@ const HotelListing: React.FC = () => {
               )}
               <span className="mx-4 text-tripswift-black/40">•</span>
               <span>
-                {filteredHotels.length} {t("HotelListing.propertiesFound", { defaultValue: "properties found" })}
+                {filteredHotels.length}{" "}
+                {t("HotelListing.propertiesFound", {
+                  defaultValue: "properties found",
+                })}
               </span>
             </div>
           </div>
@@ -335,10 +396,18 @@ const HotelListing: React.FC = () => {
             onClick={() => setMobileFiltersOpen(true)}
             className="w-full py-2.5 bg-white border border-gray-200 rounded-lg shadow-sm text-sm font-tripswift-medium text-tripswift-black hover:bg-gray-50 transition-colors duration-300 flex items-center justify-center"
           >
-            <Filter className="h-4 w-4 mr-2 text-tripswift-blue" />
-            <span>{t("HotelListing.filters", { defaultValue: "Filters" })}</span>
+            <Filter
+              className={`h-4 w-4  text-tripswift-blue ${
+                i18n.language === "ar" ? "ml-2" : "mr-2"
+              } `}
+            />
+            <span>
+              {t("HotelListing.filters", { defaultValue: "Filters" })}
+            </span>
             {activeFilterCount > 0 && (
-              <span className="ml-2 bg-tripswift-blue text-tripswift-off-white px-2 py-0.5 rounded-full text-xs font-tripswift-medium">
+              <span className={` bg-tripswift-blue text-tripswift-off-white px-2 py-0.5 rounded-full text-xs font-tripswift-medium ${
+                i18n.language === "ar" ? "mr-2" : "ml-2"
+              } `}>
                 {activeFilterCount}
               </span>
             )}
@@ -368,14 +437,22 @@ const HotelListing: React.FC = () => {
                     <span>
                       {activeFilterCount}{" "}
                       {activeFilterCount === 1
-                        ? t("HotelListing.activeFilter", { defaultValue: "active filter" })
-                        : t("HotelListing.activeFilters", { defaultValue: "active filters" })}
+                        ? t("HotelListing.activeFilter", {
+                            defaultValue: "active filter",
+                          })
+                        : t("HotelListing.activeFilters", {
+                            defaultValue: "active filters",
+                          })}
                     </span>
                     <button
                       onClick={resetFilters}
-                      className="ml-2 text-tripswift-blue hover:underline font-tripswift-medium transition-all duration-300"
+                      className={` text-tripswift-blue hover:underline font-tripswift-medium transition-all duration-300 ${
+                        i18n.language === "ar" ? "mr-2" : "ml-2"
+                      }`}
                     >
-                      {t("HotelListing.clearAll", { defaultValue: "Clear all" })}
+                      {t("HotelListing.clearAll", {
+                        defaultValue: "Clear all",
+                      })}
                     </button>
                   </div>
                 )}
@@ -459,27 +536,56 @@ const HotelListing: React.FC = () => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={t("HotelListing.searchPropertyName", { defaultValue: "Search property by name" })}
+                  placeholder={t("HotelListing.searchPropertyName", {
+                    defaultValue: "Search property by name",
+                  })}
                   className="pl-10 w-full border border-gray-200 rounded-md px-3 py-1.5 text-sm bg-tripswift-off-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue transition-all duration-300"
                 />
               </div>
 
               <div className="flex items-center">
-                <span className={`text-sm font-tripswift-medium text-tripswift-black/70 ${i18n.language === "ar" ? "ml-3":"mr-3"}`}>
+                <span
+                  className={`text-sm font-tripswift-medium text-tripswift-black/70 ${
+                    i18n.language === "ar" ? "ml-3" : "mr-3"
+                  }`}
+                >
                   {t("HotelListing.sortBy", { defaultValue: "Sort by" })}
                 </span>
                 <div className="relative">
                   <select
                     value={filters.sortOrder}
                     onChange={(e) => handleSortChange(e.target.value)}
-                    className={`appearance-none border border-gray-200 rounded-md pl-3 pr-8 py-1.5 text-sm bg-tripswift-off-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue transition-all duration-300 `}
+                    className={`appearance-none border border-gray-200 rounded-md py-1.5 text-sm bg-tripswift-off-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue transition-all duration-300
+      ${i18n.language === "ar" ? "pr-3 pl-8 text-right" : "pl-3 pr-8 text-left"}
+    `}
                   >
-                    <option value="">{t("HotelListing.recommended", { defaultValue: "Recommended" })}</option>
-                    <option value="rating_desc">{t("HotelListing.highestRating", { defaultValue: "Highest Rating" })}</option>
-                    <option value="rating_asc">{t("HotelListing.lowestRating", { defaultValue: "Lowest Rating" })}</option>
+                    <option value="">
+                      {t("HotelListing.recommended", {
+                        defaultValue: "Recommended",
+                      })}
+                    </option>
+                    <option value="rating_desc">
+                      {t("HotelListing.highestRating", {
+                        defaultValue: "Highest Rating",
+                      })}
+                    </option>
+                    <option value="rating_asc">
+                      {t("HotelListing.lowestRating", {
+                        defaultValue: "Lowest Rating",
+                      })}
+                    </option>
                   </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                    <svg className="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+
+                  <div
+                    className={`pointer-events-none absolute inset-y-0 flex items-center px-2 text-gray-500
+      ${i18n.language === "ar" ? "left-0" : "right-0"}
+    `}
+                  >
+                    <svg
+                      className="h-4 w-4 fill-current"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                    >
                       <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
                     </svg>
                   </div>
@@ -513,48 +619,76 @@ const HotelListing: React.FC = () => {
             {filteredHotels.length > 0 && !isLoading && (
               <div className="mt-6 bg-tripswift-off-white rounded-xl shadow-sm border border-gray-200 p-4">
                 <h3 className="font-tripswift-bold text-lg text-tripswift-black mb-4">
-                  {t("HotelListing.whyBookWithTripSwift", { defaultValue: "Why Book With TripSwift" })}
+                  {t("HotelListing.whyBookWithTripSwift", {
+                    defaultValue: "Why Book With TripSwift",
+                  })}
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="flex items-start">
-                    <div className={`bg-tripswift-blue/10 p-1 rounded-full  mt-0.5 ${i18n.language==="ar"?"mr-0":"mr-3"} `}>
+                    <div
+                      className={`bg-tripswift-blue/10 p-1 rounded-full mt-0.5 ${
+                        i18n.language === "ar" ? "ml-3" : "mr-3"
+                      } `}
+                    >
                       <CreditCard className="h-5 w-5 text-tripswift-blue" />
                     </div>
                     <div className="mt-1">
                       <h4 className="font-tripswift-medium text-tripswift-black">
-                        {t("HotelListing.freeCancellation", { defaultValue: "Free Cancellation" })}
+                        {t("HotelListing.freeCancellation", {
+                          defaultValue: "Free Cancellation",
+                        })}
                       </h4>
                       <p className="text-sm text-tripswift-black/60 mt-1">
-                        {t("HotelListing.freeCancellationDesc", { defaultValue: "Cancel your booking without any charges." })}
+                        {t("HotelListing.freeCancellationDesc", {
+                          defaultValue:
+                            "Cancel your booking without any charges.",
+                        })}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start">
-                    <div className="bg-tripswift-blue/10 p-1 rounded-full mr-3 mt-0.5">
+                    <div
+                      className={`bg-tripswift-blue/10 p-1 rounded-full mt-0.5 ${
+                        i18n.language === "ar" ? "ml-3" : "mr-3"
+                      } `}
+                    >
                       <Star className="h-5 w-5 text-tripswift-blue" />
                     </div>
                     <div className="mt-1.5">
                       <h4 className="font-tripswift-medium text-tripswift-black">
-                        {t("HotelListing.bestPriceGuarantee", { defaultValue: "Best Price Guarantee" })}
+                        {t("HotelListing.bestPriceGuarantee", {
+                          defaultValue: "Best Price Guarantee",
+                        })}
                       </h4>
                       <p className="text-sm text-tripswift-black/60 mt-1">
-                        {t("HotelListing.bestPriceGuaranteeDesc", { defaultValue: "Find a better price, and we'll match it." })}
+                        {t("HotelListing.bestPriceGuaranteeDesc", {
+                          defaultValue:
+                            "Find a better price, and we'll match it.",
+                        })}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start">
-                    <div className="bg-tripswift-blue/10 p-1 rounded-full mr-3 mt-0.5">
+                    <div
+                      className={`bg-tripswift-blue/10 p-1 rounded-full mt-0.5 ${
+                        i18n.language === "ar" ? "ml-3" : "mr-3"
+                      } `}
+                    >
                       <Shield className="h-5 w-5 text-tripswift-blue" />
                     </div>
                     <div className="mt-1">
                       <h4 className="font-tripswift-medium text-tripswift-black">
-                        {t("HotelListing.secureBooking", { defaultValue: "Secure Booking" })}
+                        {t("HotelListing.secureBooking", {
+                          defaultValue: "Secure Booking",
+                        })}
                       </h4>
                       <p className="text-sm text-tripswift-black/60 mt-1">
-                        {t("HotelListing.secureBookingDesc", { defaultValue: "Your information is safe with us." })}
+                        {t("HotelListing.secureBookingDesc", {
+                          defaultValue: "Your information is safe with us.",
+                        })}
                       </p>
                     </div>
                   </div>

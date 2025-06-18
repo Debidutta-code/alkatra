@@ -118,7 +118,7 @@ const isHindi =i18n.language === "hi";
     backdrop-blur-sm text-sm font-tripswift-medium md:px-2.5 lg:px-4 py-1.5 rounded-full 
     flex justify-center items-center mb-2 shadow-lg text-center"
 >
-  <span className="text-tripswift-off-white text-md lg:text-lg xl:text-xl font-tripswift-medium">
+  <span className="text-tripswift-off-white text-md lg:text-lg  font-tripswift-medium">
     {t("HotelCard.downloadourapp")}
   </span>
 </div>
@@ -130,7 +130,7 @@ const isHindi =i18n.language === "hi";
         {/* Hero Text */}
         <div className="max-w-3xl text-center  sm:mb-10 animate-in slide-in-from-bottom duration-700">
           <div className="bg-tripswift-blue/20 hidden backdrop-blur-sm text-tripswift-off-white/90 text-sm font-tripswift-medium px-4 py-1.5 rounded-full sm:inline-flex items-center mb-6 shadow-lg">
-            <span className="inline-block w-2 h-2 bg-tripswift-blue rounded-full mr-2 animate-pulse"></span>
+            <span className={`inline-block w-2 h-2 bg-tripswift-blue rounded-full animate-pulse ${i18n.language==="ar"?"ml-2":"mr-2"}`}></span>
             <span className="text-[#e9d8fd]">
               {t("HotelCard.exclusiveOffers")}
             </span>

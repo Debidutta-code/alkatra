@@ -270,7 +270,7 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
       <div className="mb-6 flex items-start">
         <Shield className={`h-5 w-5 text-tripswift-blue flex-shrink-0 mb-1.5 ${i18n.language === "ar"?"ml-2":"mr-2"}`} />
         <p className="text-xs text-tripswift-black/70">
-          Your card details are encrypted and securely processed by Stripe. We never store your full card information on our servers.
+          {t('Payment.PaymentComponents.PayAtHotelFunction.footer')}
         </p>
       </div>
 

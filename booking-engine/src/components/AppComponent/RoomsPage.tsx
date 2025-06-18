@@ -895,7 +895,7 @@ const RoomsPage: React.FC = () => {
             {/* Room type filter */}
             <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
               <div className="text-gray-500 flex items-center mr-1 font-tripswift-medium">
-                <Filter className="h-4 w-4 mr-1.5" /> Filter
+                <Filter className={`h-4 w-4  ${i18n.language==="ar"?"ml-1.5":"mr-1.5"}`} /> {t("RoomsPage.filter")}
               </div>
               {roomTypes.map((type) => (
                 <button
