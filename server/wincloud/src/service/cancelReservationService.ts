@@ -14,12 +14,18 @@ export class ThirdPartyCancelReservationService {
     let xml = '';
     try {
       console.log('▶️ Starting third-party cancel reservation processing...');
-      const existingReservation = await ThirdPartyBooking.findOne({ reservationId: data.reservationId });
-      if (!existingReservation) {
-        throw new Error(`Reservation with ID ${data.reservationId} not found`);
+      const reservation = await ThirdPartyBooking.findOne({ reservationId: data.reservationId });
+      if (!reservation) {
+        throw new Error('Reservation not found');
       }
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const checkInDate = new Date(reservation.checkInDate);
+      checkInDate.setHours(0, 0, 0, 0);
 
-      console.log('✅ Existing reservation found:', existingReservation.reservationId);
+      if (today >= checkInDate) {
+        throw new Error("Can't cancel reservation. Your check-in date already passed.");
+      }
 
       const reservationData: ThirdPartyCancelReservationData = {
         reservationId: data.reservationId,

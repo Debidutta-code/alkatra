@@ -12,6 +12,14 @@ export class ThirdPartyAmendReservationRepository {
     xmlResponse: string
   ): Promise<any> {
     try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const checkInDate = new Date(data.checkInDate);
+      checkInDate.setHours(0, 0, 0, 0); 
+
+      if (today >= checkInDate) {
+        throw new Error('Cannot update reservation.');
+      }
       console.log('Updating booking to cancelled status...');
 
       const updatedBooking = await ThirdPartyBooking.findOneAndUpdate(
