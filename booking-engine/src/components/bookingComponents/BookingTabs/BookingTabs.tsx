@@ -17,7 +17,7 @@ import EmptyState from "./EmptyState";
 import BookingCard from "./BookingCard";
 import BookingPagination from "./BookingPagination";
 import BookingDetailsModal from "./BookingDetailsModal";
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 
 
@@ -72,13 +72,13 @@ export default function BookingTabs() {
   useEffect(() => {
     const fetchBookings = async () => {
       if (!authUser?._id) {
-        // Using translation for error message
         setError(t("BookingTabs.userNotLoggedIn"));
         setLoading(false);
         return;
       }
 
       try {
+        console.log('Fetching bookings with filterData:', activeTab === 'all' ? '' : activeTab);
         const response = await axios.get<PaginationResponse>(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/booking/customers/booking/details/${authUser?._id}`,
           {
@@ -87,11 +87,11 @@ export default function BookingTabs() {
             },
             params: {
               page: currentPage,
-              limit: itemsPerPage
-            }
+              limit: itemsPerPage,
+              filterData: activeTab === 'all' ? '' : activeTab,
+            },
           }
         );
-        // Backend sometimes returns .bookings, sometimes .bookingDetails
         setBookings(response.data.bookings || []);
         setTotalBookings(response.data.totalBookings);
         setTotalPages(response.data.totalPages);
@@ -103,31 +103,43 @@ export default function BookingTabs() {
     };
 
     fetchBookings();
-  }, [authUser, token, currentPage, itemsPerPage, t]); // Add t to dependency array
+  }, [authUser, token, currentPage, itemsPerPage, activeTab, t]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab]);
+
+  useEffect(() => {
+    setFilteredBookings(bookings);
+  }, [bookings]);
 
   // Filter bookings based on active tab
+  // useEffect(() => {
+  //   const today = new Date();
+  //   if (!bookings) {
+  //     setFilteredBookings([]);
+  //     return;
+  //   }
+  //   if (activeTab === 'all') {
+  //     setFilteredBookings(bookings);
+  //   } else if (activeTab === 'upcoming') {
+  //     setFilteredBookings(bookings.filter(booking => {
+  //       const checkoutDate = parseISO(booking.checkOutDate);
+  //       return checkoutDate >= today && booking.status !== 'Cancelled';
+  //     }));
+  //   } else if (activeTab === 'completed') {
+  //     setFilteredBookings(bookings.filter(booking => {
+  //       const checkoutDate = parseISO(booking.checkOutDate);
+  //       return checkoutDate < today && booking.status !== 'Cancelled';
+  //     }));
+  //   } else if (activeTab === 'cancelled') {
+  //     setFilteredBookings(bookings.filter(booking => booking.status === 'Cancelled'));
+  //   }
+  // }, [activeTab, bookings]);
+
   useEffect(() => {
-    const today = new Date();
-    if (!bookings) {
-      setFilteredBookings([]);
-      return;
-    }
-    if (activeTab === 'all') {
-      setFilteredBookings(bookings);
-    } else if (activeTab === 'upcoming') {
-      setFilteredBookings(bookings.filter(booking => {
-        const checkoutDate = parseISO(booking.checkOutDate);
-        return checkoutDate >= today && booking.status !== 'Cancelled';
-      }));
-    } else if (activeTab === 'completed') {
-      setFilteredBookings(bookings.filter(booking => {
-        const checkoutDate = parseISO(booking.checkOutDate);
-        return checkoutDate < today && booking.status !== 'Cancelled';
-      }));
-    } else if (activeTab === 'cancelled') {
-      setFilteredBookings(bookings.filter(booking => booking.status === 'Cancelled'));
-    }
-  }, [activeTab, bookings]);
+    setFilteredBookings(bookings);
+  }, [bookings]);
 
   // Function to handle cancellation completion
   const handleCancellationComplete = (bookingId: string) => {
@@ -152,20 +164,20 @@ export default function BookingTabs() {
     setBookings(prevBookings => prevBookings.map(booking =>
       booking._id === bookingId
         ? {
-            ...booking,
-            checkInDate: amendedData.checkInDate,
-            checkOutDate: amendedData.checkOutDate,
-            ratePlanCode: amendedData.ratePlanCode,
-            roomTypeCode: amendedData.roomTypeCode,
-            numberOfRooms: amendedData.numberOfRooms,
-            totalAmount: amendedData.roomTotalPrice,
-            currencyCode: amendedData.currencyCode,
-            guestDetails: amendedData.guests,
-            status: 'Modified',
-          }
+          ...booking,
+          checkInDate: amendedData.checkInDate,
+          checkOutDate: amendedData.checkOutDate,
+          ratePlanCode: amendedData.ratePlanCode,
+          roomTypeCode: amendedData.roomTypeCode,
+          numberOfRooms: amendedData.numberOfRooms,
+          totalAmount: amendedData.roomTotalPrice,
+          currencyCode: amendedData.currencyCode,
+          guestDetails: amendedData.guests,
+          status: 'Modified',
+        }
         : booking
     ));
-  
+
     if (selectedBooking && selectedBooking._id === bookingId) {
       setSelectedBooking({
         ...selectedBooking,
@@ -180,7 +192,7 @@ export default function BookingTabs() {
         status: 'Modified',
       });
     }
-  
+
     setShowAmendUI(false);
   };
 
@@ -244,6 +256,7 @@ export default function BookingTabs() {
                 <BookingCard
                   key={booking._id}
                   booking={booking}
+                  activeTab={activeTab}
                   onViewDetails={handleViewDetails}
                   onModify={handleModifyBooking}
                   onCancel={handleCancelBooking}

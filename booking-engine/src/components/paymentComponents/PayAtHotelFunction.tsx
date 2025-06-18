@@ -154,19 +154,19 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
         checkInDate: bookingDetails.checkIn,
         checkOutDate: bookingDetails.checkOut,
         hotelCode: "WINCLOUD",
-        hotelName: bookingDetails.hotelName || "Unknown Hotel",
-        ratePlanCode: bookingDetails.ratePlanCode || "SUT",
+        hotelName: bookingDetails.hotelName || " ",
+        ratePlanCode: bookingDetails.ratePlanCode || " ",
         numberOfRooms: bookingDetails.rooms || 1,
         roomTypeCode: bookingDetails.roomType || "",
         roomTotalPrice: isNaN(parseFloat(bookingDetails.amount)) ? 0 : parseFloat(bookingDetails.amount),
-        currencyCode: bookingDetails.currency?.toUpperCase() || "INR",
+        currencyCode: bookingDetails.currency?.toUpperCase() || " ",
         email: bookingDetails.email,
         phone: bookingDetails.phone,
         guests: bookingDetails.guests.map((guest: Guest) => ({
           firstName: guest.firstName || '',
           lastName: guest.lastName || '',
           dob: guest.dob || '',
-          type: guest.type || 'adult'
+          type: guest.type || ''
         })),
         paymentInfo: {
           paymentMethodId: setupIntent.payment_method as string,

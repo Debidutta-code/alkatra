@@ -4,7 +4,8 @@ import { useEffect, useState, useRef } from "react";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useSelector } from "@/Redux/store"; // Updated import for custom Redux store
+import { useSelector } from "@/Redux/store";
+import jsPDF from 'jspdf';
 
 import Link from "next/link";
 import {
@@ -23,7 +24,7 @@ import { formatDate, calculateNights } from "@/utils/dateUtils";
 import { useTranslation } from "react-i18next";
 
 export default function PaymentSuccess() {
-  const { t , i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const searchParams = useSearchParams();
   const firstName = searchParams.get("firstName") || "";
   const lastName = searchParams.get("lastName") || "";
@@ -72,50 +73,106 @@ export default function PaymentSuccess() {
 
   // Combine data sources with priority order: Booking API > URL params > Redux > Default
   const amount = amountParam ? parseFloat(amountParam) : reduxAmount;
+  const handleDownloadConfirmation = () => {
+    if (!amount) {
+      toast.error(t("Payment.PaymentSuccess.noAmountForDownload"));
+      return;
+    }
+  
+    const doc = new jsPDF();
+  
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(12);
+  
+    let y = 20;
+  
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.text('Booking Confirmation', 20, y);
+    y += 10;
+  
+    doc.setLineWidth(0.5);
+    doc.line(20, y, 190, y);
+    y += 10;
+  
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(12);
+  
+    // Call getBookingId once and reuse the result
+    const bookingId = getBookingId();
+  
+    const details = [
+      `Booking ID: ${bookingId}`, // Use the stored bookingId
+      `Guest Name: ${getGuestName()}`,
+      `Email: ${reduxEmail}`,
+      `Phone: ${reduxPhone}`,
+      `Hotel: ${guestDetails?.hotelName || 'N/A'}`,
+      `Check-In Date: ${formatDate(checkInDate || guestDetails?.checkInDate)}`,
+      `Check-Out Date: ${formatDate(checkOutDate || guestDetails?.checkOutDate)}`,
+      `Nights: ${getBookingNights()}`,
+      `Guests: ${getGuestCountDisplay()}`,
+      `Payment Method: Pay at Hotel`,
+      `Total Amount: ₹${amount.toLocaleString()}`
+    ];
+  
+    details.forEach(detail => {
+      doc.text(detail, 20, y);
+      y += 10;
+    });
+  
+    y += 10;
+    doc.setLineWidth(0.5);
+    doc.line(20, y, 190, y);
+    y += 10;
+    doc.text('Thank you for booking with us!', 20, y);
+  
+    doc.save(`Booking_Confirmation_${bookingId}.pdf`);
+    toast.success(t("Payment.PaymentSuccess.downloadSuccessToast"));
+  };
 
   useEffect(() => {
     document.body.style.overflow = "auto";
 
-    if (reference) {
-      const fetchBookingByReference = async () => {
-        try {
-          setIsLoading(true);
-          const token = Cookies.get("accessToken");
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/booking/getreservation/${reference}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+    // if (reference) {
+    //   const fetchBookingByReference = async () => {
+    //     try {
+    //       setIsLoading(true);
+    //       const token = Cookies.get("accessToken");
+    //       const response = await fetch(
+    //         `${process.env.NEXT_PUBLIC_BACKEND_URL}/booking/getreservation/${reference}`,
+    //         {
+    //           headers: {
+    //             Authorization: `Bearer ${token}`,
+    //           },
+    //         }
+    //       );
 
-          const data = await response.json();
-          console.log("Booking data received:", data);
+    //       const data = await response.json();
+    //       console.log("Booking data received:", data);
 
-          const bookingData = data.booking || data.data || data;
+    //       const bookingData = data.booking || data.data || data;
 
-          if (bookingData && bookingData._id) {
-            setBooking(bookingData);
-            toast.success(t("Payment.PaymentSuccess.bookingConfirmedToast"));
-          } else {
-            throw new Error(
-              t("Payment.PaymentSuccess.invalidBookingDataStructure")
-            );
-          }
-        } catch (error: any) {
-          console.error("Error fetching booking:", error);
-          setError(true);
-          setErrorMessage(t("Payment.PaymentSuccess.fetchBookingError"));
-          toast.error(t("Payment.PaymentSuccess.fetchBookingErrorToast"));
-        } finally {
-          setIsLoading(false);
-        }
-      };
+    //       if (bookingData && bookingData._id) {
+    //         setBooking(bookingData);
+    //         toast.success(t("Payment.PaymentSuccess.bookingConfirmedToast"));
+    //       } else {
+    //         throw new Error(
+    //           t("Payment.PaymentSuccess.invalidBookingDataStructure")
+    //         );
+    //       }
+    //     } catch (error: any) {
+    //       console.error("Error fetching booking:", error);
+    //       setError(true);
+    //       setErrorMessage(t("Payment.PaymentSuccess.fetchBookingError"));
+    //       toast.error(t("Payment.PaymentSuccess.fetchBookingErrorToast"));
+    //     } finally {
+    //       setIsLoading(false);
+    //     }
+    //   };
 
-      fetchBookingByReference();
-      return;
-    }
+    //   fetchBookingByReference();
+    //   return;
+    // }
 
     if (
       !authUser ||
@@ -255,7 +312,7 @@ export default function PaymentSuccess() {
     const checkOut = formatDate(checkOutFinal);
 
     const hotelUrl = `/hotel?id=${propertyIdFinal}&checkin=${checkIn}&checkout=${checkOut}&rooms=${roomsFinal}&adults=${adultsFinal}&children=${childrenFinal}`;
-    const paymentSuccessUrl = `/payment-success?reference=${reference}&method=${paymentMethod}`; // Simplified URL
+    const paymentSuccessUrl = `/payment-success?reference=${reference}&method=${paymentMethod}`;
 
     // Step 1: Push /hotel first (as previous page)
     window.history.pushState({}, "", hotelUrl);
@@ -457,7 +514,7 @@ export default function PaymentSuccess() {
                   <div className="bg-tripswift-off-white/20 p-2 sm:p-3 rounded-full">
                     <CheckCircle size={24} className="sm:w-8 sm:h-8" />
                   </div>
-                  <div className={` ${i18n.language === "ar"?"mr-3 sm:mr-4":"ml-3 sm:ml-4"}`}>
+                  <div className={` ${i18n.language === "ar" ? "mr-3 sm:mr-4" : "ml-3 sm:ml-4"}`}>
                     <h1 className="text-xl sm:text-2xl md:text-3xl font-tripswift-bold text-tripswift-off-white">
                       {t("Payment.PaymentSuccess.bookingConfirmedTitle")}
                     </h1>
@@ -479,7 +536,7 @@ export default function PaymentSuccess() {
                     <div className="space-y-3 sm:space-y-4">
                       <div className="flex items-start">
                         <Calendar
-                          className={`text-tripswift-blue flex-shrink-0 ${i18n.language === "ar"?"ml-2 sm:ml-3":"mr-2 sm:mr-3"} `}
+                          className={`text-tripswift-blue flex-shrink-0 ${i18n.language === "ar" ? "ml-2 sm:ml-3" : "mr-2 sm:mr-3"} `}
                           size={18}
                         />
                         <div>
@@ -493,7 +550,7 @@ export default function PaymentSuccess() {
                       </div>
                       <div className="flex items-start">
                         <Calendar
-                          className={`text-tripswift-blue flex-shrink-0 ${i18n.language === "ar"?"ml-2 sm:ml-3":"mr-2 sm:mr-3"}`}
+                          className={`text-tripswift-blue flex-shrink-0 ${i18n.language === "ar" ? "ml-2 sm:ml-3" : "mr-2 sm:mr-3"}`}
                           size={18}
                         />
                         <div>
@@ -513,7 +570,7 @@ export default function PaymentSuccess() {
                       </div>
                       <div className="flex items-start">
                         <Users
-                          className={`text-tripswift-blue flex-shrink-0 ${i18n.language === "ar"?"ml-2 sm:ml-3":"mr-2 sm:mr-3"}`}
+                          className={`text-tripswift-blue flex-shrink-0 ${i18n.language === "ar" ? "ml-2 sm:ml-3" : "mr-2 sm:mr-3"}`}
                           size={18}
                         />
                         <div>
@@ -535,7 +592,7 @@ export default function PaymentSuccess() {
                     <div className="space-y-3 sm:space-y-4">
                       <div className="flex items-start">
                         <User
-                          className={`text-tripswift-blue flex-shrink-0 ${i18n.language === "ar"?"ml-2 sm:ml-3":"mr-2 sm:mr-3"}`}
+                          className={`text-tripswift-blue flex-shrink-0 ${i18n.language === "ar" ? "ml-2 sm:ml-3" : "mr-2 sm:mr-3"}`}
                           size={18}
                         />
                         <div>
@@ -549,7 +606,7 @@ export default function PaymentSuccess() {
                       </div>
                       <div className="flex items-start">
                         <Mail
-                          className={`text-tripswift-blue flex-shrink-0 ${i18n.language === "ar"?"ml-2 sm:ml-3":"mr-2 sm:mr-3"}`}
+                          className={`text-tripswift-blue flex-shrink-0 ${i18n.language === "ar" ? "ml-2 sm:ml-3" : "mr-2 sm:mr-3"}`}
                           size={18}
                         />
                         <div>
@@ -563,14 +620,14 @@ export default function PaymentSuccess() {
                       </div>
                       <div className="flex items-start">
                         <Phone // Added phone number display
-                          className={`text-tripswift-blue mb-1 flex-shrink-0 ${i18n.language === "ar"?"ml-2 sm:ml-3":"mr-2 sm:mr-3"}`}
+                          className={`text-tripswift-blue mb-1 flex-shrink-0 ${i18n.language === "ar" ? "ml-2 sm:ml-3" : "mr-2 sm:mr-3"}`}
                           size={18}
                         />
                         <div>
                           <p className="text-xs sm:text-sm text-tripswift-black/60">
                             {t("Payment.PaymentSuccess.phoneLabel")}
                           </p>
-                          <p className="text-sm sm:text-base font-tripswift-medium"  dir="ltr">
+                          <p className="text-sm sm:text-base font-tripswift-medium" dir="ltr">
                             {reduxPhone}
                           </p>
                         </div>
@@ -591,7 +648,7 @@ export default function PaymentSuccess() {
                       </div> */}
                       <div className="flex items-start">
                         <CreditCard
-                          className={`text-tripswift-blue mb-1 flex-shrink-0 ${i18n.language === "ar"?"ml-2 sm:ml-3":"mr-2 sm:mr-3"}`}
+                          className={`text-tripswift-blue mb-1 flex-shrink-0 ${i18n.language === "ar" ? "ml-2 sm:ml-3" : "mr-2 sm:mr-3"}`}
                           size={18}
                         />
                         <div>
@@ -661,7 +718,7 @@ export default function PaymentSuccess() {
                 </h3>
                 <ul className="space-y-2 sm:space-y-3 text-sm sm:text-base text-tripswift-black/70">
                   <li className="flex items-start">
-                    <span className={`inline-block bg-green-100 rounded-full p-1  mt-0.5 ${i18n.language === "ar"?"ml-2":"mr-2"}`}>
+                    <span className={`inline-block bg-green-100 rounded-full p-1  mt-0.5 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`}>
                       <CheckCircle
                         size={12}
                         className="sm:w-[14px] sm:h-[14px] text-green-600"
@@ -670,7 +727,7 @@ export default function PaymentSuccess() {
                     {t("Payment.PaymentSuccess.confirmationEmailSent")}
                   </li>
                   <li className="flex items-start">
-                    <span className={`inline-block bg-green-100 rounded-full p-1  mt-0.5 ${i18n.language === "ar"?"ml-2":"mr-2"}`}>
+                    <span className={`inline-block bg-green-100 rounded-full p-1  mt-0.5 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`}>
                       <CheckCircle
                         size={12}
                         className="sm:w-[14px] sm:h-[14px] text-green-600"
@@ -679,7 +736,7 @@ export default function PaymentSuccess() {
                     {t("Payment.PaymentSuccess.viewBookingDetails")}
                   </li>
                   <li className="flex items-start">
-                    <span className={`inline-block bg-green-100 rounded-full p-1  mt-0.5 ${i18n.language === "ar"?"ml-2":"mr-2"}`}>
+                    <span className={`inline-block bg-green-100 rounded-full p-1  mt-0.5 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`}>
                       <CheckCircle
                         size={12}
                         className="sm:w-[14px] sm:h-[14px] text-green-600"
@@ -690,7 +747,10 @@ export default function PaymentSuccess() {
                 </ul>
 
                 {/* Download Booking button */}
-                <button className="mt-3 sm:mt-4 w-full flex items-center justify-center gap-2 border border-tripswift-blue/30 text-tripswift-blue bg-tripswift-blue/5 hover:bg-tripswift-blue/10 py-2 px-3 sm:px-4 rounded-lg text-xs sm:text-sm font-tripswift-medium transition-colors duration-300">
+                <button
+                  onClick={handleDownloadConfirmation}
+                  className="mt-3 sm:mt-4 w-full flex items-center justify-center gap-2 border border-tripswift-blue/30 text-tripswift-blue bg-tripswift-blue/5 hover:bg-tripswift-blue/10 py-2 px-3 sm:px-4 rounded-lg text-xs sm:text-sm font-tripswift-medium transition-colors duration-300"
+                >
                   <Download size={14} className="sm:w-4 sm:h-4" />
                   {t("Payment.PaymentSuccess.downloadBookingConfirmation")}
                 </button>
