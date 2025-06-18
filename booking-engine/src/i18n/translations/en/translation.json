@@ -859,6 +859,8 @@
       }
     },
     "PaymentSuccess": {
+      "noBookingDataForDownload": "No booking data available for download.",
+      "downloadSuccessToast": "Booking confirmation downloaded successfully!",
       "processingBooking": "Processing your booking...",
       "confirmingReservation": "We're confirming your reservation. This should only take a moment.",
       "bookingFailedTitle": "Booking Failed",

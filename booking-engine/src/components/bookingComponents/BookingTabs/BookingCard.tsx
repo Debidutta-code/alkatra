@@ -8,7 +8,7 @@ import {
   FaEdit,
   FaRegTimesCircle
 } from 'react-icons/fa';
-import { Booking } from './types';
+import { Booking, BookingTabType } from './types';
 import {
   getStatusClass,
   getStatusIcon,
@@ -20,6 +20,7 @@ import { formatDate, calculateNights } from "@/utils/dateUtils";
 
 interface BookingCardProps {
   booking: Booking;
+  activeTab?: BookingTabType;
   onViewDetails: (booking: Booking) => void;
   onModify: (booking: Booking) => void;
   onCancel: (booking: Booking) => void;
@@ -27,6 +28,7 @@ interface BookingCardProps {
 
 const BookingCard: React.FC<BookingCardProps> = ({
   booking,
+  activeTab,
   onViewDetails,
   onModify,
   onCancel
@@ -153,24 +155,24 @@ const BookingCard: React.FC<BookingCardProps> = ({
           {t('BookingTabs.BookingCard.viewBookingDetails')}
         </button>
 
-        {booking.status === "Confirmed" && (
-          <div className="grid grid-cols-2 gap-3 mt-3">
-            <button
-              className="bg-tripswift-off-white hover:bg-gray-100 text-tripswift-blue border border-tripswift-blue/30 py-2 px-4 rounded-lg transition-colors duration-300 text-xs font-tripswift-medium flex items-center justify-center"
-              onClick={() => onModify(booking)}
-            >
-              <FaEdit className={` ${i18n.language === "ar" ?"ml-2":"mr-2"}`} />
-              {t('BookingTabs.BookingCard.modify')}
-            </button>
-            <button
-              className="bg-tripswift-off-white hover:bg-gray-100 text-red-600 border border-red-200 py-2 px-4 rounded-lg transition-colors text-xs font-tripswift-medium flex items-center justify-center"
-              onClick={() => onCancel(booking)}
-            >
-              <FaRegTimesCircle className={` ${i18n.language === "ar" ?"ml-2":"mr-2"}`} />
-              {t('BookingTabs.BookingCard.cancel')}
-            </button>
-          </div>
-        )}
+        {booking.status === "Confirmed" && activeTab !== 'completed' && (
+  <div className="grid grid-cols-2 gap-3 mt-3">
+    <button
+      className="bg-tripswift-off-white hover:bg-gray-100 text-tripswift-blue border border-tripswift-blue/30 py-2 px-4 rounded-lg transition-colors duration-300 text-xs font-tripswift-medium flex items-center justify-center"
+      onClick={() => onModify(booking)}
+    >
+      <FaEdit className={` ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
+      {t('BookingTabs.BookingCard.modify')}
+    </button>
+    <button
+      className="bg-tripswift-off-white hover:bg-gray-100 text-red-600 border border-red-200 py-2 px-4 rounded-lg transition-colors text-xs font-tripswift-medium flex items-center justify-center"
+      onClick={() => onCancel(booking)}
+    >
+      <FaRegTimesCircle className={` ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
+      {t('BookingTabs.BookingCard.cancel')}
+    </button>
+  </div>
+)}
       </div>
     </div>
   );
