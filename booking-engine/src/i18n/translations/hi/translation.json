@@ -158,6 +158,39 @@
     "subscribeButton": "सदस्यता लें",
     "copyright": "{year} ट्रिपस्विफ्ट - सर्वाधिकार सुरक्षित"
   },
+  "Profile": {
+    "editProfile": "प्रोफ़ाइल संपादित करें",
+    "signOut": "साइन आउट",
+    "overview": "अवलोकन",
+    "myTrips": "मेरी यात्राएँ",
+    "preferences": "प्राथमिकताएँ",
+    "security": "सुरक्षा",
+    "notifications": "सूचनाएँ",
+    "helpCenter": "सहायता केंद्र",
+    "tripsCompleted": "यात्राएँ पूरी कीं",
+    "sinceJoining": "शामिल होने के बाद से",
+    "averageRating": "औसत रेटिंग",
+    "fromHosts": "होस्ट्स से",
+    "savedPlaces": "सहेजे गए स्थान",
+    "wishlisted": "विशलिस्ट में",
+    "quickActions": "त्वरित कार्य",
+    "bookTrip": "यात्रा बुक करें",
+    "savedPlacesAction": "सहेजे गए स्थान",
+    "rewards": "पुरस्कार",
+    "deals": "डील्स",
+    "securitySettings": "सुरक्षा सेटिंग्स",
+    "changePassword": "पासवर्ड बदलें",
+    "updatePassword": "अपना पासवर्ड अपडेट करें",
+    "twoFactorAuth": "दो-कारक प्रमाणीकरण",
+    "twoFactorDesc": "अपने खाते में अतिरिक्त सुरक्षा परत जोड़ें",
+    "enable2FA": "2FA सक्षम करें",
+    "profileUpdatedSuccess": "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई",
+    "profileUpdateFailed": "प्रोफ़ाइल अपडेट करने में विफल",
+    "contentComingSoon": "{{tab}} के लिए सामग्री जल्द ही उपलब्ध होगी...",
+    "newPasswordOptional": "नया पासवर्ड (वैकल्पिक)",
+    "confirmNewPassword": "नए पासवर्ड की पुष्टि करें",
+    "joined": "{{date}} को शामिल हुए"
+  },
   "HotelCard": {
     "heroTitle": "अपनी यात्रा के लिए सही ठहरने की जगह खोजें",
     "heroSubtitle": "विशेष कीमतों पर शानदार आवास खोजें",
@@ -169,7 +202,8 @@
     "errorSelectDates": "कृपया चेक-इन और चेक-आउट दोनों तारीखें चुनें।",
     "exclusiveOffers": "विशेष ऑफर उपलब्ध",
     "freeCancellation": "मुफ्त रद्दीकरण",
-    "bestPriceGuarantee": "सर्वोत्तम मूल्य की गारंटी"
+    "bestPriceGuarantee": "सर्वोत्तम मूल्य की गारंटी",
+    "downloadourapp": " हमारा ऐप डाउनलोड करें"
   },
   "HotelListing": {
     "CompactSearchBar": {
@@ -331,6 +365,10 @@
     "aboutThisProperty": "इस संपत्ति के बारे में",
     "noImagesAvailable": "कोई छवि उपलब्ध नहीं है",
     "propertyAmenities": "संपत्ति की सुविधाएँ",
+    "nights": "रात",
+    "nightsPlural": "रातें",
+    "stay":"प्रवास",
+    "filter":"फ़िल्टर",
     "amenitiesList": {
       "wifi": "मुफ्त वाईफाई",
       "swimming_pool": "स्विमिंग पूल",
@@ -456,7 +494,8 @@
       "checkOut": "चेक‑आउट",
       "nights": "रात",
       "nightsPlural": "रातें",
-      "guestInformation": "अतिथि जानकारी",
+      "guestInformation": "अतिथि जानकारी", 
+      "dob":"जन्म तिथि",
       "firstNameLabel": "प्रथम नाम",
       "firstNamePlaceholder": "अपना प्रथम नाम दर्ज करें",
       "firstNameError": "प्रथम नाम आवश्यक है",
@@ -489,6 +528,9 @@
       "bookingSummary": "बुकिंग सारांश",
       "stayDetails": "रहने का विवरण",
       "primaryGuest": "प्राथमिक अतिथि",
+      "guests": "अतिथि",
+  "email": "ईमेल",
+  "phone": "फ़ोन",
       "priceDetails": "मूल्य विवरण",
       "roomRate": "कमरे का दर",
       "totalAmount": "कुल राशि",
@@ -729,6 +771,8 @@
       "ratePlan": "दर योजना",
       "modifyBooking": "बुकिंग संशोधित करें",
       "cancelBooking": "बुकिंग रद्द करें",
+      "dob":"जन्म तिथि",
+      "rooms": "कमरे",
       "printItinerary": "मार्ग विवरण प्रिंट करें"
     }
   },
@@ -798,7 +842,8 @@
         "cardSetupFailedError": "कार्ड सेटअप विफल",
         "processing": "प्रसंस्करण हो रहा है...",
         "confirmBooking": "बुकिंग की पुष्टि करें",
-        "paymentProcessingError": "भुगतान प्रसंस्करण के दौरान एक त्रुटि हुई"
+        "paymentProcessingError": "भुगतान प्रसंस्करण के दौरान एक त्रुटि हुई",
+          "footer": "आपके कार्ड विवरण को एन्क्रिप्ट किया गया है और Stripe द्वारा सुरक्षित रूप से प्रोसेस किया जाता है। हम कभी भी आपके पूर्ण कार्ड विवरण को अपने सर्वर पर संग्रहीत नहीं करते।"
       }
     },
     "PaymentSuccess": {
@@ -839,7 +884,23 @@
       "needHelpTitle": "मदद चाहिए?",
       "customerServiceMessage": "हमारी ग्राहक सेवा टीम आपके किसी भी प्रश्न में सहायता के लिए 24/7 उपलब्ध है।",
       "contactSupportButton": "समर्थन से संपर्क करें",
+            "phoneLabel": "फ़ोन नंबर",
       "exploreMoreHotels": "और होटल विकल्प एक्सप्लोर करें"
     }
-  }
+  },
+  "GuestBox": {
+  "guests": "मेहमान",
+  "adultsPlural": "वयस्क",
+  "infantsPlural": "शिशु",
+  "infant": "शिशु",
+  "roomsPlural": "कमरे",
+  "child": "बच्चा",
+  "childrenPlural": "बच्चे",
+  "age": "आयु",
+  "year": "साल",
+  "year_plural": "साल",
+   "selectAge": "उम्र चुनें",
+    "selectGuests": "मेहमान चुनें",
+        "ages": "आयु वर्ग"
+}
 }

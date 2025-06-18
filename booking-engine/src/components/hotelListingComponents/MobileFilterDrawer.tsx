@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Check, Star } from 'lucide-react';
 import { AMENITIES } from "@/components/HotelBox/FilterModal";
+import { useTranslation } from 'react-i18next';
 
 interface MobileFilterDrawerProps {
   isOpen: boolean;
@@ -30,7 +31,7 @@ const MobileFilterDrawer: React.FC<MobileFilterDrawerProps> = ({
   filteredHotelsCount
 }) => {
   if (!isOpen) return null;
-
+const {i18n} = useTranslation();
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-20 lg:hidden">
       <div
@@ -90,7 +91,9 @@ const MobileFilterDrawer: React.FC<MobileFilterDrawerProps> = ({
                 />
                 <label
                   htmlFor={`star-${rating}`}
-                  className="ml-2 text-xs text-gray-700 flex items-center cursor-pointer"
+                  className={` text-xs text-gray-700 flex items-center cursor-pointer ${
+                i18n.language === "ar" ? "mr-2" : "ml-2"
+              } `}
                   onClick={() => handleRatingChange(ratingFilter === rating ? null : rating)}
                 >
                   {Array.from({ length: rating }).map((_, i) => (
@@ -120,9 +123,11 @@ const MobileFilterDrawer: React.FC<MobileFilterDrawerProps> = ({
                 />
                 <label 
                   htmlFor={`mobile-amenity-${amenity.key}`} 
-                  className="ml-2 text-xs text-tripswift-black/80 normal-case font-tripswift-regular cursor-pointer"
+                  className={`ml-2 text-xs text-tripswift-black/80 normal-case font-tripswift-regular cursor-pointer ${
+                i18n.language === "ar" ? "mr-2" : "ml-2"
+              } `}
                 >
-                  {amenity.labelKey}
+{amenity.labelKey.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
                 </label>
               </div>
             ))}

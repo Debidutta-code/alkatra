@@ -17,7 +17,7 @@ interface Destination {
 }
 
 export function Destination() {
-  const { t } = useTranslation();
+  const { t , i18n } = useTranslation();
   const router = useRouter();
   const dispatch = useDispatch();
   const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
@@ -164,7 +164,7 @@ export function Destination() {
                 }`}
                 aria-label={t("HomeSections.ExploreDestinations.previous", { defaultValue: "Previous Destination" })}
               >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft className={`w-5 h-5 ${i18n.language === "ar" ? "rotate-180":""}`} />
               </button>
               <button
                 onClick={handleNext}
@@ -176,7 +176,7 @@ export function Destination() {
                 }`}
                 aria-label={t("HomeSections.ExploreDestinations.next", { defaultValue: "Next Destination" })}
               >
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className={`w-5 h-5 ${i18n.language === "ar" ? "rotate-180":""}`} />
               </button>
             </div>
           )}
@@ -235,7 +235,7 @@ export function Destination() {
                         {destination.description}
                       </p>
                       <div className="mt-3 flex items-center text-sm text-tripswift-blue">
-                        <MapPin className="w-4 h-4 mr-1" />
+                        <MapPin className={`w-4 h-4 ${i18n.language==="ar"?"ml-1":"mr-1"}`} />
                         <span>{t("HomeSections.ExploreDestinations.exploreNow", { defaultValue: "Explore Now" })}</span>
                       </div>
                     </CardContent>

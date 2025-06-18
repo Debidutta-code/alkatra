@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useTransition } from 'react';
 import { Star, Check } from 'lucide-react';
 import { AMENITIES } from "@/components/HotelBox/FilterModal";
-import { t } from 'i18next';
-
+import i18next, { t, i18n } from 'i18next';
+import { useTranslation } from 'react-i18next';
 interface FilterSidebarProps {
   amenities: { [key: string]: boolean };
   sortOrder: string;
@@ -25,6 +25,8 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
   activeFilterCount
 }) => {
   const [showAllAmenities, setShowAllAmenities] = useState(false);
+    const {i18n} = useTranslation();
+  
 
   // Decide how many amenities to show
   // const initialAmenityCount = 6;
@@ -86,7 +88,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
               />
               <label
                 htmlFor={`star-${rating}`}
-                className="ml-2 text-xs text-gray-700 flex items-center cursor-pointer"
+                className={`ml-2 text-xs text-gray-700 flex items-center cursor-pointer ${i18n.language==="ar"?"mr-2":"ml-2"}`}
                 onClick={() => handleRatingChange(ratingFilter === rating ? null : rating)}
               >
                 {Array.from({ length: rating }).map((_, i) => (
@@ -116,7 +118,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
               />
               <label
                 htmlFor={`amenity-${amenity.key}`}
-                className="ml-2 text-xs text-gray-700 normal-case cursor-pointer font-tripswift-regular"
+                className={`ml-2 text-xs text-gray-700 normal-case cursor-pointer font-tripswift-regular ${i18n.language==="ar"?"mr-2":"ml-2"}`}
                 onClick={() => toggleAmenityFilter(amenity.key)}
               >
                 {t(`HotelBox.FilterModal.amenitiesList.${amenity.labelKey}`, { defaultValue: amenity.labelKey })}

@@ -8,7 +8,7 @@ import {
   FaEdit,
   FaRegTimesCircle
 } from 'react-icons/fa';
-import { Booking } from './types';
+import { Booking, BookingTabType } from './types';
 import {
   getStatusClass,
   getStatusIcon,
@@ -20,6 +20,7 @@ import { formatDate, calculateNights } from "@/utils/dateUtils";
 
 interface BookingCardProps {
   booking: Booking;
+  activeTab?: BookingTabType;
   onViewDetails: (booking: Booking) => void;
   onModify: (booking: Booking) => void;
   onCancel: (booking: Booking) => void;
@@ -27,11 +28,12 @@ interface BookingCardProps {
 
 const BookingCard: React.FC<BookingCardProps> = ({
   booking,
+  activeTab,
   onViewDetails,
   onModify,
   onCancel
 }) => {
-  const { t } = useTranslation();
+  const { t , i18n } = useTranslation();
 
   // Calculate number of nights
   const nights = calculateNights(booking.checkInDate, booking.checkOutDate);
@@ -56,7 +58,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
       <div className="bg-gray-50 py-2 px-4 border-b border-gray-100 flex items-center justify-between">
         <div className="flex items-center">
           <span className={`inline-flex items-center text-xs font-tripswift-medium px-2.5 py-1 rounded-full ${getStatusClass(booking.status ?? "")}`}>
-            {getStatusIcon(booking.status ?? "")}
+            {getStatusIcon(booking.status ?? "" , i18n.language)}
             {booking.status}
           </span>
         </div>
@@ -65,7 +67,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
       {/* Card Header */}
       <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] p-5 relative">
         <h2 className="text-xl font-tripswift-bold text-tripswift-off-white flex items-start">
-          <FaHotel className="mr-3 flex-shrink-0 mt-0.5" />
+          <FaHotel className={` flex-shrink-0 mt-0.5  ${i18n.language === "ar" ?"ml-3":"mr-3"}`} />
           <span className="leading-tight ">{booking.hotelName}</span>
         </h2>
         {/* Stay Duration */}
@@ -83,14 +85,14 @@ const BookingCard: React.FC<BookingCardProps> = ({
           <div className="mb-3 sm:mb-0">
             <p className="text-xs text-gray-500 mb-1">{t('BookingTabs.BookingCard.checkIn')}</p>
             <p className="flex items-center text-tripswift-black font-tripswift-medium text-sm">
-              <FaCalendarCheck className="mr-2 text-green-500 flex-shrink-0 mb-1" />
+              <FaCalendarCheck className={` text-green-500 flex-shrink-0 mb-1 ${i18n.language === "ar" ?"ml-2":"mr-2"}`} />
               {formatDate(booking.checkInDate)}
             </p>
           </div>
           <div>
             <p className="text-xs text-gray-500 mb-1">{t('BookingTabs.BookingCard.checkOut')}</p>
             <p className="flex items-center text-tripswift-black font-tripswift-medium text-sm">
-              <FaCalendarTimes className="mr-2 text-red-500 flex-shrink-0 mb-1" />
+              <FaCalendarTimes className={` text-green-500 flex-shrink-0 mb-1 ${i18n.language === "ar" ?"ml-2":"mr-2"}`} />
               {formatDate(booking.checkOutDate)}
             </p>
           </div>
@@ -102,7 +104,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
           <div>
             <p className="text-xs text-gray-500 mb-1.5">{t('BookingTabs.BookingCard.roomType')}</p>
             <div className={`inline-flex items-center px-3 py-1.5 rounded-md text-xs font-tripswift-medium ${getRoomTypeStyle(roomType)} z-50`}>
-              {getRoomTypeIcon(roomType)}
+              {getRoomTypeIcon(roomType , i18n.language)}
               {roomType}
             </div>
           </div>
@@ -128,7 +130,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
           <div>
             <p className="text-xs text-gray-500 mb-1">{t('BookingTabs.BookingCard.primaryGuest')}</p>
             <p className="flex items-center text-gray-800">
-              <FaUser className="mr-2 text-tripswift-blue/70 flex-shrink-0" />
+              <FaUser className={`mr-2 text-tripswift-blue/70 flex-shrink-0 ${i18n.language === "ar" ?"ml-2":"mr-2"}`} />
               <span className="font-tripswift-medium">{primaryGuest}</span>
             </p>
           </div>
@@ -149,28 +151,28 @@ const BookingCard: React.FC<BookingCardProps> = ({
           className="w-full bg-tripswift-blue hover:bg-[#054B8F] text-tripswift-off-white py-2.5 px-4 rounded-lg transition-colors duration-300 text-sm font-tripswift-medium shadow-sm hover:shadow-md flex items-center justify-center"
           onClick={() => onViewDetails(booking)}
         >
-          <FaTicketAlt className="mr-2" />
+          <FaTicketAlt className={` ${i18n.language === "ar" ?"ml-2":"mr-2"}`} />
           {t('BookingTabs.BookingCard.viewBookingDetails')}
         </button>
 
-        {booking.status === "Confirmed" && (
-          <div className="grid grid-cols-2 gap-3 mt-3">
-            <button
-              className="bg-tripswift-off-white hover:bg-gray-100 text-tripswift-blue border border-tripswift-blue/30 py-2 px-4 rounded-lg transition-colors duration-300 text-xs font-tripswift-medium flex items-center justify-center"
-              onClick={() => onModify(booking)}
-            >
-              <FaEdit className="mr-1.5" />
-              {t('BookingTabs.BookingCard.modify')}
-            </button>
-            <button
-              className="bg-tripswift-off-white hover:bg-gray-100 text-red-600 border border-red-200 py-2 px-4 rounded-lg transition-colors text-xs font-tripswift-medium flex items-center justify-center"
-              onClick={() => onCancel(booking)}
-            >
-              <FaRegTimesCircle className="mr-1.5" />
-              {t('BookingTabs.BookingCard.cancel')}
-            </button>
-          </div>
-        )}
+        {booking.status === "Confirmed" && activeTab !== 'completed' && (
+  <div className="grid grid-cols-2 gap-3 mt-3">
+    <button
+      className="bg-tripswift-off-white hover:bg-gray-100 text-tripswift-blue border border-tripswift-blue/30 py-2 px-4 rounded-lg transition-colors duration-300 text-xs font-tripswift-medium flex items-center justify-center"
+      onClick={() => onModify(booking)}
+    >
+      <FaEdit className={` ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
+      {t('BookingTabs.BookingCard.modify')}
+    </button>
+    <button
+      className="bg-tripswift-off-white hover:bg-gray-100 text-red-600 border border-red-200 py-2 px-4 rounded-lg transition-colors text-xs font-tripswift-medium flex items-center justify-center"
+      onClick={() => onCancel(booking)}
+    >
+      <FaRegTimesCircle className={` ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
+      {t('BookingTabs.BookingCard.cancel')}
+    </button>
+  </div>
+)}
       </div>
     </div>
   );

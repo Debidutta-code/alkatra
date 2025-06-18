@@ -158,6 +158,39 @@
     "subscribeButton": "Subscribe",
     "copyright": "{year} TripSwift - All rights reserved"
   },
+  "Profile": {
+    "editProfile": "Edit Profile",
+    "signOut": "Sign Out",
+    "overview": "Overview",
+    "myTrips": "My Trips",
+    "preferences": "Preferences",
+    "security": "Security",
+    "notifications": "Notifications",
+    "helpCenter": "Help Center",
+    "tripsCompleted": "Trips Completed",
+    "sinceJoining": "Since joining",
+    "averageRating": "Average Rating",
+    "fromHosts": "From hosts",
+    "savedPlaces": "Saved Places",
+    "wishlisted": "Wishlisted",
+    "quickActions": "Quick Actions",
+    "bookTrip": "Book Trip",
+    "savedPlacesAction": "Saved Places",
+    "rewards": "Rewards",
+    "deals": "Deals",
+    "securitySettings": "Security Settings",
+    "changePassword": "Change Password",
+    "updatePassword": "Update your password",
+    "twoFactorAuth": "Two-Factor Authentication",
+    "twoFactorDesc": "Add an extra layer of security to your account",
+    "enable2FA": "Enable 2FA",
+    "profileUpdatedSuccess": "Profile updated successfully",
+    "profileUpdateFailed": "Failed to update profile",
+    "contentComingSoon": "Content for {{tab}} coming soon...",
+    "newPasswordOptional": "New Password (optional)",
+    "confirmNewPassword": "Confirm New Password",
+    "joined": "Joined {{date}}"
+  },
   "HotelCard": {
     "heroTitle": "Find the Perfect Stay for Your Journey",
     "heroSubtitle": "Discover amazing accommodations at exclusive prices",
@@ -169,7 +202,8 @@
     "errorSelectDates": "Please select both check-in and check-out dates.",
     "exclusiveOffers": "Exclusive Offers Available",
     "freeCancellation": "Free Cancellation",
-    "bestPriceGuarantee": "Best Price Guarantee"
+    "bestPriceGuarantee": "Best Price Guarantee",
+    "downloadourapp": "Download Our App"
   },
   "HotelListing": {
     "CompactSearchBar": {
@@ -331,6 +365,10 @@
     "aboutThisProperty": "About this property",
     "noImagesAvailable": "No images available",
     "propertyAmenities": "Property Amenities",
+    "nights": "Night",
+    "nightsPlural": "Nights",
+    "stay": "stay",
+    "filter":"Filter",
     "amenitiesList": {
       "wifi": "Free Wifi",
       "swimming_pool": "Swimming Pool",
@@ -454,11 +492,12 @@
       "reviewAndPayStep": "Review & Pay",
       "roomSummary": "Room Summary",
       "roomType": "Room Type",
-      "checkIn": "Check-in",
-      "checkOut": "Check-out",
+      "checkIn": "Check-In",
+      "checkOut": "Check-Out",
       "nights": "Night",
       "nightsPlural": "Nights",
       "guestInformation": "Guest Information",
+      "dob":"Date Of Birth",
       "firstNameLabel": "First Name",
       "firstNamePlaceholder": "Enter your first name",
       "firstNameError": "First Name is required",
@@ -491,6 +530,9 @@
       "bookingSummary": "Booking Summary",
       "stayDetails": "Stay Details",
       "primaryGuest": "Primary Guest",
+      "guests": "Guests",
+  "email": "Email",
+  "phone": "Phone",
       "priceDetails": "Price Details",
       "roomRate": "Room Rate",
       "totalAmount": "Total Amount",
@@ -709,8 +751,8 @@
         "cancelled": "Cancelled"
       },
       "stayDetails": "Stay Details",
-      "checkIn": "Check-in",
-      "checkOut": "Check-out",
+      "checkIn": "Check-In",
+      "checkOut": "Check-Out",
       "duration": "Duration",
       "nightsStay_one": "{{count}} Night",
       "nightsStay_other": "{{count}} Nights",
@@ -740,7 +782,10 @@
       "ratePlan": "Rate Plan",
       "modifyBooking": "Modify Booking",
       "cancelBooking": "Cancel Booking",
-      "printItinerary": "Print Itinerary"
+      "printItinerary": "Print Itinerary",
+      "rooms": "Rooms",
+       "dob":"Date Of Birth"
+
     }
   },
   "Payment": {
@@ -809,10 +854,13 @@
         "cardSetupFailedError": "Card setup failed",
         "processing": "Processing...",
         "confirmBooking": "Confirm Booking",
-        "paymentProcessingError": "An error occurred during payment processing"
+        "paymentProcessingError": "An error occurred during payment processing",
+        "footer": "Your card details are encrypted and securely processed by Stripe. We never store your full card information on our servers."
       }
     },
     "PaymentSuccess": {
+      "noBookingDataForDownload": "No booking data available for download.",
+      "downloadSuccessToast": "Booking confirmation downloaded successfully!",
       "processingBooking": "Processing your booking...",
       "confirmingReservation": "We're confirming your reservation. This should only take a moment.",
       "bookingFailedTitle": "Booking Failed",
@@ -853,5 +901,21 @@
       "contactSupportButton": "Contact Support",
       "exploreMoreHotels": "Explore more hotel options"
     }
+  },
+  "GuestBox" :{
+    "guests": "Guests",
+    "adultsPlural": "Adults",
+    "infantsPlural": "Infants",
+    "infant": "Infant",
+    "roomsPlural": "Rooms",
+    "child": "Child",
+    "childrenPlural": "Children",
+    "age":"Age",
+    "year": "year",
+  "year_plural": "years",
+  "selectAge": "Select age",
+    "selectGuests": "Select Guests",
+        "ages": "Ages"
+
   }
 }

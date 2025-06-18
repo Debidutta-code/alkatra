@@ -97,8 +97,8 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
     if (newRoom.total_room === 0) {
       errors.total_room = "Total Room is required."
     }
-    else if(newRoom.total_room < 0){
-      errors.total_room = "Value must be greater than or equal to zero"
+    else if(newRoom.total_room <= 0){
+      errors.total_room = "Value must be greater than zero"
     }
     ;
     if (newRoom.floor < 0) errors.floor = "Value must be greater than or equal to zero";
@@ -106,29 +106,29 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
     if (newRoom.room_size === 0){
        errors.room_size = "Room Size is required."
     }
-    else if(newRoom.room_size < 0){
-      errors.room_size = "Value must be greater than or equal to zero"
+    else if(newRoom.room_size <= 0){
+      errors.room_size = "Value must be greater than zero"
     };
     if (!newRoom.room_unit) errors.room_unit = "Room Unit is required.";
     if (!newRoom.smoking_policy) errors.smoking_policy = "Smoking Policy is required.";
     if (newRoom.max_occupancy === 0) {
       errors.max_occupancy = "Max Occupancy is required."
     }
-    else if(newRoom.max_occupancy < 0){
-      errors.max_occupancy = "Value must be greater than or equal to zero"
+    else if(newRoom.max_occupancy <= 0){
+      errors.max_occupancy = "Value must be greater than zero"
 
     };
     if (newRoom.max_number_of_adults === 0){
        errors.max_number_of_adults = "Max number of adults is required."
     }
-    else if(newRoom.max_number_of_adults < 0){
-             errors.max_number_of_adults = "Value must be greater than or equal to zero"
+    else if(newRoom.max_number_of_adults <= 0){
+             errors.max_number_of_adults = "Value must be greater than zero"
 
     };
     if (newRoom.max_number_of_children < 0) errors.max_number_of_children = "Value must be greater than or equal to zero";
     if (newRoom.number_of_bedrooms === 0) {errors.number_of_bedrooms = "Number of bedrooms is required."}
-    else if(newRoom.number_of_bedrooms < 0){
-      errors.number_of_bedrooms ="Value must be greater than or equal to zero"
+    else if(newRoom.number_of_bedrooms <= 0){
+      errors.number_of_bedrooms ="Value must be greater than zero"
     };
     if (newRoom.number_of_living_room < 0) errors.number_of_living_room = "Value must be greater than or equal to zero";
     if (newRoom.extra_bed < 0) errors.extra_bed = "Value must be greater than or equal to zero";
@@ -333,7 +333,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
             <Input
               id="total_room"
               name="total_room"
-              min={0}
+              min={1}
               type="number"
               value={newRoom.total_room === 0 ? "" : newRoom.total_room}
               onChange={handleInputChange}
@@ -380,7 +380,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
               id="room_size"
               name="room_size"
               type="number"
-              min={0}
+              min={1}
               value={newRoom.room_size===0 ? "": newRoom.room_size}
               onChange={handleInputChange}
               placeholder="Room Size"
@@ -432,7 +432,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
               id="max_occupancy"
               name="max_occupancy"
               type="number"
-              min={0}
+              min={1}
               value={newRoom.max_occupancy ===0 ? "" : newRoom.max_occupancy}
               onChange={handleInputChange}
               placeholder="Max Occupancy"
@@ -447,7 +447,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
               id="max_number_of_adults"
               name="max_number_of_adults"
               type="number"
-              min={0}
+              min={1}
               value={newRoom.max_number_of_adults === 0 ? "":newRoom.max_number_of_adults}
               onChange={handleInputChange}
               placeholder="Max number of adults"
@@ -480,7 +480,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
               id="number_of_bedrooms"
               name="number_of_bedrooms"
               type="number"
-              min={0}
+              min={1}
               value={newRoom.number_of_bedrooms=== 0 ?"" : newRoom.number_of_bedrooms}
               onChange={handleInputChange}
               placeholder="Number of bedrooms"
@@ -708,15 +708,15 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
                           </h3>
                           <div>
                             <span className="text-sm text-muted-foreground">Room Name</span>
-                            <p className="font-medium text-lg">{room.room_name}</p>
+                            <p className="font-medium text-lg">{room.room_name || "N/A"}</p>
                           </div>
                           <div>
                             <span className="text-sm text-muted-foreground">Room Type</span>
-                            <p className="font-medium">{room.room_type}</p>
+                            <p className="font-medium">{room.room_type || "N/A"}</p>
                           </div>
                           <div>
                             <span className="text-sm text-muted-foreground">Floor</span>
-                            <p className="font-medium">{room.floor}</p>
+                            <p className="font-medium">{room.floor || "N/A"}</p>
                           </div>
                           <div>
                             <span className="text-sm text-muted-foreground">Room View</span>
@@ -731,19 +731,19 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
                           </h3>
                           <div>
                             <span className="text-sm text-muted-foreground">Room Size</span>
-                            <p className="font-medium">{room.room_size} {room.room_unit}</p>
+                            <p className="font-medium">{room.room_size || "N/A"} {room.room_unit || "N/A"}</p>
                           </div>
                           <div>
                             <span className="text-sm text-muted-foreground">Max Occupancy</span>
-                            <p className="font-medium">{room.max_occupancy}</p>
+                            <p className="font-medium">{room.max_occupancy || "N/A"}</p>
                           </div>
                           <div>
                             <span className="text-sm text-muted-foreground">Max Adults</span>
-                            <p className="font-medium">{room.max_number_of_adults}</p>
+                            <p className="font-medium">{room.max_number_of_adults || "N/A"}</p>
                           </div>
                           <div>
                             <span className="text-sm text-muted-foreground">Max Children</span>
-                            <p className="font-medium">{room.max_number_of_children}</p>
+                            <p className="font-medium">{room.max_number_of_children || "N/A"}</p>
                           </div>
                         </div>
 
@@ -754,15 +754,15 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
                           </h3>
                           <div>
                             <span className="text-sm text-muted-foreground">Bedrooms</span>
-                            <p className="font-medium">{room.number_of_bedrooms}</p>
+                            <p className="font-medium">{room.number_of_bedrooms || "N/A"}</p>
                           </div>
                           <div>
                             <span className="text-sm text-muted-foreground">Extra Beds</span>
-                            <p className="font-medium">{room.extra_bed}</p>
+                            <p className="font-medium">{room.extra_bed || "N/A"}</p>
                           </div>
                           <div>
                             <span className="text-sm text-muted-foreground">Smoking Policy</span>
-                            <p className="font-medium">{room.smoking_policy}</p>
+                            <p className="font-medium">{room.smoking_policy || "N/A"}</p>
                           </div>
                           <div>
                             <span className="text-sm text-muted-foreground">Availability</span>

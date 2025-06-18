@@ -162,7 +162,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
       default: return <FaCheckCircle className={iconClass} />;
     }
   };
-
+  const {i18n}=useTranslation();
   return (
     <>
       <Card
@@ -233,7 +233,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
             {/* Room specs section */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 p-1.5 rounded-md">
               <div className="flex items-center text-xs font-tripswift-medium text-tripswift-black/70">
-                <FaUser className="mr-1.5 h-3 w-3 text-tripswift-blue" />
+                <FaUser className={` h-3 w-3 text-tripswift-blue ${i18n.language==="ar" ? "ml-2":"mr-2"}`} />
                 <span>
                   {data.max_number_of_adults || data.max_occupancy} {t('RoomsPage.RoomCard.adults')}
                 </span>
@@ -241,14 +241,14 @@ export const RoomCard: React.FC<RoomCardProps> = ({
 
               {(data.max_number_of_children || 0) > 0 && (
                 <div className="flex items-center text-xs font-tripswift-medium text-tripswift-black/70">
-                  <FaChild className="mr-1.5 h-3 w-3 text-tripswift-blue" />
+                  <FaChild className={` h-3 w-3 text-tripswift-blue ${i18n.language==="ar" ? "ml-2":"mr-2"}`}/>
                   <span>{data.max_number_of_children} {t('RoomsPage.RoomCard.children')}</span>
                 </div>
               )}
 
               {data.room_size > 0 && (
                 <div className="flex items-center text-xs font-tripswift-medium text-tripswift-black/70">
-                  <FaRulerCombined className="mr-1.5 h-3 w-3 text-tripswift-blue" />
+                  <FaRulerCombined className={` h-3 w-3 text-tripswift-blue ${i18n.language==="ar" ? "ml-2":"mr-2"}`} />
                   <span>{data.room_size} {data.room_unit || "m²"}</span>
                 </div>
               )}
@@ -256,7 +256,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
               {data.room_view && (
                 <div className="flex flex-wrap gap-1.5">
                   <span className="bg-tripswift-blue/5 text-tripswift-black/70 text-xs px-0.5 py-1 rounded-full font-tripswift-medium inline-flex items-center">
-                    <FaTree className="h-3 w-3 mr-1.5 text-tripswift-blue" />
+                    <FaTree className={` h-3 w-3 text-tripswift-blue ${i18n.language==="ar" ? "ml-2":"mr-2"}`} />
                     {data.room_view}
                   </span>
                 </div>
@@ -267,7 +267,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
             <div className="flex flex-wrap gap-x-2 gap-y-1.5">
               {getRoomAmenities().map((amenity, index) => (
                 <div key={index} className="flex items-center text-xs bg-blue-50 text-tripswift-blue/80 font-tripswift-medium px-2 py-1 rounded-full">
-                  {React.cloneElement(amenity.icon, { className: "h-3 w-3 mr-1.5" })}
+                  {React.cloneElement(amenity.icon, { className :` h-3 w-3  ${i18n.language==="ar" ? "ml-2":"mr-2"}` })}
                   <span className="truncate">{amenity.name}</span>
                 </div>
               ))}
@@ -286,7 +286,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
                     {price}
                   </span>
                   {isPriceAvailable && (
-                    <span className="text-tripswift-black/60 text-lg ml-1.5 font-tripswift-regular">
+                    <span className={`text-tripswift-black/60 text-lg  font-tripswift-regular ${i18n.language==="ar" ? "mr-2":"ml-2"}`}>
                       / {t('RoomsPage.RoomCard.night')}
                     </span>
                   )}
@@ -318,11 +318,11 @@ export const RoomCard: React.FC<RoomCardProps> = ({
                 onClick={() => setShowPolicyModal(true)}
                 className="text-xs text-tripswift-black/60 hover:text-tripswift-blue transition-colors duration-300 flex items-center font-tripswift-regular"
               >
-                <FaInfoCircle className="mr-1.5 h-3 w-3" /> {t('RoomsPage.RoomCard.viewBookingPolicies')}
+                <FaInfoCircle className={` h-3 w-3  ${i18n.language==="ar" ? "ml-2":"mr-2"}`} /> {t('RoomsPage.RoomCard.viewBookingPolicies')}
               </button>
 
               <div className="flex items-center text-xs text-tripswift-black/60 font-tripswift-regular">
-                <FaShieldAlt className="mr-1.5 h-3 w-3 text-green-600" />
+                <FaShieldAlt className={` h-3 w-3 text-green-600  ${i18n.language==="ar" ? "ml-2":"mr-2"}`} />
                 <span>{t('RoomsPage.RoomCard.securePayment')}</span>
               </div>
             </div>
