@@ -68,9 +68,10 @@ const createPropertySchema = z.object({
     ),
 
   // property_code: z.string().min(1, "Property code is required"),
-  property_code: z.string().refine((value) => /^\d{6}$/.test(value), {
-    message: "Please provide a valid 6-digit property code",
-  }),
+  // property_code: z.string().refine((value) => /^\d{6}$/.test(value), {
+  //   message: "Please provide a valid 6-digit property code",
+  // }),
+  property_code: z.string().min(1, "Property code is required"),
   description: z.string().min(1, "Description is required"),
 
   property_category: z.string().min(1, "Property category is required"),
@@ -268,7 +269,7 @@ export default function PropertyInfo({ onNext }: Props) {
       }
     }
   }, [propertyDetails]);
-// console.log("property details",propertyDetails?.property_category)
+  // console.log("property details",propertyDetails?.property_category)
   useEffect(() => {
     const storedData = localStorage.getItem("propertyData");
     if (storedData) {
@@ -319,9 +320,11 @@ export default function PropertyInfo({ onNext }: Props) {
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setFormLoading(false);
-        toast.error(
-          err?.response?.data?.message || "Failed to create property"
-        );
+        if (err?.response?.data?.message.includes("property code")) {
+          toast.error("This property code is already in use. Please choose a different one.");
+        } else {
+          toast.error(err?.response?.data?.message || "Failed to create property");
+        }
       }
     }
   };
@@ -459,11 +462,16 @@ export default function PropertyInfo({ onNext }: Props) {
 
       onNext();
     } catch (error) {
-      console.error("Error updating property details:", error);
-      toast.error("Failed to update property details. Please try again later.");
+      if (axios.isAxiosError(error)) {
+        if (error?.response?.data?.message.includes("property code")) {
+          toast.error("This property code is already in use. Please choose a different one.");
+        } else {
+          toast.error("Failed to update property details. Please try again later.");
+        }
+      }
     }
   };
-  
+
 
   if (propertyId && !editMode) {
     return (
@@ -512,7 +520,7 @@ export default function PropertyInfo({ onNext }: Props) {
               )}
             </div>
           </div>
-           <div className="flex flex-col md:flex-row gap-3 mt-2 items-start">
+          <div className="flex flex-col md:flex-row gap-3 mt-2 items-start">
             {/* Property Contact */}
             <div className="w-full md:w-1/2 flex flex-col">
               <Label htmlFor="property_contact">
@@ -531,7 +539,7 @@ export default function PropertyInfo({ onNext }: Props) {
                   // Only allow numbers
                   const value = e.target.value.replace(/\D/g, "");
                   if (value.length <= 10) {
-                  setValue("property_contact", value, { shouldValidate: true });
+                    setValue("property_contact", value, { shouldValidate: true });
                   }
                 }}
               />
@@ -553,7 +561,6 @@ export default function PropertyInfo({ onNext }: Props) {
                 className="mt-[3px]"
                 {...register("property_code")}
                 type="text"
-                maxLength={6}
               />
               {propertyCodeError && (
                 <p className="text-red-500 text-sm mt-1">
@@ -577,7 +584,7 @@ export default function PropertyInfo({ onNext }: Props) {
                       ? "border-red-500 focus-visible:ring-red-500"
                       : ""
                   }
-                  style={{resize:"none"}}
+                  style={{ resize: "none" }}
 
                 />
               </div>
@@ -596,11 +603,10 @@ export default function PropertyInfo({ onNext }: Props) {
               <div className="inline-block mt-[3px] relative w-full ">
                 <select
                   {...register("property_category")}
-                  className={`block appearance-none w-full  border ${
-                    propertyCategoryError
-                      ? "border-red-500"
-                      : "border-gray-300 dark:border-gray-600"
-                  } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 rounded-md leading-tight focus:outline-none focus:border-primary-500`}
+                  className={`block appearance-none w-full  border ${propertyCategoryError
+                    ? "border-red-500"
+                    : "border-gray-300 dark:border-gray-600"
+                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 rounded-md leading-tight focus:outline-none focus:border-primary-500`}
                 >
                   <option value="" disabled>
                     Select Property Category
@@ -662,11 +668,10 @@ export default function PropertyInfo({ onNext }: Props) {
               <div className="inline-block mt-[3px] relative w-full">
                 <select
                   {...register("property_type")}
-                  className={`block appearance-none w-full border ${
-                    propertyTypeError
-                      ? "border-red-500"
-                      : "border-gray-300 dark:border-gray-600"
-                  } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 rounded-md leading-tight focus:outline-none focus:border-blue-500`}
+                  className={`block appearance-none w-full border ${propertyTypeError
+                    ? "border-red-500"
+                    : "border-gray-300 dark:border-gray-600"
+                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 rounded-md leading-tight focus:outline-none focus:border-blue-500`}
                 >
                   <option value="" disabled>
                     Select Property Type
@@ -837,7 +842,7 @@ export default function PropertyInfo({ onNext }: Props) {
                   // Only allow numbers
                   const value = e.target.value.replace(/\D/g, "");
                   if (value.length <= 10) {
-                  setValue("property_contact", value, { shouldValidate: true });
+                    setValue("property_contact", value, { shouldValidate: true });
                   }
                 }}
               />
@@ -859,7 +864,6 @@ export default function PropertyInfo({ onNext }: Props) {
                 className="mt-[3px]"
                 {...register("property_code")}
                 type="text"
-                maxLength={6}
               />
               {propertyCodeError && (
                 <p className="text-red-500 text-sm mt-1">
@@ -883,7 +887,7 @@ export default function PropertyInfo({ onNext }: Props) {
                       ? "border-red-500 focus-visible:ring-red-500"
                       : ""
                   }
-                  style={{resize:"none"}}
+                  style={{ resize: "none" }}
                 />
               </div>
               {propertydescription && (
@@ -901,11 +905,10 @@ export default function PropertyInfo({ onNext }: Props) {
               <div className="inline-block mt-[3px] relative w-full ">
                 <select
                   {...register("property_category")}
-                  className={`block appearance-none w-full  border ${
-                    propertyCategoryError
-                      ? "border-red-500"
-                      : "border-gray-300 dark:border-gray-600"
-                  } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 rounded-md leading-tight focus:outline-none focus:border-primary-500`}
+                  className={`block appearance-none w-full  border ${propertyCategoryError
+                    ? "border-red-500"
+                    : "border-gray-300 dark:border-gray-600"
+                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 rounded-md leading-tight focus:outline-none focus:border-primary-500`}
                 >
                   <option value="" disabled>
                     Select Property Category
@@ -967,11 +970,10 @@ export default function PropertyInfo({ onNext }: Props) {
               <div className="inline-block mt-[3px] relative w-full">
                 <select
                   {...register("property_type")}
-                  className={`block appearance-none w-full border ${
-                    propertyTypeError
-                      ? "border-red-500"
-                      : "border-gray-300 dark:border-gray-600"
-                  } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 rounded-md leading-tight focus:outline-none focus:border-blue-500`}
+                  className={`block appearance-none w-full border ${propertyTypeError
+                    ? "border-red-500"
+                    : "border-gray-300 dark:border-gray-600"
+                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 rounded-md leading-tight focus:outline-none focus:border-blue-500`}
                 >
                   <option value="" disabled>
                     Select Property Type
@@ -1111,20 +1113,20 @@ function PreviewPropertyImages({
           {!files.length
             ? "No preview available"
             : files?.map((file, i) => (
-                <div
-                  key={`${JSON.stringify(file) + i}`}
-                  onClick={() => setCurrentImage(i)}
-                  className="rounded-md cursor-pointer overflow-hidden"
-                >
-                  <Image
-                    key={file?.public_id}
-                    src={file?.url}
-                    height={60}
-                    width={60}
-                    alt=""
-                  />
-                </div>
-              ))}
+              <div
+                key={`${JSON.stringify(file) + i}`}
+                onClick={() => setCurrentImage(i)}
+                className="rounded-md cursor-pointer overflow-hidden"
+              >
+                <Image
+                  key={file?.public_id}
+                  src={file?.url}
+                  height={60}
+                  width={60}
+                  alt=""
+                />
+              </div>
+            ))}
         </div>
         <div className="rounded-md min-h-[250px] max-h-[350px] overflow-hidden">
           <Image
@@ -1273,14 +1275,14 @@ function UploadPropertyImages({
               {!files.length
                 ? "No preview available"
                 : files.map((file) => (
-                    <Image
-                      key={file?.name}
-                      src={file?.preview}
-                      height={60}
-                      width={60}
-                      alt=""
-                    />
-                  ))}
+                  <Image
+                    key={file?.name}
+                    src={file?.preview}
+                    height={60}
+                    width={60}
+                    alt=""
+                  />
+                ))}
             </CardContent>
           </Card>
         </div>

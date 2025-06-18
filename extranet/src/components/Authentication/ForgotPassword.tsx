@@ -141,7 +141,7 @@ export default function VerifyEmailForm({ onBack }: VerifyEmailFormProps) {
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="px-2 text-muted-foreground bg-background">
-              Or continue with
+              Or
             </span>
           </div>
         </div>

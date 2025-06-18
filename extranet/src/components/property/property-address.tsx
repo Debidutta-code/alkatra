@@ -63,9 +63,8 @@ import { Textarea } from "./../ui/textarea";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { RootState, useSelector } from "../../redux/store";
 import Cookies from "js-cookie";
-import { City, Country, State } from "country-state-city";
 import error from "next/error";
-import { ICountry, IState, ICity } from "country-state-city";
+import { Country, State, City, IState, ICity } from "country-state-city";
 
 const createPropertyAddressSchema = z.object({
   address_line_1: z.string().min(1, "Address line 1 is required"),
@@ -90,19 +89,19 @@ type Inputs = {
   zip_code: string;
 };
 
-type State = {
-  countryCode: any;
-  isoCode: string;
-  name: string;
-};
+// type State = {
+//   countryCode: any;
+//   isoCode: string;
+//   name: string;
+// };
 
 type Country = {
   isoCode: string;
   name: string;
 };
 
+type State = IState;
 interface City {
-  // id: string;
   name: string;
   countryIsoCode: string;
   stateIsoCode: string;
@@ -147,11 +146,12 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
 
   useEffect(() => {
     if (selectedState && selectedCountry) {
-      const fetchedCities: any = City.getCitiesOfState(
-        selectedCountry,
-        selectedState
-      );
-      setCities(fetchedCities);
+      const fetchedCities: ICity[] = City.getCitiesOfState(selectedCountry, selectedState);
+      setCities(fetchedCities.map((city: ICity) => ({
+        name: city.name,
+        countryIsoCode: selectedCountry,
+        stateIsoCode: selectedState,
+      })) || []); // Critical fix
     }
   }, [selectedState, selectedCountry]);
 
@@ -256,49 +256,45 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
       setValue("address_line_1", propertyAddress.address_line_1 || "");
       setValue("address_line_2", propertyAddress.address_line_2 || "");
 
+      setSelectedCountry(propertyAddress.country || "");
+      setValue("country", propertyAddress.country || "");
+      setSelectedState(propertyAddress.state || "");
+      setValue("state", propertyAddress.state || "");
+      setSelectedCity(propertyAddress.city || "");
+      setValue("city", propertyAddress.city || "");
       // setValue("country", propertyAddress.country || "");
       // setValue("state", propertyAddress.state || "");
       // setValue("city", propertyAddress.city || "");
 
-      const selectedCountryObj: any = countries.find(
-        (country) => country.isoCode === propertyAddress.country
-      );
-      console.log("Selected Country Object:", selectedCountryObj);
-      setSelectedCountry(selectedCountryObj?.isoCode);
-      const countryIsoCode = selectedCountryObj
-        ? selectedCountryObj.isoCode
-        : "";
-      setValue("country", countryIsoCode);
+      // const selectedCountryObj: any = countries.find(
+      //   (country) => country.isoCode === propertyAddress.country
+      // );
+      // setSelectedCountry(selectedCountryObj?.isoCode);
+      // const countryIsoCode = selectedCountryObj
+      //   ? selectedCountryObj.isoCode
+      //   : "";
+      // setValue("country", countryIsoCode);
 
-      const selectedStateObj: any = states.find(
-        (state) =>
-          state.isoCode === propertyAddress.state &&
-          state.countryCode === countryIsoCode
-        // console.log(state.isoCode ,"===", countryIsoCode)
-      );
-      const stateName = selectedStateObj ? selectedStateObj.isoCode : "";
-      setValue("state", stateName);
-      console.log("Selected state Object:", selectedStateObj);
-      setSelectedState(selectedStateObj?.isoCode);
+      // const selectedStateObj: any = states.find(
+      //   (state) =>
+      //     state.isoCode === propertyAddress.state &&
+      //     state.countryCode === countryIsoCode
+      //   // console.log(state.isoCode ,"===", countryIsoCode)
+      // );
+      // const stateName = selectedStateObj ? selectedStateObj.isoCode : "";
+      // setValue("state", stateName);
+      // setSelectedState(selectedStateObj?.isoCode);
 
-      const selectedCityObj = cities.find(
-        (city) => city.name === propertyAddress.city
-      );
-      const cityName = selectedCityObj ? selectedCityObj.name : "";
-      console.log("city name _________________________", cityName);
-      setValue("city", cityName);
-      console.log("Selected city Object:", selectedCityObj);
-      setSelectedCity(cityName);
-
-      console.log("States Array:", states);
-      console.log("Property Address State:", propertyAddress.state);
-      console.log("Property Address Country:", propertyAddress.country);
-      console.log("Country ISO Code:", countryIsoCode);
-
+      // const selectedCityObj = cities.find(
+      //   (city) => city.name === propertyAddress.city
+      // );
+      // const cityName = selectedCityObj ? selectedCityObj.name : "";
+      // setValue("city", cityName);
+      // setSelectedCity(cityName);
       setValue("landmark", propertyAddress.landmark || "");
       setValue("zip_code", propertyAddress.zip_code.toString() || "");
     }
-  }, [propertyAddress, setValue, countries, states, cities]);
+  }, [propertyAddress, setValue]);
 
   const handlePrevious = async (property_id: string) => {
     try {
@@ -483,34 +479,29 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
               <div className=" mt-1 relative">
                 <select
                   {...register("country")}
-                  className={`block appearance-none w-full border  ${
-                    countryError
-                      ? "border-red-500"
-                      : "border-gray-300 dark:border-gray-600"
-                  } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 md:h-12.1 md:px-3 text-sm  rounded-md leading-tight focus:outline-none focus:border-primary-500`}
+                  className={`block appearance-none w-full border ${countryError ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 md:h-12.1 md:px-3 text-sm rounded-md leading-tight focus:outline-none focus:border-primary-500`}
                   value={selectedCountry}
-                  onChange={(e) =>{ handleCountryChange(e.target.value);
-                    setValue("country",e.target.value);
+                  onChange={(e) => {
+                    handleCountryChange(e.target.value);
+                    setValue("country", e.target.value);
                   }}
                 >
+                  <option value="" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+                    Select Country
+                  </option>
                   {loading ? (
-                    <option
-                      value=""
-                      className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                    >
+                    <option value="" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
                       Loading...
                     </option>
                   ) : error ? (
-                    <option
-                      value=""
-                      className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                    >
+                    <option value="" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
                       Error: {error}
                     </option>
                   ) : (
                     countries.map((country) => (
                       <option
-                        key={country.name}
+                        key={country.isoCode}
                         value={country.isoCode}
                         className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                       >
@@ -549,28 +540,23 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
               <div className="inline-block mt-1 relative w-full">
                 <select
                   {...register("state")}
-                  className={`block appearance-none w-full border ${
-                    stateError
-                      ? "border-red-500"
-                      : "border-gray-300 dark:border-gray-600"
-                  } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 md:h-12.1 md:px-3 rounded-md leading-tight focus:outline-none focus:border-primary-500`}
+                  className={`block appearance-none w-full border ${stateError ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 md:h-12.1 md:px-3 rounded-md leading-tight focus:outline-none focus:border-primary-500`}
                   value={selectedState}
-                  onChange={(e) => {setSelectedState(e.target.value);
-                     setValue("state",e.target.value);
+                  onChange={(e) => {
+                    setSelectedState(e.target.value);
+                    setValue("state", e.target.value);
                   }}
                 >
+                  <option value="" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+                    Select State
+                  </option>
                   {loading ? (
-                    <option
-                      value=""
-                      className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                    >
+                    <option value="" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
                       Loading...
                     </option>
                   ) : error ? (
-                    <option
-                      value=""
-                      className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                    >
+                    <option value="" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
                       Error: {error}
                     </option>
                   ) : (
@@ -616,28 +602,23 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
               <div className="inline-block mt-1 relative w-full">
                 <select
                   {...register("city")}
-                  className={`block appearance-none w-full border ${
-                    stateError
-                      ? "border-red-500"
-                      : "border-gray-300 dark:border-gray-600"
-                  } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 md:h-12.1 md:px-3 rounded-md leading-tight focus:outline-none focus:border-primary-500`}
+                  className={`block appearance-none w-full border ${cityError ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 md:h-12.1 md:px-3 rounded-md leading-tight focus:outline-none focus:border-primary-500`}
                   value={selectedCity}
-                  onChange={(e) => {setSelectedCity(e.target.value);
-                    setValue("city",e.target.value);
+                  onChange={(e) => {
+                    setSelectedCity(e.target.value);
+                    setValue("city", e.target.value);
                   }}
                 >
+                  <option value="" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+                    Select City
+                  </option>
                   {loading ? (
-                    <option
-                      value=""
-                      className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                    >
+                    <option value="" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
                       Loading...
                     </option>
                   ) : error ? (
-                    <option
-                      value=""
-                      className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                    >
+                    <option value="" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
                       Error: {error}
                     </option>
                   ) : (
