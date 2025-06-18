@@ -155,7 +155,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
           {t('BookingTabs.BookingCard.viewBookingDetails')}
         </button>
 
-        {booking.status === "Confirmed" && activeTab !== 'completed' && (
+        {(booking.status === "Confirmed" || booking.status==="Modified" )&& activeTab !== 'completed' && (
   <div className="grid grid-cols-2 gap-3 mt-3">
     <button
       className="bg-tripswift-off-white hover:bg-gray-100 text-tripswift-blue border border-tripswift-blue/30 py-2 px-4 rounded-lg transition-colors duration-300 text-xs font-tripswift-medium flex items-center justify-center"
