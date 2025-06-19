@@ -22,6 +22,7 @@ import {
   getRoomTypeStyle,
   getRoomTypeIcon,
 } from "./utils";
+import { dir } from "console";
 
 interface BookingDetailsModalProps {
   booking: Booking;
@@ -74,10 +75,10 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
   return (
     <>
       {/* Modal Header */}
-      <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] p-4 sm:p-5 md:p-6 rounded-t-xl relative">
+      <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] px-4 sm:px-5 md:px-6 py-4 rounded-t-xl relative">
         <div className="flex justify-between items-start">
           <div>
-            <h2 className="text-xl sm:text-2xl font-tripswift-bold text-tripswift-off-white leading-tight mb-1">
+            <h2 className="text-xl sm:text-2xl font-tripswift-bold text-tripswift-off-white leading-tight">
               {booking.hotelName}
             </h2>
           </div>
@@ -102,7 +103,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
           </button>
         </div>
         {/* Status Badge */}
-        <div className="absolute bottom-0 right-4 sm:right-6 transform translate-y-1/2">
+        <div className={`absolute bottom-0  transform translate-y-1/2 ${i18n.language ==="ar"?"left-4 sm:left-6":"right-4 sm:right-6"}`}>
           <div
             className={`flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-full shadow-md text-xs sm:text-sm ${
               booking.status === "Confirmed"
@@ -114,7 +115,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
           >
             <span
               className={`${
-                i18n.language === "ar" ? "ml-1 sm:ml-1.5" : "mr-1 sm:mr-1.5"
+                i18n.language === "ar" ? "ml-1 sm:ml-1.5 "  : "mr-1 sm:mr-1.5 di"
               }`}
             >
               {getStatusIcon(booking.status ?? "", i18n.language)}
@@ -125,10 +126,10 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
       </div>
 
       {/* Modal Content */}
-      <div className="p-4 sm:p-5 md:p-6 pt-8 sm:pt-10 font-noto-sans">
+      <div className="px-4 sm:px-5 md:px-6 py-3 font-noto-sans">
         {/* Stay Details */}
-        <div className="mb-2 md:mb-3">
-          <h3 className="text-lg sm:text-xl font-tripswift-bold text-gray-800  flex items-center">
+        <div >
+          <h3 className="text-lg sm:text-xl font-tripswift-bold text-gray-800  flex items-center py-2">
             <FaRegCalendarAlt
               className={` text-tripswift-blue text-base sm:text-lg ${
                 i18n.language === "ar" ? "ml-1.5 sm:ml-2" : "mr-1.5 sm:mr-2"
@@ -137,10 +138,10 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             {t("BookingTabs.BookingDetailsModal.stayDetails")}
           </h3>
 
-          <div className="bg-tripswift-off-white p-3 sm:p-4 md:p-5 rounded-xl">
+          <div className="bg-tripswift-off-white px-3 sm:px-4 md:px-5 py-1 rounded-xl">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6">
               <div>
-                <p className="text-xs sm:text-sm text-tripswift-black/60 mb-0.5 sm:mb-1">
+                <p className="text-xs sm:text-sm  text-gray-500  mb-0.5 sm:mb-1">
                   {t("BookingTabs.BookingDetailsModal.checkIn")}
                 </p>
                 <p className="flex items-center text-tripswift-black font-tripswift-bold text-sm sm:text-base">
@@ -170,7 +171,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                 </p>
               </div>
             </div>
-            <div className="border-t border-gray-200 mt-2 md:mt-4 pt-2 sm:pt-3">
+            <div className="border-t border-gray-200 mt-2  pt-2 sm:pt-3">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6">
                 <div>
                   <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">
@@ -178,7 +179,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                   </p>
                   <div className="flex items-center">
                     <span
-                      className={`inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 rounded-md text-xs sm:text-sm font-tripswift-medium ${getRoomTypeStyle(
+                      className={`inline-flex items-center px-2 sm:px-3 py-2 sm:py-1.5 rounded-md text-xs sm:text-sm font-tripswift-medium ${getRoomTypeStyle(
                         roomType
                       )}`}
                     >
@@ -206,7 +207,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
         </div>
 
         {/*  (all guests) */}
-        <div className="border-t border-gray-200 mb-2 md:mb-3">
+        <div className=" mt-1 border-t border-gray-200 ">
           <h3 className="text-lg sm:text-xl mt-2 font-tripswift-bold text-gray-800 flex items-center">
             <FaUser
               className={`text-tripswift-blue text-base sm:text-lg ${
@@ -215,26 +216,28 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             />
             {t("BookingTabs.BookingDetailsModal.guestDetails")}
           </h3>
-          <div className="bg-tripswift-off-white p-3 sm:p-4 md:p-5 rounded-xl">
-            <div className="space-y-4">
+          <div className="bg-tripswift-off-white px-3 sm:px-4 md:px-5 rounded-xl">
+            <div className="space-y-2">
               {booking.guestDetails && booking.guestDetails.length > 0 ? (
                 booking.guestDetails.map((guest: GuestDetails, idx: number) => (
                   <div
                     key={guest._id || idx}
-                    className="flex flex-col md:flex-row md:items-center md:gap-24 gap-2 border-b border-gray-100 pb-2 last:border-b-0 last:pb-0"
+                    className="flex flex-col  md:flex-row md:items-center md:gap-24 gap-2 border-b border-gray-100 last:border-b-0 last:pb-0"
                   >
                     <div className="flex md:w-1/3  sm:items-center gap-2 font-tripswift-medium">
-                      <FaUser className="text-tripswift-blue" />
+                      <FaUser className="text-tripswift-blue mt-1 sm:mt-0" />
                       <span className="w-full">
                         {guest.firstName} {guest.lastName}
                       </span>
                     </div>
                     {guest.dob && (
-                      <div className="text-xs md:ml-[32px] text-gray-500 ">
+                      <div className="text-xs md:ml-[13px] text-gray-500 ">
                         {t("BookingTabs.BookingDetailsModal.dob", {
                           defaultValue: "DOB",
                         })}
-                        : {formatDOB(guest.dob)}
+                         : <div className=" text-gray-800 font-tripswift-medium text-sm">
+                          {formatDOB(guest.dob)}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -245,7 +248,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                 </div>
               )}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6 mt-2">
               <div>
                 <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">
                   {t("BookingTabs.BookingDetailsModal.contactNumber")}
@@ -264,8 +267,8 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
         </div>
 
         {/* Payment Details */}
-        <div className="border-t border-gray-200 mb-2 md:mb-3">
-          <h3 className="text-lg sm:text-xl mt-2 font-tripswift-bold text-gray-800 mb-1 md:mb-2 flex items-center">
+        <div className="border-t mt-1 border-gray-200 ">
+          <h3 className="text-lg sm:text-xl mt-2 font-tripswift-bold text-gray-800 mb-1 flex items-center">
             <FaCreditCard
               className={` text-tripswift-blue text-base sm:text-lg ${
                 i18n.language === "ar" ? "ml-1.5 sm:ml-2" : "mr-1.5 sm:mr-2"
@@ -273,7 +276,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             />
             {t("BookingTabs.BookingDetailsModal.paymentDetails")}
           </h3>
-          <div className="bg-tripswift-off-white p-3 sm:p-4 md:p-5 rounded-xl">
+          <div className="bg-tripswift-off-white px-3 sm:px-4 md:px-5 py-2 rounded-xl">
             {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6">
               <div>
                 <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.paymentMethod')}</p>
@@ -316,9 +319,9 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                 </p>
               </div>
             </div>
-            <div className="border-t border-gray-200 mt-3 md:mt-4 pt-4 sm:pt-5 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+            <div className="border-t border-gray-200 mt-2 py-2 flex flex-col sm:flex-row justify-between items-start sm:items-center">
               <div className="flex flex-col space-y-0.5 sm:space-y-1">
-                <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">
+                <p className="text-xs sm:text-sm text-gray-500">
                   {t("BookingTabs.BookingDetailsModal.totalAmount")}
                 </p>
                 <div className="flex items-baseline gap-1 md:gap-2">
@@ -340,8 +343,8 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col md:flex-row gap-2 md:gap-3 border-t border-gray-200 pt-2 md:pt-4">
-          {booking.status === "Confirmed" && (
+        <div className="flex flex-col md:flex-row gap-2 md:gap-3 border-t border-gray-200 pt-2 md:pt-3">
+          {(booking.status === "Confirmed" || booking.status === "Modified") && (
             <>
               <button
                 className="flex-1 bg-tripswift-blue text-tripswift-off-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg hover:bg-[#054B8F] transition-colors duration-300 shadow-sm hover:shadow-md font-tripswift-medium flex items-center justify-center text-sm sm:text-base"

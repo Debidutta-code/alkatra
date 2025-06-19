@@ -29,7 +29,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
   const { t } = useTranslation();
   
   return (
-    <div className="flex flex-col lg:flex-row max-h-screen bg-gradient-to-br from-gray-50 to-tripswift-off-white font-noto-sans">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-gradient-to-br from-gray-50 to-tripswift-off-white font-noto-sans">
       {/* Left Side Image Panel */}
       <div className="lg:w-1/2 relative hidden lg:block overflow-hidden">
         {/* Stylized overlay with brand gradient */}
@@ -93,7 +93,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       </div>
 
       {/* Right Side Form */}
-      <div className="w-full lg:w-1/2 flex justify-center items-center p-6 lg:p-14">
+      <div className="w-full lg:w-1/2 flex justify-center items-center p-6 lg:px-14 ">
         <div className="w-full max-w-[410px] ">
           {/* Mobile Logo */}
           <div className="flex justify-center mb-12 lg:hidden">

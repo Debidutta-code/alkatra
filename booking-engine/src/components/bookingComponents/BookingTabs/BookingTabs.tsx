@@ -241,7 +241,7 @@ export default function BookingTabs() {
 
       <div className="container w-full mx-auto px-4 py-8 md:py-12 -mt-6">
         {/* Tabs Navigation */}
-        <BookingTabsNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
+        <BookingTabsNavigation activeTab={activeTab} setActiveTab={ setActiveTab} />
 
         {loading ? (
           <LoadingState />
@@ -280,7 +280,7 @@ export default function BookingTabs() {
       {/* Modals */}
       {showModal && selectedBooking && (
         <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-tripswift-off-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto relative">
+          <div className="bg-tripswift-off-white rounded-xl shadow-xl w-full max-w-2xl max-h-[95vh] overflow-y-auto relative">
             {showCancellationUI ? (
               <CancellationModal
                 booking={selectedBooking}
