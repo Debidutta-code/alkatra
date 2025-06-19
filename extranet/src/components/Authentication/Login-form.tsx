@@ -159,7 +159,7 @@ const LoginForm: React.FC = () => {
           Forgot password?
         </Button>
         </div>
-        <div className="space-y-4 pt-2">
+        <div className="space-y-2 pt-2">
           <NextUIButton
             type="submit"
             size="lg"

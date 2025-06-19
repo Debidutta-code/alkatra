@@ -137,7 +137,7 @@ const Login: React.FC = () => {
         </p>
       }
     >
-      <form className="space-y-6" onSubmit={handleSubmit}>
+      <form className="space-y-[0.6rem]" onSubmit={handleSubmit}>
         {/* Email Field */}
         <FormInput
           id="email"

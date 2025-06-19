@@ -10,7 +10,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-tripswift-off-white text-tripswift-black font-primary">
+    <div className="max-h-screen bg-tripswift-off-white text-tripswift-black font-primary">
       {/* <Navbar /> */}
       {/* <CheckAuthentication> */}
         {children}
