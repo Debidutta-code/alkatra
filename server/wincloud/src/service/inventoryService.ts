@@ -1,23 +1,31 @@
 import { parseStringPromise } from 'xml2js';
+import { create } from 'xmlbuilder2';
 import { InventoryData, OTAHotelInvCountNotifRQ } from '../interface/inventoryInterface';
 import { InventoryRepository } from '../repository/inventoryRepository';
 
+// Update InventoryError class
 class InventoryError extends Error {
     constructor(
         public errorType: string,
         public errorMessage: string,
-        public statusCode: number = 400
+        public statusCode: number = 400,
+        public response?: string // Add this property
     ) {
         super(errorMessage);
         Object.setPrototypeOf(this, InventoryError.prototype);
     }
+}
 
-    toJSON() {
-        return {
-            error: this.errorType,
-            message: this.errorMessage,
-            statusCode: this.statusCode
-        };
+// Similarly update RatePlanError class
+class RatePlanError extends Error {
+    constructor(
+        public errorType: string,
+        public errorMessage: string,
+        public statusCode: number = 400,
+        public response?: string // Add this property
+    ) {
+        super(errorMessage);
+        Object.setPrototypeOf(this, RatePlanError.prototype);
     }
 }
 
@@ -73,7 +81,50 @@ export class InventoryService {
         }
     }
 
-    async processInventoryXml(xml: string): Promise<any[]> {
+    private formatErrorResponse(error: InventoryError, echoToken: string = '20250526090139'): string {
+        const timestamp = new Date().toISOString();
+        const xml = create({ version: '1.0', encoding: 'UTF-8' })
+            .ele('OTA_HotelInvCountNotifRS', {
+                xmlns: 'http://www.opentravel.org/OTA/2003/05',
+                'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+                EchoToken: echoToken,
+                TimeStamp: timestamp,
+                Version: '1.0'
+            })
+            .ele('Errors')
+            .ele('Error', {
+                Type: error.errorType,
+                Code: error.statusCode.toString(),
+            })
+            .txt(error.errorMessage)
+            .up()
+            .up()
+            .end({ prettyPrint: true });
+
+        return xml;
+    }
+
+    private formatSuccessResponse(echoToken: string = '20250526090139'): string {
+        const timestamp = new Date().toISOString();
+        const xml = create({ version: '1.0', encoding: 'UTF-8' })
+            .ele('OTA_HotelInvCountNotifRS', {
+                xmlns: 'http://www.opentravel.org/OTA/2003/05',
+                'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+                EchoToken: echoToken,
+                TimeStamp: timestamp,
+                Version: '1.0'
+            })
+            .ele('Success')
+            .up()
+            .end({ prettyPrint: true });
+
+        return xml;
+    }
+
+    async processInventoryXml(xml: string): Promise<{ response: string; echoToken: string }> {
+        let echoToken = '20250526090139';
         try {
             const parsed: OTAHotelInvCountNotifRQ = await parseStringPromise(xml, {
                 explicitArray: false,
@@ -86,6 +137,7 @@ export class InventoryService {
 
             if (!root['$']) throw new InventoryError('XML Structure Error', 'Root attributes are missing');
             const rootAttrs = root['$'];
+            echoToken = rootAttrs.EchoToken || '20250526090139';
 
             // const requiredNamespaces = ['xmlns:xsi', 'xmlns:xsd', 'xmlns'];
             // const requiredNamespaces = ['xmlns:xsd', 'xmlns'];
@@ -166,25 +218,40 @@ export class InventoryService {
                 results.push(result);
             }
 
-            return results;
-        } catch (error) {
+            return { response: this.formatSuccessResponse(echoToken), echoToken };
+        } catch (error: any) {
+            const echoToken = ((): string => {
+                try {
+                    const parsed: OTAHotelInvCountNotifRQ = parseStringPromise(xml, {
+                        explicitArray: false,
+                        trim: true,
+                        normalize: true,
+                    });
+                    return parsed['OTA_HotelInvCountNotifRQ']?.['$']?.EchoToken || '20250526090139';
+                } catch {
+                    return '20250526090139';
+                }
+            })();
+
             if (error instanceof InventoryError) {
-                throw error;
+                return { response: this.formatErrorResponse(error, echoToken), echoToken };
             } else if (error instanceof Error) {
-                throw new InventoryError(
+                const invError = new InventoryError(
                     'Inventory Processing Failed',
                     error.message || 'Unknown error occurred while processing inventory XML',
                     500
                 );
+                return { response: this.formatErrorResponse(invError, echoToken), echoToken };
             } else {
-                throw new InventoryError(
+                const invError = new InventoryError(
                     'Inventory Processing Failed',
                     'Unexpected error format received',
                     500
                 );
+                return { response: this.formatErrorResponse(invError, echoToken), echoToken };
             }
         }
     }
 }
 
-export { InventoryError }; 
+export { InventoryError };
