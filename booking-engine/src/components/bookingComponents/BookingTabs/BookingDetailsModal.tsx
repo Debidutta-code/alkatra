@@ -72,6 +72,9 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
   const roomType =
     booking.roomTypeCode || t("BookingTabs.BookingDetailsModal.standardRoom");
   const currency = booking.currencyCode?.toUpperCase() || "INR";
+  const isPastCheckIn =
+  new Date(booking.checkInDate).setHours(0, 0, 0, 0) <
+  new Date().setHours(0, 0, 0, 0);
   return (
     <>
       {/* Modal Header */}
@@ -208,7 +211,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
 
         {/*  (all guests) */}
         <div className=" mt-1 border-t border-gray-200 ">
-          <h3 className="text-lg sm:text-xl mt-2 font-tripswift-bold text-gray-800 flex items-center">
+          <h3 className="text-lg sm:text-xl mt-2 mb-1 font-tripswift-bold text-gray-800 flex items-center">
             <FaUser
               className={`text-tripswift-blue text-base sm:text-lg ${
                 i18n.language === "ar" ? "ml-1.5 sm:ml-2" : "mr-1.5 sm:mr-2"
@@ -225,7 +228,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                     className="flex flex-col  md:flex-row md:items-center md:gap-24 gap-2 border-b border-gray-100 last:border-b-0 last:pb-0"
                   >
                     <div className="flex md:w-1/3  sm:items-center gap-2 font-tripswift-medium">
-                      <FaUser className="text-tripswift-blue mt-1 sm:mt-0" />
+                      <FaUser className="text-tripswift-blue sm:mt-0" />
                       <span className="w-full">
                         {guest.firstName} {guest.lastName}
                       </span>
@@ -344,7 +347,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
 
         {/* Action Buttons */}
         <div className="flex flex-col md:flex-row gap-2 md:gap-3 border-t border-gray-200 pt-2 md:pt-3">
-          {(booking.status === "Confirmed" || booking.status === "Modified") && (
+          {(booking.status === "Confirmed" || booking.status === "Modified") && !isPastCheckIn && (
             <>
               <button
                 className="flex-1 bg-tripswift-blue text-tripswift-off-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg hover:bg-[#054B8F] transition-colors duration-300 shadow-sm hover:shadow-md font-tripswift-medium flex items-center justify-center text-sm sm:text-base"
