@@ -22,6 +22,6 @@ router
 router.route("/logout").post(protect as any, authController.logout as any);
 router
   .route("/update/password")
-  .patch(protect as any, authController.updatePassword as any);
+  .patch(authController.updatePassword as any);
 
 export default router;

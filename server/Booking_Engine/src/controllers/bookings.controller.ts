@@ -248,26 +248,6 @@ export const updateThirdPartyReservation = CatchAsyncError(
       return { firstName, lastName, dob, age, category, ageCode };
     });
 
-    // try {
-    //   const customerResult = await stripeService.createOrRetrieveCustomer(
-    //     email,
-    //     `${guests[0].firstName} ${guests[0].lastName}`,
-    //     phone,
-    //     paymentInfo.paymentMethodId
-    //   );
-
-    //   if (!customerResult.success) {
-    //     return next(new ErrorHandler(customerResult.error || "Stripe customer creation failed", 500));
-    //   }
-    // }
-
-    // catch (error) {
-    //   return res.status(500).json({
-    //     message: "Error while interacting with Stripe",
-    //     error: error instanceof Error ? error.message : error,
-    //   });
-    // }
-
     const amendReservationInput: AmendReservationInput = {
       bookingDetails: {
         userId,
@@ -294,7 +274,7 @@ export const updateThirdPartyReservation = CatchAsyncError(
       const thirdPartyService = new ThirdPartyAmendReservationService();
       await thirdPartyService.processAmendReservation(amendReservationInput);
     } catch (error: any) {
-      return res.status(500).json({ message: "Failed to process reservation with third-party" });
+      return res.status(500).json({ message: error.message });
     }
 
     res.status(200).json({
@@ -360,6 +340,12 @@ export const cancelThirdPartyReservation = CatchAsyncError(
         reservationId: result,
       });
     } catch (error: any) {
+      if (error.message.includes('Reservation not found')) {
+        return res.status(404).json({ message: error.message });
+      }
+      if (error.message.includes('Check-in date is today or in the past')) {
+        return res.status(400).json({ message: error.message });
+      }
       return res.status(500).json({ message: `Failed to process cancellation: ${error.message}` });
     }
   }

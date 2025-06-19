@@ -23,6 +23,20 @@ export class ThirdPartyAmendReservationService {
         let xml = '';
         try {
             console.log('Starting third-party amend reservation processing...');
+
+            const reservation = await ThirdPartyBooking.findOne({ reservationId: data.bookingDetails.reservationId });
+            if (!reservation) {
+                throw new Error('Reservation not found');
+            }
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); 
+            const checkInDate = new Date(reservation.checkInDate);
+            checkInDate.setHours(0, 0, 0, 0);
+
+            if (today >= checkInDate) {
+                throw new Error("Can't update reservation. Your check-in date already passed.");
+            }
+
             console.log('@@@@@@@@@@@@@@@@@@The data we get from controller', data);
 
             const amendReservationData = await prepareAmendReservationData(data);
