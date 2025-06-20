@@ -72,7 +72,7 @@ const createPropertyAddressSchema = z.object({
   country: z.string().min(1, "Country is required"),
   state: z.string().min(1, "State is required"),
   city: z.string().min(1, "City is required"),
-  landmark: z.string().min(1, "LandMark Required"),
+  landmark: z.string().min(1, "Landmark Required"),
   // zip_code: z.string().min(1, "Zipcode is required"),
   zip_code: z.string().refine((value) => /^\d{6}$/.test(value), {
     message: "Please provide a valid 6-digit Zip Code",
