@@ -640,7 +640,11 @@
       "keepMyReservation": "الاحتفاظ بحجزي",
       "processing": "جارٍ المعالجة...",
       "confirmCancellationButton": "تأكيد الإلغاء",
-      "invalidDate": "تاريخ غير صالح"
+      "invalidDate": "تاريخ غير صالح",
+      "cancellationProcessedSuccess": "تم معالجة إلغاء الحجز بنجاح",
+      "cancellationFailed": "فشل الإلغاء",
+      "checkInDatePassed": "لا يمكن إلغاء الحجز. لقد انتهى تاريخ تسجيل الوصول الخاص بك بالفعل."
+    
     },
     "AmendReservationModal": {
   "title": "تحديث الحجز الخاص بك",
@@ -656,6 +660,7 @@
   "bestAvailableRate": "أفضل سعر متاح",
   "total": "الإجمالي",
   "whatToChange": "ما الذي ترغب في تغييره؟",
+  "estimatedTotal": "المجموع المقدر",
   "amendmentTypes": {
     "dates": "التواريخ",
     "guests": "الضيوف",

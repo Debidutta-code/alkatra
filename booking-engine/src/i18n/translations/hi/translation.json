@@ -640,7 +640,10 @@
       "keepMyReservation": "मेरा आरक्षण रखें",
       "processing": "प्रोसेसिंग...",
       "confirmCancellationButton": "रद्दीकरण की पुष्टि करें",
-      "inval,idDate": "अमान्य तिथि"
+      "inval,idDate": "अमान्य तिथि",
+      "cancellationProcessedSuccess": "आरक्षण रद्दीकरण सफलतापूर्वक संसाधित",
+      "cancellationFailed": "रद्दीकरण असफल",
+      "checkInDatePassed": "आरक्षण रद्द नहीं कर सकते। आपकी चेक-इन तिथि पहले ही बीत चुकी है।"
     },
     "AmendReservationModal": {
       "title": "अपना आरक्षण संशोधित करें",
@@ -656,6 +659,7 @@
       "bestAvailableRate": "सर्वोत्तम उपलब्ध दर",
       "total": "कुल",
       "whatToChange": "आप क्या बदलना चाहते हैं?",
+      "estimatedTotal": "अनुमानित कुल",
       "amendmentTypes": {
         "dates": "तिथियाँ",
         "guests": "अतिथि",

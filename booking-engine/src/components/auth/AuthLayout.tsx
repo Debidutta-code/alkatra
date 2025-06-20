@@ -33,7 +33,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       {/* Left Side Image Panel */}
       <div className="lg:w-1/2 relative hidden lg:block overflow-hidden">
         {/* Stylized overlay with brand gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#054B8F]/90 via-tripswift-blue/75 to-tripswift-blue/60 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-tripswift-blue/75 to-tripswift-blue/60 z-10" />
         
         {/* Background pattern */}
         <div className="absolute inset-0 bg-[url('/patterns/dot-pattern.png')] opacity-10 z-20"></div>

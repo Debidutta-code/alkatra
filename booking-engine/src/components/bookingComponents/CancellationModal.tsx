@@ -124,13 +124,13 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
   const confirmCancelBooking = async () => {
     setCancellationLoading(true);
     setCancellationMessage(null);
-
+  
     try {
       // Use the first guest in guestDetails for cancellation
       const firstGuest = booking.guestDetails && booking.guestDetails.length > 0
         ? booking.guestDetails[0]
         : { firstName: "", lastName: "" };
-
+  
       // Prepare the payload as per your backend spec
       const payload = {
         firstName: firstGuest.firstName,
@@ -154,13 +154,13 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
         }
       );
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Cancellation failed");
-
+      if (!res.ok) throw new Error(data.message || t('BookingTabs.CancellationModal.cancellationFailed'));
+  
       setCancellationMessage({
         type: "success",
-        text: data.message || "Reservation cancellation processed successfully",
+        text: data.message || t('BookingTabs.CancellationModal.cancellationProcessedSuccess'),
       });
-
+  
       setTimeout(() => {
         onCancellationComplete(booking._id);
       }, 2000);
@@ -168,7 +168,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
       console.error("Error cancelling booking:", error);
       setCancellationMessage({
         type: "error",
-        text: "Unable to cancel reservation. Please try again.",
+        text: t('BookingTabs.CancellationModal.checkInDatePassed'),
       });
     } finally {
       setCancellationLoading(false);

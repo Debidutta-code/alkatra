@@ -11,6 +11,8 @@ import { setGuestDetails } from '@/Redux/slices/hotelcard.slice';
 import GuestBox from "../HotelBox/GuestBox";
 import Cookies from "js-cookie";
 import { getDefaultDOBByType, getGuestType } from '../../utils/guestDobHelpers';
+import { useSelector } from "@/Redux/store";
+
 import {
   CalendarDays,
   Users,
@@ -40,7 +42,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
   onClose,
   onAmendComplete
 }) => {
-  const { t ,i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
 
   // States for form fields
@@ -50,7 +52,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
   const [ratePlanCode, setRatePlanCode] = useState(booking.ratePlanCode || "BAR");
   const [guests, setGuests] = useState<GuestDetails[]>([]);
   const [finalPrice, setFinalPrice] = useState<{ totalAmount: number; currencyCode: string } | null>(null);
-
+  const { guestDetails } = useSelector((state) => state.hotel);
   // UI control states
   const [amendmentType, setAmendmentType] = useState<"dates" | "room" | "guests" | "requests">("dates");
   const [loading, setLoading] = useState(false);
@@ -63,7 +65,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
     const infants = booking.guestDetails?.filter(g => g.type === "infant" || (g.dob && dayjs().diff(dayjs(g.dob), 'year') < 2))?.length || 0;
 
     return {
-      rooms: booking.numberOfRooms || 1,
+      rooms: guestDetails?.rooms || booking.numberOfRooms || 1,
       guests: adults,
       children: children,
       childAges: booking.guestDetails
@@ -86,7 +88,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
   useEffect(() => {
     if (booking.guestDetails && Array.isArray(booking.guestDetails) && booking.guestDetails.length > 0) {
       dispatch(setGuestDetails({
-        rooms: booking.numberOfRooms || 1,
+        rooms: guestDetails?.rooms || booking.numberOfRooms || 1,
         guests: guestBreakdown.guests,
         children: guestBreakdown.children,
         childAges: guestBreakdown.childAges,
@@ -106,7 +108,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
       const infants = booking.guestDetails.filter(g => g.type === "infant" || (g.dob && dayjs().diff(dayjs(g.dob), 'year') < 2)).length;
 
       dispatch(setGuestDetails({
-        rooms: booking.numberOfRooms || 1,
+        rooms: guestDetails?.rooms || booking.numberOfRooms || 1,
         guests: adults,
         children: children,
         childAges: booking.guestDetails
@@ -152,7 +154,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
     const existingInfants = filterGuestsByType("infant");
 
     let newGuests: GuestDetails[] = [];
-    console.log("new guest data",newGuests)
+    console.log("new guest data", newGuests)
 
     // Add adults preserving existing data or adding new default guests
     for (let i = 0; i < guestBreakdown.guests; i++) {
@@ -312,7 +314,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
   const handleRemoveGuest = (idx: number) => {
     setGuests(gs => gs.filter((_, i) => i !== idx));
   };
-console.log("guests",guests)
+  console.log("guests", guests)
   const getFinalPrice = async (
     selectedRoom: any,
     checkInDate: string,
@@ -477,8 +479,8 @@ console.log("guests",guests)
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 font-noto-sans p-3 sm:p-5">
-      <div ref={modalContentRef} className="bg-tripswift-off-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-3 sm:p-4 md:p-6">        {/* Header */}
-        <div className="text-center mb-4 sm:mb-6 md:mb-8">
+      <div ref={modalContentRef} className="bg-tripswift-off-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-3 sm:p-4 md:p-6">        {/* Header */}
+        <div className="text-center mb-2 sm:mb-4">
           <h3 className="text-xl sm:text-2xl font-tripswift-bold text-tripswift-black">
             {t('BookingTabs.AmendReservationModal.title')}
           </h3>
@@ -488,16 +490,16 @@ console.log("guests",guests)
         </div>
 
         {/* Original booking details */}
-        <div className="bg-gradient-to-r from-tripswift-blue/10 to-tripswift-blue/5 rounded-xl p-3 sm:p-4 md:p-5 mb-4 sm:mb-6">
+        <div className="bg-gradient-to-r from-tripswift-blue/10 to-tripswift-blue/5 rounded-xl p-3 sm:p-4 mb-2 sm:mb-4">
           <h4 className="text-base sm:text-lg font-tripswift-bold text-tripswift-blue mb-3 sm:mb-4 flex items-center">
-            <Info className={`h-4 w-4 sm:h-5 sm:w-5  ${i18n.language === "ar"?"ml-1.5 sm:ml-2":"mr-1.5 sm:mr-2"}`} />
+            <Info className={`h-4 w-4 sm:h-5 sm:w-5 ${i18n.language === "ar" ? "ml-1.5 sm:ml-2" : "mr-1.5 sm:mr-2"}`} />
             {t('BookingTabs.AmendReservationModal.currentBookingDetails')}
           </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            {/* Left column */}
+          <div className="flex flex-row flex-wrap gap-3 sm:gap-4">
+            {/* Stay Dates */}
             <div className="space-y-3 sm:space-y-4">
               <div className="flex items-start">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 sm:mr-3 shadow-sm flex-shrink-0">
+                <div className="w-8 sm:w-10  rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 sm:mr-3 shadow-sm flex-shrink-0">
                   <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
                 </div>
                 <div>
@@ -516,10 +518,10 @@ console.log("guests",guests)
               </div>
             </div>
 
-            {/* Right column */}
+            {/* Room Details */}
             <div className="space-y-3 sm:space-y-4">
               <div className="flex items-start">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 sm:mr-3 shadow-sm flex-shrink-0">
+                <div className="w-8 sm:w-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 sm:mr-3 shadow-sm flex-shrink-0">
                   <BedIcon className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
                 </div>
                 <div>
@@ -531,9 +533,12 @@ console.log("guests",guests)
                   </p>
                 </div>
               </div>
+            </div>
 
+            {/* Rate Plan */}
+            <div className="space-y-3 sm:space-y-4">
               <div className="flex items-start">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 sm:mr-3 shadow-sm flex-shrink-0">
+                <div className="w-8  sm:w-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 sm:mr-3 shadow-sm flex-shrink-0">
                   <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
                 </div>
                 <div>
@@ -543,9 +548,6 @@ console.log("guests",guests)
                   <p className="text-sm sm:text-base text-tripswift-black font-tripswift-medium">
                     {ratePlanCode}
                   </p>
-                  {/* <p className="text-[10px] sm:text-xs text-tripswift-black/50 mt-0.5 sm:mt-1">
-                    ₹{booking.totalAmount.toFixed(2)} {t('BookingTabs.AmendReservationModal.total')}
-                  </p> */}
                 </div>
               </div>
             </div>
@@ -553,7 +555,7 @@ console.log("guests",guests)
         </div>
 
         {/* Amendment type selector */}
-        <div className="mb-4 sm:mb-6">
+        <div className="mb-2 sm:mb-4">
           <h4 className="font-tripswift-medium text-tripswift-black mb-2 sm:mb-3 text-sm sm:text-base">
             {t('BookingTabs.AmendReservationModal.whatToChange')}
           </h4>
@@ -610,21 +612,21 @@ console.log("guests",guests)
         </div>
 
         {/* Amendment form fields */}
-        <div className="bg-tripswift-off-white border border-gray-200 rounded-xl shadow-sm p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 transition duration-300">
+        <div className="bg-tripswift-off-white border border-gray-200 rounded-xl shadow-sm p-3 sm:p-4 md:p-6 mb-2 sm:mb-4 transition duration-300">
           {/* Dates Amendment Form */}
           {amendmentType === "dates" && (
-            <div className="space-y-4 sm:space-y-5 bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-tripswift-blue/20">
-              <div className="flex items-center gap-2 mb-3 sm:mb-4">
+            <div className="space-y-2 sm:space-y-3 bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-tripswift-blue/20">
+              <div className="flex items-center gap-1 sm:gap-2 mb-2 sm:mb-3">
                 <CalendarDays className="h-5 w-5 text-tripswift-blue flex-shrink-0" />
                 <h4 className="text-lg sm:text-xl font-tripswift-bold text-tripswift-black">
                   {t('BookingTabs.AmendReservationModal.changeDates')}
                 </h4>
               </div>
               <div className="relative">
-                <label className="block text-sm font-tripswift-medium text-tripswift-black/70 mb-2">
+                <label className="block text-sm font-tripswift-medium text-tripswift-black/70 mb-1">
                   {t('BookingTabs.AmendReservationModal.selectNewDates')}
                 </label>
-                <div className="relative flex items-center gap-2 bg-tripswift-off-white rounded-lg p-2 border border-tripswift-blue/20 hover:border-tripswift-blue/50 transition-colors">
+                <div className="relative flex items-center gap-1 sm:gap-2 bg-tripswift-off-white rounded-lg p-2 border border-tripswift-blue/20 hover:border-tripswift-blue/50 transition-colors">
                   <Calendar className="h-4 w-4 text-tripswift-blue/70 absolute left-3 top-1/2 -translate-y-1/2" />
                   <RangePicker
                     value={dateRange}
@@ -639,7 +641,7 @@ console.log("guests",guests)
                     }}
                     format="DD/MM/YYYY"
                     className="w-full pl-10 bg-transparent border-none focus:ring-0 hover:bg-tripswift-blue/5 transition-colors"
-                    style={{ height: '48px', fontSize: '16px', fontFamily: 'Noto Sans, sans-serif' }}
+                    style={{ height: '28px', fontSize: '6px', fontFamily: 'Noto Sans, sans-serif' }}
                     placeholder={[
                       t('BookingTabs.AmendReservationModal.checkInDate'),
                       t('BookingTabs.AmendReservationModal.checkOutDate')
@@ -648,12 +650,12 @@ console.log("guests",guests)
                   />
                 </div>
                 {errors["dateRange"] && (
-                  <p className="text-xs text-red-600 mt-1">{errors["dateRange"]}</p>
+                  <p className="text-xs text-red-600 mt-0.5">{errors["dateRange"]}</p>
                 )}
               </div>
               {dateRange && dateRange[0] && dateRange[1] && (
-                <div className="px-4 py-3 bg-tripswift-blue/10 rounded-lg text-sm text-tripswift-blue/90 font-tripswift-medium flex items-center">
-                  <Clock className={`h-4 w-4 text-tripswift-blue mr-2 flex-shrink-0 ${i18n.language === "ar"?"ml-2":"mr-2"}`} />
+                <div className="px-3 py-2 bg-tripswift-blue/10 rounded-lg text-sm text-tripswift-blue/90 font-tripswift-medium flex items-center">
+                  <Clock className={`h-4 w-4 text-tripswift-blue mr-2 flex-shrink-0 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
                   <div>
                     {t('BookingTabs.AmendReservationModal.stayDuration', {
                       count: dateRange[1].diff(dateRange[0], 'day')
@@ -666,16 +668,16 @@ console.log("guests",guests)
 
           {/* Guests Amendment Form */}
           {amendmentType === "guests" && (
-            <div className="space-y-3 sm:space-y-5">
+            <div className="space-y-2 sm:space-y-3">
               <GuestBox
-                onChange={(breakdown) => setGuestBreakdown(breakdown)}
+                onChange={(breakdown) => setGuestBreakdown((prev) => ({ ...prev, ...breakdown }))}
               />
-              <div className="flex flex-col gap-3 mt-4">
+              <div className="flex flex-col gap-2 mt-2">
                 {guests.map((guest, idx) => {
                   const guestType: "adult" | "child" | "infant" = guest.type || getGuestType(guest.dob);
                   return (
-                    <div key={idx} className="flex flex-col sm:flex-row gap-2 border border-gray-200 rounded-md p-3 bg-white relative">
-                      <div className="flex-1 flex flex-col sm:flex-row gap-2">
+                    <div key={idx} className="flex flex-col sm:flex-row gap-1 sm:gap-2 border border-gray-200 rounded-md p-2 bg-white relative">
+                      <div className="flex-1 flex flex-col sm:flex-row gap-1 sm:gap-2">
                         <div className="flex-1">
                           <Input
                             className="flex-1"
@@ -688,7 +690,7 @@ console.log("guests",guests)
                             size="large"
                           />
                           {errors[`firstName-${idx}`] && (
-                            <p className="text-xs text-red-600 mt-1">{errors[`firstName-${idx}`]}</p>
+                            <p className="text-xs text-red-600 mt-0.5">{errors[`firstName-${idx}`]}</p>
                           )}
                         </div>
                         <div className="flex-1">
@@ -703,7 +705,7 @@ console.log("guests",guests)
                             size="large"
                           />
                           {errors[`lastName-${idx}`] && (
-                            <p className="text-xs text-red-600 mt-1">{errors[`lastName-${idx}`]}</p>
+                            <p className="text-xs text-red-600 mt-0.5">{errors[`lastName-${idx}`]}</p>
                           )}
                         </div>
                         <div className="flex-1">
@@ -729,27 +731,21 @@ console.log("guests",guests)
                             size="large"
                           />
                           {errors[`dob-${idx}`] && (
-                            <p className="text-xs text-red-600 mt-1">{errors[`dob-${idx}`]}</p>
+                            <p className="text-xs text-red-600 mt-0.5">{errors[`dob-${idx}`]}</p>
                           )}
                         </div>
                       </div>
                       {/* {guests.length > 1 && (
-            <button
-              onClick={() => handleRemoveGuest(idx)}
-              className="absolute top-2 right-2 text-tripswift-black/50 hover:text-tripswift-black"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )} */}
+              <button
+                onClick={() => handleRemoveGuest(idx)}
+                className="absolute top-2 right-2 text-tripswift-black/50 hover:text-tripswift-black"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )} */}
                     </div>
                   );
                 })}
-                {/* <Button
-      onClick={handleAddGuest}
-      className="mt-2 bg-tripswift-blue text-tripswift-off-white hover:bg-tripswift-blue/90"
-    >
-      {t('BookingTabs.AmendReservationModal.addGuest')}
-    </Button> */}
               </div>
             </div>
           )}
@@ -800,12 +796,14 @@ console.log("guests",guests)
 
           {/* Display Final Price */}
           {finalPrice && (
-            <div className="mt-4 p-3 sm:p-4 bg-tripswift-blue/10 rounded-lg border border-tripswift-blue/20 flex items-center gap-2">
-              <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue flex-shrink-0" />
-              <div>
-                {/* <p className="text-xs sm:text-sm text-tripswift-black/70 font-tripswift-medium">
+            <div className="mt-2 p-1.5 sm:p-2 bg-tripswift-blue/10 rounded-lg border border-tripswift-blue/20 flex items-start gap-1 sm:gap-1.5">
+              <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-tripswift-off-white flex items-center justify-center mr-1 sm:mr-1.5 shadow-sm flex-shrink-0">
+                <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
+              </div>
+              <div className="flex-col space-y-0.5">
+                <p className="text-xs sm:text-sm text-tripswift-black/70 font-tripswift-medium">
                   {t('BookingTabs.AmendReservationModal.estimatedTotal')}
-                </p> */}
+                </p>
                 <p className="text-base sm:text-lg font-tripswift-bold text-tripswift-black">
                   {finalPrice.currencyCode} {finalPrice.totalAmount.toFixed(2)}
                 </p>
@@ -815,7 +813,7 @@ console.log("guests",guests)
         </div>
 
         {/* Amendment policies */}
-        <div className="bg-gray-50 rounded-xl border border-gray-200 mb-4 sm:mb-6 overflow-hidden">
+        <div className="bg-gray-50 rounded-xl border border-gray-200 mb-2 sm:mb-4 overflow-hidden">
           <div className="py-2 sm:py-3 px-3 sm:px-4 bg-gray-100 border-b border-gray-200">
             <div className="flex items-center gap-1.5 sm:gap-2">
               <ShieldAlert className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-tripswift-black/60" />
@@ -848,11 +846,11 @@ console.log("guests",guests)
 
         {/* Message display area */}
         {amendmentMessage && (
-          <div className={`mb-4 sm:mb-6 p-3 sm:p-4 rounded-xl border flex items-start sm:items-center gap-3 sm:gap-4 ${amendmentMessage.type === 'success'
+          <div className={`mb-2 sm:mb-4 p-3 sm:p-4 rounded-xl border flex items-start sm:items-center gap-3 sm:gap-4 ${amendmentMessage.type === 'success'
             ? 'bg-green-50 border-green-200 text-green-700'
             : amendmentMessage.type === 'warning'
-              ? 'bg-amber-50 border-amber-200 text-amber-700'
-              : 'bg-red-50 border-red-200 text-red-700'
+              ? 'bg-amber-50 border--200 text-amber-700'
+              : 'bg-red-50 border-red-20amber0 text-red-700'
             }`}>
             <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${amendmentMessage.type === 'success'
               ? 'bg-green-100'
@@ -875,7 +873,7 @@ console.log("guests",guests)
           <button
             onClick={onClose}
             disabled={loading}
-            className="px-4 sm:px-6 py-2.5 sm:py-3 border border-gray-200 rounded-lg sm:rounded-xl text-tripswift-black/80 hover:bg-gray-50 font-tripswift-medium transition-colors text-sm sm:text-base mt-2 sm:mt-0"
+            className="px-4 sm:px-6 py-2.5 sm:py-3 border border-gray-200 rounded-lg sm:rounded-xl text-tripswift-black/80 hover:bg-gray-50 font-tripswift-medium transition-colors text-sm sm:text-base mt-1 sm:mt-0"
           >
             {t('BookingTabs.AmendReservationModal.cancel')}
           </button>

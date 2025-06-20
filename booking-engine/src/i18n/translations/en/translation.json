@@ -642,7 +642,11 @@
       "keepMyReservation": "Keep My Reservation",
       "processing": "Processing...",
       "confirmCancellationButton": "Confirm Cancellation",
-      "invalidDate": "Invalid Date"
+      "invalidDate": "Invalid Date",
+      "cancellationProcessedSuccess": "Reservation cancellation processed successfully",
+      "cancellationFailed": "Cancellation failed",
+      "checkInDatePassed": "Can't cancel reservation. Your check-in date already passed."
+    
     },
     "AmendReservationModal": {
       "title": "Update Your Reservation",
@@ -658,6 +662,7 @@
       "bestAvailableRate": "Best Available Rate",
       "total": "total",
       "whatToChange": "What would you like to change?",
+      "estimatedTotal": "Estimated Total",
       "amendmentTypes": {
         "dates": "Dates",
         "guests": "Guests",

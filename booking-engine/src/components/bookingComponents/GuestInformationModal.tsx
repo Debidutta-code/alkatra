@@ -849,6 +849,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                           value={phone}
                           onChange={handlePhoneChange}
                           defaultCountry="IN"
+                          maxLength={16}
                           placeholder={t(
                             "BookingComponents.GuestInformationModal.phonePlaceholder"
                           )}

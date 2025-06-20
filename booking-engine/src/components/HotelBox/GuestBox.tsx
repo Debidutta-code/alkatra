@@ -168,7 +168,7 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
   
       // Call onChange callback if provided
       if (onChange) {
-        onChange(guestData);
+        onChange(guestData); // Ensure this propagates the new rooms value
       }
   
       closeModal();
