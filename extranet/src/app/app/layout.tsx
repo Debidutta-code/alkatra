@@ -22,7 +22,7 @@ function MainContent({ children }: { children: React.ReactNode }) {
       <div
         className={cn(
           "flex-1 overflow-auto transition-all duration-300",
-          open && !isMobile ? "ml-[250px]" : "ml-0"
+          open && !isMobile&&isSuperAdmin ? "ml-[250px]" : "ml-0"
         )}
       >
         {children}

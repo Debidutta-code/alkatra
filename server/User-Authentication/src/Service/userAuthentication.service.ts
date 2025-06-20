@@ -33,7 +33,6 @@ interface UpdatePasswordBody {
 
 export class UserService {
   private userRepository: UserRepository;
-
   constructor() {
     this.userRepository = new UserRepository();
   }
@@ -138,21 +137,13 @@ export class UserService {
     return await this.userRepository.createUser(userData);
   }
 
-  async loginUser(
-    data: LoginBody
-  ): Promise<{ user: AuthType; accessToken: string }> {
+  async loginUser(data: LoginBody): Promise<{ user: AuthType; accessToken: string }> {
     const { email, password } = data;
     if (!email || !password) {
       throw formatError(ErrorMessages.MISSING_LOGIN_CREDENTIALS);
     }
     const user = await this.userRepository.findUserByEmailWithPassword(email);
-    console.log("User from login ",user)
-    if (!user ) {
-      throw formatError(ErrorMessages.INVALID_LOGIN_CREDENTIALS);
-    }
-    const isValidPassword=await compareHash(password, user.password)
-    console.log("Va;id Passwpd",isValidPassword)
-    if(!isValidPassword) {
+    if (!user || !compareHash(password, user.password)) {
       throw formatError(ErrorMessages.INVALID_LOGIN_CREDENTIALS);
     }
     const accessToken = assignToken(
@@ -166,6 +157,7 @@ export class UserService {
     );
     return { user, accessToken };
   }
+
 
   async verifyEmail(email: string): Promise<void> {
     if (!email) {

@@ -208,7 +208,7 @@ export default function AppSidebar() {
   return (
     <div className="">
       <Sidebar>
-        <SidebarHeader className="border-b p-4">
+        <SidebarHeader className="border-b p-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Image
