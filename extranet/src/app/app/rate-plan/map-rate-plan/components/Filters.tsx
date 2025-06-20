@@ -33,7 +33,7 @@ export const Filters: React.FC<FiltersProps> = ({
   onResetFilters,
 }) => {
   // Extract unique rate plans from the data
-  const ratePlans = Array.from(new Set(data.map(item => item._id)));
+  const ratePlans = Array.from(new Set(data.map(item => item.rates.ratePlanCode)));
 
   useEffect(() => {
     console.log(roomTypes);

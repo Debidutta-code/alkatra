@@ -166,12 +166,12 @@ class RoomPriceService {
           isAvailable: false,
           message: `from ${startDate} to ${endDate} only ${availability.availability.count} room's are available`
         }
-      }else{
+      } else {
         return {
-          success:true,
-          isAvailable:true,
-          totalAvailableRooms:availability.availability.count,
-          demandedRooms:noOfRooms
+          success: true,
+          isAvailable: true,
+          totalAvailableRooms: availability.availability.count,
+          demandedRooms: noOfRooms
         }
       }
       if (!availability) {
@@ -194,6 +194,7 @@ class RoomRentCalculationService {
 
   public static async getRoomRentService(
     hotelcode: string,
+    // PropertyCode: string,
     invTypeCode: string,
     startDate: Date,
     endDate: Date,
@@ -205,7 +206,9 @@ class RoomRentCalculationService {
     try {
       // Input validation
       const validationResult = this.validateInputs(
-        hotelcode, invTypeCode, startDate, endDate,
+        hotelcode,
+        // PropertyCode,
+         invTypeCode, startDate, endDate,
         noOfChildrens, noOfAdults, noOfRooms
       );
 
@@ -215,7 +218,8 @@ class RoomRentCalculationService {
           message: validationResult.message
         };
       }
-
+      const startDate2=startDate
+      const endDate2=endDate
       const start = startOfDay(startDate);
       const end = startOfDay(endDate); // Use startOfDay for endDate to exclude checkout day
       const numberOfNights = differenceInDays(end, start);
@@ -228,8 +232,8 @@ class RoomRentCalculationService {
       }
 
       // Get inventory with rates - use endOfDay for data fetching but not for night calculation
-      const inventory = await HotelPricesDao.getInventoryWithRates(hotelcode, invTypeCode, start, endOfDay(endDate));
-
+      const inventory = await HotelPricesDao.getInventoryWithRates(hotelcode, invTypeCode, new Date(startDate2), endOfDay(endDate2));
+      // console.log("Inventory",inventory)
       if (!inventory || inventory.length === 0) {
         return {
           success: false,
@@ -296,7 +300,8 @@ class RoomRentCalculationService {
   }
 
   private static validateInputs(
-    hotelcode: string,
+    // hotelcode: string,
+    PropertyCode: string,
     invTypeCode: string,
     startDate: Date,
     endDate: Date,
@@ -305,7 +310,7 @@ class RoomRentCalculationService {
     noOfRooms: number
   ): { isValid: boolean; message?: string } {
 
-    if (!hotelcode || !invTypeCode) {
+    if (!PropertyCode || !invTypeCode) {
       return { isValid: false, message: "Hotel code and inventory type code are required" };
     }
 
@@ -407,12 +412,12 @@ class RoomRentCalculationService {
         currentDate.setDate(currentDate.getDate() + 1);
       }
 
-      console.log(`=== Date Generation Debug ===`);
-      console.log(`Start Date: ${startDate.toDateString()}`);
-      console.log(`End Date: ${endDate.toString()}`);
-      console.log(`Generated ${stayDates.length} nights: ${stayDates.map(d => d.toDateString()).join(', ')}`);
-      console.log(`Expected nights: ${numberOfNights}`);
-      console.log(`=== End Debug ===`);
+      // console.log(`=== Date Generation Debug ===`);
+      // console.log(`Start Date: ${startDate.toDateString()}`);
+      // console.log(`End Date: ${endDate.toString()}`);
+      // console.log(`Generated ${stayDates.length} nights: ${stayDates.map(d => d.toDateString()).join(', ')}`);
+      // console.log(`Expected nights: ${numberOfNights}`);
+      // console.log(`=== End Debug ===`);
 
       for (const date of stayDates) {
         const dayOfWeek = this.getDayOfWeek(date);
@@ -538,10 +543,10 @@ class RoomRentCalculationService {
     try {
       const totalGuests = noOfAdults + noOfChildrens;
 
-      console.log('=== Rate Calculation Debug ===');
-      console.log('Rate Plan Code:', rate.ratePlanCode);
-      console.log('Adults:', noOfAdults, 'Children:', noOfChildrens);
-      console.log('Available Additional Guest Amounts:', rate.additionalGuestAmounts);
+      // console.log('=== Rate Calculation Debug ===');
+      // console.log('Rate Plan Code:', rate.ratePlanCode);
+      // console.log('Adults:', noOfAdults, 'Children:', noOfChildrens);
+      // console.log('Available Additional Guest Amounts:', rate.additionalGuestAmounts);
 
       // Find the appropriate base rate
       const baseByGuestAmts: BaseGuestAmount[] = rate.baseByGuestAmts || [];
@@ -580,8 +585,8 @@ class RoomRentCalculationService {
       const baseRatePerRoom = selectedBaseRate.amountBeforeTax;
       const baseGuestsIncluded = selectedBaseRate.numberOfGuests;
 
-      console.log('Selected Base Rate:', selectedBaseRate);
-      console.log('Base Guests Included:', baseGuestsIncluded);
+      // console.log('Selected Base Rate:', selectedBaseRate);
+      // console.log('Base Guests Included:', baseGuestsIncluded);
 
       // Calculate additional charges for guests exceeding base coverage
       let additionalAdultCharges = 0;
@@ -592,10 +597,10 @@ class RoomRentCalculationService {
 
       // Only calculate additional charges if total guests exceed base coverage
       if (totalGuests > baseGuestsIncluded) {
-        console.log('Total guests exceed base coverage, calculating additional charges...');
+        // console.log('Total guests exceed base coverage, calculating additional charges...');
         
         const extraGuests = totalGuests - baseGuestsIncluded;
-        console.log('Extra guests beyond base:', extraGuests);
+        // console.log('Extra guests beyond base:', extraGuests);
 
         // Calculate additional adults (if any)
         const additionalAdults = Math.max(0, noOfAdults - Math.max(0, baseGuestsIncluded - noOfChildrens));
@@ -605,7 +610,7 @@ class RoomRentCalculationService {
           const adultRate = additionalGuestAmounts.find(aga => aga.ageQualifyingCode === '10');
           if (adultRate) {
             additionalAdultCharges = additionalAdults * adultRate.amount;
-            console.log(`Additional adults to charge: ${additionalAdults} at ${adultRate.amount} each = ${additionalAdultCharges}`);
+            // console.log(`Additional adults to charge: ${additionalAdults} at ${adultRate.amount} each = ${additionalAdultCharges}`);
           } else {
             console.warn('No adult rate (code 10) found in additionalGuestAmounts');
           }
@@ -616,7 +621,7 @@ class RoomRentCalculationService {
           const childRate = additionalGuestAmounts.find(aga => aga.ageQualifyingCode === '8');
           if (childRate) {
             additionalChildrenCharges = noOfChildrens * childRate.amount;
-            console.log(`Children to charge: ${noOfChildrens} at ${childRate.amount} each = ${additionalChildrenCharges}`);
+            // console.log(`Children to charge: ${noOfChildrens} at ${childRate.amount} each = ${additionalChildrenCharges}`);
             
             // Create simple breakdown for children
             for (let i = 0; i < noOfChildrens; i++) {
@@ -657,10 +662,10 @@ class RoomRentCalculationService {
       const totalPerRoom = baseRatePerRoom + totalAdditionalChargesPerRoom;
       const totalAmountForDay = totalPerRoom * noOfRooms;
 
-      console.log('Additional Adult Charges:', additionalAdultCharges);
-      console.log('Additional Children Charges:', additionalChildrenCharges);
-      console.log('Total Additional Charges Per Room:', totalAdditionalChargesPerRoom);
-      console.log('=== End Debug ===');
+      // console.log('Additional Adult Charges:', additionalAdultCharges);
+      // console.log('Additional Children Charges:', additionalChildrenCharges);
+      // console.log('Total Additional Charges Per Room:', totalAdditionalChargesPerRoom);
+      // console.log('=== End Debug ===');
 
       return {
         success: true,

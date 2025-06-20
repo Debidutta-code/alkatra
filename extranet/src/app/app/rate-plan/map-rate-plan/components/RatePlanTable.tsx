@@ -100,7 +100,7 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
                   
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{item._id}</div>
+                      <div className="text-sm font-medium text-gray-900">{item.rates.ratePlanCode}</div>
                     </div>
                   </td>
                   

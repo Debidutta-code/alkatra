@@ -14,7 +14,7 @@ import { cn } from "../../lib/utils";
 function MainContent({ children }: { children: React.ReactNode }) {
   const { open, isMobile } = useSidebar();
   const currentUser = useSelector((state: RootState) => state.auth.user);
-  const isSuperAdmin = currentUser?.role === "superAdmin";
+  const SuperAdmin = currentUser?.role === "superAdmin"||currentUser?.role==="groupManager"
 
   return (
     <div className="flex flex-1 flex-col">
@@ -22,7 +22,7 @@ function MainContent({ children }: { children: React.ReactNode }) {
       <div
         className={cn(
           "flex-1 overflow-auto transition-all duration-300",
-          open && !isMobile ? "ml-[250px]" : "ml-0"
+          open && !isMobile&&SuperAdmin ? "ml-[250px]" : "ml-0"
         )}
       >
         {children}

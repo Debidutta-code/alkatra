@@ -1,4 +1,4 @@
-import RateAmount  from "../../../wincloud/src/model/ratePlanDateWise.model"
+import RateAmount from "../../../wincloud/src/model/ratePlanDateWise.model"
 import { Inventory } from "../../../wincloud/src/model/inventoryModel"
 class HotelPricesDao {
     public static async getHotelPlans(hotelCode: string, invTypeCode: string) {
@@ -34,6 +34,7 @@ class HotelPricesDao {
         })
     }
     public static async getInventoryWithRates(hotelCode: string, invTypeCode: string, start: Date, end: Date) {
+        console.log(start)
         const pipeline = [
             // Stage 1: Match inventory records
             {
@@ -69,10 +70,18 @@ class HotelPricesDao {
                                         { $eq: ['$invTypeCode', '$$invTypeCode'] },
                                         {
                                             $or: [
+                                                // Case 1: Rate range overlaps with inventory date
                                                 {
                                                     $and: [
-                                                        { $lte: ['$startDate', end] },
-                                                        { $gte: ['$endDate', start] }
+                                                        { $lte: ['$startDate', '$$invEndDate'] },
+                                                        { $gte: ['$endDate', '$$invStartDate'] }
+                                                    ]
+                                                },
+                                                // Case 2: Rate range is within the inventory date
+                                                {
+                                                    $and: [
+                                                        { $gte: ['$startDate', '$$invStartDate'] },
+                                                        { $lte: ['$endDate', '$$invEndDate'] }
                                                     ]
                                                 }
                                             ]
@@ -80,6 +89,7 @@ class HotelPricesDao {
                                     ]
                                 }
                             }
+
                         },
                         {
                             $addFields: {
@@ -139,15 +149,18 @@ class HotelPricesDao {
         ];
         try {
             const results = await Inventory.aggregate(pipeline).exec();
+            results.map((item)=>{
+                console.log(item.rates)
+            })
             return results
         } catch (error) {
             console.error('Error in aggregation pipeline:', error);
             throw error;
         }
     }
-    public static async checkAvailabilityDao(hotelCode:string,invTypeCode:string,startDate:Date,endDate:Date){
+    public static async checkAvailabilityDao(hotelCode: string, invTypeCode: string, startDate: Date, endDate: Date) {
         try {
-            const availability=await Inventory.findOne({hotelCode:hotelCode,invTypeCode:invTypeCode,startDate:startDate,endDate:endDate})
+            const availability = await Inventory.findOne({ hotelCode: hotelCode, invTypeCode: invTypeCode, startDate: startDate, endDate: endDate })
             return availability
         } catch (error) {
             console.log("Error occur while checking availability");
