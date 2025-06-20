@@ -459,7 +459,7 @@ const HotelListing: React.FC = () => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={t("HotelListing.searchPropertyName", { defaultValue: "Search property name" })}
+                  placeholder={t("HotelListing.searchPropertyName", { defaultValue: "Search property by name" })}
                   className="pl-10 w-full border border-gray-200 rounded-md px-3 py-1.5 text-sm bg-tripswift-off-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue transition-all duration-300"
                 />
               </div>

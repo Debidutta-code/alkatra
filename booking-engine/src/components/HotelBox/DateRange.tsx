@@ -50,7 +50,7 @@ const DateRange: React.FC<Props> = ({ dates, setDates }) => {
         suffixIcon={<></>}
         format="DD-MM-YYYY"
         picker="date"
-        separator={<span className="px-2.5 text-tripswift-black/40">–</span>}
+        separator={<span className="lg:pr-4 px-2.5 text-tripswift-black/40">–</span>}
         allowClear={false}
         placeholder={[
           t("HotelBox.DateRange.checkInPlaceholder"),
