@@ -54,8 +54,8 @@ const MapRatePlanPage: React.FC = () => {
       const response = await ratePlanServices("WINCLOUD", currentPage, selectedRoomType, dateRange?.from, dateRange?.to);
       
       setData(response.data);
-      setOriginalData([...response.data]);
-      
+      setOriginalData(response.data);
+      setFilteredData(response.data)
       setEditingRows(new Set());
       setEditButtonClicked(false);
       setModifiedValues({});
@@ -87,7 +87,6 @@ const MapRatePlanPage: React.FC = () => {
     const originalIndex = data.findIndex(item => item._id === itemToUpdate._id);
 
     if (originalIndex !== -1) {
-      // Update the price (amountBeforeTax) in the rates.baseByGuestAmts
       updatedData[originalIndex] = {
         ...updatedData[originalIndex],
         rates: {

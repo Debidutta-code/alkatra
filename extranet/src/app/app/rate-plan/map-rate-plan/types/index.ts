@@ -20,6 +20,7 @@ export interface RatePlanInterFace {
     };
     currencyCode: string
     _id:string;
+    ratePlanCode:string
   }
 }
 export interface paginationTypes{

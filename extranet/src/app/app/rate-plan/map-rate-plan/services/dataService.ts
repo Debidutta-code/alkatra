@@ -40,7 +40,7 @@ export const filterData = (
 
   // Filter by rate plan (using _id as identifier)
   if (selectedRatePlan) {
-    filtered = filtered.filter(item => item._id === selectedRatePlan);
+    filtered = filtered.filter(item => item.rates.ratePlanCode === selectedRatePlan);
   }
 
   return filtered;

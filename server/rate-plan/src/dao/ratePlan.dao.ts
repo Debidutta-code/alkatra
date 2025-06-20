@@ -249,6 +249,8 @@ const dataPipeline = [
               in: {
                 _id: "$$firstRate._id",
                 currencyCode: "$$firstRate.currencyCode",
+                                ratePlanCode:"$$firstRate.ratePlanCode",
+
                 // Preserve the baseByGuestAmts structure
                 baseByGuestAmts: {
                   $cond: {
