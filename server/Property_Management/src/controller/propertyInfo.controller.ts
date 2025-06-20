@@ -62,7 +62,7 @@ const createpropertyInfo = catchAsync(
     } = req.body;
     const brand_name = req.body.brand_name;
 
-    console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n", 
+    console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n",
       brand_name,
       property_name,
       property_email,
@@ -102,6 +102,11 @@ const createpropertyInfo = catchAsync(
 
     if (property) {
       return next(new AppError("A property already exists with this email", 400));
+    }
+
+    const existingPropertyCode = await PropertyInfo.findOne({ property_code });
+    if (existingPropertyCode) {
+      return next(new AppError("A property already exists with this property code", 400));
     }
 
     const newProperty = new PropertyInfo({
@@ -149,13 +154,26 @@ const updatePropertyInfo = catchAsync(
     } = req.body;
 
     const property = await PropertyInfo.findById(propertInfoId);
-
     if (!property) {
       return next(
         new AppError(`No property found with this id ${propertInfoId}`, 404)
       );
     }
+    // Check for duplicate property_email if changed
+    if (property_email && property_email !== property.property_email) {
+      const existingEmail = await PropertyInfo.findOne({ property_email });
+      if (existingEmail) {
+        return next(new AppError("A property already exists with this email", 400));
+      }
+    }
 
+    // Check for duplicate property_code if changed
+    if (property_code && property_code !== property.property_code) {
+      const existingCode = await PropertyInfo.findOne({ property_code });
+      if (existingCode) {
+        return next(new AppError("A property already exists with this property code", 400));
+      }
+    }
     const updateProperty = await PropertyInfo.findByIdAndUpdate(
       propertInfoId,
       {
@@ -171,7 +189,7 @@ const updatePropertyInfo = catchAsync(
       },
       { new: true }
     );
-    
+
     return res.status(200).json({
       status: "success",
       error: false,
@@ -182,7 +200,7 @@ const updatePropertyInfo = catchAsync(
 );
 
 const deleteProperty = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const propertyInfoId = req.params.id;  
+  const propertyInfoId = req.params.id;
 
   const property = await PropertyInfo.findById(propertyInfoId);
   if (!property) {

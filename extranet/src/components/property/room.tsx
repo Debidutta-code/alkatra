@@ -61,38 +61,46 @@ export const roomSchema = z.object({
   room_name: z.string().min(1, "Room name is required"),
   room_type: z.string().min(1, "Room type is required"),
   total_room: z
-    .number( {required_error : "Total rooms is required"})
-    .nonnegative("Room count must be positive"),
+  .number({ required_error: "Total rooms is required" })
+  // .nonnegative("Room count must be positive")
+  .min(1, { message: "Value must be greater than or equal to 1" }),
+
   floor: z
     .number()
-    .nonnegative("Floor must be a positive number")
+    .nonnegative("Value must be greater than or equal to 0")
     .optional(),
   room_view: z.string().optional(),
   room_size: z
     .number({required_error : "Room size is required"})
-    .nonnegative("Room size must be positive"),
+    // .nonnegative("Room size must be positive")
+    .min(1, { message: "Value must be greater than or equal to 1" }),
+
   room_unit: z.string().min(1, "Room unit is required"),
   smoking_policy: z.string().min(1, "Smoking policy is required"),
   max_occupancy: z
     .number({required_error:"Max occupancy is required"})
-    .nonnegative("Max occupancy must be positive"),
+    // .nonnegative("Max occupancy must be positive")
+      .min(1, { message: "Value must be greater than or equal to 1" }),
   max_number_of_adults: z
     .number({ required_error:"Enter max adults" })
-    .nonnegative("Adults cannot be negative"),
+    // .nonnegative("Adults cannot be negative")
+      .min(1, { message: "Value must be greater than or equal to 1" }),
   max_number_of_children: z
     .number()
-    .nonnegative("Children cannot be negative")
+    .nonnegative("Value must be greater than or equal to 0")
     .optional(), // Changed to min(1) - required
   number_of_bedrooms: z
     .number({ required_error: "Enter number of bedrooms" })
-    .nonnegative("Bedrooms can't be negative"), // Changed to min(1) - required
+    // .nonnegative("Bedrooms can't be negative")
+      .min(1, { message: "Value must be greater than or equal to 1" }),
+ // Changed to min(1) - required
   number_of_living_room: z
     .number()
-    .nonnegative("Living rooms can't be negative")
+    .nonnegative("Value must be greater than or equal to 0")
     .optional(), // Changed to min(1) - required
   extra_bed: z
     .number()
-    .nonnegative("Provide a positive bed count")
+    .nonnegative("Value must be greater than or equal to 0")
     .optional(), // Changed to min(1) - required
   description: z.string().optional(),
   image: z.array(z.string()).optional(),
@@ -511,7 +519,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             <Input
               id="total_room"
               className="h-9"
-              min={0}
+              // min={1}
               value={roomDetails?.total_room}
               {...register("total_room", { valueAsNumber: true })}
               onChange={(e) =>
@@ -535,7 +543,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             <Input
               id="floor"
               className="h-9"
-              min={0}
+              // min={0}
               value={roomDetails?.floor}
               {...register("floor", { valueAsNumber: true })}
               onChange={(e) =>
@@ -586,7 +594,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             <Input
               id="room_size"
               className="h-9"
-              min={0}
+              // min={1}
               value={roomDetails?.room_size}
               {...register("room_size", { valueAsNumber: true })}
               onChange={(e) =>
@@ -717,7 +725,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             <Input
               id="max_occupancy"
               className="h-9"
-              min={0}
+              // min={1}
               value={roomDetails?.max_occupancy}
               {...register("max_occupancy", { valueAsNumber: true })}
               onChange={(e) =>
@@ -746,7 +754,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             <Input
               id="max_number_of_adults"
               className="h-9"
-              min={0}
+              // min={1}
               value={roomDetails?.max_number_of_adults}
               {...register("max_number_of_adults", { valueAsNumber: true })}
               onChange={(e) =>
@@ -775,7 +783,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             <Input
               id="max_number_of_children"
               className="h-9"
-              min={0}
+              // min={0}
               value={roomDetails?.max_number_of_children}
               {...register("max_number_of_children", { valueAsNumber: true })}
               onChange={(e) =>
@@ -804,7 +812,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             <Input
               id="number_of_bedrooms"
               className="h-9"
-              min={0}
+              // min={1}
               value={roomDetails?.number_of_bedrooms}
               {...register("number_of_bedrooms", { valueAsNumber: true })}
               onChange={(e) =>
@@ -833,7 +841,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             <Input
               id="number_of_living_room"
               className="h-9"
-              min={0}
+              // min={0}
               value={roomDetails?.number_of_living_room}
               {...register("number_of_living_room", { valueAsNumber: true })}
               onChange={(e) =>
@@ -857,7 +865,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             <Input
               id="extra_bed"
               className="h-9"
-              min={0}
+              // min={0}
               value={roomDetails?.extra_bed}
               {...register("extra_bed", { valueAsNumber: true })}
               onChange={(e) =>

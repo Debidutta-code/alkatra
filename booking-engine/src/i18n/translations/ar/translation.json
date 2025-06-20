@@ -368,6 +368,7 @@
     "nights": "ليلة",
     "nightsPlural": "ليالي",
     "stay": "إقامة",
+    "filter":"فلتر",
     "amenitiesList": {
       "wifi": "واي فاي مجاني",
       "swimming_pool": "حمام سباحة",
@@ -494,6 +495,7 @@
       "nights": "ليلة",
       "nightsPlural": "ليالي",
       "guestInformation": "معلومات الضيف",
+      "dob":"تاريخ الميلاد",
       "firstNameLabel": "الاسم الأول",
       "firstNamePlaceholder": "أدخل اسمك الأول",
       "firstNameError": "الاسم الأول مطلوب ويجب أن يحتوي على أحرف ومسافات فقط.",
@@ -526,6 +528,9 @@
       "bookingSummary": "ملخص الحجز",
       "stayDetails": "تفاصيل الإقامة",
       "primaryGuest": "الضيف الأساسي",
+      "guests": "الضيوف",
+  "email": "البريد الإلكتروني",
+  "phone": "رقم الهاتف",
       "priceDetails": "تفاصيل السعر",
       "roomRate": "سعر الغرفة",
       "totalAmount": "الإجمالي",
@@ -774,7 +779,10 @@
       "ratePlan": "خطة السعر",
       "modifyBooking": "تعديل الحجز",
       "cancelBooking": "إلغاء الحجز",
+      "dob":"تاريخ الميلاد",
+      "rooms": "غرف",
       "printItinerary": "طباعة خط سير الرحلة"
+
     }
   },
   "Payment": {
@@ -843,7 +851,8 @@
         "cardSetupFailedError": "فشل إعداد البطاقة",
         "processing": "جاري المعالجة...",
         "confirmBooking": "تأكيد الحجز",
-        "paymentProcessingError": "حدث خطأ أثناء معالجة الدفع"
+        "paymentProcessingError": "حدث خطأ أثناء معالجة الدفع",
+          "footer": "يتم تشفير تفاصيل بطاقتك ومعالجتها بأمان من قبل Stripe. نحن لا نقوم أبدًا بتخزين معلومات بطاقتك الكاملة على خوادمنا."
       }
     },
     "PaymentSuccess": {
@@ -884,7 +893,25 @@
       "needHelpTitle": "هل تحتاج مساعدة؟",
       "customerServiceMessage": "فريق خدمة العملاء لدينا متاح على مدار الساعة طوال أيام الأسبوع لمساعدتك في أي أسئلة.",
       "contactSupportButton": "اتصل بالدعم",
-      "exploreMoreHotels": "استكشاف المزيد من خيارات الفنادق"
+      "exploreMoreHotels": "استكشاف المزيد من خيارات الفنادق",
+            "phoneLabel": "رقم الهاتف"
+
     }
-  }
+  } ,
+  "GuestBox": {
+  "guests": "الضيوف",
+  "adultsPlural": "البالغون",
+  "infantsPlural": "الرضع",
+  "infant": "رضيع",
+  "roomsPlural": "الغرف",
+  "child": "طفل",
+  "childrenPlural": "الأطفال",
+  "age": "العمر",
+   "year": "سنة",
+  "year_plural": "سنوات",
+   "selectAge": "اختر العمر",
+    "selectGuests": "اختر الضيوف",
+        "ages": "الأعمار"
+}
+
 }

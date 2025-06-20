@@ -20,21 +20,21 @@ export const useFetchBookingData = () => {
     const [bookDataloading, setBookDataloading] = useState(true);
     const [bookDataError, setBookDataError] = useState(null);
 
-    useEffect(() => {
-        const fetchBookingData = async () => {
-            setBookDataloading(true);
-            try {
-                const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/booking/getBookingData`);
-                setBookData(response.data);
-            } catch (err: any) {
-                setBookDataError(err.message);
-            } finally {
-                setBookDataloading(false);
-            }
-        };
+    // useEffect(() => {
+    //     const fetchBookingData = async () => {
+    //         setBookDataloading(true);
+    //         try {
+    //             const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/booking/getBookingData`);
+    //             setBookData(response.data);
+    //         } catch (err: any) {
+    //             setBookDataError(err.message);
+    //         } finally {
+    //             setBookDataloading(false);
+    //         }
+    //     };
 
-        fetchBookingData();
-    }, []);
+    //     fetchBookingData();
+    // }, []);
 
     return { bookData, bookDataloading, bookDataError };
 }

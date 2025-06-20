@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { MapPin, Settings2, X, Search, Star } from "lucide-react";
 import { FilterModal, FilterState } from "./FilterModal";
 import { Card } from "@/components/ui/card";
+import { useTranslation } from "react-i18next";
 
 interface HeaderProps {
   onFilterChange?: (filters: FilterState) => void;
@@ -105,6 +106,7 @@ export const Header: React.FC<HeaderProps> = ({ onFilterChange, onLocationChange
 
   const selectedFiltersCount = Object.values(filters.amenities).filter(Boolean).length + 
     (filters.rating !== null ? 1 : 0);
+    const {i18n} = useTranslation();
 
   return (
     <div className="sticky top-20 z-50 w-full bg-white shadow-md p-4 flex flex-col sm:flex-row items-center gap-4">
@@ -197,7 +199,7 @@ export const Header: React.FC<HeaderProps> = ({ onFilterChange, onLocationChange
 
       {/* Active filters display */}
       {selectedFiltersCount > 0 && (
-        <div className="hidden sm:flex items-center gap-2 ml-2">
+        <div className={`hidden sm:flex items-center gap-2 ${i18n.language==="ar"?"mr:2":"ml:2"}`}>
           {filters.rating !== null && (
             <div className="bg-tripswift-blue/10 text-tripswift-blue text-sm px-2.5 py-1 rounded-full flex items-center gap-1.5">
               <Star className="h-3 w-3" />
@@ -219,7 +221,7 @@ export const Header: React.FC<HeaderProps> = ({ onFilterChange, onLocationChange
               <div key={amenity} className="bg-tripswift-blue/10 text-tripswift-blue text-sm px-2.5 py-1 rounded-full flex items-center gap-1.5">
                 <span>{amenity}</span>
                 <X 
-                  className="h-3 w-3 ml-1 cursor-pointer hover:text-tripswift-black"
+                  className={`h-3 w-3  cursor-pointer hover:text-tripswift-black ${i18n.language==="ar"?"mr:1":"ml:1"} `}
                   onClick={() => {
                     const newFilters = {
                       ...filters,
