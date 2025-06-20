@@ -34,21 +34,15 @@ class HotelPricesDao {
         })
     }
     public static async getInventoryWithRates(hotelCode: string, invTypeCode: string, start: Date, end: Date) {
-        console.log(start)
+
+        console.log(hotelCode, invTypeCode, start, end)
         const pipeline = [
-            // Stage 1: Match inventory records
+            // Stage 1: Match inventory records - ONLY by startDate
             {
                 $match: {
                     hotelCode: hotelCode,
                     invTypeCode: invTypeCode,
-                    $or: [{ "availability.startDate": { $gte: start, $lte: end } },
-                    { "availability.endDate": { $gte: start, $lte: end } },
-                    {
-                        $and: [
-                            { "availability.startDate": { $lte: start } },
-                            { "availability.endDate": { $gte: end } }
-                        ]
-                    }]
+                    "availability.startDate": { $gte: start, $lte: end }
                 }
             },
             // Stage 2: Lookup rates from RateAmount collection
@@ -68,45 +62,19 @@ class HotelPricesDao {
                                     $and: [
                                         { $eq: ['$hotelCode', '$$hotelCode'] },
                                         { $eq: ['$invTypeCode', '$$invTypeCode'] },
-                                        {
-                                            $or: [
-                                                // Case 1: Rate range overlaps with inventory date
-                                                {
-                                                    $and: [
-                                                        { $lte: ['$startDate', '$$invEndDate'] },
-                                                        { $gte: ['$endDate', '$$invStartDate'] }
-                                                    ]
-                                                },
-                                                // Case 2: Rate range is within the inventory date
-                                                {
-                                                    $and: [
-                                                        { $gte: ['$startDate', '$$invStartDate'] },
-                                                        { $lte: ['$endDate', '$$invEndDate'] }
-                                                    ]
-                                                }
-                                            ]
-                                        }
+                                        // Only match rates that start within the inventory period
+                                        { $gte: ['$startDate', '$$invStartDate'] },
+                                        { $lte: ['$startDate', '$$invEndDate'] }
                                     ]
                                 }
                             }
-
                         },
                         {
                             $addFields: {
                                 dateMatch: {
                                     $and: [
-                                        {
-                                            $or: [
-                                                { $lte: ['$startDate', '$$invEndDate'] },
-                                                { $gte: ['$endDate', '$$invStartDate'] }
-                                            ]
-                                        },
-                                        {
-                                            $or: [
-                                                { $gte: ['$startDate', '$$invStartDate'] },
-                                                { $lte: ['$endDate', '$$invEndDate'] }
-                                            ]
-                                        }
+                                        { $gte: ['$startDate', '$$invStartDate'] },
+                                        { $lte: ['$startDate', '$$invEndDate'] }
                                     ]
                                 }
                             }
@@ -147,9 +115,11 @@ class HotelPricesDao {
                 }
             }
         ];
+
         try {
             const results = await Inventory.aggregate(pipeline).exec();
-            results.map((item)=>{
+            results.map((item) => {
+                console.log(item)
                 console.log(item.rates)
             })
             return results

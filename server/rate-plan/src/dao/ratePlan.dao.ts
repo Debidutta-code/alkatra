@@ -214,8 +214,6 @@ public static async getRatePlanByHotel(
     },
     { $count: "total" }
   ];
-  // ... existing code ...
-// Pipeline for fetching paginated data
 const dataPipeline = [
   { $match: inventoryMatch },
   {
