@@ -350,18 +350,15 @@ const getRoomsByPropertyId2 = catchAsync(
                 currency_code: "$currencyCode",
                 rate_plan_code: "$ratePlanCode",
                 available_guest_rates: "$baseByGuestAmts",
-                rate_images: "$image" // Renamed to avoid confusion with room images
+                rate_images: "$image" 
               }
             }
           ],
           as: "rateInfo"
         }
       },
-
-      // Final projection - including ALL room model fields
       {
         $project: {
-          // Original room model fields
           _id: 1,
           propertyInfo_id: 1,
           room_name: 1,
@@ -380,19 +377,17 @@ const getRoomsByPropertyId2 = catchAsync(
           number_of_living_room: 1,
           extra_bed: 1,
           description: 1,
-          image: 1, // Room images from the room model
+          image: 1, 
           available: 1,
           rateplan_created: 1,
           createdAt: 1,
           updatedAt: 1,
           __v: 1,
-
-          // Rate information from lookup
           room_price: { $arrayElemAt: ["$rateInfo.room_price", 0] },
           currency_code: { $arrayElemAt: ["$rateInfo.currency_code", 0] },
           rate_plan_code: { $arrayElemAt: ["$rateInfo.rate_plan_code", 0] },
           available_guest_rates: { $arrayElemAt: ["$rateInfo.available_guest_rates", 0] },
-          rate_images: { $arrayElemAt: ["$rateInfo.rate_images", 0] }, // Images from rate info
+          rate_images: { $arrayElemAt: ["$rateInfo.rate_images", 0] }, 
           has_valid_rate: { $gt: [{ $size: "$rateInfo" }, 0] }
         }
       }
@@ -405,7 +400,7 @@ const getRoomsByPropertyId2 = catchAsync(
     }
 
     const couponCode = await generateCouponCode();
-    const deepLinkUrl = `${process.env.DEEP_LINK}/property/${propertyInfoId}?coupon=${couponCode.code}`;
+    const deepLinkUrl = `${process.env.DEEP_LINK}/property/${propertyInfoId}?coupon=${couponCode.code}&startDate=${startDate}&endDate=${endDate}`;
 
     let qrCodeData: string;
     try {
