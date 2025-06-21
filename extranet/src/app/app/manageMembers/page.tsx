@@ -136,7 +136,7 @@ const ManageMembers = () => {
   }, []);
 
   return (
-    <main className="py-8 px-10 md:px-20 lg:px-56">
+    <main className="py-8 p-40">
       {" "}
       <div className="flex items-center justify-between">
         <div>

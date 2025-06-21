@@ -64,7 +64,6 @@ const LoginForm = () => {
       // Get the current user from the store after login
       const state = store.getState();
       const currentUser = state.auth.user;
-      console.log(currentUser)
       if (currentUser) {
         if (currentUser.role === "hotelManager"&&currentUser.noOfProperties==0) {
           router.push("/app/property/create");
@@ -73,11 +72,11 @@ const LoginForm = () => {
 
         } else {
           // superAdmin and groupManager go to the property management page
-          router.push("/app/property");
+          router.push("/app");
         }
       } else {
         // Fallback if user not available yet
-        router.push("/app/property");
+        router.push("/app");
       }
     } catch (err:any) {
       console.log("error ",err.message)

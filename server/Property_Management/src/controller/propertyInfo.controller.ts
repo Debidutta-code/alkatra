@@ -44,17 +44,12 @@ const getMyProperties = catchAsync(
     });
   }
 );
+
 export const getAdminProperties = catchAsync(
   async (req: any, res: Response, next: NextFunction) => {
     try {
-      // Add debugging logs
-      console.log('Request params:', req.params);
-      console.log('Request query:', req.query);
-      console.log('Request body:', req.body);
-      console.log('req.user:', req.user);
       
       const userId = req.user?.id;
-      console.log("userId", userId);
       
       // Validate userId exists
       if (!userId) {
@@ -74,6 +69,7 @@ export const getAdminProperties = catchAsync(
       
       const userRole = actualUser.role;
       let responseData: any = {};
+      console.log(userRole)
       
       switch (userRole) {
         case "superAdmin":
@@ -148,36 +144,32 @@ export const getAdminProperties = catchAsync(
             createdBy: actualUser.email
           });
           
+          if (managedHotelManagers.length === 0) {
+            console.log('No hotel managers found for this group manager');
+            responseData = {
+              properties: [],
+              draftProperties: []
+            };
+            break;
+          }
+          
           const managedHotelManagerIds = managedHotelManagers.map(hm => hm._id);
+          console.log('Managed hotel manager IDs:', managedHotelManagerIds);
           
-          const properties = await PropertyInfo.find({
-            user_id: { $in: managedHotelManagerIds },
-            isDraft: false
-          });
+          // Fetch all properties for these hotel managers
+          const allProperties = await PropertyInfo.find({
+            user_id: { $in: managedHotelManagerIds }
+          }).select("_id image property_name");
           
-          const draftProperties = await PropertyInfo.find({
-            user_id: { $in: managedHotelManagerIds },
-            isDraft: true
-          });
+          // console.log('All properties found:', allProperties.length);
+           const allHotels = allProperties.map(property => ({
+            _id: property._id,
+            name: property.property_name,
+            image: property.image || []
+          }));
           
-          responseData = { properties, draftProperties };
-          break;
-          
-        case "hotelManager":
-          // Regular hotel manager - only their own properties
-          const ownProperties = await PropertyInfo.find({
-            user_id: userId,
-            isDraft: false
-          });
-          
-          const ownDraftProperties = await PropertyInfo.find({
-            user_id: userId,
-            isDraft: true
-          });
-          
-          responseData = { 
-            properties: ownProperties, 
-            draftProperties: ownDraftProperties 
+          responseData = {
+            direct: allHotels,
           };
           break;
           

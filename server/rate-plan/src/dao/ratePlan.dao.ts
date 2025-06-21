@@ -214,8 +214,6 @@ public static async getRatePlanByHotel(
     },
     { $count: "total" }
   ];
-  // ... existing code ...
-// Pipeline for fetching paginated data
 const dataPipeline = [
   { $match: inventoryMatch },
   {
@@ -250,6 +248,7 @@ const dataPipeline = [
                 _id: "$$firstRate._id",
                 currencyCode: "$$firstRate.currencyCode",
                 // Preserve the baseByGuestAmts structure
+                ratePlanCode:"$$firstRate.ratePlanCode",
                 baseByGuestAmts: {
                   $cond: {
                     if: { $gt: [{ $size: "$$firstRate.baseByGuestAmts" }, 0] },
