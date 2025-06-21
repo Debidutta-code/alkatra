@@ -33,11 +33,9 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
     const availability = getAvailability(item);
     return (
       price !== null && 
-      price !== undefined && 
-      price > 0 && 
+      price !== undefined &&
       availability !== null && 
-      availability !== undefined && 
-      availability > 0
+      availability !== undefined 
     ); // Show rows only when both price and availability exist and are greater than 0
   });
 
