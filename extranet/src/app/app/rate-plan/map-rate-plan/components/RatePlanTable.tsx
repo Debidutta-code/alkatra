@@ -8,8 +8,7 @@ import { getPrice, getAvailability, getCurrencyCode, getDateRangeString } from '
 interface RatePlanTableProps {
   filteredData: RatePlanInterFace[];
   editingRows: Set<number>;
-  handlePriceChange: (index: number, newPrice: number) => void;
-  handleAvailabilityChange: (index: number, newAvailability: number) => void;
+  handlePriceChange: (id: string, newPrice: number) => void;
   toggleEditRow: (index: number) => void;
   toggleEditButton: () => void;
   editButtonVal: boolean;
@@ -19,12 +18,11 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
   filteredData,
   editingRows,
   handlePriceChange,
-  handleAvailabilityChange,
   toggleEditRow,
   toggleEditButton,
   editButtonVal
 }) => {
-  
+
   const handleEditClick = (index: number) => {
     // If global edit mode is not active, activate it first
     if (!editButtonVal) {
@@ -81,11 +79,10 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
               {filteredData.map((item, index) => (
                 <tr
                   key={`${item._id}-${item.invTypeCode}-${item.hotelCode}`}
-                  className={`transition-colors duration-150 ${
-                    isRowEditable(index) 
-                      ? 'bg-tripswift-blue/10 hover:bg-blue-100' 
+                  className={`transition-colors duration-150 ${isRowEditable(index)
+                      ? 'bg-tripswift-blue/10 hover:bg-blue-100'
                       : 'hover:bg-gray-50'
-                  }`}
+                    }`}
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     <div>
@@ -97,30 +94,29 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
                       </div>
                     </div>
                   </td>
-                  
+
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-gray-900">{item.rates.ratePlanCode}</div>
                     </div>
                   </td>
-                  
+
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-gray-900">{item.invTypeCode}</div>
                     </div>
                   </td>
-                  
+
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-1">
                       <input
                         type="number"
                         value={getPrice(item)}
-                        onChange={(e) => handlePriceChange(index, parseFloat(e.target.value) || 0)}
-                        className={`w-20 px-2 py-1 text-sm rounded transition-all duration-200 ${
-                          isRowEditable(index)
+                        onChange={(e) => handlePriceChange(item._id, parseFloat(e.target.value) || 0)}
+                        className={`w-20 px-2 py-1 text-sm rounded transition-all duration-200 ${isRowEditable(index)
                             ? 'border-2 border-tripswift-blue bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm'
                             : 'border-none bg-transparent focus:outline-none'
-                        }`}
+                          }`}
                         step="0.01"
                         min={0}
                         disabled={!isRowEditable(index)}
@@ -129,23 +125,18 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
                       <span className="text-xs text-gray-500">{getCurrencyCode(item)}</span>
                     </div>
                   </td>
-                  
+
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
                       type="number"
                       value={getAvailability(item)}
-                      onChange={(e) => handleAvailabilityChange(index, parseInt(e.target.value) || 0)}
-                      className={`w-16 px-2 py-1 text-sm rounded transition-all duration-200 ${
-                        isRowEditable(index)
-                          ? 'border-2 border-tripswift-blue bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm'
-                          : 'border-none bg-transparent focus:outline-none'
-                      }`}
+                      className={`w-16 px-2 py-1 text-sm rounded transition-all duration-200 border-none bg-transparent focus:outline-none`}
                       min={0}
-                      disabled={!isRowEditable(index)}
-                      readOnly={!isRowEditable(index)}
+                      disabled={true}
+                      readOnly={true}
                     />
                   </td>
-                  
+
                   <td className="px-6 py-4 whitespace-nowrap text-right">
                     <div className="flex justify-end space-x-1">
                       {isRowEditable(index) ? (
