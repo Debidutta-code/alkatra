@@ -14,7 +14,6 @@ const MapRatePlanPage: React.FC = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [selectedRoomType, setSelectedRoomType] = useState<string>('');
   const [selectedRatePlan, setSelectedRatePlan] = useState<string>('');
-  const [editingRows, setEditingRows] = useState<Set<number>>(new Set());
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [allRoomTypes, setAllRoomTypes] = useState<any[]>([]);
@@ -55,8 +54,7 @@ const MapRatePlanPage: React.FC = () => {
 
       setData(response.data);
       setOriginalData(response.data);
-      setFilteredData(response.data)
-      setEditingRows(new Set());
+      setFilteredData(response.data);
       setEditButtonClicked(false);
       setModifiedValues([]);
 
@@ -79,63 +77,51 @@ const MapRatePlanPage: React.FC = () => {
   }, [dateRange, selectedRoomType, selectedRatePlan, data, allRoomTypes]);
 
   const handlePriceChange = (id: string, newPrice: number) => {
-    console.log("id",id)
-    console.log("newPrice",newPrice)
-    const updatedData = [...data];
-    const itemToUpdate = filteredData.find(item => item._id === id);
-
-    if (!itemToUpdate) {
-      console.error('Item not found for ID:', id);
-      return;
-    }
-
-    // Find the item in the original data array
-    const originalIndex = data.findIndex(item => item._id === itemToUpdate._id);
-
-    if (originalIndex !== -1) {
-      updatedData[originalIndex] = {
-        ...updatedData[originalIndex],
-        rates: {
-          ...updatedData[originalIndex].rates,
-          baseByGuestAmts: {
-            ...updatedData[originalIndex].rates.baseByGuestAmts,
-            amountBeforeTax: newPrice
+    // Update the data state with new price
+    const updatedData = data.map(item => {
+      if (item.rates._id === id) {
+        return {
+          ...item,
+          rates: {
+            ...item.rates,
+            baseByGuestAmts: {
+              ...item.rates.baseByGuestAmts,
+              amountBeforeTax: newPrice
+            }
           }
+        };
+      }
+      return item;
+    });
+
+    setData(updatedData);
+
+    // Track modified values
+    setModifiedValues(prev => {
+      // Remove existing entry for this rateAmountId if it exists
+      const filtered = prev.filter(item => item.rateAmountId !== id);
+
+      // Add the new/updated entry
+      return [
+        ...filtered,
+        {
+          rateAmountId: id,
+          price: newPrice
         }
-      };
-      setData(updatedData);
-
-      setModifiedValues(prev => {
-        const filtered = prev.filter(item => item.rateAmountId !== itemToUpdate._id);
-
-        return [
-          ...filtered,
-          {
-            rateAmountId: itemToUpdate._id, 
-            price: newPrice
-          }
-        ];
-      });
-    }
+      ];
+    });
   };
 
   const toggleEditButton = () => {
     setEditButtonClicked(!editButtonClicked);
-
-    // If disabling edit mode, clear all editing rows
-    if (editButtonClicked) {
-      setEditingRows(new Set());
-    }
   };
 
   const handleSave = async () => {
     try {
-      const rowsToSave = data.filter((_, index) => editingRows.has(index));
-
-      if (rowsToSave.length > 0) {
-        await saveData(rowsToSave);
-        toast.success(`Successfully saved ${rowsToSave.length} row(s)!`);
-        await fetchRatePlans();
+      if (modifiedValues.length > 0) {
+        await saveData(modifiedValues); // Pass the modified values array
+        toast.success(`Successfully saved ${modifiedValues.length} modification(s)!`);
+        await fetchRatePlans(); // This will clear modifiedValues
       } else {
         toast.error('No changes to save');
       }
@@ -151,28 +137,8 @@ const MapRatePlanPage: React.FC = () => {
     setSelectedRatePlan('');
   };
 
-  const toggleEditRow = (index: number) => {
-    const newEditingRows = new Set(editingRows);
-    if (newEditingRows.has(index)) {
-      newEditingRows.delete(index);
-    } else {
-      newEditingRows.add(index);
-    }
-    setEditingRows(newEditingRows);
-  };
-
-  // Helper function to get unique room types (invTypeCode)
-  // const getRoomTypes = () => {
-  //   return Array.from(new Set(data.map(item => item.invTypeCode))).filter(Boolean);
-  // };
-
-  // Helper function to get unique hotel codes (for rate plans)
-  // const getHotelCodes = () => {
-  //   return Array.from(new Set(data.map(item => item.hotelCode))).filter(Boolean);
-  // };
-
   // Check if there are any unsaved changes
-  const hasUnsavedChanges = editingRows.size > 0 || Object.keys(modifiedValues).length > 0;
+  const hasUnsavedChanges = modifiedValues.length > 0;
 
   return (
     <div className="px-10 min-h-screen" style={{ height: 'calc(100vh - 100px)' }}>
@@ -198,20 +164,17 @@ const MapRatePlanPage: React.FC = () => {
           <div className="flex items-center space-x-2">
             <SaveButton
               isLoading={isLoading}
-              editingRows={editingRows}
               handleSave={handleSave}
-              disabled={!hasUnsavedChanges}
-            />
+              disabled={!hasUnsavedChanges} />
           </div>
         </div>
 
         <RatePlanTable
           filteredData={filteredData}
-          editingRows={editingRows}
           handlePriceChange={handlePriceChange}
-          toggleEditRow={toggleEditRow}
           toggleEditButton={toggleEditButton}
           editButtonVal={editButtonClicked}
+          modifiedValues={modifiedValues} // Pass modified values to show which items are modified
         />
       </div>
     </div>
