@@ -125,9 +125,9 @@ export const RoomCard: React.FC<RoomCardProps> = ({
 
   const getRoomAmenities = () => {
     if (data.amenities && data.amenities.length > 0) {
-      return data.amenities.map(amenity => ({
+      return data.amenities.map((amenity) => ({
         icon: getIconComponent(amenity.icon),
-        name: amenity.name
+        name: amenity.name,
       }));
     }
 
@@ -149,10 +149,10 @@ export const RoomCard: React.FC<RoomCardProps> = ({
       case 'tree': return <FaTree className={iconClass} />;
       case 'user': return <FaUser className={iconClass} />;
       case 'child': return <FaChild className={iconClass} />;
-      // case 'bathroom': return <FaBath className={iconClass} />;
-      // case 'towels': return <FaShower className={iconClass} />;
+      case 'bathroom': return <FaBath className={iconClass} />;
+      case 'towels': return <FaShower className={iconClass} />;
       case 'linens': return <FaBed className={iconClass} />;
-      // case 'tableChairs': return <FaChair className={iconClass} />;
+      case 'tableChairs': return <FaChair className={iconClass} />;
       case 'desk': return <FaDesktop className={iconClass} />;
       case 'dresserWardrobe': return <FaDoorClosed className={iconClass} />;
       case 'sofaSeating': return <FaCouch className={iconClass} />;

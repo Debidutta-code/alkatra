@@ -279,8 +279,8 @@
       "propertyRating": "Property Rating",
       "amenities": "Amenities",
       "sortBy": "Sort By",
-      "cancel": "Cancel",
-      "applyFilters": "Apply Filters",
+      "cancel": "Clear all filters",
+      "applyFilters": "See {{count}} results",
       "ariaCloseModal": "Close modal",
       "ariaSortOrder": "Sort order",
       "ratingUp": "& Up",
@@ -368,7 +368,7 @@
     "nights": "Night",
     "nightsPlural": "Nights",
     "stay": "stay",
-    "filter":"Filter",
+    "filter": "Filter",
     "amenitiesList": {
       "wifi": "Free Wifi",
       "swimming_pool": "Swimming Pool",
@@ -389,11 +389,12 @@
     "allRooms": "All Rooms",
     "searchRoomName": "Search room by name",
     "availableRooms": "Available Rooms",
-    "showingRooms_one": "Showing {count} room",
-    "showingRooms_other": "Showing {count} rooms",
+    "showingRooms_one": "Showing {{count}} room",
+    "showingRooms_other": "Showing {{count}} rooms",
     "noRoomsAvailableTitle": "No Rooms Available",
     "noRoomsAvailableMessage": "We couldn't find any rooms matching your criteria. Try adjusting your search filters or dates.",
     "clearFilters": "Clear Filters",
+    "loadingRoomsMessage": "Loading available rooms...",
     "priceNotAvailable": "",
     "qrCode": {
       "discountTitle": "Use Your Discount",
@@ -418,7 +419,20 @@
       "amenities": {
         "wifi": "Free WiFi",
         "airConditioning": "Air Conditioning",
-        "kingBed": "King Bed"
+        "kingBed": "King Bed",
+        "smokingBan": "No Smoking",
+        "view": "Scenic View",
+        "bathroom": "Private Bathroom",
+        "towels": "Towels Provided",
+        "linens": "Bed Linens",
+        "tableChairs": "Table and Chairs",
+        "desk": "Work Desk",
+        "dresserWardrobe": "Dresser/Wardrobe",
+        "sofaSeating": "Sofa Seating",
+        "television": "Television",
+        "telephone": "Telephone",
+        "heating": "Heating",
+        "default": "Amenity"
       },
       "policies": {
         "title": "Booking Policies",
@@ -497,7 +511,7 @@
       "nights": "Night",
       "nightsPlural": "Nights",
       "guestInformation": "Guest Information",
-      "dob":"Date Of Birth",
+      "dob": "Date Of Birth",
       "firstNameLabel": "First Name",
       "firstNamePlaceholder": "Enter your first name",
       "firstNameError": "First Name is required",
@@ -531,8 +545,8 @@
       "stayDetails": "Stay Details",
       "primaryGuest": "Primary Guest",
       "guests": "Guests",
-  "email": "Email",
-  "phone": "Phone",
+      "email": "Email",
+      "phone": "Phone",
       "priceDetails": "Price Details",
       "roomRate": "Room Rate",
       "totalAmount": "Total Amount",
@@ -646,7 +660,6 @@
       "cancellationProcessedSuccess": "Reservation cancellation processed successfully",
       "cancellationFailed": "Cancellation failed",
       "checkInDatePassed": "Can't cancel reservation. Your check-in date already passed."
-    
     },
     "AmendReservationModal": {
       "title": "Update Your Reservation",
@@ -789,8 +802,7 @@
       "cancelBooking": "Cancel Booking",
       "printItinerary": "Print Itinerary",
       "rooms": "Rooms",
-       "dob":"Date Of Birth"
-
+      "dob": "Date Of Birth"
     }
   },
   "Payment": {
@@ -907,20 +919,26 @@
       "exploreMoreHotels": "Explore more hotel options"
     }
   },
-  "GuestBox" :{
+  "GuestBox": {
     "guests": "Guests",
     "adultsPlural": "Adults",
+    "adultSingular": "Adult",
     "infantsPlural": "Infants",
-    "infant": "Infant",
+    "infantSingular": "Infant",
     "roomsPlural": "Rooms",
-    "child": "Child",
+    "roomSingular": "Room",
     "childrenPlural": "Children",
-    "age":"Age",
-    "year": "year",
-  "year_plural": "years",
-  "selectAge": "Select age",
+    "childSingular": "Child",
+    "age": "Age",
+    "yearSingular": "year",
+    "yearPlural": "years",
+    "selectAge": "Select age",
     "selectGuests": "Select Guests",
-        "ages": "Ages"
-
+    "ages": "Ages",
+    "cancel": "Cancel",
+    "apply": "Apply",
+    "defaultText": "1 Room · 1 Adult · 0 Children",
+    "maxGuestsError": "Maximum {{maxGuests}} guests allowed per room. Please add more rooms or reduce guests.",
+    "selectAgeError": "Please select the age for all children and infants"
   }
 }

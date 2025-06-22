@@ -75,7 +75,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
       {/* Property rating */}
       <div className="mb-6">
-        <h3 className="text-xs font-tripswift-medium text-tripswift-black mb-3">Property rating</h3>
+        <h3 className="text-xs font-tripswift-medium text-tripswift-black mb-3">{t("HotelBox.FilterModal.propertyRating", { defaultValue: "Property Rating" })}</h3>
         <div className="space-y-2">
           {[5, 4, 3, 2, 1].map((rating) => (
             <div key={rating} className="flex items-center">
@@ -105,7 +105,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
       {/* Amenities */}
       <div>
-        <h3 className="text-xs font-tripswift-medium text-tripswift-black mb-3">Amenities</h3>
+        <h3 className="text-xs font-tripswift-medium text-tripswift-black mb-3">{t("HotelBox.FilterModal.amenities", { defaultValue: "Amenities" })}</h3>
         <div className="space-y-2">
           {AMENITIES.map((amenity) => (
             <div key={amenity.key} className="flex items-center">

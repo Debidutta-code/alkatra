@@ -259,7 +259,7 @@
     "recommended": "अनुशंसित",
     "highestRating": "उच्चतम रेटिंग",
     "lowestRating": "निम्नतम रेटिंग",
-    "whyBookWithTripSwift": "TripSwift के साथ बुक क्यों करें",
+    "whyBookWithTripSwift": "ट्रिपस्विफ्ट के साथ बुक क्यों करें",
     "freeCancellation": "मुफ्त रद्दीकरण",
     "freeCancellationDesc": "हमारी अधिकांश प्रॉपर्टी चेक-इन से 24 घंटे पहले तक मुफ्त रद्दीकरण प्रदान करती हैं।",
     "bestPriceGuarantee": "सर्वश्रेष्ठ मूल्य गारंटी",
@@ -279,8 +279,8 @@
       "propertyRating": "प्रॉपर्टी रेटिंग",
       "amenities": "सुविधाएँ",
       "sortBy": "इसके अनुसार क्रमबद्ध करें",
-      "cancel": "रद्द करें",
-      "applyFilters": "फ़िल्टर लागू करें",
+      "cancel": "सभी फ़िल्टर साफ़ करें",
+      "applyFilters": "{{count}} परिणाम देखें",
       "ariaCloseModal": "मॉडल बंद करें",
       "ariaSortOrder": "क्रमबद्ध करें",
       "ratingUp": "और ऊपर",
@@ -367,8 +367,8 @@
     "propertyAmenities": "संपत्ति की सुविधाएँ",
     "nights": "रात",
     "nightsPlural": "रातें",
-    "stay":"प्रवास",
-    "filter":"फ़िल्टर",
+    "stay": "प्रवास",
+    "filter": "फ़िल्टर",
     "amenitiesList": {
       "wifi": "मुफ्त वाईफाई",
       "swimming_pool": "स्विमिंग पूल",
@@ -389,11 +389,12 @@
     "allRooms": "सभी कमरे",
     "searchRoomName": "कमरे का नाम खोजें",
     "availableRooms": "उपलब्ध कमरे",
-    "showingRooms_one": "कमरा दिखा रहा है",
-    "showingRooms_other": "कमरे दिखा रहा है",
+    "showingRooms_one": "{{count}} कमरा दिखाया जा रहा है",
+    "showingRooms_other": "{{count}} कमरे दिखाए जा रहे हैं",
     "noRoomsAvailableTitle": "कोई कमरा उपलब्ध नहीं है",
     "noRoomsAvailableMessage": "हमें आपके मानदंडों से मेल खाने वाले कोई कमरे नहीं मिले। कृपया अपने खोज फ़िल्टर या तारीखें समायोजित करने का प्रयास करें।",
     "clearFilters": "फ़िल्टर साफ़ करें",
+    "loadingRoomsMessage": "उपलब्ध कमरों को लोड हो रहा है...",
     "qrCode": {
       "discountTitle": "अपना डिस्काउंट उपयोग करें",
       "qrCodeAlt": "डिस्काउंट क्यूआर कोड",
@@ -413,10 +414,23 @@
       "bookNow": "अभी बुक करें",
       "viewBookingPolicies": "बुकिंग नीतियां देखें",
       "securePayment": "सुरक्षित भुगतान",
-      "amenities": {
-        "wifi": "मुफ्त वाई-फाई",
+"amenities": {
+        "wifi": "मुफ्त वाईफाई",
         "airConditioning": "एयर कंडीशनिंग",
-        "kingBed": "किंग बेड"
+        "kingBed": "किंग बेड",
+        "smokingBan": "धूम्रपान निषिद्ध",
+        "view": "मनोरम दृश्य",
+        "bathroom": "निजी बाथरूम",
+        "towels": "तौलिए प्रदान किए गए",
+        "linens": "बिस्तर लिनन",
+        "tableChairs": "टेबल और कुर्सियाँ",
+        "desk": "कार्य डेस्क",
+        "dresserWardrobe": "ड्रेसर/अलमारी",
+        "sofaSeating": "सोफा बैठने की व्यवस्था",
+        "television": "टेलीविजन",
+        "telephone": "टेलीफोन",
+        "heating": "हीटिंग",
+        "default": "सुविधा"
       },
       "policies": {
         "title": "बुकिंग नीतियां",
@@ -494,8 +508,8 @@
       "checkOut": "चेक‑आउट",
       "nights": "रात",
       "nightsPlural": "रातें",
-      "guestInformation": "अतिथि जानकारी", 
-      "dob":"जन्म तिथि",
+      "guestInformation": "अतिथि जानकारी",
+      "dob": "जन्म तिथि",
       "firstNameLabel": "प्रथम नाम",
       "firstNamePlaceholder": "अपना प्रथम नाम दर्ज करें",
       "firstNameError": "प्रथम नाम आवश्यक है",
@@ -529,8 +543,8 @@
       "stayDetails": "रहने का विवरण",
       "primaryGuest": "प्राथमिक अतिथि",
       "guests": "अतिथि",
-  "email": "ईमेल",
-  "phone": "फ़ोन",
+      "email": "ईमेल",
+      "phone": "फ़ोन",
       "priceDetails": "मूल्य विवरण",
       "roomRate": "कमरे का दर",
       "totalAmount": "कुल राशि",
@@ -775,7 +789,7 @@
       "ratePlan": "दर योजना",
       "modifyBooking": "बुकिंग संशोधित करें",
       "cancelBooking": "बुकिंग रद्द करें",
-      "dob":"जन्म तिथि",
+      "dob": "जन्म तिथि",
       "rooms": "कमरे",
       "printItinerary": "मार्ग विवरण प्रिंट करें"
     }
@@ -847,7 +861,7 @@
         "processing": "प्रसंस्करण हो रहा है...",
         "confirmBooking": "बुकिंग की पुष्टि करें",
         "paymentProcessingError": "भुगतान प्रसंस्करण के दौरान एक त्रुटि हुई",
-          "footer": "आपके कार्ड विवरण को एन्क्रिप्ट किया गया है और Stripe द्वारा सुरक्षित रूप से प्रोसेस किया जाता है। हम कभी भी आपके पूर्ण कार्ड विवरण को अपने सर्वर पर संग्रहीत नहीं करते।"
+        "footer": "आपके कार्ड विवरण को एन्क्रिप्ट किया गया है और Stripe द्वारा सुरक्षित रूप से प्रोसेस किया जाता है। हम कभी भी आपके पूर्ण कार्ड विवरण को अपने सर्वर पर संग्रहीत नहीं करते।"
       }
     },
     "PaymentSuccess": {
@@ -888,23 +902,30 @@
       "needHelpTitle": "मदद चाहिए?",
       "customerServiceMessage": "हमारी ग्राहक सेवा टीम आपके किसी भी प्रश्न में सहायता के लिए 24/7 उपलब्ध है।",
       "contactSupportButton": "समर्थन से संपर्क करें",
-            "phoneLabel": "फ़ोन नंबर",
+      "phoneLabel": "फ़ोन नंबर",
       "exploreMoreHotels": "और होटल विकल्प एक्सप्लोर करें"
     }
   },
   "GuestBox": {
-  "guests": "मेहमान",
-  "adultsPlural": "वयस्क",
-  "infantsPlural": "शिशु",
-  "infant": "शिशु",
-  "roomsPlural": "कमरे",
-  "child": "बच्चा",
-  "childrenPlural": "बच्चे",
-  "age": "आयु",
-  "year": "साल",
-  "year_plural": "साल",
-   "selectAge": "उम्र चुनें",
+    "guests": "मेहमान",
+    "adultsPlural": "वयस्क",
+    "adultSingular": "वयस्क",
+    "infantsPlural": "शिशु",
+    "infantSingular": "शिशु",
+    "roomsPlural": "कमरे",
+    "roomSingular": "कमरा",
+    "childSingular": "बच्चा",
+    "childrenPlural": "बच्चे",
+    "age": "उम्र",
+    "yearSingular": "साल",
+    "yearPlural": "साल",
+    "selectAge": "उम्र चुनें",
     "selectGuests": "मेहमान चुनें",
-        "ages": "आयु वर्ग"
-}
+    "ages": "उम्र",
+    "cancel": "रद्द करें",
+    "apply": "लागू करें",
+    "defaultText": "1 कमरा · 1 वयस्क · 0 बच्चे",
+    "maxGuestsError": "प्रति कमरे में अधिकतम {{maxGuests}} मेहमान की अनुमति है। कृपया और कमरे जोड़ें या मेहमानों को कम करें।",
+    "selectAgeError": "कृपया सभी बच्चों और शिशुओं की उम्र चुनें"
+  }
 }
