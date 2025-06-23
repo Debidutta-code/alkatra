@@ -166,6 +166,9 @@ const RoomsPage: React.FC = () => {
       if (!propertyId) return;
       setIsLoading(true);
       try {
+        const propertyResponse = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`
+        );
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}`,
           {
@@ -175,9 +178,6 @@ const RoomsPage: React.FC = () => {
           }
         );
         setRooms(response.data);
-        const propertyResponse = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`
-        );
         if (response.data.qrCode) {
           setQrCodeData({
             qrCode: response.data.qrCode,
@@ -241,38 +241,38 @@ const RoomsPage: React.FC = () => {
       telephone: "RoomsPage.RoomCard.amenities.telephone",
       heating: "RoomsPage.RoomCard.amenities.heating",
     };
-    
-// Inside convertAmenities function
 
-const convertedAmenities = roomAmenities.map((amenity) => {
-  const getIconName = (amenityName: string) => {
-    const amenityLower = amenityName.toLowerCase();
-    if (amenityLower.includes("wifi") || amenityLower.includes("internet")) return "wifi";
-    if (amenityLower.includes("air") || amenityLower.includes("ac")) return "snowflake";
-    if (amenityLower.includes("smoking")) return "smoking-ban";
-    if (amenityLower.includes("bed")) return "bed";
-    if (amenityLower.includes("view")) return "tree";
-    if (amenityLower.includes("bathroom")) return "bathroom";
-    if (amenityLower.includes("towels")) return "towels";
-    if (amenityLower.includes("linens")) return "linens";
-    if (amenityLower.includes("table") || amenityLower.includes("chairs")) return "tableChairs";
-    if (amenityLower.includes("desk")) return "desk";
-    if (amenityLower.includes("dresser") || amenityLower.includes("wardrobe")) return "dresserWardrobe";
-    if (amenityLower.includes("sofa") || amenityLower.includes("seating")) return "sofaSeating";
-    if (amenityLower.includes("television")) return "television";
-    if (amenityLower.includes("telephone")) return "telephone";
-    if (amenityLower.includes("heating")) return "heating";
-    return "check-circle";
-  };
+    // Inside convertAmenities function
 
-  const iconName = getIconName(amenity);
-  const translationKey = amenityTranslationMap[amenity.toLowerCase()] || "RoomsPage.RoomCard.amenities.default";
+    const convertedAmenities = roomAmenities.map((amenity) => {
+      const getIconName = (amenityName: string) => {
+        const amenityLower = amenityName.toLowerCase();
+        if (amenityLower.includes("wifi") || amenityLower.includes("internet")) return "wifi";
+        if (amenityLower.includes("air") || amenityLower.includes("ac")) return "snowflake";
+        if (amenityLower.includes("smoking")) return "smoking-ban";
+        if (amenityLower.includes("bed")) return "bed";
+        if (amenityLower.includes("view")) return "tree";
+        if (amenityLower.includes("bathroom")) return "bathroom";
+        if (amenityLower.includes("towels")) return "towels";
+        if (amenityLower.includes("linens")) return "linens";
+        if (amenityLower.includes("table") || amenityLower.includes("chairs")) return "tableChairs";
+        if (amenityLower.includes("desk")) return "desk";
+        if (amenityLower.includes("dresser") || amenityLower.includes("wardrobe")) return "dresserWardrobe";
+        if (amenityLower.includes("sofa") || amenityLower.includes("seating")) return "sofaSeating";
+        if (amenityLower.includes("television")) return "television";
+        if (amenityLower.includes("telephone")) return "telephone";
+        if (amenityLower.includes("heating")) return "heating";
+        return "check-circle";
+      };
 
-  return {
-    icon: iconName,
-    name: t(translationKey),
-  };
-});
+      const iconName = getIconName(amenity);
+      const translationKey = amenityTranslationMap[amenity.toLowerCase()] || "RoomsPage.RoomCard.amenities.default";
+
+      return {
+        icon: iconName,
+        name: t(translationKey),
+      };
+    });
 
     return {
       ...room,
@@ -283,7 +283,6 @@ const convertedAmenities = roomAmenities.map((amenity) => {
 
   const handleBookNow = (room: Room) => {
     if (!room.has_valid_rate) return;
-    // console.log("room",room)
     setSelectedRoom(room);
     setIsModalOpen(true);
     dispatch(setRoomId(room._id));
@@ -302,14 +301,14 @@ const convertedAmenities = roomAmenities.map((amenity) => {
     adults?: number;
     children?: number;
     infants?: number;
-    guests?: Guest[]; // <--- make sure this is present
+    guests?: Guest[];
   }) => {
     console.log("form data", formData);
     const queryParams = new URLSearchParams({
       roomId: formData.roomId,
       propertyId: formData.propertyId,
       // amount: formData.amount,
-      currency: "INR",
+      currency: selectedRoom?.currency_code || "",
       checkIn: formData.checkIn,
       checkOut: formData.checkOut,
       email: formData.email,

@@ -15,7 +15,7 @@ import QRCodeForAPP from "../ui/qrcode";
 
 
 const HotelCard = () => {
-  const { t ,i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -25,8 +25,8 @@ const HotelCard = () => {
   // Set default dates (tomorrow and day after tomorrow)
   const tomorrow = format(addDays(new Date(), 1), "yyyy-MM-dd");
   const dayAfterTomorrow = format(addDays(new Date(), 2), "yyyy-MM-dd");
-const isArabic = i18n.language === "ar";
-const isHindi =i18n.language === "hi";
+  const isArabic = i18n.language === "ar";
+  const isHindi = i18n.language === "hi";
   // Monitor scroll position for subtle parallax effect
   useEffect(() => {
     const handleScroll = () => {
@@ -97,41 +97,38 @@ const isHindi =i18n.language === "hi";
 
       {/* Main Content */}
       <div
-        className={`relative z-10 h-full flex flex-col items-center justify-center px-4 transition-all duration-1000 ${
-          isLoaded ? "opacity-100" : "opacity-0 translate-y-10"
-        }`}
+        className={`relative z-10 h-full flex flex-col items-center justify-center px-4 transition-all duration-1000 ${isLoaded ? "opacity-100" : "opacity-0 translate-y-10"
+          }`}
       >
-     <div
-  className={`absolute hidden md:block top-0 
+        <div
+          className={`absolute hidden md:block top-0 
     ${isArabic ? 'left-0 md:left-2 lg:left-4' : 'right-0 md:right-2 lg:right-4'} 
     md:top-16 ${isHindi ? 'lg:top-16' : 'lg:top-14'} 
     xl:w-52 lg:w-48 md:w-32 w-16 h-auto 
     shadow-lg rounded-lg flex-col items-center`}
->
-  <QRCodeForAPP />
-  <div
-  style={{
-    backgroundImage:
-      "linear-gradient(90deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 57%, rgba(227,131,57,1) 100%)",
-  }}
-  className="mt-2 w-full bg-gradient-to-r from-red-500 to-orange-600 
+        >
+          <QRCodeForAPP />
+          <div
+            style={{
+              backgroundImage:
+                "linear-gradient(90deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 57%, rgba(227,131,57,1) 100%)",
+            }}
+            className="mt-2 w-full bg-gradient-to-r from-red-500 to-orange-600 
     backdrop-blur-sm text-sm font-tripswift-medium md:px-2.5 lg:px-4 py-1.5 rounded-full 
     flex justify-center items-center mb-2 shadow-lg text-center"
->
-  <span className="text-tripswift-off-white text-md lg:text-lg  font-tripswift-medium">
-    {t("HotelCard.downloadourapp")}
-  </span>
-</div>
+          >
+            <span className="text-tripswift-off-white text-md lg:text-lg  font-tripswift-medium">
+              {t("HotelCard.downloadourapp")}
+            </span>
+          </div>
 
-</div>
-
-
+        </div>
 
         {/* Hero Text */}
         <div className="max-w-3xl text-center  sm:mb-10 animate-in slide-in-from-bottom duration-700">
           <div className="bg-tripswift-blue/20 hidden backdrop-blur-sm text-tripswift-off-white/90 text-sm font-tripswift-medium px-4 py-1.5 rounded-full sm:inline-flex items-center mb-6 shadow-lg">
-            <span className={`inline-block w-2 h-2 bg-tripswift-blue rounded-full animate-pulse ${i18n.language==="ar"?"ml-2":"mr-2"}`}></span>
-            <span className="text-[#e9d8fd]">
+            <span className={`inline-block w-2 h-2 bg-tripswift-blue rounded-full animate-pulse ${i18n.language === "ar" ? "ml-2" : "mr-2"}`}></span>
+            <span className="text-[#ffffff]">
               {t("HotelCard.exclusiveOffers")}
             </span>
           </div>
@@ -158,19 +155,19 @@ const isHindi =i18n.language === "hi";
           <div className="mt-5 md:flex items-center hidden  justify-center animate-in slide-in-from-bottom duration-700 delay-300">
             <div className="bg-tripswift-off-white/20 backdrop-blur-lg px-5 py-2.5 rounded-full shadow-lg flex items-center gap-4">
               <div className="flex items-center">
-                <span className={`inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse  ${i18n.language==="ar"?"ml-2":"mr-2"}`}></span>
+                <span className={`inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse  ${i18n.language === "ar" ? "ml-2" : "mr-2"}`}></span>
                 <span className="text-sm font-tripswift-medium text-tripswift-off-white">
                   {t("HotelCard.freeCancellation")}
                 </span>
               </div>
               <div className="flex items-center">
-                <span className={`inline-block w-2 h-2 bg-yellow-400 rounded-full animate-pulse  ${i18n.language==="ar"?"ml-2":"mr-2"}`}></span>
+                <span className={`inline-block w-2 h-2 bg-yellow-400 rounded-full animate-pulse  ${i18n.language === "ar" ? "ml-2" : "mr-2"}`}></span>
                 <span className="text-sm font-tripswift-medium text-tripswift-off-white">
                   {t("HotelCard.bestPriceGuarantee")}
                 </span>
               </div>
               <div className="hidden sm:flex items-center">
-                <span className={`inline-block w-2 h-2 bg-tripswift-blue rounded-full animate-pulse  ${i18n.language==="ar"?"ml-2":"mr-2"}`}></span>
+                <span className={`inline-block w-2 h-2 bg-tripswift-blue rounded-full animate-pulse  ${i18n.language === "ar" ? "ml-2" : "mr-2"}`}></span>
                 <span className="text-sm font-tripswift-medium text-tripswift-off-white">
                   {t("HotelCard.specialOffer")}
                 </span>

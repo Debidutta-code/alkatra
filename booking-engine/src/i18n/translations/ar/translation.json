@@ -211,6 +211,7 @@
       "checkInPlaceholder": "تاريخ الوصول",
       "checkOutPlaceholder": "تاريخ المغادرة",
       "searchButton": "بحث",
+      "errorSameDates": "لا يمكن أن تكون تواريخ الوصول والمغادرة متطابقة.",
       "errorInvalidLocation": "يرجى إدخال موقع صالح.",
       "errorSelectDates": "يرجى تحديد تاريخي الوصول والمغادرة.",
       "errorNoHotels": "لا توجد فنادق متاحة للموقع المحدد.",
@@ -418,7 +419,7 @@
       "bookNow": "احجز الآن",
       "viewBookingPolicies": "عرض سياسات الحجز",
       "securePayment": "دفع آمن",
-     "amenities": {
+      "amenities": {
         "wifi": "واي فاي مجاني",
         "airConditioning": "تكييف",
         "kingBed": "سرير كبير",
@@ -552,6 +553,9 @@
       "priceDetails": "تفاصيل السعر",
       "roomRate": "سعر الغرفة",
       "totalAmount": "الإجمالي",
+      "baseRatePerNight": "السعر الأساسي لليلة",
+      "additionalGuestCharges": "رسوم الضيوف الإضافية",
+      "priceIncludes": "السعر يشمل {{rooms}} غرفة لـ {{guests}} ضيفًا",
       "paymentNoticeTitle": "سيتم معالجة الدفع بأمان",
       "paymentNoticeDescription": "بالمتابعة، فإنك توافق على شروطنا وسياسة الخصوصية.",
       "backToDetails": "العودة إلى التفاصيل",

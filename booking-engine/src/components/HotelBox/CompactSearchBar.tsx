@@ -78,35 +78,42 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
 
   const handleSearchButtonClick = async (e: React.MouseEvent) => {
     e.preventDefault();
-
+  
     if (loading) return;
-
+  
     // Validation logic
     if (!searchQuery || searchQuery.length < 3) {
       toast.error(t("HotelListing.CompactSearchBar.errorInvalidLocation"));
       return;
     }
-
+  
     if (!dates || dates.length !== 2 || !dates[0] || !dates[1]) {
       toast.error(t("HotelListing.CompactSearchBar.errorSelectDates"));
       return;
     }
-    console.log("guest details", guestDetails)
+  
+    // Add this validation to prevent same check-in and check-out dates
+    if (dates[0] === dates[1]) {
+      toast.error(t("HotelListing.CompactSearchBar.errorSameDates"));
+      return;
+    }
+  
+    console.log("guest details", guestDetails);
     setLoading(true);
     try {
       await getHotelsByCity(searchQuery);
       const checkinDate = encodeURIComponent(dates[0] || "");
       const checkoutDate = encodeURIComponent(dates[1] || "");
-
+  
       // Use the onSearch callback if provided, otherwise use router
       if (onSearch) {
         onSearch(searchQuery, dates[0], dates[1], guestDetails);
       } else {
         // Build guest details query parameters
-        const guestParams = guestDetails ?
-          `&rooms=${guestDetails.rooms || 1}&adults=${guestDetails.guests || 1}&children=${guestDetails.children || 0}infant=${guestDetails.infants || 0}` :
-          '';
-
+        const guestParams = guestDetails
+          ? `&rooms=${guestDetails.rooms || 1}&adults=${guestDetails.guests || 1}&children=${guestDetails.children || 0}&infant=${guestDetails.infants || 0}`
+          : 1;
+  
         router.push(`/destination?location=${encodeURIComponent(searchQuery)}&checkin=${checkinDate}&checkout=${checkoutDate}${guestParams}`);
       }
     } catch (error) {
