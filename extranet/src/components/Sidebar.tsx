@@ -36,69 +36,83 @@ interface NavigationItem {
   restricted?: boolean;
 }
 
-export default function AppSidebar({ role }: { role: string }) {
+export default function AppSidebar({ role }: { role?: string }) {
   const pathname = usePathname();
   const { user } = useSelector((state: RootState) => state.auth);
   const { isMobile, open, toggleSidebar } = useSidebar();
 
   const navigationItems: NavigationItem[] = [
-    
+
     {
       title: "Grouped Properties",
       href: "/app/property/grouped",
       icon: Layers,
-      description: "Managed property groups"
+      restricted: role !== "superAdmin" && role !== "groupManager"
     },
     {
       title: "Direct Properties",
       href: "/app/property/single",
       icon: Building2,
-      description: "Individual properties",
       restricted: role !== "superAdmin"
     },
-    
+    {
+      title: "Hotel Name",
+      href: "/app/property",
+      icon: Building2,
+      restricted: role !== "hotelManager"
+    },
+    {
+      title: "Offers",
+      href: "/app/offers",
+      icon: Building2,
+    },
+    {
+      title: "Logs",
+      href: "/app/offers",
+      icon: Building2,
+    },
   ];
 
   const visibleItems = navigationItems.filter(item => !item.restricted);
 
   const NavItem = ({ item }: { item: NavigationItem }) => {
     const isActive = pathname === item.href;
-    
+
     return (
       <Link href={item.href} className="block">
         <div className={cn(
           "group relative flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-all duration-200 ",
-          isActive 
-            ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25" 
+          isActive
+            ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25"
             : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
         )}>
-          
+
           {/* Active indicator */}
           {isActive && (
             <div className="absolute left-0 top-1/2 h-8 w-1 -translate-y-1/2 rounded-r-full bg-white shadow-sm" />
           )}
-          
+
           {/* Icon */}
           <div className={cn(
             "flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
-            isActive 
-              ? "bg-white/20 text-white" 
+            isActive
+              ? "bg-white/20 text-white"
               : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400   "
           )}>
             <item.icon className="h-4 w-4" />
           </div>
-          
+
           {/* Content */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
               <span className="truncate">{item.title}</span>
               {item.badge && (
-                <Badge 
-                  variant="secondary" 
+                <Badge
+                  variant="secondary"
                   className={cn(
                     "ml-2 text-xs",
-                    isActive 
-                      ? "bg-white/20 text-white border-white/30" 
+                    isActive
+                      ? "bg-white/20 text-white border-white/30"
                       : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
                   )}
                 >
@@ -109,8 +123,8 @@ export default function AppSidebar({ role }: { role: string }) {
             {item.description && (
               <p className={cn(
                 "text-xs mt-0.5 truncate",
-                isActive 
-                  ? "text-white/80" 
+                isActive
+                  ? "text-white/80"
                   : "text-gray-500 dark:text-gray-400"
               )}>
                 {item.description}
@@ -159,7 +173,7 @@ export default function AppSidebar({ role }: { role: string }) {
         </SidebarHeader>
 
         <SidebarContent className="bg-gradient-to-b from-white via-gray-50/30 to-white dark:from-gray-900 dark:via-gray-800/30 dark:to-gray-900 p-4">
-       
+
 
           {/* Navigation Items */}
           <nav className="space-y-2">
@@ -175,7 +189,7 @@ export default function AppSidebar({ role }: { role: string }) {
             </div>
           </nav>
 
-          
+
         </SidebarContent>
       </Sidebar>
     </div>

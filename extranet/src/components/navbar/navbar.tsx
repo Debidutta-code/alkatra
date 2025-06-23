@@ -69,7 +69,6 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [noNav, setNoNav] = useState(false);
-  const [isSuperAdmin, setSuperAdmin] = useState<boolean>(false);
 
   const { user, isAuthenticated } = useSelector(
     (state: RootState) => state.auth
@@ -77,15 +76,7 @@ export default function Navbar() {
   const dispatch = useDispatch();
   const { theme } = useTheme();
   const [logoSrc, setLogoSrc] = useState("/assets/TRIP-1.png");
-  const currentUser = useSelector((state: RootState) => state.auth.user);
 
-    useEffect(() => {
-      if (currentUser?.role === "superAdmin"||currentUser?.role==="groupManager") {
-        setSuperAdmin(true);
-      } else {
-        setSuperAdmin(false);
-      }
-    }, [currentUser]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -119,11 +110,7 @@ export default function Navbar() {
       }`}
     >
       <div className="flex items-center">
-        {isSuperAdmin && (
-          <>
             <NavbarSidebarToggle />
-          </>
-        )}
         <Image src={logoSrc} height={100} width={100} alt="Trip swift logo" />
       </div>
       <div className="flex gap-2">
@@ -133,11 +120,11 @@ export default function Navbar() {
               <NavigationMenuTrigger>Properties</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <div className="p-4 w-[200px] space-y-2">
-                  <Link href={`/app/property`}>
+                  {/* <Link href={`/app/property`}>
                     <Button variant={"ghost"} className="w-full justify-start">
                       Manage Properties
                     </Button>
-                  </Link>
+                  </Link> */}
 
                   <Link href="/app/bookings">
                     <Button variant={"ghost"} className="w-full justify-start">

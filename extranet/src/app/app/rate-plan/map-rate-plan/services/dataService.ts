@@ -40,7 +40,7 @@ export const filterData = (
 
   // Filter by rate plan (using _id as identifier)
   if (selectedRatePlan) {
-    filtered = filtered.filter(item => item.rates.ratePlanCode === selectedRatePlan);
+    filtered = filtered.filter(item => item.rates?.ratePlanCode === selectedRatePlan);
   }
 
   return filtered;
@@ -67,7 +67,7 @@ export const updatePrice = (
 
   if (originalIndex !== -1) {
     // Update the base amount for the first guest (assuming single guest pricing)
-    if (updatedData[originalIndex].rates.baseByGuestAmts) {
+    if (updatedData[originalIndex].rates?.baseByGuestAmts) {
       updatedData[originalIndex].rates.baseByGuestAmts.amountBeforeTax = newPrice;
     }
   }
@@ -101,10 +101,10 @@ export const updateAvailability = (
   return updatedData;
 };
 
-// Helper function to get price from the rates structure
+// Helper function to get price from the rates? structure
 export const getPrice = (item: RatePlanInterFace): number => {
-  if (item.rates.baseByGuestAmts) {
-    return item.rates.baseByGuestAmts.amountBeforeTax;
+  if (item.rates?.baseByGuestAmts) {
+    return item.rates?.baseByGuestAmts.amountBeforeTax;
   }
   return 0;
 };
@@ -116,7 +116,7 @@ export const getAvailability = (item: RatePlanInterFace): number => {
 
 // Helper function to get currency code
 export const getCurrencyCode = (item: RatePlanInterFace): string => {
-  return item.rates.currencyCode;
+  return item.rates?.currencyCode;
 };
 
 // Helper function to get date range string for display
@@ -135,8 +135,8 @@ export const saveData = async (data: RatePlanInterFace[]): Promise<void> => {
     console.log("From save Data",data)
     let modifiedRatePlans = data.map((mp) => {
       const inventoryId = mp._id;
-      const rateAmountId = mp.rates._id;
-      const price = mp.rates.baseByGuestAmts.amountBeforeTax;
+      const rateAmountId = mp.rates?._id;
+      const price = mp.rates?.baseByGuestAmts.amountBeforeTax;
       const availability = mp.availability.count;
       return { inventoryId, rateAmountId, price, availability };
     });

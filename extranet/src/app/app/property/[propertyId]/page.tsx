@@ -568,7 +568,7 @@ export default function Page({ params, searchParams }: Props) {
               >
               Rate and Inventory Allotment
             </Button>
-            <Button
+            {/* <Button
               variant="default"
               onClick={() => router.push(`/app/rate-plan/set-availability`)}
               className="bg-tripswift-blue hover:bg-tripswift-blue-600 text-white mx-2"
@@ -588,7 +588,7 @@ export default function Page({ params, searchParams }: Props) {
               className="bg-tripswift-blue hover:bg-tripswift-blue-600 text-white mx-2"
               >
               Map Rate Plan
-            </Button>
+            </Button> */}
           </div>
         {/* </div> */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">

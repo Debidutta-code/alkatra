@@ -13,8 +13,6 @@ import { cn } from "../../lib/utils";
 
 function MainContent({ children }: { children: React.ReactNode }) {
   const { open, isMobile } = useSidebar();
-  const currentUser = useSelector((state: RootState) => state.auth.user);
-  const SuperAdmin = currentUser?.role === "superAdmin"||currentUser?.role==="groupManager"
 
   return (
     <div className="flex flex-1 flex-col">
@@ -22,7 +20,7 @@ function MainContent({ children }: { children: React.ReactNode }) {
       <div
         className={cn(
           "flex-1 overflow-auto transition-all duration-300",
-          open && !isMobile&&SuperAdmin ? "ml-[250px]" : "ml-0"
+          open && !isMobile ? "ml-[250px]" : "ml-0"
         )}
       >
         {children}
@@ -38,7 +36,6 @@ export default function RootLayout({
 }) {
   const [loading, setLoading] = useState(true);
   const currentUser = useSelector((state: RootState) => state.auth.user);
-  const showSideBar = currentUser?.role === "superAdmin"||currentUser?.role==="groupManager";
 
   useEffect(() => {
     const timeout = setTimeout(() => setLoading(false), 1000);
@@ -51,7 +48,7 @@ export default function RootLayout({
         <div className="h-screen w-screen flex items-center justify-center">
           <Triangle
             height="80"
-            width="80"
+            width="80"  
             color="#4fa94d"
             ariaLabel="triangle-loading"
             visible={true}
@@ -61,7 +58,7 @@ export default function RootLayout({
         <SidebarProvider>
           <div className="flex flex-col h-screen">
             
-            {showSideBar && <AppSidebar role={currentUser?.role} />}
+            <AppSidebar role={currentUser?.role||"hotelManager"} />
             <div className="flex flex-1 overflow-hidden">
               <MainContent>{children}</MainContent>
             </div>
