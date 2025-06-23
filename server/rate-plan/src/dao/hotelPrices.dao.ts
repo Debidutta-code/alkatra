@@ -1,4 +1,4 @@
-import RateAmount  from "../../../wincloud/src/model/ratePlanDateWise.model"
+import RateAmount from "../../../wincloud/src/model/ratePlanDateWise.model"
 import { Inventory } from "../../../wincloud/src/model/inventoryModel"
 class HotelPricesDao {
     public static async getHotelPlans(hotelCode: string, invTypeCode: string) {
@@ -131,9 +131,9 @@ class HotelPricesDao {
         throw error;
     }
 }
-    public static async checkAvailabilityDao(hotelCode:string,invTypeCode:string,startDate:Date,endDate:Date){
+    public static async checkAvailabilityDao(hotelCode: string, invTypeCode: string, startDate: Date, endDate: Date) {
         try {
-            const availability=await Inventory.findOne({hotelCode:hotelCode,invTypeCode:invTypeCode,startDate:startDate,endDate:endDate})
+            const availability = await Inventory.findOne({ hotelCode: hotelCode, invTypeCode: invTypeCode, startDate: startDate, endDate: endDate })
             return availability
         } catch (error) {
             console.log("Error occur while checking availability");

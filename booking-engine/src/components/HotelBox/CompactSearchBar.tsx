@@ -10,6 +10,7 @@ import { getHotelsByCity } from '@/api/hotel';
 import { format, addDays } from 'date-fns';
 import { useSelector } from "@/Redux/store";
 import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 interface CompactSearchBarProps {
   initialLocation?: string;
@@ -32,7 +33,7 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
   
   // Get guest details from Redux store
   const { guestDetails } = useSelector((state) => state.hotel);
-  
+  const {i18n} = useTranslation();
   // Set default dates (tomorrow and day after tomorrow)
   const tomorrow = format(addDays(new Date(), 1), "yyyy-MM-dd");
   const dayAfterTomorrow = format(addDays(new Date(), 2), "yyyy-MM-dd");
@@ -141,7 +142,7 @@ console.log("guest details",guestDetails)
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
               placeholder={t("HotelListing.CompactSearchBar.locationPlaceholder")}
-              className={`block w-[262px] md:w-full  h-11 sm:pl-12 pl-8 pr-2 sm:pr-10 py-2 rounded-md border ${
+              className={`block w-[262px] md:w-full  h-11 sm:pl-12 pl-8 pr-4 sm:pr-8 py-2 rounded-md border ${
                 isSearchFocused
                   ? "border-tripswift-blue ring-2 ring-tripswift-blue/10"
                   : "border-tripswift-black/10 hover:border-tripswift-blue/30"
@@ -204,7 +205,7 @@ console.log("guest details",guestDetails)
                   <span className="font-tripswift-semibold text-[14px]">
                     {t("HotelListing.CompactSearchBar.searchButton")}
                   </span>
-                  <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" />
+                  <ChevronRight className={`w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300 ${i18n.language==="ar"?"rotate-180":""}`}  />
                 </>
               )}
             </span>

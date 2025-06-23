@@ -33,7 +33,5 @@ export interface paginationTypes{
 }
 export interface modifiedRatePlanInterface{
   rateAmountId:string;
-  inventoryId:string;
   price:number;
-  availability:number;
 }

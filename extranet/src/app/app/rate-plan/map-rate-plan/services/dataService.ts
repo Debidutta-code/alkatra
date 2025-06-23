@@ -1,4 +1,4 @@
-import { DateRange, RatePlanInterFace } from '../types';
+import { DateRange, RatePlanInterFace ,modifiedRatePlanInterface} from '../types';
 import { format, isWithinInterval, parseISO } from '../utils/dateUtils';
 import Cookies from 'js-cookie';
 import { fetchRatePlans, getAllRatePlans,modifyRatePlans } from "../API"
@@ -35,12 +35,12 @@ export const filterData = (
 
   // Filter by room type (invTypeCode)
   if (selectedRoomType) {
-    filtered = filtered.filter(item => item.invTypeCode === selectedRoomType);
+    filtered = filtered.filter(item => item?.invTypeCode === selectedRoomType);
   }
 
   // Filter by rate plan (using _id as identifier)
   if (selectedRatePlan) {
-    filtered = filtered.filter(item => item.rates?.ratePlanCode === selectedRatePlan);
+    filtered = filtered.filter(item => item?.rates?.ratePlanCode === selectedRatePlan);
   }
 
   return filtered;
@@ -126,7 +126,7 @@ export const getDateRangeString = (item: RatePlanInterFace): string => {
   return `${startDate} - ${endDate}`;
 };
 
-export const saveData = async (data: RatePlanInterFace[]): Promise<void> => {
+export const saveData = async (data: modifiedRatePlanInterface[]): Promise<void> => {
   try {
     const accessToken = Cookies.get('accessToken');
     if (!accessToken) {
@@ -134,11 +134,9 @@ export const saveData = async (data: RatePlanInterFace[]): Promise<void> => {
     }
     console.log("From save Data",data)
     let modifiedRatePlans = data.map((mp) => {
-      const inventoryId = mp._id;
-      const rateAmountId = mp.rates?._id;
-      const price = mp.rates?.baseByGuestAmts.amountBeforeTax;
-      const availability = mp.availability.count;
-      return { inventoryId, rateAmountId, price, availability };
+      const rateAmountId = mp.rateAmountId
+      const price = mp.price
+      return {rateAmountId, price };
     });
     return await modifyRatePlans(modifiedRatePlans,accessToken)
   } catch (error: any) {

@@ -15,6 +15,7 @@ import {
   deletePropertyAddress,
   getPropertyAddressById,
   updatePropertyAddressBypropertyid,
+  getUniqueCities
 } from "../../controller/propertyaddress.controller";
 
 // import { protect } from "@quotus_packages/auth_middleware";
@@ -107,6 +108,8 @@ export default (app: Router) => {
     .get(getAllProperty as any)
     .post(protect as any, createpropertyInfo as any);
 
+    router.route("/unique-cities").get(getUniqueCities as any);
+    
   router
     .route("/:id")
     .get(getPropertyInfoById as any)

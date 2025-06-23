@@ -158,6 +158,39 @@
     "subscribeButton": "اشترك",
     "copyright": "{year} تريبسويفت - جميع الحقوق محفوظة"
   },
+  "Profile": {
+    "editProfile": "تعديل الملف الشخصي",
+    "signOut": "تسجيل الخروج",
+    "overview": "نظرة عامة",
+    "myTrips": "رحلاتي",
+    "preferences": "التفضيلات",
+    "security": "الأمان",
+    "notifications": "الإشعارات",
+    "helpCenter": "مركز المساعدة",
+    "tripsCompleted": "الرحلات المكتملة",
+    "sinceJoining": "منذ الانضمام",
+    "averageRating": "متوسط التقييم",
+    "fromHosts": "من المضيفين",
+    "savedPlaces": "الأماكن المحفوظة",
+    "wishlisted": "في قائمة الرغبات",
+    "quickActions": "إجراءات سريعة",
+    "bookTrip": "حجز رحلة",
+    "savedPlacesAction": "الأماكن المحفوظة",
+    "rewards": "المكافآت",
+    "deals": "الصفقات",
+    "securitySettings": "إعدادات الأمان",
+    "changePassword": "تغيير كلمة المرور",
+    "updatePassword": "تحديث كلمة المرور الخاصة بك",
+    "twoFactorAuth": "المصادقة الثنائية",
+    "twoFactorDesc": "إضافة طبقة إضافية من الأمان إلى حسابك",
+    "enable2FA": "تفعيل المصادقة الثنائية",
+    "profileUpdatedSuccess": "تم تحديث الملف الشخصي بنجاح",
+    "profileUpdateFailed": "فشل في تحديث الملف الشخصي",
+    "contentComingSoon": "المحتوى لـ {{tab}} قادم قريبًا...",
+    "newPasswordOptional": "كلمة مرور جديدة (اختياري)",
+    "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
+    "joined": "انضم في {{date}}"
+  },
   "HotelCard": {
     "heroTitle": "ابحث عن الإقامة المثالية لرحلتك",
     "heroSubtitle": "اكتشف أماكن إقامة رائعة بأسعار حصرية",
@@ -169,7 +202,8 @@
     "errorSelectDates": "يرجى تحديد تاريخي الوصول والمغادرة.",
     "exclusiveOffers": "عروض حصرية متاحة",
     "freeCancellation": "إلغاء مجاني",
-    "bestPriceGuarantee": "ضمان أفضل الأسعار"
+    "bestPriceGuarantee": "ضمان أفضل الأسعار",
+    "downloadourapp": "حمّل تطبيقنا"
   },
   "HotelListing": {
     "CompactSearchBar": {
@@ -318,33 +352,10 @@
     },
     "ExploreDestinations": {
       "title": "استكشف الوجهات",
-      "exploreNow": "استكشف الآن",
-      "destinations": {
-        "maldives": {
-          "name": "جزر المالديف",
-          "category": "جنة الشاطئ"
-        },
-        "swissAlps": {
-          "name": "جبال الألب السويسرية",
-          "category": "مغامرة"
-        },
-        "santorini": {
-          "name": "سانتوريني",
-          "category": "هروب رومانسي"
-        },
-        "dubai": {
-          "name": "دبي",
-          "category": "فخامة"
-        },
-        "bali": {
-          "name": "بالي",
-          "category": "ثقافي"
-        },
-        "tokyo": {
-          "name": "طوكيو",
-          "category": "حياة المدينة"
-        }
-      }
+      "descriptionTemplate": "استكشف الفنادق في {{city}}",
+      "imageAlt": "وجهة {{name}}",
+      "goToGroup": "الانتقال إلى المجموعة {{count}}",
+      "exploreNow": "استكشف الآن"
     }
   },
   "RoomsPage": {
@@ -354,6 +365,10 @@
     "aboutThisProperty": "عن هذا العقار",
     "noImagesAvailable": "لا توجد صور متاحة",
     "propertyAmenities": "مرافق العقار",
+    "nights": "ليلة",
+    "nightsPlural": "ليالي",
+    "stay": "إقامة",
+    "filter":"فلتر",
     "amenitiesList": {
       "wifi": "واي فاي مجاني",
       "swimming_pool": "حمام سباحة",
@@ -480,6 +495,7 @@
       "nights": "ليلة",
       "nightsPlural": "ليالي",
       "guestInformation": "معلومات الضيف",
+      "dob":"تاريخ الميلاد",
       "firstNameLabel": "الاسم الأول",
       "firstNamePlaceholder": "أدخل اسمك الأول",
       "firstNameError": "الاسم الأول مطلوب ويجب أن يحتوي على أحرف ومسافات فقط.",
@@ -490,7 +506,7 @@
       "emailPlaceholder": "your.email@example.com",
       "emailInfo": "سيتم إرسال تأكيد الحجز إلى هذا البريد الإلكتروني",
       "emailError": "البريد الإلكتروني مطلوب",
-      "emailInvalidError":"يرجى إدخال عنوان بريد إلكتروني صالح",
+      "emailInvalidError": "يرجى إدخال عنوان بريد إلكتروني صالح",
       "phoneLabel": "رقم الهاتف",
       "phonePlaceholder": "أدخل رقم الهاتف",
       "phoneInfo": "لإشعارات متعلقة بالحجز",
@@ -503,6 +519,8 @@
       "adultsPlural": "بالغون",
       "childSingular": "طفل",
       "childrenPlural": "أطفال",
+      "infantSingular": "رضيع",
+      "infantsPlural": "رضع",
       "guestDisplayFormat": "الغرف والضيوف",
       "childrenPartFormat": "أطفال",
       "informationVerified": "تم التحقق من المعلومات بنجاح!",
@@ -510,6 +528,9 @@
       "bookingSummary": "ملخص الحجز",
       "stayDetails": "تفاصيل الإقامة",
       "primaryGuest": "الضيف الأساسي",
+      "guests": "الضيوف",
+  "email": "البريد الإلكتروني",
+  "phone": "رقم الهاتف",
       "priceDetails": "تفاصيل السعر",
       "roomRate": "سعر الغرفة",
       "totalAmount": "الإجمالي",
@@ -619,8 +640,112 @@
       "keepMyReservation": "الاحتفاظ بحجزي",
       "processing": "جارٍ المعالجة...",
       "confirmCancellationButton": "تأكيد الإلغاء",
-      "invalidDate": "تاريخ غير صالح"
+      "invalidDate": "تاريخ غير صالح",
+      "cancellationProcessedSuccess": "تم معالجة إلغاء الحجز بنجاح",
+      "cancellationFailed": "فشل الإلغاء",
+      "checkInDatePassed": "لا يمكن إلغاء الحجز. لقد انتهى تاريخ تسجيل الوصول الخاص بك بالفعل."
+    
     },
+    "AmendReservationModal": {
+  "title": "تحديث الحجز الخاص بك",
+  "subtitle": "قم بإجراء تغييرات على إقامتك القادمة في {{propertyName}}",
+  "currentBookingDetails": "تفاصيل الحجز الحالية",
+  "stayDates": "تواريخ الإقامة",
+  "nightsCount_one": "{{count}} ليلة",
+  "nightsCount_other": "{{count}} ليالٍ",
+  "guests": "الضيوف",
+  "guestsCount": "{{adults}} بالغ، {{children}} طفل",
+  "roomDetails": "تفاصيل الغرفة",
+  "ratePlan": "خطة السعر",
+  "bestAvailableRate": "أفضل سعر متاح",
+  "total": "الإجمالي",
+  "whatToChange": "ما الذي ترغب في تغييره؟",
+  "estimatedTotal": "المجموع المقدر",
+  "amendmentTypes": {
+    "dates": "التواريخ",
+    "guests": "الضيوف",
+    "roomType": "نوع الغرفة",
+    "specialRequests": "الطلبات الخاصة"
+  },
+  "changeDates": "تغيير التواريخ",
+  "selectNewDates": "اختر تواريخ إقامة جديدة",
+  "checkInDate": "تاريخ تسجيل الوصول",
+  "checkOutDate": "تاريخ تسجيل المغادرة",
+  "stayDuration_one": "مدة الإقامة: {{count}} ليلة",
+  "stayDuration_other": "مدة الإقامة: {{count}} ليالٍ",
+  "nightsAdded_one": "(+{{count}} ليلة)",
+  "nightsAdded_other": "(+{{count}} ليالٍ)",
+  "nightsReduced_one": "(-{{count}} ليلة)",
+  "nightsReduced_other": "(-{{count}} ليالٍ)",
+  "changeGuests": "تغيير الضيوف",
+  "numberOfAdults": "عدد البالغين",
+  "numberOfChildren": "عدد الأطفال",
+  "adult_one": "بالغ",
+  "adult_other": "بالغين",
+  "child_one": "طفل",
+  "child_other": "أطفال",
+  "guestsNote": "قد يتم تطبيق رسوم إضافية على الضيوف الإضافيين. تختلف السعة القصوى حسب نوع الغرفة.",
+  "changeRoomType": "تغيير نوع الغرفة",
+  "roomType": "نوع الغرفة",
+  "roomTypeNote": "تخضع تغييرات نوع الغرفة للتوافر وقد تؤثر على السعر الإجمالي.",
+  "updateSpecialRequests": "تحديث الطلبات الخاصة",
+  "specialRequestsLabel": "الطلبات أو التفضيلات الخاصة",
+  "specialRequestsPlaceholder": "أدخل أي طلبات خاصة أو تفضيلات مثل الطابق العلوي، تسجيل وصول مبكر، إلخ.",
+  "specialRequestsNote": "الطلبات الخاصة تخضع للتوافر ولا يمكن ضمان تلبيتها.",
+  "priceAdjustment": "تعديل السعر",
+  "additionalPayment": "مطلوب دفعة إضافية",
+  "additionalChargeExplanation": "ستؤدي تغييراتك إلى رسوم إضافية قدرها ₹{{amount}}",
+  "refundToBeProcessed": "سيتم معالجة استرداد",
+  "refundExplanation": "ستؤدي تغييراتك إلى استرداد قدره ₹{{amount}}",
+  "amendmentPolicies": "سياسات التعديل",
+  "policies": {
+    "dateChanges": "تغييرات التواريخ تخضع للتوافر",
+    "changes72Hours": "قد تؤدي التغييرات خلال 72 ساعة من تسجيل الوصول إلى رسوم إضافية",
+    "roomUpgrades": "ترقيات الغرف تخضع للتوافر والرسوم الإضافية",
+    "reducingStay": "قد يخضع تقليص مدة الإقامة لسياسة الإلغاء الخاصة بالحجز الأصلي"
+  },
+  "cancel": "إلغاء",
+  "processing": "جارٍ المعالجة...",
+  "confirmAmendment": "تأكيد التعديل",
+  "errors": {
+    "selectValidDates": "يرجى اختيار تواريخ تسجيل وصول ومغادرة صالحة.",
+    "unableToAmend": "تعذر تحديث الحجز. يرجى المحاولة مرة أخرى أو التواصل مع الدعم.",
+    "invalidFirstName": "الاسم الأول مطلوب",
+    "invalidLastName": "اسم العائلة مطلوب",
+    "dobRequired": "تاريخ الميلاد مطلوب.",
+    "selectRoomType": "يرجى اختيار نوع الغرفة.",
+    "selectRatePlan": "يرجى اختيار خطة السعر.",
+    "invalidDateRange": "يجب أن يكون تاريخ تسجيل المغادرة بعد تاريخ تسجيل الوصول.",
+    "correctFormErrors": "يرجى تصحيح الأخطاء في النموذج قبل الإرسال."
+  },
+  "success": {
+    "reservationAmended": "تم تحديث الحجز بنجاح.",
+    "additionalPayment": "سيتم معالجة دفعة إضافية قدرها ₹{{amount}}.",
+    "refundProcessed": "سيتم معالجة استرداد قدره ₹{{amount}}.",
+    "noChange": "لم يحدث أي تغيير في السعر الإجمالي."
+  },
+  "roomTypes": {
+    "standard": "غرفة قياسية",
+    "deluxe": "غرفة ديلوكس",
+    "suite": "جناح",
+    "executive": "جناح تنفيذي",
+    "family": "غرفة عائلية"
+  },
+  "ratePlans": {
+    "bestAvailable": "أفضل سعر متاح",
+    "aaaMember": "سعر أعضاء AAA",
+    "package": "سعر الباقة",
+    "weekend": "عرض نهاية الأسبوع"
+  },
+  "modifications": {
+    "changedCheckIn": "تم تغيير تاريخ تسجيل الوصول",
+    "changedCheckOut": "تم تغيير تاريخ تسجيل المغادرة",
+    "changedRoomType": "تم تغيير نوع الغرفة إلى {{roomType}}",
+    "changedGuestCount": "تم تغيير عدد الضيوف",
+    "changedRatePlan": "تم تغيير خطة السعر إلى {{ratePlanName}}"
+  }
+} ,
+
     "BookingDetailsModal": {
       "bookingNumber": "الحجز #{{id}}",
       "closeModal": "إغلاق النافذة",
@@ -659,7 +784,10 @@
       "ratePlan": "خطة السعر",
       "modifyBooking": "تعديل الحجز",
       "cancelBooking": "إلغاء الحجز",
+      "dob":"تاريخ الميلاد",
+      "rooms": "غرف",
       "printItinerary": "طباعة خط سير الرحلة"
+
     }
   },
   "Payment": {
@@ -681,8 +809,8 @@
         "adults": "بالغون",
         "child": "طفل",
         "children": "أطفال",
-         "infant":" رضيع",
-         "infants":"رُضَّع",
+        "infant": " رضيع",
+        "infants": "رُضَّع",
         "guest": "الضيف"
       },
       "paymentMethod": {
@@ -728,7 +856,8 @@
         "cardSetupFailedError": "فشل إعداد البطاقة",
         "processing": "جاري المعالجة...",
         "confirmBooking": "تأكيد الحجز",
-        "paymentProcessingError": "حدث خطأ أثناء معالجة الدفع"
+        "paymentProcessingError": "حدث خطأ أثناء معالجة الدفع",
+          "footer": "يتم تشفير تفاصيل بطاقتك ومعالجتها بأمان من قبل Stripe. نحن لا نقوم أبدًا بتخزين معلومات بطاقتك الكاملة على خوادمنا."
       }
     },
     "PaymentSuccess": {
@@ -769,7 +898,25 @@
       "needHelpTitle": "هل تحتاج مساعدة؟",
       "customerServiceMessage": "فريق خدمة العملاء لدينا متاح على مدار الساعة طوال أيام الأسبوع لمساعدتك في أي أسئلة.",
       "contactSupportButton": "اتصل بالدعم",
-      "exploreMoreHotels": "استكشاف المزيد من خيارات الفنادق"
+      "exploreMoreHotels": "استكشاف المزيد من خيارات الفنادق",
+            "phoneLabel": "رقم الهاتف"
+
     }
-  }
+  } ,
+  "GuestBox": {
+  "guests": "الضيوف",
+  "adultsPlural": "البالغون",
+  "infantsPlural": "الرضع",
+  "infant": "رضيع",
+  "roomsPlural": "الغرف",
+  "child": "طفل",
+  "childrenPlural": "الأطفال",
+  "age": "العمر",
+   "year": "سنة",
+  "year_plural": "سنوات",
+   "selectAge": "اختر العمر",
+    "selectGuests": "اختر الضيوف",
+        "ages": "الأعمار"
+}
+
 }

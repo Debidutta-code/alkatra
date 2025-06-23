@@ -174,12 +174,6 @@ class RoomPriceService {
           demandedRooms: noOfRooms
         }
       }
-      if (!availability) {
-        return {
-          success: false,
-          message: ""
-        }
-      }
     } catch (error) {
       return {
         success: false,

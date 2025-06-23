@@ -23,7 +23,7 @@ const registerSchema = z.object({
   email: z
     .string()
     .min(1, "Email is required")
-    .regex(gmailRegex, "Please provide a valid Gmail address"),
+    .regex(gmailRegex, "Please provide a valid Email address"),
   password: z
     .string()
     .min(1, "Password is required")
@@ -67,7 +67,7 @@ export default function RegisterForm() {
       toast.success("Registration successful!");
       router.push("/login");
     } catch (err: any) {
-      const errorMsg = err.response?.data?.message || "Registration failed";
+      const errorMsg = err.response?.data?.err?.errors[0]?.detail|| "Registration failed";
       toast.error(errorMsg);
     }
   };

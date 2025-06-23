@@ -33,7 +33,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       {/* Left Side Image Panel */}
       <div className="lg:w-1/2 relative hidden lg:block overflow-hidden">
         {/* Stylized overlay with brand gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#054B8F]/90 via-tripswift-blue/75 to-tripswift-blue/60 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-tripswift-blue/75 to-tripswift-blue/60 z-10" />
         
         {/* Background pattern */}
         <div className="absolute inset-0 bg-[url('/patterns/dot-pattern.png')] opacity-10 z-20"></div>
@@ -93,8 +93,8 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       </div>
 
       {/* Right Side Form */}
-      <div className="w-full lg:w-1/2 flex justify-center items-center p-6 lg:p-14">
-        <div className="w-full max-w-md">
+      <div className="w-full lg:w-1/2 flex justify-center items-center p-6 lg:px-14 ">
+        <div className="w-full max-w-[410px] ">
           {/* Mobile Logo */}
           <div className="flex justify-center mb-12 lg:hidden">
             <Image 
@@ -111,15 +111,15 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
             {/* Card Header with brand accent */}
             <div className="h-2 bg-gradient-to-r from-tripswift-blue to-[#054B8F]"></div>
             
-            <div className="p-10 rounded-t-xl">
+            <div className="px-10 py-6 rounded-t-xl">
               <h2 className="text-2xl font-tripswift-bold text-tripswift-black mb-2 tracking-tight">{title}</h2>
-              <p className="text-tripswift-black/60 mb-8">{subtitle}</p>
+              <p className="text-tripswift-black/60 mb-6">{subtitle}</p>
               
               {children}
             </div>
 
             {/* Footer Area with subtle pattern */}
-            <div className="px-10 py-6 bg-tripswift-off-white/70 border-t border-gray-100 relative overflow-hidden">
+            <div className="px-10 py-3 bg-tripswift-off-white/70 border-t border-gray-100 relative overflow-hidden">
               {/* <div className="absolute inset-0 bg-[url('/patterns/subtle-dots.png')] opacity-5"></div> */}
               <div className="relative z-10">
                 {footerContent}
@@ -128,7 +128,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
           </div>
           
           {/* Trust & Security Section with enhanced design */}
-          <div className="mt-10 bg-gradient-to-r from-tripswift-blue/5 to-tripswift-blue/10 rounded-xl p-5 border border-tripswift-blue/10 transform transition-all duration-300 hover:from-tripswift-blue/10 hover:to-tripswift-blue/15">
+          <div className={location.pathname === '/register' ? 'hidden' : 'mt-6 bg-gradient-to-r from-tripswift-blue/5 to-tripswift-blue/10 rounded-xl p-5 border border-tripswift-blue/10 transform transition-all duration-300 hover:from-tripswift-blue/10 hover:to-tripswift-blue/15'}>
             <div className="flex items-start">
               <div className="bg-tripswift-blue p-2 rounded-full mr-4 mt-0.5 shadow-md shadow-tripswift-blue/20">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-tripswift-off-white" viewBox="0 0 20 20" fill="currentColor">

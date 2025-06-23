@@ -20,7 +20,7 @@ const AuthButton: React.FC<AuthButtonProps> = ({
   
   // Base classes that will always be applied
   const baseClasses = `
-    w-full flex justify-center items-center py-4 px-6 rounded-xl font-tripswift-bold text-base
+    w-full flex justify-center items-center py-3 px-6 rounded-xl font-tripswift-bold text-base
     relative overflow-hidden
     text-tripswift-off-white shadow-lg hover:shadow-xl transform
     transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-tripswift-blue

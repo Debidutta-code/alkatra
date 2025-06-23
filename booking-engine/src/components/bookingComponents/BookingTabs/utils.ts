@@ -45,16 +45,17 @@ export const getStatusClass = (status: string): string => {
   }
 };
 
-export const getStatusIcon = (status: string): JSX.Element => {
+export const getStatusIcon = (status: string , lang : string ="eg"): JSX.Element => {
+      const directionClass = lang === "ar" ? "ml-1.5" : "mr-1.5";
     switch (status) {
       case "Confirmed":
-        return React.createElement(FaRegCalendarCheck, { className: "mr-1.5 text-green-600" });
+        return React.createElement(FaRegCalendarCheck, { className: ` text-green-600 ${directionClass}` });
       case "Pending":
-        return React.createElement(FaRegClock, { className: "mr-1.5 text-yellow-600" });
+        return React.createElement(FaRegClock, { className: ` text-yellow-600 ${directionClass}` });
       case "Cancelled":
-        return React.createElement(FaRegTimesCircle, { className: "mr-1.5 text-red-600" });
+        return React.createElement(FaRegTimesCircle, { className: ` text-red-600 ${directionClass}` });
       default:
-        return React.createElement(FaRegCalendarAlt, { className: "mr-1.5 text-gray-600" });
+        return React.createElement(FaRegCalendarAlt, { className: ` text-gray-600 ${directionClass}` });
     }
 };
 
@@ -73,15 +74,16 @@ export const getRoomTypeStyle = (roomType: string = ""): string => {
 };
 
 // Added the missing getRoomTypeIcon function
-export const getRoomTypeIcon = (roomType: string = ""): JSX.Element => {
+export const getRoomTypeIcon = (roomType: string = "", lang: string = "en"): JSX.Element => {
   const type = roomType?.toLowerCase() || "";
-  
+    const directionClass = lang === "ar" ? "ml-1.5" : "mr-1.5";
+
   if (type.includes("deluxe") || type.includes("premium")) {
-    return React.createElement(FaConciergeBell, { className: "mr-1.5 text-tripswift-blue" });
+    return React.createElement(FaConciergeBell, { className: ` text-tripswift-blue ${directionClass}`});
   } else if (type.includes("suite")) {
-    return React.createElement(FaStar, { className: "mr-1.5 text-tripswift-blue" });
+    return React.createElement(FaStar, { className:  ` text-tripswift-blue ${directionClass}` });
   } else {
-    return React.createElement(FaBed, { className: "mr-1.5 text-tripswift-blue" });
+    return React.createElement(FaBed, { className:  ` text-tripswift-blue ${directionClass}` });
   }
 };
 

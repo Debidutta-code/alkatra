@@ -61,21 +61,9 @@ class RatePlanDao {
     }
     // Create update promises for each rate plan
     const updatePromises = ratePlansData.map(async (planData, index) => {
-      const { rateAmountId, inventoryId, price, availability } = planData;
+      const { rateAmountId, price } = planData;
       let inventoryUpdated = null;
       let rateUpdated = null;
-      // Update inventory if availability is provided
-      if (availability !== undefined && inventoryId) {
-        inventoryUpdated = await Inventory.findByIdAndUpdate(
-          inventoryId,
-          { "availability.count": availability },
-          { new: true, runValidators: true }
-        );
-        if (!inventoryUpdated) {
-          throw new Error(`Inventory not found or update failed for inventoryId: ${inventoryId}`);
-        }
-      }
-      // Update rate amount if price is provided
       if (price !== undefined && rateAmountId) {
         console.log("rate amount",rateAmountId)
         rateUpdated = await RateAmount.findByIdAndUpdate(
@@ -91,14 +79,12 @@ class RatePlanDao {
           throw new Error(`Rate Amount update failed for rateAmountId: ${rateAmountId}`);
         }
       }
-      // Validate that at least one update was requested
-      if (price === undefined && availability === undefined) {
+      if (price === undefined ) {
         throw new Error(`No update data provided for index ${index}`);
       }
       return {
         index,
         rateAmountId,
-        inventoryId,
         rateAmount: rateUpdated,
         inventory: inventoryUpdated,
         success: true
@@ -247,6 +233,7 @@ const dataPipeline = [
               in: {
                 _id: "$$firstRate._id",
                 currencyCode: "$$firstRate.currencyCode",
+
                 // Preserve the baseByGuestAmts structure
                 ratePlanCode:"$$firstRate.ratePlanCode",
                 baseByGuestAmts: {

@@ -22,7 +22,7 @@ import ForgotPassword from "./ForgotPassword";
 import UpdatePassword from "./UpdatePassword";
 
 const Login: React.FC = () => {
-  const { t } = useTranslation();
+  const { t ,i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -137,7 +137,7 @@ const Login: React.FC = () => {
         </p>
       }
     >
-      <form className="space-y-6" onSubmit={handleSubmit}>
+      <form className="space-y-[0.6rem]" onSubmit={handleSubmit}>
         {/* Email Field */}
         <FormInput
           id="email"
@@ -179,7 +179,7 @@ const Login: React.FC = () => {
               onChange={() => setRememberMe(!rememberMe)}
               className="w-4 h-4 rounded-md border-tripswift-black/20 text-tripswift-blue focus:ring-tripswift-blue/20 transition-colors duration-300 mb-2"
             />
-            <label htmlFor="remember" className="ml-2 text-sm text-tripswift-black/70 font-tripswift-medium ">
+            <label htmlFor="remember" className={` text-sm text-tripswift-black/70 font-tripswift-medium ${i18n.language==="ar"?"mr-2":"ml-2"} `}>
               {t('Auth.Login.rememberMe')}
             </label>
           </div>

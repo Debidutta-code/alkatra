@@ -39,7 +39,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
 
   return (
     <div className="group font-noto-sans">
-      <div className="flex justify-between items-center mb-2">
+      <div className="flex justify-between items-center ">
         <label htmlFor={id} className="block text-sm font-tripswift-medium text-tripswift-black/80 transition-colors group-hover:text-tripswift-black">
           {label}
         </label>
@@ -79,7 +79,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
           onBlur={onBlur}
           disabled={disabled}
           placeholder="••••••••"
-          className={`w-full pl-12 pr-12 py-4 rounded-lg border-[1.5px] ${
+          className={`w-full pl-12 pr-12 py-2.5 rounded-lg border-[1.5px] ${
             error 
               ? 'border-red-300 bg-red-50/50' 
               : isFocused
@@ -118,7 +118,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
       
       {/* Error message with improved styling */}
       {error && (
-        <div className="text-red-500 text-[13px] mt-2 flex items-start bg-red-50/50 p-2 rounded-md border border-red-100">
+        <div className="text-red-500 text-[13px] mt-1 flex items-center rounded-md">
           <AlertCircle size={14} className="mr-1.5 mt-0.5 flex-shrink-0" />
           <span className="font-tripswift-medium">{error}</span>
         </div>

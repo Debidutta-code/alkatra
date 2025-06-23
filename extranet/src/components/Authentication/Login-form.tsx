@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 import { login, getUser } from "../../redux/slices/authSlice";
 import { getProperties } from "../../redux/slices/propertySlice";
 import { CardTitle } from "../ui/card";
+import { ReloadIcon } from "@radix-ui/react-icons";
 
 type Props = {};
 
@@ -48,6 +49,7 @@ const LoginForm = () => {
   const form = useForm<Inputs>({
     defaultValues: { email: "", password: "" },
     resolver: zodResolver(loginSchema),
+    mode: "onChange",
   });
 
   const { register, handleSubmit, formState } = form;
@@ -96,54 +98,107 @@ const LoginForm = () => {
         <CardTitle className="text-5xl">
           Login | <span className="font-normal text-xl">TripSwift</span>
         </CardTitle>
+        <p className="text-muted-foreground">
+          Sign in to your TripSwift account
+        </p>
       </div>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-        <div className="mb-10 space-y-4">
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              withIcon
-              startIcon={<AtSign size={20} />}
-              size={"lg"}
-              {...register("email")}
-              type="email"
-            />
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
+        <div className="space-y-2">
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-medium">
+              Email Address
+            </Label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <AtSign className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <Input
+                id="email"
+                placeholder="your@email.com"
+                className="pl-10"
+                {...register("email")}
+                variant={errors.email ? "error" : undefined}
+              />
+            </div>
             {errors.email && (
               <p className="text-red-500">{errors.email.message}</p>
             )}
           </div>
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <Input
-              {...register("password")}
-              withIcon
-              startIcon={<Lock size={20} />}
-              endIcon={
-                <Button
-                  variant={"ghost"}
-                  onClick={() => setIsVisible(!isVisible)}
-                  className="px-0 py-0 hover:bg-transparent"
-                  type="button"
-                >
-                  {isVisible ? <Eye size={20} /> : <EyeOff size={20} />}
-                </Button>
-              }
-              size={"lg"}
-              type={isVisible ? "text" : "password"}
-            />
+
+          <div className="">
+            <div className="flex items-center mb-1 justify-between">
+              <Label htmlFor="password" className="text-sm font-medium">
+                Password
+              </Label>
+            </div>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <Input
+                id="password"
+                placeholder="••••••••"
+                className="pl-10 pr-10"
+                {...register("password")}
+                type={isVisible ? "text" : "password"}
+                variant={errors.password ? "error" : undefined}
+              />
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0 h-full px-3 py-1 hover:bg-transparent"
+                onClick={() => setIsVisible(!isVisible)}
+              >
+                {isVisible ? (
+                  <EyeOff className="h-5 w-5 text-muted-foreground" />
+                ) : (
+                  <Eye className="h-5 w-5 text-muted-foreground" />
+                )}
+                <span className="sr-only">
+                  {isVisible ? "Hide password" : "Show password"}
+                </span>
+              </Button>
+            </div>
             {errors.password && (
-              <p className="text-red-500">{errors.password.message}</p>
+              <p className="text-sm text-destructive mt-2">
+                {errors.password.message}
+              </p>
             )}
           </div>
-          <div>
-            <Button
-              type="button" // Explicitly set to type="button" to prevent form submission
-              className="underline hover:text-foreground transition-all duration-200 text-black dark:text-white"
-              onClick={() => setIsForgotPassword(true)}
-              variant={"link"}
-            >
-              Forgot your password?
-            </Button>
+        </div>
+        <div className="text-right">
+          <Button
+          type="button"
+          variant="link"
+          className="text-primary hover:text-primary/80 px-0"
+          onClick={() => setIsForgotPassword(true)}
+        >
+          Forgot password?
+        </Button>
+        </div>
+        <div className="space-y-2 pt-2">
+          <NextUIButton
+            type="submit"
+            size="lg"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+            isDisabled={ loading}
+          >
+            {loading && <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />}
+            Sign In
+          </NextUIButton>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">
+                Don't have an account?
+              </span>
+            </div>
           </div>
         </div>
         <div className="flex flex-col items-center">

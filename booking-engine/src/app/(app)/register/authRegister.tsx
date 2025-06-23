@@ -95,7 +95,7 @@ const Register: React.FC = () => {
         </p>
       }
     >
-      <form className="space-y-5" onSubmit={handleSubmit}>
+      <form className="space-y-2" onSubmit={handleSubmit}>
         {/* First Name Field */}
         <FormInput
           id="firstName"

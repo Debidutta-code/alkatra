@@ -5,8 +5,11 @@ import { Filters } from './components/Filters';
 import { RatePlanTable } from './components/RatePlanTable';
 import { SaveButton } from './components/SaveButton';
 import { filterData, updatePrice, updateAvailability, saveData, ratePlanServices, getAllRatePlanServices } from './services/dataService';
-import { RatePlanInterFace, DateRange, paginationTypes } from './types';
+import { RatePlanInterFace, DateRange, paginationTypes, modifiedRatePlanInterface } from './types';
 import toast, { Toaster } from 'react-hot-toast';
+import Pagination from "./components/Pagination"
+// Pagination Component
+
 
 const MapRatePlanPage: React.FC = () => {
   const [data, setData] = useState<RatePlanInterFace[]>([]);
@@ -14,7 +17,6 @@ const MapRatePlanPage: React.FC = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [selectedRoomType, setSelectedRoomType] = useState<string>('');
   const [selectedRatePlan, setSelectedRatePlan] = useState<string>('');
-  const [editingRows, setEditingRows] = useState<Set<number>>(new Set());
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [allRoomTypes, setAllRoomTypes] = useState<any[]>([]);
@@ -28,10 +30,9 @@ const MapRatePlanPage: React.FC = () => {
     resultsPerPage: 20
   });
   const [editButtonClicked, setEditButtonClicked] = useState<boolean>(false);
-  const [modifiedValues, setModifiedValues] = useState<{[key: string]: any}>({});
+  const [modifiedValues, setModifiedValues] = useState<modifiedRatePlanInterface[]>([]);
   const [originalData, setOriginalData] = useState<RatePlanInterFace[]>([]);
 
-  // Load room types once on component mount
   useEffect(() => {
     const fetchRoomTypes = async () => {
       try {
@@ -42,21 +43,31 @@ const MapRatePlanPage: React.FC = () => {
         }
       } catch (error) {
         console.error('Error fetching room types:', error);
-        setRoomTypesLoaded(true); // Set to true even on error to prevent infinite loading
+        setRoomTypesLoaded(true);
       }
     };
 
     fetchRoomTypes();
   }, []);
 
-  // Load rate plans data
   const fetchRatePlans = async () => {
     try {
+      setIsLoading(true);
       const response = await ratePlanServices("WINCLOUD", currentPage, selectedRoomType, dateRange?.from, dateRange?.to);
+
       setData(response.data);
-      setOriginalData([...response.data]); // Keep a copy of original data
+      setOriginalData(response.data);
+      setFilteredData(response.data);
+      console.log("Pagination response",response.pagination)
+      setPaginationResults(response.pagination)
+      setEditButtonClicked(false);
+      setModifiedValues([]);
+
     } catch (error) {
       console.error('Error fetching rate plans:', error);
+      toast.error('Failed to fetch rate plans data');
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -66,96 +77,70 @@ const MapRatePlanPage: React.FC = () => {
     }
   }, [currentPage, dateRange, selectedRatePlan, selectedRoomType, roomTypesLoaded]);
 
-  // Update filtered data whenever data or filters change
   useEffect(() => {
     setFilteredData(filterData(data, dateRange, selectedRoomType, selectedRatePlan, allRoomTypes));
   }, [dateRange, selectedRoomType, selectedRatePlan, data, allRoomTypes]);
 
-  const handlePriceChange = (index: number, newPrice: number) => {
-    const updatedData = [...data];
-    const itemToUpdate = filteredData[index];
-
-    // Find the item in the original data array
-    const originalIndex = data.findIndex(item => item._id === itemToUpdate._id);
-
-    if (originalIndex !== -1) {
-      // Update the price (amountBeforeTax) in the rates.baseByGuestAmts
-      updatedData[originalIndex] = {
-        ...updatedData[originalIndex],
-        rates: {
-          ...updatedData[originalIndex].rates,
-          baseByGuestAmts: {
-            ...updatedData[originalIndex].rates.baseByGuestAmts,
-            amountBeforeTax: newPrice
-          }
-        }
-      };
-      setData(updatedData);
-      
-      // Track modified values
-      setModifiedValues(prev => ({
-        ...prev,
-        [`${itemToUpdate._id}_price`]: newPrice
-      }));
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= paginationResults.totalPage && page !== currentPage) {
+      setCurrentPage(page);
+      // Scroll to top when page changes
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  };
+
+  const handlePriceChange = (id: string, newPrice: number) => {
+    // Update the data state with new price
+    const updatedData = data.map(item => {
+      if (item.rates._id === id) {
+        return {
+          ...item,
+          rates: {
+            ...item.rates,
+            baseByGuestAmts: {
+              ...item.rates.baseByGuestAmts,
+              amountBeforeTax: newPrice
+            }
+          }
+        };
+      }
+      return item;
+    });
+
+    setData(updatedData);
+
+    // Track modified values
+    setModifiedValues(prev => {
+      // Remove existing entry for this rateAmountId if it exists
+      const filtered = prev.filter(item => item.rateAmountId !== id);
+
+      // Add the new/updated entry
+      return [
+        ...filtered,
+        {
+          rateAmountId: id,
+          price: newPrice
+        }
+      ];
+    });
   };
 
   const toggleEditButton = () => {
     setEditButtonClicked(!editButtonClicked);
-    
-    // If disabling edit mode, clear all editing rows
-    if (editButtonClicked) {
-      setEditingRows(new Set());
-    }
-  };
-
-  const handleAvailabilityChange = (index: number, newAvailability: number) => {
-    const updatedData = [...data];
-    const itemToUpdate = filteredData[index];
-
-    // Find the item in the original data array
-    const originalIndex = data.findIndex(item => item._id === itemToUpdate._id);
-
-    if (originalIndex !== -1) {
-      // Update the availability count
-      updatedData[originalIndex] = {
-        ...updatedData[originalIndex],
-        availability: {
-          ...updatedData[originalIndex].availability,
-          count: newAvailability
-        }
-      };
-      setData(updatedData);
-      
-      // Track modified values
-      setModifiedValues(prev => ({
-        ...prev,
-        [`${itemToUpdate._id}_availability`]: newAvailability
-      }));
-    }
   };
 
   const handleSave = async () => {
-    setIsLoading(true);
-    console.log(editingRows)
     try {
-      // Only save the rows that were being edited
-      const rowsToSave = data.filter((_, index) => editingRows.has(index));
-      
-      if (rowsToSave.length > 0) {
-        await saveData(rowsToSave);
-        setEditingRows(new Set());
-        setEditButtonClicked(false);
-        setModifiedValues({});
-        toast.success(`Successfully saved ${rowsToSave.length} row(s)!`);
+      if (modifiedValues.length > 0) {
+        await saveData(modifiedValues); // Pass the modified values array
+        toast.success(`Successfully saved ${modifiedValues.length} modification(s)!`);
+        await fetchRatePlans(); // This will clear modifiedValues
       } else {
-        // toast.info('No changes to save');
+        toast.error('No changes to save');
       }
     } catch (error) {
       toast.error('Failed to save data');
       console.error('Save error:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -163,39 +148,11 @@ const MapRatePlanPage: React.FC = () => {
     setDateRange(undefined);
     setSelectedRoomType('');
     setSelectedRatePlan('');
-  };
-
-  const toggleEditRow = (index: number) => {
-    const newEditingRows = new Set(editingRows);
-    if (newEditingRows.has(index)) {
-      newEditingRows.delete(index);
-    } else {
-      newEditingRows.add(index);
-    }
-    setEditingRows(newEditingRows);
-  };
-
-  const cancelAllEdits = () => {
-    // Restore original data
-    setData([...originalData]);
-    setEditingRows(new Set());
-    setEditButtonClicked(false);
-    setModifiedValues({});
-    // toast.info('All changes cancelled');
-  };
-
-  // Helper function to get unique room types (invTypeCode)
-  const getRoomTypes = () => {
-    return Array.from(new Set(data.map(item => item.invTypeCode))).filter(Boolean);
-  };
-
-  // Helper function to get unique hotel codes (for rate plans)
-  const getHotelCodes = () => {
-    return Array.from(new Set(data.map(item => item.hotelCode))).filter(Boolean);
+    setCurrentPage(1); // Reset to first page when filters are reset
   };
 
   // Check if there are any unsaved changes
-  const hasUnsavedChanges = editingRows.size > 0 || Object.keys(modifiedValues).length > 0;
+  const hasUnsavedChanges = modifiedValues.length > 0;
 
   return (
     <div className="px-10 min-h-screen" style={{ height: 'calc(100vh - 100px)' }}>
@@ -216,31 +173,39 @@ const MapRatePlanPage: React.FC = () => {
             />
           </>
         )}
-        
+
         <div className="flex justify-end items-center mt-4">
-          
-          
           <div className="flex items-center space-x-2">
-            
-            
             <SaveButton
               isLoading={isLoading}
-              editingRows={editingRows}
               handleSave={handleSave}
-              disabled={!hasUnsavedChanges}
-            />
+              disabled={!hasUnsavedChanges} />
           </div>
         </div>
 
         <RatePlanTable
           filteredData={filteredData}
-          editingRows={editingRows}
           handlePriceChange={handlePriceChange}
-          handleAvailabilityChange={handleAvailabilityChange}
-          toggleEditRow={toggleEditRow}
           toggleEditButton={toggleEditButton}
           editButtonVal={editButtonClicked}
+          modifiedValues={modifiedValues} // Pass modified values to show which items are modified
         />
+
+        {/* Pagination Component */}
+        {filteredData.length > 0 && (
+          <div className="mt-6 mb-4">
+            <Pagination
+              currentPage={paginationResults.currentPage}
+              totalPages={paginationResults.totalPage}
+              totalResults={paginationResults.totalResults}
+              resultsPerPage={paginationResults.resultsPerPage}
+              hasNextPage={paginationResults.hasNextPage}
+              hasPreviousPage={paginationResults.hasPreviousPage}
+              onPageChange={handlePageChange}
+              isLoading={isLoading}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

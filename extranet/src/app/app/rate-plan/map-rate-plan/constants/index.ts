@@ -4,5 +4,4 @@ export const TABLE_HEADERS = [
   { key: 'roomType', label: 'Room Type' },
   { key: 'price', label: 'Price' },
   { key: 'availability', label: 'Availability' },
-  { key: 'actions', label: 'Actions' },
 ];

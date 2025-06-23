@@ -75,7 +75,7 @@ const FormInput: React.FC<FormInputProps> = ({
           disabled={disabled}
           aria-invalid={!!error}
           aria-describedby={error ? `${id}-error` : helpText ? `${id}-help` : undefined}
-          className={`w-full pl-12 pr-${showCheckmark ? '12' : '4'} py-4 rounded-lg border-[1.5px] ${
+          className={`w-full pl-12 pr-${showCheckmark ? '12' : '4'} py-2.5 rounded-lg border-[1.5px] ${
             error 
               ? 'border-red-300 bg-red-50/50' 
               : isFocused
@@ -97,7 +97,7 @@ const FormInput: React.FC<FormInputProps> = ({
       
       {/* Error message with improved styling */}
       {error && (
-        <div id={`${id}-error`} className="text-red-500 text-[13px] mt-2 flex items-center bg-red-50/50 p-2 rounded-md border border-red-100">
+        <div id={`${id}-error`} className="text-red-500 text-[13px] mt-1 flex items-center rounded-md ">
           <AlertCircle size={14} className="mr-1.5 flex-shrink-0" />
           <span className="font-tripswift-medium">{error}</span>
         </div>
