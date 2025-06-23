@@ -7,6 +7,9 @@ import { SaveButton } from './components/SaveButton';
 import { filterData, updatePrice, updateAvailability, saveData, ratePlanServices, getAllRatePlanServices } from './services/dataService';
 import { RatePlanInterFace, DateRange, paginationTypes, modifiedRatePlanInterface } from './types';
 import toast, { Toaster } from 'react-hot-toast';
+import Pagination from "./components/Pagination"
+// Pagination Component
+
 
 const MapRatePlanPage: React.FC = () => {
   const [data, setData] = useState<RatePlanInterFace[]>([]);
@@ -55,6 +58,8 @@ const MapRatePlanPage: React.FC = () => {
       setData(response.data);
       setOriginalData(response.data);
       setFilteredData(response.data);
+      console.log("Pagination response",response.pagination)
+      setPaginationResults(response.pagination)
       setEditButtonClicked(false);
       setModifiedValues([]);
 
@@ -75,6 +80,14 @@ const MapRatePlanPage: React.FC = () => {
   useEffect(() => {
     setFilteredData(filterData(data, dateRange, selectedRoomType, selectedRatePlan, allRoomTypes));
   }, [dateRange, selectedRoomType, selectedRatePlan, data, allRoomTypes]);
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= paginationResults.totalPage && page !== currentPage) {
+      setCurrentPage(page);
+      // Scroll to top when page changes
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   const handlePriceChange = (id: string, newPrice: number) => {
     // Update the data state with new price
@@ -135,6 +148,7 @@ const MapRatePlanPage: React.FC = () => {
     setDateRange(undefined);
     setSelectedRoomType('');
     setSelectedRatePlan('');
+    setCurrentPage(1); // Reset to first page when filters are reset
   };
 
   // Check if there are any unsaved changes
@@ -176,6 +190,22 @@ const MapRatePlanPage: React.FC = () => {
           editButtonVal={editButtonClicked}
           modifiedValues={modifiedValues} // Pass modified values to show which items are modified
         />
+
+        {/* Pagination Component */}
+        {filteredData.length > 0 && (
+          <div className="mt-6 mb-4">
+            <Pagination
+              currentPage={paginationResults.currentPage}
+              totalPages={paginationResults.totalPage}
+              totalResults={paginationResults.totalResults}
+              resultsPerPage={paginationResults.resultsPerPage}
+              hasNextPage={paginationResults.hasNextPage}
+              hasPreviousPage={paginationResults.hasPreviousPage}
+              onPageChange={handlePageChange}
+              isLoading={isLoading}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
