@@ -35,7 +35,8 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
       price !== null && 
       price !== undefined &&
       availability !== null && 
-      availability !== undefined 
+      availability !== undefined &&
+      item.rates?.ratePlanCode
     ); // Show rows only when both price and availability exist and are greater than 0
   });
 
@@ -121,7 +122,7 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
                     
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className="text-sm font-medium text-gray-900">{item.rates.ratePlanCode}</div>
+                        <div className="text-sm font-medium text-gray-900">{item.rates?.ratePlanCode}</div>
                       </div>
                     </td>
                     
