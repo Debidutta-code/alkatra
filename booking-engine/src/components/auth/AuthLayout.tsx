@@ -54,7 +54,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         {/* Content overlay */}
         <div className="absolute inset-0 flex flex-col justify-center items-start z-30 p-16">
           {/* Logo with enhanced drop shadow */}
-          <div className="mb-12 drop-shadow-2xl transform hover:scale-105 transition-transform duration-300">
+          <div className="mb-6 drop-shadow-2xl transform hover:scale-105 transition-transform duration-300">
             <Image 
               src={LoginIcon} 
               width={160} 
@@ -96,7 +96,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       <div className="w-full lg:w-1/2 flex justify-center items-center p-6 lg:px-14 ">
         <div className="w-full max-w-[410px] ">
           {/* Mobile Logo */}
-          <div className="flex justify-center mb-12 lg:hidden">
+          <div className="flex justify-center mb-6 lg:hidden">
             <Image 
               src={LoginIconMob} 
               width={140} 

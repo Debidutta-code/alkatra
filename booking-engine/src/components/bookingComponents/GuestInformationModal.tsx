@@ -66,6 +66,7 @@ interface GuestInformationModalProps {
     hotelName: string;
     ratePlanCode: string;
     roomType: string;
+    currency?: string;
   }) => void;
   guestData?: {
     rooms?: number;
@@ -105,7 +106,7 @@ interface FinalPrice {
     numberOfNights: number;
     averagePerNight: number;
   };
-  dailyBreakdown: DailyBreakDown | null;
+  dailyBreakdown: DailyBreakDown[] | null;
   availableRooms: number;
   requestedRooms: number;
 }
@@ -132,8 +133,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         i < (guestData?.guests || 1)
           ? "adult"
           : i < (guestData?.guests || 1) + (guestData?.children || 0)
-          ? "child"
-          : "infant";
+            ? "child"
+            : "infant";
 
       const today = new Date();
       let defaultDOB = "";
@@ -246,8 +247,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
             i < (guestData?.guests || 1)
               ? "adult"
               : i < (guestData?.guests || 1) + (guestData?.children || 0)
-              ? "child"
-              : "infant";
+                ? "child"
+                : "infant";
           const guest = guests[i];
           return {
             firstName: guestData.firstName || guest?.firstName || "",
@@ -459,8 +460,13 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         infants: guestData?.infants || 0,
         guests,
         hotelName: guestData?.hotelName || "",
-        ratePlanCode: finalPrice?.dailyBreakdown?.ratePlanCode || "",
+        ratePlanCode: finalPrice?.dailyBreakdown && finalPrice.dailyBreakdown.length > 0
+          ? finalPrice.dailyBreakdown[0].ratePlanCode
+          : "",
         roomType: selectedRoom?.room_type || "",
+        currency: finalPrice?.dailyBreakdown && finalPrice.dailyBreakdown.length > 0
+          ? finalPrice.dailyBreakdown[0].currencyCode
+          : "",
       });
     }
   };
@@ -546,11 +552,10 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex flex-col items-center">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-tripswift-bold ${
-                    activeSection === "details" || isFormUpdated
-                      ? "bg-tripswift-blue text-tripswift-off-white"
-                      : "bg-tripswift-black/10 text-tripswift-black/60"
-                  }`}
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-tripswift-bold ${activeSection === "details" || isFormUpdated
+                    ? "bg-tripswift-blue text-tripswift-off-white"
+                    : "bg-tripswift-black/10 text-tripswift-black/60"
+                    }`}
                 >
                   1
                 </div>
@@ -562,20 +567,18 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
               </div>
               <div className="flex-1 mx-4">
                 <div
-                  className={`h-1 rounded-full ${
-                    isFormUpdated
-                      ? "bg-tripswift-blue"
-                      : "bg-tripswift-black/20"
-                  } transition-all duration-300`}
+                  className={`h-1 rounded-full ${isFormUpdated
+                    ? "bg-tripswift-blue"
+                    : "bg-tripswift-black/20"
+                    } transition-all duration-300`}
                 ></div>
               </div>
               <div className="flex flex-col items-center">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-tripswift-bold ${
-                    activeSection === "review" && isFormUpdated
-                      ? "bg-tripswift-blue text-tripswift-off-white"
-                      : "bg-tripswift-black/10 text-tripswift-black/60"
-                  }`}
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-tripswift-bold ${activeSection === "review" && isFormUpdated
+                    ? "bg-tripswift-blue text-tripswift-off-white"
+                    : "bg-tripswift-black/10 text-tripswift-black/60"
+                    }`}
                 >
                   2
                 </div>
@@ -637,9 +640,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                             (guest.type === "child"
                               ? guestData?.guests || 1
                               : guest.type === "infant"
-                              ? (guestData?.guests || 1) +
+                                ? (guestData?.guests || 1) +
                                 (guestData?.children || 0)
-                              : 0) +
+                                : 0) +
                             1}
                         </h4>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -650,9 +653,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                             >
                               <User
                                 size={16}
-                                className={`text-tripswift-blue  ${
-                                  i18n.language === "ar" ? "ml-2" : "mr-2"
-                                }`}
+                                className={`text-tripswift-blue  ${i18n.language === "ar" ? "ml-2" : "mr-2"
+                                  }`}
                               />
                               {t(
                                 "BookingComponents.GuestInformationModal.firstNameLabel"
@@ -688,9 +690,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                             >
                               <User
                                 size={16}
-                                className={`text-tripswift-blue  ${
-                                  i18n.language === "ar" ? "ml-2" : "mr-2"
-                                }`}
+                                className={`text-tripswift-blue  ${i18n.language === "ar" ? "ml-2" : "mr-2"
+                                  }`}
                               />
                               {t(
                                 "BookingComponents.GuestInformationModal.lastNameLabel"
@@ -726,11 +727,10 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                             >
                               <Calendar
                                 size={16}
-                                className={`text-tripswift-blue  ${
-                                  i18n.language === "ar" ? "ml-2" : "mr-2"
-                                }`}
+                                className={`text-tripswift-blue  ${i18n.language === "ar" ? "ml-2" : "mr-2"
+                                  }`}
                               />
-                             {t(
+                              {t(
                                 "BookingComponents.GuestInformationModal.dob"
                               )}
                             </label>
@@ -744,40 +744,40 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                               max={
                                 guest.type === "adult"
                                   ? getFormattedDate(
-                                      new Date(
-                                        new Date().setFullYear(
-                                          new Date().getFullYear() - 13
-                                        )
+                                    new Date(
+                                      new Date().setFullYear(
+                                        new Date().getFullYear() - 13
                                       )
                                     )
+                                  )
                                   : guest.type === "child"
-                                  ? getFormattedDate(
+                                    ? getFormattedDate(
                                       new Date(
                                         new Date().setFullYear(
                                           new Date().getFullYear() - 2
                                         )
                                       )
                                     )
-                                  : getFormattedDate(new Date())
+                                    : getFormattedDate(new Date())
                               }
                               min={
                                 guest.type === "child"
                                   ? getFormattedDate(
-                                      new Date(
-                                        new Date().setFullYear(
-                                          new Date().getFullYear() - 13
-                                        )
+                                    new Date(
+                                      new Date().setFullYear(
+                                        new Date().getFullYear() - 13
                                       )
                                     )
+                                  )
                                   : guest.type === "infant"
-                                  ? getFormattedDate(
+                                    ? getFormattedDate(
                                       new Date(
                                         new Date().setFullYear(
                                           new Date().getFullYear() - 2
                                         )
                                       )
                                     )
-                                  : undefined
+                                    : undefined
                               }
                               className={`w-full px-3 py-2 border border-tripswift-black/20 rounded-lg focus:outline-none 
       focus:ring-2 focus:ring-tripswift-blue/30 text-sm transition-all duration-200 
@@ -800,9 +800,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       >
                         <Mail
                           size={16}
-                          className={`text-tripswift-blue  ${
-                            i18n.language === "ar" ? "ml-2" : "mr-2"
-                          }`}
+                          className={`text-tripswift-blue  ${i18n.language === "ar" ? "ml-2" : "mr-2"
+                            }`}
                         />
                         {t(
                           "BookingComponents.GuestInformationModal.emailLabel"
@@ -835,9 +834,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       >
                         <Phone
                           size={16}
-                          className={`text-tripswift-blue  ${
-                            i18n.language === "ar" ? "ml-2" : "mr-2"
-                          }`}
+                          className={`text-tripswift-blue  ${i18n.language === "ar" ? "ml-2" : "mr-2"
+                            }`}
                         />
                         {t(
                           "BookingComponents.GuestInformationModal.phoneLabel"
@@ -853,9 +851,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                           placeholder={t(
                             "BookingComponents.GuestInformationModal.phonePlaceholder"
                           )}
-                          className={`w-full px-3 py-2 border border-tripswift-black/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 text-sm transition-all duration-200 ${
-                            i18n.language === "ar" ? "text-right" : ""
-                          }`}
+                          className={`w-full px-3 py-2 border border-tripswift-black/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 text-sm transition-all duration-200 ${i18n.language === "ar" ? "text-right" : ""
+                            }`}
                           international
                           limitMaxLength={true}
                         />
@@ -889,9 +886,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       <h4 className="text-base font-tripswift-medium text-tripswift-black mb-1 flex items-center">
                         <Calendar
                           size={16}
-                          className={`text-tripswift-blue  ${
-                            i18n.language === "ar" ? "ml-2" : "mr-2"
-                          }`}
+                          className={`text-tripswift-blue  ${i18n.language === "ar" ? "ml-2" : "mr-2"
+                            }`}
                         />
                         {t(
                           "BookingComponents.GuestInformationModal.stayDetails"
@@ -901,8 +897,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         <div>
                           <p className="text-xs text-tripswift-black/60">
                             {t(
-                          "BookingComponents.GuestInformationModal.roomType"
-                        )}
+                              "BookingComponents.GuestInformationModal.roomType"
+                            )}
                           </p>
                           <p className="text-sm font-tripswift-medium">
                             {selectedRoom.room_name} ({selectedRoom.room_type})
@@ -910,9 +906,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         </div>
                         <div>
                           <p className="text-xs text-tripswift-black/60">
-                             {t(
-                          "BookingComponents.GuestInformationModal.checkIn"
-                        )}
+                            {t(
+                              "BookingComponents.GuestInformationModal.checkIn"
+                            )}
                           </p>
                           <p className="text-sm font-tripswift-medium">
                             {formatDate(checkInDate)}
@@ -921,8 +917,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         <div>
                           <p className="text-xs text-tripswift-black/60">
                             {t(
-                          "BookingComponents.GuestInformationModal.checkOut"
-                        )}
+                              "BookingComponents.GuestInformationModal.checkOut"
+                            )}
                           </p>
                           <p className="text-sm font-tripswift-medium">
                             {formatDate(checkOutDate)}
@@ -931,8 +927,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         <div>
                           <p className="text-xs text-tripswift-black/60">
                             {t(
-                        "BookingComponents.GuestInformationModal.nightsPlural"
-                      )}
+                              "BookingComponents.GuestInformationModal.nightsPlural"
+                            )}
                           </p>
                           <p className="text-sm font-tripswift-medium">
                             {nightsCount} {nightsText}
@@ -941,8 +937,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         <div>
                           <p className="text-xs text-tripswift-black/60">
                             {t(
-                          "BookingComponents.GuestInformationModal.guests"
-                        )}
+                              "BookingComponents.GuestInformationModal.guests"
+                            )}
                           </p>
                           <p className="text-sm font-tripswift-medium">
                             {getGuestCountDisplay()}
@@ -954,9 +950,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       <h4 className="text-base font-tripswift-medium text-tripswift-black mb-1 flex items-center">
                         <User
                           size={16}
-                          className={`text-tripswift-blue  ${
-                            i18n.language === "ar" ? "ml-2" : "mr-2"
-                          }`}
+                          className={`text-tripswift-blue  ${i18n.language === "ar" ? "ml-2" : "mr-2"
+                            }`}
                         />
                         {t(
                           "BookingComponents.GuestInformationModal.guestInformation"
@@ -966,8 +961,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         <div>
                           <p className="text-xs text-tripswift-black/60">
                             {t(
-                          "BookingComponents.GuestInformationModal.primaryGuest"
-                        )}
+                              "BookingComponents.GuestInformationModal.primaryGuest"
+                            )}
                           </p>
                           <p className="text-sm font-tripswift-medium">
                             {guests[0]?.firstName} {guests[0]?.lastName}
@@ -975,9 +970,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         </div>
                         <div>
                           <p className="text-xs text-tripswift-black/60">
-                           {t(
-                          "BookingComponents.GuestInformationModal.email"
-                        )}
+                            {t(
+                              "BookingComponents.GuestInformationModal.email"
+                            )}
                           </p>
                           <p className="text-sm font-tripswift-medium">
                             {email}
@@ -986,11 +981,11 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         <div>
                           <p className="text-xs text-tripswift-black/60">
                             {t(
-                          "BookingComponents.GuestInformationModal.phone"
-                        )}
+                              "BookingComponents.GuestInformationModal.phone"
+                            )}
                           </p>
                           <p
-                            className={`text-sm font-tripswift-medium  ${i18n.language === "ar"?"text-right":""}`}
+                            className={`text-sm font-tripswift-medium  ${i18n.language === "ar" ? "text-right" : ""}`}
                             dir="ltr"
                           >
                             {"\u200E" + phone}
@@ -1002,42 +997,73 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                 </div>
 
                 {/* Price Summary Card */}
-                <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-tripswift-black/10">
-                  <div className="bg-tripswift-blue/10 px-4 py-2 rounded-t-xl">
-                    <h3 className="text-lg font-tripswift-bold text-tripswift-black">
-                      {t(
-                        "BookingComponents.GuestInformationModal.priceDetails"
-                      )}
-                    </h3>
-                  </div>
-                  <div className="px-4 pb-2 space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-tripswift-black/70">
-                       {t(
-                          "BookingComponents.GuestInformationModal.roomRate"
-                        )}({nightsCount} {nightsText})
-                      </span>
-                      <span className="text-sm font-tripswift-medium">
-                        ₹
-                        {finalPrice?.baseRatePerNight ||
-                          selectedRoom.room_price}{" "}
-                        × {nightsCount}
-                      </span>
+                {finalPrice && finalPrice.totalAmount ? (
+                  <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-tripswift-black/10">
+                    <div className="bg-tripswift-blue/10 px-4 py-2 rounded-t-xl">
+                      <h3 className="text-lg font-tripswift-bold text-tripswift-black">
+                        {t("BookingComponents.GuestInformationModal.priceDetails")}
+                      </h3>
                     </div>
-                    <div className="border-t border-tripswift-black/10 pt-4">
+                    <div className="px-4 pb-2 space-y-2">
+                      {/* Base Rate Breakdown */}
                       <div className="flex justify-between items-center">
-                        <span className="text-base font-tripswift-bold">
-                          {t(
-                          "BookingComponents.GuestInformationModal.totalAmount"
-                        )}
+                        <span className="text-sm text-tripswift-black/70">
+                          {t("BookingComponents.GuestInformationModal.baseRatePerRoomPerNight")} ×{" "}
+                          {finalPrice.requestedRooms} {t("BookingComponents.GuestInformationModal.roomsPlural")} ×{" "}
+                          {finalPrice.numberOfNights} {nightsText}
                         </span>
-                        <span className="text-xl font-tripswift-bold text-tripswift-blue">
-                          ₹{finalPrice?.totalAmount}
+                        <span className="text-sm font-tripswift-medium">
+                          {(finalPrice.dailyBreakdown && finalPrice.dailyBreakdown.length > 0
+                            ? finalPrice.dailyBreakdown[0].currencyCode
+                            : "INR")}{" "}
+                          {(finalPrice.baseRatePerNight || selectedRoom.room_price).toLocaleString()} × {finalPrice.requestedRooms} × {finalPrice.numberOfNights} ={" "}
+                          {(finalPrice.breakdown.totalBaseAmount || selectedRoom.room_price * finalPrice.requestedRooms * finalPrice.numberOfNights).toLocaleString()}
                         </span>
                       </div>
+                      {/* Additional Guest Charges */}
+                      {finalPrice.additionalGuestCharges !== undefined && finalPrice.additionalGuestCharges > 0 && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-tripswift-black/70">
+                            {t("BookingComponents.GuestInformationModal.additionalGuestCharges")}
+                          </span>
+                          <span className="text-sm font-tripswift-medium">
+                            {(finalPrice.dailyBreakdown && finalPrice.dailyBreakdown.length > 0
+                              ? finalPrice.dailyBreakdown[0].currencyCode
+                              : "INR")}{" "}
+                            {finalPrice.additionalGuestCharges.toLocaleString()}
+                          </span>
+                        </div>
+                      )}
+                      {/* Total Amount */}
+                      <div className="border-t border-tripswift-black/10 pt-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-base font-tripswift-bold">
+                            {t("BookingComponents.GuestInformationModal.totalAmount")}
+                          </span>
+                          <span className="text-xl font-tripswift-bold text-tripswift-blue">
+                            {(finalPrice.dailyBreakdown && finalPrice.dailyBreakdown.length > 0
+                              ? finalPrice.dailyBreakdown[0].currencyCode
+                              : "INR")}{" "}
+                            {finalPrice.totalAmount.toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                      {/* Additional Info */}
+                      <p className="text-xs text-tripswift-black/60 mt-2">
+                        {t("BookingComponents.GuestInformationModal.priceIncludes", {
+                          rooms: finalPrice.requestedRooms || guestData?.rooms || 1,
+                          guests: (guestData?.guests || 1) + (guestData?.children || 0) + (guestData?.infants || 0),
+                        })}
+                      </p>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-tripswift-black/10 p-4 text-center">
+                    <p className="text-sm text-tripswift-black/60">
+                      {t("BookingComponents.GuestInformationModal.priceLoading")}
+                    </p>
+                  </div>
+                )}
 
                 {/* Payment Notice */}
                 <div className="bg-tripswift-blue/5 rounded-xl px-4 py-3 border border-tripswift-blue/20">
@@ -1085,11 +1111,10 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                   : handleConfirmBooking
               }
               disabled={activeSection === "review" && !isFormUpdated}
-              className={`px-6 py-2.5 rounded-lg text-sm font-tripswift-medium transition-all duration-200 ${
-                activeSection === "review" && !isFormUpdated
-                  ? "bg-tripswift-blue/50 text-tripswift-off-white cursor-not-allowed"
-                  : "bg-tripswift-blue text-tripswift-off-white hover:bg-tripswift-blue/90"
-              }`}
+              className={`px-6 py-2.5 rounded-lg text-sm font-tripswift-medium transition-all duration-200 ${activeSection === "review" && !isFormUpdated
+                ? "bg-tripswift-blue/50 text-tripswift-off-white cursor-not-allowed"
+                : "bg-tripswift-blue text-tripswift-off-white hover:bg-tripswift-blue/90"
+                }`}
             >
               {activeSection === "details"
                 ? t("BookingComponents.GuestInformationModal.continueToReview")

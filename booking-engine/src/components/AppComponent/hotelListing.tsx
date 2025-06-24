@@ -162,11 +162,9 @@ const HotelListing: React.FC = () => {
   ) => {
     const guestToUse = guestData || guestDetails;
     const guestParams = guestToUse
-      ? `&rooms=${guestToUse.rooms || 1}&adults=${
-          guestToUse.guests || 1
-        }&children=${guestToUse.children || 0}&infant=${
-          guestToUse.infants || 0
-        }`
+      ? `&rooms=${guestToUse.rooms || 1}&adults=${guestToUse.guests || 1
+      }&children=${guestToUse.children || 0}&infant=${guestToUse.infants || 0
+      }`
       : "";
     router.push(
       `/destination?location=${encodeURIComponent(
@@ -213,11 +211,9 @@ const HotelListing: React.FC = () => {
 
     // Pass guest details in the URL
     const guestParams = guestDetails
-      ? `&rooms=${guestDetails.rooms || 1}&adults=${
-          guestDetails.guests || 1
-        }&children=${guestDetails.children || 0}&infant=${
-          guestDetails.infants || 0
-        }`
+      ? `&rooms=${guestDetails.rooms || 1}&adults=${guestDetails.guests || 1
+      }&children=${guestDetails.children || 0}&infant=${guestDetails.infants || 0
+      }`
       : "";
 
     window.location.href = `/hotel?id=${hotelId}&checkin=${checkinDate}&checkout=${checkoutDate}${guestParams}`;
@@ -332,39 +328,30 @@ const HotelListing: React.FC = () => {
           <div>
             <div className="flex items-center">
               <MapPin
-                className={`h-5 w-5  text-tripswift-blue ${
-                  i18n.language === "ar" ? "ml-3" : "mr-3"
-                }`}
+                className={`h-5 w-5  text-tripswift-blue ${i18n.language === "ar" ? "ml-3" : "mr-3"
+                  }`}
               />
               <h1 className="text-xl font-tripswift-bold text-tripswift-black">
                 {i18n.language === "hi"
                   ? `${params.location || params.destination} ${t(
-                      "HotelListing.hotelsIn"
-                    )}`
-                  : `${t("HotelListing.hotelsIn")} ${
-                      params.location || params.destination
-                    }`}
+                    "HotelListing.hotelsIn"
+                  )}`
+                  : `${t("HotelListing.hotelsIn")} ${params.location || params.destination
+                  }`}
               </h1>
             </div>
 
             <div className="flex flex-wrap items-center  text-sm font-tripswift-regular text-tripswift-black/70 mt-2 ">
               <div className={`flex items-center `}>
                 <Calendar
-                  className={`h-5 w-5  text-tripswift-blue ${
-                    i18n.language === "ar" ? "ml-3" : "mr-3"
-                  }`}
+                  className={`h-5 w-5  text-tripswift-blue ${i18n.language === "ar" ? "ml-3" : "mr-3"
+                    }`}
                 />
                 {checkinDate && checkoutDate ? (
                   <span>
-                    {formatDate(checkinDate, {
-                      month: "short",
-                      day: "numeric",
-                    })}{" "}
-                    -{" "}
-                    {formatDate(checkoutDate, {
-                      month: "short",
-                      day: "numeric",
-                    })}
+                    {i18n.language === "ar"
+                      ? `${formatDate(checkoutDate, { month: "short", day: "numeric" })} - ${formatDate(checkinDate, { month: "short", day: "numeric" })}`
+                      : `${formatDate(checkinDate, { month: "short", day: "numeric" })} - ${formatDate(checkoutDate, { month: "short", day: "numeric" })}`}
                   </span>
                 ) : (
                   <span>
@@ -376,7 +363,7 @@ const HotelListing: React.FC = () => {
               </div>
               <span className={` text-tripswift-black/40 mx-4`}>•</span>
               {checkinDate && checkoutDate ? (
-                <span>{calculateNights(checkinDate, checkoutDate)} nights</span>
+                <span>{calculateNights(checkinDate, checkoutDate)} {t("HotelListing.nights", { defaultValue: "nights" })}</span>
               ) : (
                 <span>Select dates</span>
               )}
@@ -397,17 +384,15 @@ const HotelListing: React.FC = () => {
             className="w-full py-2.5 bg-white border border-gray-200 rounded-lg shadow-sm text-sm font-tripswift-medium text-tripswift-black hover:bg-gray-50 transition-colors duration-300 flex items-center justify-center"
           >
             <Filter
-              className={`h-4 w-4  text-tripswift-blue ${
-                i18n.language === "ar" ? "ml-2" : "mr-2"
-              } `}
+              className={`h-4 w-4  text-tripswift-blue ${i18n.language === "ar" ? "ml-2" : "mr-2"
+                } `}
             />
             <span>
               {t("HotelListing.filters", { defaultValue: "Filters" })}
             </span>
             {activeFilterCount > 0 && (
-              <span className={` bg-tripswift-blue text-tripswift-off-white px-2 py-0.5 rounded-full text-xs font-tripswift-medium ${
-                i18n.language === "ar" ? "mr-2" : "ml-2"
-              } `}>
+              <span className={` bg-tripswift-blue text-tripswift-off-white px-2 py-0.5 rounded-full text-xs font-tripswift-medium ${i18n.language === "ar" ? "mr-2" : "ml-2"
+                } `}>
                 {activeFilterCount}
               </span>
             )}
@@ -438,17 +423,16 @@ const HotelListing: React.FC = () => {
                       {activeFilterCount}{" "}
                       {activeFilterCount === 1
                         ? t("HotelListing.activeFilter", {
-                            defaultValue: "active filter",
-                          })
+                          defaultValue: "active filter",
+                        })
                         : t("HotelListing.activeFilters", {
-                            defaultValue: "active filters",
-                          })}
+                          defaultValue: "active filters",
+                        })}
                     </span>
                     <button
                       onClick={resetFilters}
-                      className={` text-tripswift-blue hover:underline font-tripswift-medium transition-all duration-300 ${
-                        i18n.language === "ar" ? "mr-2" : "ml-2"
-                      }`}
+                      className={` text-tripswift-blue hover:underline font-tripswift-medium transition-all duration-300 ${i18n.language === "ar" ? "mr-2" : "ml-2"
+                        }`}
                     >
                       {t("HotelListing.clearAll", {
                         defaultValue: "Clear all",
@@ -529,7 +513,7 @@ const HotelListing: React.FC = () => {
           <div className="lg:w-3/4">
             <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-200 p-4 mb-4 flex flex-wrap items-center justify-between gap-3">
               <div className="relative flex-grow max-w-xs">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className={`absolute inset-y-0 ${i18n.language === "ar" ? "right-0 pr-3" : "left-0 pl-3"} flex items-center pointer-events-none`}>
                   <Search className="h-4 w-4 text-tripswift-black/50" />
                 </div>
                 <input
@@ -539,15 +523,14 @@ const HotelListing: React.FC = () => {
                   placeholder={t("HotelListing.searchPropertyName", {
                     defaultValue: "Search property by name",
                   })}
-                  className="pl-10 w-full border border-gray-200 rounded-md px-3 py-1.5 text-sm bg-tripswift-off-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue transition-all duration-300"
+                  className={`${i18n.language === "ar" ? "pr-10" : "pl-10"} w-full border border-gray-200 rounded-md px-3 py-1.5 text-sm bg-tripswift-off-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue transition-all duration-300`}
                 />
               </div>
 
               <div className="flex items-center">
                 <span
-                  className={`text-sm font-tripswift-medium text-tripswift-black/70 ${
-                    i18n.language === "ar" ? "ml-3" : "mr-3"
-                  }`}
+                  className={`text-sm font-tripswift-medium text-tripswift-black/70 ${i18n.language === "ar" ? "ml-3" : "mr-3"
+                    }`}
                 >
                   {t("HotelListing.sortBy", { defaultValue: "Sort by" })}
                 </span>
@@ -627,9 +610,8 @@ const HotelListing: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="flex items-start">
                     <div
-                      className={`bg-tripswift-blue/10 p-1 rounded-full mt-0.5 ${
-                        i18n.language === "ar" ? "ml-3" : "mr-3"
-                      } `}
+                      className={`bg-tripswift-blue/10 p-1 rounded-full mt-0.5 ${i18n.language === "ar" ? "ml-3" : "mr-3"
+                        } `}
                     >
                       <CreditCard className="h-5 w-5 text-tripswift-blue" />
                     </div>
@@ -650,9 +632,8 @@ const HotelListing: React.FC = () => {
 
                   <div className="flex items-start">
                     <div
-                      className={`bg-tripswift-blue/10 p-1 rounded-full mt-0.5 ${
-                        i18n.language === "ar" ? "ml-3" : "mr-3"
-                      } `}
+                      className={`bg-tripswift-blue/10 p-1 rounded-full mt-0.5 ${i18n.language === "ar" ? "ml-3" : "mr-3"
+                        } `}
                     >
                       <Star className="h-5 w-5 text-tripswift-blue" />
                     </div>
@@ -673,9 +654,8 @@ const HotelListing: React.FC = () => {
 
                   <div className="flex items-start">
                     <div
-                      className={`bg-tripswift-blue/10 p-1 rounded-full mt-0.5 ${
-                        i18n.language === "ar" ? "ml-3" : "mr-3"
-                      } `}
+                      className={`bg-tripswift-blue/10 p-1 rounded-full mt-0.5 ${i18n.language === "ar" ? "ml-3" : "mr-3"
+                        } `}
                     >
                       <Shield className="h-5 w-5 text-tripswift-blue" />
                     </div>

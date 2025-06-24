@@ -88,7 +88,7 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
         }
     };
     const defaultHotelImage = "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300&q=80";
-    const {i18n}=useTranslation();
+    const { i18n } = useTranslation();
     return (
         <div
             className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300 group font-noto-sans cursor-pointer"
@@ -127,7 +127,7 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
 
                         {/* Location */}
                         <div className="flex items-center text-sm text-tripswift-black/60 mb-2">
-                            <MapPin className={`h-4 w-4 text-tripswift-blue mb-1 ${i18n.language==="ar" ?"ml-1":"mr-1 "}`} />
+                            <MapPin className={`h-4 w-4 text-tripswift-blue mb-1 ${i18n.language === "ar" ? "ml-1" : "mr-1 "}`} />
                             <span>{location}</span>
                         </div>
 
@@ -144,7 +144,7 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
                                 .map(([amenity]) => (
                                     <div key={amenity} className="flex items-center text-xs font-tripswift-medium text-tripswift-blue bg-tripswift-blue/5 border border-tripswift-blue/20 px-2 py-1 rounded-md">
                                         {getAmenityIcon(amenity)}
-                                        <span className={`capitalize ${i18n.language==="ar" ?"mr-2":"ml-2"} `}>{t(`HotelListing.HotelCardItem.amenitiesList.${amenity}`)}</span>
+                                        <span className={`capitalize ${i18n.language === "ar" ? "mr-2" : "ml-2"} `}>{t(`HotelListing.HotelCardItem.amenitiesList.${amenity}`)}</span>
                                     </div>
                                 ))}
                         </div>
@@ -152,7 +152,9 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
                         {checkinDate && checkoutDate && (
                             <div className="flex items-center text-xs text-tripswift-black/70 mb-2 font-tripswift-medium">
                                 <span className="bg-tripswift-blue/5 border border-tripswift-blue/10 px-2 py-1 rounded-md text-tripswift-blue">
-                                    {formatDate(checkinDate)} - {formatDate(checkoutDate)}
+                                    {i18n.language === "ar"
+                                        ? `${formatDate(checkoutDate)} - ${formatDate(checkinDate)}`
+                                        : `${formatDate(checkinDate)} - ${formatDate(checkoutDate)}`}
                                 </span>
                             </div>
                         )}

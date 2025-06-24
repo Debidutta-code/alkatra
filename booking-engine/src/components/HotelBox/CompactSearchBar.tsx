@@ -30,10 +30,10 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
   const searchParams = useSearchParams();
   const router = useRouter();
   const searchContainerRef = useRef<HTMLDivElement>(null);
-  
+
   // Get guest details from Redux store
   const { guestDetails } = useSelector((state) => state.hotel);
-  const {i18n} = useTranslation();
+  const { i18n } = useTranslation();
   // Set default dates (tomorrow and day after tomorrow)
   const tomorrow = format(addDays(new Date(), 1), "yyyy-MM-dd");
   const dayAfterTomorrow = format(addDays(new Date(), 2), "yyyy-MM-dd");
@@ -68,45 +68,52 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
   const clearSearch = () => {
     setSearchQuery("");
   };
-  
+
   // Handler for when guest details change
   const handleGuestDetailsChange = (details: any) => {
     if (onGuestChange) {
       onGuestChange(details);
     }
   };
-  
+
   const handleSearchButtonClick = async (e: React.MouseEvent) => {
     e.preventDefault();
-
+  
     if (loading) return;
-
+  
     // Validation logic
     if (!searchQuery || searchQuery.length < 3) {
       toast.error(t("HotelListing.CompactSearchBar.errorInvalidLocation"));
       return;
     }
-
+  
     if (!dates || dates.length !== 2 || !dates[0] || !dates[1]) {
       toast.error(t("HotelListing.CompactSearchBar.errorSelectDates"));
       return;
     }
-console.log("guest details",guestDetails)
+  
+    // Add this validation to prevent same check-in and check-out dates
+    if (dates[0] === dates[1]) {
+      toast.error(t("HotelListing.CompactSearchBar.errorSameDates"));
+      return;
+    }
+  
+    console.log("guest details", guestDetails);
     setLoading(true);
     try {
       await getHotelsByCity(searchQuery);
       const checkinDate = encodeURIComponent(dates[0] || "");
       const checkoutDate = encodeURIComponent(dates[1] || "");
-
+  
       // Use the onSearch callback if provided, otherwise use router
       if (onSearch) {
         onSearch(searchQuery, dates[0], dates[1], guestDetails);
       } else {
         // Build guest details query parameters
-        const guestParams = guestDetails ? 
-          `&rooms=${guestDetails.rooms || 1}&adults=${guestDetails.guests || 1}&children=${guestDetails.children || 0}infant=${guestDetails.infants || 0}` : 
-          '';
-        
+        const guestParams = guestDetails
+          ? `&rooms=${guestDetails.rooms || 1}&adults=${guestDetails.guests || 1}&children=${guestDetails.children || 0}&infant=${guestDetails.infants || 0}`
+          : 1;
+  
         router.push(`/destination?location=${encodeURIComponent(searchQuery)}&checkin=${checkinDate}&checkout=${checkoutDate}${guestParams}`);
       }
     } catch (error) {
@@ -123,14 +130,12 @@ console.log("guest details",guestDetails)
         <div className="w-full sm:w-auto sm:flex-1" ref={searchContainerRef}>
           <div className="relative group">
             <div
-              className={`absolute inset-y-0 left-3 flex items-center pointer-events-none transition-colors duration-200 ${
-                isSearchFocused ? "text-tripswift-blue" : "text-tripswift-black/40"
-              }`}
+              className={`absolute inset-y-0 ${i18n.language === "ar" ? "right-3" : "left-3"} flex items-center pointer-events-none transition-colors duration-200 ${isSearchFocused ? "text-tripswift-blue" : "text-tripswift-black/40"
+                }`}
             >
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-300 ${
-                  isSearchFocused ? "bg-tripswift-blue/10" : "bg-transparent"
-                }`}
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-300 ${isSearchFocused ? "bg-tripswift-blue/10" : "bg-transparent"
+                  }`}
               >
                 <MapPin className="h-4 w-4" />
               </div>
@@ -142,18 +147,17 @@ console.log("guest details",guestDetails)
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
               placeholder={t("HotelListing.CompactSearchBar.locationPlaceholder")}
-              className={`block w-[262px] md:w-full  h-11 sm:pl-12 pl-8 pr-4 sm:pr-8 py-2 rounded-md border ${
-                isSearchFocused
-                  ? "border-tripswift-blue ring-2 ring-tripswift-blue/10"
-                  : "border-tripswift-black/10 hover:border-tripswift-blue/30"
-              } outline-none text-tripswift-black transition duration-200 ease-in-out shadow-sm font-tripswift-medium text-[16px] px-2 tracking-normal`}
+              className={`block w-[262px] md:w-full  h-11 sm:pl-12 pl-8 pr-4 sm:pr-8 py-2 rounded-md border ${isSearchFocused
+                ? "border-tripswift-blue ring-2 ring-tripswift-blue/10"
+                : "border-tripswift-black/10 hover:border-tripswift-blue/30"
+                } outline-none text-tripswift-black transition duration-200 ease-in-out shadow-sm font-tripswift-medium text-[16px] px-2 tracking-normal`}
               style={{ textIndent: "16px " }} // Match input:placeholder-shown style
               aria-label={t("HotelListing.CompactSearchBar.locationPlaceholder")}
             />
             {searchQuery && (
               <button
                 onClick={clearSearch}
-                className="absolute inset-y-0 right-3 flex items-center text-tripswift-black/40 hover:text-tripswift-black transition-colors"
+                className={`absolute inset-y-0 ${i18n.language === "ar" ? "left-3" : "right-3"} flex items-center text-tripswift-black/40 hover:text-tripswift-black transition-colors`}
                 aria-label={t("HotelListing.CompactSearchBar.ariaClearSearch")}
               >
                 <div className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-tripswift-black/5">
@@ -167,12 +171,12 @@ console.log("guest details",guestDetails)
         {/* Date Range */}
         <div className=" w-[262px] sm:flex-1">
           <div className="relative group">
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+            <div className={`absolute inset-y-0 ${i18n.language === "ar" ? "right-3" : "left-3"} flex items-center pointer-events-none`}>
               <div className="w-8 h-8 rounded-full flex items-center justify-center group-hover:bg-tripswift-blue/10 transition-colors duration-300">
                 <Calendar className="h-4 w-4 text-tripswift-black/40 group-hover:text-tripswift-blue transition-colors duration-200" />
               </div>
             </div>
-            <div className="bg-tripswift-off-white border border-tripswift-black/10 text-[16px] hover:border-tripswift-blue/30 rounded-md shadow-sm transition-all duration-200 h-11  pl-12 flex items-center">
+            <div className={`bg-tripswift-off-white border border-tripswift-black/10 text-[16px] hover:border-tripswift-blue/30 rounded-md shadow-sm transition-all duration-200 h-11 ${i18n.language === "ar" ? "pr-12" : "pl-12"} flex items-center`}>
               <DateRange dates={dates} setDates={setDates} />
             </div>
           </div>
@@ -205,7 +209,7 @@ console.log("guest details",guestDetails)
                   <span className="font-tripswift-semibold text-[14px]">
                     {t("HotelListing.CompactSearchBar.searchButton")}
                   </span>
-                  <ChevronRight className={`w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300 ${i18n.language==="ar"?"rotate-180":""}`}  />
+                  <ChevronRight className={`w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300 ${i18n.language === "ar" ? "rotate-180" : ""}`} />
                 </>
               )}
             </span>

@@ -52,7 +52,7 @@ function PaymentPageContent() {
 
   // Get booking parameters from URL
   // const amount = isNaN(parseInt(searchParams.get("amount") || "0", 10)) ? 0 : parseInt(searchParams.get("amount") || "0", 10); 
-  const currency = searchParams.get("currency")?.toLowerCase() || "INR";
+  const currency = searchParams.get("currency")?.toLowerCase() || "";
   const firstName = searchParams.get('firstName') || authUser?.firstName || '';
   const lastName = searchParams.get('lastName') || authUser?.lastName || '';
   const email = searchParams.get('email') || authUser?.email || '';
@@ -63,16 +63,16 @@ function PaymentPageContent() {
   const checkOut = searchParams.get('checkOut') || '';
   const userId = authUser?._id || searchParams.get('userId') || '';
   const hotelName = searchParams.get('hotelName') || 'Unknown Hotel';
-  const ratePlanCode = searchParams.get('ratePlanCode')?.toUpperCase() || 'SUT';
-  const roomType = searchParams.get('roomType') || 'SUT';
+  const ratePlanCode = searchParams.get('ratePlanCode')?.toUpperCase() || '';
+  const roomType = searchParams.get('roomType') || '';
 
   // Get guest counts from URL parameters
   const rooms = parseInt(searchParams.get('rooms') || '1', 10);
   const adults = parseInt(searchParams.get('adults') || '1', 10);
   const children = parseInt(searchParams.get('children') || '0', 10);
   const infants = parseInt(searchParams.get('infants') || '0', 10);
- const amountFromRedux = useSelector((state: any) => state.pmsHotelCard.amount);
- const {i18n} =useTranslation();
+  const amountFromRedux = useSelector((state: any) => state.pmsHotelCard.amount);
+  const { i18n } = useTranslation();
   // Use amount from Redux only
   const amount = amountFromRedux ? parseInt(amountFromRedux, 10) : 0;
   // Parse guests from query parameters
@@ -202,7 +202,7 @@ function PaymentPageContent() {
                     <div className="flex flex-col md:flex-row md:justify-between gap-6">
                       <div className={`flex  items-start `}>
                         <CalendarRange className={`text-tripswift-blue flex-shrink-0`} size={20} />
-                        <div className={` ${i18n.language==="ar" ?"mr-3":"ml-3"}`}>
+                        <div className={` ${i18n.language === "ar" ? "mr-3" : "ml-3"}`}>
                           <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentPageContent.bookingSummary.stayDates')}</p>
                           <p className="font-tripswift-medium">
                             {formatDate(checkIn, { weekday: 'short', month: 'short', day: 'numeric' })} - {formatDate(checkOut, { weekday: 'short', month: 'short', day: 'numeric' })}
@@ -215,7 +215,7 @@ function PaymentPageContent() {
 
                       <div className="flex items-start ">
                         <Users className="text-tripswift-blue flex-shrink-0" size={20} />
-                        <div className={` ${i18n.language==="ar" ?"mr-3":"ml-3"}`}>
+                        <div className={` ${i18n.language === "ar" ? "mr-3" : "ml-3"}`}>
                           <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentPageContent.bookingSummary.guests')}</p>
                           <p className="font-tripswift-medium ">
                             {rooms} {rooms === 1 ? t('Payment.PaymentPageContent.bookingSummary.room') : t('Payment.PaymentPageContent.bookingSummary.rooms')} · {adults} {adults === 1 ? t('Payment.PaymentPageContent.bookingSummary.adult') : t('Payment.PaymentPageContent.bookingSummary.adults')}
@@ -226,7 +226,7 @@ function PaymentPageContent() {
 
                       <div className="flex items-start ">
                         <CheckCircle className="text-tripswift-blue flex-shrink-0" size={20} />
-                        <div className={` ${i18n.language==="ar" ?"mr-3":"ml-3"}`}>
+                        <div className={` ${i18n.language === "ar" ? "mr-3" : "ml-3"}`}>
                           <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentPageContent.bookingSummary.guest')}</p>
                           <p className="font-tripswift-medium">{guests[0]?.firstName} {guests[0]?.lastName}</p>
                           <p className="text-sm text-tripswift-black/60 truncate max-w-[200px]">{email}</p>
@@ -363,7 +363,7 @@ function PaymentPageContent() {
                         {paymentOption === 'payAtHotel' && (
                           <div className="bg-blue-50 p-3 rounded-lg mt-4">
                             <div className="flex items-start">
-                              <Clock className={`text-tripswift-blue flex-shrink-0 mt-0.5  ${i18n.language==="ar" ?"ml-2":"mr-2"}`} size={16} />
+                              <Clock className={`text-tripswift-blue flex-shrink-0 mt-0.5  ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} size={16} />
                               <p className="text-sm text-tripswift-black/70">
                                 {t('Payment.PaymentPageContent.priceDetails.payAtHotelInfo')}
                               </p>
@@ -376,15 +376,15 @@ function PaymentPageContent() {
                       <div className="mt-8 pt-4 border-t border-gray-200">
                         <div className="flex flex-col space-y-3">
                           <div className="flex items-center">
-                            <Shield className={`h-5 w-5 text-green-600 ${i18n.language==="ar" ?"ml-2":"mr-2"}`} />
+                            <Shield className={`h-5 w-5 text-green-600 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
                             <span className="text-sm text-tripswift-black/70">{t('Payment.PaymentPageContent.securityBadges.securePayments')}</span>
                           </div>
                           <div className="flex items-center">
-                            <CreditCard className={`h-5 w-5 text-green-600 ${i18n.language==="ar" ?"ml-2":"mr-2"}`} />
+                            <CreditCard className={`h-5 w-5 text-green-600 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
                             <span className="text-sm text-tripswift-black/70">{t('Payment.PaymentPageContent.securityBadges.noCardStorage')}</span>
                           </div>
                           <div className="flex items-center">
-                            <CheckCircle className={`h-5 w-5 text-green-600 ${i18n.language==="ar" ?"ml-2":"mr-2"}`} />
+                            <CheckCircle className={`h-5 w-5 text-green-600 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
                             <span className="text-sm text-tripswift-black/70">{t('Payment.PaymentPageContent.securityBadges.freeCancellation')}</span>
                           </div>
                         </div>
