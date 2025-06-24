@@ -1,32 +1,33 @@
-"use client";
-import Image from "next/image"
+
+"use client"
+import { useEffect, useState } from "react";
 import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
   useSidebar
-} from "../components/ui/sidebar";
+} from "./ui/sidebar";
+import Image from "next/image";
+
 import {
   X,
   Building2,
   Users,
-  BarChart3,
-  Settings,
-  Home,
   ChevronRight,
   Layers,
   Crown,
-  Shield
+  Shield,
+  LayoutDashboard,
+  Hotel
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { cn } from "../lib/utils";
+import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
+import axios from "axios"
+import { RootState } from "@src/redux/store";
 import { useSelector } from "react-redux";
-import { RootState } from "../redux/store";
-import { Button } from "../components/ui/button";
-import { Badge } from "../components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-
 interface NavigationItem {
   title: string;
   href: string;
@@ -37,12 +38,41 @@ interface NavigationItem {
 }
 
 export default function AppSidebar({ role }: { role?: string }) {
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const pathname = usePathname();
-  const { user } = useSelector((state: RootState) => state.auth);
-  const { isMobile, open, toggleSidebar } = useSidebar();
+  const { open, toggleSidebar } = useSidebar();
+  const [propertyId, setPropertyId] = useState({
+    id: "",
+    name: "",
+    status: false
+  })
+  const fetchHotelAdminHotel = async (accessToken: string) => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/getHotelManagerRooms`, {
+        headers: {
+          "Authorization": `Bearer ${accessToken}`
+        }
+      })
+      if (response.data.success) {
+        setPropertyId({ ...propertyId, id: response.data.data._id, name: response.data.data.property_name, status: true })
+      } else {
+        setPropertyId({ ...propertyId, status: false })
+      }
+      console.log("PropertyIdDetails", response?.data)
+    } catch (error) {
 
+    }
+  }
+  useEffect(() => {
+    if (!accessToken || role != "hotelManager") return;
+    fetchHotelAdminHotel(accessToken);
+  }, [accessToken]);
   const navigationItems: NavigationItem[] = [
-
+    {
+      title: "Dashboard",
+      href: "/app",
+      icon: LayoutDashboard,
+    },
     {
       title: "Grouped Properties",
       href: "/app/property/grouped",
@@ -56,20 +86,21 @@ export default function AppSidebar({ role }: { role?: string }) {
       restricted: role !== "superAdmin"
     },
     {
-      title: "Hotel Name",
-      href: "/app/property",
-      icon: Building2,
-      restricted: role !== "hotelManager"
+      title: `${propertyId.status?`${propertyId?.name}`:"No Property Available"}`,
+      href: `/app/property/${propertyId?.id}`,
+      icon: Hotel,
+      restricted: role !== "hotelManager",
+      description:`${!propertyId?.status?"Create Your Property First":""}`
     },
     {
       title: "Offers",
       href: "/app/offers",
-      icon: Building2,
+      icon: Crown,
     },
     {
       title: "Logs",
-      href: "/app/offers",
-      icon: Building2,
+      href: "/app/logs",
+      icon: Shield,
     },
   ];
 
@@ -81,13 +112,11 @@ export default function AppSidebar({ role }: { role?: string }) {
     return (
       <Link href={item.href} className="block">
         <div className={cn(
-          "group relative flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-all duration-200 ",
+          "group relative flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-all duration-200",
           isActive
             ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25"
-            : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+            : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
         )}>
-
-          {/* Active indicator */}
           {isActive && (
             <div className="absolute left-0 top-1/2 h-8 w-1 -translate-y-1/2 rounded-r-full bg-white shadow-sm" />
           )}
@@ -97,41 +126,44 @@ export default function AppSidebar({ role }: { role?: string }) {
             "flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
             isActive
               ? "bg-white/20 text-white"
-              : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400   "
+              : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
           )}>
             <item.icon className="h-4 w-4" />
           </div>
 
           {/* Content */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between">
-              <span className="truncate">{item.title}</span>
-              {item.badge && (
-                <Badge
-                  variant="secondary"
-                  className={cn(
-                    "ml-2 text-xs",
-                    isActive
-                      ? "bg-white/20 text-white border-white/30"
-                      : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
-                  )}
-                >
-                  {item.badge}
-                </Badge>
+          {open && (
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <span className="truncate">{item.title}</span>
+                {item.badge && (
+                  <Badge
+                    variant="secondary"
+                    className={cn(
+                      "ml-2 text-xs",
+                      isActive
+                        ? "bg-white/20 text-white border-white/30"
+                        : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                    )}
+                  >
+                    {item.badge}
+                  </Badge>
+                )}
+              </div>
+              {item.description && (
+                <p className={cn(
+                  "text-xs mt-0.5 truncate",
+                  isActive
+                    ? "text-white/80"
+                    : "text-gray-500 dark:text-gray-400"
+                )}>
+                  {item.description}
+                </p>
               )}
             </div>
-            {item.description && (
-              <p className={cn(
-                "text-xs mt-0.5 truncate",
-                isActive
-                  ? "text-white/80"
-                  : "text-gray-500 dark:text-gray-400"
-              )}>
-                {item.description}
-              </p>
-            )}
-          </div>
-          {isActive && (
+          )}
+
+          {open && isActive && (
             <ChevronRight className="h-4 w-4 text-white/80" />
           )}
         </div>
@@ -146,15 +178,12 @@ export default function AppSidebar({ role }: { role?: string }) {
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-3">
               <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg blur opacity-25  transition duration-200"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg blur opacity-25 transition duration-200"></div>
                 <div className="relative bg-white dark:bg-gray-900 rounded-lg p-1">
-                  <Image
-                    src="/assets/TRIP-1.png"
-                    alt="Logo"
-                    width={100}
-                    height={32}
-                    className="rounded-md"
-                  />
+                  <div className="w-[100px] h-8 bg-gradient-to-r  rounded-md flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">        <Image src={"/assets/TRIP-1.png"} height={100} width={100} alt="Trip swift logo" />
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -164,7 +193,7 @@ export default function AppSidebar({ role }: { role?: string }) {
                 variant="ghost"
                 size="sm"
                 onClick={toggleSidebar}
-                className="h-8 w-8 p-0  hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors rounded-lg"
+                className="h-8 w-8 p-0 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors rounded-lg"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -173,8 +202,6 @@ export default function AppSidebar({ role }: { role?: string }) {
         </SidebarHeader>
 
         <SidebarContent className="bg-gradient-to-b from-white via-gray-50/30 to-white dark:from-gray-900 dark:via-gray-800/30 dark:to-gray-900 p-4">
-
-
           {/* Navigation Items */}
           <nav className="space-y-2">
             <div className="mb-4">
@@ -188,8 +215,6 @@ export default function AppSidebar({ role }: { role?: string }) {
               </div>
             </div>
           </nav>
-
-
         </SidebarContent>
       </Sidebar>
     </div>

@@ -3,6 +3,7 @@ import { AppError } from "../Property_Management/src/utils/appError";
 import { errorHandler } from "../Property_Management/src/middlewares/error.middleware";
 
 // route imports
+import roleBased from "../RoleBased/src/routes/rolebased.route"
 import authRouter from "../User-Authentication/src/Routes/auth.route";
 import pmsRoutes from "../Property_Management/src/api";
 import userRouter from "../User-Authentication/src/Routes/user.route";
@@ -13,7 +14,6 @@ import bookingRouter from "../Booking_Engine/src/routes/booking.routes";
 import paymentRouter from "../Booking_Engine/src/routes/payment.routes";
 import ratePlaneRoute from "../rate-plan/src/routes/ratePlan.route";
 import couponManagement from "../Coupon_Management/routes/couponRoutes";
-
 export async function initializeExpressRoutes({ app }: { app: Express }) {
   app.head("/status", (_, res: Response) => res.status(200).end());
 
@@ -26,7 +26,7 @@ export async function initializeExpressRoutes({ app }: { app: Express }) {
   app.use("/api/v1/search", searchRouter);
   // amadeus hotel routes
   app.use("/api/v1/room", inventoryRouter);
-  
+
   app.use("/api/v1/booking", bookingRouter);
   app.use("/api/v1/payment", paymentRouter);
 
@@ -34,8 +34,8 @@ export async function initializeExpressRoutes({ app }: { app: Express }) {
 
   // Coupon managemen api
   app.use("/api/v1/coupon", couponManagement);
+  app.use("/api/v1/admin", roleBased)
 
-  
 
   app.all("*", (req: Request, _res: Response, next: NextFunction) => {
     next(new AppError(`Can't find ${req.originalUrl} path on the server`, 404));

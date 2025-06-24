@@ -54,10 +54,10 @@ type Props = {};
 // Create a separate component for the sidebar toggle logic
 function NavbarSidebarToggle() {
   const { open, isMobile } = useSidebar();
-  
+
   // Show toggle in navbar only when sidebar is closed (desktop) or always on mobile
   if (open && !isMobile) return null;
-  
+
   return (
     <div className="ml-2">
       <SidebarTrigger />
@@ -69,6 +69,7 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [noNav, setNoNav] = useState(false);
+  const { open } = useSidebar();
 
   const { user, isAuthenticated } = useSelector(
     (state: RootState) => state.auth
@@ -105,12 +106,11 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`h-[10vh] w-screen border-b px-10 ${
-        noNav ? "hidden" : "flex items-center justify-between"
-      }`}
+      className={`h-[10vh]  border-b px-10 ${noNav ? "hidden" : "flex items-center justify-between"
+        } ${open?"w-[78vw]":"w-[100vw]"}`}
     >
       <div className="flex items-center">
-            <NavbarSidebarToggle />
+        <NavbarSidebarToggle />
         <Image src={logoSrc} height={100} width={100} alt="Trip swift logo" />
       </div>
       <div className="flex gap-2">
@@ -120,11 +120,7 @@ export default function Navbar() {
               <NavigationMenuTrigger>Properties</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <div className="p-4 w-[200px] space-y-2">
-                  {/* <Link href={`/app/property`}>
-                    <Button variant={"ghost"} className="w-full justify-start">
-                      Manage Properties
-                    </Button>
-                  </Link> */}
+                
 
                   <Link href="/app/bookings">
                     <Button variant={"ghost"} className="w-full justify-start">
@@ -166,7 +162,7 @@ export default function Navbar() {
               </Avatar>
               {user &&
                 user.firstName.charAt(0).toUpperCase() +
-                  user.firstName.slice(1).toLowerCase()}
+                user.firstName.slice(1).toLowerCase()}
             </MenubarTrigger>
             <MenubarContent className="">
               <MenubarItem onClick={handleLogout}>
@@ -184,30 +180,3 @@ export default function Navbar() {
   );
 }
 
-// const ListItem = React.forwardRef<
-//   React.ElementRef<"a">,
-//   React.ComponentPropsWithoutRef<"a">
-// >(({ className, title, children, ...props }, ref) => {
-//   return (
-//     <li>
-//       <NavigationMenuLink asChild>
-//         <a
-//           ref={ref}
-//           className={cn(
-//             "block select-none space-y-1 list-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-slate-700 dark:focus:bg-slate-700",
-//             className
-//           )}
-//           {...props}
-//         >
-//           <div className="text-sm font-medium leading-none">{title}</div>
-//           <p className="line-clamp-2 text-sm leading-snug text-slate-500 dark:text-slate-400">
-//             {children}
-//           </p>
-//         </a>
-//       </NavigationMenuLink>
-//     </li>
-//   );
-// });
-// ListItem.displayName = "ListItem";
-
-// export default dynamic(() => Promise.resolve(Navbar), { ssr: false });

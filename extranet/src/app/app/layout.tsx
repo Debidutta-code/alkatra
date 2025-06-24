@@ -4,10 +4,7 @@ import Navbar from "../../components/navbar/navbar";
 import CheckAuthentication from "../../components/CheckAuthentication/CheckAuthentication";
 import { Triangle } from "react-loader-spinner";
 import AppSidebar from "../../components/Sidebar";
-import {
-  SidebarProvider,
-  useSidebar,
-} from "../../components/ui/sidebar";
+import { SidebarProvider, useSidebar } from "../../components/ui/sidebar";
 import { RootState, useSelector } from "../../redux/store";
 import { cn } from "../../lib/utils";
 
@@ -15,16 +12,14 @@ function MainContent({ children }: { children: React.ReactNode }) {
   const { open, isMobile } = useSidebar();
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div
+      className={cn(
+        "h-full w-full overflow-auto transition-all duration-300 overflow-x-hidden",
+        open && !isMobile && "w-[80vw] ml-[20vw]"
+      )}
+    >
       <Navbar />
-      <div
-        className={cn(
-          "flex-1 overflow-auto transition-all duration-300",
-          open && !isMobile ? "ml-[250px]" : "ml-0"
-        )}
-      >
-        {children}
-      </div>
+      <div className="">{children}</div>
     </div>
   );
 }
@@ -45,10 +40,10 @@ export default function RootLayout({
   return (
     <CheckAuthentication setLoading={setLoading}>
       {loading ? (
-        <div className="h-screen w-screen flex items-center justify-center">
+        <div className="h-screen w-[100vw] flex items-center justify-center">
           <Triangle
             height="80"
-            width="80"  
+            width="80"
             color="#4fa94d"
             ariaLabel="triangle-loading"
             visible={true}
@@ -56,10 +51,11 @@ export default function RootLayout({
         </div>
       ) : (
         <SidebarProvider>
-          <div className="flex flex-col h-screen">
-            
-            <AppSidebar role={currentUser?.role||"hotelManager"} />
-            <div className="flex flex-1 overflow-hidden">
+          <div className="flex h-screen max-w-[100vw]">
+            {/* Sidebar */}
+            <AppSidebar role={currentUser?.role || "hotelManager"} />
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col overflow-hidden">
               <MainContent>{children}</MainContent>
             </div>
           </div>

@@ -248,54 +248,6 @@ const Analytics = () => {
               </LineChart>
             </ResponsiveContainer>
           </div>
-
-          {/* Quick Actions */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Quick Actions</h3>
-            <div className="space-y-4">
-              <button className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl hover:from-indigo-100 hover:to-purple-100 transition-all duration-200 group">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-indigo-500 rounded-lg group-hover:bg-indigo-600 transition-colors">
-                    <Users className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="font-medium text-gray-900">Manage Users</span>
-                </div>
-                <div className="text-indigo-500 group-hover:text-indigo-600">→</div>
-              </button>
-              
-              <button className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl hover:from-green-100 hover:to-emerald-100 transition-all duration-200 group">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-green-500 rounded-lg group-hover:bg-green-600 transition-colors">
-                    <TrendingUp className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="font-medium text-gray-900">View Reports</span>
-                </div>
-                <div className="text-green-500 group-hover:text-green-600">→</div>
-              </button>
-              
-              <button className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl hover:from-orange-100 hover:to-red-100 transition-all duration-200 group">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-orange-500 rounded-lg group-hover:bg-orange-600 transition-colors">
-                    <Settings className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="font-medium text-gray-900">Settings</span>
-                </div>
-                <div className="text-orange-500 group-hover:text-orange-600">→</div>
-              </button>
-
-              {userRole === 'superadmin' && (
-                <button className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl hover:from-purple-100 hover:to-pink-100 transition-all duration-200 group">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-purple-500 rounded-lg group-hover:bg-purple-600 transition-colors">
-                      <Eye className="w-5 h-5 text-white" />
-                    </div>
-                    <span className="font-medium text-gray-900">System Overview</span>
-                  </div>
-                  <div className="text-purple-500 group-hover:text-purple-600">→</div>
-                </button>
-              )}
-            </div>
-          </div>
         </div>
       </div>
     </div>

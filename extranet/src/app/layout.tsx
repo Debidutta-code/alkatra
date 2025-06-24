@@ -53,7 +53,7 @@ export default function RootLayout({
       </head>
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased",
+          "min-h-[100vh] bg-background font-sans antialiased",
           notoSans.variable,
           "text-foreground bg-tripswift-off-white"
         )}
