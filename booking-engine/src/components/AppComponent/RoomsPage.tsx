@@ -221,26 +221,26 @@ const RoomsPage: React.FC = () => {
         });
       });
     }
-    const amenityTranslationMap: { [key: string]: string } = {
-      wifi: "RoomsPage.RoomCard.amenities.wifi",
-      internet: "RoomsPage.RoomCard.amenities.wifi",
-      airconditioning: "RoomsPage.RoomCard.amenities.airConditioning",
-      ac: "RoomsPage.RoomCard.amenities.airConditioning",
-      kingbed: "RoomsPage.RoomCard.amenities.kingBed",
-      smoking: "RoomsPage.RoomCard.amenities.smokingBan",
-      bed: "RoomsPage.RoomCard.amenities.kingBed",
-      view: "RoomsPage.RoomCard.amenities.view",
-      bathroom: "RoomsPage.RoomCard.amenities.bathroom",
-      towels: "RoomsPage.RoomCard.amenities.towels",
-      linens: "RoomsPage.RoomCard.amenities.linens",
-      tablechairs: "RoomsPage.RoomCard.amenities.tableChairs",
-      desk: "RoomsPage.RoomCard.amenities.desk",
-      dresserwardrobe: "RoomsPage.RoomCard.amenities.dresserWardrobe",
-      sofaseating: "RoomsPage.RoomCard.amenities.sofaSeating",
-      television: "RoomsPage.RoomCard.amenities.television",
-      telephone: "RoomsPage.RoomCard.amenities.telephone",
-      heating: "RoomsPage.RoomCard.amenities.heating",
-    };
+    // const amenityTranslationMap: { [key: string]: string } = {
+    //   wifi: "RoomsPage.RoomCard.amenities.wifi",
+    //   internet: "RoomsPage.RoomCard.amenities.wifi",
+    //   airconditioning: "RoomsPage.RoomCard.amenities.airConditioning",
+    //   ac: "RoomsPage.RoomCard.amenities.airConditioning",
+    //   kingbed: "RoomsPage.RoomCard.amenities.kingBed",
+    //   smoking: "RoomsPage.RoomCard.amenities.smokingBan",
+    //   bed: "RoomsPage.RoomCard.amenities.kingBed",
+    //   view: "RoomsPage.RoomCard.amenities.view",
+    //   bathroom: "RoomsPage.RoomCard.amenities.bathroom",
+    //   towels: "RoomsPage.RoomCard.amenities.towels",
+    //   linens: "RoomsPage.RoomCard.amenities.linens",
+    //   tablechairs: "RoomsPage.RoomCard.amenities.tableChairs",
+    //   desk: "RoomsPage.RoomCard.amenities.desk",
+    //   dresserwardrobe: "RoomsPage.RoomCard.amenities.dresserWardrobe",
+    //   sofaseating: "RoomsPage.RoomCard.amenities.sofaSeating",
+    //   television: "RoomsPage.RoomCard.amenities.television",
+    //   telephone: "RoomsPage.RoomCard.amenities.telephone",
+    //   heating: "RoomsPage.RoomCard.amenities.heating",
+    // };
 
     // Inside convertAmenities function
 
@@ -265,12 +265,14 @@ const RoomsPage: React.FC = () => {
         return "check-circle";
       };
 
-      const iconName = getIconName(amenity);
-      const translationKey = amenityTranslationMap[amenity.toLowerCase()] || "RoomsPage.RoomCard.amenities.default";
+      // const iconName = getIconName(amenity);
+      // const translationKey = amenityTranslationMap[amenity.toLowerCase()] || "RoomsPage.RoomCard.amenities.default";
 
       return {
-        icon: iconName,
-        name: t(translationKey),
+        // icon: iconName,
+        // name: t(translationKey),
+        icon: getIconName(amenity),
+        name: amenity,
       };
     });
 
