@@ -163,6 +163,89 @@ export const createReservationWithStoredCard = CatchAsyncError(
   }
 );
 
+export async function createReservationWithCryptoPayment(input: {
+  userId: string;
+  checkInDate: string;
+  checkOutDate: string;
+  hotelCode: string;
+  hotelName: string;
+  ratePlanCode: string;
+  numberOfRooms: number;
+  roomTypeCode: string;
+  roomTotalPrice: number;
+  currencyCode: string;
+  email: string;
+  phone: string;
+  guests: { firstName: string; lastName: string; dob: string }[];
+}) {
+  const {
+    userId,
+    checkInDate,
+    checkOutDate,
+    hotelCode,
+    hotelName,
+    ratePlanCode,
+    numberOfRooms,
+    roomTypeCode,
+    roomTotalPrice,
+    currencyCode,
+    email,
+    phone,
+    guests,
+  } = input;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const checkIn = new Date(checkInDate);
+  const checkOut = new Date(checkOutDate);
+
+  if (checkIn < today || checkOut <= checkIn) {
+    throw new Error("Check-in date cannot be in the past or Check-out date must be after check-in date");
+  }
+
+  if (!Array.isArray(guests) || guests.length === 0) {
+    throw new Error("Guest details are required");
+  }
+
+  const ageCodeCount: Record<string, number> = { "7": 0, "8": 0, "10": 0 };
+
+  const categorizedGuests = guests.map(({ firstName, lastName, dob }) => {
+    if (!dob) throw new Error(`DOB missing for ${firstName} ${lastName}`);
+    const { age, category, ageCode } = calculateAgeCategory(dob);
+    ageCodeCount[ageCode] = (ageCodeCount[ageCode] || 0) + 1;
+    return { firstName, lastName, dob, age, category, ageCode };
+  });
+
+  const reservationInput: ReservationInput = {
+    bookingDetails: {
+      userId,
+      checkInDate,
+      checkOutDate,
+      hotelCode,
+      hotelName,
+      ratePlanCode,
+      roomTypeCode,
+      numberOfRooms,
+      roomTotalPrice,
+      currencyCode,
+      guests,
+      email,
+      phone,
+    },
+    ageCodeSummary: ageCodeCount,
+  };
+
+  console.log("Reservation Input Data (Crypto):", JSON.stringify(reservationInput, null, 2));
+
+  const thirdPartyService = new ThirdPartyReservationService();
+  await thirdPartyService.processThirdPartyReservation(reservationInput);
+
+  return {
+    message: "Reservation with crypto confirmed",
+    guests: categorizedGuests,
+    ageCodeSummary: ageCodeCount,
+  };
+}
 
 export const updateThirdPartyReservation = CatchAsyncError(
   async (req: any, res: Response, next: NextFunction) => {

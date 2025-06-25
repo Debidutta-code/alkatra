@@ -1,21 +1,25 @@
 import axios from 'axios';
 import { parseStringPromise } from 'xml2js';
+import { stringify } from 'flatted';
 
 export class ApiClient {
     async sendToThirdParty(xml: string): Promise<{ message: string }> {
         try {
+            console.log('Sending XML to third-party API:', xml);
             const apiUrl = process.env.WINCLOUD_TEST_API;
             if (!apiUrl) {
                 throw new Error('WINCLOUD_TEST_API environment variable is not defined');
             }
+            console.log('Third-party API URL:', apiUrl);
+            const apiResponse = await axios.post(apiUrl, xml, {
+                headers: { 'Content-Type': 'text/xml' },
+            });
 
-            // const apiResponse = await axios.post(apiUrl, xml, {
-            //     headers: { 'Content-Type': 'application/xml' },
-            // });
-            const apiResponse = {
-                status: 200
-            };
-            console.log('API Response Status:', apiResponse.status);
+            console.log("API Response:", stringify(apiResponse));
+            console.log("→ Status:", apiResponse.status);
+            console.log("→ Status Text:", apiResponse.statusText);
+            console.log("→ Headers:", apiResponse.headers);
+            console.log("→ Data:", apiResponse.data);
 
             if (apiResponse.status !== 200) {
                 throw new Error(`Third-party API responded with status code ${apiResponse.status}`);
