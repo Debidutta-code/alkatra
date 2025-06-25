@@ -22,7 +22,6 @@ export class ReservationProcessor {
         let reservation_id: string;
         console.log("ReservationProcessor: Processing reservation input data:", reservationId);
 
-        console.log("@@@@@@@@@@@@@@@@@@ Reservation processor: Processing reservation input data:", JSON.stringify(data, null, 2));
         const reservationData: ThirdPartyReservationData = {
             userId,
             hotelCode,

@@ -22,10 +22,9 @@ export class ThirdPartyReservationService {
     async processThirdPartyReservation(data: ReservationInput): Promise<string> {
         try {
             console.log('Starting third-party reservation processing...');
-            console.log(`@@@@@@@@@@@@@@@@@@@@\nReceived data: ${JSON.stringify(data)}`);
+            // console.log(`@@@@@@@@@@@@@@@@@@@@\nReceived data: ${JSON.stringify(data)}`);
 
             const reservationData: ThirdPartyReservationData = await this.processor.processReservationInput(data);
-            console.log('@@@@@@@@@@@@@@@\nProcessed reservation data:', JSON.stringify(reservationData, null, 2));
 
             // Step 2: Generate XML
             const xml: string = await this.formatter.generateReservationXml(reservationData);

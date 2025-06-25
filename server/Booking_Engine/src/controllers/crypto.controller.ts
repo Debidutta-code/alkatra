@@ -230,10 +230,10 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
   }
   console.log(`The amount in crypto guest details storage is ${roomTotalPrice}`);
   if (roomTotalPrice !== convertedAmount) {
-      return res.status(400).json({
-        message: "Amount not matched in guest details initialize",
-      });
-    }
+    return res.status(400).json({
+      message: "Amount not matched in guest details initialize",
+    });
+  }
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -379,6 +379,23 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
       data: payment,
     });
   } catch (error) {
+    return next(new ErrorHandler("Internal server error", 500));
+  }
+});
+
+export const getWalletAddress = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  console.log("Entering into get wallet address");
+  const collection = mongoose.connection.collection("CryptoWalletAddress");
+  try {
+    console.log("");
+    const walletAddress = await collection.find({}, { projection: { _id: 0, wallet_address: 1 } }).toArray();
+    return res.status(200).json({
+        success: true,
+        message: "Token list fetched successfully",
+        address: walletAddress,
+      });
+  }
+  catch (error) {
     return next(new ErrorHandler("Internal server error", 500));
   }
 });
