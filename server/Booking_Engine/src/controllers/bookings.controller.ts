@@ -234,9 +234,7 @@ export async function createReservationWithCryptoPayment(input: {
     },
     ageCodeSummary: ageCodeCount,
   };
-
-  console.log("Reservation Input Data (Crypto):", JSON.stringify(reservationInput, null, 2));
-
+  
   const thirdPartyService = new ThirdPartyReservationService();
   await thirdPartyService.processThirdPartyReservation(reservationInput);
 

@@ -7,7 +7,6 @@ export class ThirdPartyReservationRepository {
     xmlSent: string,
     apiResponse: string
   ): Promise<void> {
-    console.log(`@@@@ Creating third-party booking @@@@\n`, JSON.stringify(data, null, 2));
 
     const booking = new ThirdPartyBooking({
       userId: data.userId,

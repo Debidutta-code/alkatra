@@ -52,7 +52,7 @@ const cryptoBookingSchema = new Schema<ICryptoBooking>({
     totalAmount: { type: Number, required: true },
     currencyCode: { type: String, required: true },
     userId: { type: String, required: true },
-    txHash: {type: String,require: false, unique: true},
+    txHash: {type: String,required: false},
     senderWalletAddress: {type: String, require: false},
     status: { type: String, required: false, enum: ['Confirmed', 'Processing', 'Cancelled'] },
     createdAt: { type: Date, default: Date.now },

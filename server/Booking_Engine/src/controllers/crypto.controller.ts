@@ -134,7 +134,7 @@ export const cryptoPaymentInitiate = async (req: AuthenticatedRequest, res: Resp
 
     if (amount !== convertedAmount) {
       return res.status(400).json({
-        message: "Amount not matched",
+        message: "Amount not matched in crypto payment initiation",
       });
     }
 
@@ -171,6 +171,7 @@ export const cryptoPaymentInitiate = async (req: AuthenticatedRequest, res: Resp
     });
 
     await cryptoPaymentDetails.save();
+    convertedAmount = 0;
 
     return res.status(200).json({
       message: "Crypto payment initiated successfully",
@@ -227,12 +228,7 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
       message: `Missing required fields: ${missingFields.join(", ")}`,
     });
   }
-
-  if (roomTotalPrice !== convertedAmount) {
-    return res.status(400).json({
-      message: "Amount not matched",
-    });
-  }
+  console.log(`The amount in crypto guest details storage is ${roomTotalPrice}`);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -280,7 +276,6 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
     });
     await newBooking.save();
 
-    convertedAmount = 0;
     res.status(200).json({
       message: "Reservation received and stored successfully",
       reservationId,
@@ -297,6 +292,7 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
     });
   }
 });
+
 
 export const pushCryptoPaymentDetails = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {

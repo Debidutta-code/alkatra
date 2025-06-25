@@ -4,8 +4,6 @@ import { create } from 'xmlbuilder2';
 
 export class XmlFormatter {
     async generateReservationXml(data: ThirdPartyReservationData): Promise<string> {
-        console.log('@@@@@@@@@@@@@@@@@@@@@@@Generating XML for reservation data:', JSON.stringify(data, null, 2));
-
         const {
             userId,
             guests,

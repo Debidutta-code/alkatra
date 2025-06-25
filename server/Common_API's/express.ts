@@ -12,6 +12,7 @@ import inventoryRouter from "../wincloud/src/api/route";
 import customerRouter from "../Customer-Authentication/src/api/routes/customerRoutes";
 import bookingRouter from "../Booking_Engine/src/routes/booking.routes";
 import paymentRouter from "../Booking_Engine/src/routes/payment.routes";
+import cryptoRouter from "../Booking_Engine/src/routes/cryptoPayment.routes";
 import ratePlaneRoute from "../rate-plan/src/routes/ratePlan.route";
 import couponManagement from "../Coupon_Management/routes/couponRoutes";
 export async function initializeExpressRoutes({ app }: { app: Express }) {
@@ -29,6 +30,9 @@ export async function initializeExpressRoutes({ app }: { app: Express }) {
 
   app.use("/api/v1/booking", bookingRouter);
   app.use("/api/v1/payment", paymentRouter);
+  
+  // crypto payment routes
+  app.use("/api/v1/crypto", cryptoRouter);
 
   app.use("/api/v1/rate-plan", ratePlaneRoute);
 
