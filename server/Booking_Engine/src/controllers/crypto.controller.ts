@@ -231,7 +231,7 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
   console.log(`The amount in crypto guest details storage is ${roomTotalPrice}`);
   if (roomTotalPrice !== convertedAmount) {
       return res.status(400).json({
-        message: "Amount not matched in crypto payment initiation",
+        message: "Amount not matched in guest details initialize",
       });
     }
 
