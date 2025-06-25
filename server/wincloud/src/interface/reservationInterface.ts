@@ -7,6 +7,7 @@ export interface GuestDetails {
 
 export interface ReservationInput {
   bookingDetails: {
+    reservationId: string;
     userId: string;
     checkInDate: string;
     checkOutDate: string;

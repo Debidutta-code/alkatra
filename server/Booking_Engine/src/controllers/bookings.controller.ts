@@ -127,6 +127,7 @@ export const createReservationWithStoredCard = CatchAsyncError(
     
     const reservationInput: ReservationInput = {
       bookingDetails: {
+        reservationId: "",
         userId,
         checkInDate,
         checkOutDate,
@@ -164,6 +165,7 @@ export const createReservationWithStoredCard = CatchAsyncError(
 );
 
 export async function createReservationWithCryptoPayment(input: {
+  reservationId?: string;
   userId: string;
   checkInDate: string;
   checkOutDate: string;
@@ -179,6 +181,7 @@ export async function createReservationWithCryptoPayment(input: {
   guests: { firstName: string; lastName: string; dob: string }[];
 }) {
   const {
+    reservationId,
     userId,
     checkInDate,
     checkOutDate,
@@ -218,6 +221,7 @@ export async function createReservationWithCryptoPayment(input: {
 
   const reservationInput: ReservationInput = {
     bookingDetails: {
+      reservationId: reservationId ?? "",
       userId,
       checkInDate,
       checkOutDate,

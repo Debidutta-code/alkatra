@@ -171,7 +171,7 @@ export const cryptoPaymentInitiate = async (req: AuthenticatedRequest, res: Resp
     });
 
     await cryptoPaymentDetails.save();
-    convertedAmount = 0;
+    convertedAmount = amount;
 
     return res.status(200).json({
       message: "Crypto payment initiated successfully",
@@ -229,6 +229,11 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
     });
   }
   console.log(`The amount in crypto guest details storage is ${roomTotalPrice}`);
+  if (roomTotalPrice !== convertedAmount) {
+      return res.status(400).json({
+        message: "Amount not matched in crypto payment initiation",
+      });
+    }
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -275,6 +280,7 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
       createdAt: new Date(),
     });
     await newBooking.save();
+    convertedAmount = 0;
 
     res.status(200).json({
       message: "Reservation received and stored successfully",
@@ -352,6 +358,7 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
     await guestDetails.save();
 
     await createReservationWithCryptoPayment({
+      reservationId: guestDetails.reservationId,
       userId: guestDetails?.userId ?? "",
       checkInDate: guestDetails.checkInDate,
       checkOutDate: guestDetails.checkOutDate,
