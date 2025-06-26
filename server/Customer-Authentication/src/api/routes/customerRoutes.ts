@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { authenticateCustomer } from "../../middleware/authMiddleware";
 import CustomerController from "../../controllers/customerController";
+import verificationOtpController from "../../controllers/verificationOtp.controller";
 
 const router = Router();
 
@@ -11,5 +12,7 @@ router.get("/me", authenticateCustomer, CustomerController.getCustomerOwnData);
 router.patch("/update", authenticateCustomer, CustomerController.updateCustomerProfile); 
 router.post("/verify-email", CustomerController.checkEmailExists);
 router.patch("/reset-password", CustomerController.updatePassword);
+router.post('/send-otp', verificationOtpController.sendOTP);
+router.post('/verify-otp', verificationOtpController.verifyOTP);
 
 export default router; 
