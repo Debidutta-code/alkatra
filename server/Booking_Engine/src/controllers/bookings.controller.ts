@@ -15,6 +15,7 @@ import Customer from "../../../Customer-Authentication/src/models/customer.model
 import { ReservationInput } from "../../../wincloud/src/interface/reservationInterface";
 import { ThirdPartyCancelReservationService } from '../../../wincloud/src/service/cancelReservationService';
 import { AmendReservationInput } from "../../../wincloud/src/interface/amendReservationInterface";
+import { CryptoGuestDetails } from "../models/cryptoUserPaymentInitialStage.model";
 
 const calculateAgeCategory = (dob: string) => {
   const birthDate = new Date(dob);
@@ -124,7 +125,7 @@ export const createReservationWithStoredCard = CatchAsyncError(
         error: error instanceof Error ? error.message : error,
       });
     }
-    
+
     const reservationInput: ReservationInput = {
       bookingDetails: {
         reservationId: "",
@@ -238,7 +239,7 @@ export async function createReservationWithCryptoPayment(input: {
     },
     ageCodeSummary: ageCodeCount,
   };
-  
+
   const thirdPartyService = new ThirdPartyReservationService();
   await thirdPartyService.processThirdPartyReservation(reservationInput);
 
@@ -1139,8 +1140,6 @@ export const getBookingDetailsOfUser = CatchAsyncError(
       const matchCriteria: any = {
         userId,
       };
-
-      // Date filtering
       if (startDate || endDate) {
         if (!startDate || !endDate) {
           return res.status(400).json({
@@ -1154,8 +1153,6 @@ export const getBookingDetailsOfUser = CatchAsyncError(
           $lte: new Date(endDate as string),
         };
       }
-
-      // Guest name filtering
       if (guestName) {
         matchCriteria.guestDetails = {
           $elemMatch: {
@@ -1164,45 +1161,77 @@ export const getBookingDetailsOfUser = CatchAsyncError(
         };
       }
 
-      // Status filtering based on filterData
       if (filterData && filterData !== 'null' && filterData !== '') {
-        const validFilters = ['upcoming', 'completed', 'cancelled'];
+        const validFilters = ['upcoming', 'completed', 'cancelled', 'processing'];
         if (!validFilters.includes(filterData as string)) {
           return res.status(400).json({
             success: false,
-            message: "Invalid filterData. Must be one of: upcoming, completed, cancelled",
+            message: "Invalid filterData. Must be one of: upcoming, completed, cancelled, processing",
           });
         }
 
         const currentDate = new Date();
-        currentDate.setHours(0, 0, 0, 0); // Normalize to start of day
+        currentDate.setHours(0, 0, 0, 0);
 
         if (filterData === 'upcoming') {
           matchCriteria.checkInDate = {
             ...matchCriteria.checkInDate,
             $gt: currentDate,
           };
-          matchCriteria.status = { $ne: 'Cancelled' };
+            matchCriteria.status = { $ne: 'Cancelled' };
+          console.log("Current Date:", currentDate.toISOString());
+          console.log("Check-in Date Match Criteria:", JSON.stringify(matchCriteria.checkInDate, null, 2));
         } else if (filterData === 'completed') {
           matchCriteria.checkInDate = {
             ...matchCriteria.checkInDate,
             $lte: currentDate,
           };
-          matchCriteria.status = { $in: ['Confirmed', 'Pending'] };
+          matchCriteria.status = { $in: ['Confirmed'] }; 
         } else if (filterData === 'cancelled') {
           matchCriteria.status = 'Cancelled';
+        } else if (filterData === 'Processing') {
+          
+          delete matchCriteria.status;
+          
+          if (matchCriteria.checkInDate) {
+            matchCriteria.checkInDate = {
+              $gte: matchCriteria.checkInDate.$gte?.toISOString().split('T')[0],
+              $lte: matchCriteria.checkInDate.$lte?.toISOString().split('T')[0],
+            };
+          }
         }
-      } else {
-        // If filterData is not provided, null, or empty, return all bookings for the user
-        // Only userId and optional startDate/endDate/guestName filters will apply
       }
 
-      const totalBookings = await ThirdPartyBooking.countDocuments(matchCriteria);
-
-      const bookings = await ThirdPartyBooking.find(matchCriteria)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit);
+      let bookings;
+      let totalBookings;
+      if (filterData === 'processing') {
+        totalBookings = await CryptoGuestDetails.countDocuments({
+          ...matchCriteria,
+          status: 'Processing',
+        });
+        bookings = await CryptoGuestDetails.find({
+          ...matchCriteria,
+          status: 'Processing',
+        })
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit);
+      } else {
+        totalBookings = await ThirdPartyBooking.countDocuments(matchCriteria);
+        bookings = await ThirdPartyBooking.find(matchCriteria)
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit);
+      }
+      bookings = bookings.map(booking => ({
+        ...booking.toObject(),
+        checkInDate: booking.checkInDate instanceof Date
+          ? booking.checkInDate.toISOString().split('T')[0]
+          : booking.checkInDate,
+        checkOutDate: booking.checkOutDate instanceof Date
+          ? booking.checkOutDate.toISOString().split('T')[0]
+          : booking.checkOutDate,
+      }));
 
       const totalRevenue = bookings.reduce(
         (sum, booking) => sum + (booking.totalAmount || 0),
