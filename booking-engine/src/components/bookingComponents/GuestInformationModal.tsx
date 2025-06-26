@@ -162,6 +162,10 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   const [isFormUpdated, setIsFormUpdated] = useState(false);
   const [updateMessage, setUpdateMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [countdown, setCountdown] = useState(0); // in seconds
   const [activeSection, setActiveSection] = useState<"details" | "review">(
     "details"
   );
@@ -295,6 +299,14 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       document.body.style.overflow = "auto";
     };
   }, [isOpen]);
+  useEffect(() => {
+    if (otpSent && countdown > 0) {
+      const interval = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [otpSent, countdown]);
 
   const handleGuestChange = (
     index: number,
@@ -307,6 +319,88 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   };
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const handleVerifyEmail = async () => {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setErrors((prev) => ({
+        ...prev,
+        email: t("BookingComponents.GuestInformationModal.emailInvalidError"),
+      }));
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/send-otp`,
+        {
+          identifier: email,
+          type: "mail_verification",
+        },
+        { withCredentials: true }
+      );
+
+      if (response.data.success) {
+        setUpdateMessage(
+          response.data.message ||
+          t("BookingComponents.GuestInformationModal.otpSent")
+        );
+        setOtpSent(true);
+        setCountdown(300); // 5 minutes
+        setEmailVerified(false);
+      } else {
+        setErrorMessage(
+          response.data.message ||
+          t("BookingComponents.GuestInformationModal.otpSendFailed")
+        );
+      }
+    } catch (err: any) {
+      console.error("OTP Request Error:", err);
+      setErrorMessage(
+        t("BookingComponents.GuestInformationModal.otpSendError")
+      );
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otp.trim()) {
+      setErrorMessage(
+        t("BookingComponents.GuestInformationModal.otpEmptyError")
+      );
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/verify-otp`,
+        {
+          identifier: email,
+          otp,
+          type: "mail_verification",
+        },
+        { withCredentials: true }
+      );
+
+      if (response.data.success) {
+        setUpdateMessage(
+          t("BookingComponents.GuestInformationModal.emailVerified")
+        );
+        setEmailVerified(true);
+        setOtpSent(false);
+        setCountdown(0);
+        setOtp("");
+      } else {
+        setErrorMessage(
+          response.data.message ||
+          t("BookingComponents.GuestInformationModal.otpInvalidError")
+        );
+      }
+    } catch (err: any) {
+      console.error("OTP Verify Error:", err);
+      setErrorMessage(
+        t("BookingComponents.GuestInformationModal.otpVerifyError")
+      );
+    }
+  };
 
   const handleUpdate = () => {
     let valid = true;
@@ -346,7 +440,13 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       valid = false;
     }
 
-    // In your handleUpdate function:
+    if (!emailVerified) {
+      newErrors["email"] = t(
+        "BookingComponents.GuestInformationModal.emailNotVerified"
+      );
+      valid = false;
+    }
+
     if (!phone) {
       newErrors["phone"] = t(
         "BookingComponents.GuestInformationModal.phoneError"
@@ -356,21 +456,20 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       phone.startsWith("+91") &&
       phone.replace(/\D/g, "").length !== 12
     ) {
-      newErrors["phone"] = "Indian phone number must be 10 digits";
+      newErrors["phone"] = t(
+        "BookingComponents.GuestInformationModal.phoneIndiaError"
+      );
       valid = false;
     } else {
       const numericPhone = phone.replace(/\D/g, "");
       if (phone.startsWith("+91")) {
-        // India specific validation
         if (numericPhone.length !== 12) {
-          // +91 plus 10 digits = 12 total
           newErrors["phone"] = t(
             "BookingComponents.GuestInformationModal.phoneIndiaError"
           );
           valid = false;
         }
       } else {
-        // Basic international validation (minimum 8 digits)
         if (numericPhone.length < 8) {
           newErrors["phone"] = t(
             "BookingComponents.GuestInformationModal.phoneInternationalError"
@@ -800,28 +899,70 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       >
                         <Mail
                           size={16}
-                          className={`text-tripswift-blue  ${i18n.language === "ar" ? "ml-2" : "mr-2"
-                            }`}
+                          className={`text-tripswift-blue  ${i18n.language === "ar" ? "ml-2" : "mr-2"}`}
                         />
-                        {t(
-                          "BookingComponents.GuestInformationModal.emailLabel"
-                        )}
+                        {t("BookingComponents.GuestInformationModal.emailLabel")}
                       </label>
-                      <input
-                        type="email"
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder={t(
-                          "BookingComponents.GuestInformationModal.emailPlaceholder"
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                        <input
+                          type="email"
+                          id="email"
+                          value={email}
+                          onChange={(e) => {
+                            const newEmail = e.target.value;
+                            if (emailVerified && newEmail !== email) {
+                              setEmailVerified(false);
+                              setOtpSent(false);
+                              setOtp("");
+                              setCountdown(0);
+                            }
+                            setEmail(newEmail);
+                          }}
+                          placeholder={t("BookingComponents.GuestInformationModal.emailPlaceholder")}
+                          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 text-sm transition-all duration-200 ${errors["email"] ? "border-red-600" : "border-tripswift-black/20"
+                            }`}
+                          required
+                        />
+                        {!emailVerified && (
+                          <button
+                            onClick={handleVerifyEmail}
+                            type="button"
+                            className="bg-tripswift-blue text-tripswift-off-white px-4 py-2 rounded-lg text-sm hover:bg-tripswift-blue/90 transition whitespace-nowrap"
+                          >
+                            {t("BookingComponents.GuestInformationModal.sendOtp")}
+                          </button>
                         )}
-                        className="w-full px-3 py-2 border border-tripswift-black/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 text-sm transition-all duration-200"
-                        required
-                      />
-                      {errors["email"] && (
-                        <p className="text-xs text-red-600 mt-1">
-                          {errors["email"]}
+                      </div>
+                      {otpSent && countdown > 0 && !emailVerified && (
+                        <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2">
+                          <input
+                            type="text"
+                            placeholder={t("BookingComponents.GuestInformationModal.otpPlaceholder")}
+                            value={otp}
+                            maxLength={6}
+                            onChange={(e) => setOtp(e.target.value)}
+                            className="w-full px-3 py-2 border border-tripswift-black/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 text-sm transition-all duration-200"
+                          />
+                          <button
+                            onClick={handleVerifyOtp}
+                            className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition whitespace-nowrap"
+                          >
+                            {t("BookingComponents.GuestInformationModal.verifyOtp")}
+                          </button>
+                          <p className="text-xs text-tripswift-black/60 sm:ml-2 mt-1 sm:mt-0">
+                            {t("BookingComponents.GuestInformationModal.otpExpiresIn")}{" "}
+                            {Math.floor(countdown / 60)}:
+                            {String(countdown % 60).padStart(2, "0")}
+                          </p>
+                        </div>
+                      )}
+                      {emailVerified && (
+                        <p className="text-xs text-green-600 mt-1">
+                          ✅ {t("BookingComponents.GuestInformationModal.emailVerified")}
                         </p>
+                      )}
+                      {errors["email"] && (
+                        <p className="text-xs text-red-600 mt-1">{errors["email"]}</p>
                       )}
                       <p className="text-xs text-tripswift-black/50 mt-1">
                         {t("BookingComponents.GuestInformationModal.emailInfo")}

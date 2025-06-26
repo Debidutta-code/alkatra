@@ -1,6 +1,7 @@
 // components/paymentComponents/PaymentOptionSelector.tsx
 "use client";
 
+import { QrCode, Wallet } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -115,47 +116,36 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
         </label>
       </div>
       {selectedOption === "payWithCrypto" && (
-        <div className="mt-6 p-4 bg-tripswift-off-white rounded-lg shadow-md">
-          <h4 className="text-md font-tripswift-medium mb-3 text-tripswift-black">
+        <div className="mt-4 p-3 bg-tripswift-off-white rounded-lg shadow-sm">
+          <h4 className="text-sm font-tripswift-medium mb-2 text-tripswift-black/80 uppercase tracking-wider">
             {t("Payment.PaymentComponents.PaymentOptionSelector.chooseCryptoMethod")}
           </h4>
-          <div className="flex flex-col gap-3">
-            <label
-              className={`flex items-center p-3 border rounded-lg cursor-pointer transition-all ${cryptoSubOption === "payWithWallet"
-                ? "border-tripswift-blue bg-tripswift-blue/10 text-tripswift-black"
-                : "border-gray-200 hover:bg-gray-50 text-tripswift-black/70"
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => handleCryptoSubOptionChange("payWithWallet")}
+              className={`p-2.5 rounded-lg border transition-all flex items-center justify-center gap-1.5 ${cryptoSubOption === "payWithWallet"
+                  ? "border-tripswift-blue bg-tripswift-blue/10"
+                  : "border-gray-200 hover:bg-gray-50"
                 }`}
             >
-              <input
-                type="radio"
-                name="cryptoSubOption"
-                value="payWithWallet"
-                checked={cryptoSubOption === "payWithWallet"}
-                onChange={() => handleCryptoSubOptionChange("payWithWallet")}
-                className="text-tripswift-blue mr-2"
-              />
-              <span className="text-sm text-tripswift-black">
-              {t("Payment.PaymentComponents.PaymentOptionSelector.payWithWallet")}
+              <Wallet className="w-4 h-4 text-tripswift-black" />
+              <span className="text-xs font-tripswift-medium text-tripswift-black">
+                {t("Payment.PaymentComponents.PaymentOptionSelector.payWithWallet")}
               </span>
-            </label>
-            <label
-              className={`flex items-center p-3 border rounded-lg cursor-pointer transition-all ${cryptoSubOption === "payWithQR"
-                ? "border-tripswift-blue bg-tripswift-blue/10 text-tripswift-black"
-                : "border-gray-200 hover:bg-gray-50 text-tripswift-black/70"
+            </button>
+
+            <button
+              onClick={() => handleCryptoSubOptionChange("payWithQR")}
+              className={`p-2.5 rounded-lg border transition-all flex items-center justify-center gap-1.5 ${cryptoSubOption === "payWithQR"
+                  ? "border-tripswift-blue bg-tripswift-blue/10"
+                  : "border-gray-200 hover:bg-gray-50"
                 }`}
             >
-              <input
-                type="radio"
-                name="cryptoSubOption"
-                value="payWithQR"
-                checked={cryptoSubOption === "payWithQR"}
-                onChange={() => handleCryptoSubOptionChange("payWithQR")}
-                className="text-tripswift-blue mr-2"
-              />
-              <span className="text-sm text-tripswift-black">
+              <QrCode className="w-4 h-4 text-tripswift-black" />
+              <span className="text-xs font-tripswift-medium text-tripswift-black">
                 {t("Payment.PaymentComponents.PaymentOptionSelector.payWithQR")}
               </span>
-            </label>
+            </button>
           </div>
         </div>
       )}
