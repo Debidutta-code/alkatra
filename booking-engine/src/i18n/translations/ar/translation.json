@@ -863,7 +863,10 @@
         "payNow": "ادفع الآن",
         "payNowDescription": "أكمل الدفع فوراً",
         "payAtHotel": "الدفع في الفندق",
-        "payAtHotelDescription": "احفظ بطاقتك بأمان للدفع في الفندق"
+        "payAtHotelDescription": "احفظ بطاقتك بأمان للدفع في الفندق",
+        "chooseCryptoMethod": "اختر طريقة الدفع بالعملات الرقمية",
+        "payWithWallet": "الدفع بالمحفظة",
+        "payWithQR": "الدفع برمز QR"
       },
       "PayAtHotelFunction": {
         "infoTitle": "معلومات الدفع في الفندق",
@@ -942,5 +945,42 @@
     "defaultText": "1 غرفة · 1 بالغ · 0 أطفال",
     "maxGuestsError": "الحد الأقصى {{maxGuests}} ضيوف مسموح لكل غرفة. يرجى إضافة المزيد من الغرف أو تقليل عدد الضيوف.",
     "selectAgeError": "يرجى تحديد عمر جميع الأطفال والرُضع"
+  },
+  "PayWithCryptoQR": {
+    "title": "الدفع بالعملات الرقمية",
+    "amountLabel": "المبلغ",
+    "loadingTokens": "جارٍ تحميل العملات...",
+    "loadingNetworks": "جارٍ تحميل الشبكات...",
+    "convertingCurrency": "جارٍ تحويل {{currency}} إلى دولار أمريكي...",
+    "convertedAmount": "المبلغ المحول",
+    "selectToken": "اختر العملة",
+    "selectNetwork": "اختر الشبكة",
+    "noNetworksAvailable": "لا توجد شبكات متاحة لهذه العملة",
+    "noTokensAvailable": "لا توجد عملات متاحة",
+    "processing": "جارٍ المعالجة...",
+    "initiatePayment": "بدء الدفع",
+    "paymentInitiated": "تم بدء الدفع بالعملة الرقمية بنجاح",
+    "token": "العملة",
+    "blockchain": "البلوكشين",
+    "amount": "المبلغ",
+    "status": "الحالة",
+    "paymentId": "معرف الدفع",
+    "scanQRCode": "امسح رمز QR للدفع باستخدام {{token}} على {{network}}",
+    "qrCodePlaceholder": "سيظهر رمز QR هنا",
+    "sendAmountInstruction": "أرسل المبلغ الدقيق إلى العنوان الموضح أعلاه باستخدام شبكة {{network}}",
+    "tokenLogoAlt": "شعار {{token}}",
+    "networkLogoAlt": "شعار {{network}}",
+    "errors": {
+      "noAuthToken": "لم يتم العثور على رمز التوثيق",
+      "fetchTokens": "خطأ في جلب العملات",
+      "fetchTokensError": "حدث خطأ أثناء جلب العملات",
+      "fetchNetworks": "خطأ في جلب الشبكات",
+      "fetchNetworksError": "حدث خطأ أثناء جلب الشبكات",
+      "currencyConversion": "خطأ في تحويل العملة",
+      "currencyConversionError": "حدث خطأ أثناء تحويل العملة",
+      "selectionIncomplete": "يرجى اختيار العملة والشبكة والتأكد من تحويل المبلغ",
+      "initiatePayment": "خطأ في بدء الدفع",
+      "initiatePaymentError": "حدث خطأ أثناء بدء الدفع"
+    }
   }
 }

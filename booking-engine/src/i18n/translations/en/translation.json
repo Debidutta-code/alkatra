@@ -506,6 +506,7 @@
       "guestDetailsStep": "Guest Details",
       "reviewAndPayStep": "Review & Pay",
       "roomSummary": "Room Summary",
+      "priceLoading": "",
       "roomType": "Room Type",
       "checkIn": "Check-In",
       "checkOut": "Check-Out",
@@ -811,6 +812,7 @@
   },
   "Payment": {
     "PaymentPageContent": {
+      "selectCryptoMethod": "Please select a crypto payment method above.",
       "invalidPayment": {
         "title": "Invalid Payment",
         "message": "We couldn't process your payment due to missing information.",
@@ -863,7 +865,10 @@
         "payNow": "Pay Now",
         "payNowDescription": "Complete payment immediately",
         "payAtHotel": "Pay at Hotel",
-        "payAtHotelDescription": "Securely save card for hotel payment"
+        "payAtHotelDescription": "Securely save card for hotel payment",
+        "chooseCryptoMethod": "Choose Crypto Payment Method",
+        "payWithWallet": "Pay with Wallet",
+        "payWithQR": "Pay with QR Code"
       },
       "PayAtHotelFunction": {
         "infoTitle": "Pay at Hotel Information",
@@ -944,5 +949,42 @@
     "defaultText": "1 Room · 1 Adult · 0 Children",
     "maxGuestsError": "Maximum {{maxGuests}} guests allowed per room. Please add more rooms or reduce guests.",
     "selectAgeError": "Please select the age for all children and infants"
+  },
+  "PayWithCryptoQR": {
+    "title": "Pay with Crypto",
+    "amountLabel": "Amount",
+    "loadingTokens": "Loading tokens...",
+    "loadingNetworks": "Loading networks...",
+    "convertingCurrency": "Converting {{currency}} to USD...",
+    "convertedAmount": "Converted Amount",
+    "selectToken": "Select Token",
+    "selectNetwork": "Select Network",
+    "noNetworksAvailable": "No networks available for this token",
+    "noTokensAvailable": "No tokens available",
+    "processing": "Processing...",
+    "initiatePayment": "Initiate Payment",
+    "paymentInitiated": "Crypto payment initiated successfully",
+    "token": "Token",
+    "blockchain": "Blockchain",
+    "amount": "Amount",
+    "status": "Status",
+    "paymentId": "Payment ID",
+    "scanQRCode": "Scan QR Code to pay with {{token}} on {{network}}",
+    "qrCodePlaceholder": "QR Code will appear here",
+    "sendAmountInstruction": "Send the exact amount to the address shown above using the {{network}} network",
+    "tokenLogoAlt": "{{token}} logo",
+    "networkLogoAlt": "{{network}} logo",
+    "errors": {
+      "noAuthToken": "No authentication token found",
+      "fetchTokens": "Error fetching tokens",
+      "fetchTokensError": "An error occurred while fetching tokens",
+      "fetchNetworks": "Error fetching networks",
+      "fetchNetworksError": "An error occurred while fetching networks",
+      "currencyConversion": "Error converting currency",
+      "currencyConversionError": "An error occurred during currency conversion",
+      "selectionIncomplete": "Please select token, network, and ensure amount is converted",
+      "initiatePayment": "Error initiating payment",
+      "initiatePaymentError": "An error occurred while initiating payment"
+    }
   }
 }

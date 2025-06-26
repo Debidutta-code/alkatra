@@ -5,6 +5,8 @@ import CheckoutPage from "@/components/Stripe/checkoutPage";
 import PayAtHotelFunction from "@/components/paymentComponents/PayAtHotelFunction";
 import PaymentOptionSelector from "@/components/paymentComponents/PaymentOptionSelector";
 import convertToSubcurrency from "@/lib/convertToSubcurrency";
+import PayWithCryptoWallet from "@/components/paymentComponents/payWithCrypto/PayWithCryptoWallet";
+import PayWithCryptoQR from "@/components/paymentComponents/payWithCrypto/PayWithCryptoQR";
 import { formatDate, calculateNights } from "@/utils/dateUtils";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
@@ -46,7 +48,7 @@ function PaymentPageContent() {
   const [error, setError] = useState<string | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
-
+  const [convertedAmount, setConvertedAmount] = useState<number | null>(null);
   const searchParams = useSearchParams();
   const authUser = useSelector((state: RootState) => state.auth.user);
 
@@ -280,13 +282,13 @@ function PaymentPageContent() {
                     {/* Payment Form - Only render when payment option is selected and not initializing */}
                     {paymentOption && stripePromise && !isInitializing && !error && (
                       <div className="mt-6">
-                        {paymentOption === 'payNow' && clientSecret ? (
+                        {paymentOption === "payNow" && clientSecret ? (
                           <Elements
                             stripe={stripePromise}
                             options={{
                               clientSecret,
                               appearance: {
-                                theme: 'stripe',
+                                theme: "stripe",
                               },
                             }}
                           >
@@ -308,22 +310,33 @@ function PaymentPageContent() {
                               children={children}
                             />
                           </Elements>
-                        ) : (
+                        ) : paymentOption === "payAtHotel" ? (
                           <Elements
                             stripe={stripePromise}
                             options={{
-                              mode: 'setup',
+                              mode: "setup",
                               currency: currency,
                               appearance: {
-                                theme: 'stripe',
+                                theme: "stripe",
                               },
                             }}
                           >
-                            <PayAtHotelFunction
-                              bookingDetails={bookingDetails}
-                            />
+                            <PayAtHotelFunction bookingDetails={bookingDetails} />
                           </Elements>
-                        )}
+                        ) : paymentOption === "payWithCrypto-payWithWallet" ? (
+                          <PayWithCryptoWallet bookingDetails={bookingDetails} />
+                        ) : paymentOption === "payWithCrypto-payWithQR" ? (
+                          <PayWithCryptoQR
+                            bookingDetails={bookingDetails}
+                            onConvertedAmountChange={setConvertedAmount}
+                          />
+                        ) : paymentOption === "payWithCrypto" ? (
+                          <div className="bg-tripswift-off-white p-4 rounded-lg shadow-md">
+                            <p className="text-sm text-tripswift-black/70">
+                              {t("Payment.PaymentPageContent.selectCryptoMethod") || "Please select a crypto payment method above."}
+                            </p>
+                          </div>
+                        ) : null}
                       </div>
                     )}
                   </div>
@@ -356,8 +369,9 @@ function PaymentPageContent() {
                         <div className="flex justify-between items-center">
                           <div className="font-tripswift-bold text-lg">{t('Payment.PaymentPageContent.priceDetails.total')}</div>
                           <div className="font-tripswift-bold text-xl text-tripswift-blue">
-                            {currency.toUpperCase()} {amount.toLocaleString()}
-                          </div>
+                          {(paymentOption === "payWithCrypto-payWithQR" || paymentOption === "payWithCrypto-payWithWallet") && convertedAmount !== null
+      ? `USD ${convertedAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      : `${currency.toUpperCase()} ${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}                          </div>
                         </div>
 
                         {paymentOption === 'payAtHotel' && (

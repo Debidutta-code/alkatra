@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // swcMinify: true,
   images: {
     domains: ['res.cloudinary.com', 'images.unsplash.com'],
     remotePatterns: [
@@ -12,7 +11,17 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: '**.unsplash.com',
-      }
+      },
+      {
+        protocol: 'https',
+        hostname: 'assets.coingecko.com',
+        pathname: '/coins/images/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 's2.coinmarketcap.com',
+        pathname: '/static/img/coins/**',
+      },
     ],
     formats: ['image/avif', 'image/webp'],
   },

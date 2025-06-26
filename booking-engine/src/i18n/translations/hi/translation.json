@@ -852,7 +852,10 @@
         "payNow": "अभी भुगतान करें",
         "payNowDescription": "भुगतान तुरंत पूरा करें",
         "payAtHotel": "होटल में भुगतान करें",
-        "payAtHotelDescription": "होटल भुगतान के लिए कार्ड सुरक्षित रूप से सहेजें"
+        "payAtHotelDescription": "होटल भुगतान के लिए कार्ड सुरक्षित रूप से सहेजें",
+        "chooseCryptoMethod": "क्रिप्टो भुगतान विधि चुनें",
+        "payWithWallet": "वॉलेट के साथ भुगतान करें",
+        "payWithQR": "QR कोड के साथ भुगतान करें"
       },
       "PayAtHotelFunction": {
         "infoTitle": "होटल में भुगतान की जानकारी",
@@ -931,5 +934,42 @@
     "defaultText": "1 कमरा · 1 वयस्क · 0 बच्चे",
     "maxGuestsError": "प्रति कमरे में अधिकतम {{maxGuests}} मेहमान की अनुमति है। कृपया और कमरे जोड़ें या मेहमानों को कम करें।",
     "selectAgeError": "कृपया सभी बच्चों और शिशुओं की उम्र चुनें"
+  },
+  "PayWithCryptoQR": {
+    "title": "क्रिप्टो के साथ भुगतान करें",
+    "amountLabel": "राशि",
+    "loadingTokens": "टोकन लोड हो रहे हैं...",
+    "loadingNetworks": "नेटवर्क लोड हो रहे हैं...",
+    "convertingCurrency": "{{currency}} को USD में परिवर्तित किया जा रहा है...",
+    "convertedAmount": "परिवर्तित राशि",
+    "selectToken": "टोकन चुनें",
+    "selectNetwork": "नेटवर्क चुनें",
+    "noNetworksAvailable": "इस टोकन के लिए कोई नेटवर्क उपलब्ध नहीं है",
+    "noTokensAvailable": "कोई टोकन उपलब्ध नहीं है",
+    "processing": "प्रोसेसिंग...",
+    "initiatePayment": "भुगतान शुरू करें",
+    "paymentInitiated": "क्रिप्टो भुगतान सफलतापूर्वक शुरू हुआ",
+    "token": "टोकन",
+    "blockchain": "ब्लॉकचेन",
+    "amount": "राशि",
+    "status": "स्थिति",
+    "paymentId": "भुगतान आईडी",
+    "scanQRCode": "{{token}} के साथ {{network}} पर भुगतान करने के लिए QR कोड स्कैन करें",
+    "qrCodePlaceholder": "QR कोड यहाँ दिखाई देगा",
+    "sendAmountInstruction": "उपरोक्त दिखाए गए पते पर {{network}} नेटवर्क का उपयोग करके सटीक राशि भेजें",
+    "tokenLogoAlt": "{{token}} लोगो",
+    "networkLogoAlt": "{{network}} लोगो",
+    "errors": {
+      "noAuthToken": "कोई प्रमाणीकरण टोकन नहीं मिला",
+      "fetchTokens": "टोकन प्राप्त करने में त्रुटि",
+      "fetchTokensError": "टोकन प्राप्त करने के दौरान एक त्रुटि हुई",
+      "fetchNetworks": "नेटवर्क प्राप्त करने में त्रुटि",
+      "fetchNetworksError": "नेटवर्क प्राप्त करने के दौरान एक त्रुटि हुई",
+      "currencyConversion": "मुद्रा परिवर्तन में त्रुटि",
+      "currencyConversionError": "मुद्रा परिवर्तन के दौरान एक त्रुटि हुई",
+      "selectionIncomplete": "कृपया टोकन, नेटवर्क चुनें और सुनिश्चित करें कि राशि परिवर्तित हो",
+      "initiatePayment": "भुगतान शुरू करने में त्रुटि",
+      "initiatePaymentError": "भुगतान शुरू करने के दौरान एक त्रुटि हुई"
+    }
   }
 }
