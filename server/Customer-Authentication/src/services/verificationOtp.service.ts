@@ -1,5 +1,6 @@
 import OTPDao from '../repositories/verificationOtp.dao';
 import { OTPType, OTPStatus } from '../models/verification.model';
+import emailService from './email.service';
 
 class OTPService {
   private generateOTP(): string {
@@ -10,10 +11,27 @@ class OTPService {
     const otp = this.generateOTP();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 mins
 
-    await OTPDao.createOTP({ identifier, otp, type, expiresAt, status: OTPStatus.PENDING });
+      await OTPDao.createOTP({ identifier, otp, type, expiresAt, status: OTPStatus.PENDING });
 
-    // TODO: Integrate SMS/Email service here to send `otp`
-    console.log(`OTP for ${identifier}: ${otp}`);
+      if (type === OTPType.MAIL_VERIFICATION) { 
+          
+      const subject = `Your OTP for ${type.toUpperCase()}`;
+      const html = `<p>Your OTP is: <strong>${otp}</strong></p><p>This code will expire in 5 minutes.</p>`;
+
+    try {
+    await emailService.sendEmail({
+      to: identifier,
+      subject,
+      html,
+      text: `Your OTP is ${otp}`,
+    });
+  } catch (error) {
+        console.error('❌ Failed to send OTP email:', error);
+        throw new Error('OTP sending failed. Please try again.'); // 
+    // optionally: delete the OTP record or handle the failure
+  }
+      }
+      
   }
 
  async verifyOTP(identifier: string, inputOtp: string, type: OTPType): Promise<{ success: boolean; message: string }> {

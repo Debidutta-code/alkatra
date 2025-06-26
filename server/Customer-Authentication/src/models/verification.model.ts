@@ -10,6 +10,8 @@ export enum OTPStatus {
 export enum OTPType {
   REGISTER = 'register',
   LOGIN = 'login',
+  MAIL_VERIFICATION = 'mail_verification',
+  
 }
 
 export interface IOTP extends Document {

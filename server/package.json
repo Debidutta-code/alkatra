@@ -23,6 +23,7 @@
   "dependencies": {
     "@clerk/clerk-sdk-node": "^5.0.53",
     "@elastic/elasticsearch": "^8.14.0",
+    "@sendgrid/mail": "^8.1.5",
     "amadeus": "^11.0.0",
     "babel": "^6.23.0",
     "bcryptjs": "^2.4.3",
