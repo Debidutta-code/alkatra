@@ -5,6 +5,8 @@ import { initializeExpressRoutes } from "./Common_API's/express";
 import { createPropertyIndexAndDoc } from "./search-engine/src/sync_controllers/syncData";
 import { Room } from "./Property_Management/src/model/room.model";
 import elasticClient from "./search-engine/src/service/elasticsearch";
+import cron from "node-cron";
+import CryptoPaymentDetails from './Booking_Engine/src/models/cryptoPayment.model';
 
 async function checkElasticClient() {
   try {
@@ -51,3 +53,23 @@ initializeExpressRoutes({ app }).then(async () => {
     await changeStream.close();
   }
 })();
+
+cron.schedule("*/1 * * * *", async () => {
+  try {
+    const fortyMinutesAgo = new Date(Date.now() - 40 * 60 * 1000);
+    const result = await CryptoPaymentDetails.updateMany(
+      {
+        status: "Pending",
+        createdAt: { $lte: fortyMinutesAgo }
+      },
+      {
+        $set: { status: "Cancelled" }
+      }
+    );
+    if (result.modifiedCount > 0) {
+      console.log(`[AUTO-CANCEL] ${result.modifiedCount} pending payments marked as Cancelled.`);
+    }
+  } catch (error) {
+    console.error("[AUTO-CANCEL ERROR]", error);
+  }
+});

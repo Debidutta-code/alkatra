@@ -171,7 +171,7 @@ export const cryptoPaymentInitiate = async (req: AuthenticatedRequest, res: Resp
     });
 
     await cryptoPaymentDetails.save();
-    convertedAmount = amount;
+    convertedAmount = finalAmount;
 
     return res.status(200).json({
       message: "Crypto payment initiated successfully",
