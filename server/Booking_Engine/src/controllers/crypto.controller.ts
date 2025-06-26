@@ -27,6 +27,28 @@ const calculateAgeCategory = (dob: string) => {
   return { age, category: "Adult", ageCode: "10" };
 };
 
+export const getPaymentSuccessResponse = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  const {paymentId, amount} = req.query;
+  try {
+    const getDetails = await CryptoPaymentDetails.findOne({
+      payment_id: paymentId,
+      amount: parseFloat(amount as string),
+      status: "Confirmed",
+    });
+    if (!getDetails) {
+      return res.status(404).json({
+        message: "Payment still not confirmed or not found",
+      });
+    }
+    return res.status(200).json({
+      message: "Payment confirmed successfully",
+    });
+  }
+  catch (error) {
+    return next(new ErrorHandler("Internal server error", 500));
+  }
+});
+
 
 export const getCryptoDetails = CatchAsyncError(
   async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -322,6 +344,9 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
       txHash,
       senderWalletAddress,
     });
+   
+    console.log(">>>>>>>> CryptoPaymentLog:", cryptoPaymentLog,"parsedamount is ", parseFloat(amount));
+
     await cryptoPaymentLog.save();
 
     const payment = await CryptoPaymentDetails.findOne({
@@ -383,6 +408,7 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
   }
 });
 
+
 export const getWalletAddress = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   console.log("Entering into get wallet address");
   const collection = mongoose.connection.collection("CryptoWalletAddress");
@@ -390,12 +416,13 @@ export const getWalletAddress = CatchAsyncError(async (req: AuthenticatedRequest
     console.log("");
     const walletAddress = await collection.find({}, { projection: { _id: 0, wallet_address: 1 } }).toArray();
     return res.status(200).json({
-        success: true,
-        message: "Token list fetched successfully",
-        address: walletAddress,
-      });
+      success: true,
+      message: "Token list fetched successfully",
+      address: walletAddress,
+    });
   }
   catch (error) {
     return next(new ErrorHandler("Internal server error", 500));
   }
 });
+

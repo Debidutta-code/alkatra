@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { cryptoPaymentInitiate, currencyConversion, getCryptoDetails, getWalletAddress, pushCryptoPaymentDetails, storeGuestDetailsForCryptoPayment } from "../controllers/crypto.controller";
+import { cryptoPaymentInitiate, currencyConversion, getCryptoDetails, getPaymentSuccessResponse, getWalletAddress, pushCryptoPaymentDetails, storeGuestDetailsForCryptoPayment } from "../controllers/crypto.controller";
 import { authenticateCustomer } from "../../../Customer-Authentication/src/middleware/authMiddleware";
 
 const router = Router();
@@ -10,5 +10,6 @@ router.route("/push-crypto-payment").post(pushCryptoPaymentDetails);
 router.route("/currency-conversion").post(authenticateCustomer as any, currencyConversion);
 router.route("/guest-details-initiate").post(authenticateCustomer as any, storeGuestDetailsForCryptoPayment);
 router.route("/wallet-address").get(authenticateCustomer as any, getWalletAddress);
+router.route("/get-payment-status").get(authenticateCustomer as any, getPaymentSuccessResponse)
 
 export default router;
