@@ -329,7 +329,8 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                 </p>
                 <div className="flex items-baseline gap-1 md:gap-2">
                   <span className="text-xl sm:text-2xl font-tripswift-bold text-tripswift-blue">
-                    {currency} {booking.totalAmount?.toLocaleString()}
+                    {/* {currency} {booking.totalAmount?.toLocaleString()} */}
+                    USD {booking.totalAmount.toLocaleString()}
                   </span>
                 </div>
               </div>
