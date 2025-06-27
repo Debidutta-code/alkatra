@@ -271,14 +271,14 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
 
         {/* Payment Details */}
         <div className="border-t mt-1 border-gray-200 ">
-          <h3 className="text-lg sm:text-xl mt-2 font-tripswift-bold text-gray-800 mb-1 flex items-center">
+          {/* <h3 className="text-lg sm:text-xl mt-2 font-tripswift-bold text-gray-800 mb-1 flex items-center">
             <FaCreditCard
               className={` text-tripswift-blue text-base sm:text-lg ${
                 i18n.language === "ar" ? "ml-1.5 sm:ml-2" : "mr-1.5 sm:mr-2"
               }`}
             />
             {t("BookingTabs.BookingDetailsModal.paymentDetails")}
-          </h3>
+          </h3> */}
           <div className="bg-tripswift-off-white px-3 sm:px-4 md:px-5 py-2 rounded-xl">
             {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6">
               <div>
@@ -296,14 +296,14 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
               </div>
             </div> */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6">
-              <div>
+              {/* <div>
                 <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">
                   {t("BookingTabs.BookingDetailsModal.paymentMethod")}
                 </p>
                 <p className="text-gray-800 font-tripswift-medium text-sm sm:text-base">
                   Pay at Hotel
                 </p>
-              </div>
+              </div> */}
               <div>
                 <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">
                   {t("BookingTabs.BookingDetailsModal.bookingDate")}

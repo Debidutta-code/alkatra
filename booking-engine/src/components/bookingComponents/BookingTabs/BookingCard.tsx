@@ -113,7 +113,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
 
           {/* Payment Method */}
           <div>
-            <p className="text-xs text-gray-500 mb-1.5">{t('BookingTabs.BookingCard.paymentMethod')}</p>
+            {/* <p className="text-xs text-gray-500 mb-1.5">{t('BookingTabs.BookingCard.paymentMethod')}</p> */}
             {/* <div className={`inline-flex items-center text-xs font-tripswift-medium ${(booking.payment === "payAtHotel" || booking.paymentType === "payAtHotel")
                 ? "text-purple-700"
                 : "text-blue-700"
@@ -121,9 +121,9 @@ const BookingCard: React.FC<BookingCardProps> = ({
               {getPaymentMethodIcon(booking)}
               {getPaymentMethodText(booking)}
             </div> */}
-              <p className="text-xs font-tripswift-medium text-purple-700">
+              {/* <p className="text-xs font-tripswift-medium text-purple-700">
                 Pay at Hotel
-              </p>
+              </p> */}
           </div>
         </div>
 

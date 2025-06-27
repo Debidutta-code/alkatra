@@ -526,7 +526,7 @@
       "emailError": "Email is required.",
       "emailInvalidError": "Please enter a valid email address",
       "emailNotVerified": "Please verify your email",
-      "sendOtp": "Send OTP",
+      "sendOtp": "Verify Email",
       "verifyOtp": "Verify OTP",
       "otpPlaceholder": "Enter OTP",
       "otpExpiresIn": "Expires in",

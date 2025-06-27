@@ -1,7 +1,7 @@
 // src/app/payment-progress/page.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { format, differenceInYears } from "date-fns";
@@ -51,6 +51,8 @@ const PaymentProgressPage: React.FC = () => {
     const [copied, setCopied] = useState(false);
     const [loading, setLoading] = useState(true);
     const [timeElapsed, setTimeElapsed] = useState(0);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+
 
     // Timer for tracking payment time
     useEffect(() => {
@@ -100,13 +102,14 @@ const PaymentProgressPage: React.FC = () => {
         return () => clearTimeout(timer);
     }, [t]);
 
+
+    const successTimeoutRef = useRef<NodeJS.Timeout>();
+
     // Add this useEffect hook after the existing useEffect blocks (e.g., after the localStorage retrieval useEffect)
     useEffect(() => {
         let intervalId: NodeJS.Timeout;
-        let successTimeoutId: NodeJS.Timeout;
-
         const checkPaymentStatus = async () => {
-            if (!paymentData?.payment_id) return;
+            if (!paymentData?.payment_id || paymentData.status === "completed") return;
 
             try {
                 const token = Cookies.get("accessToken");
@@ -125,33 +128,40 @@ const PaymentProgressPage: React.FC = () => {
                     }
                 );
 
-                if (response.status === 200 && response.data.status === "completed") {
-                    setPaymentData((prev) => (prev ? { ...prev, status: "completed" } : prev));
-                    clearInterval(intervalId); // Stop polling on success
+                if (response.status === 200 && response.data.message === "Payment confirmed successfully") {
+                    setPaymentData((prev) => prev ? { ...prev, status: "completed" } : prev);
+                    setShowSuccessModal(true);
+                    clearInterval(intervalId);
 
-                    // Show success screen for 3 seconds before redirect
-                    successTimeoutId = setTimeout(() => {
+                    // Clear any existing timeout
+                    if (successTimeoutRef.current) {
+                        clearTimeout(successTimeoutRef.current);
+                    }
+
+                    // Set new timeout
+                    successTimeoutRef.current = setTimeout(() => {
+                        console.log("Executing redirect to /my-trip");
                         localStorage.removeItem("paymentData");
-                        router.push("/my-trip");
+                        router.replace("/my-trip"); // Using replace instead of push
                     }, 3000);
-                } else {
-                    setPaymentData((prev) => (prev ? { ...prev, status: "processing" } : prev)); // Key line for non-success
                 }
             } catch (err) {
                 console.error("Payment status check failed:", err);
-                setPaymentData((prev) => (prev ? { ...prev, status: "processing" } : prev)); // Key line for errors
             }
         };
 
-        // Start polling every 10 seconds
-        intervalId = setInterval(checkPaymentStatus, 10000);
+        if (paymentData?.status !== "completed") {
+            checkPaymentStatus();
+            intervalId = setInterval(checkPaymentStatus, 10000);
+        }
 
-        // Clean up intervals and timeouts on unmount
         return () => {
             clearInterval(intervalId);
-            clearTimeout(successTimeoutId);
+            if (successTimeoutRef.current) {
+                clearTimeout(successTimeoutRef.current);
+            }
         };
-    }, [paymentData?.payment_id, paymentData?.amount, t, router]);
+    }, [paymentData?.payment_id, paymentData?.amount, paymentData?.status, t, router]);
 
     // Handle copy address
     const handleCopyAddress = async () => {
@@ -275,15 +285,7 @@ const PaymentProgressPage: React.FC = () => {
                             </div>
                         </div>
                     ) : paymentData ? (
-                        paymentData.status === "completed" ? (
-                            <div className="min-h-screen bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8] flex items-center justify-center p-4 font-noto-sans">
-                                <div className="bg-tripswift-off-white rounded-xl shadow-lg p-6 flex flex-col items-center space-y-4 max-w-sm w-full text-center">
-                                    <CheckCircle className="w-16 h-16 text-green-600" />
-                                    <h3 className="text-lg font-tripswift-bold text-tripswift-black mb-1">Payment Successful!</h3>
-                                    <p className="text-sm text-tripswift-black/60">You will be redirected to My Trips in 3 seconds...</p>
-                                </div>
-                            </div>
-                        ) : (
+                        (
                             <div className="grid lg:grid-cols-3 gap-8">
                                 {/* Existing payment and QR code columns */}
                                 <div className="lg:col-span-1 space-y-6">
@@ -695,6 +697,56 @@ const PaymentProgressPage: React.FC = () => {
                     </div>
                 </div>
             </div>
+            {/* Success Modal */}
+            {showSuccessModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm">
+    <div className="bg-tripswift-off-white rounded-xl shadow-2xl p-8 max-w-md w-full text-center animate-fade-in">
+      <div className="flex justify-center mb-4">
+        <div className="relative">
+          <CheckCircle className="w-16 h-16 text-green-600" />
+          <div className="absolute inset-0 rounded-full bg-green-100 animate-ping opacity-75"></div>
+        </div>
+      </div>
+      <h3 className="text-2xl font-tripswift-bold text-tripswift-black mb-2">
+        Payment Successful!
+      </h3>
+      <p className="text-tripswift-black/70 mb-6">
+        Your payment has been confirmed.
+      </p>
+      
+      {/* <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+        <div
+          className="bg-green-600 h-2.5 rounded-full"
+          style={{ animation: 'progressBar 3s linear forwards' }}
+        ></div>
+      </div> */}
+      
+      <button
+        onClick={() => {
+          localStorage.removeItem("paymentData");
+          router.replace("/my-trip");
+        }}
+        className="w-full py-3 px-4 bg-tripswift-blue text-tripswift-off-white rounded-lg hover:bg-tripswift-blue/90 transition-all duration-300 font-tripswift-medium"
+      >
+        Take me to My Bookings
+      </button>
+
+      <style jsx>{`
+        @keyframes progressBar {
+          0% { width: 100%; }
+          100% { width: 0%; }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.3s ease-out forwards;
+        }
+      `}</style>
+    </div>
+  </div>
+)}
         </div>
     );
 };
