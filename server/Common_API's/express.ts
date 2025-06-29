@@ -15,6 +15,7 @@ import paymentRouter from "../Booking_Engine/src/routes/payment.routes";
 import cryptoRouter from "../Booking_Engine/src/routes/cryptoPayment.routes";
 import ratePlaneRoute from "../rate-plan/src/routes/ratePlan.route";
 import couponManagement from "../Coupon_Management/routes/couponRoutes";
+import notification from "../notification/src/route/notification.route";
 export async function initializeExpressRoutes({ app }: { app: Express }) {
   app.head("/status", (_, res: Response) => res.status(200).end());
 
@@ -39,6 +40,7 @@ export async function initializeExpressRoutes({ app }: { app: Express }) {
   // Coupon managemen api
   app.use("/api/v1/coupon", couponManagement);
   app.use("/api/v1/admin", roleBased)
+  app.use("/api/v1/notification", notification);
 
 
   app.all("*", (req: Request, _res: Response, next: NextFunction) => {
