@@ -7,6 +7,7 @@ import { Toaster } from "react-hot-toast";
 import { Providers } from "./provider";
 import Footer from "../components/layout/Footer";
 import Script from "next/script";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const nunito = Nunito({
   subsets: ["latin"],

@@ -15,6 +15,9 @@ import paymentRouter from "../Booking_Engine/src/routes/payment.routes";
 import cryptoRouter from "../Booking_Engine/src/routes/cryptoPayment.routes";
 import ratePlaneRoute from "../rate-plan/src/routes/ratePlan.route";
 import couponManagement from "../Coupon_Management/routes/couponRoutes";
+import { initializeAuthRoutes } from "../Customer-Authentication/src/api/routes/googleAuthRoute";
+
+
 export async function initializeExpressRoutes({ app }: { app: Express }) {
   app.head("/status", (_, res: Response) => res.status(200).end());
 
@@ -22,6 +25,9 @@ export async function initializeExpressRoutes({ app }: { app: Express }) {
   app.use("/api/v1/auth", authRouter);
   app.use("/api/v1/user", userRouter);
   app.use("/api/v1/customers", customerRouter);
+
+  // Google Auth
+  app.use("/api/v1/google", initializeAuthRoutes);
   // PMS
   app.use("/api/v1/pms", pmsRoutes());
   app.use("/api/v1/search", searchRouter);
