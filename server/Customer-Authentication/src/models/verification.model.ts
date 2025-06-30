@@ -11,6 +11,7 @@ export enum OTPType {
   REGISTER = 'register',
   LOGIN = 'login',
   MAIL_VERIFICATION = 'mail_verification',
+  NUMBER_VERYFICATION = 'number_verification',
   
 }
 
