@@ -2,8 +2,11 @@ import { Router } from "express";
 import { authenticateCustomer } from "../../middleware/authMiddleware";
 import CustomerController from "../../controllers/customerController";
 import verificationOtpController from "../../controllers/verificationOtp.controller";
+import { SMSController } from "../../controllers/sms.controller";
 
 const router = Router();
+const smsController = new SMSController();
+
 
 router.post("/register", CustomerController.registerCustomer);
 router.post("/login", CustomerController.loginCustomer);
@@ -14,5 +17,6 @@ router.post("/verify-email", CustomerController.checkEmailExists);
 router.patch("/reset-password", CustomerController.updatePassword);
 router.post('/send-otp', verificationOtpController.sendOTP);
 router.post('/verify-otp', verificationOtpController.verifyOTP);
+router.post('/send-sms',smsController.sendSMS );
 
 export default router; 

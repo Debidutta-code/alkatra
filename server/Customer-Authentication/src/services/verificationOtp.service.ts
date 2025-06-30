@@ -1,6 +1,10 @@
 import OTPDao from '../repositories/verificationOtp.dao';
 import { OTPType, OTPStatus } from '../models/verification.model';
 import emailService from './email.service';
+import { TwilioService } from './sms.service';
+
+const twilioService = new TwilioService();
+
 
 class OTPService {
   private generateOTP(): string {
@@ -12,24 +16,29 @@ class OTPService {
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 mins
 
       await OTPDao.createOTP({ identifier, otp, type, expiresAt, status: OTPStatus.PENDING });
-
-      if (type === OTPType.MAIL_VERIFICATION) { 
-          
-      const subject = `Your OTP for ${type.toUpperCase()}`;
-      const html = `<p>Your OTP is: <strong>${otp}</strong></p><p>This code will expire in 5 minutes.</p>`;
-
     try {
-    await emailService.sendEmail({
-      to: identifier,
-      subject,
-      html,
-      text: `Your OTP is ${otp}`,
-    });
-  } catch (error) {
+      if (type === OTPType.MAIL_VERIFICATION) {
+          
+        const subject = `Your OTP for ${type.toUpperCase()}`;
+        const html = `<p>Your OTP is: <strong>${otp}</strong></p><p>This code will expire in 5 minutes.</p>`;
+
+
+        await emailService.sendEmail({
+          to: identifier,
+          subject,
+          html,
+          text: `Your OTP is ${otp}`,
+        });
+      } else if (type === OTPType.NUMBER_VERYFICATION) {
+
+        const message = `Your OTP is ${otp}. This code will expire in 5 minutes.`;
+      await twilioService.sendSMS(identifier, message); // ✅ Use Twilio SMS
+    }
+    } catch (error) {
         console.error('❌ Failed to send OTP email:', error);
         throw new Error('OTP sending failed. Please try again.'); // 
     // optionally: delete the OTP record or handle the failure
-  }
+  
       }
       
   }
