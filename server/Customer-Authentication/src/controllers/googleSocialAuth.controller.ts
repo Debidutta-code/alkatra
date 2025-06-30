@@ -11,7 +11,7 @@ export class AuthController {
     this.service = new AuthService();
   }
 
-  async getUser(req: Request, res: Response) {
+  getUser = async(req: Request, res: Response) => {
     console.log('GOOGLE AUTH getUser called');
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
@@ -29,7 +29,7 @@ export class AuthController {
     }
   }
 
-  async postGoogleAuthData(req: Request, res: Response) {
+  postGoogleAuthData = async(req: Request, res: Response) => {
     try {
       console.log("Enterng into POST GOOGLE AUTH DATA");
       const { code } = req.body;
@@ -59,8 +59,9 @@ export class AuthController {
 
       const result = await this.service.handleGoogleAuth({
         id: data.id,
-        emails: [{ value: data.email }],
+        emails: data.email,
         displayName: data.name || 'Unknown User',
+        avatar: data.picture,
       });
 
       return res.status(200).json({ token: result.token, user: result.user });

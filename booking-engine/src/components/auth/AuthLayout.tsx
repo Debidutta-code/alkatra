@@ -53,7 +53,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       console.log("Login successful:", data);
       if (data.token) {
         localStorage.setItem('authToken', data.token);
-        window.location.href = '/dashboard';
+        window.location.href = '/';
       }
     } else {
       console.error("Google login failed: No auth code received");

@@ -55,7 +55,9 @@ passport.deserializeUser(async (id: string, done) => {
 });
 
 // Routes
-router.post('/auth/google', authController.postGoogleAuthData);
+// router.post('/auth/google', authController.postGoogleAuthData);
+router.post('/auth/google', authController.postGoogleAuthData.bind(authController));
+
 
 router.get('/auth/google', (req, res, next) => {
   console.log('🔔 /auth/google route called for:', req.originalUrl);

@@ -16,8 +16,8 @@ export class AuthService {
       user = await this.repository.createUser({
         googleId: profile.id,
         displayName: profile.displayName,
-        email: profile.emails.value,
-        avatar: profile.photos.value,
+        email: profile.emails,
+        avatar: profile.avatar,
       });
     }
 
