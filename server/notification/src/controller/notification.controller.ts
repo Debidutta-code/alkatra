@@ -4,7 +4,7 @@ import { NotificationService } from '../service/notification.service';
 import { TokenDao } from '../dao/notification.dao';
 
 export class NotificationController {
-    constructor(private notificationService: typeof NotificationService) { }
+  constructor(private notificationService: typeof NotificationService) { }
 
 
   /**
@@ -34,27 +34,27 @@ export class NotificationController {
       console.error('❌ Failed to send notification:', error);
       res.status(500).json({ message: 'Internal server error', error: error.message });
     }
-    };
+  };
 
-    public registerDeviceToken = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { userId, token, platform } = req.body;
+  public registerDeviceToken = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { userId, token, platform } = req.body;
 
-    if (!userId || !token || !platform) {
-      res.status(400).json({ message: 'userId, token, and platform are required.' });
-      return;
+      if (!userId || !token || !platform) {
+        res.status(400).json({ message: 'userId, token, and platform are required.' });
+        return;
+      }
+
+      const tokenDao = new TokenDao();
+      // ✅ Access TokenDao inside service
+      await tokenDao.saveOrUpdateToken(userId, token, platform);
+
+      res.status(200).json({ message: 'Device token registered successfully' });
+    } catch (error: any) {
+      console.error('❌ Failed to register device token:', error);
+      res.status(500).json({ message: 'Internal server error', error: error.message });
     }
+  };
 
-    const tokenDao = new TokenDao();
- // ✅ Access TokenDao inside service
-    await tokenDao.saveOrUpdateToken(userId, token, platform);
-
-    res.status(200).json({ message: 'Device token registered successfully' });
-  } catch (error: any) {
-    console.error('❌ Failed to register device token:', error);
-    res.status(500).json({ message: 'Internal server error', error: error.message });
-  }
-};
-    
 
 }

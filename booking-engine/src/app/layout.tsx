@@ -32,9 +32,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={nunito.className}>
         <Providers>
-           <FCMInitializer />
+          <FCMInitializer />
           <Navbar />
-          {children}
+          {/* <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}> */}
+            {children}
+          {/* </GoogleOAuthProvider> */}
           <Footer />
           <Toaster position="top-right" />
         </Providers>

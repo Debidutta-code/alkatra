@@ -20,6 +20,7 @@ export class AuthService {
         avatar: profile.photos[0].value,
       });
     }
+
     const token = jwt.sign(
                 { id: user._id },
                 process.env.JWT_SECRET_KEY || "your-secret-key",
