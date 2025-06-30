@@ -16,16 +16,16 @@ export class AuthService {
       user = await this.repository.createUser({
         googleId: profile.id,
         displayName: profile.displayName,
-        email: profile.emails[0].value,
-        avatar: profile.photos[0].value,
+        email: profile.emails.value,
+        avatar: profile.photos.value,
       });
     }
 
     const token = jwt.sign(
-                { id: user._id },
-                process.env.JWT_SECRET_KEY || "your-secret-key",
-                { expiresIn: "7d" }
-            );
+      { id: user._id },
+      process.env.JWT_SECRET_KEY || "your-secret-key",
+      { expiresIn: "7d" }
+    );
     return { user, token };
   }
 

@@ -6,86 +6,86 @@ import { AuthController } from '../../controllers/googleSocialAuth.controller';
 import config from '../../../../Common_API/index';
 import { google } from 'googleapis';
 
+const router = Router();
+const authService = new AuthService();
+const authController = new AuthController();
 
-export const initializeAuthRoutes = (router: Router) => {
-  const authService = new AuthService();
-  const authController = new AuthController();
+if (!config.googleClientId || !config.googleClientSecret || !config.googleFrontendCallbackUrl) {
+  console.error('Missing Google OAuth environment variables:', {
+    clientId: config.googleClientId,
+    clientSecret: config.googleClientSecret ? '[REDACTED]' : undefined,
+    callbackUrl: config.googleFrontendCallbackUrl,
+  });
+  throw new Error('Google OAuth configuration incomplete');
+}
 
-  if (!config.googleClientId || !config.googleClientSecret || !config.googleFrontendCallbackUrl) {
-    console.error('Missing Google OAuth environment variables:', {
-      clientId: config.googleClientId,
-      clientSecret: config.googleClientSecret ? '[REDACTED]' : undefined,
-      callbackUrl: config.googleFrontendCallbackUrl,
+// Passport Google Strategy
+passport.use(new GoogleStrategy({
+  clientID: config.googleClientId,
+  clientSecret: config.googleClientSecret,
+  callbackURL: 'http://localhost:8080/api/v1/google/auth/google/callback',
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    console.log('Google profile received:', {
+      id: profile.id,
+      email: profile.emails?.[0]?.value,
+      name: profile.displayName,
     });
-    throw new Error('Google OAuth configuration incomplete');
+    const result = await authService.handleGoogleAuth(profile);
+    done(null, result);
+  } catch (err) {
+    console.error('Google auth error:', err);
+    done(err, false);
   }
+}));
 
-  // Passport Google Strategy
-  passport.use(new GoogleStrategy({
-    clientID: config.googleClientId,
-    clientSecret: config.googleClientSecret,
-    callbackURL: 'http://localhost:8080/api/v1/google/auth/google/callback',
-  }, async (accessToken, refreshToken, profile, done) => {
-    try {
-      console.log('Google profile received:', {
-        id: profile.id,
-        email: profile.emails?.[0]?.value,
-        name: profile.displayName,
-      });
-      const result = await authService.handleGoogleAuth(profile);
-      done(null, result);
-    } catch (err) {
-      console.error('Google auth error:', err);
-      done(err, false);
+passport.serializeUser((user: any, done) => {
+  console.log('Serializing user:', user.user._id);
+  done(null, user.user._id);
+});
+
+passport.deserializeUser(async (id: string, done) => {
+  try {
+    const user = await authService.getUserById(id);
+    done(null, user);
+  } catch (err) {
+    console.error('Deserialize error:', err);
+    done(err, null);
+  }
+});
+
+// Routes
+router.post('/auth/google', authController.postGoogleAuthData);
+
+router.get('/auth/google', (req, res, next) => {
+  console.log('🔔 /auth/google route called for:', req.originalUrl);
+  next();
+}, passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
+
+router.get('/auth/google/callback', (req, res, next) => {
+  passport.authenticate('google', { session: false, failureRedirect: `${config.googleFrontendCallbackUrl}/login` }, (err, user) => {
+    if (err) {
+      console.error('Callback error:', err);
+      return res.status(500).json({ error: 'Authentication failed' });
     }
-  }));
-
-  passport.serializeUser((user: any, done) => {
-    console.log('Serializing user:', user.user._id);
-    done(null, user.user._id);
-  });
-
-  passport.deserializeUser(async (id: string, done) => {
-    try {
-      const user = await authService.getUserById(id);
-      done(null, user);
-    } catch (err) {
-      console.error('Deserialize error:', err);
-      done(err, null);
+    if (!user) {
+      console.error('No user returned from Google auth');
+      return res.redirect(`${config.googleFrontendCallbackUrl}/login`);
     }
-  });
-
-  // Routes
-  router.post('/auth/google', authController.postGoogleAuthData);
-
-  router.get('/auth/google', (req, res, next) => {
-    console.log('🔔 /auth/google route called for:', req.originalUrl);
+    req.user = user;
     next();
-  }, passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
+  })(req, res, next);
+}, (req: any, res: Response) => {
+  try {
+    const { token } = req.user;
+    console.log('Redirecting to dashboard with token:', token);
+    res.redirect(`${config.googleFrontendCallbackUrl}/dashboard?token=${token}`);
+  } catch (error) {
+    console.error('Error in callback redirect:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
-  router.get('/auth/google/callback', (req, res, next) => {
-    passport.authenticate('google', { session: false, failureRedirect: `${config.googleFrontendCallbackUrl}/login` }, (err, user) => {
-      if (err) {
-        console.error('Callback error:', err);
-        return res.status(500).json({ error: 'Authentication failed' });
-      }
-      if (!user) {
-        console.error('No user returned from Google auth');
-        return res.redirect(`${config.googleFrontendCallbackUrl}/login`);
-      }
-      req.user = user;
-      next();
-    })(req, res, next);
-  }, (req: any, res: Response) => {
-    try {
-      const { token } = req.user;
-      console.log('Redirecting to dashboard with token:', token);
-      res.redirect(`${config.googleFrontendCallbackUrl}/dashboard?token=${token}`);
-    } catch (error) {
-      console.error('Error in callback redirect:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  });
+router.get('/api/user', (req: Request, res: Response) => authController.getUser(req, res));
 
-  router.get('/api/user', (req: Request, res: Response) => authController.getUser(req, res));
-};
+export default router;

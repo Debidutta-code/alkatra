@@ -31,6 +31,7 @@ export class AuthController {
 
   async postGoogleAuthData(req: Request, res: Response) {
     try {
+      console.log("Enterng into POST GOOGLE AUTH DATA");
       const { code } = req.body;
       if (!code) {
         return res.status(400).json({ error: 'Authorization code is required' });
@@ -41,7 +42,7 @@ export class AuthController {
       const oauth2Client = new google.auth.OAuth2(
         config.googleClientId,
         config.googleClientSecret,
-        'http://localhost:3004/auth/google/callback'
+        'http://localhost:3004'
       );
 
       const { tokens } = await oauth2Client.getToken(code);
