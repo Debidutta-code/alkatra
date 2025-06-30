@@ -45,6 +45,7 @@ const authSlice = createSlice({
       .addCase(updateProfile.fulfilled, (state, action) => {
         state.user = {
           ...state.user,
+          _id:action.payload.firstName,
           firstName: action.payload.firstName,
           lastName: action.payload.lastName,
           email: action.payload.email,
@@ -83,6 +84,8 @@ export const getUser = () =>
         Authorization: `Bearer ${accessToken}`,
       },
     });
+
+    // console.log("User data:", res.data.data);
 
     dispatch(setUser(res.data.data));
     localStorage.setItem("user", JSON.stringify(res.data.data));

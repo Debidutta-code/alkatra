@@ -39,6 +39,7 @@
     "date-and-time": "^3.0.3",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
+    "firebase": "^11.9.1",
     "fortawesome": "^0.0.1-security",
     "framer-motion": "^12.4.7",
     "headlessui": "^0.0.0",
