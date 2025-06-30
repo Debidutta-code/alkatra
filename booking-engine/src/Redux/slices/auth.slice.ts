@@ -77,15 +77,18 @@ export const login = (data: { email: string; password: string }) =>
 
 export const getUser = () =>
   async (dispatch: typeof store.dispatch) => {
-    const accessToken = Cookies.get("accessToken");
-
+    let accessToken = Cookies.get("accessToken");
+    console.log(`The access token we get from cookies ${accessToken}`);
+    if (!accessToken) {
+      accessToken = localStorage.getItem("authToken") || "";
+      console.log(`The access token we get from localstorage ${accessToken}`);
+    }
+    if (!accessToken) return;
     const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/me`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-
-    // console.log("User data:", res.data.data);
 
     dispatch(setUser(res.data.data));
     localStorage.setItem("user", JSON.stringify(res.data.data));
@@ -104,7 +107,7 @@ export const updateProfile = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const token = Cookies.get("accessToken");
+      const token = Cookies.get("accessToken") || localStorage.getItem("authToken") || "";
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/update`,
         data,

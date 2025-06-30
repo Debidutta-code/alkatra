@@ -29,7 +29,7 @@ class CustomerService {
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         const newCustomer = await customerRepository.create({
-            firstName, 
+            firstName,
             lastName,
             email,
             phone,
@@ -80,18 +80,26 @@ class CustomerService {
         try {
             const secretKey = process.env.JWT_SECRET_KEY || "your_secret_key";
             const decoded = jwt.verify(token, secretKey) as { id: string };
+
             if (!decoded.id) {
-                throw new Error("Invalid token");
+                throw new Error("Invalid token: missing ID");
             }
-            const customer = await customerRepository.findById(decoded.id);
+
+            let customer = await customerRepository.findById(decoded.id);
+
             if (!customer) {
-                throw new Error("Customer not found");
+                customer = await customerRepository.findByIdFromGoogleUserCollection(decoded.id);
+                if (!customer) {
+                    throw new Error("Customer not found in any collection");
+                }
             }
+
             return customer;
-        } catch (error) {
-            throw new Error("Error retrieving customer");
+        } catch (error: any) {
+            throw new Error(`Error retrieving customer: ${error.message}`);
         }
     }
+
 
     // Update customer profile
     async updateCustomerProfile(customerId: string, updateData: Partial<ICustomer>): Promise<ICustomer | null> {
@@ -119,12 +127,12 @@ class CustomerService {
         if (!email || !newPassword) {
             throw new Error("Email and new password are required");
         }
-        
+
         const customer = await customerRepository.findByEmail(email);
         if (!customer) {
             throw new Error("Customer not found");
         }
-        
+
         if (!isValidPassword(newPassword)) {
             throw new Error(
                 "Password must be at least 8 characters long and include at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character."

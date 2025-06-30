@@ -218,7 +218,7 @@ const Navbar: React.FC = () => {
                     size="sm"
                     color="primary"
                     className="transition-transform bg-tripswift-blue text-tripswift-off-white"
-                    name={`${user.firstName} ${user.lastName}`}  // This helps with accessibility
+                    name={`${user.firstName} ${user.lastName}`} 
                     fallback={
                       <p className="text-lg font-tripswift-bold text-tripswift-off-white">
                         {user.firstName.charAt(0) + user.lastName.charAt(0)}

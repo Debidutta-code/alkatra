@@ -43,7 +43,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         body: JSON.stringify({ code: authResult.code }),
       });
 
-      if (!response.ok) {
+      if (response.status !== 200) {
         const errorData = await response.json();
         console.error("Response status:", response.status, errorData);
         throw new Error(`Failed to login with Google: ${errorData.error || response.statusText}`);
