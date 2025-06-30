@@ -26,4 +26,5 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(morgan("dev"));
 app.use(express.json({ limit: '50mb' }));
+app.options("*", cors());
 

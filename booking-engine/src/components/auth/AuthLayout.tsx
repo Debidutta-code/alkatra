@@ -7,6 +7,12 @@ import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
 import LoginImg from "@/components/assets/login.jpg";
 import LoginIcon from "@/components/assets/TRIP-1.png";
 import LoginIconMob from "@/components/assets/TRIP-1.png";
+import { useRouter } from "next/navigation";
+import Cookies from 'js-cookie';
+import { useDispatch } from "react-redux";
+import { googleLogin } from "@/Redux/slices/auth.slice";
+import toast from "react-hot-toast"
+import { AppDispatch } from "@/Redux/store";
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -29,45 +35,44 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
 }) => {
   const { t } = useTranslation();
   const pathname = usePathname();
+  const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
 
   const responseGoogle = async (authResult: any) => {
-  try {
-    console.log("Google login response:", authResult);
-    if (authResult?.code) {
-      const response = await fetch('/api/v1/google/auth/google', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({ code: authResult.code }),
-      });
-
-      if (response.status !== 200) {
-        const errorData = await response.json();
-        console.error("Response status:", response.status, errorData);
-        throw new Error(`Failed to login with Google: ${errorData.error || response.statusText}`);
+    try {
+      if (authResult?.code) {
+        await dispatch(googleLogin({ code: authResult.code })).unwrap();
+        toast.success(
+          t("Auth.Google.successMessage") || "Successfully logged in with Google",
+          { icon: "👋" }
+        );
+        router.push("/");
+      } else {
+        console.error("Google login failed: No auth code received");
+        toast.error(
+          t("Auth.Google.noCodeError") || "No authorization code received",
+          { icon: "❌" }
+        );
       }
-
-      const data = await response.json();
-      console.log("Login successful:", data);
-      if (data.token) {
-        localStorage.setItem('authToken', data.token);
-        window.location.href = '/';
-      }
-    } else {
-      console.error("Google login failed: No auth code received");
+    } catch (error) {
+      console.error("Google login error:", error);
+      toast.error(
+        t("Auth.Google.errorMessage") || "An error occurred during Google login",
+        { icon: "❌" }
+      );
     }
-  } catch (error) {
-    console.error("Google login error:", error);
-  }
-};
+  };
 
-  const googleLogin = useGoogleLogin({
+  const googleLoginHook = useGoogleLogin({
     onSuccess: responseGoogle,
-    onError: (error) => console.error("Google login error:", error),
-    flow: 'auth-code',
-    redirect_uri: 'http://localhost:3004/auth/google/callback',
+    onError: (error) => {
+      console.error("Google login error:", error);
+      toast.error(t("Auth.Google.errorMessage") || "Google login failed", {
+        icon: "❌",
+      });
+    },
+    flow: "auth-code",
+    redirect_uri: "http://localhost:3004/auth/google/callback",
   });
 
   return (
@@ -138,7 +143,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
               {children}
             </div>
             <button
-              onClick={() => googleLogin()}
+              onClick={() => googleLoginHook()}
               className="w-full h-12 flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-lg px-4 mb-4 hover:bg-gray-50 transition-colors duration-200"
             >
               <svg className="w-5 h-5" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
