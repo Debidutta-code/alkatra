@@ -20,6 +20,11 @@ const useFCM = (userId?: string) => {
           
           console.log('✅ Notification permission granted',vapidKey);
 
+          if (!messaging) {
+            console.error("Firebase Messaging is not supported in this browser.");
+            return;
+}
+
           const token = await getToken(messaging, { vapidKey });
         console.log('🔑 FCM Token:', token);
 
@@ -50,10 +55,14 @@ const useFCM = (userId?: string) => {
 
 
     // Optional: Handle incoming messages
-    onMessage(messaging, (payload) => {
-      console.log('📩 Foreground message:', payload);
-      alert(payload.notification?.title);
-    });
+    if (messaging) {
+  onMessage(messaging, (payload) => {
+    console.log('📩 Foreground message:', payload);
+    alert(payload.notification?.title);
+  });
+} else {
+  console.warn('❌ Firebase Messaging is not available (unsupported browser or not initialized)');
+}
   }, [userId]);
 };
 
