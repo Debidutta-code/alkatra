@@ -8,6 +8,7 @@ import { filterData, updatePrice, updateAvailability, saveData, ratePlanServices
 import { RatePlanInterFace, DateRange, paginationTypes, modifiedRatePlanInterface } from './types';
 import toast, { Toaster } from 'react-hot-toast';
 import Pagination from "./components/Pagination"
+import { useSidebar } from '@src/components/ui/sidebar';
 // Pagination Component
 
 
@@ -21,6 +22,7 @@ const MapRatePlanPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [allRoomTypes, setAllRoomTypes] = useState<any[]>([]);
   const [roomTypesLoaded, setRoomTypesLoaded] = useState<boolean>(false);
+  const { state } = useSidebar(); // state: "collapsed" | "expanded"
   const [paginationResults, setPaginationResults] = useState<paginationTypes>({
     currentPage: 1,
     totalPage: 10,
@@ -58,8 +60,13 @@ const MapRatePlanPage: React.FC = () => {
       setData(response.data);
       setOriginalData(response.data);
       setFilteredData(response.data);
+      const patchedPagination = {
+      ...response.pagination,
+      totalPage: response.pagination.totalPages,
+    };
       console.log("Pagination response",response.pagination)
-      setPaginationResults(response.pagination)
+      console.log("patched ",patchedPagination)
+      setPaginationResults(patchedPagination)
       setEditButtonClicked(false);
       setModifiedValues([]);
 
@@ -155,7 +162,18 @@ const MapRatePlanPage: React.FC = () => {
   const hasUnsavedChanges = modifiedValues.length > 0;
 
   return (
-    <div className="px-10 min-h-screen" style={{ height: 'calc(100vh - 100px)' }}>
+<div
+  className={`
+    min-h-screen
+    transition-all duration-300
+    px-6 md:px-10
+    ${state === 'expanded' ? 'md:ml-[6.5rem] lg:ml-0' : 'md:ml-0 lg:ml-0'}
+  `}
+  style={{
+    height: 'calc(100vh - 100px)',
+  }}
+>
+
       <Toaster position="top-right" />
       <div className="max-w-7xl mx-auto">
         {roomTypesLoaded && (
@@ -202,7 +220,6 @@ const MapRatePlanPage: React.FC = () => {
               hasNextPage={paginationResults.hasNextPage}
               hasPreviousPage={paginationResults.hasPreviousPage}
               onPageChange={handlePageChange}
-              isLoading={isLoading}
             />
           </div>
         )}

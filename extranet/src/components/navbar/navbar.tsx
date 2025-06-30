@@ -59,7 +59,7 @@ function NavbarSidebarToggle() {
   if (open && !isMobile) return null;
 
   return (
-    <div className="ml-2">
+    <div className="">
       <SidebarTrigger />
     </div>
   );
@@ -75,8 +75,8 @@ export default function Navbar() {
     (state: RootState) => state.auth
   );
   const dispatch = useDispatch();
-  const { theme } = useTheme();
-  const [logoSrc, setLogoSrc] = useState("/assets/TRIP-1.png");
+  // const { theme } = useTheme();
+  // const [logoSrc, setLogoSrc] = useState("/assets/ALHAJZ.png");
 
 
   const handleLogout = () => {
@@ -96,22 +96,22 @@ export default function Navbar() {
   }, [pathname]);
 
   // Update logo when theme changes
-  useEffect(() => {
-    if (theme === "dark") {
-      setLogoSrc("/assets/TRIP-2.png");
-    } else {
-      setLogoSrc("/assets/TRIP-1.png");
-    }
-  }, [theme]);
+  // useEffect(() => {
+  //   if (theme === "dark") {
+  //     setLogoSrc("/assets/TRIP-2.png");
+  //   } else {
+  //     setLogoSrc("/assets/ALHAJZ.png");
+  //   }
+  // }, [theme]);
 
   return (
     <nav
-      className={`h-[10vh]  border-b px-10 ${noNav ? "hidden" : "flex items-center justify-between"
-        } ${open?"w-[78vw]":"w-[100vw]"}`}
+      className={`md:h-[14vh] h-[12vh]  border-b px-8 ${noNav ? "hidden" : "flex items-center justify-between"
+        } ${open?"w-[78vw] ":"w-[100vw] sm:px-20 md:px-16 xl:px-24"}`}
     >
-      <div className="flex items-center">
+      <div className={"flex  items-center"}>
         <NavbarSidebarToggle />
-        <Image src={logoSrc} height={100} width={100} alt="Trip swift logo" />
+        {/* <Image className="md:block hidden" src={logoSrc} height={100} width={100} alt="Al Hajz" /> */}
       </div>
       <div className="flex gap-2">
         <NavigationMenu>
@@ -153,7 +153,7 @@ export default function Navbar() {
         </NavigationMenu>
         <Menubar>
           <MenubarMenu>
-            <MenubarTrigger className="space-x-2">
+            <MenubarTrigger className="sm:space-x-2 space-x-1">
               <Avatar className="h-6 w-6">
                 <AvatarImage src="https://www.flaticon.com/free-icons/user" />
                 <AvatarFallback>
@@ -174,7 +174,7 @@ export default function Navbar() {
             </MenubarContent>
           </MenubarMenu>
         </Menubar>
-        <ModeToggle />
+        {/* <ModeToggle /> */}
       </div>
     </nav>
   );
