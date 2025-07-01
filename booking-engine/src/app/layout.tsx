@@ -7,6 +7,7 @@ import { Toaster } from "react-hot-toast";
 import { Providers } from "./provider";
 import Footer from "../components/layout/Footer";
 import Script from "next/script";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import FCMInitializer from "@/components/fcmInitializer/FCMInitializer";
 
 const nunito = Nunito({
@@ -31,9 +32,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={nunito.className}>
         <Providers>
-           <FCMInitializer />
+          <FCMInitializer />
           <Navbar />
-          {children}
+          {/* <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}> */}
+            {children}
+          {/* </GoogleOAuthProvider> */}
           <Footer />
           <Toaster position="top-right" />
         </Providers>

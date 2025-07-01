@@ -26,7 +26,7 @@
         "./authentication/**/*",
         "Booking_Engine/**/*",
         "./payment/**/*",
-        "Common_API's/**/*",
+        "Common_API/**/*",
         "./pms_api/**/*",
         "./price_pref/**/*",
         "./search-engine/**/*",

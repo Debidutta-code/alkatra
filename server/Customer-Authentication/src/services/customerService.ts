@@ -4,6 +4,7 @@ import customerRepository from "../repositories/customerRepository";
 import { isValidPassword } from "../utils/passwordValidator";
 import { ICustomer } from "../models/customer.model";
 import jwt from "jsonwebtoken";
+import { IUser } from "../models/googleUser.model";
 
 class CustomerService {
     // new customer register
@@ -29,7 +30,7 @@ class CustomerService {
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         const newCustomer = await customerRepository.create({
-            firstName, 
+            firstName,
             lastName,
             email,
             phone,
@@ -80,16 +81,50 @@ class CustomerService {
         try {
             const secretKey = process.env.JWT_SECRET_KEY || "your_secret_key";
             const decoded = jwt.verify(token, secretKey) as { id: string };
+
             if (!decoded.id) {
-                throw new Error("Invalid token");
+                throw new Error("Invalid token: missing ID");
             }
-            const customer = await customerRepository.findById(decoded.id);
+
+            let customer = await customerRepository.findById(decoded.id);
             if (!customer) {
-                throw new Error("Customer not found");
+                if (!customer) {
+                    customer = await this.getGoogleCustomerOwnData(token);
+                    return customer;
+                }
             }
             return customer;
-        } catch (error) {
-            throw new Error("Error retrieving customer");
+        } catch (error: any) {
+            throw new Error(`Error retrieving customer: ${error.message}`);
+        }
+    }
+
+    async getGoogleCustomerOwnData(token: string): Promise<any> {
+        try {
+            const secretKey = process.env.JWT_SECRET_KEY || "your_secret_key";
+            const decoded = jwt.verify(token, secretKey) as { id: string };
+
+            if (!decoded.id) {
+                throw new Error("Invalid token: missing ID");
+            }
+
+            const customer = await customerRepository.findByIdFromGoogleUserCollection(decoded.id);
+            if (!customer) {
+                throw new Error("Customer details not found");
+            }
+
+            const [firstName, ...rest] = customer.displayName?.split(" ") || ["Unknown"];
+            const lastName = rest.join(" ") || "";
+
+            return {
+                _id: customer._id,
+                firstName,
+                lastName,
+                email: customer.email,
+                avatar: customer.avatar || null
+            };
+        } catch (error: any) {
+            throw new Error(`Error retrieving customer: ${error.message}`);
         }
     }
 
@@ -119,12 +154,12 @@ class CustomerService {
         if (!email || !newPassword) {
             throw new Error("Email and new password are required");
         }
-        
+
         const customer = await customerRepository.findByEmail(email);
         if (!customer) {
             throw new Error("Customer not found");
         }
-        
+
         if (!isValidPassword(newPassword)) {
             throw new Error(
                 "Password must be at least 8 characters long and include at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character."

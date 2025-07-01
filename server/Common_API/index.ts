@@ -13,5 +13,8 @@ export default {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN,
   kafkaBootstrapServers: process.env.KAFKA_BOOTSTRAP_SERVERS,
   kafkaAuthTopic: process.env.KAFKA_AUTH_TOPIC,
+  googleClientId: process.env.GOOGLE_CLIENT_ID,
+  googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  googleFrontendCallbackUrl: process.env.GOOGLE_FRONTEND_CALLBACK_URL,
 };
 
