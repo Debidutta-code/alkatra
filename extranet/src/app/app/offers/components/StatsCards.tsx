@@ -60,7 +60,7 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
       {statItems.map((item, index) => (
         <div key={index} className={`${item.bgColor} rounded-xl p-6 border border-gray-100`}>
           <div className="flex items-center justify-between">

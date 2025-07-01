@@ -181,7 +181,7 @@ export default function AppSidebar({ role }: { role?: string }) {
       <div className="w-auto max-w-[120px]  h-auto">
         <Image
           src  ="/assets/ALHAJZ.png"
-          alt="Trip swift logo"
+          alt="Al Hajz"
           width={0}
           height={0}
           sizes="(max-width: 768px) 80px, 100px"

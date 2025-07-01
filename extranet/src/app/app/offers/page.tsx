@@ -147,7 +147,7 @@ function Offers() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-6">
+          <div className="flex flex-col gap-3 lg:flex-row items-start justify-between py-6">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Offers Management</h1>
               <p className="text-gray-600 mt-1">Create and manage booking offers for your properties</p>
@@ -244,7 +244,7 @@ function Offers() {
 
         {/* Offers Grid */}
         {filteredOffers.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 max-cols-3 gap-6">
             {filteredOffers.map(offer => (
               <div key={offer.id} className="relative">
                 <div className="absolute top-4 left-4 z-10">

@@ -162,13 +162,14 @@ const Page = () => {
   );
 
   return (
+    
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       {/* Header Section */}
-      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10 backdrop-blur-sm bg-white/95 dark:bg-gray-900/95">
-        <div className="max-w-7xl mx-auto px-6 py-6">
+      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 top-0 z-10 backdrop-blur-sm bg-white/95 dark:bg-gray-900/95">
+        <div className="max-w-7xl mx-auto  px-4 sm:px-6 md:px-8  py-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              <h1 className="text-3xl  font-bold text-gray-900 dark:text-white mb-2">
                 Property Portfolio
               </h1>
               <div className="flex items-center space-x-6 text-sm text-gray-600 dark:text-gray-400">
@@ -194,7 +195,7 @@ const Page = () => {
                 />
               </div>
               
-              <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+              <div className="flex gap-2 items-center  dark:bg-gray-800 rounded-lg p-1">
                 <Button
                   variant={viewMode === 'grid' ? 'default' : 'ghost'}
                   size="sm"
@@ -207,7 +208,7 @@ const Page = () => {
                   variant={viewMode === 'list' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('list')}
-                  className="px-3"
+                  className="px-3 bg-gray-100"
                 >
                   <List className="w-4 h-4" />
                 </Button>
@@ -222,7 +223,7 @@ const Page = () => {
         {loading ? (
           <LoadingState />
         ) : filteredProperties.length > 0 ? (
-          <div className="space-y-8">
+          <div className="space-y-8 w-full">
             {filteredProperties.map((group) => (
               <div key={group.id} className="space-y-6">
                 <Card className="border-0 shadow-lg bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm">
@@ -244,9 +245,9 @@ const Page = () => {
                   </CardHeader>
                   
                   <CardContent className="pt-0">
-                    <div className={`grid gap-6 ${
+                    <div className={`grid gap-2 md:gap-6 ${
                       viewMode === 'grid' 
-                        ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3' 
+                        ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3' 
                         : 'grid-cols-1 md:grid-cols-2'
                     }`}>
                       {group.hotels.map((hotel) => (

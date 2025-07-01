@@ -49,7 +49,7 @@ export default function RootLayout({
         </div>
       ) : (
         <SidebarProvider>
-          <div className="relative min-h-screen max-w-full overflow-x-hidden">
+          <div className="relative min-h-screen w-full overflow-x-hidden">
             {/* Sidebar only shown when open */}
             <AppSidebar role={currentUser?.role || "hotelManager"} />
             {/* Main content */}
