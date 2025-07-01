@@ -63,6 +63,7 @@ export class AuthController {
         displayName: data.name || 'Unknown User',
         avatar: data.picture,
       });
+      console.log(`The token in GOOGLE auth is: ${result.token}`);
       return res.status(200).json({ token: result.token });
     } catch (error) {
       console.error('Error in /auth/google POST:', error);
