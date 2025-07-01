@@ -1,8 +1,11 @@
 // src/services/notificationService.ts
 import admin from '../config/firebase.config';
 import { TokenDao } from '../dao/notification.dao';
+import DeviceToken from '../model/deviceToken.model';
 
 interface NotificationPayload {
+  hotelCode: string;
+  offerId: null;
   title: string;
   body: string;
   data?: Record<string, string>;
@@ -35,7 +38,26 @@ export class NotificationService {
 
       console.log(`✅ Sent to ${response.successCount} devices; ${response.failureCount} failures`);
 
-      // 🔁 Remove invalid or expired tokens
+      const tokenDocs = await DeviceToken.find({ token: { $in: fcmTokens } }).lean();
+      const userTokenMap = new Map<string, string[]>();
+      tokenDocs.forEach(doc => {
+        if (!userTokenMap.has(doc.userId.toString())) {
+          userTokenMap.set(doc.userId.toString(), []);
+        }
+        userTokenMap.get(doc.userId.toString())!.push(doc.token);
+      });
+
+      for (const [userId, tokens] of userTokenMap) {
+        await tokenDao.saveNotificationLog(
+          userId,
+          payload.offerId || null,
+          payload.hotelCode || 'N/A',
+          payload.title,
+          payload.body,
+          payload.data
+        );
+      }
+      
       const failedTokensToRemove: string[] = [];
 
       response.responses.forEach((resp, idx) => {

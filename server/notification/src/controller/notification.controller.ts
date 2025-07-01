@@ -25,6 +25,8 @@ export class NotificationController {
         title,
         body,
         data,
+        hotelCode: '',
+        offerId: null
       });
 
       res.status(200).json({
@@ -120,6 +122,37 @@ export class NotificationController {
       });
     } catch (error: any) {
       console.error(`❌ Error fetching offers for hotel ${req.params.hotelCode}:`, error);
+      res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+  };
+
+  /**
+   * Get notifications for a specific user by userId
+   */
+  public getNotificationsByUserId = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { userId } = req.query;
+
+      if (!userId || typeof userId !== 'string') {
+        res.status(400).json({ message: 'userId is required and must be a string.' });
+        return;
+      }
+
+      const tokenDao = new TokenDao();
+      const notifications = await tokenDao.getNotificationLogsByUserId(userId);
+
+      if (notifications.length === 0) {
+        res.status(404).json({ message: 'No notifications found for this user.' });
+        return;
+      }
+
+      res.status(200).json({
+        message: 'Notifications fetched successfully',
+        notifications,
+        total: notifications.length,
+      });
+    } catch (error: any) {
+      console.error(`❌ Error fetching notifications for user ${req.query.userId}:`, error);
       res.status(500).json({ message: 'Internal server error', error: error.message });
     }
   };

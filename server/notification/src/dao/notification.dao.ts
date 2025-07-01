@@ -1,5 +1,7 @@
 // src/repositories/tokenRepo.ts
+import mongoose from 'mongoose';
 import deviceTokenModel from '../model/deviceToken.model';
+import userNotificationLogModel, { IUserNotificationLog } from '../model/userNotificationLog.model';
 
 export class TokenDao {
   /**
@@ -42,8 +44,8 @@ export class TokenDao {
         { token },
         { userId, platform, updatedAt: new Date() },
         { upsert: true, new: true }
-        );
-        console.log(`✅ Device token ${token} saved/updated for user ${userId}`);
+      );
+      console.log(`✅ Device token ${token} saved/updated for user ${userId}`);
       return updated;
     } catch (error) {
       console.error('❌ Error saving or updating device token:', error);
@@ -61,6 +63,49 @@ export class TokenDao {
     } catch (error) {
       console.error(`❌ Error deleting token ${token}:`, error);
       throw new Error('Failed to delete device token');
+    }
+  }
+
+  /**
+   * Save a notification log for a user.
+   */
+  public async saveNotificationLog(
+    userId: string,
+    offerId: string | null,
+    hotelCode: string,
+    title: string,
+    body: string,
+    data?: Record<string, string>
+  ): Promise<IUserNotificationLog> {
+    try {
+      const notificationLog = new userNotificationLogModel({
+        userId,
+        offerId: offerId ? new mongoose.Types.ObjectId(offerId) : null,
+        hotelCode,
+        title,
+        body,
+        data,
+        sentAt: new Date(),
+      });
+      const savedLog = await notificationLog.save();
+      console.log(`✅ Notification log saved for user ${userId}`);
+      return savedLog;
+    } catch (error) {
+      console.error('❌ Error saving notification log:', error);
+      throw new Error('Failed to save notification log');
+    }
+  }
+
+  /**
+   * Get notification logs for a specific user.
+   */
+  public async getNotificationLogsByUserId(userId: string): Promise<IUserNotificationLog[]> {
+    try {
+      const logs = await userNotificationLogModel.find({ userId }).lean();
+      return logs;
+    } catch (error) {
+      console.error(`❌ Error fetching notification logs for user ${userId}:`, error);
+      throw new Error('Failed to fetch notification logs');
     }
   }
 }
