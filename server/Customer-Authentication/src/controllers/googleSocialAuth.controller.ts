@@ -42,7 +42,7 @@ export class AuthController {
       const oauth2Client = new google.auth.OAuth2(
         config.googleClientId,
         config.googleClientSecret,
-        'http://localhost:3004'
+        `${process.env.GOOGLE_FRONTEND_CALLBACK_URL}`
       );
 
       const { tokens } = await oauth2Client.getToken(code);
