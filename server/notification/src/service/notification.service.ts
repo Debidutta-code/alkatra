@@ -12,9 +12,9 @@ const tokenDao = new TokenDao();
 
 export class NotificationService {
   static async sendPushNotification(payload: NotificationPayload): Promise<any> {
-      const fcmTokens = await tokenDao.getAllDeviceTokensForAllUsers();
-      
-      console.log(`🔔 Sending notification to ${fcmTokens} devices...`);
+    const fcmTokens = await tokenDao.getAllDeviceTokensForAllUsers();
+
+    console.log(`🔔 Sending notification to ${fcmTokens} devices...`);
 
     if (!fcmTokens.length) {
       console.warn('⚠️ No device tokens found to send notification');
@@ -31,7 +31,7 @@ export class NotificationService {
     };
 
     try {
-const response = await admin.messaging().sendEachForMulticast(message);
+      const response = await admin.messaging().sendEachForMulticast(message);
 
       console.log(`✅ Sent to ${response.successCount} devices; ${response.failureCount} failures`);
 
