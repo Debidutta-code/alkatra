@@ -9,6 +9,7 @@ import { RatePlanInterFace, DateRange, paginationTypes, modifiedRatePlanInterfac
 import toast, { Toaster } from 'react-hot-toast';
 import Pagination from "./components/Pagination"
 import { useSidebar } from '@src/components/ui/sidebar';
+import { cn } from '@src/lib/utils';
 // Pagination Component
 
 
@@ -22,7 +23,7 @@ const MapRatePlanPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [allRoomTypes, setAllRoomTypes] = useState<any[]>([]);
   const [roomTypesLoaded, setRoomTypesLoaded] = useState<boolean>(false);
-  const { state } = useSidebar(); // state: "collapsed" | "expanded"
+  const { state , isMobile } = useSidebar(); // state: "collapsed" | "expanded"
   const [paginationResults, setPaginationResults] = useState<paginationTypes>({
     currentPage: 1,
     totalPage: 10,
@@ -162,20 +163,18 @@ const MapRatePlanPage: React.FC = () => {
   const hasUnsavedChanges = modifiedValues.length > 0;
 
   return (
-<div
-  className={`
-    min-h-screen
-    transition-all duration-300
-    px-6 md:px-10
-    ${state === 'expanded' ? 'md:ml-[6.5rem] lg:ml-0' : 'md:ml-0 lg:ml-0'}
-  `}
-  style={{
-    height: 'calc(100vh - 100px)',
-  }}
+ <div
+  className={cn(
+    "flex flex-col min-h-screen transition-all overflow-x-hidden  duration-300",
+    !isMobile && state === "collapsed" && "md:overflow-x-hidden ",
+    !isMobile && state === "expanded" && ""
+  )}
 >
 
+
+
       <Toaster position="top-right" />
-      <div className="max-w-7xl mx-auto">
+<div className="w-full px-4 sm:px-6 md:px-8 ">
         {roomTypesLoaded && (
           <>
             <Filters

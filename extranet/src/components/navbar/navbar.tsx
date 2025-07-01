@@ -107,9 +107,10 @@ export default function Navbar() {
   return (
     <nav
       className={`md:h-[14vh] h-[12vh]  border-b px-8 ${noNav ? "hidden" : "flex items-center justify-between"
-        } ${open?"w-[78vw] ":"w-[100vw] sm:px-20 md:px-16 xl:px-24"}`}
+        } ${open?"w-[78vw] ":"w-full md:w-[100vw] sm:px- md:px-16 xl:px-24"}`}
     >
-      <div className={"flex  items-center"}>
+     <div className="flex justify-between w-full">
+       <div className={"flex  items-center"}>
         <NavbarSidebarToggle />
         {/* <Image className="md:block hidden" src={logoSrc} height={100} width={100} alt="Al Hajz" /> */}
       </div>
@@ -176,6 +177,7 @@ export default function Navbar() {
         </Menubar>
         {/* <ModeToggle /> */}
       </div>
+     </div>
     </nav>
   );
 }
