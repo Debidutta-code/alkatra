@@ -45,25 +45,26 @@ export const Filters: React.FC<FiltersProps> = ({
  
 
   {/* Title and Reset */}
-  <div className="flex flex-wrap items-center justify-between gap-4 mt-2 mb-4">
-     <div className="flex flex-wrap items-center justify-between gap-2">
+  <div className="flex flex-wrap  items-center justify-between gap-4 mt-2 mb-4">
+     <div className="flex flex-wrap w-full items-center justify-between gap-2">
     <Button
       variant="outline"
       onClick={() => router.back()}
-      className="px-4 py-2 text-gray-600 hover:text-tripswift-black border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-tripswift-medium"
+      className="px-3 py-2 text-gray-600 hover:text-tripswift-black border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-tripswift-medium"
     >
       <ArrowLeft className="mr-2 h-4 w-4" /> Back
     </Button>
-  </div>
     <h1 className="text-xl sm:text-2xl font-tripswift-bold text-tripswift-black">
       Rate and Inventory Allotment
     </h1>
     <button
       onClick={onResetFilters}
-      className="px-4 py-2 text-gray-600 hover:text-tripswift-black border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-tripswift-medium"
+      className="px-3 py-2 text-gray-600 hover:text-tripswift-black border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-tripswift-medium"
     >
       Reset Filters
     </button>
+  </div>
+    
   </div>
 
   {/* Filters Grid */}
