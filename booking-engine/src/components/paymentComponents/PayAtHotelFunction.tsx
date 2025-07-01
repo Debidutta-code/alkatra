@@ -9,6 +9,8 @@ import { Shield, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from '../../Redux/store';
 import { setGuestDetails } from '../../Redux/slices/pmsHotelCard.slice';
+import axios from 'axios';
+import { formatDate } from '@/utils/dateUtils';
 
 interface Guest {
   firstName: string;
@@ -41,8 +43,17 @@ interface PayAtHotelProps {
   };
 }
 
+const formatCurrency = (amount: string, currency: string = 'INR') => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(parseFloat(amount));
+};
+
 const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
-  const { t , i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const stripe = useStripe();
   const elements = useElements();
   const router = useRouter();
@@ -178,6 +189,26 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
       const bookingResponse = await confirmBookingWithStoredCard(bookingPayload, token);
       console.log("Booking response:", bookingResponse);
 
+      try {
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/send-sms`,
+          {
+            phone: bookingDetails.phone,
+            message: 
+`Your booking at ${bookingDetails.hotelName || "our hotel"} is confirmed!
+• Room Type: ${bookingDetails.roomType || "Standard"}
+• Rooms: ${bookingDetails.rooms || 1}
+• Check-in: ${formatDate(bookingDetails.checkIn)}
+• Check-out: ${formatDate(bookingDetails.checkOut)}
+• Total: ${formatCurrency(bookingDetails.amount, bookingDetails.currency)}`
+    },
+          { withCredentials: true }
+        );
+      } catch (smsError) {
+        console.error("Failed to send confirmation SMS:", smsError);
+        // Don't fail the booking process if SMS fails
+      }
+
       // Dispatch guest details to Redux
       dispatch(setGuestDetails({
         guests: bookingResponse?.savedBooking?.guests || bookingDetails.guests,
@@ -268,7 +299,7 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
       )}
 
       <div className="mb-6 flex items-start">
-        <Shield className={`h-5 w-5 text-tripswift-blue flex-shrink-0 mb-1.5 ${i18n.language === "ar"?"ml-2":"mr-2"}`} />
+        <Shield className={`h-5 w-5 text-tripswift-blue flex-shrink-0 mb-1.5 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
         <p className="text-xs text-tripswift-black/70">
           {t('Payment.PaymentComponents.PayAtHotelFunction.footer')}
         </p>
