@@ -185,7 +185,7 @@ const Page = () => {
     );
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <div className="min-h-screen bg-gradient-to-br md:mx-8 from-emerald-50 via-white to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
             {/* Header Section */}
             <div className="bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-700  top-0 z-10 backdrop-blur-lg">
                 <div className="max-w-7xl mx-auto sm:px-6 md:px-8 px-4 py-6">

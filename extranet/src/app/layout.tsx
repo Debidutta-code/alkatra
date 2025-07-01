@@ -66,7 +66,7 @@ export default function RootLayout({
         >
           <Providers>
             <SidebarProvider>
-              <div className="flex flex-col w-full md:px-4 lg:px-10 min-h-screen">       
+              <div className="flex flex-col w-full  min-h-screen">       
                 {children}
               </div>
               <Toaster

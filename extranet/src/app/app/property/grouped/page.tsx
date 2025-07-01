@@ -163,7 +163,7 @@ const Page = () => {
 
   return (
     
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gradient-to-br md:mx-8 from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       {/* Header Section */}
       <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 top-0 z-10 backdrop-blur-sm bg-white/95 dark:bg-gray-900/95">
         <div className="max-w-7xl mx-auto  px-4 sm:px-6 md:px-8  py-6">
@@ -184,36 +184,39 @@ const Page = () => {
               </div>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  placeholder="Search properties or groups..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 w-64 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              
-              <div className="flex gap-2 items-center  dark:bg-gray-800 rounded-lg p-1">
-                <Button
-                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('grid')}
-                  className="px-3"
-                >
-                  <Grid3X3 className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                  className="px-3 bg-gray-100"
-                >
-                  <List className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
+           <div className="flex flex-wrap items-center gap-3">
+  {/* Search Input */}
+  <div className="relative flex-grow min-w-[200px] sm:min-w-[250px]">
+    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+    <Input
+      placeholder="Search properties or groups..."
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      className="pl-10 w-full bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500"
+    />
+  </div>
+
+  {/* View Mode Toggle */}
+  <div className="flex gap-2 items-center dark:bg-gray-800 rounded-lg p-1">
+    <Button
+      variant={viewMode === 'grid' ? 'default' : 'ghost'}
+      size="sm"
+      onClick={() => setViewMode('grid')}
+      className="px-3"
+    >
+      <Grid3X3 className="w-4 h-4" />
+    </Button>
+    <Button
+      variant={viewMode === 'list' ? 'default' : 'ghost'}
+      size="sm"
+      onClick={() => setViewMode('list')}
+      className="px-3"
+    >
+      <List className="w-4 h-4" />
+    </Button>
+  </div>
+</div>
+
           </div>
         </div>
       </div>

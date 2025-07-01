@@ -122,7 +122,7 @@ export default function Navbar() {
   </div>
 
   {/* Right: Menus and Avatar */}
-  <div className="flex items-center md:pr-6 lg:pr-10  flex-wrap justify-end min-w-0">
+  <div className="flex items-center sm:gap-2 flex-wrap justify-end min-w-0">
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem>
