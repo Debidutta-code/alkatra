@@ -2,9 +2,11 @@
 import { Request, Response } from 'express';
 import { NotificationService } from '../service/notification.service';
 import { TokenDao } from '../dao/notification.dao';
+import { OfferModel } from '../model/hotelOffers.model';
+import { PropertyInfo } from '../../../Property_Management/src/model/property.info.model';
 
 export class NotificationController {
-    constructor(private notificationService: typeof NotificationService) { }
+  constructor(private notificationService: typeof NotificationService) { }
 
 
   /**
@@ -34,27 +36,92 @@ export class NotificationController {
       console.error('❌ Failed to send notification:', error);
       res.status(500).json({ message: 'Internal server error', error: error.message });
     }
-    };
+  };
 
-    public registerDeviceToken = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { userId, token, platform } = req.body;
+  public registerDeviceToken = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { userId, token, platform } = req.body;
 
-    if (!userId || !token || !platform) {
-      res.status(400).json({ message: 'userId, token, and platform are required.' });
-      return;
+      if (!userId || !token || !platform) {
+        res.status(400).json({ message: 'userId, token, and platform are required.' });
+        return;
+      }
+
+      const tokenDao = new TokenDao();
+      // ✅ Access TokenDao inside service
+      await tokenDao.saveOrUpdateToken(userId, token, platform);
+
+      res.status(200).json({ message: 'Device token registered successfully' });
+    } catch (error: any) {
+      console.error('❌ Failed to register device token:', error);
+      res.status(500).json({ message: 'Internal server error', error: error.message });
     }
+  };
 
-    const tokenDao = new TokenDao();
- // ✅ Access TokenDao inside service
-    await tokenDao.saveOrUpdateToken(userId, token, platform);
+  public createOffersAccordingToHotel = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { hotelCode, title, body, data } = req.body;
 
-    res.status(200).json({ message: 'Device token registered successfully' });
-  } catch (error: any) {
-    console.error('❌ Failed to register device token:', error);
-    res.status(500).json({ message: 'Internal server error', error: error.message });
-  }
-};
-    
+      if (!title || !body || !hotelCode) {
+        res.status(400).json({ message: 'Title, body, and hotel code are required.' });
+        return;
+      }
+
+      const propertyDetails = await PropertyInfo.findOne({ property_code : hotelCode });
+      if (!propertyDetails) {
+        res.status(400).json({ message: 'Defined hotel is not available' });
+        return;
+      }
+
+      const offer = new OfferModel({
+        hotelCode,
+        title,
+        body,
+        data,
+      });
+
+      const savedOffer = await offer.save();
+
+      res.status(201).json({
+        message: 'Offer created successfully',
+        offer: savedOffer,
+      });
+    } catch (error: any) {
+      console.error('❌ Error creating offer:', error);
+      res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+  };
+
+  public getOffersByHotelCode = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { hotelCode } = req.query;
+
+      if (!hotelCode) {
+        res.status(400).json({ message: 'Hotel code is required.' });
+        return;
+      }
+      
+      const propertyDetails = await PropertyInfo.findOne({ property_code : hotelCode });
+      if (!propertyDetails) {
+        res.status(400).json({ message: 'Defined hotel is not available' });
+        return;
+      }
+
+      const offers = await OfferModel.find({ hotelCode }).lean();
+
+      if (offers.length === 0) {
+        res.status(404).json({ message: 'No offers found for this hotel.' });
+        return;
+      }
+
+      res.status(200).json({
+        message: 'Offers fetched successfully',
+        offers,
+      });
+    } catch (error: any) {
+      console.error(`❌ Error fetching offers for hotel ${req.params.hotelCode}:`, error);
+      res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+  };
 
 }
