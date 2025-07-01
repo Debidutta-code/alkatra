@@ -109,7 +109,7 @@ export const googleLogin = createAsyncThunk<
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/google/auth/google`, { code },
         {
-          withCredentials: true,
+          // withCredentials: true,
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
