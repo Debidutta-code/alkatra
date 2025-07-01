@@ -81,7 +81,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       });
     },
     flow: "auth-code",
-    redirect_uri: "http://localhost:3004/auth/google/callback",
+    redirect_uri: "https://book.trip-swift.ai/auth/google/callback",
   });
 
   console.log("🟢 useGoogleLogin initialized with auth-code flow and redirect URI");
@@ -147,7 +147,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
               className="drop-shadow-lg"
             />
           </div>
-          <div className="bg-tripswift-off-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] overflow-hidden transition-all duration-300 hover:shadow-[0_20px_80px_rgba(7,109,179,0.07)]">
+          <div className="bg-tripswift-off-white items-center rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] overflow-hidden transition-all duration-300 hover:shadow-[0_20px_80px_rgba(7,109,179,0.07)]">
             <div className="h-2 bg-gradient-to-r from-tripswift-blue to-[#054B8F]"></div>
             <div className="px-10 py-6 rounded-t-xl">
               <h2 className="text-2xl font-tripswift-bold text-tripswift-black mb-2 tracking-tight">{title}</h2>
@@ -156,7 +156,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
             </div>
             <button
               onClick={() => googleLoginHook()}
-              className="w-full h-12 flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-lg px-4 mb-4 hover:bg-gray-50 transition-colors duration-200"
+              className="w-full h-14 flex items-center justify-center gap-3 rounded-lg px-4 mb-4"
             >
               <svg className="w-5 h-5" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" fill="#EA4335" />
@@ -165,7 +165,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                 <path d="M24 48c6.48 0 11.93-2.15 15.89-5.85l-7.98-6.19c-2.22 1.49-5.03 2.38-7.91 2.38-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" fill="#34A853" />
               </svg>
               <span className="text-tripswift-black font-tripswift-medium text-sm">
-                Sign in with Google
+                {t('Sign in with Google')}
               </span>
             </button>
             <div className="px-10 py-3 bg-tripswift-off-white/70 border-t border-gray-100 relative overflow-hidden">
