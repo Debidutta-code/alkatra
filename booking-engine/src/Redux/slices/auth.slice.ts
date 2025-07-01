@@ -100,48 +100,63 @@ export const googleLogin = createAsyncThunk<
   { token: string },
   { code: string },
   { dispatch: AppDispatch; state: RootState }
->("auth/googleLogin", async (data, { dispatch, rejectWithValue }) => {
-  try {
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/google/auth/google`,
-      { code: data.code },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-      }
-    );
-    console.log("Google login response:", response.data);
-    if (response.status !== 200) {
-      throw new Error(response.data.error || "Failed to login with Google");
-    }
+>(
+  "auth/googleLogin",
+  async ({ code }, { dispatch, rejectWithValue }) => {
+    try {
+      console.log("🌐 Sending auth code to backend:", code);
 
-    const { token } = response.data;
-    if (!token) {
-      throw new Error("No token received from Google login");
-    }
-
-    // Store token in cookies and localStorage
-    Cookies.set("accessToken", token);
-    localStorage.setItem("authToken", token);
-
-    // Dispatch setAccessToken to update Redux state
-    dispatch(setAccessToken(token));
-
-    // Fetch user data
-    await dispatch(getUser());
-
-    return { token };
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to login with Google"
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/google/auth/google`, { code },
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          
+        }
       );
+
+      console.log("✅ Google login response received:", response);
+
+      if (response.status !== 200) {
+        throw new Error(response.data.error || "Failed to login with Google");
+      }
+
+      const { token } = response.data;
+
+      if (!token) {
+        throw new Error("No token received from Google login");
+      }
+
+      console.log("🔑 Token received from backend:", token);
+
+      // Store token in cookies and localStorage
+      Cookies.set("accessToken", token);
+      localStorage.setItem("authToken", token);
+
+      // Update Redux state
+      dispatch(setAccessToken(token));
+
+      // Fetch and store user data
+      await dispatch(getUser());
+
+      return { token };
+    } catch (error) {
+      console.error("❌ Error in googleLogin thunk:", error);
+
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(
+          error.response?.data?.message || "Failed to login with Google"
+        );
+      }
+
+      return rejectWithValue("Failed to login with Google");
     }
-    return rejectWithValue("Failed to login with Google");
   }
-});
+);
+
 
 // Get user thunk
 export const getUser = createAsyncThunk<

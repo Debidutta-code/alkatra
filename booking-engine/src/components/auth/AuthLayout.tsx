@@ -39,23 +39,32 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
   const dispatch = useDispatch<AppDispatch>();
 
   const responseGoogle = async (authResult: any) => {
+    console.log("✅ Step 1: Entered responseGoogle");
     try {
+      console.log("🔍 Step 2: Received authResult:", authResult);
+
       if (authResult?.code) {
-        await dispatch(googleLogin({ code: authResult.code })).unwrap();
+        console.log("✅ Step 3: Auth code found:", authResult.code);
+
+        const result = await dispatch(googleLogin({ code: authResult.code })).unwrap();
+        console.log("✅ Step 4: Dispatch result:", result);
+
         toast.success(
           t("Auth.Google.successMessage") || "Successfully logged in with Google",
           { icon: "👋" }
         );
+
+        console.log("➡️ Step 5: Redirecting to home");
         router.push("/");
       } else {
-        console.error("Google login failed: No auth code received");
+        console.error("❌ Step 3: Google login failed - No auth code received");
         toast.error(
           t("Auth.Google.noCodeError") || "No authorization code received",
           { icon: "❌" }
         );
       }
     } catch (error) {
-      console.error("Google login error:", error);
+      console.error("❌ Step 4: Error during Google login dispatch:", error);
       toast.error(
         t("Auth.Google.errorMessage") || "An error occurred during Google login",
         { icon: "❌" }
@@ -66,7 +75,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
   const googleLoginHook = useGoogleLogin({
     onSuccess: responseGoogle,
     onError: (error) => {
-      console.error("Google login error:", error);
+      console.error("❌ Step 0: Google login failed in hook:", error);
       toast.error(t("Auth.Google.errorMessage") || "Google login failed", {
         icon: "❌",
       });
@@ -74,6 +83,9 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
     flow: "auth-code",
     redirect_uri: "http://localhost:3004/auth/google/callback",
   });
+
+  console.log("🟢 useGoogleLogin initialized with auth-code flow and redirect URI");
+
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gradient-to-br from-gray-50 to-tripswift-off-white font-noto-sans">
