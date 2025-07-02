@@ -3,7 +3,7 @@ import LoginForm from "./Login-form";
 
 export default function Login() {
   return (
-    <div className="flex flex-col lg:flex-row w-full min-h-screen">
+    <div className="flex  flex-col lg:flex-row w-full max-h-screen">
       {/* Background Image Section - Hidden on mobile, visible on lg+ */}
       <div 
         className="hidden lg:block lg:w-1/2 bg-[url('/assets/login-bg.jpg')] bg-cover bg-center"

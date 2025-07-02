@@ -6,20 +6,18 @@ import { Triangle } from "react-loader-spinner";
 import AppSidebar from "../../components/Sidebar";
 import { SidebarProvider, useSidebar } from "../../components/ui/sidebar";
 import { RootState, useSelector } from "../../redux/store";
-import { cn } from "../../lib/utils";
 
 function MainContent({ children }: { children: React.ReactNode }) {
   const { open, isMobile } = useSidebar();
 
   return (
     <div
-      className={cn(
-        "h-full w-full overflow-auto transition-all duration-300 overflow-x-hidden",
-        open && !isMobile && "w-[80vw] ml-[20vw]"
-      )}
+      className={`h-full  overflow-x-hidden transition-all duration-300 ${
+        open && !isMobile ? "ml-[220px]" : ""
+      }`}
     >
       <Navbar />
-      <div className="">{children}</div>
+      <div>{children}</div>
     </div>
   );
 }
@@ -40,7 +38,7 @@ export default function RootLayout({
   return (
     <CheckAuthentication setLoading={setLoading}>
       {loading ? (
-        <div className="h-screen w-[100vw] flex items-center justify-center">
+        <div className="h-screen w-screen flex items-center justify-center">
           <Triangle
             height="80"
             width="80"
@@ -51,13 +49,11 @@ export default function RootLayout({
         </div>
       ) : (
         <SidebarProvider>
-          <div className="flex h-screen max-w-[100vw]">
-            {/* Sidebar */}
+          <div className="relative min-h-screen w-full overflow-x-hidden">
+            {/* Sidebar only shown when open */}
             <AppSidebar role={currentUser?.role || "hotelManager"} />
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col overflow-hidden">
-              <MainContent>{children}</MainContent>
-            </div>
+            {/* Main content */}
+            <MainContent>{children}</MainContent>
           </div>
         </SidebarProvider>
       )}

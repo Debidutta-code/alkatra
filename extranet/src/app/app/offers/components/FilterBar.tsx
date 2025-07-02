@@ -51,7 +51,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         <h3 className="font-semibold text-gray-900">Filters</h3>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {/* Search */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -123,20 +123,20 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         </div>
 
         {/* Date Range */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 ">
           <input
             type="date"
             placeholder="Start Date"
             value={filters.dateRange.start}
             onChange={(e) => handleDateRangeChange('start', e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="flex-1 w-1/2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <input
             type="date"
             placeholder="End Date"
             value={filters.dateRange.end}
             onChange={(e) => handleDateRangeChange('end', e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="flex-1 w-1/2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
       </div>

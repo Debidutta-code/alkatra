@@ -173,33 +173,36 @@ export default function AppSidebar({ role }: { role?: string }) {
 
   return (
     <div className="">
-      <Sidebar className="border-r-2 border-gray-400">
-        <SidebarHeader className="border-b border-gray-200/60 dark:border-gray-800/60 h-[10vh] bg-gradient-to-r from-white via-gray-50/50 to-white dark:from-gray-900 dark:via-gray-800/50 dark:to-gray-900">
-          <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-3">
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg blur opacity-25 transition duration-200"></div>
-                <div className="relative bg-white dark:bg-gray-900 rounded-lg p-1">
-                  <div className="w-[100px] h-8 bg-gradient-to-r  rounded-md flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">        <Image src={"/assets/TRIP-1.png"} height={100} width={100} alt="Trip swift logo" />
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+      <Sidebar
+       className="border-r-2 border-gray-400">
+       <SidebarHeader className="border-b border-gray-200/60 dark:border-gray-800/60 h-[12vh] md:h-[14vh] bg-gradient-to-r from-white via-gray-50/50 to-white dark:from-gray-900 dark:via-gray-800/50 dark:to-gray-900">
+  <div className="flex items-center justify-between  px-3 h-full">
+    <div className="flex items-center gap-3">
+      <div className="w-auto max-w-[120px]  h-auto">
+        <Image
+          src  ="/assets/ALHAJZ.png"
+          alt="Al Hajz"
+          width={0}
+          height={0}
+          sizes="(max-width: 768px) 80px, 100px"
+          className="w-full h-auto object-contain"
+        />
+      </div>
+    </div>
 
-            {open && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleSidebar}
-                className="h-8 w-8 p-0 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors rounded-lg"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-        </SidebarHeader>
+    {open && (
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={toggleSidebar}
+        className="h-8 w-8 p-0 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors rounded-lg"
+      >
+        <X className="h-4 w-4" />
+      </Button>
+    )}
+  </div>
+</SidebarHeader>
+
 
         <SidebarContent className="bg-gradient-to-b from-white via-gray-50/30 to-white dark:from-gray-900 dark:via-gray-800/30 dark:to-gray-900 p-4">
           {/* Navigation Items */}
