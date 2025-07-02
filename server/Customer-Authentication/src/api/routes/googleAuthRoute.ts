@@ -4,7 +4,6 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { AuthService } from '../../services/googleAuthService';
 import { AuthController } from '../../controllers/googleSocialAuth.controller';
 import config from '../../../../Common_API/index';
-import { google } from 'googleapis';
 
 const router = Router();
 const authService = new AuthService();
