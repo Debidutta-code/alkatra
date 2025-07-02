@@ -9,7 +9,7 @@ interface IOffer {
 }
 
 const offerSchema = new Schema<IOffer>({
-  hotelCode: { type: String, required: true },
+  hotelCode: { type: String, required: false },
   title: { type: String, required: true },
   body: { type: String, required: true },
   data: { type: Map, of: String },

@@ -60,23 +60,16 @@ export class NotificationController {
     }
   };
 
-  public createOffersAccordingToHotel = async (req: Request, res: Response): Promise<void> => {
+  public createOffers = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { hotelCode, title, body, data } = req.body;
+      const { title, body, data } = req.body;
 
-      if (!title || !body || !hotelCode) {
-        res.status(400).json({ message: 'Title, body, and hotel code are required.' });
-        return;
-      }
-
-      const propertyDetails = await PropertyInfo.findOne({ property_code : hotelCode });
-      if (!propertyDetails) {
-        res.status(400).json({ message: 'Defined hotel is not available' });
+      if (!title || !body) {
+        res.status(400).json({ message: 'Title and body are required.' });
         return;
       }
 
       const offer = new OfferModel({
-        hotelCode,
         title,
         body,
         data,
@@ -94,25 +87,19 @@ export class NotificationController {
     }
   };
 
-  public getOffersByHotelCode = async (req: Request, res: Response): Promise<void> => {
+  public getOffersByNotificationId = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { hotelCode } = req.query;
+      const { id: notificationId } = req.params;
 
-      if (!hotelCode) {
-        res.status(400).json({ message: 'Hotel code is required.' });
-        return;
-      }
-      
-      const propertyDetails = await PropertyInfo.findOne({ property_code : hotelCode });
-      if (!propertyDetails) {
-        res.status(400).json({ message: 'Defined hotel is not available' });
+      if (!notificationId) {
+        res.status(400).json({ message: 'Notification id is required.' });
         return;
       }
 
-      const offers = await OfferModel.find({ hotelCode }).lean();
+      const offers = await OfferModel.find({ _id : notificationId }).lean();
 
       if (offers.length === 0) {
-        res.status(404).json({ message: 'No offers found for this hotel.' });
+        res.status(404).json({ message: 'No offers found.' });
         return;
       }
 
@@ -121,7 +108,7 @@ export class NotificationController {
         offers,
       });
     } catch (error: any) {
-      console.error(`❌ Error fetching offers for hotel ${req.params.hotelCode}:`, error);
+      console.error(`❌ Error fetching offers for ${req.params.notificationId}:`, error);
       res.status(500).json({ message: 'Internal server error', error: error.message });
     }
   };
