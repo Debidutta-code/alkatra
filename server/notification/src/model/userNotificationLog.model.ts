@@ -8,6 +8,7 @@ export interface IUserNotificationLog extends Document {
   body: string;
   data?: Record<string, string>;
   sentAt: Date;
+  markedAs: boolean;
 }
 
 const UserNotificationLogSchema: Schema = new Schema({
@@ -18,6 +19,7 @@ const UserNotificationLogSchema: Schema = new Schema({
   body: { type: String, required: true },
   data: { type: Map, of: String },
   sentAt: { type: Date, default: Date.now },
+  markedAs: { type: Boolean, default: false },
 });
 
 export default mongoose.model<IUserNotificationLog>('NotificationLog', UserNotificationLogSchema);

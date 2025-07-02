@@ -4,6 +4,8 @@ import { NotificationService } from '../service/notification.service';
 import { TokenDao } from '../dao/notification.dao';
 import { OfferModel } from '../model/hotelOffers.model';
 import { PropertyInfo } from '../../../Property_Management/src/model/property.info.model';
+import userNotificationLogModel from '../model/userNotificationLog.model';
+
 
 export class NotificationController {
   constructor(private notificationService: typeof NotificationService) { }
@@ -96,7 +98,7 @@ export class NotificationController {
         return;
       }
 
-      const offers = await OfferModel.find({ _id : notificationId }).lean();
+      const offers = await OfferModel.find({ _id: notificationId }).lean();
 
       if (offers.length === 0) {
         res.status(404).json({ message: 'No offers found.' });
@@ -144,4 +146,33 @@ export class NotificationController {
     }
   };
 
+  public notificationUpdateFromUserSide = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { userId, notificationId } = req.query;
+
+      if (!userId || !notificationId) {
+        res.status(400).json({ message: 'UserId and NotificationId are required and must be strings.' });
+        return;
+      }
+
+      const result = await userNotificationLogModel.findOneAndUpdate(
+        { userId, _id: notificationId },
+        { $set: { markedAs: true } },
+        { new: true }
+      );
+
+      if (!result) {
+        res.status(404).json({ message: 'Notification not found for the given user.' });
+        return;
+      }
+
+      res.status(200).json({
+        message: 'Notification marked as read successfully.',
+        updatedNotification: result
+      });
+    } catch (error: any) {
+      console.error(`❌ Error updating notification ${req.params.notificationId}:`, error);
+      res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+  };
 }
