@@ -15,6 +15,6 @@ router.post('/register-device-token', notificationController.registerDeviceToken
 router.route('/offer-by-hotel')
   .post(notificationController.createOffersAccordingToHotel)
   .get(notificationController.getOffersByHotelCode);
-router.get('/user-notifications-get', notificationController.getNotificationsByUserId);
+router.get('/user-notifications-get/:id', notificationController.getNotificationsByUserId);
 
 export default router;

@@ -131,7 +131,7 @@ export class NotificationController {
    */
   public getNotificationsByUserId = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { userId } = req.query;
+      const { id: userId } = req.params;
 
       if (!userId || typeof userId !== 'string') {
         res.status(400).json({ message: 'userId is required and must be a string.' });
