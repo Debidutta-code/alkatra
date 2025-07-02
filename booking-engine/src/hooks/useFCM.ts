@@ -4,28 +4,28 @@ import { useEffect } from 'react';
 import { getToken, onMessage } from 'firebase/messaging';
 import { messaging } from '../utils/firebase.config'; // Adjust the import path as needed
 
-const vapidKey =  process.env.NEXT_PUBLIC_VAPIDKEY as string; // from Firebase Console
+const vapidKey = process.env.NEXT_PUBLIC_VAPIDKEY as string; // from Firebase Console
 
 const useFCM = (userId?: string) => {
-    useEffect(() => {
-      
-        console.log('🔔 useFCM hook initialized with userId-----------------------------:', userId);
+  useEffect(() => {
+
+    console.log('🔔 useFCM hook initialized with userId-----------------------------:', userId);
     const setupFCM = async () => {
       try {
         const permission = await Notification.requestPermission();
         if (permission !== 'granted') {
           console.warn('🚫 Notification permission denied');
           return;
-          }
-          
-          console.log('✅ Notification permission granted',vapidKey);
+        }
 
-          if (!messaging) {
-            console.error("Firebase Messaging is not supported in this browser.");
-            return;
-}
+        console.log('✅ Notification permission granted', vapidKey);
 
-          const token = await getToken(messaging, { vapidKey });
+        if (!messaging) {
+          console.error("Firebase Messaging is not supported in this browser.");
+          return;
+        }
+
+        const token = await getToken(messaging, { vapidKey });
         console.log('🔑 FCM Token:', token);
 
         if (token) {
@@ -50,19 +50,19 @@ const useFCM = (userId?: string) => {
       }
     };
 
-        setupFCM();
+    setupFCM();
     console.log('✅ useFCM effect running, setting up onMessage...');
 
 
     // Optional: Handle incoming messages
     if (messaging) {
-  onMessage(messaging, (payload) => {
-    console.log('📩 Foreground message:', payload);
-    alert(payload.notification?.title);
-  });
-} else {
-  console.warn('❌ Firebase Messaging is not available (unsupported browser or not initialized)');
-}
+      onMessage(messaging, (payload) => {
+        console.log('📩 Foreground message:', payload);
+        // alert(payload.notification?.title);
+      });
+    } else {
+      console.warn('❌ Firebase Messaging is not available (unsupported browser or not initialized)');
+    }
   }, [userId]);
 };
 

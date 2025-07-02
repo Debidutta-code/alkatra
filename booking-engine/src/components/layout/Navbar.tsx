@@ -18,18 +18,25 @@ import { logout, getUser } from '@/Redux/slices/auth.slice';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
+
 // Define types
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
-import { jwtDecode } from 'jwt-decode';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 interface RootState {
   auth: {
     user: UserType | null;
   };
+  notifications: {
+    notifications: Notification[];
+    unreadCount: number;
+    isLoading: boolean;
+  };
 }
 
 interface UserType {
+  _id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -157,7 +164,7 @@ const Navbar: React.FC = () => {
               className="h-16 w-auto transform transition-transform group-hover:scale-110 duration-300" // Increased h-16 (64px) and hover scale to 110%
               priority
               style={{
-                maxHeight: '70px', 
+                maxHeight: '70px',
                 objectFit: 'contain',
                 objectPosition: 'left center',
               }}
@@ -218,7 +225,7 @@ const Navbar: React.FC = () => {
                     size="sm"
                     color="primary"
                     className="transition-transform bg-tripswift-blue text-tripswift-off-white"
-                    name={`${user.firstName} ${user.lastName}`} 
+                    name={`${user.firstName} ${user.lastName}`}
                     fallback={
                       <p className="text-lg font-tripswift-bold text-tripswift-off-white">
                         {user.firstName.charAt(0) + user.lastName.charAt(0)}
@@ -293,6 +300,12 @@ const Navbar: React.FC = () => {
               </button>
             </div>
           )}
+          {/* Notification Bell - Only show for logged-in users */}
+          {user && (
+            <div className="flex items-center py-2 rounded-full hover:bg-tripswift-blue/10 transition-all duration-300">
+              <NotificationBell className="relative" userId={user._id} />
+            </div>
+          )}
         </div>
       </div>
 
@@ -326,6 +339,13 @@ const Navbar: React.FC = () => {
                 {t('Navbar.myTrip')}
               </span>
             </div>
+
+            {/* Notification Bell - Mobile */}
+            {user && (
+              <div className="py-2">
+                <NotificationBell className="flex items-center gap-2" userId={user._id} />
+              </div>
+            )}
 
             {/* Auth Options */}
             {!user ? (
