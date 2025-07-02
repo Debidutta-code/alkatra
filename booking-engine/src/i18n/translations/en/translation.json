@@ -526,7 +526,8 @@
       "emailError": "Email is required.",
       "emailInvalidError": "Please enter a valid email address",
       "emailNotVerified": "Please verify your email",
-      "sendOtp": "Verify Email",
+      "verifyEmail": "Verify Email",
+      "verifyPhone": "Verify Phone",
       "verifyOtp": "Verify OTP",
       "otpPlaceholder": "Enter OTP",
       "otpExpiresIn": "Expires in",
@@ -537,6 +538,7 @@
       "otpInvalidError": "Invalid OTP",
       "otpVerifyError": "Error verifying OTP",
       "emailVerified": "Email verified successfully",
+      "phoneVerified":"Phone verified successfully",
       "phoneLabel": "Phone Number",
       "phonePlaceholder": "Enter phone number",
       "phoneInfo": "For booking-related notifications",
@@ -846,7 +848,7 @@
         "children": "Children",
         "infant": "Infant",
         "infants": "Infants",
-        "guest": "Guest"
+        "guest": "Primary Guest"
       },
       "paymentMethod": {
         "title": "Payment Method"
