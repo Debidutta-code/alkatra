@@ -5,6 +5,7 @@ import { Bell, X, Check, CheckCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 import Cookies from 'js-cookie';
+import axios from 'axios';
 
 interface NotificationBellProps {
   className?: string;
@@ -24,20 +25,11 @@ interface Notification {
 // API function to fetch notifications
 const fetchUserNotifications = async (userId: string): Promise<Notification[]> => {
   try {
-    const accessToken = Cookies.get('accessToken');
-    const response = await fetch(`http://localhost:8080/api/v1/notification/user-notifications-get/${userId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {}),
-      },
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/notification/user-notifications-get/${userId}`, {
+      
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
+    const data = response.data;
     // Handle different API response structures and map to Notification type
     const notifications = Array.isArray(data) ? data : data.notifications || [];
     
