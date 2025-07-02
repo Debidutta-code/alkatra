@@ -60,23 +60,14 @@ export class NotificationController {
     }
   };
 
-  public createOffersAccordingToHotel = async (req: Request, res: Response): Promise<void> => {
+  public createOffers = async (req: Request, res: Response): Promise<void> => {
     try {
-      // const { hotelCode, title, body, data } = req.body;
       const { title, body, data } = req.body;
 
-      // if (!title || !body || !hotelCode) {
       if (!title || !body) {
-        // res.status(400).json({ message: 'Title, body, and hotel code are required.' });
         res.status(400).json({ message: 'Title and body are required.' });
         return;
       }
-
-      // const propertyDetails = await PropertyInfo.findOne({ property_code : hotelCode });
-      // if (!propertyDetails) {
-      //   res.status(400).json({ message: 'Defined hotel is not available' });
-      //   return;
-      // }
 
       const offer = new OfferModel({
         title,
@@ -96,28 +87,18 @@ export class NotificationController {
     }
   };
 
-  public getOffersByHotelCode = async (req: Request, res: Response): Promise<void> => {
+  public getOffersByNotificationId = async (req: Request, res: Response): Promise<void> => {
     try {
-      // const { hotelCode } = req.query;
       const { id: notificationId } = req.params;
 
-      // if (!hotelCode) {
       if (!notificationId) {
-        // res.status(400).json({ message: 'Hotel code is required.' });
         res.status(400).json({ message: 'Notification id is required.' });
         return;
       }
-      
-      // const propertyDetails = await PropertyInfo.findOne({ property_code : hotelCode });
-      // if (!propertyDetails) {
-      //   res.status(400).json({ message: 'Defined hotel is not available' });
-      //   return;
-      // }
 
       const offers = await OfferModel.find({ _id : notificationId }).lean();
 
       if (offers.length === 0) {
-        // res.status(404).json({ message: 'No offers found for this hotel.' });
         res.status(404).json({ message: 'No offers found.' });
         return;
       }
