@@ -57,7 +57,7 @@ initializeExpressRoutes({ app }).then(async () => {
 })();
 
 // CORN job implemented to auto cancel
-cron.schedule("*/1 * * * *", async () => {
+cron.schedule("*/15 * * * *", async () => {
   try {
     const fortyMinutesAgo = new Date(Date.now() - 40 * 60 * 1000);
     const result = await CryptoPaymentDetails.updateMany(

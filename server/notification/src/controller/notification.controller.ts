@@ -4,6 +4,8 @@ import { NotificationService } from '../service/notification.service';
 import { TokenDao } from '../dao/notification.dao';
 import { OfferModel } from '../model/hotelOffers.model';
 import { PropertyInfo } from '../../../Property_Management/src/model/property.info.model';
+import userNotificationLogModel from '../model/userNotificationLog.model';
+
 
 export class NotificationController {
   constructor(private notificationService: typeof NotificationService) { }
@@ -25,6 +27,8 @@ export class NotificationController {
         title,
         body,
         data,
+        hotelCode: '',
+        offerId: null
       });
 
       res.status(200).json({
@@ -58,23 +62,16 @@ export class NotificationController {
     }
   };
 
-  public createOffersAccordingToHotel = async (req: Request, res: Response): Promise<void> => {
+  public createOffers = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { hotelCode, title, body, data } = req.body;
+      const { title, body, data } = req.body;
 
-      if (!title || !body || !hotelCode) {
-        res.status(400).json({ message: 'Title, body, and hotel code are required.' });
-        return;
-      }
-
-      const propertyDetails = await PropertyInfo.findOne({ property_code : hotelCode });
-      if (!propertyDetails) {
-        res.status(400).json({ message: 'Defined hotel is not available' });
+      if (!title || !body) {
+        res.status(400).json({ message: 'Title and body are required.' });
         return;
       }
 
       const offer = new OfferModel({
-        hotelCode,
         title,
         body,
         data,
@@ -92,25 +89,19 @@ export class NotificationController {
     }
   };
 
-  public getOffersByHotelCode = async (req: Request, res: Response): Promise<void> => {
+  public getOffersByNotificationId = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { hotelCode } = req.query;
+      const { id: notificationId } = req.params;
 
-      if (!hotelCode) {
-        res.status(400).json({ message: 'Hotel code is required.' });
-        return;
-      }
-      
-      const propertyDetails = await PropertyInfo.findOne({ property_code : hotelCode });
-      if (!propertyDetails) {
-        res.status(400).json({ message: 'Defined hotel is not available' });
+      if (!notificationId) {
+        res.status(400).json({ message: 'Notification id is required.' });
         return;
       }
 
-      const offers = await OfferModel.find({ hotelCode }).lean();
+      const offers = await OfferModel.find({ _id: notificationId }).lean();
 
       if (offers.length === 0) {
-        res.status(404).json({ message: 'No offers found for this hotel.' });
+        res.status(404).json({ message: 'No offers found.' });
         return;
       }
 
@@ -119,9 +110,69 @@ export class NotificationController {
         offers,
       });
     } catch (error: any) {
-      console.error(`❌ Error fetching offers for hotel ${req.params.hotelCode}:`, error);
+      console.error(`❌ Error fetching offers for ${req.params.notificationId}:`, error);
       res.status(500).json({ message: 'Internal server error', error: error.message });
     }
   };
 
+  /**
+   * Get notifications for a specific user by userId
+   */
+  public getNotificationsByUserId = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id: userId } = req.params;
+
+      if (!userId || typeof userId !== 'string') {
+        res.status(400).json({ message: 'userId is required and must be a string.' });
+        return;
+      }
+
+      const tokenDao = new TokenDao();
+      const notifications = await tokenDao.getNotificationLogsByUserId(userId);
+
+      if (notifications.length === 0) {
+        res.status(404).json({ message: 'No notifications found for this user.' });
+        return;
+      }
+
+      res.status(200).json({
+        message: 'Notifications fetched successfully',
+        notifications,
+        total: notifications.length,
+      });
+    } catch (error: any) {
+      console.error(`❌ Error fetching notifications for user ${req.query.userId}:`, error);
+      res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+  };
+
+  public notificationUpdateFromUserSide = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { userId, notificationId } = req.query;
+
+      if (!userId || !notificationId) {
+        res.status(400).json({ message: 'UserId and NotificationId are required and must be strings.' });
+        return;
+      }
+
+      const result = await userNotificationLogModel.findOneAndUpdate(
+        { userId, _id: notificationId },
+        { $set: { markedAs: true } },
+        { new: true }
+      );
+
+      if (!result) {
+        res.status(404).json({ message: 'Notification not found for the given user.' });
+        return;
+      }
+
+      res.status(200).json({
+        message: 'Notification marked as read successfully.',
+        updatedNotification: result
+      });
+    } catch (error: any) {
+      console.error(`❌ Error updating notification ${req.params.notificationId}:`, error);
+      res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+  };
 }

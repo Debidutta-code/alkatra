@@ -50,7 +50,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         console.log("✅ Step 4: Dispatch result:", result);
 
         toast.success(
-          t("Auth.Google.successMessage") || "Successfully logged in with Google",
+          t("Successfully logged in"),
           { icon: "👋" }
         );
 
@@ -59,14 +59,14 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       } else {
         console.error("❌ Step 3: Google login failed - No auth code received");
         toast.error(
-          t("Auth.Google.noCodeError") || "No authorization code received",
+          t("No authorization code received"),
           { icon: "❌" }
         );
       }
     } catch (error) {
       console.error("❌ Step 4: Error during Google login dispatch:", error);
       toast.error(
-        t("Auth.Google.errorMessage") || "An error occurred during Google login",
+        t("An error occurred during Google login"),
         { icon: "❌" }
       );
     }

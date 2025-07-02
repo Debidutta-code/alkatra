@@ -4,7 +4,6 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { AuthService } from '../../services/googleAuthService';
 import { AuthController } from '../../controllers/googleSocialAuth.controller';
 import config from '../../../../Common_API/index';
-import { google } from 'googleapis';
 
 const router = Router();
 const authService = new AuthService();
@@ -23,7 +22,7 @@ if (!config.googleClientId || !config.googleClientSecret || !config.googleFronte
 passport.use(new GoogleStrategy({
   clientID: config.googleClientId,
   clientSecret: config.googleClientSecret,
-  callbackURL: 'http://localhost:8080/api/v1/google/auth/google/callback',
+  callbackURL: `${process.env.GOOGLE_CALLBACK_URL}/google/auth/google/callback`,
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     console.log('Google profile received:', {
@@ -54,10 +53,9 @@ passport.deserializeUser(async (id: string, done) => {
   }
 });
 
-// Routes
-// router.post('/auth/google', authController.postGoogleAuthData);
-router.post('/auth/google', authController.postGoogleAuthData.bind(authController));
 
+router.post('/auth/google', authController.postGoogleAuthData.bind(authController));
+// router.post('/mobile/google', authController.postMobileAuthData.bind(authController));
 
 router.get('/auth/google', (req, res, next) => {
   console.log('🔔 /auth/google route called for:', req.originalUrl);

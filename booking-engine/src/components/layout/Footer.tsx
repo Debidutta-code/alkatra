@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import React from "react";
-import img from "../assets/TRIP-1.png"; // Ensure this path is correct
+import img from "../assets/TRIP-1.png";
 import { usePathname } from "next/navigation";
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { useTranslation } from "react-i18next";
