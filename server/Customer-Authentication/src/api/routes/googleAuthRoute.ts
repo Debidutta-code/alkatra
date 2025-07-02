@@ -23,7 +23,7 @@ if (!config.googleClientId || !config.googleClientSecret || !config.googleFronte
 passport.use(new GoogleStrategy({
   clientID: config.googleClientId,
   clientSecret: config.googleClientSecret,
-  callbackURL: 'http://localhost:8080/api/v1/google/auth/google/callback',
+  callbackURL: `${process.env.GOOGLE_CALLBACK_URL}/google/auth/google/callback`,
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     console.log('Google profile received:', {
