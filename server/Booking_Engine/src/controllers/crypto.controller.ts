@@ -301,7 +301,7 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
       ageCodeSummary: ageCodeCount,
       numberOfRooms,
       totalAmount: roomTotalPrice,
-      currencyCode,
+      // currencyCode,
       userId,
       status: "Processing",
       createdAt: new Date(),
@@ -329,7 +329,6 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
 
 export const pushCryptoPaymentDetails = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    console.log("Entering into push crypto payment details");
     const { senderWalletAddress, token, blockChain, amount, txHash } = req.body;
     console.log("Received data:", { token, blockChain, amount, txHash });
     const requiredFields = { token, blockChain, amount, txHash };
@@ -343,26 +342,34 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
         message: `Missing required fields: ${missingFields.join(", ")}`,
       });
     }
-
-    const paymentAmount = await CryptoPaymentDetails.findOne({
-      amount: amount
+    const cryptoPaymentLog = new CryptoPaymentLog({
+      token,
+      blockchain: blockChain,
+      amount: parseFloat(amount),
+      txHash,
+      senderWalletAddress,
     });
-    console.log("----------11111111111111111111-------------------------", paymentAmount)
+   
+    console.log(">>>>>>>> CryptoPaymentLog:", cryptoPaymentLog,"parsedamount is ", parseFloat(amount));
+
+    await cryptoPaymentLog.save();
 
     const payment = await CryptoPaymentDetails.findOne({
-      amount: amount,
+      token,
+      blockchain: blockChain,
+      amount: parseFloat(amount),
       status: "Pending",
     });
-    console.log("----------111111111.1.1.1.1.1.1.1.1.-------------------------", payment)
+
     if (payment) {
       await notification.sendCryptoPaymentNotification(payment.customer_id.toString(), parseFloat(amount), txHash)
       console.log("----------11111111111111111111-------------------------")
     }
+
     const guestDetails = await CryptoGuestDetails.findOne({
-      totalAmount: amount,
-      status: "Processing"
+      totalAmount: parseFloat(amount),
+      status: "Processing",
     });
-    console.log("----------2222222222222222222222-------------------------", guestDetails);
 
     if (!payment) {
       return res.status(404).json({
@@ -382,20 +389,8 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
     (payment as any).senderWalletAddress = senderWalletAddress;
     (guestDetails as any).txHash = txHash;
     (guestDetails as any).senderWalletAddress = senderWalletAddress;
-
-
-
     await payment.save();
     await guestDetails.save();
-
-    const cryptoPaymentLog = new CryptoPaymentLog({
-      token,
-      blockchain: blockChain,
-      amount: parseFloat(amount),
-      txHash,
-      senderWalletAddress,
-    });
-    await cryptoPaymentLog.save();
 
     await createReservationWithCryptoPayment({
       reservationId: guestDetails.reservationId,

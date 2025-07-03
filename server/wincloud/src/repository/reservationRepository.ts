@@ -26,7 +26,7 @@ export class ThirdPartyReservationRepository {
       currencyCode: data.currencyCode,
       status: 'Confirmed',
     });
-
+    console.log(`The currency code in WINCLOUD Repository ${booking.currencyCode}`)
     const savedBooking = await booking.save();
 
     await this.logReservationAttempt(

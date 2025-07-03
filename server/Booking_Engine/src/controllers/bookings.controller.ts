@@ -393,6 +393,8 @@ export async function createReservationWithCryptoPayment(input: {
       guests,
     } = input;
 
+    console.log(`BOOKING Controller, crypto booking begins ${currencyCode} ${roomTotalPrice}`)
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const checkIn = new Date(checkInDate);
