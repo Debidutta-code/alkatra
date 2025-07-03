@@ -102,11 +102,6 @@ const PaymentProgressPage: React.FC = () => {
                         parsedData.status
                     ) {
                         setPaymentData(parsedData);
-                        if (parsedData.paymentOption && parsedData.paymentOption === "payWithCrypto-payWithWallet") {
-                            setHasPaymentWithWallet(true); 
-                        } else {
-                            setHasPaymentWithWallet(false); 
-                        }
                     } else {
                         setError(t("PayWithCryptoQR.errors.invalidPaymentData"));
                     }
@@ -206,56 +201,6 @@ const PaymentProgressPage: React.FC = () => {
         );
     }
 
-    const handleNetworkSelect = (chainId:number) => {
-     
-        switchChain({ chainId: Number(chainId) });
-      };
-    
-
-const payWithWallet = async () => {
-  if (!walletClient) {
-    toast.error("Please connect your wallet first.");
-    return;
-  }
-
-  if (
-    paymentData &&
-    paymentData.blockchain &&
-    paymentData.token &&
-    paymentData.amount &&
-    paymentData.address &&
-    contaractAddress
-  ) {
-    try {
-      setWalletPaymentProgressStatus(true);
-      const receipt = await sendToken(
-        walletClient,
-        paymentData.blockchain,
-        paymentData.token,
-        paymentData.amount,
-        paymentData.address,
-        chainId,
-        selectedChainId,
-        contaractAddress
-      );
-      console.log("Transaction receipt:", receipt);
-      if (receipt){
-        checkPaymentStatus();
-        setShowWalletTransactionPopup(true);
-
-      }
-      return receipt;
-    } catch (error) {
-      
-    } finally {
-        setWalletPaymentProgressStatus(false);
-    }
-  } else {
-    toast.error("Missing required payment details.");
-  }
-};
-
-    
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8] font-noto-sans">
             <div className="container mx-auto px-4 py-4">
