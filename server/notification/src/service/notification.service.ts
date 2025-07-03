@@ -87,5 +87,33 @@ export class NotificationService {
       console.error('❌ Error sending push notification:', error);
       throw new Error('Failed to send push notification');
     }
-  }
+    }
+    
+    static async sendCryptoPaymentNotification(userId: string, amount: number, txId?: string): Promise<any> {
+
+        console.log(`🔔 Sending crypto payment notification to user ${userId} for amount ${amount} USDT`);
+      const userTokens = await tokenDao.getDeviceTokensByUserId(userId);
+      if (!userTokens.length) {
+        console.warn(`⚠️ No device tokens found for user ${userId}`);
+        return { successCount: 0, failureCount: 0 };
+      }
+
+       const message: admin.messaging.MulticastMessage = {
+      data: {
+        type: 'CRYPTO_PAYMENT_CONFIRMED',
+        userId,
+        amount: amount.toString(),
+        txId: txId || '',
+        message: `Your crypto payment of ${amount} USDT has been confirmed.`,
+      },
+      tokens: userTokens,
+    };
+
+      try {
+        const response = await admin.messaging().sendEachForMulticast(message);
+        console.log(`✅ Sent crypto payment notification to ${response.successCount} devices`);
+      } catch (error) {
+        console.error('❌ Error sending crypto payment notification:', error);
+      }
+    }
 }

@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { getToken, onMessage } from 'firebase/messaging';
 import { messaging } from '../utils/firebase.config'; // Adjust the import path as needed
+import toast from 'react-hot-toast';
 
 const vapidKey = process.env.NEXT_PUBLIC_VAPIDKEY as string; // from Firebase Console
 
@@ -58,7 +59,11 @@ const useFCM = (userId?: string) => {
     if (messaging) {
       onMessage(messaging, (payload) => {
         console.log('📩 Foreground message:', payload);
-        // alert(payload.notification?.title);
+        toast.success(`New Notification Received: ${payload.notification?.title}`, {
+            duration: 7000,
+            icon: '🔔',
+        //   position: 'top-right',
+        });
       });
     } else {
       console.warn('❌ Firebase Messaging is not available (unsupported browser or not initialized)');
