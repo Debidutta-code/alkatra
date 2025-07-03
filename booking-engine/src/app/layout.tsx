@@ -31,7 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={nunito.className}>
         <Providers>
-           <FCMInitializer />
+          <FCMInitializer />
           <Navbar />
           {children}
           <Footer />

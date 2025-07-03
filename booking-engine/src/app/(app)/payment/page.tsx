@@ -128,7 +128,9 @@ function PaymentPageContent() {
     adults,
     children,
     infants,
-    guests
+    guests,
+    paymentOption
+    
   };
   console.log("Booking details:", JSON.stringify(bookingDetails, null, 2));
 
@@ -324,7 +326,7 @@ function PaymentPageContent() {
                             <PayAtHotelFunction bookingDetails={bookingDetails} />
                           </Elements>
                         ) : paymentOption === "payWithCrypto-payWithWallet" ? (
-                          <PayWithCryptoWallet bookingDetails={bookingDetails} />
+                          <PayWithCryptoWallet bookingDetails={bookingDetails} onConvertedAmountChange={setConvertedAmount}/>
                         ) : paymentOption === "payWithCrypto-payWithQR" ? (
                           <PayWithCryptoQR
                             bookingDetails={bookingDetails}

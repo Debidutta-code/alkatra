@@ -4,7 +4,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { format, differenceInYears } from "date-fns";
+import { format, differenceInYears, set } from "date-fns";
 import axios from "axios";
 import Cookies from "js-cookie";
 // ... other imports
@@ -19,9 +19,14 @@ import {
     Shield,
     ExternalLink,
     RefreshCw,
-    Loader2
+    Loader2,
+    Loader
 } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useWalletClient,useChainId } from "wagmi";
+import { sendToken } from "./metamaskServices";
+import toast from "react-hot-toast";
 
 interface PaymentData {
     token: string;
@@ -41,6 +46,7 @@ interface PaymentData {
     email?: string;
     phone?: string;
     guests?: any;
+    paymentOption?: string;
 }
 
 const PaymentProgressPage: React.FC = () => {
@@ -52,7 +58,13 @@ const PaymentProgressPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [timeElapsed, setTimeElapsed] = useState(0);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
-
+    const [hasPaymentWithWallet, setHasPaymentWithWallet] = useState(false); 
+    const [selectedChainId, setSelectedChainId] = useState<number | null>(null);
+    const [contaractAddress,setContractAddress] = useState<string | null>(null);
+    const { data: walletClient } = useWalletClient();
+    const chainId = useChainId();
+    const [walletPaymentProgressStatus, setWalletPaymentProgressStatus] = useState(false);
+    const[showWalletTransactionPopup,setShowWalletTransactionPopup]=useState(false);
 
     // Timer for tracking payment time
     useEffect(() => {
@@ -87,6 +99,11 @@ const PaymentProgressPage: React.FC = () => {
                         parsedData.status
                     ) {
                         setPaymentData(parsedData);
+                        if (parsedData.paymentOption && parsedData.paymentOption === "payWithCrypto-payWithWallet") {
+                            setHasPaymentWithWallet(true); 
+                        } else {
+                            setHasPaymentWithWallet(false); 
+                        }
                     } else {
                         setError(t("PayWithCryptoQR.errors.invalidPaymentData"));
                     }
@@ -101,6 +118,19 @@ const PaymentProgressPage: React.FC = () => {
 
         return () => clearTimeout(timer);
     }, [t]);
+
+   useEffect(() => {
+    const storedChainId = localStorage.getItem("selectedChainId");
+    const storedContractAddress = localStorage.getItem("contractAddress");
+    // console.log("Stored value:", storedChainId);
+
+    if (storedChainId) {
+      setSelectedChainId(Number(storedChainId));
+    }
+    if(storedContractAddress){
+        setContractAddress(storedContractAddress);
+    }
+  }, []);
 
 
     const successTimeoutRef = useRef<NodeJS.Timeout>();
@@ -163,6 +193,105 @@ const PaymentProgressPage: React.FC = () => {
         };
     }, [paymentData?.payment_id, paymentData?.amount, paymentData?.status, t, router]);
 
+
+
+     
+    
+    // api call for paymment status in wallet payment section
+        const checkPaymentStatus = async () => {
+            if (!paymentData?.payment_id || paymentData.status === "completed" ) return;
+            
+            try {
+                const token = Cookies.get("accessToken");
+                if (!token) {
+                    setError(t("PayWithCryptoQR.errors.noAuthToken"));
+                    return;
+                }
+                const response = await axios.get(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/crypto/get-payment-status?paymentId=${paymentData.payment_id}&amount=${paymentData.amount}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                if (response.status === 200 && response.data.message === "Payment confirmed successfully") {
+                    setPaymentData((prev) => prev ? { ...prev, status: "completed" } : prev);
+                    setShowWalletTransactionPopup(false);
+                    setShowSuccessModal(true);                   
+
+                    // Set new timeout
+                    successTimeoutRef.current = setTimeout(() => {
+                        console.log("Executing redirect to /my-trip");
+                        localStorage.removeItem("paymentData");
+                        router.replace("/my-trip"); 
+                    }, 3000);
+                    return;
+                }
+            } catch (err) {
+                console.error("Payment status check failed:", err);
+            }
+            setTimeout(checkPaymentStatus,10000);
+        };
+
+
+        // const checkPaymentStatus = async () => {
+        //     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>1>",paymentData?.status)
+        //     if (!paymentData?.payment_id || paymentData.status === "completed" ) return;
+            
+        //     try {
+        //         const token = Cookies.get("accessToken");
+        //         if (!token) {
+        //             setError(t("PayWithCryptoQR.errors.noAuthToken"));
+        //             return;
+        //         }
+        //         console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2")
+        //         // const response = await axios.get(
+        //         //     `${process.env.NEXT_PUBLIC_BACKEND_URL}/crypto/get-payment-status?paymentId=${paymentData.payment_id}&amount=${paymentData.amount}`,
+        //         //     {
+        //         //         headers: {
+        //         //             Authorization: `Bearer ${token}`,
+        //         //             "Content-Type": "application/json",
+        //         //         },
+        //         //     }
+        //         // );
+                
+        //         const status = 200;
+        //         const message ="Payment confirmed successfully"
+        //         // console.log("✅ Raw Axios response:", response);
+        //         console.log("✅ Response status:", status);
+        //         console.log("✅ Response message:", message);
+
+
+        //         if (status === 200 && message === "Payment confirmed successfully") {
+        //             setPaymentData((prev) => prev ? { ...prev, status: "completed" } : prev);
+        //             console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>3",message)
+        //             setShowWalletTransactionPopup(false);
+        //             setShowSuccessModal(true);                   
+
+        //             // Set new timeout
+        //             successTimeoutRef.current = setTimeout(() => {
+        //                 console.log("Executing redirect to /my-trip");
+        //                 localStorage.removeItem("paymentData");
+        //                 router.replace("/my-trip"); 
+        //             }, 3000);
+        //             return;
+        //         }
+        //     } catch (err) {
+        //         console.error("Payment status check failed:", err);
+        //     }
+        //     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>4")
+        //     setTimeout(checkPaymentStatus,10000);
+        // };
+
+
+        
+
+
+
+    
     // Handle copy address
     const handleCopyAddress = async () => {
         if (!paymentData?.address) return;
@@ -260,6 +389,52 @@ const PaymentProgressPage: React.FC = () => {
         );
     }
 
+    
+
+const payWithWallet = async () => {
+  if (!walletClient) {
+    toast.error("Please connect your wallet first.");
+    return;
+  }
+
+  if (
+    paymentData &&
+    paymentData.blockchain &&
+    paymentData.token &&
+    paymentData.amount &&
+    paymentData.address &&
+    contaractAddress
+  ) {
+    try {
+      setWalletPaymentProgressStatus(true);
+      const receipt = await sendToken(
+        walletClient,
+        paymentData.blockchain,
+        paymentData.token,
+        paymentData.amount,
+        paymentData.address,
+        chainId,
+        selectedChainId,
+        contaractAddress
+      );
+      console.log("Transaction receipt:", receipt);
+      if (receipt){
+        checkPaymentStatus();
+        setShowWalletTransactionPopup(true);
+
+      }
+      return receipt;
+    } catch (error) {
+      
+    } finally {
+        setWalletPaymentProgressStatus(false);
+    }
+  } else {
+    toast.error("Missing required payment details.");
+  }
+};
+
+    
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8] font-noto-sans">
             <div className="container mx-auto px-4 py-4">
@@ -288,9 +463,9 @@ const PaymentProgressPage: React.FC = () => {
                         (
                             <div className="grid lg:grid-cols-3 gap-8">
                                 {/* Existing payment and QR code columns */}
-                                <div className="lg:col-span-1 space-y-6">
+                                <div className="lg:col-span-1 space-y-6 xs:w-fit sm:w-fit md:w-auto">
                                     {/* Payment Details Card */}
-                                    <div className="bg-tripswift-off-white rounded-xl shadow-md overflow-hidden">
+                                    <div className="bg-tripswift-off-white rounded-xl shadow-md overflow-hidden ">
                                         <div className="bg-tripswift-blue p-4 text-tripswift-off-white">
                                             <h2 className="font-tripswift-medium text-lg flex items-center gap-2">
                                                 <Wallet className="w-5 h-5" />
@@ -497,174 +672,89 @@ const PaymentProgressPage: React.FC = () => {
                                     </div>
                                 </div>
 
-                                {/* Right Column - QR Code */}
-                                <div className="lg:col-span-2">
+                                {/* Right Column - wallet pay Code */}
+                                {hasPaymentWithWallet ? (
+                                    <div className="lg:col-span-2 w-full">
                                     {/* QR Code Card */}
                                     <div className="bg-tripswift-off-white rounded-xl shadow-md overflow-hidden">
                                         <div className="bg-tripswift-blue p-4 text-tripswift-off-white">
                                             <h2 className="font-tripswift-medium text-lg flex items-center gap-2">
-                                                <QrCode className="w-5 h-5" />
-                                                Scan & Pay
+                                                <Wallet className="w-5 h-5" />
+                                                Pay through Wallet
                                             </h2>
                                         </div>
-                                        <div className="p-6">
-                                            <div className="grid md:grid-cols-2 gap-8">
-                                                {/* QR Code */}
-                                                <div className="text-center">
-                                                    <div className="from-gray-50 to-gray-100 rounded-xl p-2">
-                                                        <div className="inline-block bg-tripswift-off-white p-3 rounded-xl shadow-md">
-                                                            <QRCodeCanvas
-                                                                value={paymentData?.address || ""}
-                                                                size={140}
-                                                                style={{ width: "100%", height: "100%" }}
-                                                                bgColor="#ffffff"
-                                                                fgColor="#1e293b"
-                                                                level="H"
-                                                                includeMargin={true}
-                                                            />
-                                                        </div>
-                                                        <p className="text-xs text-tripswift-black/60 mt-2">Scan with your crypto wallet</p>
-                                                    </div>
-
-                                                    <div className="bg-tripswift-off-white rounded-xl shadow-md overflow-hidden sticky top-6">
-                                                        <div className="p-4 space-y-4">
-                                                            {/* Status Badge with expiration check */}
-                                                            <div className="text-center">
-                                                                <div
-                                                                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${timeElapsed <= 0 ? "bg-red-50 border-red-200 text-red-600" : getStatusConfig(paymentData.status).bgColor
-                                                                        } ${timeElapsed <= 0 ? "border-red-200" : getStatusConfig(paymentData.status).borderColor} border-2`}
-                                                                >
-                                                                    {timeElapsed <= 0 ? (
-                                                                        <AlertCircle className="w-4 h-4 text-red-600" />
-                                                                    ) : (
-                                                                        getStatusConfig(paymentData.status).icon
-                                                                    )}
-                                                                    <span
-                                                                        className={`font-tripswift-bold ${timeElapsed <= 0 ? "text-red-600" : getStatusConfig(paymentData.status).color}`}
-                                                                    >
-                                                                        {timeElapsed <= 0 ? "Payment Expired" : getStatusConfig(paymentData.status).text}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-
-                                                            {/* Timer with expiration warning */}
-                                                            <div className="text-center">
-                                                                <div className={`text-xl font-tripswift-bold ${timeElapsed <= 0 ? "text-red-600" : "text-tripswift-black"}`}>
-                                                                    {formatTime(timeElapsed)}
-                                                                    {timeElapsed <= 0 && <span className="text-xs block mt-1">(Session expired)</span>}
-                                                                    {timeElapsed <= 100 && timeElapsed > 0 && (
-                                                                        <span className="text-xs block mt-1 text-yellow-600">(Expiring soon)</span>
-                                                                    )}
-                                                                </div>
-                                                                <p className="text-xs text-tripswift-black/60">
-                                                                    {timeElapsed <= 0 ? "Maximum time reached" : "Time remaining"}
-                                                                </p>
-                                                            </div>
-
-                                                            {/* Quick Actions */}
-                                                            <div className="space-y-2">
-                                                                {timeElapsed > 0 ? (
-                                                                    <button
-                                                                        onClick={handleRefresh}
-                                                                        className="w-full flex items-center justify-center gap-1 py-2 px-3 bg-tripswift-blue/10 text-tripswift-blue rounded-lg hover:bg-tripswift-blue/20 transition-all duration-300 font-tripswift-medium text-sm"
-                                                                        aria-label="Check payment status"
-                                                                    >
-                                                                        <RefreshCw className="w-3 h-3" />
-                                                                        Check Status
-                                                                    </button>
-                                                                ) : (
-                                                                    <button
-                                                                        onClick={checkBooking}
-                                                                        className="w-full flex items-center justify-center gap-1 py-2 px-3 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-all duration-300 font-tripswift-medium text-sm"
-                                                                        aria-label="Check booking details"
-                                                                    >
-                                                                        <ArrowLeft className="w-3 h-3" />
-                                                                        Check Booking
-                                                                    </button>
-                                                                )}
-
-                                                                <div className="flex items-center gap-1 p-2 bg-green-50 border border-green-200 rounded-lg text-sm">
-                                                                    <Shield className="w-3 h-3 text-green-600" />
-                                                                    <span className="text-green-700 font-tripswift-medium">
-                                                                        {timeElapsed <= 0 ? "Session expired" : "Secure Payment"}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {/* Address & Instructions */}
+                                        <div className="p-4 sm:p-6">
+                                            <div><ConnectButton /></div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 sm:p-5">
+                                                {/* Address and pay button */}
                                                 <div className="space-y-4">
-                                                    <div className="p-4 bg-gray-50 rounded-xl">
-                                                        <label className="text-tripswift-black/70 font-tripswift-medium block mb-2">Wallet Address</label>
-                                                        <div className="flex items-center gap-2">
-                                                            <code className="flex-1 text-sm text-tripswift-black/80 bg-tripswift-off-white px-3 py-2 rounded-lg font-mono break-all border">
-                                                                {paymentData?.address || "Loading address..."}
-                                                            </code>
-                                                            <button
-                                                                onClick={handleCopyAddress}
-                                                                className={`p-2 rounded-lg transition-all ${copied ? "bg-green-100 text-green-600" : "bg-gray-200 text-tripswift-black/60 hover:bg-gray-300"
-                                                                    }`}
-                                                                title="Copy address"
+                                                <span className="text-tripswift-black/70 text-sm sm:text-base block mb-2">
+                                                            Send {paymentData.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {paymentData.token} on {paymentData.blockchain} to {paymentData?.address || "Loading address..."}
+                                                        </span>
+                                
+                                                    {/* Pay button */}
+                                                    <div className="text-center">
+                                                        {walletPaymentProgressStatus ? (
+                                                            <button 
+                                                                type="button" 
+                                                                className="w-full sm:w-auto text-white bg-tripswift-blue font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                                                             >
-                                                                {copied ? <CheckCircle className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+                                                                Processing...
                                                             </button>
-                                                        </div>
-                                                        {copied && (
-                                                            <p className="text-green-600 text-sm mt-2 font-tripswift-medium">✓ Address copied to clipboard!</p>
+                                                        ) : (
+                                                            <button 
+                                                                onClick={payWithWallet}
+                                                                type="button" 
+                                                                className="w-full sm:w-auto text-white bg-tripswift-blue font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                                                            >
+                                                                Click to pay
+                                                            </button>
                                                         )}
                                                     </div>
-
-                                                    {/* Instructions */}
-                                                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                                                        <h3 className="font-tripswift-bold text-blue-800 mb-3 flex items-center gap-2">
-                                                            <AlertCircle className="w-4 h-4" />
-                                                            Payment Instructions
-                                                        </h3>
-                                                        <ul className="text-blue-700 text-sm space-y-2">
-                                                            <li className="flex items-start gap-2">
-                                                                <span className="font-tripswift-bold">1.</span>
-                                                                <span>Send exactly <strong>${paymentData.amount}</strong> worth of <strong>{paymentData.token}</strong></span>
-                                                            </li>
-                                                            <li className="flex items-start gap-2">
-                                                                <span className="font-tripswift-bold">2.</span>
-                                                                <span>Use the <strong>{paymentData.blockchain}</strong> network only</span>
-                                                            </li>
-                                                            <li className="flex items-start gap-2">
-                                                                <span className="font-tripswift-bold">3.</span>
-                                                                <span>Double-check the wallet address before sending</span>
-                                                            </li>
-                                                            <li className="flex items-start gap-2">
-                                                                <span className="font-tripswift-bold">4.</span>
-                                                                <span>Payment confirmation is automatic (5-15 minutes)</span>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-
-                                                    {/* Warning */}
-                                                    <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                                        <p className="text-yellow-800 text-sm">
-                                                            <strong>Important:</strong> Only send {paymentData.token} on {paymentData.blockchain} network. Sending other tokens or using wrong network will result in loss of funds.
-                                                        </p>
-                                                    </div>
+                                
+                                                    {/* Popup */}
+                                                    {showWalletTransactionPopup && (
+                                                        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 transition-opacity duration-300">
+                                                            <div className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 w-[90%] sm:w-96 animate-scaleFade relative">
+                                                                <button
+                                                                    className="absolute top-3 right-3 text-gray-400 hover:text-blue-500 text-xl transition"
+                                                                    onClick={() => setShowWalletTransactionPopup(false)}
+                                                                    aria-label="Close"
+                                                                >
+                                                                    ✕
+                                                                </button>
+                                
+                                                                <div className="flex items-center gap-3 mb-4">
+                                                                    <div className="bg-blue-100 text-blue-600 p-2 rounded-full">
+                                                                        <Loader className="animate-spin" />
+                                                                    </div>
+                                                                    <h2 className="text-lg sm:text-xl font-semibold text-gray-800">Wallet Transaction</h2>
+                                                                </div>
+                                
+                                                                <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
+                                                                    Wait while we confirming your payment. This may take upto 2-3 minutes. Please do not close this window.
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="pt-6">
+                                    
+                                    <div className="pt-4 sm:pt-6">
                                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
                                             <button
                                                 onClick={handleViewBookings}
-                                                className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-tripswift-blue text-tripswift-off-white rounded-lg hover:bg-tripswift-blue/90 transition-all duration-300 font-tripswift-medium shadow-sm hover:shadow-md"
+                                                className="flex-1 min-w-[200px] flex items-center justify-center gap-2 py-2.5 px-4 bg-tripswift-blue text-tripswift-off-white rounded-lg hover:bg-tripswift-blue/90 transition-all duration-300 font-tripswift-medium shadow-sm hover:shadow-md"
                                             >
                                                 <ExternalLink className="w-4 h-4" />
                                                 View My Bookings
                                             </button>
-
+                                
                                             <button
                                                 onClick={handleViewHome}
-                                                className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-tripswift-off-white text-tripswift-black/80 rounded-lg hover:bg-gray-100 transition-all duration-300 font-tripswift-medium border border-gray-200 shadow-sm hover:shadow-md"
+                                                className="flex-1 min-w-[200px] flex items-center justify-center gap-2 py-2.5 px-4 bg-tripswift-off-white text-tripswift-black/80 rounded-lg hover:bg-gray-100 transition-all duration-300 font-tripswift-medium border border-gray-200 shadow-sm hover:shadow-md"
                                             >
                                                 <ArrowLeft className="w-4 h-4" />
                                                 Return Home
@@ -672,6 +762,184 @@ const PaymentProgressPage: React.FC = () => {
                                         </div>
                                     </div>
                                 </div>
+
+                                ):(
+                                            <div className="lg:col-span-2">
+                                                {/* QR Code Card */}
+                                                <div className="bg-tripswift-off-white rounded-xl shadow-md overflow-hidden">
+                                                    <div className="bg-tripswift-blue p-4 text-tripswift-off-white">
+                                                        <h2 className="font-tripswift-medium text-lg flex items-center gap-2">
+                                                            <QrCode className="w-5 h-5" />
+                                                            Scan & Pay
+                                                        </h2>
+                                                    </div>
+                                                    <div className="p-6">
+                                                        <div className="grid md:grid-cols-2 gap-8">
+                                                            {/* QR Code */}
+                                                            <div className="text-center">
+                                                                <div className="from-gray-50 to-gray-100 rounded-xl p-2">
+                                                                    <div className="inline-block bg-tripswift-off-white p-3 rounded-xl shadow-md">
+                                                                        <QRCodeCanvas
+                                                                            value={paymentData?.address || ""}
+                                                                            size={140}
+                                                                            style={{ width: "100%", height: "100%" }}
+                                                                            bgColor="#ffffff"
+                                                                            fgColor="#1e293b"
+                                                                            level="H"
+                                                                            includeMargin={true}
+                                                                        />
+                                                                    </div>
+                                                                    <p className="text-xs text-tripswift-black/60 mt-2">Scan with your crypto wallet</p>
+                                                                </div>
+
+                                                                <div className="bg-tripswift-off-white rounded-xl shadow-md overflow-hidden sticky top-6">
+                                                                    <div className="p-4 space-y-4">
+                                                                        {/* Status Badge with expiration check */}
+                                                                        <div className="text-center">
+                                                                            <div
+                                                                                className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${timeElapsed <= 0 ? "bg-red-50 border-red-200 text-red-600" : getStatusConfig(paymentData.status).bgColor
+                                                                                    } ${timeElapsed <= 0 ? "border-red-200" : getStatusConfig(paymentData.status).borderColor} border-2`}
+                                                                            >
+                                                                                {timeElapsed <= 0 ? (
+                                                                                    <AlertCircle className="w-4 h-4 text-red-600" />
+                                                                                ) : (
+                                                                                    getStatusConfig(paymentData.status).icon
+                                                                                )}
+                                                                                <span
+                                                                                    className={`font-tripswift-bold ${timeElapsed <= 0 ? "text-red-600" : getStatusConfig(paymentData.status).color}`}
+                                                                                >
+                                                                                    {timeElapsed <= 0 ? "Payment Expired" : getStatusConfig(paymentData.status).text}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        {/* Timer with expiration warning */}
+                                                                        <div className="text-center">
+                                                                            <div className={`text-xl font-tripswift-bold ${timeElapsed <= 0 ? "text-red-600" : "text-tripswift-black"}`}>
+                                                                                {formatTime(timeElapsed)}
+                                                                                {timeElapsed <= 0 && <span className="text-xs block mt-1">(Session expired)</span>}
+                                                                                {timeElapsed <= 100 && timeElapsed > 0 && (
+                                                                                    <span className="text-xs block mt-1 text-yellow-600">(Expiring soon)</span>
+                                                                                )}
+                                                                            </div>
+                                                                            <p className="text-xs text-tripswift-black/60">
+                                                                                {timeElapsed <= 0 ? "Maximum time reached" : "Time remaining"}
+                                                                            </p>
+                                                                        </div>
+
+                                                                        {/* Quick Actions */}
+                                                                        <div className="space-y-2">
+                                                                            {timeElapsed > 0 ? (
+                                                                                <button
+                                                                                    onClick={handleRefresh}
+                                                                                    className="w-full flex items-center justify-center gap-1 py-2 px-3 bg-tripswift-blue/10 text-tripswift-blue rounded-lg hover:bg-tripswift-blue/20 transition-all duration-300 font-tripswift-medium text-sm"
+                                                                                    aria-label="Check payment status"
+                                                                                >
+                                                                                    <RefreshCw className="w-3 h-3" />
+                                                                                    Check Status
+                                                                                </button>
+                                                                            ) : (
+                                                                                <button
+                                                                                    onClick={checkBooking}
+                                                                                    className="w-full flex items-center justify-center gap-1 py-2 px-3 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-all duration-300 font-tripswift-medium text-sm"
+                                                                                    aria-label="Check booking details"
+                                                                                >
+                                                                                    <ArrowLeft className="w-3 h-3" />
+                                                                                    Check Booking
+                                                                                </button>
+                                                                            )}
+
+                                                                            <div className="flex items-center gap-1 p-2 bg-green-50 border border-green-200 rounded-lg text-sm">
+                                                                                <Shield className="w-3 h-3 text-green-600" />
+                                                                                <span className="text-green-700 font-tripswift-medium">
+                                                                                    {timeElapsed <= 0 ? "Session expired" : "Secure Payment"}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Address & Instructions */}
+                                                            <div className="space-y-4">
+                                                                <div className="p-4 bg-gray-50 rounded-xl">
+                                                                    <label className="text-tripswift-black/70 font-tripswift-medium block mb-2">Wallet Address</label>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <code className="flex-1 text-sm text-tripswift-black/80 bg-tripswift-off-white px-3 py-2 rounded-lg font-mono break-all border">
+                                                                            {paymentData?.address || "Loading address..."}
+                                                                        </code>
+                                                                        <button
+                                                                            onClick={handleCopyAddress}
+                                                                            className={`p-2 rounded-lg transition-all ${copied ? "bg-green-100 text-green-600" : "bg-gray-200 text-tripswift-black/60 hover:bg-gray-300"
+                                                                                }`}
+                                                                            title="Copy address"
+                                                                        >
+                                                                            {copied ? <CheckCircle className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+                                                                        </button>
+                                                                    </div>
+                                                                    {copied && (
+                                                                        <p className="text-green-600 text-sm mt-2 font-tripswift-medium">✓ Address copied to clipboard!</p>
+                                                                    )}
+                                                                </div>
+
+                                                                {/* Instructions */}
+                                                                <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                                                                    <h3 className="font-tripswift-bold text-blue-800 mb-3 flex items-center gap-2">
+                                                                        <AlertCircle className="w-4 h-4" />
+                                                                        Payment Instructions
+                                                                    </h3>
+                                                                    <ul className="text-blue-700 text-sm space-y-2">
+                                                                        <li className="flex items-start gap-2">
+                                                                            <span className="font-tripswift-bold">1.</span>
+                                                                            <span>Send exactly <strong>${paymentData.amount}</strong> worth of <strong>{paymentData.token}</strong></span>
+                                                                        </li>
+                                                                        <li className="flex items-start gap-2">
+                                                                            <span className="font-tripswift-bold">2.</span>
+                                                                            <span>Use the <strong>{paymentData.blockchain}</strong> network only</span>
+                                                                        </li>
+                                                                        <li className="flex items-start gap-2">
+                                                                            <span className="font-tripswift-bold">3.</span>
+                                                                            <span>Double-check the wallet address before sending</span>
+                                                                        </li>
+                                                                        <li className="flex items-start gap-2">
+                                                                            <span className="font-tripswift-bold">4.</span>
+                                                                            <span>Payment confirmation is automatic (5-15 minutes)</span>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+
+                                                                {/* Warning */}
+                                                                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                                                    <p className="text-yellow-800 text-sm">
+                                                                        <strong>Important:</strong> Only send {paymentData.token} on {paymentData.blockchain} network. Sending other tokens or using wrong network will result in loss of funds.
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="pt-6">
+                                                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                                                        <button
+                                                            onClick={handleViewBookings}
+                                                            className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-tripswift-blue text-tripswift-off-white rounded-lg hover:bg-tripswift-blue/90 transition-all duration-300 font-tripswift-medium shadow-sm hover:shadow-md"
+                                                        >
+                                                            <ExternalLink className="w-4 h-4" />
+                                                            View My Bookings
+                                                        </button>
+
+                                                        <button
+                                                            onClick={handleViewHome}
+                                                            className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-tripswift-off-white text-tripswift-black/80 rounded-lg hover:bg-gray-100 transition-all duration-300 font-tripswift-medium border border-gray-200 shadow-sm hover:shadow-md"
+                                                        >
+                                                            <ArrowLeft className="w-4 h-4" />
+                                                            Return Home
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                )}
+                                
                             </div>
                         )
                     ) : null}
