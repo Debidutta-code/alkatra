@@ -89,16 +89,16 @@ export class NotificationController {
     }
   };
 
-  public getOffersByNotificationId = async (req: Request, res: Response): Promise<void> => {
+  public getOffers = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { id: notificationId } = req.params;
+      // Get pagination params
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const skip = (page - 1) * limit;
 
-      if (!notificationId) {
-        res.status(400).json({ message: 'Notification id is required.' });
-        return;
-      }
-
-      const offers = await OfferModel.find({ _id: notificationId }).lean();
+      // Fetch offers with pagination
+      const offers = await OfferModel.find().skip(skip).limit(limit).lean();
+      const totalOffers = await OfferModel.countDocuments();
 
       if (offers.length === 0) {
         res.status(404).json({ message: 'No offers found.' });
@@ -107,10 +107,14 @@ export class NotificationController {
 
       res.status(200).json({
         message: 'Offers fetched successfully',
+        page,
+        limit,
+        total: totalOffers,
+        totalPages: Math.ceil(totalOffers / limit),
         offers,
       });
     } catch (error: any) {
-      console.error(`❌ Error fetching offers for ${req.params.notificationId}:`, error);
+      console.error(`❌ Error fetching offers:`, error);
       res.status(500).json({ message: 'Internal server error', error: error.message });
     }
   };
@@ -128,7 +132,7 @@ export class NotificationController {
       }
 
       const tokenDao = new TokenDao();
-      const notifications = await tokenDao.getNotificationLogsByUserId(userId);
+      const notifications = await tokenDao.getNotificationLogsByUserId(userId, { sort: { sentAt: -1 } });
 
       if (notifications.length === 0) {
         res.status(404).json({ message: 'No notifications found for this user.' });

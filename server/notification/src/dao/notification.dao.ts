@@ -99,7 +99,7 @@ export class TokenDao {
   /**
    * Get notification logs for a specific user.
    */
-  public async getNotificationLogsByUserId(userId: string): Promise<IUserNotificationLog[]> {
+  public async getNotificationLogsByUserId(userId: string, p0: { sort: { sentAt: number; }; }): Promise<IUserNotificationLog[]> {
     try {
       const logs = await userNotificationLogModel.find({ userId }).lean();
       return logs;

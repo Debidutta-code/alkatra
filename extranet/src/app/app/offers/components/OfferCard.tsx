@@ -29,7 +29,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
 
         setLoading(true);
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/notification/offer-by-hotel/${user.id}`
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/notification/offer-by-hotel`
         );
         
         const fetchedOffer = response.data.offers[0];

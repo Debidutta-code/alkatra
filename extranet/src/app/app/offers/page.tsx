@@ -41,7 +41,7 @@ function Offers() {
       setLoading(true);
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/notification/offer-by-hotel/${user.id}`
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/notification/offer-by-hotel`
         );
         
         if (response.data?.offers) {
