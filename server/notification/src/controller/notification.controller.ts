@@ -62,7 +62,7 @@ export class NotificationController {
     }
   };
 
-  public createOffers = async (req: Request, res: Response): Promise<void> => {
+  public createNotifications = async (req: Request, res: Response): Promise<void> => {
     try {
       const { title, body, data } = req.body;
 
@@ -71,10 +71,15 @@ export class NotificationController {
         return;
       }
 
+      if (data && (!data.type || !data.offerCode)) {
+        res.status(400).json({ message: 'Data object must include type and offerCode.' });
+        return;
+      }
+
       const offer = new OfferModel({
         title,
         body,
-        data,
+        data: data ? { type: data.type, offerCode: data.offerCode } : undefined,
       });
 
       const savedOffer = await offer.save();
@@ -89,7 +94,7 @@ export class NotificationController {
     }
   };
 
-  public getOffers = async (req: Request, res: Response): Promise<void> => {
+  public getNotifications = async (req: Request, res: Response): Promise<void> => {
     try {
       // Get pagination params
       const page = parseInt(req.query.page as string) || 1;
