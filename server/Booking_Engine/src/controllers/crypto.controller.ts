@@ -29,7 +29,7 @@ const calculateAgeCategory = (dob: string) => {
 };
 
 export const getPaymentSuccessResponse = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  const {paymentId, amount} = req.query;
+  const { paymentId, amount } = req.query;
   try {
     const getDetails = await CryptoPaymentDetails.findOne({
       payment_id: paymentId,
@@ -65,7 +65,7 @@ export const getCryptoDetails = CatchAsyncError(
               _id: 0,
               "networks.name": 1,
               "networks.imageUrl": 1,
-              "networks.contractAddress":1,
+              "networks.contractAddress": 1,
             },
           }
         );
@@ -347,8 +347,8 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
       txHash,
       senderWalletAddress,
     });
-   
-    console.log(">>>>>>>> CryptoPaymentLog:", cryptoPaymentLog,"parsedamount is ", parseFloat(amount));
+
+    console.log(">>>>>>>> CryptoPaymentLog:", cryptoPaymentLog, "parsedamount is ", parseFloat(amount));
 
     await cryptoPaymentLog.save();
 
@@ -414,7 +414,6 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
 
 
 export const getWalletAddress = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  console.log("Entering into get wallet address");
   const collection = mongoose.connection.collection("CryptoWalletAddress");
   try {
     console.log("");
@@ -430,3 +429,46 @@ export const getWalletAddress = CatchAsyncError(async (req: AuthenticatedRequest
   }
 });
 
+export const getInitiatedPaymentDetails = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  const { userId, amount } = req.query;
+  if (!userId || !amount) {
+    return res.status(400).json({
+      message: `Missing userId or initiated amount fields`,
+    });
+  }
+  console.log(`Get data from UI by QUERY userid: ${userId}, amount: ${amount}`);
+  try {
+
+    const customerId = mongoose.Types.ObjectId.isValid(userId as string) ? new mongoose.Types.ObjectId(userId as string) : null;
+    const amountNumber = Number(amount);
+
+    if (!customerId || isNaN(amountNumber)) {
+      return res.status(400).json({
+        message: 'Invalid userId or amount format',
+      });
+    }
+
+    const paymentDetails = await CryptoPaymentDetails.findOne({
+      customer_id: customerId,
+      amount: amountNumber,
+      status: 'Pending',
+    });
+
+    if (!paymentDetails) {
+      return res.status(404).json({
+        message: 'No matching payment details found',
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Payment details retrieved successfully',
+      paymentDetails,
+    });
+  } catch (error: any) {
+    console.error('❌ Error retrieving payment details:', error);
+    return res.status(500).json({
+      message: 'Internal server error',
+      error: error.message,
+    });
+  }
+});

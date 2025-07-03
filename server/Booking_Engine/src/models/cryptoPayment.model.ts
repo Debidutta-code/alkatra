@@ -1,5 +1,12 @@
 import mongoose from "mongoose";
 
+const getISTTime = () => {
+  const now = new Date();
+  const istOffset = 5.5 * 60 * 60 * 1000;
+  const istTime = new Date(now.getTime() + istOffset);
+  return istTime;
+};
+
 const cryptoPaymentSchema = new mongoose.Schema({
   customer_id: {
     type: mongoose.Schema.Types.ObjectId,
@@ -35,6 +42,10 @@ const cryptoPaymentSchema = new mongoose.Schema({
     enum: ["Confirmed", "Pending", "Cancelled"],
     default: "Pending",
   },
+  initiatedTime: {
+    type: Date,
+    default: getISTTime,
+  },
 }, {
   timestamps: true,
 });
@@ -59,6 +70,10 @@ const cryptoPaymentLogSchema = new mongoose.Schema({
   senderWalletAddress: {
     type: String,
     require: false,
+  },
+  initiatedTime: {
+    type: Date,
+    default: getISTTime,
   },
 }, {
   timestamps: true,
