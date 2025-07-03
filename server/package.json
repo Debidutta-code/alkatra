@@ -6,7 +6,7 @@
   "scripts": {
     "clean": "rimraf ./dist",
     "dev": "nodemon index.ts",
-    "build": "rimraf ./dist ",
+    "build": "rimraf ./dist && tsc",
     "start": "npm run build && pm2 start dist/index.js --name=Extranet_Server",
     "pm2:stop": "pm2 stop TwipSwift",
     "pm2:restart": "pm2 restart TwipSwift",
