@@ -76,6 +76,18 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
     }
   }, [userId]);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   const loadNotifications = async () => {
     setLoading(true);
     setError(null);
@@ -263,11 +275,11 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
                 )}
               </div>
 
-              <div className="p-3 bg-gray-50 border-t border-tripswift-black/10 text-center">
+              {/* <div className="p-3 bg-gray-50 border-t border-tripswift-black/10 text-center">
                 <button className="text-xs text-tripswift-blue hover:text-tripswift-blue/80 font-medium">
                   View all notifications
                 </button>
-              </div>
+              </div> */}
             </motion.div>
           </>
         )}
