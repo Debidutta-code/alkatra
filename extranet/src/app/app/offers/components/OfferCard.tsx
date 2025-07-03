@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Eye, Send, BadgePercent, FileText, User } from 'lucide-react';
-import { BookingOffer } from '../types/offer';
+import { Notification } from '../types/offer';
 import { useSelector, useDispatch, RootState } from '../../../../redux/store';
 import { getUser } from '../../../../redux/slices/authSlice';
 import axios from 'axios';
@@ -8,12 +8,12 @@ import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 
 interface OfferCardProps {
-  offer: BookingOffer;
-  onView: (offer: BookingOffer) => void;
+  offer: Notification;
+  onView: (offer: Notification) => void;
 }
 
 export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
-  const [offerDetails, setOfferDetails] = useState<BookingOffer>(offer);
+  const [offerDetails, setOfferDetails] = useState<Notification>(offer);
   const [loading, setLoading] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -29,24 +29,22 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
 
         setLoading(true);
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/notification/offer-by-hotel`
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/notification/get-notification`
         );
 
         const fetchedOffer = response.data.offers[0];
         setOfferDetails({
           id: fetchedOffer._id,
           title: fetchedOffer.title,
-          description: fetchedOffer.body,
-          discountValue: parseFloat(fetchedOffer.data.discountPercentage),
-          endDate: fetchedOffer.data.validTill,
-          terms: fetchedOffer.data.terms,
+          body: fetchedOffer.body,
+          data: {
+            type: fetchedOffer.data.type,
+            offerCode: fetchedOffer.data.offerCode,
+            _id: fetchedOffer.data._id
+          },
           createdAt: fetchedOffer.createdAt,
-          createdBy: `${user.firstName} ${user.lastName}`,
-          status: fetchedOffer.data.status || 'inactive',
-          bookingsCount: fetchedOffer.data.bookingsCount || 0,
-          totalRevenue: fetchedOffer.data.totalRevenue || 0,
-          averageBookingValue: fetchedOffer.data.averageBookingValue || 0,
-          updatedAt: fetchedOffer.updatedAt || fetchedOffer.createdAt
+          updatedAt: fetchedOffer.createdAt,
+          createdBy: `${user.firstName} ${user.lastName}`
         });
       } catch (error: any) {
         if (error.response?.status !== 404) {
@@ -71,25 +69,23 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/notification/send-notification`,
         {
-          title: `🎉 ${offerDetails.title}`,
-          body: offerDetails.description,
+          title: offerDetails.title,
+          body: offerDetails.body,
           data: {
-            type: "promotion",
-            offerCode: `SAVE${offerDetails.discountValue}`,
-            validTill: offerDetails.endDate,
-            terms: offerDetails.terms,
+            type: offerDetails.data.type,
+            offerCode: offerDetails.data.offerCode,
             userId: user.id
           }
         }
       );
 
       if (response.status === 200) {
-        toast.success('Offer published successfully!');
+        toast.success('Notification sent successfully!');
       } else {
-        throw new Error('Failed to publish offer');
+        throw new Error('Failed to send notification');
       }
     } catch (error) {
-      toast.error('Failed to publish offer');
+      toast.error('Failed to send notification');
     } finally {
       setPublishing(false);
     }
@@ -105,13 +101,8 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
               {offerDetails.title}
             </h3>
             <p className="text-sm text-gray-600 line-clamp-2">
-              {offerDetails.description}
+              {offerDetails.body}
             </p>
-          </div>
-          <div className="ml-4 flex-shrink-0">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-              {offerDetails.status === 'active' ? 'Active' : 'Inactive'}
-            </span>
           </div>
         </div>
       </div>
@@ -121,14 +112,14 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <BadgePercent className="h-5 w-5 text-blue-500 mr-2" />
-            <span className="text-2xl font-bold text-green-600">
-              {offerDetails.discountValue}% OFF
+            <span className="text-lg font-bold text-blue-600">
+              {offer.data.type || 'Promotional'} Type
             </span>
           </div>
-          <div className="flex items-center text-sm text-gray-500">
+          {/* <div className="flex items-center text-sm text-gray-500">
             <User className="h-4 w-4 mr-1" />
             <span>Created by {offerDetails.createdBy}</span>
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -136,25 +127,25 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
       <div className="p-6">
         <div className="space-y-4">
           <div className="flex items-start">
-            <Calendar className="h-5 w-5 text-gray-400 mr-3 mt-0.5 flex-shrink-0" />
+            <FileText className="h-5 w-5 text-gray-400 mr-3 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-sm font-medium text-gray-500">Valid Till</p>
+              <p className="text-sm font-medium text-gray-500">Offer Code</p>
               <p className="text-sm text-gray-900">
-                {offerDetails.endDate ? (
-                  format(new Date(offerDetails.endDate), 'PPP')
-                ) : (
-                  'No expiration date'
-                )}
+                {offer.data.offerCode || 'No offer code'}
               </p>
             </div>
           </div>
 
           <div className="flex items-start">
-            <FileText className="h-5 w-5 text-gray-400 mr-3 mt-0.5 flex-shrink-0" />
+            <Calendar className="h-5 w-5 text-gray-400 mr-3 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-sm font-medium text-gray-500">Terms & Conditions</p>
+              <p className="text-sm font-medium text-gray-500">Created At</p>
               <p className="text-sm text-gray-900">
-                {offerDetails.terms}
+                {offerDetails.createdAt ? (
+                  format(new Date(offerDetails.createdAt), 'PPP')
+                ) : (
+                  'No date available'
+                )}
               </p>
             </div>
           </div>
@@ -171,7 +162,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
               }`}
           >
             <Send className="-ml-1 mr-2 h-4 w-4" />
-            {publishing ? 'Publishing...' : 'Publish Offer'}
+            {publishing ? 'Sending...' : 'Send Notification'}
           </button>
           <button
             onClick={() => onView(offerDetails)}

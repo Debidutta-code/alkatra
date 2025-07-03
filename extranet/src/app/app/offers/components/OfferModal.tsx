@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, DollarSign } from 'lucide-react';
-import { BookingOffer } from '../types/offer';
+import { X } from 'lucide-react';
+import { Notification } from '../types/offer';
 import { useSelector, useDispatch, RootState } from '../../../../redux/store';
 import { getUser } from '../../../../redux/slices/authSlice';
 import axios from 'axios';
@@ -8,8 +8,8 @@ import axios from 'axios';
 interface OfferModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (offer: Partial<BookingOffer>) => void;
-  offer?: BookingOffer;
+  onSave: (offer: Partial<Notification>) => void;
+  offer?: Notification;
   mode: 'create' | 'view';
 }
 
@@ -20,12 +20,10 @@ export const OfferModal: React.FC<OfferModalProps> = ({
   offer,
   mode
 }) => {
-  const [formData, setFormData] = useState<Partial<BookingOffer>>({
+  const [formData, setFormData] = useState<Partial<Notification>>({
     title: '',
-    description: '',
-    discountValue: 0,
-    endDate: '',
-    terms: ''
+    body: '',
+    data: { type: '', offerCode: '' }
   });
 
   const [error, setError] = useState<string | null>(null);
@@ -37,26 +35,20 @@ export const OfferModal: React.FC<OfferModalProps> = ({
     if (offer && mode === 'view') {
       setFormData({
         title: offer.title,
-        description: offer.description,
-        discountValue: offer.discountValue,
-        endDate: offer.endDate,
-        terms: offer.terms
+        body: offer.body,
+        data: offer.data
       });
     } else if (mode === 'create') {
       setFormData({
         title: '',
-        description: '',
-        discountValue: 0,
-        endDate: '',
-        terms: ''
+        body: '',
+        data: { type: '', offerCode: '' }
       });
     }
   }, [offer, mode, isOpen]);
 
   useEffect(() => {
-    if (!user?.id || !isAuthenticated) {
-      dispatch(getUser());
-    }
+    if (!user?.id || !isAuthenticated) dispatch(getUser());
   }, [dispatch, user?.id, isAuthenticated]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -70,54 +62,51 @@ export const OfferModal: React.FC<OfferModalProps> = ({
     }
 
     try {
-      const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/notification/offer-by-hotel`;
-      const payload = {
-        title: formData.title,
-        body: formData.description,
-        data: {
-          discountPercentage: formData.discountValue,
-          validTill: formData.endDate,
-          terms: formData.terms
-        }
-      };
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/notification/create-notification`,
+        {
+          title: formData.title,
+          body: formData.body,
+          data: {
+            type: formData.data?.type || 'Promotional',
+            offerCode: formData.data?.offerCode || ''
+          }
+        },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
 
-      const response = await axios.post(apiUrl, payload, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      // Fixed: Check for response.data.offer instead of response.data.offers[0]
-      if (!response.data || !response.data.offer?._id) {
-        throw new Error('Invalid response from server');
-      }
+      if (!response.data?.offer?._id) throw new Error('Invalid response from server');
 
       onSave({
         ...formData,
-        id: response.data.offer._id || Date.now().toString(),
-        createdAt: response.data.offer.createdAt || new Date().toISOString(),
-        updatedAt: response.data.offer.createdAt || new Date().toISOString(),
-        createdBy: user ? `${user.firstName} ${user.lastName}` : 'Unknown User',
-        status: 'active', // Set default status
-        bookingsCount: 0,
-        totalRevenue: 0,
-        averageBookingValue: 0
+        id: response.data.offer._id,
+        createdAt: response.data.offer.createdAt,
+        updatedAt: response.data.offer.createdAt,
+        createdBy: user ? `${user.firstName} ${user.lastName}` : 'Unknown User'
       });
-
-      // Close the modal after successful creation
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
-      if (axios.isAxiosError(err)) {
-        console.error('API Error:', err.response?.data || err.message);
-      }
+      if (axios.isAxiosError(err)) console.error('API Error:', err.response?.data || err.message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleInputChange = (field: keyof BookingOffer, value: any) => {
+  const handleInputChange = (field: keyof Notification, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleDataChange = (field: keyof Notification['data'], value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      data: {
+        type: '',
+        offerCode: '',
+        ...prev.data,
+        [field]: value
+      }
+    }));
   };
 
   if (!isOpen) return null;
@@ -125,43 +114,39 @@ export const OfferModal: React.FC<OfferModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">
-            {mode === 'create' && 'Create New Notification'}
-            {mode === 'view' && 'Notification Details'}
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">
+            {mode === 'create' ? 'Create New Notification' : 'Notification Details'}
           </h2>
-          <button
-            onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-          >
+          <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600 rounded-lg">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6">
-          <div className="space-y-6">
+        <form onSubmit={handleSubmit} className="p-4">
+          <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
-              <div className="space-y-4">
+              <h3 className="font-medium text-gray-900 mb-2">Basic Information</h3>
+              <div className="space-y-2">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                  <label className="block text-sm text-gray-700 mb-1">Title</label>
                   <input
                     type="text"
                     value={formData.title || ''}
                     onChange={(e) => handleInputChange('title', e.target.value)}
                     disabled={mode === 'view'}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                    className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                  <label className="block text-sm text-gray-700 mb-1">Message Body</label>
                   <textarea
-                    value={formData.description || ''}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    value={formData.body || ''}
+                    onChange={(e) => handleInputChange('body', e.target.value)}
                     disabled={mode === 'view'}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                    className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
                     required
                   />
                 </div>
@@ -169,75 +154,51 @@ export const OfferModal: React.FC<OfferModalProps> = ({
             </div>
 
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                <DollarSign className="w-5 h-5" />
-                Discount Settings
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
+              <h3 className="font-medium text-gray-900 mb-2">Details</h3>
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Discount Percentage</label>
-                  <input
-                    type="number"
-                    value={formData.discountValue || ''}
-                    onChange={(e) => handleInputChange('discountValue', Number(e.target.value))}
+                  <label className="block text-sm text-gray-700 mb-1">Type</label>
+                  <select
+                    value={formData.data?.type || ''}
+                    onChange={(e) => handleDataChange('type', e.target.value)}
                     disabled={mode === 'view'}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
-                    min="0"
-                    max="100"
-                    required
+                    className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                  >
+                    <option value="">Select type</option>
+                    <option value="Promotional">Promotional</option>
+                    <option value="Commercial">Commercial</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-700 mb-1">Offer Code</label>
+                  <input
+                    type="text"
+                    value={formData.data?.offerCode || ''}
+                    onChange={(e) => handleDataChange('offerCode', e.target.value)}
+                    disabled={mode === 'view'}
+                    className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                    placeholder="e.g., PROMO123"
                   />
                 </div>
               </div>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
-                Valid Till
-              </h3>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">End Date</label>
-                <input
-                  type="date"
-                  value={formData.endDate || ''}
-                  onChange={(e) => handleInputChange('endDate', e.target.value)}
-                  disabled={mode === 'view'}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Terms & Conditions</h3>
-              <textarea
-                value={formData.terms || ''}
-                onChange={(e) => handleInputChange('terms', e.target.value)}
-                disabled={mode === 'view'}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
-                placeholder="Enter terms and conditions (e.g., Applicable only on deluxe rooms)"
-              />
             </div>
           </div>
 
-          {error && (
-            <div className="mt-4 text-red-600 text-sm">{error}</div>
-          )}
+          {error && <div className="mt-3 text-red-600 text-sm">{error}</div>}
 
           {mode !== 'view' && (
-            <div className="mt-8 flex items-center justify-end gap-4 pt-6 border-t border-gray-200">
+            <div className="mt-6 flex justify-end gap-3 pt-4 border-t border-gray-200">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                className="px-3 py-1.5 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
                 disabled={isSubmitting}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-6 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors disabled:bg-blue-400"
+                className="px-4 py-1.5 bg-blue-600 text-white hover:bg-blue-700 rounded-md disabled:bg-blue-400"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? 'Saving...' : 'Create Notification'}

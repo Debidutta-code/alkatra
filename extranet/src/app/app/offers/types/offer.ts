@@ -1,33 +1,13 @@
-export interface BookingOffer {
+export interface Notification {
   id: string;
   title: string;
-  description: string;
-  discountValue: number;
-  endDate: string;
-  terms: string;
-  status: 'active' | 'inactive' | 'expired' | 'scheduled';
-  bookingsCount: number;
-  totalRevenue: number;
-  averageBookingValue: number;
+  body: string;
+  data: {
+    type: string;
+    offerCode: string;
+    _id?: string;
+  };
   createdAt: string;
   updatedAt: string;
   createdBy: string;
-}
-
-export interface OfferFilters {
-  search: string;
-  status: string;
-  dateRange: {
-    start: string;
-    end: string;
-  };
-}
-
-export interface OfferStats {
-  totalOffers: number;
-  activeOffers: number;
-  totalBookings: number;
-  totalRevenue: number;
-  avgConversionRate: number;
-  topPerformingOffer: string;
 }
