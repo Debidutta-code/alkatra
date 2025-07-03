@@ -93,7 +93,7 @@ export default function AppSidebar({ role }: { role?: string }) {
       description:`${!propertyId?.status?"Create Your Property First":""}`
     },
     {
-      title: "Offers",
+      title: "Notifications",
       href: "/app/offers",
       icon: Crown,
     },
