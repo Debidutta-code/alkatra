@@ -24,6 +24,12 @@ import EmailService from '../../../Customer-Authentication/src/services/email.se
 const emailTemplate = readFileSync(join(__dirname, '../HTML_files/reservationConfirmationEmail.html'), 'utf-8');
 const template = Handlebars.compile(emailTemplate);
 
+const updateEmailTemplate = readFileSync(join(__dirname, '../HTML_files/reservationUpdateEmail.html'), 'utf-8');
+const updateTemplate = Handlebars.compile(updateEmailTemplate);
+
+const cancelEmailTemplate = readFileSync(join(__dirname, '../HTML_files/reservationCancellationEmail.html'), 'utf-8');
+const cancelTemplate = Handlebars.compile(cancelEmailTemplate);
+
 const calculateAgeCategory = (dob: string) => {
   const birthDate = new Date(dob);
   const today = new Date();
@@ -309,13 +315,13 @@ export async function createReservationWithCryptoPayment(input: {
 
     await EmailService.sendEmail({
       to: email,
-      text: `Your reservation update has been confirmed`,
+      text: `Your reservation has been confirmed`,
       subject: `Reservation Confirmation - ${hotelName}`,
       html: htmlContent,
     });
 
     return {
-      message: "Reservation update with crypto confirmed",
+      message: "Reservation with crypto confirmed",
       guests: categorizedGuests,
       ageCodeSummary: ageCodeCount,
     };
@@ -327,130 +333,160 @@ export async function createReservationWithCryptoPayment(input: {
 }
 
 
-
 export const updateThirdPartyReservation = CatchAsyncError(
   async (req: any, res: Response, next: NextFunction) => {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(400).json({ message: "User ID is required" });
-    }
-    const reservationId = req.params.id;
-    if (!reservationId) {
-      return res.status(400).json({ message: "Reservation ID is required" });
-    }
-    const existingReservation = await ThirdPartyBooking.findOne({ reservationId });
-    if (!existingReservation) {
-      throw new Error(`Reservation with ID ${reservationId} not found in our record`);
-    }
-    if (existingReservation.status === 'Cancelled') {
-      throw new Error(`Reservation with ID ${reservationId} is already cancelled`);
-    }
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
+      }
 
-    const {
-      checkInDate,
-      checkOutDate,
-      hotelCode,
-      hotelName,
-      ratePlanCode,
-      numberOfRooms,
-      roomTypeCode,
-      roomTotalPrice,
-      currencyCode,
-      email,
-      phone,
-      guests,
-      // paymentInfo,
-    } = req.body;
+      const reservationId = req.params.id;
+      if (!reservationId) {
+        return res.status(400).json({ message: "Reservation ID is required" });
+      }
 
-    const requiredFields = {
-      reservationId,
-      checkInDate,
-      checkOutDate,
-      hotelCode,
-      ratePlanCode,
-      numberOfRooms,
-      roomTypeCode,
-      roomTotalPrice,
-      currencyCode,
-      email,
-      phone,
-      guests,
-      // paymentInfo,
-    };
+      const existingReservation = await ThirdPartyBooking.findOne({ reservationId });
+      if (!existingReservation) {
+        throw new Error(`Reservation with ID ${reservationId} not found in our record`);
+      }
 
-    const missingFields = Object.entries(requiredFields)
-      .filter(([_, value]) => value === undefined || value === null || value === "")
-      .map(([key]) => key);
+      if (existingReservation.status === 'Cancelled') {
+        throw new Error(`Reservation with ID ${reservationId} is already cancelled`);
+      }
 
-    if (missingFields.length > 0) {
-      return res.status(400).json({
-        message: `Missing required fields: ${missingFields.join(", ")}`,
-      });
-    }
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const checkIn = new Date(checkInDate);
-    const checkOut = new Date(checkOutDate);
-
-    if (checkIn < today || checkOut <= checkIn) {
-      return res.status(400).json({
-        message: "Check-in date cannot be in the past or Check-out date must be after check-in date",
-      });
-    }
-
-    if (!Array.isArray(guests) || guests.length === 0) {
-      return res.status(400).json({ message: "Guest details are required" });
-    }
-
-    const ageCodeCount: Record<string, number> = { "7": 0, "8": 0, "10": 0 };
-
-    const categorizedGuests = guests.map(({ firstName, lastName, dob }) => {
-      if (!dob) throw new Error(`DOB missing for ${firstName} ${lastName}`);
-      const { age, category, ageCode } = calculateAgeCategory(dob);
-      ageCodeCount[ageCode] = (ageCodeCount[ageCode] || 0) + 1;
-      return { firstName, lastName, dob, age, category, ageCode };
-    });
-
-    const amendReservationInput: AmendReservationInput = {
-      bookingDetails: {
-        userId,
-        reservationId,
+      const {
         checkInDate,
         checkOutDate,
         hotelCode,
         hotelName,
         ratePlanCode,
-        roomTypeCode,
         numberOfRooms,
+        roomTypeCode,
         roomTotalPrice,
         currencyCode,
-        guests,
         email,
         phone,
-      },
-      ageCodeSummary: ageCodeCount,
-    };
+        guests,
+      } = req.body;
 
-    // console.log("Reservation Input Data:", JSON.stringify(amendReservationInput, null, 2));
+      const requiredFields = {
+        reservationId,
+        checkInDate,
+        checkOutDate,
+        hotelCode,
+        ratePlanCode,
+        numberOfRooms,
+        roomTypeCode,
+        roomTotalPrice,
+        currencyCode,
+        email,
+        phone,
+        guests,
+      };
 
-    try {
-      const thirdPartyService = new ThirdPartyAmendReservationService();
-      await thirdPartyService.processAmendReservation(amendReservationInput);
+      const missingFields = Object.entries(requiredFields)
+        .filter(([_, value]) => value === undefined || value === null || value === "")
+        .map(([key]) => key);
+
+      if (missingFields.length > 0) {
+        return res.status(400).json({
+          message: `Missing required fields: ${missingFields.join(", ")}`,
+        });
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const checkIn = new Date(checkInDate);
+      const checkOut = new Date(checkOutDate);
+
+      if (checkIn < today || checkOut <= checkIn) {
+        return res.status(400).json({
+          message: "Check-in date cannot be in the past or Check-out date must be after check-in date",
+        });
+      }
+
+      if (!Array.isArray(guests) || guests.length === 0) {
+        return res.status(400).json({ message: "Guest details are required" });
+      }
+
+      const ageCodeCount: Record<string, number> = { "7": 0, "8": 0, "10": 0 };
+
+      const categorizedGuests = guests.map(({ firstName, lastName, dob }) => {
+        if (!dob) throw new Error(`DOB missing for ${firstName} ${lastName}`);
+        const { age, category, ageCode } = calculateAgeCategory(dob);
+        ageCodeCount[ageCode] = (ageCodeCount[ageCode] || 0) + 1;
+        return { firstName, lastName, dob, age, category, ageCode };
+      });
+
+      const amendReservationInput: AmendReservationInput = {
+        bookingDetails: {
+          userId,
+          reservationId,
+          checkInDate,
+          checkOutDate,
+          hotelCode,
+          hotelName,
+          ratePlanCode,
+          roomTypeCode,
+          numberOfRooms,
+          roomTotalPrice,
+          currencyCode,
+          guests,
+          email,
+          phone,
+        },
+        ageCodeSummary: ageCodeCount,
+      };
+
+      try {
+        const thirdPartyService = new ThirdPartyAmendReservationService();
+        await thirdPartyService.processAmendReservation(amendReservationInput);
+        const template = {
+          guestName: `${guests[0].firstName} ${guests[0].lastName}`,
+          hotelName,
+          checkInDate: new Date(checkInDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+          checkOutDate: new Date(checkOutDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+          roomTypeCode,
+          numberOfRooms,
+          roomTotalPrice,
+          currencyCode,
+          email,
+          phone,
+          guests: categorizedGuests,
+          supportEmail: process.env.SUPPORT_EMAIL || 'support@yourcompany.com',
+          supportPhone: process.env.SUPPORT_PHONE || '+1-800-123-4567',
+          websiteUrl: process.env.WEBSITE_URL || 'https://book.trip-swift.ai',
+          companyName: process.env.COMPANY_NAME || 'Al-Hajz',
+          companyAddress: process.env.COMPANY_ADDRESS || 'Gothapatna, Bhubaneswar, Odisha, 751003',
+          currentYear: new Date().getFullYear(),
+        };
+
+        const htmlContent = updateTemplate(template);
+
+        await EmailService.sendEmail({
+          to: email,
+          text: `Your reservation update has been confirmed`,
+          subject: `Reservation Confirmation - ${hotelName}`,
+          html: htmlContent,
+        });
+      } catch (error: any) {
+        return res.status(500).json({ message: error.message || "Failed to update reservation" });
+      }
+
+      res.status(200).json({
+        message: "Reservation updated successfully",
+        numberOfRooms,
+        roomTotalPrice,
+        guests: categorizedGuests,
+        ageCodeSummary: ageCodeCount,
+      });
     } catch (error: any) {
-      return res.status(500).json({ message: error.message });
+      console.error("❌ Error updating third-party reservation:", error.message || error);
+      return res.status(500).json({ message: error.message || "Internal server error" });
     }
-
-    res.status(200).json({
-      message: "Reservation received",
-      numberOfRooms,
-      roomTotalPrice,
-      guests: categorizedGuests,
-      ageCodeSummary: ageCodeCount,
-    });
   }
 );
-
 
 export const cancelThirdPartyReservation = CatchAsyncError(
   async (req: any, res: Response, next: NextFunction) => {
@@ -464,10 +500,10 @@ export const cancelThirdPartyReservation = CatchAsyncError(
     }
     const existingReservation = await ThirdPartyBooking.findOne({ reservationId });
     if (!existingReservation) {
-      throw new Error(`Reservation with ID ${reservationId} not found in our record`);
+      return res.status(404).json({ message: `Reservation with ID ${reservationId} not found in our record` });
     }
     if (existingReservation.status === 'Cancelled') {
-      throw new Error(`Reservation with ID ${reservationId} is already cancelled`);
+      return res.status(400).json({ message: `Reservation with ID ${reservationId} is already cancelled` });
     }
 
     const { firstName, lastName, email, hotelCode, hotelName, checkInDate, checkOutDate } = req.body;
@@ -486,19 +522,46 @@ export const cancelThirdPartyReservation = CatchAsyncError(
       reservationId,
       hotelCode,
       hotelName,
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
+      firstName,
+      lastName,
+      email,
       checkInDate,
       checkOutDate,
       status: "Cancelled",
     };
 
-    // console.log("Cancel Reservation Input Data:", JSON.stringify(cancelReservationInput, null, 2));
-
     try {
       const thirdPartyService = new ThirdPartyCancelReservationService();
       const result = await thirdPartyService.processCancelReservation(cancelReservationInput);
+
+      // Send cancellation confirmation email
+      try {
+        const templateData = {
+          reservationId,
+          guestName: `${firstName} ${lastName}`,
+          hotelName,
+          checkInDate: new Date(checkInDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+          checkOutDate: new Date(checkOutDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+          supportEmail: process.env.SUPPORT_EMAIL || 'support@yourcompany.com',
+          supportPhone: process.env.SUPPORT_PHONE || '+1-800-123-4567',
+          websiteUrl: process.env.WEBSITE_URL || 'https://book.trip-swift.ai',
+          companyName: process.env.COMPANY_NAME || 'Al-Hajz',
+          companyAddress: process.env.COMPANY_ADDRESS || 'Gothapatna, Bhubaneswar, Odisha, 751003',
+          currentYear: new Date().getFullYear(),
+        };
+
+        const htmlContent = cancelTemplate(templateData);
+
+        await EmailService.sendEmail({
+          to: email,
+          subject: `Booking Cancellation Confirmation - ${hotelName}`,
+          html: htmlContent,
+        });
+        console.log(`✅ Cancellation confirmation email sent to ${email}`);
+      } catch (emailError: any) {
+        console.error('❌ Failed to send cancellation confirmation email:', emailError);
+      }
+
       res.status(200).json({
         message: "Reservation cancellation processed successfully",
         reservationId: result,
