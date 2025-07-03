@@ -21,13 +21,13 @@ import { join } from 'path';
 import Handlebars from 'handlebars';
 import EmailService from '../../../Customer-Authentication/src/services/email.service';
 
-const emailTemplate = readFileSync(join(__dirname, '../HTML_files/reservationConfirmationEmail.html'), 'utf-8');
+const emailTemplate = readFileSync(join(__dirname, '../../../HTML_files/reservationConfirmationEmail.html'), 'utf-8');
 const template = Handlebars.compile(emailTemplate);
 
-const updateEmailTemplate = readFileSync(join(__dirname, '../HTML_files/reservationUpdateEmail.html'), 'utf-8');
+const updateEmailTemplate = readFileSync(join(__dirname, '../../../HTML_files/reservationUpdateEmail.html'), 'utf-8');
 const updateTemplate = Handlebars.compile(updateEmailTemplate);
 
-const cancelEmailTemplate = readFileSync(join(__dirname, '../HTML_files/reservationCancellationEmail.html'), 'utf-8');
+const cancelEmailTemplate = readFileSync(join(__dirname, '../../../HTML_files/reservationCancellationEmail.html'), 'utf-8');
 const cancelTemplate = Handlebars.compile(cancelEmailTemplate);
 
 const calculateAgeCategory = (dob: string) => {
