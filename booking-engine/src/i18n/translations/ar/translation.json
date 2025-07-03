@@ -561,7 +561,11 @@
       "backToDetails": "العودة إلى التفاصيل",
       "cancel": "إلغاء",
       "continueToReview": "متابعة إلى المراجعة",
-      "proceedToPayment": "المتابعة إلى الدفع"
+      "proceedToPayment": "المتابعة إلى الدفع",
+      "phoneNotVerified": "رقم الهاتف غير مُتحقق منه",
+      "phoneInvalidError": "يرجى إدخال رقم هاتف صحيح",
+      "processing": "جاري المعالجة...",
+      "verifying": "جاري التحقق"
     }
   },
   "BookingTabs": {

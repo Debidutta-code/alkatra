@@ -557,7 +557,11 @@
       "backToDetails": "विवरण पर वापस जाएं",
       "cancel": "रद्द करें",
       "continueToReview": "समीक्षा के लिए जारी रखें",
-      "proceedToPayment": "भुगतान के लिए आगे बढ़ें"
+      "proceedToPayment": "भुगतान के लिए आगे बढ़ें",
+      "phoneNotVerified": "फोन नंबर सत्यापित नहीं है",
+      "phoneInvalidError": "कृपया एक वैध फोन नंबर दर्ज करें",
+      "processing": "प्रसंस्करण...",
+      "verifying": "सत्यापित कर रहे हैं"
     }
   },
   "BookingTabs": {
