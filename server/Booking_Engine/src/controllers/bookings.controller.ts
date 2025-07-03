@@ -16,6 +16,13 @@ import { ReservationInput } from "../../../wincloud/src/interface/reservationInt
 import { ThirdPartyCancelReservationService } from '../../../wincloud/src/service/cancelReservationService';
 import { AmendReservationInput } from "../../../wincloud/src/interface/amendReservationInterface";
 import { CryptoGuestDetails } from "../models/cryptoUserPaymentInitialStage.model";
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import Handlebars from 'handlebars';
+import EmailService from '../../../Customer-Authentication/src/services/email.service';
+
+const emailTemplate = readFileSync(join(__dirname, '../HTML_files/reservationConfirmationEmail.html'), 'utf-8');
+const template = Handlebars.compile(emailTemplate);
 
 const calculateAgeCategory = (dob: string) => {
   const birthDate = new Date(dob);
@@ -151,6 +158,40 @@ export const createReservationWithStoredCard = CatchAsyncError(
     try {
       const thirdPartyService = new ThirdPartyReservationService();
       await thirdPartyService.processThirdPartyReservation(reservationInput);
+      try {
+        const templateData = {
+          guestName: `${guests[0].firstName} ${guests[0].lastName}`,
+          hotelName,
+          hotelCode,
+          checkInDate: new Date(checkInDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+          checkOutDate: new Date(checkOutDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+          roomTypeCode,
+          numberOfRooms,
+          roomTotalPrice,
+          currencyCode,
+          email,
+          phone,
+          guests: categorizedGuests,
+          supportEmail: process.env.SUPPORT_EMAIL || 'support@yourcompany.com',
+          supportPhone: process.env.SUPPORT_PHONE || '+1-800-123-4567',
+          websiteUrl: process.env.WEBSITE_URL || 'https://book.trip-swift.ai',
+          companyName: process.env.COMPANY_NAME || 'Trip-Swift',
+          companyAddress: process.env.COMPANY_ADDRESS || 'Gothapatna, Bhubaneswar, Odisha, 751003',
+          currentYear: new Date().getFullYear(),
+        };
+
+        const htmlContent = template(templateData);
+
+        await EmailService.sendEmail({
+          to: email,
+          text: `Your reservation has been confirmed`,
+          subject: `Reservation Confirmation - ${hotelName}`,
+          html: htmlContent,
+        });
+      }
+      catch (error: any) {
+        return res.status(500).json({ message: "❌ Failed to send confirmation email" });
+      }
     } catch (error: any) {
       return res.status(500).json({ message: "Failed to process reservation with third-party" });
     }
@@ -1178,7 +1219,7 @@ export const getBookingDetailsOfUser = CatchAsyncError(
             ...matchCriteria.checkInDate,
             $gt: currentDate,
           };
-            matchCriteria.status = { $ne: 'Cancelled' };
+          matchCriteria.status = { $ne: 'Cancelled' };
           console.log("Current Date:", currentDate.toISOString());
           console.log("Check-in Date Match Criteria:", JSON.stringify(matchCriteria.checkInDate, null, 2));
         } else if (filterData === 'completed') {
@@ -1186,13 +1227,13 @@ export const getBookingDetailsOfUser = CatchAsyncError(
             ...matchCriteria.checkInDate,
             $lte: currentDate,
           };
-          matchCriteria.status = { $in: ['Confirmed'] }; 
+          matchCriteria.status = { $in: ['Confirmed'] };
         } else if (filterData === 'cancelled') {
           matchCriteria.status = 'Cancelled';
         } else if (filterData === 'Processing') {
-          
+
           delete matchCriteria.status;
-          
+
           if (matchCriteria.checkInDate) {
             matchCriteria.checkInDate = {
               $gte: matchCriteria.checkInDate.$gte?.toISOString().split('T')[0],

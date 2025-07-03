@@ -89,10 +89,12 @@ export class NotificationService {
     }
     }
     
-    static async sendCryptoPaymentNotification(userId: string, amount: number, txId?: string): Promise<any> {
+    public async sendCryptoPaymentNotification(userId: string, amount: number, txId?: string): Promise<any> {
 
         console.log(`🔔 Sending crypto payment notification to user ${userId} for amount ${amount} USDT`);
       const userTokens = await tokenDao.getDeviceTokensByUserId(userId);
+
+      console.log("---------------==============",userTokens)
       if (!userTokens.length) {
         console.warn(`⚠️ No device tokens found for user ${userId}`);
         return { successCount: 0, failureCount: 0 };
