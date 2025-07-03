@@ -16,19 +16,8 @@ import { ReservationInput } from "../../../wincloud/src/interface/reservationInt
 import { ThirdPartyCancelReservationService } from '../../../wincloud/src/service/cancelReservationService';
 import { AmendReservationInput } from "../../../wincloud/src/interface/amendReservationInterface";
 import { CryptoGuestDetails } from "../models/cryptoUserPaymentInitialStage.model";
-import { readFileSync } from 'fs';
-import { join } from 'path';
-import Handlebars from 'handlebars';
 import EmailService from '../../../Customer-Authentication/src/services/email.service';
 
-const emailTemplate = readFileSync(join(__dirname, '../../../HTML_files/reservationConfirmationEmail.html'), 'utf-8');
-const template = Handlebars.compile(emailTemplate);
-
-const updateEmailTemplate = readFileSync(join(__dirname, '../../../HTML_files/reservationUpdateEmail.html'), 'utf-8');
-const updateTemplate = Handlebars.compile(updateEmailTemplate);
-
-const cancelEmailTemplate = readFileSync(join(__dirname, '../../../HTML_files/reservationCancellationEmail.html'), 'utf-8');
-const cancelTemplate = Handlebars.compile(cancelEmailTemplate);
 
 const calculateAgeCategory = (dob: string) => {
   const birthDate = new Date(dob);
@@ -165,33 +154,191 @@ export const createReservationWithStoredCard = CatchAsyncError(
       const thirdPartyService = new ThirdPartyReservationService();
       await thirdPartyService.processThirdPartyReservation(reservationInput);
       try {
-        const templateData = {
-          guestName: `${guests[0].firstName} ${guests[0].lastName}`,
-          hotelName,
-          hotelCode,
-          checkInDate: new Date(checkInDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
-          checkOutDate: new Date(checkOutDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
-          roomTypeCode,
-          numberOfRooms,
-          roomTotalPrice,
-          currencyCode,
-          email,
-          phone,
-          guests: categorizedGuests,
-          supportEmail: process.env.SUPPORT_EMAIL || 'support@yourcompany.com',
-          supportPhone: process.env.SUPPORT_PHONE || '+1-800-123-4567',
-          websiteUrl: process.env.WEBSITE_URL || 'https://book.trip-swift.ai',
-          companyName: process.env.COMPANY_NAME || 'Trip-Swift',
-          companyAddress: process.env.COMPANY_ADDRESS || 'Gothapatna, Bhubaneswar, Odisha, 751003',
-          currentYear: new Date().getFullYear(),
-        };
+        const htmlContent = `<!DOCTYPE html>
+        <html lang="en">
 
-        const htmlContent = template(templateData);
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              background-color: #f4f4f4;
+              margin: 0;
+              padding: 0;
+            }
+
+            .container {
+              max-width: 600px;
+              margin: 20px auto;
+              background-color: #ffffff;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .header {
+              background-color: #1a73e8;
+              color: #ffffff;
+              padding: 20px;
+              text-align: center;
+            }
+
+            .header h1 {
+              margin: 0;
+              font-size: 24px;
+            }
+
+            .content {
+              padding: 20px;
+            }
+
+            .content h2 {
+              color: #333333;
+              font-size: 20px;
+              margin-top: 0;
+            }
+
+            .content p {
+              color: #666666;
+              line-height: 1.6;
+              margin: 10px 0;
+            }
+
+            .details-table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 20px 0;
+            }
+
+            .details-table th,
+            .details-table td {
+              padding: 10px;
+              text-align: left;
+              border-bottom: 1px solid #dddddd;
+            }
+
+            .details-table th {
+              background-color: #f8f8f8;
+              color: #333333;
+              font-weight: bold;
+            }
+
+            .footer {
+              background-color: #f4f4f4;
+              padding: 15px;
+              text-align: center;
+              color: #888888;
+              font-size: 12px;
+            }
+
+            .button {
+              display: inline-block;
+              padding: 10px 20px;
+              margin: 20px 0;
+              background-color: #1a73e8;
+              color: #ffffff;
+              text-decoration: none;
+              border-radius: 5px;
+              font-weight: bold;
+            }
+
+            @media only screen and (max-width: 600px) {
+              .container {
+                width: 100%;
+                margin: 10px;
+              }
+
+              .header h1 {
+                font-size: 20px;
+              }
+
+              .content h2 {
+                font-size: 18px;
+              }
+            }
+          </style>
+        </head>
+
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Booking Confirmation</h1>
+            </div>
+            <div class="content">
+              <h2>Dear {{guestName}},</h2>
+              <p>Thank you for your booking with {{hotelName}}! We are excited to confirm your booking details below.</p>
+
+              <h2>Reservation Details</h2>
+              <table class="details-table">
+                <tr>
+                  <th>Hotel Name</th>
+                  <td>{{hotelName}}</td>
+                </tr>
+                <tr>
+                  <th>Check-In Date</th>
+                  <td>{{checkInDate}}</td>
+                </tr>
+                <tr>
+                  <th>Check-Out Date</th>
+                  <td>{{checkOutDate}}</td>
+                </tr>
+                <tr>
+                  <th>Room Type</th>
+                  <td>{{roomTypeCode}}</td>
+                </tr>
+                <tr>
+                  <th>Number of Rooms</th>
+                  <td>{{numberOfRooms}}</td>
+                </tr>
+                <tr>
+                  <th>Total Price</th>
+                  <td>{{roomTotalPrice}} {{currencyCode}}</td>
+                </tr>
+                <tr>
+                  <th>Contact Email</th>
+                  <td>{{email}}</td>
+                </tr>
+                <tr>
+                  <th>Contact Phone</th>
+                  <td>{{phone}}</td>
+                </tr>
+              </table>
+
+              <h2>Guest Details</h2>
+              <table class="details-table">
+                <tr>
+                  <th>Name</th>
+                  <th>Age Category</th>
+                </tr>
+                {{#each guests}}
+                <tr>
+                  <td>{{firstName}} {{lastName}}</td>
+                  <td>{{category}} (Age {{age}})</td>
+                </tr>
+                {{/each}}
+              </table>
+
+              <p>For any questions or to modify your reservation, please contact us at <a
+                  href="mailto:{{supportEmail}}">{{supportEmail}}</a> or call {{supportPhone}}.</p>
+
+              <a href="{{websiteUrl}}" class="button">View Your Booking</a>
+            </div>
+            <div class="footer">
+              <p>&copy; {{currentYear}} {{companyName}}. All rights reserved.</p>
+              <p>{{companyAddress}}</p>
+            </div>
+          </div>
+        </body>
+
+        </html>`
+
+        // const htmlContent = template(templateData);
 
         await EmailService.sendEmail({
           to: email,
-          text: `Your reservation has been confirmed`,
-          subject: `Reservation Confirmation - ${hotelName}`,
+          text: `Your booking has been confirmed`,
+          subject: `Booking Confirmation - ${hotelName}`,
           html: htmlContent,
         });
       }
@@ -291,27 +438,184 @@ export async function createReservationWithCryptoPayment(input: {
     const thirdPartyService = new ThirdPartyReservationService();
     await thirdPartyService.processThirdPartyReservation(reservationInput);
 
-    const templateData = {
-      guestName: `${guests[0].firstName} ${guests[0].lastName}`,
-      hotelName,
-      checkInDate: new Date(checkInDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
-      checkOutDate: new Date(checkOutDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
-      roomTypeCode,
-      numberOfRooms,
-      roomTotalPrice,
-      currencyCode,
-      email,
-      phone,
-      guests: categorizedGuests,
-      supportEmail: process.env.SUPPORT_EMAIL || 'support@yourcompany.com',
-      supportPhone: process.env.SUPPORT_PHONE || '+1-800-123-4567',
-      websiteUrl: process.env.WEBSITE_URL || 'https://book.trip-swift.ai',
-      companyName: process.env.COMPANY_NAME || 'Al-Hajz',
-      companyAddress: process.env.COMPANY_ADDRESS || 'Gothapatna, Bhubaneswar, Odisha, 751003',
-      currentYear: new Date().getFullYear(),
-    };
+    const htmlContent = `<!DOCTYPE html>
+        <html lang="en">
 
-    const htmlContent = template(templateData);
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              background-color: #f4f4f4;
+              margin: 0;
+              padding: 0;
+            }
+
+            .container {
+              max-width: 600px;
+              margin: 20px auto;
+              background-color: #ffffff;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .header {
+              background-color: #1a73e8;
+              color: #ffffff;
+              padding: 20px;
+              text-align: center;
+            }
+
+            .header h1 {
+              margin: 0;
+              font-size: 24px;
+            }
+
+            .content {
+              padding: 20px;
+            }
+
+            .content h2 {
+              color: #333333;
+              font-size: 20px;
+              margin-top: 0;
+            }
+
+            .content p {
+              color: #666666;
+              line-height: 1.6;
+              margin: 10px 0;
+            }
+
+            .details-table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 20px 0;
+            }
+
+            .details-table th,
+            .details-table td {
+              padding: 10px;
+              text-align: left;
+              border-bottom: 1px solid #dddddd;
+            }
+
+            .details-table th {
+              background-color: #f8f8f8;
+              color: #333333;
+              font-weight: bold;
+            }
+
+            .footer {
+              background-color: #f4f4f4;
+              padding: 15px;
+              text-align: center;
+              color: #888888;
+              font-size: 12px;
+            }
+
+            .button {
+              display: inline-block;
+              padding: 10px 20px;
+              margin: 20px 0;
+              background-color: #1a73e8;
+              color: #ffffff;
+              text-decoration: none;
+              border-radius: 5px;
+              font-weight: bold;
+            }
+
+            @media only screen and (max-width: 600px) {
+              .container {
+                width: 100%;
+                margin: 10px;
+              }
+
+              .header h1 {
+                font-size: 20px;
+              }
+
+              .content h2 {
+                font-size: 18px;
+              }
+            }
+          </style>
+        </head>
+
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Booking Confirmation</h1>
+            </div>
+            <div class="content">
+              <h2>Dear {{guestName}},</h2>
+              <p>Thank you for your booking with {{hotelName}}! We are excited to confirm your booking details below.</p>
+
+              <h2>Reservation Details</h2>
+              <table class="details-table">
+                <tr>
+                  <th>Hotel Name</th>
+                  <td>{{hotelName}}</td>
+                </tr>
+                <tr>
+                  <th>Check-In Date</th>
+                  <td>{{checkInDate}}</td>
+                </tr>
+                <tr>
+                  <th>Check-Out Date</th>
+                  <td>{{checkOutDate}}</td>
+                </tr>
+                <tr>
+                  <th>Room Type</th>
+                  <td>{{roomTypeCode}}</td>
+                </tr>
+                <tr>
+                  <th>Number of Rooms</th>
+                  <td>{{numberOfRooms}}</td>
+                </tr>
+                <tr>
+                  <th>Total Price</th>
+                  <td>{{roomTotalPrice}} {{currencyCode}}</td>
+                </tr>
+                <tr>
+                  <th>Contact Email</th>
+                  <td>{{email}}</td>
+                </tr>
+                <tr>
+                  <th>Contact Phone</th>
+                  <td>{{phone}}</td>
+                </tr>
+              </table>
+
+              <h2>Guest Details</h2>
+              <table class="details-table">
+                <tr>
+                  <th>Name</th>
+                  <th>Age Category</th>
+                </tr>
+                {{#each guests}}
+                <tr>
+                  <td>{{firstName}} {{lastName}}</td>
+                  <td>{{category}} (Age {{age}})</td>
+                </tr>
+                {{/each}}
+              </table>
+
+              <p>For any questions or to modify your reservation, please contact us at <a
+                  href="mailto:{{supportEmail}}">{{supportEmail}}</a> or call {{supportPhone}}.</p>
+
+              <a href="{{websiteUrl}}" class="button">View Your Booking</a>
+            </div>
+            <div class="footer">
+              <p>&copy; {{currentYear}} {{companyName}}. All rights reserved.</p>
+              <p>{{companyAddress}}</p>
+            </div>
+          </div>
+        </body>
+
+        </html>`
 
     await EmailService.sendEmail({
       to: email,
@@ -442,27 +746,193 @@ export const updateThirdPartyReservation = CatchAsyncError(
       try {
         const thirdPartyService = new ThirdPartyAmendReservationService();
         await thirdPartyService.processAmendReservation(amendReservationInput);
-        const template = {
-          guestName: `${guests[0].firstName} ${guests[0].lastName}`,
-          hotelName,
-          checkInDate: new Date(checkInDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
-          checkOutDate: new Date(checkOutDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
-          roomTypeCode,
-          numberOfRooms,
-          roomTotalPrice,
-          currencyCode,
-          email,
-          phone,
-          guests: categorizedGuests,
-          supportEmail: process.env.SUPPORT_EMAIL || 'support@yourcompany.com',
-          supportPhone: process.env.SUPPORT_PHONE || '+1-800-123-4567',
-          websiteUrl: process.env.WEBSITE_URL || 'https://book.trip-swift.ai',
-          companyName: process.env.COMPANY_NAME || 'Al-Hajz',
-          companyAddress: process.env.COMPANY_ADDRESS || 'Gothapatna, Bhubaneswar, Odisha, 751003',
-          currentYear: new Date().getFullYear(),
-        };
+          const htmlContent = `<!DOCTYPE html>
+<html lang="en">
 
-        const htmlContent = updateTemplate(template);
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+      background-color: #1a73e8;
+      color: #ffffff;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .content {
+      padding: 20px;
+    }
+
+    .content h2 {
+      color: #333333;
+      font-size: 20px;
+      margin-top: 0;
+    }
+
+    .content p {
+      color: #666666;
+      line-height: 1.6;
+      margin: 10px 0;
+    }
+
+    .details-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    .details-table th,
+    .details-table td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #dddddd;
+    }
+
+    .details-table th {
+      background-color: #f8f8f8;
+      color: #333333;
+      font-weight: bold;
+    }
+
+    .footer {
+      background-color: #f4f4f4;
+      padding: 15px;
+      text-align: center;
+      color: #888888;
+      font-size: 12px;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      margin: 20px 0;
+      background-color: #1a73e8;
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    @media only screen and (max-width: 600px) {
+      .container {
+        width: 100%;
+        margin: 10px;
+      }
+
+      .header h1 {
+        font-size: 20px;
+      }
+
+      .content h2 {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Booking Update Confirmation</h1>
+    </div>
+    <div class="content">
+      <h2>Dear {{guestName}},</h2>
+      <p>Your reservation with {{hotelName}} has been successfully updated. Below are the updated details for your
+        booking.</p>
+
+      <h2>Updated Reservation Details</h2>
+      <table class="details-table">
+        <tr>
+          <th>Reservation ID</th>
+          <td>{{reservationId}}</td>
+        </tr>
+        <tr>
+          <th>Hotel Name</th>
+          <td>{{hotelName}}</td>
+        </tr>
+        <!-- <tr>
+          <th>Hotel Code</th>
+          <td>{{hotelCode}}</td>
+        </tr> -->
+        <tr>
+          <th>Check-In Date</th>
+          <td>{{checkInDate}}</td>
+        </tr>
+        <tr>
+          <th>Check-Out Date</th>
+          <td>{{checkOutDate}}</td>
+        </tr>
+        <tr>
+          <th>Room Type</th>
+          <td>{{roomTypeCode}}</td>
+        </tr>
+        <tr>
+          <th>Number of Rooms</th>
+          <td>{{numberOfRooms}}</td>
+        </tr>
+        <tr>
+          <th>Total Price</th>
+          <td>{{roomTotalPrice}} {{currencyCode}}</td>
+        </tr>
+        <tr>
+          <th>Contact Email</th>
+          <td>{{email}}</td>
+        </tr>
+        <tr>
+          <th>Contact Phone</th>
+          <td>{{phone}}</td>
+        </tr>
+      </table>
+
+      <h2>Guest Details</h2>
+      <table class="details-table">
+        <tr>
+          <th>Name</th>
+          <th>Age Category</th>
+        </tr>
+        {{#each guests}}
+        <tr>
+          <td>{{firstName}} {{lastName}}</td>
+          <td>{{category}} (Age {{age}})</td>
+        </tr>
+        {{/each}}
+      </table>
+
+      <p>If you have any questions or need further modifications to your reservation, please contact us at <a
+          href="mailto:{{supportEmail}}">{{supportEmail}}</a> or call {{supportPhone}}.</p>
+
+      <a href="{{websiteUrl}}" class="button">View Your Updated Reservation</a>
+    </div>
+    <div class="footer">
+      <p>© {{currentYear}} {{companyName}}. All rights reserved.</p>
+      <p>{{companyAddress}}</p>
+    </div>
+  </div>
+</body>
+
+</html>`
 
         await EmailService.sendEmail({
           to: email,
@@ -536,21 +1006,158 @@ export const cancelThirdPartyReservation = CatchAsyncError(
 
       // Send cancellation confirmation email
       try {
-        const templateData = {
-          reservationId,
-          guestName: `${firstName} ${lastName}`,
-          hotelName,
-          checkInDate: new Date(checkInDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
-          checkOutDate: new Date(checkOutDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
-          supportEmail: process.env.SUPPORT_EMAIL || 'support@yourcompany.com',
-          supportPhone: process.env.SUPPORT_PHONE || '+1-800-123-4567',
-          websiteUrl: process.env.WEBSITE_URL || 'https://book.trip-swift.ai',
-          companyName: process.env.COMPANY_NAME || 'Al-Hajz',
-          companyAddress: process.env.COMPANY_ADDRESS || 'Gothapatna, Bhubaneswar, Odisha, 751003',
-          currentYear: new Date().getFullYear(),
-        };
+        const htmlContent = `<!DOCTYPE html>
+<html lang="en">
 
-        const htmlContent = cancelTemplate(templateData);
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background-color: #d32f2f;
+            /* Red theme */
+            color: #ffffff;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .content {
+            padding: 15px;
+        }
+
+        .content p {
+            color: #666666;
+            line-height: 1.5;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .details-table th,
+        .details-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .details-table th {
+            background-color: #f8f8f8;
+            color: #333333;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .details-table td {
+            color: #666666;
+            font-size: 14px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 15px 0;
+            background-color: #d32f2f;
+            /* Red theme */
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .footer {
+            background-color: #f4f4f4;
+            padding: 10px;
+            text-align: center;
+            color: #888888;
+            font-size: 12px;
+        }
+
+        @media only screen and (max-width: 500px) {
+            .container {
+                width: 100%;
+                margin: 10px;
+            }
+
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .content p {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Booking Cancellation Confirmation</h1>
+        </div>
+        <div class="content">
+            <p>Dear {{guestName}},</p>
+            <p>Your reservation with {{hotelName}} has been successfully cancelled. Below are the details of the
+                cancelled booking.</p>
+
+            <table class="details-table">
+                <tr>
+                    <th>Reservation ID</th>
+                    <td>{{reservationId}}</td>
+                </tr>
+                <tr>
+                    <th>Hotel Name</th>
+                    <td>{{hotelName}}</td>
+                </tr>
+                <tr>
+                    <th>Check-In Date</th>
+                    <td>{{checkInDate}}</td>
+                </tr>
+                <tr>
+                    <th>Check-Out Date</th>
+                    <td>{{checkOutDate}}</td>
+                </tr>
+            </table>
+
+            <p>If you have any questions or need assistance, please contact us at <a
+                    href="mailto:{{supportEmail}}">{{supportEmail}}</a> or call {{supportPhone}}.</p>
+
+            <a href="{{websiteUrl}}" class="button">Visit Our Website</a>
+        </div>
+        <div class="footer">
+            <p>© {{currentYear}} {{companyName}}. All rights reserved.</p>
+            <p>{{companyAddress}}</p>
+        </div>
+    </div>
+</body>
+
+</html>`
 
         await EmailService.sendEmail({
           to: email,
