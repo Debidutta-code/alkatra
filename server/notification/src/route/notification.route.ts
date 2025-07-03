@@ -12,8 +12,8 @@ const notificationController = new NotificationController(NotificationService);
 // ✅ Register routes
 router.post('/send-notification', notificationController.sendToAllUsers);
 router.post('/register-device-token', notificationController.registerDeviceToken);
-router.route('/offer-by-hotel').post(notificationController.createOffers)
-router.route('/offer-by-hotel').get(notificationController.getOffers);
+router.route('/create-notification').post(notificationController.createNotifications)
+router.route('/get-notification').get(notificationController.getNotifications);
 router.get('/user-notifications-get/:id', notificationController.getNotificationsByUserId);
 router.patch('/update-notification-user', notificationController.notificationUpdateFromUserSide);
 
