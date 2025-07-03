@@ -31,7 +31,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/notification/offer-by-hotel`
         );
-        
+
         const fetchedOffer = response.data.offers[0];
         setOfferDetails({
           id: fetchedOffer._id,
@@ -50,7 +50,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
         });
       } catch (error: any) {
         if (error.response?.status !== 404) {
-          toast.error('Failed to fetch offer details');
+          toast.error('Failed to fetch notification details');
         }
       } finally {
         setLoading(false);
@@ -82,7 +82,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
           }
         }
       );
-      
+
       if (response.status === 200) {
         toast.success('Offer published successfully!');
       } else {
@@ -132,7 +132,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
         </div>
       </div>
 
-      {/* Offer details */}
+      {/* Notification details */}
       <div className="p-6">
         <div className="space-y-4">
           <div className="flex items-start">
@@ -140,11 +140,15 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
             <div>
               <p className="text-sm font-medium text-gray-500">Valid Till</p>
               <p className="text-sm text-gray-900">
-                {format(new Date(offerDetails.endDate), 'PPP')}
+                {offerDetails.endDate ? (
+                  format(new Date(offerDetails.endDate), 'PPP')
+                ) : (
+                  'No expiration date'
+                )}
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-start">
             <FileText className="h-5 w-5 text-gray-400 mr-3 mt-0.5 flex-shrink-0" />
             <div>
@@ -163,9 +167,8 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
           <button
             onClick={handlePublish}
             disabled={publishing || loading}
-            className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${
-              publishing ? 'opacity-70 cursor-not-allowed' : ''
-            }`}
+            className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${publishing ? 'opacity-70 cursor-not-allowed' : ''
+              }`}
           >
             <Send className="-ml-1 mr-2 h-4 w-4" />
             {publishing ? 'Publishing...' : 'Publish Offer'}

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useMemo } from 'react';
-import { Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { BookingOffer, OfferFilters } from './types/offer';
 import { OfferCard } from './components/OfferCard';
 import { OfferModal } from './components/OfferModal';
@@ -22,9 +22,30 @@ function Offers() {
     offer: undefined as BookingOffer | undefined
   });
   const [loading, setLoading] = useState(false);
-  
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 5,
+    total: 0,
+    totalPages: 1
+  });
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
+
+  const handleLimitChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newLimit = parseInt(event.target.value, 10);
+    setPagination(prev => ({
+      ...prev,
+      limit: newLimit,
+      page: 1 // Reset to the first page when limit changes
+    }));
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPagination(prev => ({
+      ...prev,
+      page: newPage
+    }));
+  };
 
   // Fetch user if not authenticated
   useEffect(() => {
@@ -41,9 +62,15 @@ function Offers() {
       setLoading(true);
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/notification/offer-by-hotel`
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/notification/offer-by-hotel`,
+          {
+            params: {
+              page: pagination.page,
+              limit: pagination.limit
+            }
+          }
         );
-        
+
         if (response.data?.offers) {
           const fetchedOffers = response.data.offers.map((offer: any) => ({
             id: offer._id,
@@ -79,10 +106,10 @@ function Offers() {
   const filteredOffers = useMemo(() => {
     return offers.filter(offer => {
       const matchesSearch = offer.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-                          offer.description.toLowerCase().includes(filters.search.toLowerCase());
+        offer.description.toLowerCase().includes(filters.search.toLowerCase());
       const matchesStatus = !filters.status || offer.status === filters.status;
       const matchesDateRange = (!filters.dateRange.start || offer.endDate >= filters.dateRange.start) &&
-                             (!filters.dateRange.end || offer.endDate <= filters.dateRange.end);
+        (!filters.dateRange.end || offer.endDate <= filters.dateRange.end);
 
       return matchesSearch && matchesStatus && matchesDateRange;
     });
@@ -129,7 +156,7 @@ function Offers() {
                 disabled={loading}
               >
                 <Plus className="w-4 h-4" />
-                Create Offer
+                Create Notification
               </button>
             </div>
           </div>
@@ -166,6 +193,54 @@ function Offers() {
               <Plus className="w-4 h-4" />
               Create Your First Offer
             </button>
+          </div>
+        )}
+
+        {offers.length > 0 && (
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-700">Items per page:</span>
+              <select
+                value={pagination.limit}
+                onChange={handleLimitChange}
+                className="rounded-md border-gray-300 py-1 pl-2 pr-8 text-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+              >
+                {[5, 10, 20, 50].map(size => (
+                  <option key={size} value={size}>{size}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handlePageChange(pagination.page - 1)}
+                disabled={pagination.page === 1}
+                className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+
+              <span className="text-sm text-gray-700">
+                Page {pagination.page} of {pagination.totalPages}
+              </span>
+
+              <button
+                onClick={() => handlePageChange(pagination.page + 1)}
+                disabled={pagination.page >= pagination.totalPages}
+                className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="text-sm text-gray-500">
+              {offers.length > 0 ? (
+                `Showing ${(pagination.page - 1) * pagination.limit + 1}-${(pagination.page - 1) * pagination.limit + offers.length
+                } of ${pagination.total} offers`
+              ) : (
+                'No offers to display'
+              )}
+            </div>
           </div>
         )}
       </div>

@@ -127,8 +127,8 @@ export const OfferModal: React.FC<OfferModalProps> = ({
       <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">
-            {mode === 'create' && 'Create New Offer'}
-            {mode === 'view' && 'Offer Details'}
+            {mode === 'create' && 'Create New Notification'}
+            {mode === 'view' && 'Notification Details'}
           </h2>
           <button
             onClick={onClose}
@@ -240,7 +240,7 @@ export const OfferModal: React.FC<OfferModalProps> = ({
                 className="px-6 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors disabled:bg-blue-400"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Saving...' : 'Create Offer'}
+                {isSubmitting ? 'Saving...' : 'Create Notification'}
               </button>
             </div>
           )}
