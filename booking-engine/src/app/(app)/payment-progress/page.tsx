@@ -7,6 +7,9 @@ import { useTranslation } from "react-i18next";
 import { format, differenceInYears } from "date-fns";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { onMessage } from 'firebase/messaging';
+import { messaging } from '../../../utils/firebase.config';
+import toast from "react-hot-toast";
 // ... other imports
 import {
     CheckCircle,
@@ -54,6 +57,30 @@ const PaymentProgressPage: React.FC = () => {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
 
 
+    // payment notify
+     useEffect(() => {
+
+        console.log('🔔 useFCM hook initialized----------pppppp-------------------');
+      if (messaging) {
+        onMessage(messaging, (payload) => {
+          const data = payload.data;
+    
+          if (data?.type === 'CRYPTO_PAYMENT_CONFIRMED') {
+            toast.success(`💸 ${data.message}`, { duration: 8000 });
+    
+            // Optional: trigger state update or refetch wallet
+            console.log('✅ Payment data:', data);
+            return;
+          }
+    
+          // fallback for other notifications
+          toast(`🔔 ${payload.notification?.title}`);
+        });
+      }
+    }, []);
+    
+
+
     // Timer for tracking payment time
     useEffect(() => {
         const initialDuration = 2400; // 40 minutes in seconds
@@ -74,6 +101,8 @@ const PaymentProgressPage: React.FC = () => {
     // Retrieve payment data from localStorage
     // Inside the useEffect for retrieving payment data
     useEffect(() => {
+
+        console.log("Retrieving payment data from localStorage...");
         const timer = setTimeout(() => {
             const storedData = localStorage.getItem("paymentData");
             if (storedData) {
