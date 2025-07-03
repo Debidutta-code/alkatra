@@ -100,12 +100,19 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
   };
 
   const incDecHandler = (
-    setter: React.Dispatch<React.SetStateAction<number>>,
-    delta: number,
-    minValue: number = 1
-  ) => {
-    setter((prevValue) => Math.max(prevValue + delta, minValue));
-  };
+  setter: React.Dispatch<React.SetStateAction<number>>,
+  delta: number,
+  minValue: number = 1,
+  maxValue?: number
+) => {
+  setter((prevValue) => {
+    const updatedValue = prevValue + delta;
+    if (updatedValue < minValue) return minValue;
+    if (maxValue !== undefined && updatedValue > maxValue) return maxValue;
+    return updatedValue;
+  });
+};
+
 
   const handleChildrenChange = (value: number) => {
     setChildren(() => {
@@ -241,7 +248,8 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
                 </span>
                 <button
                   className="w-9 h-9 rounded-full border border-tripswift-black/20 text-tripswift-black/60 flex items-center justify-center transition-colors hover:bg-tripswift-blue/10"
-                  onClick={() => incDecHandler(setRooms, 1)}
+                  onClick={() => incDecHandler(setRooms, 1, 1, 4)}
+                  disabled={rooms >= 4}
                 >
                   <span className="text-lg">+</span>
                 </button>

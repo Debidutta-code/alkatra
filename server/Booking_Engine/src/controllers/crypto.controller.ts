@@ -9,9 +9,11 @@ import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { CryptoGuestDetails } from "../models/cryptoUserPaymentInitialStage.model";
 import { createReservationWithCryptoPayment } from "./bookings.controller";
-import {NotificationService} from "../../../notification/src/service/notification.service";
+import { NotificationService } from "../../../notification/src/service/notification.service";
 
 let convertedAmount: number;
+
+const notification = new NotificationService()
 
 const calculateAgeCategory = (dob: string) => {
   const birthDate = new Date(dob);
@@ -66,6 +68,7 @@ export const getCryptoDetails = CatchAsyncError(
               "networks.name": 1,
               "networks.imageUrl": 1,
               "networks.contractAddress": 1,
+              "networks.chainId": 1
             },
           }
         );
@@ -298,7 +301,7 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
       ageCodeSummary: ageCodeCount,
       numberOfRooms,
       totalAmount: roomTotalPrice,
-      currencyCode,
+      // currencyCode,
       userId,
       status: "Processing",
       createdAt: new Date(),
@@ -326,7 +329,6 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
 
 export const pushCryptoPaymentDetails = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    console.log("Entering into push crypto payment details");
     const { senderWalletAddress, token, blockChain, amount, txHash } = req.body;
     console.log("Received data:", { token, blockChain, amount, txHash });
     const requiredFields = { token, blockChain, amount, txHash };
@@ -347,8 +349,8 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
       txHash,
       senderWalletAddress,
     });
-
-    console.log(">>>>>>>> CryptoPaymentLog:", cryptoPaymentLog, "parsedamount is ", parseFloat(amount));
+   
+    console.log(">>>>>>>> CryptoPaymentLog:", cryptoPaymentLog,"parsedamount is ", parseFloat(amount));
 
     await cryptoPaymentLog.save();
 
@@ -358,6 +360,11 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
       amount: parseFloat(amount),
       status: "Pending",
     });
+
+    if (payment) {
+      await notification.sendCryptoPaymentNotification(payment.customer_id.toString(), parseFloat(amount), txHash)
+      console.log("----------11111111111111111111-------------------------")
+    }
 
     const guestDetails = await CryptoGuestDetails.findOne({
       totalAmount: parseFloat(amount),
@@ -384,7 +391,6 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
     (guestDetails as any).senderWalletAddress = senderWalletAddress;
     await payment.save();
     await guestDetails.save();
-    await NotificationService.sendCryptoPaymentNotification(payment.customer_id.toString(),payment.amount,txHash )
 
     await createReservationWithCryptoPayment({
       reservationId: guestDetails.reservationId,

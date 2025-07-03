@@ -28,7 +28,7 @@ export class ThirdPartyReservationService {
 
             // Step 2: Generate XML
             const xml: string = await this.formatter.generateReservationXml(reservationData);
-            console.log('Generated XML with reservationId:', reservationData.reservationId);
+            // console.log('Generated XML with reservationId:', reservationData.reservationId);
             // let response: any;
             // Step 3: Send to third-party API
             const response = await this.apiClient.sendToThirdParty(xml);

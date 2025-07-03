@@ -16,6 +16,8 @@ import { ReservationInput } from "../../../wincloud/src/interface/reservationInt
 import { ThirdPartyCancelReservationService } from '../../../wincloud/src/service/cancelReservationService';
 import { AmendReservationInput } from "../../../wincloud/src/interface/amendReservationInterface";
 import { CryptoGuestDetails } from "../models/cryptoUserPaymentInitialStage.model";
+import EmailService from '../../../Customer-Authentication/src/services/email.service';
+
 
 const calculateAgeCategory = (dob: string) => {
   const birthDate = new Date(dob);
@@ -146,11 +148,203 @@ export const createReservationWithStoredCard = CatchAsyncError(
       ageCodeSummary: ageCodeCount,
     };
 
-    console.log("Reservation Input Data:", JSON.stringify(reservationInput, null, 2));
+    // console.log("Reservation Input Data:", JSON.stringify(reservationInput, null, 2));
 
     try {
       const thirdPartyService = new ThirdPartyReservationService();
       await thirdPartyService.processThirdPartyReservation(reservationInput);
+      try {
+        const htmlContent = `<!DOCTYPE html>
+        <html lang="en">
+
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              background-color: #f4f4f4;
+              margin: 0;
+              padding: 0;
+            }
+
+            .container {
+              max-width: 600px;
+              margin: 20px auto;
+              background-color: #ffffff;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .header {
+              background-color: #1a73e8;
+              color: #ffffff;
+              padding: 20px;
+              text-align: center;
+            }
+
+            .header h1 {
+              margin: 0;
+              font-size: 24px;
+            }
+
+            .content {
+              padding: 20px;
+            }
+
+            .content h2 {
+              color: #333333;
+              font-size: 20px;
+              margin-top: 0;
+            }
+
+            .content p {
+              color: #666666;
+              line-height: 1.6;
+              margin: 10px 0;
+            }
+
+            .details-table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 20px 0;
+            }
+
+            .details-table th,
+            .details-table td {
+              padding: 10px;
+              text-align: left;
+              border-bottom: 1px solid #dddddd;
+            }
+
+            .details-table th {
+              background-color: #f8f8f8;
+              color: #333333;
+              font-weight: bold;
+            }
+
+            .footer {
+              background-color: #f4f4f4;
+              padding: 15px;
+              text-align: center;
+              color: #888888;
+              font-size: 12px;
+            }
+
+            .button {
+              display: inline-block;
+              padding: 10px 20px;
+              margin: 20px 0;
+              background-color: #1a73e8;
+              color: #ffffff;
+              text-decoration: none;
+              border-radius: 5px;
+              font-weight: bold;
+            }
+
+            @media only screen and (max-width: 600px) {
+              .container {
+                width: 100%;
+                margin: 10px;
+              }
+
+              .header h1 {
+                font-size: 20px;
+              }
+
+              .content h2 {
+                font-size: 18px;
+              }
+            }
+          </style>
+        </head>
+
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Booking Confirmation</h1>
+            </div>
+            <div class="content">
+              <h2>Dear {{guestName}},</h2>
+              <p>Thank you for your booking with {{hotelName}}! We are excited to confirm your booking details below.</p>
+
+              <h2>Reservation Details</h2>
+              <table class="details-table">
+                <tr>
+                  <th>Hotel Name</th>
+                  <td>{{hotelName}}</td>
+                </tr>
+                <tr>
+                  <th>Check-In Date</th>
+                  <td>{{checkInDate}}</td>
+                </tr>
+                <tr>
+                  <th>Check-Out Date</th>
+                  <td>{{checkOutDate}}</td>
+                </tr>
+                <tr>
+                  <th>Room Type</th>
+                  <td>{{roomTypeCode}}</td>
+                </tr>
+                <tr>
+                  <th>Number of Rooms</th>
+                  <td>{{numberOfRooms}}</td>
+                </tr>
+                <tr>
+                  <th>Total Price</th>
+                  <td>{{roomTotalPrice}} {{currencyCode}}</td>
+                </tr>
+                <tr>
+                  <th>Contact Email</th>
+                  <td>{{email}}</td>
+                </tr>
+                <tr>
+                  <th>Contact Phone</th>
+                  <td>{{phone}}</td>
+                </tr>
+              </table>
+
+              <h2>Guest Details</h2>
+              <table class="details-table">
+                <tr>
+                  <th>Name</th>
+                  <th>Age Category</th>
+                </tr>
+                {{#each guests}}
+                <tr>
+                  <td>{{firstName}} {{lastName}}</td>
+                  <td>{{category}} (Age {{age}})</td>
+                </tr>
+                {{/each}}
+              </table>
+
+              <p>For any questions or to modify your reservation, please contact us at <a
+                  href="mailto:{{supportEmail}}">{{supportEmail}}</a> or call {{supportPhone}}.</p>
+
+              <a href="{{websiteUrl}}" class="button">View Your Booking</a>
+            </div>
+            <div class="footer">
+              <p>&copy; {{currentYear}} {{companyName}}. All rights reserved.</p>
+              <p>{{companyAddress}}</p>
+            </div>
+          </div>
+        </body>
+
+        </html>`
+
+        // const htmlContent = template(templateData);
+
+        await EmailService.sendEmail({
+          to: email,
+          text: `Your booking has been confirmed`,
+          subject: `Booking Confirmation - ${hotelName}`,
+          html: htmlContent,
+        });
+      }
+      catch (error: any) {
+        return res.status(500).json({ message: "❌ Failed to send confirmation email" });
+      }
     } catch (error: any) {
       return res.status(500).json({ message: "Failed to process reservation with third-party" });
     }
@@ -181,99 +375,15 @@ export async function createReservationWithCryptoPayment(input: {
   phone: string;
   guests: { firstName: string; lastName: string; dob: string }[];
 }) {
-  const {
-    reservationId,
-    userId,
-    checkInDate,
-    checkOutDate,
-    hotelCode,
-    hotelName,
-    ratePlanCode,
-    numberOfRooms,
-    roomTypeCode,
-    roomTotalPrice,
-    currencyCode,
-    email,
-    phone,
-    guests,
-  } = input;
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const checkIn = new Date(checkInDate);
-  const checkOut = new Date(checkOutDate);
-
-  if (checkIn < today || checkOut <= checkIn) {
-    throw new Error("Check-in date cannot be in the past or Check-out date must be after check-in date");
-  }
-
-  if (!Array.isArray(guests) || guests.length === 0) {
-    throw new Error("Guest details are required");
-  }
-
-  const ageCodeCount: Record<string, number> = { "7": 0, "8": 0, "10": 0 };
-
-  const categorizedGuests = guests.map(({ firstName, lastName, dob }) => {
-    if (!dob) throw new Error(`DOB missing for ${firstName} ${lastName}`);
-    const { age, category, ageCode } = calculateAgeCategory(dob);
-    ageCodeCount[ageCode] = (ageCodeCount[ageCode] || 0) + 1;
-    return { firstName, lastName, dob, age, category, ageCode };
-  });
-
-  const reservationInput: ReservationInput = {
-    bookingDetails: {
-      reservationId: reservationId ?? "",
+  try {
+    const {
+      reservationId,
       userId,
       checkInDate,
       checkOutDate,
       hotelCode,
       hotelName,
       ratePlanCode,
-      roomTypeCode,
-      numberOfRooms,
-      roomTotalPrice,
-      currencyCode,
-      guests,
-      email,
-      phone,
-    },
-    ageCodeSummary: ageCodeCount,
-  };
-
-  const thirdPartyService = new ThirdPartyReservationService();
-  await thirdPartyService.processThirdPartyReservation(reservationInput);
-
-  return {
-    message: "Reservation with crypto confirmed",
-    guests: categorizedGuests,
-    ageCodeSummary: ageCodeCount,
-  };
-}
-
-export const updateThirdPartyReservation = CatchAsyncError(
-  async (req: any, res: Response, next: NextFunction) => {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(400).json({ message: "User ID is required" });
-    }
-    const reservationId = req.params.id;
-    if (!reservationId) {
-      return res.status(400).json({ message: "Reservation ID is required" });
-    }
-    const existingReservation = await ThirdPartyBooking.findOne({ reservationId });
-    if (!existingReservation) {
-      throw new Error(`Reservation with ID ${reservationId} not found in our record`);
-    }
-    if (existingReservation.status === 'Cancelled') {
-      throw new Error(`Reservation with ID ${reservationId} is already cancelled`);
-    }
-
-    const {
-      checkInDate,
-      checkOutDate,
-      hotelCode,
-      hotelName,
-      ratePlanCode,
       numberOfRooms,
       roomTypeCode,
       roomTotalPrice,
@@ -281,34 +391,9 @@ export const updateThirdPartyReservation = CatchAsyncError(
       email,
       phone,
       guests,
-      // paymentInfo,
-    } = req.body;
+    } = input;
 
-    const requiredFields = {
-      reservationId,
-      checkInDate,
-      checkOutDate,
-      hotelCode,
-      ratePlanCode,
-      numberOfRooms,
-      roomTypeCode,
-      roomTotalPrice,
-      currencyCode,
-      email,
-      phone,
-      guests,
-      // paymentInfo,
-    };
-
-    const missingFields = Object.entries(requiredFields)
-      .filter(([_, value]) => value === undefined || value === null || value === "")
-      .map(([key]) => key);
-
-    if (missingFields.length > 0) {
-      return res.status(400).json({
-        message: `Missing required fields: ${missingFields.join(", ")}`,
-      });
-    }
+    console.log(`BOOKING Controller, crypto booking begins ${currencyCode} ${roomTotalPrice}`)
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -316,13 +401,11 @@ export const updateThirdPartyReservation = CatchAsyncError(
     const checkOut = new Date(checkOutDate);
 
     if (checkIn < today || checkOut <= checkIn) {
-      return res.status(400).json({
-        message: "Check-in date cannot be in the past or Check-out date must be after check-in date",
-      });
+      throw new Error("Check-in date cannot be in the past or Check-out date must be after check-in date");
     }
 
     if (!Array.isArray(guests) || guests.length === 0) {
-      return res.status(400).json({ message: "Guest details are required" });
+      throw new Error("Guest details are required");
     }
 
     const ageCodeCount: Record<string, number> = { "7": 0, "8": 0, "10": 0 };
@@ -334,10 +417,10 @@ export const updateThirdPartyReservation = CatchAsyncError(
       return { firstName, lastName, dob, age, category, ageCode };
     });
 
-    const amendReservationInput: AmendReservationInput = {
+    const reservationInput: ReservationInput = {
       bookingDetails: {
+        reservationId: reservationId ?? "",
         userId,
-        reservationId,
         checkInDate,
         checkOutDate,
         hotelCode,
@@ -354,25 +437,528 @@ export const updateThirdPartyReservation = CatchAsyncError(
       ageCodeSummary: ageCodeCount,
     };
 
-    console.log("Reservation Input Data:", JSON.stringify(amendReservationInput, null, 2));
+    const thirdPartyService = new ThirdPartyReservationService();
+    await thirdPartyService.processThirdPartyReservation(reservationInput);
 
-    try {
-      const thirdPartyService = new ThirdPartyAmendReservationService();
-      await thirdPartyService.processAmendReservation(amendReservationInput);
-    } catch (error: any) {
-      return res.status(500).json({ message: error.message });
-    }
+    const htmlContent = `<!DOCTYPE html>
+        <html lang="en">
 
-    res.status(200).json({
-      message: "Reservation received",
-      numberOfRooms,
-      roomTotalPrice,
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              background-color: #f4f4f4;
+              margin: 0;
+              padding: 0;
+            }
+
+            .container {
+              max-width: 600px;
+              margin: 20px auto;
+              background-color: #ffffff;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .header {
+              background-color: #1a73e8;
+              color: #ffffff;
+              padding: 20px;
+              text-align: center;
+            }
+
+            .header h1 {
+              margin: 0;
+              font-size: 24px;
+            }
+
+            .content {
+              padding: 20px;
+            }
+
+            .content h2 {
+              color: #333333;
+              font-size: 20px;
+              margin-top: 0;
+            }
+
+            .content p {
+              color: #666666;
+              line-height: 1.6;
+              margin: 10px 0;
+            }
+
+            .details-table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 20px 0;
+            }
+
+            .details-table th,
+            .details-table td {
+              padding: 10px;
+              text-align: left;
+              border-bottom: 1px solid #dddddd;
+            }
+
+            .details-table th {
+              background-color: #f8f8f8;
+              color: #333333;
+              font-weight: bold;
+            }
+
+            .footer {
+              background-color: #f4f4f4;
+              padding: 15px;
+              text-align: center;
+              color: #888888;
+              font-size: 12px;
+            }
+
+            .button {
+              display: inline-block;
+              padding: 10px 20px;
+              margin: 20px 0;
+              background-color: #1a73e8;
+              color: #ffffff;
+              text-decoration: none;
+              border-radius: 5px;
+              font-weight: bold;
+            }
+
+            @media only screen and (max-width: 600px) {
+              .container {
+                width: 100%;
+                margin: 10px;
+              }
+
+              .header h1 {
+                font-size: 20px;
+              }
+
+              .content h2 {
+                font-size: 18px;
+              }
+            }
+          </style>
+        </head>
+
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Booking Confirmation</h1>
+            </div>
+            <div class="content">
+              <h2>Dear {{guestName}},</h2>
+              <p>Thank you for your booking with {{hotelName}}! We are excited to confirm your booking details below.</p>
+
+              <h2>Reservation Details</h2>
+              <table class="details-table">
+                <tr>
+                  <th>Hotel Name</th>
+                  <td>{{hotelName}}</td>
+                </tr>
+                <tr>
+                  <th>Check-In Date</th>
+                  <td>{{checkInDate}}</td>
+                </tr>
+                <tr>
+                  <th>Check-Out Date</th>
+                  <td>{{checkOutDate}}</td>
+                </tr>
+                <tr>
+                  <th>Room Type</th>
+                  <td>{{roomTypeCode}}</td>
+                </tr>
+                <tr>
+                  <th>Number of Rooms</th>
+                  <td>{{numberOfRooms}}</td>
+                </tr>
+                <tr>
+                  <th>Total Price</th>
+                  <td>{{roomTotalPrice}} {{currencyCode}}</td>
+                </tr>
+                <tr>
+                  <th>Contact Email</th>
+                  <td>{{email}}</td>
+                </tr>
+                <tr>
+                  <th>Contact Phone</th>
+                  <td>{{phone}}</td>
+                </tr>
+              </table>
+
+              <h2>Guest Details</h2>
+              <table class="details-table">
+                <tr>
+                  <th>Name</th>
+                  <th>Age Category</th>
+                </tr>
+                {{#each guests}}
+                <tr>
+                  <td>{{firstName}} {{lastName}}</td>
+                  <td>{{category}} (Age {{age}})</td>
+                </tr>
+                {{/each}}
+              </table>
+
+              <p>For any questions or to modify your reservation, please contact us at <a
+                  href="mailto:{{supportEmail}}">{{supportEmail}}</a> or call {{supportPhone}}.</p>
+
+              <a href="{{websiteUrl}}" class="button">View Your Booking</a>
+            </div>
+            <div class="footer">
+              <p>&copy; {{currentYear}} {{companyName}}. All rights reserved.</p>
+              <p>{{companyAddress}}</p>
+            </div>
+          </div>
+        </body>
+
+        </html>`
+
+    await EmailService.sendEmail({
+      to: email,
+      text: `Your reservation has been confirmed`,
+      subject: `Reservation Confirmation - ${hotelName}`,
+      html: htmlContent,
+    });
+
+    return {
+      message: "Reservation with crypto confirmed",
       guests: categorizedGuests,
       ageCodeSummary: ageCodeCount,
-    });
+    };
+
+  } catch (error: any) {
+    console.error("❌ Error creating reservation with crypto:", error.message || error);
+    throw new Error(`Failed to create reservation: ${error.message || "Unknown error"}`);
+  }
+}
+
+
+export const updateThirdPartyReservation = CatchAsyncError(
+  async (req: any, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
+      }
+
+      const reservationId = req.params.id;
+      if (!reservationId) {
+        return res.status(400).json({ message: "Reservation ID is required" });
+      }
+
+      const existingReservation = await ThirdPartyBooking.findOne({ reservationId });
+      if (!existingReservation) {
+        throw new Error(`Reservation with ID ${reservationId} not found in our record`);
+      }
+
+      if (existingReservation.status === 'Cancelled') {
+        throw new Error(`Reservation with ID ${reservationId} is already cancelled`);
+      }
+
+      const {
+        checkInDate,
+        checkOutDate,
+        hotelCode,
+        hotelName,
+        ratePlanCode,
+        numberOfRooms,
+        roomTypeCode,
+        roomTotalPrice,
+        currencyCode,
+        email,
+        phone,
+        guests,
+      } = req.body;
+
+      const requiredFields = {
+        reservationId,
+        checkInDate,
+        checkOutDate,
+        hotelCode,
+        ratePlanCode,
+        numberOfRooms,
+        roomTypeCode,
+        roomTotalPrice,
+        currencyCode,
+        email,
+        phone,
+        guests,
+      };
+
+      const missingFields = Object.entries(requiredFields)
+        .filter(([_, value]) => value === undefined || value === null || value === "")
+        .map(([key]) => key);
+
+      if (missingFields.length > 0) {
+        return res.status(400).json({
+          message: `Missing required fields: ${missingFields.join(", ")}`,
+        });
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const checkIn = new Date(checkInDate);
+      const checkOut = new Date(checkOutDate);
+
+      if (checkIn < today || checkOut <= checkIn) {
+        return res.status(400).json({
+          message: "Check-in date cannot be in the past or Check-out date must be after check-in date",
+        });
+      }
+
+      if (!Array.isArray(guests) || guests.length === 0) {
+        return res.status(400).json({ message: "Guest details are required" });
+      }
+
+      const ageCodeCount: Record<string, number> = { "7": 0, "8": 0, "10": 0 };
+
+      const categorizedGuests = guests.map(({ firstName, lastName, dob }) => {
+        if (!dob) throw new Error(`DOB missing for ${firstName} ${lastName}`);
+        const { age, category, ageCode } = calculateAgeCategory(dob);
+        ageCodeCount[ageCode] = (ageCodeCount[ageCode] || 0) + 1;
+        return { firstName, lastName, dob, age, category, ageCode };
+      });
+
+      const amendReservationInput: AmendReservationInput = {
+        bookingDetails: {
+          userId,
+          reservationId,
+          checkInDate,
+          checkOutDate,
+          hotelCode,
+          hotelName,
+          ratePlanCode,
+          roomTypeCode,
+          numberOfRooms,
+          roomTotalPrice,
+          currencyCode,
+          guests,
+          email,
+          phone,
+        },
+        ageCodeSummary: ageCodeCount,
+      };
+
+      try {
+        const thirdPartyService = new ThirdPartyAmendReservationService();
+        await thirdPartyService.processAmendReservation(amendReservationInput);
+          const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+      background-color: #1a73e8;
+      color: #ffffff;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .content {
+      padding: 20px;
+    }
+
+    .content h2 {
+      color: #333333;
+      font-size: 20px;
+      margin-top: 0;
+    }
+
+    .content p {
+      color: #666666;
+      line-height: 1.6;
+      margin: 10px 0;
+    }
+
+    .details-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    .details-table th,
+    .details-table td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #dddddd;
+    }
+
+    .details-table th {
+      background-color: #f8f8f8;
+      color: #333333;
+      font-weight: bold;
+    }
+
+    .footer {
+      background-color: #f4f4f4;
+      padding: 15px;
+      text-align: center;
+      color: #888888;
+      font-size: 12px;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      margin: 20px 0;
+      background-color: #1a73e8;
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    @media only screen and (max-width: 600px) {
+      .container {
+        width: 100%;
+        margin: 10px;
+      }
+
+      .header h1 {
+        font-size: 20px;
+      }
+
+      .content h2 {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Booking Update Confirmation</h1>
+    </div>
+    <div class="content">
+      <h2>Dear {{guestName}},</h2>
+      <p>Your reservation with {{hotelName}} has been successfully updated. Below are the updated details for your
+        booking.</p>
+
+      <h2>Updated Reservation Details</h2>
+      <table class="details-table">
+        <tr>
+          <th>Reservation ID</th>
+          <td>{{reservationId}}</td>
+        </tr>
+        <tr>
+          <th>Hotel Name</th>
+          <td>{{hotelName}}</td>
+        </tr>
+        <!-- <tr>
+          <th>Hotel Code</th>
+          <td>{{hotelCode}}</td>
+        </tr> -->
+        <tr>
+          <th>Check-In Date</th>
+          <td>{{checkInDate}}</td>
+        </tr>
+        <tr>
+          <th>Check-Out Date</th>
+          <td>{{checkOutDate}}</td>
+        </tr>
+        <tr>
+          <th>Room Type</th>
+          <td>{{roomTypeCode}}</td>
+        </tr>
+        <tr>
+          <th>Number of Rooms</th>
+          <td>{{numberOfRooms}}</td>
+        </tr>
+        <tr>
+          <th>Total Price</th>
+          <td>{{roomTotalPrice}} {{currencyCode}}</td>
+        </tr>
+        <tr>
+          <th>Contact Email</th>
+          <td>{{email}}</td>
+        </tr>
+        <tr>
+          <th>Contact Phone</th>
+          <td>{{phone}}</td>
+        </tr>
+      </table>
+
+      <h2>Guest Details</h2>
+      <table class="details-table">
+        <tr>
+          <th>Name</th>
+          <th>Age Category</th>
+        </tr>
+        {{#each guests}}
+        <tr>
+          <td>{{firstName}} {{lastName}}</td>
+          <td>{{category}} (Age {{age}})</td>
+        </tr>
+        {{/each}}
+      </table>
+
+      <p>If you have any questions or need further modifications to your reservation, please contact us at <a
+          href="mailto:{{supportEmail}}">{{supportEmail}}</a> or call {{supportPhone}}.</p>
+
+      <a href="{{websiteUrl}}" class="button">View Your Updated Reservation</a>
+    </div>
+    <div class="footer">
+      <p>© {{currentYear}} {{companyName}}. All rights reserved.</p>
+      <p>{{companyAddress}}</p>
+    </div>
+  </div>
+</body>
+
+</html>`
+
+        await EmailService.sendEmail({
+          to: email,
+          text: `Your reservation update has been confirmed`,
+          subject: `Reservation Confirmation - ${hotelName}`,
+          html: htmlContent,
+        });
+      } catch (error: any) {
+        return res.status(500).json({ message: error.message || "Failed to update reservation" });
+      }
+
+      res.status(200).json({
+        message: "Reservation updated successfully",
+        numberOfRooms,
+        roomTotalPrice,
+        guests: categorizedGuests,
+        ageCodeSummary: ageCodeCount,
+      });
+    } catch (error: any) {
+      console.error("❌ Error updating third-party reservation:", error.message || error);
+      return res.status(500).json({ message: error.message || "Internal server error" });
+    }
   }
 );
-
 
 export const cancelThirdPartyReservation = CatchAsyncError(
   async (req: any, res: Response, next: NextFunction) => {
@@ -386,10 +972,10 @@ export const cancelThirdPartyReservation = CatchAsyncError(
     }
     const existingReservation = await ThirdPartyBooking.findOne({ reservationId });
     if (!existingReservation) {
-      throw new Error(`Reservation with ID ${reservationId} not found in our record`);
+      return res.status(404).json({ message: `Reservation with ID ${reservationId} not found in our record` });
     }
     if (existingReservation.status === 'Cancelled') {
-      throw new Error(`Reservation with ID ${reservationId} is already cancelled`);
+      return res.status(400).json({ message: `Reservation with ID ${reservationId} is already cancelled` });
     }
 
     const { firstName, lastName, email, hotelCode, hotelName, checkInDate, checkOutDate } = req.body;
@@ -408,19 +994,183 @@ export const cancelThirdPartyReservation = CatchAsyncError(
       reservationId,
       hotelCode,
       hotelName,
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
+      firstName,
+      lastName,
+      email,
       checkInDate,
       checkOutDate,
       status: "Cancelled",
     };
 
-    console.log("Cancel Reservation Input Data:", JSON.stringify(cancelReservationInput, null, 2));
-
     try {
       const thirdPartyService = new ThirdPartyCancelReservationService();
       const result = await thirdPartyService.processCancelReservation(cancelReservationInput);
+
+      // Send cancellation confirmation email
+      try {
+        const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background-color: #d32f2f;
+            /* Red theme */
+            color: #ffffff;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .content {
+            padding: 15px;
+        }
+
+        .content p {
+            color: #666666;
+            line-height: 1.5;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .details-table th,
+        .details-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .details-table th {
+            background-color: #f8f8f8;
+            color: #333333;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .details-table td {
+            color: #666666;
+            font-size: 14px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 15px 0;
+            background-color: #d32f2f;
+            /* Red theme */
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .footer {
+            background-color: #f4f4f4;
+            padding: 10px;
+            text-align: center;
+            color: #888888;
+            font-size: 12px;
+        }
+
+        @media only screen and (max-width: 500px) {
+            .container {
+                width: 100%;
+                margin: 10px;
+            }
+
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .content p {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Booking Cancellation Confirmation</h1>
+        </div>
+        <div class="content">
+            <p>Dear {{guestName}},</p>
+            <p>Your reservation with {{hotelName}} has been successfully cancelled. Below are the details of the
+                cancelled booking.</p>
+
+            <table class="details-table">
+                <tr>
+                    <th>Reservation ID</th>
+                    <td>{{reservationId}}</td>
+                </tr>
+                <tr>
+                    <th>Hotel Name</th>
+                    <td>{{hotelName}}</td>
+                </tr>
+                <tr>
+                    <th>Check-In Date</th>
+                    <td>{{checkInDate}}</td>
+                </tr>
+                <tr>
+                    <th>Check-Out Date</th>
+                    <td>{{checkOutDate}}</td>
+                </tr>
+            </table>
+
+            <p>If you have any questions or need assistance, please contact us at <a
+                    href="mailto:{{supportEmail}}">{{supportEmail}}</a> or call {{supportPhone}}.</p>
+
+            <a href="{{websiteUrl}}" class="button">Visit Our Website</a>
+        </div>
+        <div class="footer">
+            <p>© {{currentYear}} {{companyName}}. All rights reserved.</p>
+            <p>{{companyAddress}}</p>
+        </div>
+    </div>
+</body>
+
+</html>`
+
+        await EmailService.sendEmail({
+          to: email,
+          subject: `Booking Cancellation Confirmation - ${hotelName}`,
+          html: htmlContent,
+        });
+        console.log(`✅ Cancellation confirmation email sent to ${email}`);
+      } catch (emailError: any) {
+        console.error('❌ Failed to send cancellation confirmation email:', emailError);
+      }
+
       res.status(200).json({
         message: "Reservation cancellation processed successfully",
         reservationId: result,
@@ -1178,7 +1928,7 @@ export const getBookingDetailsOfUser = CatchAsyncError(
             ...matchCriteria.checkInDate,
             $gt: currentDate,
           };
-            matchCriteria.status = { $ne: 'Cancelled' };
+          matchCriteria.status = { $ne: 'Cancelled' };
           console.log("Current Date:", currentDate.toISOString());
           console.log("Check-in Date Match Criteria:", JSON.stringify(matchCriteria.checkInDate, null, 2));
         } else if (filterData === 'completed') {
@@ -1186,13 +1936,13 @@ export const getBookingDetailsOfUser = CatchAsyncError(
             ...matchCriteria.checkInDate,
             $lte: currentDate,
           };
-          matchCriteria.status = { $in: ['Confirmed'] }; 
+          matchCriteria.status = { $in: ['Confirmed'] };
         } else if (filterData === 'cancelled') {
           matchCriteria.status = 'Cancelled';
         } else if (filterData === 'Processing') {
-          
+
           delete matchCriteria.status;
-          
+
           if (matchCriteria.checkInDate) {
             matchCriteria.checkInDate = {
               $gte: matchCriteria.checkInDate.$gte?.toISOString().split('T')[0],

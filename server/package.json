@@ -38,6 +38,7 @@
     "flatted": "^3.3.3",
     "google-auth-library": "^10.1.0",
     "googleapis": "^150.0.1",
+    "handlebars": "^4.7.8",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "luxon": "^3.5.0",

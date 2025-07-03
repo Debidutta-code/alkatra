@@ -50,7 +50,7 @@ const cryptoBookingSchema = new Schema<ICryptoBooking>({
     ageCodeSummary: { type: Map, of: Number, required: true },
     numberOfRooms: { type: Number, required: true },
     totalAmount: { type: Number, required: true },
-    currencyCode: { type: String, required: true },
+    currencyCode: { type: String, required: true, enum: ['usd'], default: 'usd' },
     userId: { type: String, required: true },
     txHash: {type: String,required: false},
     senderWalletAddress: {type: String, require: false},

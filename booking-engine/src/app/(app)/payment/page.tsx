@@ -65,6 +65,7 @@ function PaymentPageContent() {
   const checkOut = searchParams.get('checkOut') || '';
   const userId = authUser?._id || searchParams.get('userId') || '';
   const hotelName = searchParams.get('hotelName') || 'Unknown Hotel';
+  const hotelCode=searchParams.get('hotelCode') || 'Unknown Hotel Code';
   const ratePlanCode = searchParams.get('ratePlanCode')?.toUpperCase() || '';
   const roomType = searchParams.get('roomType') || '';
 
@@ -122,13 +123,16 @@ function PaymentPageContent() {
     phone,
     userId,
     hotelName,
+    hotelCode,
     ratePlanCode,
     roomType,
     rooms,
     adults,
     children,
     infants,
-    guests
+    guests,
+    paymentOption
+    
   };
   console.log("Booking details:", JSON.stringify(bookingDetails, null, 2));
 
@@ -325,7 +329,7 @@ function PaymentPageContent() {
                             <PayAtHotelFunction bookingDetails={bookingDetails} />
                           </Elements>
                         ) : paymentOption === "payWithCrypto-payWithWallet" ? (
-                          <PayWithCryptoWallet bookingDetails={bookingDetails} />
+                          <PayWithCryptoWallet bookingDetails={bookingDetails} onConvertedAmountChange={setConvertedAmount}/>
                         ) : paymentOption === "payWithCrypto-payWithQR" ? (
                           <PayWithCryptoQR
                             bookingDetails={bookingDetails}
