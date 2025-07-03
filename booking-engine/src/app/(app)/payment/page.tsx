@@ -65,6 +65,7 @@ function PaymentPageContent() {
   const checkOut = searchParams.get('checkOut') || '';
   const userId = authUser?._id || searchParams.get('userId') || '';
   const hotelName = searchParams.get('hotelName') || 'Unknown Hotel';
+  const hotelCode=searchParams.get('hotelCode') || 'Unknown Hotel Code';
   const ratePlanCode = searchParams.get('ratePlanCode')?.toUpperCase() || '';
   const roomType = searchParams.get('roomType') || '';
 
@@ -122,6 +123,7 @@ function PaymentPageContent() {
     phone,
     userId,
     hotelName,
+    hotelCode,
     ratePlanCode,
     roomType,
     rooms,
@@ -371,9 +373,9 @@ function PaymentPageContent() {
                         <div className="flex justify-between items-center">
                           <div className="font-tripswift-bold text-lg">{t('Payment.PaymentPageContent.priceDetails.total')}</div>
                           <div className="font-tripswift-bold text-xl text-tripswift-blue">
-                          {(paymentOption === "payWithCrypto-payWithQR" || paymentOption === "payWithCrypto-payWithWallet") && convertedAmount !== null
-      ? `USD ${convertedAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-      : `${currency.toUpperCase()} ${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}                          </div>
+                            {(paymentOption === "payWithCrypto-payWithQR" || paymentOption === "payWithCrypto-payWithWallet") && convertedAmount !== null
+                              ? `USD ${convertedAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                              : `${currency.toUpperCase()} ${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}                          </div>
                         </div>
 
                         {paymentOption === 'payAtHotel' && (

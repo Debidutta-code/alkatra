@@ -377,9 +377,7 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
     <div className="bg-tripswift-off-white p-6 rounded-lg ">
 
       <div className="mb-4 flex justify-between text-start">
-        {/* <p className="text-sm font-tripswift-medium">
-          Amount: {bookingDetails.currency.toUpperCase()} {bookingDetails.amount}
-        </p> */}
+        
         <div className=" ">
           <ConnectButton
             accountStatus="address"

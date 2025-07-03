@@ -64,6 +64,8 @@ export const getCryptoDetails = CatchAsyncError(
               _id: 0,
               "networks.name": 1,
               "networks.imageUrl": 1,
+              "networks.chainId":1,
+              "networks.contractAddress": 1,
             },
           }
         );
