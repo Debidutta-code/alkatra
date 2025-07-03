@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { cryptoPaymentInitiate, currencyConversion, getCryptoDetails, getPaymentSuccessResponse, getWalletAddress, pushCryptoPaymentDetails, storeGuestDetailsForCryptoPayment } from "../controllers/crypto.controller";
+import { cryptoPaymentInitiate, currencyConversion, getCryptoDetails, getInitiatedPaymentDetails, getPaymentSuccessResponse, getWalletAddress, pushCryptoPaymentDetails, storeGuestDetailsForCryptoPayment } from "../controllers/crypto.controller";
 import { authenticateCustomer } from "../../../Customer-Authentication/src/middleware/authMiddleware";
 
 const router = Router();
 
 router.route("/crypto-payment-initiate").post(authenticateCustomer as any, cryptoPaymentInitiate);
+router.route("/get-crypto-initiated-payment").get(authenticateCustomer as any, getInitiatedPaymentDetails);
 router.route("/crypto-details").get(authenticateCustomer as any, getCryptoDetails);
 router.route("/push-crypto-payment").post(pushCryptoPaymentDetails);
 router.route("/currency-conversion").post(authenticateCustomer as any, currencyConversion);
