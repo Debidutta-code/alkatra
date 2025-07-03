@@ -5,7 +5,7 @@ import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { useDispatch, useSelector } from "react-redux";
 import { setGuestDetails, setAmount } from "@/Redux/slices/pmsHotelCard.slice";
-import { User, Mail, Phone, Calendar, CreditCard, X } from "lucide-react";
+import { User, Mail, Phone, Calendar, CreditCard, X, Loader2 } from "lucide-react";
 import { formatDate, calculateNights } from "@/utils/dateUtils";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
@@ -120,6 +120,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   onConfirmBooking,
   guestData,
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isEmailVerifying, setIsEmailVerifying] = useState(false);
+  const [isPhoneVerifying, setIsPhoneVerifying] = useState(false);
   const authUser = useSelector((state: RootState) => state.auth.user);
   const totalGuests =
     (guestData?.guests || 1) +
@@ -170,6 +173,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   const [phoneCountdown, setPhoneCountdown] = useState(0);
   const [emailVerified, setEmailVerified] = useState(false);
   const [phoneVerified, setPhoneVerified] = useState(false);
+
 
   const [activeSection, setActiveSection] = useState<"details" | "review">(
     "details"
@@ -322,6 +326,16 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     }
   }, [phoneOtpSent, phoneCountdown]);
 
+  useEffect(() => {
+    if (updateMessage) {
+      const timer = setTimeout(() => {
+        setUpdateMessage(null);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [updateMessage]);
+
   const handleGuestChange = (
     index: number,
     field: keyof Guest,
@@ -333,7 +347,14 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   };
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
+  const validateGuestNames = () => {
+    return guests.every(guest =>
+      guest.firstName.trim() &&
+      guest.lastName.trim() &&
+      /^[A-Za-z\s]+$/.test(guest.firstName) &&
+      /^[A-Za-z\s]+$/.test(guest.lastName)
+    );
+  };
   const handleVerifyEmail = async () => {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setErrors((prev) => ({
@@ -342,7 +363,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       }));
       return;
     }
-
+    setIsEmailVerifying(true);
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/send-otp`,
@@ -373,6 +394,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         t("BookingComponents.GuestInformationModal.otpSendError")
       );
     }
+    finally {
+      setIsEmailVerifying(false);
+    }
   };
 
   const handleVerifyEmailOtp = async () => {
@@ -384,6 +408,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     }
 
     try {
+      setErrorMessage(null);
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/verify-otp`,
         {
@@ -402,6 +427,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         setEmailOtpSent(false);
         setEmailCountdown(0);
         setEmailOtp("");
+        setErrorMessage(null);
       } else {
         setErrorMessage(
           response.data.message ||
@@ -418,13 +444,13 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
 
   const handleVerifyPhone = async () => {
     if (!phone || !/^\+\d{8,}$/.test(phone)) {
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
         phone: t("BookingComponents.GuestInformationModal.phoneInvalidError"),
       }));
       return;
     }
-
+    setIsPhoneVerifying(true);
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/send-otp`,
@@ -441,8 +467,10 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
           t("BookingComponents.GuestInformationModal.otpSent")
         );
         setPhoneOtpSent(true);
-        setPhoneCountdown(300); // 5 minutes
+        setPhoneCountdown(300);
         setPhoneVerified(false);
+        // Clear any existing phone errors
+        setErrors(prev => ({ ...prev, phone: '' }));
       } else {
         setErrorMessage(
           response.data.message ||
@@ -455,6 +483,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         t("BookingComponents.GuestInformationModal.otpSendError")
       );
     }
+    finally {
+      setIsPhoneVerifying(false);
+    }
   };
 
   const handleVerifyPhoneOtp = async () => {
@@ -466,6 +497,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     }
 
     try {
+      setErrorMessage(null); // Clear any existing error
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/verify-otp`,
         {
@@ -484,6 +516,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         setPhoneOtpSent(false);
         setPhoneCountdown(0);
         setPhoneOtp("");
+        setErrorMessage(null);
       } else {
         setErrorMessage(
           response.data.message ||
@@ -493,12 +526,13 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     } catch (err: any) {
       console.error("Phone OTP Verify Error:", err);
       setErrorMessage(
+        err.response?.data?.message ||
         t("BookingComponents.GuestInformationModal.otpVerifyError")
       );
     }
   };
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     let valid = true;
     const newErrors: { [key: string]: string } = {};
 
@@ -562,29 +596,33 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     setErrors(newErrors);
     if (!valid) return;
 
-    setUpdateMessage(
-      t("BookingComponents.GuestInformationModal.informationVerified")
-    );
-    dispatch(
-      setGuestDetails({
-        guests,
-        email,
-        phone,
-        rooms: guestData?.rooms || 1,
-        adults: guestData?.guests || 1,
-        children: guestData?.children || 0,
-        infants: guestData?.infants || 0,
-        childAges: guestData?.childAges || [],
-      })
-    );
-    setIsFormUpdated(true);
-    getFinalPrice(selectedRoom, checkInDate, checkOutDate, guestData);
-    setTimeout(() => {
+    setIsLoading(true); // Set loading state to show loader
+    try {
+      setUpdateMessage(
+        t("BookingComponents.GuestInformationModal.informationVerified")
+      );
+      dispatch(
+        setGuestDetails({
+          guests,
+          email,
+          phone,
+          rooms: guestData?.rooms || 1,
+          adults: guestData?.guests || 1,
+          children: guestData?.children || 0,
+          infants: guestData?.infants || 0,
+          childAges: guestData?.childAges || [],
+        })
+      );
+      setIsFormUpdated(true);
+      await getFinalPrice(selectedRoom, checkInDate, checkOutDate, guestData); // Await async call
       setActiveSection("review");
-    }, 800);
+    } catch (error) {
+      setErrorMessage(t("BookingComponents.GuestInformationModal.updateError"));
+    } finally {
+      setIsLoading(false); // Reset loading state
+    }
   };
-
-  const handleConfirmBooking = () => {
+  const handleConfirmBooking = async () => {
     if (isFormUpdated && selectedRoom) {
       const propertyId =
         selectedRoom.propertyInfo_id ||
@@ -592,21 +630,21 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         selectedRoom.propertyId ||
         "";
       if (!propertyId) {
+        console.log("Missing propertyId");
         setErrorMessage(
           t("BookingComponents.GuestInformationModal.propertyInfoMissing")
         );
         return;
       }
       if (!finalPrice || !finalPrice.totalAmount) {
+        console.log("Missing finalPrice or totalAmount");
         setErrorMessage(
           t("BookingComponents.GuestInformationModal.priceFetchError")
         );
         return;
       }
       const totalPrice = finalPrice?.totalAmount ?? 0;
-      // Dispatch amount to Redux store
       dispatch(setAmount(totalPrice.toString()));
-      // const nightsCount = calculateNights(checkInDate, checkOutDate);
       console.log("Booking Payload:", {
         firstName: guests[0]?.firstName || "",
         lastName: guests[0]?.lastName || "",
@@ -624,31 +662,51 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         guests,
       });
 
-      onConfirmBooking({
-        email,
-        phone: phone || "",
-        propertyId,
-        roomId: selectedRoom._id,
-        checkIn: checkInDate,
-        checkOut: checkOutDate,
-        amount: totalPrice.toString(),
-        userId: authUser?._id,
-        rooms: guestData?.rooms || 1,
-        adults: guestData?.guests || 1,
-        children: guestData?.children || 0,
-        infants: guestData?.infants || 0,
-        guests,
-        hotelName: guestData?.hotelName || "",
-        ratePlanCode: finalPrice?.dailyBreakdown && finalPrice.dailyBreakdown.length > 0
-          ? finalPrice.dailyBreakdown[0].ratePlanCode
-          : "",
-        roomType: selectedRoom?.room_type || "",
-        currency: finalPrice?.dailyBreakdown && finalPrice.dailyBreakdown.length > 0
-          ? finalPrice.dailyBreakdown[0].currencyCode
-          : "",
-      });
+      console.log("Setting isLoading to true for handleConfirmBooking");
+      setIsLoading(true);
+      try {
+        const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 500));
+        await Promise.all([
+          onConfirmBooking({
+            email,
+            phone: phone || "",
+            propertyId,
+            roomId: selectedRoom._id,
+            checkIn: checkInDate,
+            checkOut: checkOutDate,
+            amount: totalPrice.toString(),
+            userId: authUser?._id,
+            rooms: guestData?.rooms || 1,
+            adults: guestData?.guests || 1,
+            children: guestData?.children || 0,
+            infants: guestData?.infants || 0,
+            guests,
+            hotelName: guestData?.hotelName || "",
+            ratePlanCode: finalPrice?.dailyBreakdown && finalPrice.dailyBreakdown.length > 0
+              ? finalPrice.dailyBreakdown[0].ratePlanCode
+              : "",
+            roomType: selectedRoom?.room_type || "",
+            currency: finalPrice?.dailyBreakdown && finalPrice.dailyBreakdown.length > 0
+              ? finalPrice.dailyBreakdown[0].currencyCode
+              : "",
+          }),
+          minLoadingTime,
+        ]);
+        console.log("onConfirmBooking completed successfully");
+      } catch (error) {
+        console.error("Error in handleConfirmBooking:", error);
+        setErrorMessage(
+          t("BookingComponents.GuestInformationModal.bookingError")
+        );
+      } finally {
+        console.log("Setting isLoading to false for handleConfirmBooking");
+        setIsLoading(false);
+      }
+    } else {
+      console.log("isFormUpdated or selectedRoom is missing", { isFormUpdated, selectedRoom });
     }
   };
+
   if (!isOpen || !selectedRoom) return null;
 
   const nightsCount = calculateNights(checkInDate, checkOutDate);
@@ -990,6 +1048,10 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                           value={email}
                           onChange={(e) => {
                             const newEmail = e.target.value;
+                            // Clear email error when typing
+                            if (errors.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+                              setErrors(prev => ({ ...prev, email: '' }));
+                            }
                             if (emailVerified && newEmail !== email) {
                               setEmailVerified(false);
                               setEmailOtpSent(false);
@@ -999,16 +1061,30 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                             setEmail(newEmail);
                           }}
                           placeholder={t("BookingComponents.GuestInformationModal.emailPlaceholder")}
-                          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 text-sm transition-all duration-200 ${errors["email"] ? "border-red-600" : "border-tripswift-black/20"}`}
+                          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 text-sm transition-all duration-200 ${errors.email ? "border-red-600" : "border-tripswift-black/20"
+                            }`}
                           required
                         />
                         {!emailVerified && (
                           <button
-                            onClick={handleVerifyEmail}
+                            onClick={() => {
+                              if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                                setErrors(prev => ({ ...prev, email: '' }));
+                              }
+                              handleVerifyEmail();
+                            }}
                             type="button"
+                            disabled={isEmailVerifying}
                             className="bg-tripswift-blue text-tripswift-off-white px-4 py-2 rounded-lg text-sm hover:bg-tripswift-blue/90 transition whitespace-nowrap"
                           >
-                            {t("BookingComponents.GuestInformationModal.verifyEmail")}
+                            {isEmailVerifying ? (
+                              <>
+                                {/* <Loader2 className="w-4 h-4 animate-spin text-tripswift-off-white" /> */}
+                                <span>{t("BookingComponents.GuestInformationModal.verifying")}</span>
+                              </>
+                            ) : (
+                              t("BookingComponents.GuestInformationModal.verifyEmail")
+                            )}
                           </button>
                         )}
                       </div>
@@ -1019,7 +1095,10 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                             placeholder={t("BookingComponents.GuestInformationModal.otpPlaceholder")}
                             value={emailOtp}
                             maxLength={6}
-                            onChange={(e) => setEmailOtp(e.target.value)}
+                            onChange={(e) => {
+                              setEmailOtp(e.target.value);
+                              setErrorMessage(null);
+                            }}
                             className="w-full px-3 py-2 border border-tripswift-black/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 text-sm transition-all duration-200"
                           />
                           <button
@@ -1039,8 +1118,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                           ✅ {t("BookingComponents.GuestInformationModal.emailVerified")}
                         </p>
                       )}
-                      {errors["email"] && (
-                        <p className="text-xs text-red-600 mt-1">{errors["email"]}</p>
+                      {errors.email && (
+                        <p className="text-xs text-red-600 mt-1">{errors.email}</p>
                       )}
                       <p className="text-xs text-tripswift-black/50 mt-1">
                         {t("BookingComponents.GuestInformationModal.emailInfo")}
@@ -1063,6 +1142,10 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                           name="phone"
                           value={phone}
                           onChange={(value) => {
+                            // Clear phone error when typing a valid number
+                            if (errors.phone && value && /^\+\d{8,}$/.test(value)) {
+                              setErrors(prev => ({ ...prev, phone: '' }));
+                            }
                             if (phoneVerified && value !== phone) {
                               setPhoneVerified(false);
                               setPhoneOtpSent(false);
@@ -1074,16 +1157,30 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                           maxLength={16}
                           defaultCountry="IN"
                           placeholder={t("BookingComponents.GuestInformationModal.phonePlaceholder")}
-                          className={`w-full px-2 sm:px-3 h-9 sm:h-11 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-xs sm:text-sm font-tripswift-regular ${errors["phone"] ? "border-red-600" : "border-tripswift-black/20"}`}
+                          className={`w-full px-2 sm:px-3 h-9 sm:h-11 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-xs sm:text-sm font-tripswift-regular ${errors.phone ? "border-red-600" : "border-tripswift-black/20"
+                            }`}
                           international
                         />
                         {!phoneVerified && (
                           <button
-                            onClick={handleVerifyPhone}
+                            onClick={() => {
+                              if (phone && /^\+\d{8,}$/.test(phone)) {
+                                setErrors(prev => ({ ...prev, phone: '' }));
+                              }
+                              handleVerifyPhone();
+                            }}
                             type="button"
+                            disabled={isPhoneVerifying}
                             className="bg-tripswift-blue text-tripswift-off-white px-4 py-2 rounded-lg text-sm hover:bg-tripswift-blue/90 transition whitespace-nowrap"
                           >
-                            {t("BookingComponents.GuestInformationModal.verifyPhone")}
+                            {isPhoneVerifying ? (
+                              <>
+                                {/* <Loader2 className="w-4 h-4 animate-spin text-tripswift-off-white" /> */}
+                                <span>{t("BookingComponents.GuestInformationModal.verifying")}</span>
+                              </>
+                            ) : (
+                              t("BookingComponents.GuestInformationModal.verifyPhone")
+                            )}
                           </button>
                         )}
                       </div>
@@ -1094,11 +1191,25 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                             placeholder={t("BookingComponents.GuestInformationModal.otpPlaceholder")}
                             value={phoneOtp}
                             maxLength={6}
-                            onChange={(e) => setPhoneOtp(e.target.value)}
-                            className="w-full px-3 py-2 border border-tripswift-black/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 text-sm transition-all duration-200"
+                            onChange={(e) => {
+                              setPhoneOtp(e.target.value);
+                              // Clear error when user starts typing
+                              if (errorMessage && errorMessage.includes("OTP")) {
+                                setErrorMessage(null);
+                              }
+                            }}
+                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 text-sm transition-all duration-200 ${errorMessage && errorMessage.includes("OTP") ? "border-red-600" : "border-tripswift-black/20"
+                              }`}
                           />
                           <button
-                            onClick={handleVerifyPhoneOtp}
+                            onClick={async () => {
+                              try {
+                                await handleVerifyPhoneOtp();
+                                // Error will be cleared in handleVerifyPhoneOtp on success
+                              } catch (error) {
+                                // Error is already handled in handleVerifyPhoneOtp
+                              }
+                            }}
                             className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition whitespace-nowrap"
                           >
                             {t("BookingComponents.GuestInformationModal.verifyOtp")}
@@ -1114,8 +1225,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                           ✅ {t("BookingComponents.GuestInformationModal.phoneVerified")}
                         </p>
                       )}
-                      {errors["phone"] && (
-                        <p className="text-xs text-red-600 mt-1">{errors["phone"]}</p>
+                      {errors.phone && (
+                        <p className="text-xs text-red-600 mt-1">{errors.phone}</p>
                       )}
                       <p className="text-xs text-tripswift-black/50 mt-1">
                         {t("BookingComponents.GuestInformationModal.phoneInfo")}
@@ -1258,52 +1369,82 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         {t("BookingComponents.GuestInformationModal.priceDetails")}
                       </h3>
                     </div>
-                    <div className="px-4 pb-2 space-y-2">
-                      {/* Base Rate Breakdown */}
-                      <div className="flex justify-between items-center">
+                    <div className="px-4 pb-2 space-y-1">
+                      {/* Total Base Amount */}
+                      <div className="flex justify-between items-center py-1">
                         <span className="text-sm text-tripswift-black/70">
-                          {t("BookingComponents.GuestInformationModal.baseRatePerRoomPerNight")} ×{" "}
-                          {finalPrice.requestedRooms} {t("BookingComponents.GuestInformationModal.roomsPlural")} ×{" "}
-                          {finalPrice.numberOfNights} {nightsText}
+                          Total Base Amount:
                         </span>
                         <span className="text-sm font-tripswift-medium">
-                          {(finalPrice.dailyBreakdown && finalPrice.dailyBreakdown.length > 0
-                            ? finalPrice.dailyBreakdown[0].currencyCode
-                            : "INR")}{" "}
-                          {(finalPrice.baseRatePerNight || selectedRoom.room_price).toLocaleString()} × {finalPrice.requestedRooms} × {finalPrice.numberOfNights} ={" "}
-                          {(finalPrice.breakdown.totalBaseAmount || selectedRoom.room_price * finalPrice.requestedRooms * finalPrice.numberOfNights).toLocaleString()}
+                          ₹{finalPrice.breakdown.totalBaseAmount.toLocaleString()}
                         </span>
                       </div>
-                      {/* Additional Guest Charges */}
-                      {finalPrice.additionalGuestCharges !== undefined && finalPrice.additionalGuestCharges > 0 && (
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-tripswift-black/70">
-                            {t("BookingComponents.GuestInformationModal.additionalGuestCharges")}
-                          </span>
-                          <span className="text-sm font-tripswift-medium">
-                            {(finalPrice.dailyBreakdown && finalPrice.dailyBreakdown.length > 0
-                              ? finalPrice.dailyBreakdown[0].currencyCode
-                              : "INR")}{" "}
-                            {finalPrice.additionalGuestCharges.toLocaleString()}
-                          </span>
+
+                      {/* Total Additional Charges */}
+                      <div className="flex justify-between items-center py-1">
+                        <span className="text-sm text-tripswift-black/70">
+                          Total Additional Charges:
+                        </span>
+                        <span className="text-sm font-tripswift-medium">
+                          ₹{finalPrice.breakdown.totalAdditionalCharges.toLocaleString()}
+                        </span>
+                      </div>
+
+                      {/* Total Amount */}
+                      <div className="flex justify-between items-center py-1">
+                        <span className="text-sm font-tripswift-bold text-tripswift-black">
+                          Total Amount:
+                        </span>
+                        <span className="text-sm font-tripswift-bold">
+                          ₹{finalPrice.breakdown.totalAmount.toLocaleString()}
+                        </span>
+                      </div>
+
+                      {/* Number of Nights */}
+                      <div className="flex justify-between items-center py-1">
+                        <span className="text-sm text-tripswift-black/70">
+                          Number of Nights:
+                        </span>
+                        <span className="text-sm font-tripswift-medium">
+                          {finalPrice.numberOfNights}
+                        </span>
+                      </div>
+
+                      {/* Daily Breakdown */}
+                      {finalPrice.dailyBreakdown && finalPrice.dailyBreakdown.length > 0 && (
+                        <div className="mt-2">
+                          <div className="text-sm font-tripswift-medium text-tripswift-black mb-1">
+                            Daily Breakdown:
+                          </div>
+                          <div className="space-y-0.5">
+                            {finalPrice.dailyBreakdown.map((day, index) => (
+                              <div key={index} className="flex justify-between items-center py-0.5 pl-4">
+                                <span className="text-sm text-tripswift-black/70">
+                                  {day.date}
+                                </span>
+                                <span className="text-sm font-tripswift-medium">
+                                  ₹{day.totalForAllRooms.toLocaleString()}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
-                      {/* Total Amount */}
-                      <div className="border-t border-tripswift-black/10 pt-4">
+
+                      {/* Final Total Amount - Highlighted */}
+                      <div className="border-t border-tripswift-black/10 pt-2 mt-2">
                         <div className="flex justify-between items-center">
-                          <span className="text-base font-tripswift-bold">
-                            {t("BookingComponents.GuestInformationModal.totalAmount")}
+                          <span className="text-base font-tripswift-bold text-tripswift-black">
+                            Total Amount
                           </span>
                           <span className="text-xl font-tripswift-bold text-tripswift-blue">
-                            {(finalPrice.dailyBreakdown && finalPrice.dailyBreakdown.length > 0
-                              ? finalPrice.dailyBreakdown[0].currencyCode
-                              : "INR")}{" "}
-                            {finalPrice.totalAmount.toLocaleString()}
+                            ₹{finalPrice.totalAmount.toLocaleString()}
                           </span>
                         </div>
                       </div>
+
                       {/* Additional Info */}
-                      <p className="text-xs text-tripswift-black/60 mt-2">
+                      <p className="text-xs text-tripswift-black/60 mt-1">
                         {t("BookingComponents.GuestInformationModal.priceIncludes", {
                           rooms: finalPrice.requestedRooms || guestData?.rooms || 1,
                           guests: (guestData?.guests || 1) + (guestData?.children || 0) + (guestData?.infants || 0),
@@ -1359,20 +1500,38 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                 : t("BookingComponents.GuestInformationModal.cancel")}
             </button>
             <button
-              onClick={
-                activeSection === "details"
-                  ? handleUpdate
-                  : handleConfirmBooking
+              onClick={(e) => {
+                // Trigger the appropriate handler based on activeSection
+                activeSection === "details" ? handleUpdate() : handleConfirmBooking();
+              }}
+              disabled={
+                (activeSection === "details" &&
+                  (!emailVerified || !phoneVerified || !validateGuestNames())) ||
+                (activeSection === "review" && !isFormUpdated) ||
+                isLoading
               }
-              disabled={activeSection === "review" && !isFormUpdated}
-              className={`px-6 py-2.5 rounded-lg text-sm font-tripswift-medium transition-all duration-200 ${activeSection === "review" && !isFormUpdated
-                ? "bg-tripswift-blue/50 text-tripswift-off-white cursor-not-allowed"
-                : "bg-tripswift-blue text-tripswift-off-white hover:bg-tripswift-blue/90"
+              className={`px-6 py-2.5 rounded-lg text-sm font-tripswift-medium transition-all duration-200 flex items-center justify-center gap-2 ${(activeSection === "details" &&
+                (!emailVerified || !phoneVerified || !validateGuestNames())) ||
+                (activeSection === "review" && !isFormUpdated) ||
+                isLoading
+                ? "bg-gray-300 text-black cursor-not-allowed"
+                : "bg-tripswift-blue text-tripswift-off-white hover:bg-tripswift-blue/90 active:scale-95 active:opacity-80"
                 }`}
             >
-              {activeSection === "details"
-                ? t("BookingComponents.GuestInformationModal.continueToReview")
-                : t("BookingComponents.GuestInformationModal.proceedToPayment")}
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-tripswift-off-white" />
+                  <span>
+                    {activeSection === "details"
+                      ? t("BookingComponents.GuestInformationModal.processing")
+                      : t("BookingComponents.GuestInformationModal.processing")}
+                  </span>
+                </>
+              ) : (
+                activeSection === "details"
+                  ? t("BookingComponents.GuestInformationModal.continueToReview")
+                  : t("BookingComponents.GuestInformationModal.proceedToPayment")
+              )}
             </button>
           </div>
         </div>

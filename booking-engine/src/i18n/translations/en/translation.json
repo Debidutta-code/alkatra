@@ -576,7 +576,11 @@
       "backToDetails": "Back to Details",
       "cancel": "Cancel",
       "continueToReview": "Continue to Review",
-      "proceedToPayment": "Proceed to Payment"
+      "proceedToPayment": "Proceed to Payment",
+      "phoneNotVerified": "Phone number not verified",
+      "phoneInvalidError": "Please enter a valid phone number",
+      "processing": "Processing...",
+      "verifying": "Verifying"
     }
   },
   "BookingTabs": {
