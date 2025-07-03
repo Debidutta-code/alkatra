@@ -349,18 +349,18 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
     console.log("----------11111111111111111111-------------------------", paymentAmount)
 
     const payment = await CryptoPaymentDetails.findOne({
-      amount: amount
+      amount: amount,
+      status: "Pending",
     });
     console.log("----------111111111.1.1.1.1.1.1.1.1.-------------------------", payment)
     if (payment) {
       await notification.sendCryptoPaymentNotification(payment.customer_id.toString(), parseFloat(amount), txHash)
       console.log("----------11111111111111111111-------------------------")
     }
-
     const guestDetails = await CryptoGuestDetails.findOne({
-      totalAmount: amount
+      totalAmount: amount,
+      status: "Processing"
     });
-
     console.log("----------2222222222222222222222-------------------------", guestDetails);
 
     if (!payment) {

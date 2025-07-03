@@ -91,14 +91,18 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>Booking Confirmation</h1>
+      <h1>Booking Update Confirmation</h1>
     </div>
     <div class="content">
       <h2>Dear {{guestName}},</h2>
-      <p>Thank you for your reservation with {{hotelName}}! We are excited to confirm your booking details below.</p>
+      <p>Your reservation with {{hotelName}} has been successfully updated. Below are the updated details for your booking.</p>
       
-      <h2>Reservation Details</h2>
+      <h2>Updated Reservation Details</h2>
       <table class="details-table">
+        <tr>
+          <th>Reservation ID</th>
+          <td>{{reservationId}}</td>
+        </tr>
         <tr>
           <th>Hotel Name</th>
           <td>{{hotelName}}</td>
@@ -151,12 +155,12 @@
         {{/each}}
       </table>
 
-      <p>For any questions or to modify your reservation, please contact us at <a href="mailto:{{supportEmail}}">{{supportEmail}}</a> or call {{supportPhone}}.</p>
+      <p>If you have any questions or need further modifications to your reservation, please contact us at <a href="mailto:{{supportEmail}}">{{supportEmail}}</a> or call {{supportPhone}}.</p>
       
-      <a href="{{websiteUrl}}" class="button">View Your Reservation</a>
+      <a href="{{websiteUrl}}" class="button">View Your Updated Reservation</a>
     </div>
     <div class="footer">
-      <p>&copy; {{currentYear}} {{companyName}}. All rights reserved.</p>
+      <p>© {{currentYear}} {{companyName}}. All rights reserved.</p>
       <p>{{companyAddress}}</p>
     </div>
   </div>
