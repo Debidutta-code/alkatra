@@ -2,11 +2,18 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['res.cloudinary.com', 'images.unsplash.com'],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: '**.cloudinary.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com', 
+      },
+      {
+        protocol: 'http',
+        hostname: 'res.cloudinary.com', 
       },
       {
         protocol: 'https',
@@ -54,10 +61,11 @@ const nextConfig = {
     ];
   },
   async rewrites() {
+    console.log('Proxying API requests to:', `${process.env.NEXT_PUBLIC_BACKEND_URL}/google/:path*`);
     return [
       {
-        source: '/api/:path*',
-        destination: 'https://external-api.com/:path*',
+        source: '/api/v1/google/:path*',
+        destination: `${process.env.NEXT_PUBLIC_BACKEND_URL}/google/:path*`,
       },
     ];
   },

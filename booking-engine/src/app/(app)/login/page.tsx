@@ -3,13 +3,16 @@
 import React, { Suspense } from "react";
 import Login from "./authLogin";
 import RedirectIfAuthenticated from "@/components/check_authentication/RedirectIfAuthenticated";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const LoginPage = () => {
   return (
     <RedirectIfAuthenticated>
       <div>
         <Suspense fallback={<div>Loading...</div>}>
-          <Login />
+          <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ""}>
+            <Login />
+          </GoogleOAuthProvider>
         </Suspense>
       </div>
     </RedirectIfAuthenticated>

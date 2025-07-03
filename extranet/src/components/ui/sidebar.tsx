@@ -136,16 +136,18 @@ const Sidebar = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
     if (isMobile) {
       return (
         <Drawer open={openMobile} onOpenChange={setOpenMobile} {...props}>
-          <DrawerContent
-            // data-sidebar="sidebar"
-            // data-mobile="true"
-            className="bg-gray-50 p-0 text-gray-900"
-          >
+         <DrawerContent
+  className="fixed left-0 top-0 z-50 m-0 h-screen w-[16rem] max-w-[90vw] translate-x-0 translate-y-0 transform-none p-0 bg-white shadow-lg"
+>
+
+
+
             <VisuallyHidden.Root>
               <DrawerTitle>Sidebar</DrawerTitle>
             </VisuallyHidden.Root>
             <div className="relative flex h-full w-full flex-col">
-              <DrawerClose className="absolute right-4 top-4" asChild>
+              <DrawerClose 
+              className="absolute right-4 top-4" asChild>
                 <Button
                   variant="ghost"
                   className="!p-2 text-gray-700 hover:text-gray-900 dark:text-gray-300 hover:dark:text-gray-50"
@@ -169,7 +171,7 @@ const Sidebar = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
         
         <div
           className={cx(
-            "fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] duration-150 ease-in-out will-change-transform md:flex",
+            "fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,width] duration-150 ease-in-out will-change-transform md:flex",
             "left-0 group-data-[collapsible=true]:left-[calc(var(--sidebar-width)*-1)]",
             "border-r border-gray-200 dark:border-gray-800",
             className,

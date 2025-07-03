@@ -17,6 +17,7 @@ import { login, getUser } from "../../redux/slices/authSlice";
 import { getProperties } from "../../redux/slices/propertySlice";
 import { CardTitle } from "../ui/card";
 import { ReloadIcon } from "@radix-ui/react-icons";
+import Image from "next/image";
 
 type Props = {};
 
@@ -62,16 +63,21 @@ const LoginForm = () => {
       await dispatch(getUser());
       await dispatch(getProperties());
       toast.success("Login successful!");
-      console.log("Login data",data)
+      console.log("Login data", data);
       // Get the current user from the store after login
       const state = store.getState();
       const currentUser = state.auth.user;
       if (currentUser) {
-        if (currentUser.role === "hotelManager"&&currentUser.noOfProperties==0) {
+        if (
+          currentUser.role === "hotelManager" &&
+          currentUser.noOfProperties == 0
+        ) {
           router.push("/app/property/create");
-        }else if(currentUser.role === "hotelManager"&&currentUser.noOfProperties>0){
+        } else if (
+          currentUser.role === "hotelManager" &&
+          currentUser.noOfProperties > 0
+        ) {
           router.push("/app");
-
         } else {
           // superAdmin and groupManager go to the property management page
           router.push("/app");
@@ -80,8 +86,8 @@ const LoginForm = () => {
         // Fallback if user not available yet
         router.push("/app");
       }
-    } catch (err:any) {
-      console.log("error ",err.message)
+    } catch (err: any) {
+      console.log("error ", err.message);
       toast.error("Login failed. Please check your credentials.");
     } finally {
       setLoading(false);
@@ -93,13 +99,27 @@ const LoginForm = () => {
   }
 
   return (
-    <div className="w-[500px]">
-      <div className="mb-10">
-        <CardTitle className="text-5xl">
-          Login | <span className="font-normal text-xl">TripSwift</span>
-        </CardTitle>
-        <p className="text-muted-foreground">
-          Sign in to your TripSwift account
+<div className="w-full max-w-md sm:max-w-lg lg:max-w-xl xl:max-w-2xl px-4 sm:px-6 md:px-8">
+      {/* Logo at the top of the login form */}
+      <div className="flex justify-center lg:hidden mb-4">
+        <div className="relative w-[160px] h-[60px]  ">
+          <Image
+            src="/assets/ALHAJZ.png"
+            alt="Al Hajz Logo"
+            fill
+            className="object-contain"
+            priority
+          />
+        </div>
+      </div>
+      <div className="mb-6 text-center">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-800">
+          <h1 className="text-2xl  font-bold tracking-tight text-gray-800">
+            Welcome Back to <span className="text-primary">Al HaJz</span>
+          </h1>
+        </h1>
+        <p className="text-sm sm:text-base text-muted-foreground mt-2">
+          Sign in to manage your properties
         </p>
       </div>
 
@@ -171,16 +191,16 @@ const LoginForm = () => {
         </div>
         <div className="text-right">
           <Button
-          type="button"
-          variant="link"
-          className="text-primary hover:text-primary/80 px-0"
-          onClick={() => setIsForgotPassword(true)}
-        >
-          Forgot password?
-        </Button>
+            type="button"
+            variant="link"
+            className="text-primary hover:text-primary/80 px-0"
+            onClick={() => setIsForgotPassword(true)}
+          >
+            Forgot password?
+          </Button>
         </div>
         <div className="space-y-2 pt-2">
-          <NextUIButton
+          {/* <NextUIButton
             type="submit"
             size="lg"
             className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
@@ -188,9 +208,9 @@ const LoginForm = () => {
           >
             {loading && <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />}
             Sign In
-          </NextUIButton>
+          </NextUIButton> */}
 
-          <div className="relative">
+          {/* <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-border" />
             </div>
@@ -199,10 +219,10 @@ const LoginForm = () => {
                 Don't have an account?
               </span>
             </div>
-          </div>
+          </div> */}
         </div>
         <div className="flex flex-col items-center">
-          <span>
+          {/* <span>
             Don't have an account?{" "}
             <Button
               type="button"
@@ -212,7 +232,7 @@ const LoginForm = () => {
             >
               Register
             </Button>
-          </span>
+          </span> */}
           <SubmitButton loading={loading} />
         </div>
       </form>

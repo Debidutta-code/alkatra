@@ -1,212 +1,177 @@
-import React from 'react';
-import { 
-  Calendar, 
-  Users, 
-  DollarSign, 
-  TrendingUp, 
-  Edit, 
-  Trash2, 
-  Copy,
-  Eye,
-  MapPin,
-  Bed,
-  Clock,
-  UserCheck
-} from 'lucide-react';
-import { BookingOffer } from '../types/offer';
+import React, { useState, useEffect } from 'react';
+import { Calendar, Eye, Send, BadgePercent, FileText, User } from 'lucide-react';
+import { Notification } from '../types/offer';
+import { useSelector, useDispatch, RootState } from '../../../../redux/store';
+import { getUser } from '../../../../redux/slices/authSlice';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import { format } from 'date-fns';
 
 interface OfferCardProps {
-  offer: BookingOffer;
-  onEdit: (offer: BookingOffer) => void;
-  onDelete: (id: string) => void;
-  onDuplicate: (offer: BookingOffer) => void;
-  onView: (offer: BookingOffer) => void;
+  offer: Notification;
+  onView: (offer: Notification) => void;
 }
 
-export const OfferCard: React.FC<OfferCardProps> = ({ 
-  offer, 
-  onEdit, 
-  onDelete, 
-  onDuplicate, 
-  onView 
-}) => {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'bg-green-100 text-green-800 border-green-200';
-      case 'inactive': return 'bg-gray-100 text-gray-800 border-gray-200';
-      case 'expired': return 'bg-red-100 text-red-800 border-red-200';
-      case 'scheduled': return 'bg-blue-100 text-blue-800 border-blue-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
+  const [offerDetails, setOfferDetails] = useState<Notification>(offer);
+  const [loading, setLoading] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const fetchOffer = async () => {
+      try {
+        if (!user?.id || !isAuthenticated) {
+          await dispatch(getUser());
+          return;
+        }
+
+        setLoading(true);
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/notification/get-notification`
+        );
+
+        const fetchedOffer = response.data.offers[0];
+        setOfferDetails({
+          id: fetchedOffer._id,
+          title: fetchedOffer.title,
+          body: fetchedOffer.body,
+          data: {
+            type: fetchedOffer.data.type,
+            offerCode: fetchedOffer.data.offerCode,
+            _id: fetchedOffer.data._id
+          },
+          createdAt: fetchedOffer.createdAt,
+          updatedAt: fetchedOffer.createdAt,
+          createdBy: `${user.firstName} ${user.lastName}`
+        });
+      } catch (error: any) {
+        if (error.response?.status !== 404) {
+          toast.error('Failed to fetch notification details');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOffer();
+  }, [offer.id, dispatch, user, isAuthenticated]);
+
+  const handlePublish = async () => {
+    if (!user?.id) {
+      toast.error('Please log in to publish offers');
+      return;
+    }
+
+    setPublishing(true);
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/notification/send-notification`,
+        {
+          title: offerDetails.title,
+          body: offerDetails.body,
+          data: {
+            type: offerDetails.data.type,
+            offerCode: offerDetails.data.offerCode,
+            userId: user.id
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success('Notification sent successfully!');
+      } else {
+        throw new Error('Failed to send notification');
+      }
+    } catch (error) {
+      toast.error('Failed to send notification');
+    } finally {
+      setPublishing(false);
     }
   };
-
-  const getOfferTypeColor = (type: string) => {
-    switch (type) {
-      case 'early_bird': return 'bg-purple-100 text-purple-800';
-      case 'last_minute': return 'bg-orange-100 text-orange-800';
-      case 'group_booking': return 'bg-cyan-100 text-cyan-800';
-      case 'extended_stay': return 'bg-indigo-100 text-indigo-800';
-      case 'seasonal': return 'bg-emerald-100 text-emerald-800';
-      case 'room_discount': return 'bg-pink-100 text-pink-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const formatOfferType = (type: string) => {
-    return type.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-  };
-
-  const formatDiscountValue = () => {
-    if (offer.discountType === 'percentage') {
-      return `${offer.discountValue}% OFF`;
-    } else if (offer.discountType === 'fixed') {
-      return `$${offer.discountValue} OFF`;
-    } else {
-      return `$${offer.discountValue} per night`;
-    }
-  };
-
-  const progressPercentage = offer.usageLimit 
-    ? Math.min((offer.bookingsCount / offer.usageLimit) * 100, 100)
-    : 0;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
-      {/* Header */}
-      <div className="p-6 border-b border-gray-100">
-        <div className="flex items-start justify-between mb-3">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">{offer.title}</h3>
-            <p className="text-sm text-gray-600 line-clamp-2">{offer.description}</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(offer.status)}`}>
-              {offer.status.charAt(0).toUpperCase() + offer.status.slice(1)}
-            </span>
-            <span className={`px-2 py-1 text-xs font-medium rounded-full ${getOfferTypeColor(offer.offerType)}`}>
-              {formatOfferType(offer.offerType)}
-            </span>
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden">
+      {/* Header with gradient background */}
+      <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-6 border-b border-gray-200">
+        <div className="flex items-start justify-between">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-xl font-semibold text-gray-900 mb-1 truncate">
+              {offerDetails.title}
+            </h3>
+            <p className="text-sm text-gray-600 line-clamp-2">
+              {offerDetails.body}
+            </p>
           </div>
         </div>
+      </div>
 
+      {/* Offer highlights */}
+      <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-bold text-green-600">
-            {formatDiscountValue()}
+          <div className="flex items-center">
+            <BadgePercent className="h-5 w-5 text-blue-500 mr-2" />
+            <span className="text-lg font-bold text-blue-600">
+              {offer.data.type || 'Promotional'} Type
+            </span>
           </div>
-          <div className="text-sm text-gray-500">
-            Created by {offer.createdBy}
-          </div>
+          {/* <div className="flex items-center text-sm text-gray-500">
+            <User className="h-4 w-4 mr-1" />
+            <span>Created by {offerDetails.createdBy}</span>
+          </div> */}
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="p-6 border-b border-gray-100">
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-gray-400" />
-            <div>
-              <p className="text-sm text-gray-600">Bookings</p>
-              <p className="font-semibold text-gray-900">{offer.bookingsCount.toLocaleString()}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <DollarSign className="w-4 h-4 text-gray-400" />
-            <div>
-              <p className="text-sm text-gray-600">Revenue</p>
-              <p className="font-semibold text-gray-900">${offer.totalRevenue.toLocaleString()}</p>
-            </div>
-          </div>
-        </div>
-
-        {offer.usageLimit && (
-          <div>
-            <div className="flex justify-between text-sm text-gray-600 mb-1">
-              <span>Usage Progress</span>
-              <span>{offer.bookingsCount} / {offer.usageLimit}</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${progressPercentage}%` }}
-              />
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Details */}
-      <div className="p-6 border-b border-gray-100">
-        <div className="grid grid-cols-1 gap-3 text-sm">
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-gray-400" />
-            <span className="text-gray-600">Valid:</span>
-            <span className="font-medium">{new Date(offer.startDate).toLocaleDateString()} - {new Date(offer.endDate).toLocaleDateString()}</span>
-          </div>
-          
-          {offer.minStayNights && (
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-gray-400" />
-              <span className="text-gray-600">Min Stay:</span>
-              <span className="font-medium">{offer.minStayNights} nights</span>
-            </div>
-          )}
-
-          {offer.advanceBookingDays && (
-            <div className="flex items-center gap-2">
-              <UserCheck className="w-4 h-4 text-gray-400" />
-              <span className="text-gray-600">Advance Booking:</span>
-              <span className="font-medium">{offer.advanceBookingDays} days</span>
-            </div>
-          )}
-
-          <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-gray-400" />
-            <span className="text-gray-600">Properties:</span>
-            <span className="font-medium">{offer.properties.length} selected</span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Bed className="w-4 h-4 text-gray-400" />
-            <span className="text-gray-600">Room Types:</span>
-            <span className="font-medium">{offer.applicableRoomTypes.length} types</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Actions */}
+      {/* Notification details */}
       <div className="p-6">
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => onView(offer)}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-          >
-            <Eye className="w-4 h-4" />
-            View Details
-          </button>
-          
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => onDuplicate(offer)}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-              title="Duplicate"
-            >
-              <Copy className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => onEdit(offer)}
-              className="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
-              title="Edit"
-            >
-              <Edit className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => onDelete(offer.id)}
-              className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-              title="Delete"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+        <div className="space-y-4">
+          <div className="flex items-start">
+            <FileText className="h-5 w-5 text-gray-400 mr-3 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-gray-500">Offer Code</p>
+              <p className="text-sm text-gray-900">
+                {offer.data.offerCode || 'No offer code'}
+              </p>
+            </div>
           </div>
+
+          <div className="flex items-start">
+            <Calendar className="h-5 w-5 text-gray-400 mr-3 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-gray-500">Created At</p>
+              <p className="text-sm text-gray-900">
+                {offerDetails.createdAt ? (
+                  format(new Date(offerDetails.createdAt), 'PPP')
+                ) : (
+                  'No date available'
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Action buttons */}
+      <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+        <div className="flex justify-end space-x-3">
+          <button
+            onClick={handlePublish}
+            disabled={publishing || loading}
+            className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${publishing ? 'opacity-70 cursor-not-allowed' : ''
+              }`}
+          >
+            <Send className="-ml-1 mr-2 h-4 w-4" />
+            {publishing ? 'Sending...' : 'Send Notification'}
+          </button>
+          <button
+            onClick={() => onView(offerDetails)}
+            disabled={loading}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <Eye className="-ml-1 mr-2 h-4 w-4" />
+            {loading ? 'Loading...' : 'View Details'}
+          </button>
         </div>
       </div>
     </div>

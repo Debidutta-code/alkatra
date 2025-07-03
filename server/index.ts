@@ -1,12 +1,18 @@
 import { connect } from "mongoose";
-import config from "./Common_API's/index";
+import config from "./Common_API/index";
 import { app } from "./app";
-import { initializeExpressRoutes } from "./Common_API's/express";
+import { initializeExpressRoutes } from "./Common_API/express";
 import { createPropertyIndexAndDoc } from "./search-engine/src/sync_controllers/syncData";
 import { Room } from "./Property_Management/src/model/room.model";
 import elasticClient from "./search-engine/src/service/elasticsearch";
 import cron from "node-cron";
 import CryptoPaymentDetails from './Booking_Engine/src/models/cryptoPayment.model';
+import cors from 'cors';
+import passport from 'passport';
+
+
+// Middleware
+app.use(passport.initialize());
 
 async function checkElasticClient() {
   try {
@@ -30,10 +36,6 @@ initializeExpressRoutes({ app }).then(async () => {
     app.listen(config.port, () => {
       console.log(`🏡 Server is running on port ${config.port}`);
     });
-
-    // call these functions only when database connection successful
-    // checkElasticClient();
-    // createPropertyIndexAndDoc();
   }
   catch (err) {
     console.log(`Error: ${err}`);
@@ -54,7 +56,8 @@ initializeExpressRoutes({ app }).then(async () => {
   }
 })();
 
-cron.schedule("*/1 * * * *", async () => {
+// CORN job implemented to auto cancel
+cron.schedule("*/15 * * * *", async () => {
   try {
     const fortyMinutesAgo = new Date(Date.now() - 40 * 60 * 1000);
     const result = await CryptoPaymentDetails.updateMany(

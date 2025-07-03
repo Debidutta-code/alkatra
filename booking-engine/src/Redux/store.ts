@@ -11,6 +11,7 @@ import userFormReducer from "./slices/useForm.slice";
 import hotelReducer from "./slices/hotelcard.slice";
 import pmsHotelCardReducer from "./slices/pmsHotelCard.slice";
 import paymentReducer from "./slices/payment.slice";
+import notificationReducer from './slices/notification.slice';
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "./storage";
 
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
   hotel: hotelReducer,
   pmsHotelCard: pmsHotelCardReducer,
   payment: paymentReducer,
+  notifications: notificationReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -5,93 +5,105 @@ import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { jwtDecode } from "jwt-decode";
 
-export type User = {
+// Strongly typed User interface
+export interface User {
   firstName: string;
   lastName: string;
   email: string;
   role: string;
-  _id: string;
-  noOfProperties:number;
-};
+  id: string; // Changed from _id to id for consistency
+  noOfProperties: number;
+}
 
-type InitialState = {
+interface InitialState {
   accessToken: string;
   isAuthenticated: boolean;
   authLoading: boolean;
-  user: User | undefined;
-};
+  user: User | null; // Changed from undefined to null for better type safety
+}
 
 const initialState: InitialState = {
   accessToken: Cookies.get("accessToken") || "",
   isAuthenticated: Cookies.get("isAuthenticated") === "true",
   authLoading: false,
-  user: undefined,
+  user: null,
 };
 
 const authSlice = createSlice({
-  name: "authSlice",
+  name: "auth",
   initialState,
   reducers: {
     setAccessToken(
-      state: Draft<typeof initialState>,
-      action: PayloadAction<typeof initialState.accessToken>
+      state: Draft<InitialState>,
+      action: PayloadAction<string>
     ) {
       state.accessToken = action.payload;
       state.isAuthenticated = true;
-      Cookies.set("accessToken", action.payload, { secure: true, sameSite: "Strict" });
-      Cookies.set("isAuthenticated", "true", { secure: true, sameSite: "Strict" });
+      Cookies.set("accessToken", action.payload, { 
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+        expires: 1 // 1 day
+      });
+      Cookies.set("isAuthenticated", "true", {
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict"
+      });
     },
-    removeAccessToken(state: Draft<typeof initialState>) {
+    removeAccessToken(state: Draft<InitialState>) {
       state.accessToken = "";
       state.isAuthenticated = false;
-      state.user = undefined;
+      state.user = null;
       Cookies.remove("accessToken");
       Cookies.remove("isAuthenticated");
       Cookies.remove("ownerId");
+      localStorage.clear();
     },
     setUser(
-      state: Draft<typeof initialState>,
-      action: PayloadAction<typeof initialState.user>
+      state: Draft<InitialState>,
+      action: PayloadAction<User | null>
     ) {
       state.user = action.payload;
+      if (action.payload) {
+        Cookies.set("ownerId", action.payload.id, { 
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "Strict"
+        });
+      }
     },
+    setAuthLoading(
+      state: Draft<InitialState>,
+      action: PayloadAction<boolean>
+    ) {
+      state.authLoading = action.payload;
+    }
   },
 });
 
-export const { setAccessToken, removeAccessToken, setUser } = authSlice.actions;
-
-
-export const login =
-  (data: { email: string; password: string }) =>
+// Thunk actions
+export const login = (data: { email: string; password: string }) => 
   async (dispatch: typeof store.dispatch) => {
     try {
-      console.log(process.env.NEXT_PUBLIC_BACKEND_URL);
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`, data);
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`, 
+        data
+      );
+      
       const { accessToken, user } = res.data.data;
       if (!accessToken) {
-        toast.error("Login failed. No access token received.");
-        return;
+        throw new Error("No access token received");
       }
 
-      Cookies.set("accessToken", accessToken, {
-        expires: 1,
-        secure: process.env.NODE_ENV === 'production', 
-        sameSite: process.env.NODE_ENV === 'production' ? "Lax" : "Strict", 
-        path: "/",
-        domain: process.env.NODE_ENV === 'production' ? 'dashboard.trip-swift.ai' : 'localhost' 
-      });
-      dispatch(setAccessToken(accessToken));
-      dispatch(setUser(user));
+      // Transform user object to use 'id' instead of '_id' if needed
+      const normalizedUser = user._id ? { ...user, id: user._id } : user;
 
+      dispatch(setAccessToken(accessToken));
+      dispatch(setUser(normalizedUser));
+      
       return accessToken;
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
-        if (error.response?.status === 401) {
-          toast.error("Invalid Email or Password");
-        } 
-        // else {
-        //   toast.error(error.response?.data?.message || "Login failed");
-        // }
+        const message = error.response?.data?.message || "Login failed";
+        toast.error(message);
       } else {
         toast.error("An unexpected error occurred");
       }
@@ -99,70 +111,70 @@ export const login =
     }
   };
 
-  export const logout = () => async (dispatch: typeof store.dispatch, getState: typeof store.getState) => {
-    const state = getState();
-    const accessToken = state.auth.accessToken;
-    
-    let logoutSuccess = false;
+export const logout = () => 
+  async (dispatch: typeof store.dispatch, getState: typeof store.getState) => {
+    const { accessToken } = getState().auth;
     
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/logout`, {}, {
-        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
-      });
-      logoutSuccess = true;
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/logout`, 
+        {},
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+      toast.success("Logged out successfully");
     } catch (error) {
-      console.error("Logout API call failed:", error);
+      console.error("Logout API error:", error);
+      toast.success("Logged out (session cleared)");
     } finally {
       dispatch(removeAccessToken());
-      
-      if (logoutSuccess) {
-        toast.success("Successfully logged out!");
-      } else {
-        toast.success("Logged out successfully");
-        // Changed message to be more user-friendly
-      }
     }
   };
 
-export const getUser =
-  () => async (dispatch: typeof store.dispatch, getState: typeof store.getState) => {
-    const state = getState();
-    const accessToken = state.auth.accessToken;
-    const isAuthenticated = state.auth.isAuthenticated;
-
+export const getUser = () => 
+  async (dispatch: typeof store.dispatch, getState: typeof store.getState) => {
+    const { accessToken, isAuthenticated } = getState().auth;
+    
     if (!isAuthenticated || !accessToken) {
       dispatch(logout());
       return;
     }
 
     try {
-      const decodedToken: any = jwtDecode(accessToken);
-      const currentTime = Date.now() / 1000; // Convert to seconds
-
-      if (decodedToken.exp < currentTime) {
-        console.warn("Token expired. Logging out...");
+      // Verify token expiration
+      const decoded = jwtDecode(accessToken);
+      if (decoded.exp && decoded.exp < Date.now() / 1000) {
         dispatch(logout());
         return;
       }
 
       const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/me`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: { Authorization: `Bearer ${accessToken}` }
       });
 
-      const user = res?.data?.data?.user;
+      const user = res.data.data?.user;
       if (user) {
-        dispatch(setUser(user));
-        Cookies.set("ownerId", user._id, { secure: true, sameSite: "Strict" });
+        // Normalize user object to use 'id'
+        const normalizedUser = user._id ? { ...user, id: user._id } : user;
+        dispatch(setUser(normalizedUser));
       }
     } catch (error: any) {
       if (error.response?.status === 401) {
-        console.warn("Unauthorized! Logging out...");
         dispatch(logout());
-      } else {
-        console.error("Error fetching user:", error);
       }
+      console.error("Failed to fetch user:", error);
     }
   };
 
+// Selectors
+export const selectCurrentUser = (state: RootState) => state.auth.user;
+export const selectIsAuthenticated = (state: RootState) => state.auth.isAuthenticated;
+export const selectAuthLoading = (state: RootState) => state.auth.authLoading;
+
+export const { 
+  setAccessToken, 
+  removeAccessToken, 
+  setUser,
+  setAuthLoading 
+} = authSlice.actions;
 
 export default authSlice.reducer;

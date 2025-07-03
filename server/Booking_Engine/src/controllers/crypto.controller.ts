@@ -9,8 +9,11 @@ import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { CryptoGuestDetails } from "../models/cryptoUserPaymentInitialStage.model";
 import { createReservationWithCryptoPayment } from "./bookings.controller";
+import { NotificationService } from "../../../notification/src/service/notification.service";
 
 let convertedAmount: number;
+
+const notification = new NotificationService()
 
 const calculateAgeCategory = (dob: string) => {
   const birthDate = new Date(dob);
@@ -28,7 +31,7 @@ const calculateAgeCategory = (dob: string) => {
 };
 
 export const getPaymentSuccessResponse = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  const {paymentId, amount} = req.query;
+  const { paymentId, amount } = req.query;
   try {
     const getDetails = await CryptoPaymentDetails.findOne({
       payment_id: paymentId,
@@ -64,7 +67,6 @@ export const getCryptoDetails = CatchAsyncError(
               _id: 0,
               "networks.name": 1,
               "networks.imageUrl": 1,
-              "networks.chainId":1,
               "networks.contractAddress": 1,
             },
           }
@@ -326,6 +328,7 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
 
 export const pushCryptoPaymentDetails = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
+    console.log("Entering into push crypto payment details");
     const { senderWalletAddress, token, blockChain, amount, txHash } = req.body;
     console.log("Received data:", { token, blockChain, amount, txHash });
     const requiredFields = { token, blockChain, amount, txHash };
@@ -339,29 +342,26 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
         message: `Missing required fields: ${missingFields.join(", ")}`,
       });
     }
-    const cryptoPaymentLog = new CryptoPaymentLog({
-      token,
-      blockchain: blockChain,
-      amount: parseFloat(amount),
-      txHash,
-      senderWalletAddress,
-    });
-   
-    console.log(">>>>>>>> CryptoPaymentLog:", cryptoPaymentLog,"parsedamount is ", parseFloat(amount));
 
-    await cryptoPaymentLog.save();
+    const paymentAmount = await CryptoPaymentDetails.findOne({
+      amount: amount
+    });
+    console.log("----------11111111111111111111-------------------------", paymentAmount)
 
     const payment = await CryptoPaymentDetails.findOne({
-      token,
-      blockchain: blockChain,
-      amount: parseFloat(amount),
+      amount: amount,
       status: "Pending",
     });
-
+    console.log("----------111111111.1.1.1.1.1.1.1.1.-------------------------", payment)
+    if (payment) {
+      await notification.sendCryptoPaymentNotification(payment.customer_id.toString(), parseFloat(amount), txHash)
+      console.log("----------11111111111111111111-------------------------")
+    }
     const guestDetails = await CryptoGuestDetails.findOne({
-      totalAmount: parseFloat(amount),
-      status: "Processing",
+      totalAmount: amount,
+      status: "Processing"
     });
+    console.log("----------2222222222222222222222-------------------------", guestDetails);
 
     if (!payment) {
       return res.status(404).json({
@@ -381,8 +381,20 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
     (payment as any).senderWalletAddress = senderWalletAddress;
     (guestDetails as any).txHash = txHash;
     (guestDetails as any).senderWalletAddress = senderWalletAddress;
+
+
+
     await payment.save();
     await guestDetails.save();
+
+    const cryptoPaymentLog = new CryptoPaymentLog({
+      token,
+      blockchain: blockChain,
+      amount: parseFloat(amount),
+      txHash,
+      senderWalletAddress,
+    });
+    await cryptoPaymentLog.save();
 
     await createReservationWithCryptoPayment({
       reservationId: guestDetails.reservationId,
@@ -412,7 +424,6 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
 
 
 export const getWalletAddress = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  console.log("Entering into get wallet address");
   const collection = mongoose.connection.collection("CryptoWalletAddress");
   try {
     console.log("");
@@ -428,3 +439,46 @@ export const getWalletAddress = CatchAsyncError(async (req: AuthenticatedRequest
   }
 });
 
+export const getInitiatedPaymentDetails = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  const { userId, amount } = req.query;
+  if (!userId || !amount) {
+    return res.status(400).json({
+      message: `Missing userId or initiated amount fields`,
+    });
+  }
+  console.log(`Get data from UI by QUERY userid: ${userId}, amount: ${amount}`);
+  try {
+
+    const customerId = mongoose.Types.ObjectId.isValid(userId as string) ? new mongoose.Types.ObjectId(userId as string) : null;
+    const amountNumber = Number(amount);
+
+    if (!customerId || isNaN(amountNumber)) {
+      return res.status(400).json({
+        message: 'Invalid userId or amount format',
+      });
+    }
+
+    const paymentDetails = await CryptoPaymentDetails.findOne({
+      customer_id: customerId,
+      amount: amountNumber,
+      status: 'Pending',
+    });
+
+    if (!paymentDetails) {
+      return res.status(404).json({
+        message: 'No matching payment details found',
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Payment details retrieved successfully',
+      paymentDetails,
+    });
+  } catch (error: any) {
+    console.error('❌ Error retrieving payment details:', error);
+    return res.status(500).json({
+      message: 'Internal server error',
+      error: error.message,
+    });
+  }
+});

@@ -210,7 +210,7 @@ function PaymentPageContent() {
                         <CalendarRange className={`text-tripswift-blue flex-shrink-0`} size={20} />
                         <div className={` ${i18n.language === "ar" ? "mr-3" : "ml-3"}`}>
                           <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentPageContent.bookingSummary.stayDates')}</p>
-                          <p className="font-tripswift-medium">
+                          <p className="text-sm text-tripswift-black/60 truncate max-w-[200px]">
                             {formatDate(checkIn, { weekday: 'short', month: 'short', day: 'numeric' })} - {formatDate(checkOut, { weekday: 'short', month: 'short', day: 'numeric' })}
                           </p>
                           <p className="text-sm text-tripswift-black/60">
@@ -223,9 +223,10 @@ function PaymentPageContent() {
                         <Users className="text-tripswift-blue flex-shrink-0" size={20} />
                         <div className={` ${i18n.language === "ar" ? "mr-3" : "ml-3"}`}>
                           <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentPageContent.bookingSummary.guests')}</p>
-                          <p className="font-tripswift-medium ">
+                          <p className="text-sm text-tripswift-black/60 truncate max-w-[200px]">
                             {rooms} {rooms === 1 ? t('Payment.PaymentPageContent.bookingSummary.room') : t('Payment.PaymentPageContent.bookingSummary.rooms')} · {adults} {adults === 1 ? t('Payment.PaymentPageContent.bookingSummary.adult') : t('Payment.PaymentPageContent.bookingSummary.adults')}
-                            {children > 0 ? ` · ${children} ${children === 1 ? t('Payment.PaymentPageContent.bookingSummary.child') : t('Payment.PaymentPageContent.bookingSummary.children')}` : ''} · {infants > 0 ? ` ${infants} ${infants === 1 ? t('Payment.PaymentPageContent.bookingSummary.infant') : t('Payment.PaymentPageContent.bookingSummary.infants')}` : ''}
+                            {children > 0 ? ` · ${children} ${children === 1 ? t('Payment.PaymentPageContent.bookingSummary.child') : t('Payment.PaymentPageContent.bookingSummary.children')}` : ''}
+                            {infants > 0 ? ` · ${infants} ${infants === 1 ? t('Payment.PaymentPageContent.bookingSummary.infant') : t('Payment.PaymentPageContent.bookingSummary.infants')}` : ''}
                           </p>
                         </div>
                       </div>
@@ -234,7 +235,7 @@ function PaymentPageContent() {
                         <CheckCircle className="text-tripswift-blue flex-shrink-0" size={20} />
                         <div className={` ${i18n.language === "ar" ? "mr-3" : "ml-3"}`}>
                           <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentPageContent.bookingSummary.guest')}</p>
-                          <p className="font-tripswift-medium">{guests[0]?.firstName} {guests[0]?.lastName}</p>
+                          <p className="text-sm text-tripswift-black/60 truncate max-w-[200px]">{guests[0]?.firstName} {guests[0]?.lastName}</p>
                           <p className="text-sm text-tripswift-black/60 truncate max-w-[200px]">{email}</p>
                         </div>
                       </div>
@@ -369,7 +370,7 @@ function PaymentPageContent() {
                           <div className="font-tripswift-medium">{currency.toUpperCase()} {ratePerNight.toLocaleString()} × {nights}</div>
                         </div> */}
 
-                        <div className="border-t border-gray-200 my-4"></div>
+                        {/* <div className="border-t border-gray-200 my-4"></div> */}
                         <div className="flex justify-between items-center">
                           <div className="font-tripswift-bold text-lg">{t('Payment.PaymentPageContent.priceDetails.total')}</div>
                           <div className="font-tripswift-bold text-xl text-tripswift-blue">

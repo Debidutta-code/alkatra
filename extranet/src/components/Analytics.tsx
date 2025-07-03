@@ -63,10 +63,10 @@ const Analytics = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br md:mx-8 from-indigo-50 via-white to-purple-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
@@ -75,24 +75,24 @@ const Analytics = () => {
               
             </div>
             <div className="flex items-center space-x-3">
-              <button className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+              {/* <button className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
                 <Search className="w-5 h-5" />
-              </button>
+              </button> */}
               <button className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
                 <Filter className="w-5 h-5" />
               </button>
-              <button className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+              {/* <button className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
                 <Download className="w-5 h-5" />
-              </button>
+              </button> */}
               <button 
                 onClick={handleRefresh}
                 className={`p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors ${isLoading ? 'animate-spin' : ''}`}
               >
                 <RefreshCw className="w-5 h-5" />
               </button>
-              <button className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+              {/* <button className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
                 <Bell className="w-5 h-5" />
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
@@ -100,7 +100,7 @@ const Analytics = () => {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Users"
             value="24,583"

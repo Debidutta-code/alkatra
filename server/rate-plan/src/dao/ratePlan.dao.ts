@@ -146,7 +146,7 @@ public static async getRatePlanByHotel(
   };
 }> {
   page = page ?? 1;
-  const resultsPerPage = 20;
+  const resultsPerPage = 10;
   const skip = (page - 1) * resultsPerPage;
   // Build match stage for inventory based on given parameters
   const inventoryMatch: any = { hotelCode };

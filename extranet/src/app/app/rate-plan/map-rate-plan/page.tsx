@@ -8,6 +8,8 @@ import { filterData, updatePrice, updateAvailability, saveData, ratePlanServices
 import { RatePlanInterFace, DateRange, paginationTypes, modifiedRatePlanInterface } from './types';
 import toast, { Toaster } from 'react-hot-toast';
 import Pagination from "./components/Pagination"
+import { useSidebar } from '@src/components/ui/sidebar';
+import { cn } from '@src/lib/utils';
 // Pagination Component
 
 
@@ -21,6 +23,7 @@ const MapRatePlanPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [allRoomTypes, setAllRoomTypes] = useState<any[]>([]);
   const [roomTypesLoaded, setRoomTypesLoaded] = useState<boolean>(false);
+  const { state , isMobile } = useSidebar(); // state: "collapsed" | "expanded"
   const [paginationResults, setPaginationResults] = useState<paginationTypes>({
     currentPage: 1,
     totalPage: 10,
@@ -58,8 +61,13 @@ const MapRatePlanPage: React.FC = () => {
       setData(response.data);
       setOriginalData(response.data);
       setFilteredData(response.data);
+      const patchedPagination = {
+      ...response.pagination,
+      totalPage: response.pagination.totalPages,
+    };
       console.log("Pagination response",response.pagination)
-      setPaginationResults(response.pagination)
+      console.log("patched ",patchedPagination)
+      setPaginationResults(patchedPagination)
       setEditButtonClicked(false);
       setModifiedValues([]);
 
@@ -155,9 +163,18 @@ const MapRatePlanPage: React.FC = () => {
   const hasUnsavedChanges = modifiedValues.length > 0;
 
   return (
-    <div className="px-10 min-h-screen" style={{ height: 'calc(100vh - 100px)' }}>
+ <div
+  className={cn(
+    "flex flex-col min-h-screen transition-all overflow-x-hidden  duration-300",
+    !isMobile && state === "collapsed" && "md:overflow-x-hidden ",
+    !isMobile && state === "expanded" && ""
+  )}
+>
+
+
+
       <Toaster position="top-right" />
-      <div className="max-w-7xl mx-auto">
+<div className="w-full px-4 sm:px-6 md:px-8 ">
         {roomTypesLoaded && (
           <>
             <Filters
@@ -202,7 +219,6 @@ const MapRatePlanPage: React.FC = () => {
               hasNextPage={paginationResults.hasNextPage}
               hasPreviousPage={paginationResults.hasPreviousPage}
               onPageChange={handlePageChange}
-              isLoading={isLoading}
             />
           </div>
         )}

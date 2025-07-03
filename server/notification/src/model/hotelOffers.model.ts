@@ -1,5 +1,10 @@
 import { Schema, model } from 'mongoose';
 
+interface IData {
+  type: string;
+  offerCode: string
+}
+
 interface IOffer {
   hotelCode: string;
   title: string;
@@ -8,11 +13,16 @@ interface IOffer {
   createdAt: Date;
 }
 
+const dataSchema = new Schema<IData>({
+  type: { type: String, required: true },
+  offerCode: { type: String, required: true },
+});
+
 const offerSchema = new Schema<IOffer>({
-  hotelCode: { type: String, required: true },
+  hotelCode: { type: String, required: false },
   title: { type: String, required: true },
   body: { type: String, required: true },
-  data: { type: Map, of: String },
+  data: { type: dataSchema, required: false },
   createdAt: { type: Date, default: Date.now },
 });
 
