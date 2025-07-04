@@ -60,7 +60,7 @@ const useFCM = (userId?: string) => {
       onMessage(messaging, (payload) => {
         console.log('📩 Foreground message:', payload);
         toast.success(`New Notification Received: ${payload.notification?.title}`, {
-            duration: 7000,
+            duration: 5000,
             icon: '🔔',
         //   position: 'top-right',
         });
