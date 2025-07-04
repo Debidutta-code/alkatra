@@ -1,4 +1,3 @@
-// utils/firebase-config.ts
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getMessaging, isSupported } from 'firebase/messaging';
 
@@ -14,11 +13,18 @@ const firebaseConfig = {
 
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-export const getMessagingInstance = async () => {
-  if (typeof window !== 'undefined' && (await isSupported())) {
-    return getMessaging(app);
-  }
-  return null;
-};
+let messaging: ReturnType<typeof getMessaging> | null = null;
 
-export { app };
+if (typeof window !== 'undefined') {
+  isSupported().then((supported: boolean) => {
+    if (supported) {
+      messaging = getMessaging(app);
+    } else {
+      console.warn("🚫 FCM is not supported in this browser.");
+    }
+  }).catch((err: any) => {
+    console.error("❌ Error checking FCM support:", err);
+  });
+}
+
+export { app, messaging };

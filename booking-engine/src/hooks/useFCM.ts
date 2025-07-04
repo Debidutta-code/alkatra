@@ -2,15 +2,15 @@
 
 import { useEffect } from 'react';
 import { getToken, onMessage } from 'firebase/messaging';
-import { getMessagingInstance } from '../utils/firebase.config'; // ✅ Import the lazy function
+import { messaging } from '../utils/firebase.config'; // Adjust the import path as needed
 import toast from 'react-hot-toast';
 
-const vapidKey = process.env.NEXT_PUBLIC_VAPIDKEY as string;
+const vapidKey = process.env.NEXT_PUBLIC_VAPIDKEY as string; // from Firebase Console
 
 const useFCM = (userId?: string) => {
   useEffect(() => {
-    console.log('🔔 useFCM hook initialized with userId:', userId);
 
+    console.log('🔔 useFCM hook initialized with userId-----------------------------:', userId);
     const setupFCM = async () => {
       try {
         const permission = await Notification.requestPermission();
@@ -21,8 +21,6 @@ const useFCM = (userId?: string) => {
 
         console.log('✅ Notification permission granted', vapidKey);
 
-        const messaging = await getMessagingInstance(); // ✅ Safe, client-only
-
         if (!messaging) {
           console.error("Firebase Messaging is not supported in this browser.");
           return;
@@ -32,10 +30,14 @@ const useFCM = (userId?: string) => {
         console.log('🔑 FCM Token:', token);
 
         if (token) {
+          console.log('📱 FCM Token:', token);
+
+          // 🔁 Send to backend
           await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/notification/register-device-token`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              // Include auth token if needed
             },
             body: JSON.stringify({
               userId,
@@ -44,22 +46,28 @@ const useFCM = (userId?: string) => {
             }),
           });
         }
-
-        // ✅ Setup onMessage listener
-        onMessage(messaging, (payload) => {
-          console.log('📩 Foreground message:', payload.notification?.title);
-          toast.success(`New Notification: ${payload.notification?.title}`, {
-            duration: 5000,
-            icon: '🔔',
-          });
-        });
-
       } catch (err) {
-        console.error('❌ Error initializing FCM:', err);
+        console.error('❌ Error getting FCM token:', err);
       }
     };
 
     setupFCM();
+    console.log('✅ useFCM effect running, setting up onMessage...');
+
+
+    // Optional: Handle incoming messages
+    if (messaging) {
+      onMessage(messaging, (payload) => {
+        console.log('📩 Foreground message:', payload);
+        toast.success(`New Notification Received: ${payload.notification?.title}`, {
+            duration: 5000,
+            icon: '🔔',
+        //   position: 'top-right',
+        });
+      });
+    } else {
+      console.warn('❌ Firebase Messaging is not available (unsupported browser or not initialized)');
+    }
   }, [userId]);
 };
 
