@@ -17,6 +17,7 @@ import { ThirdPartyCancelReservationService } from '../../../wincloud/src/servic
 import { AmendReservationInput } from "../../../wincloud/src/interface/amendReservationInterface";
 import { CryptoGuestDetails } from "../models/cryptoUserPaymentInitialStage.model";
 import EmailService from '../../../Customer-Authentication/src/services/email.service';
+import Handlebars from "handlebars";
 
 
 const calculateAgeCategory = (dob: string) => {
@@ -331,9 +332,33 @@ export const createReservationWithStoredCard = CatchAsyncError(
           </div>
         </body>
 
-        </html>`
+        </html>`;
 
-        // const htmlContent = template(templateData);
+        const templateData = {
+          guestName: `${guests[0].firstName} ${guests[0].lastName}`, // Primary guest name
+          hotelName: hotelName,
+          checkInDate: new Date(checkInDate).toLocaleDateString(), // Format date
+          checkOutDate: new Date(checkOutDate).toLocaleDateString(), // Format date
+          roomTypeCode: roomTypeCode,
+          numberOfRooms: numberOfRooms,
+          roomTotalPrice: roomTotalPrice,
+          currencyCode: currencyCode,
+          email: email,
+          phone: phone,
+          guests: categorizedGuests, // Array of guests w
+          supportEmail: 'support@alhajz.com', // Replace with actual support email
+          supportPhone: '+1-800-123-4567', // Replace with actual support phone
+          websiteUrl: 'https://book.trip-swift.ai.com/', // Replace with actual website URL
+          currentYear: new Date().getFullYear(),
+          companyName: 'Al-Hajz', // Replace with actual company name
+          companyAddress: '1234 Example St, City, Country', // Replace with actual address
+        };
+
+        // Compile the Handlebars template
+        const template = Handlebars.compile(htmlContent);
+
+        // Generate the final HTML by replacing placeholders with actual data
+        const finalHtml = template(templateData);
 
         await EmailService.sendEmail({
           to: email,
@@ -617,7 +642,29 @@ export async function createReservationWithCryptoPayment(input: {
           </div>
         </body>
 
-        </html>`
+        </html>`;
+    const templateData = {
+      guestName: `${guests[0].firstName} ${guests[0].lastName}`,
+      hotelName,
+      checkInDate: new Date(checkInDate).toLocaleDateString(),
+      checkOutDate: new Date(checkOutDate).toLocaleDateString(),
+      roomTypeCode,
+      numberOfRooms,
+      roomTotalPrice,
+      currencyCode,
+      email,
+      phone,
+      guests: categorizedGuests,
+      supportEmail: 'support@yourcompany.com',
+      supportPhone: '+1-800-123-4567',
+      websiteUrl: 'https://yourwebsite.com/booking',
+      currentYear: new Date().getFullYear(),
+      companyName: 'Your Company Name',
+      companyAddress: '1234 Example St, City, Country',
+    };
+
+    const template = Handlebars.compile(htmlContent);
+    const finalHtml = template(templateData);
 
     await EmailService.sendEmail({
       to: email,
@@ -748,7 +795,7 @@ export const updateThirdPartyReservation = CatchAsyncError(
       try {
         const thirdPartyService = new ThirdPartyAmendReservationService();
         await thirdPartyService.processAmendReservation(amendReservationInput);
-          const htmlContent = `<!DOCTYPE html>
+        const htmlContent = `<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -934,7 +981,32 @@ export const updateThirdPartyReservation = CatchAsyncError(
   </div>
 </body>
 
-</html>`
+</html>`;
+
+        const templateData = {
+          guestName: `${guests[0].firstName} ${guests[0].lastName}`,
+          hotelName,
+          reservationId,
+          checkInDate: new Date(checkInDate).toLocaleDateString(),
+          checkOutDate: new Date(checkOutDate).toLocaleDateString(),
+          roomTypeCode,
+          numberOfRooms,
+          roomTotalPrice,
+          currencyCode,
+          email,
+          phone,
+          guests: categorizedGuests,
+          supportEmail: "support@company.com",
+          supportPhone: "+1-800-123-4567",
+          websiteUrl: "https://www.company.com/reservations",
+          currentYear: new Date().getFullYear(),
+          companyName: "Your Company Name",
+          companyAddress: "1234 Hotel St, City, Country",
+        };
+
+        const template = Handlebars.compile(htmlContent);
+        const finalHtml = template(templateData);
+
 
         await EmailService.sendEmail({
           to: email,
@@ -962,55 +1034,53 @@ export const updateThirdPartyReservation = CatchAsyncError(
 
 export const cancelThirdPartyReservation = CatchAsyncError(
   async (req: any, res: Response, next: NextFunction) => {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(400).json({ message: "User ID is required" });
-    }
-    const reservationId = req.params.id;
-    if (!reservationId) {
-      return res.status(400).json({ message: "Reservation ID is required" });
-    }
-    const existingReservation = await ThirdPartyBooking.findOne({ reservationId });
-    if (!existingReservation) {
-      return res.status(404).json({ message: `Reservation with ID ${reservationId} not found in our record` });
-    }
-    if (existingReservation.status === 'Cancelled') {
-      return res.status(400).json({ message: `Reservation with ID ${reservationId} is already cancelled` });
-    }
-
-    const { firstName, lastName, email, hotelCode, hotelName, checkInDate, checkOutDate } = req.body;
-    const requiredFields = { reservationId, firstName, lastName, email, hotelCode, hotelName, checkInDate, checkOutDate };
-    const missingFields = Object.entries(requiredFields)
-      .filter(([_, value]) => value === undefined || value === null || value === "")
-      .map(([key]) => key);
-
-    if (missingFields.length > 0) {
-      return res.status(400).json({
-        message: `Missing required fields: ${missingFields.join(", ")}`,
-      });
-    }
-
-    const cancelReservationInput = {
-      reservationId,
-      hotelCode,
-      hotelName,
-      firstName,
-      lastName,
-      email,
-      checkInDate,
-      checkOutDate,
-      status: "Cancelled",
-    };
-
     try {
-      const thirdPartyService = new ThirdPartyCancelReservationService();
-      const result = await thirdPartyService.processCancelReservation(cancelReservationInput);
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
+      }
+      const reservationId = req.params.id;
+      if (!reservationId) {
+        return res.status(400).json({ message: "Reservation ID is required" });
+      }
+      const existingReservation = await ThirdPartyBooking.findOne({ reservationId });
+      if (!existingReservation) {
+        return res.status(404).json({ message: `Reservation with ID ${reservationId} not found in our record` });
+      }
+      if (existingReservation.status === 'Cancelled') {
+        return res.status(400).json({ message: `Reservation with ID ${reservationId} is already cancelled` });
+      }
 
-      // Send cancellation confirmation email
+      const { firstName, lastName, email, hotelCode, hotelName, checkInDate, checkOutDate } = req.body;
+      const requiredFields = { reservationId, firstName, lastName, email, hotelCode, hotelName, checkInDate, checkOutDate };
+      const missingFields = Object.entries(requiredFields)
+        .filter(([_, value]) => value === undefined || value === null || value === "")
+        .map(([key]) => key);
+
+      if (missingFields.length > 0) {
+        return res.status(400).json({
+          message: `Missing required fields: ${missingFields.join(", ")}`,
+        });
+      }
+
+      const cancelReservationInput = {
+        reservationId,
+        hotelCode,
+        hotelName,
+        firstName,
+        lastName,
+        email,
+        checkInDate,
+        checkOutDate,
+        status: "Cancelled",
+      };
+
       try {
+        const thirdPartyService = new ThirdPartyCancelReservationService();
+        const result = await thirdPartyService.processCancelReservation(cancelReservationInput);
+
         const htmlContent = `<!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1021,7 +1091,6 @@ export const cancelThirdPartyReservation = CatchAsyncError(
             margin: 0;
             padding: 0;
         }
-
         .container {
             max-width: 500px;
             margin: 20px auto;
@@ -1030,69 +1099,57 @@ export const cancelThirdPartyReservation = CatchAsyncError(
             overflow: hidden;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-
         .header {
             background-color: #d32f2f;
-            /* Red theme */
             color: #ffffff;
             padding: 15px;
             text-align: center;
         }
-
         .header h1 {
             margin: 0;
             font-size: 20px;
         }
-
         .content {
             padding: 15px;
         }
-
         .content p {
             color: #666666;
             line-height: 1.5;
             margin: 8px 0;
             font-size: 14px;
         }
-
         .details-table {
             width: 100%;
             border-collapse: collapse;
             margin: 15px 0;
         }
-
         .details-table th,
         .details-table td {
             padding: 8px;
             text-align: left;
             border-bottom: 1px solid #e0e0e0;
         }
-
         .details-table th {
             background-color: #f8f8f8;
             color: #333333;
             font-weight: bold;
             font-size: 14px;
         }
-
         .details-table td {
             color: #666666;
             font-size: 14px;
         }
-
         .button {
             display: inline-block;
             padding: 8px 16px;
             margin: 15px 0;
             background-color: #d32f2f;
-            /* Red theme */
             color: #ffffff;
             text-decoration: none;
             border-radius: 4px;
             font-size: 14px;
             font-weight: bold;
         }
-
         .footer {
             background-color: #f4f4f4;
             padding: 10px;
@@ -1100,24 +1157,20 @@ export const cancelThirdPartyReservation = CatchAsyncError(
             color: #888888;
             font-size: 12px;
         }
-
         @media only screen and (max-width: 500px) {
             .container {
                 width: 100%;
                 margin: 10px;
             }
-
             .header h1 {
                 font-size: 18px;
             }
-
             .content p {
                 font-size: 13px;
             }
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <div class="header">
@@ -1125,9 +1178,7 @@ export const cancelThirdPartyReservation = CatchAsyncError(
         </div>
         <div class="content">
             <p>Dear {{guestName}},</p>
-            <p>Your reservation with {{hotelName}} has been successfully cancelled. Below are the details of the
-                cancelled booking.</p>
-
+            <p>Your reservation with {{hotelName}} has been successfully cancelled. Below are the details of the cancelled booking.</p>
             <table class="details-table">
                 <tr>
                     <th>Reservation ID</th>
@@ -1146,10 +1197,7 @@ export const cancelThirdPartyReservation = CatchAsyncError(
                     <td>{{checkOutDate}}</td>
                 </tr>
             </table>
-
-            <p>If you have any questions or need assistance, please contact us at <a
-                    href="mailto:{{supportEmail}}">{{supportEmail}}</a> or call {{supportPhone}}.</p>
-
+            <p>If you have any questions or need assistance, please contact us at <a href="mailto:{{supportEmail}}">{{supportEmail}}</a> or call {{supportPhone}}.</p>
             <a href="{{websiteUrl}}" class="button">Visit Our Website</a>
         </div>
         <div class="footer">
@@ -1158,24 +1206,42 @@ export const cancelThirdPartyReservation = CatchAsyncError(
         </div>
     </div>
 </body>
+</html>`;
 
-</html>`
+        const templateData = {
+          guestName: `${firstName} ${lastName}`,
+          hotelName,
+          reservationId,
+          checkInDate: new Date(checkInDate).toLocaleDateString(),
+          checkOutDate: new Date(checkOutDate).toLocaleDateString(),
+          supportEmail: "support@company.com",
+          supportPhone: "+1-800-123-4567",
+          websiteUrl: "https://www.company.com",
+          currentYear: new Date().getFullYear(),
+          companyName: "Your Company Name",
+          companyAddress: "1234 Hotel St, City, Country",
+        };
+
+        const template = Handlebars.compile(htmlContent);
+        const finalHtml = template(templateData);
 
         await EmailService.sendEmail({
           to: email,
           subject: `Booking Cancellation Confirmation - ${hotelName}`,
-          html: htmlContent,
+          html: finalHtml,
         });
         console.log(`✅ Cancellation confirmation email sent to ${email}`);
-      } catch (emailError: any) {
-        console.error('❌ Failed to send cancellation confirmation email:', emailError);
-      }
 
-      res.status(200).json({
-        message: "Reservation cancellation processed successfully",
-        reservationId: result,
-      });
+        res.status(200).json({
+          message: "Reservation cancellation processed successfully",
+          reservationId: result,
+        });
+      } catch (error: any) {
+        console.error('❌ Failed to send cancellation confirmation email:', error);
+        return res.status(500).json({ message: `Failed to process cancellation: ${error.message}` });
+      }
     } catch (error: any) {
+      console.error("❌ Error cancelling third-party reservation:", error.message || error);
       if (error.message.includes('Reservation not found')) {
         return res.status(404).json({ message: error.message });
       }
