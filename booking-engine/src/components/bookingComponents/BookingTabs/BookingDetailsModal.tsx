@@ -13,6 +13,10 @@ import {
   FaRegCalendarCheck,
   FaEdit,
   FaRegTimesCircle,
+  FaBed,
+  FaUsers,
+  FaPhone,
+  FaMapMarkerAlt,
 } from "react-icons/fa";
 import {
   formatDateString,
@@ -37,7 +41,8 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
   onAmend,
   onCancel,
 }) => {
-  const { t , i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
+
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -73,135 +78,155 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
     booking.roomTypeCode || t("BookingTabs.BookingDetailsModal.standardRoom");
   const currency = booking.currencyCode?.toUpperCase() || "INR";
   const isPastCheckIn =
-  new Date(booking.checkInDate).setHours(0, 0, 0, 0) <
-  new Date().setHours(0, 0, 0, 0);
+    new Date(booking.checkInDate).setHours(0, 0, 0, 0) <
+    new Date().setHours(0, 0, 0, 0);
+
+  const nights = calculateNights(booking.checkInDate, booking.checkOutDate);
+
   return (
     <>
-      {/* Modal Header */}
-      <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] px-4 sm:px-5 md:px-6 py-4 rounded-t-xl relative">
-        <div className="flex justify-between items-start">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-tripswift-bold text-tripswift-off-white leading-tight">
-              {booking.hotelName}
-            </h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-tripswift-off-white hover:text-tripswift-off-white bg-tripswift-off-white/10 hover:bg-tripswift-off-white/20 rounded-full p-1.5 sm:p-2 transition-colors"
-            aria-label={t("BookingTabs.BookingDetailsModal.closeModal")}
-          >
-            <svg
-              className="h-4 w-4 sm:h-5 sm:w-5"
-              viewBox="0 0 24 24"
-              fill="none"
-            >
-              <path
-                d="M18 6L6 18M6 6L18 18"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
+      {/* Enhanced Modal Header */}
+      <div className="bg-gradient-to-br from-tripswift-blue via-[#054B8F] to-[#043A73] px-4 py-4 rounded-t-xl relative overflow-hidden">
+        {/* Background pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-16 translate-x-16"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full translate-y-12 -translate-x-12"></div>
         </div>
-        {/* Status Badge */}
-        <div className={`absolute bottom-0  transform translate-y-1/2 ${i18n.language ==="ar"?"left-4 sm:left-6":"right-4 sm:right-6"}`}>
-          <div
-            className={`flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-full shadow-md text-xs sm:text-sm ${
-              booking.status === "Confirmed"
-                ? "bg-green-50 text-green-700 border border-green-200"
-                : booking.status === "Pending"
-                ? "bg-yellow-50 text-yellow-700 border border-yellow-200"
-                : "bg-red-50 text-red-700 border border-red-200"
-            }`}
-          >
-            <span
-              className={`${
-                i18n.language === "ar" ? "ml-1 sm:ml-1.5 "  : "mr-1 sm:mr-1.5 di"
-              }`}
-            >
-              {getStatusIcon(booking.status ?? "", i18n.language)}
-            </span>
-            <span className="font-tripswift-bold">{booking.status}</span>
+
+        <div className="relative z-10">
+          <div className="flex justify-between items-start mb-3">
+            <div className="flex-1">
+              <div className="flex items-center mb-1">
+                <FaHotel className="text-tripswift-off-white mr-2" />
+                <span className="text-tripswift-off-white text-sm font-tripswift-medium">
+                  {t("BookingTabs.BookingDetailsModal.accommodation")}
+                </span>
+              </div>
+              <h2 className="text-2xl font-tripswift-bold text-tripswift-off-white leading-tight mb-1">
+                {booking.hotelName}
+              </h2>
+              <p className="text-tripswift-off-white text-sm">
+                Booking ID: {booking._id?.slice(-8).toUpperCase()}
+              </p>
+            </div>
+
+            {/* Status Badge - Moved to top right */}
+            <div className={`flex items-center gap-3 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
+              <div
+                className={`flex items-center px-3 py-1.5 rounded-full shadow-lg text-sm font-tripswift-bold backdrop-blur-sm ${booking.status === "Confirmed"
+                    ? "bg-white/95 text-green-700 border border-green-200/30"
+                    : booking.status === "Pending"
+                      ? "bg-white/95 text-amber-700 border border-amber-200/30"
+                      : "bg-white/95 text-red-700 border border-red-200/30"
+                  }`}
+              >
+                <span className={`${i18n.language === "ar" ? "ml-1.5" : "mr-1.5"}`}>
+                  {getStatusIcon(booking.status ?? "", i18n.language)}
+                </span>
+                <span>{booking.status}</span>
+              </div>
+
+              <button
+                onClick={onClose}
+                className="text-tripswift-off-white hover:text-tripswift-off-white bg-tripswift-off-white/10 hover:bg-tripswift-off-white/20 rounded-full p-2 transition-all duration-200 hover:scale-105"
+                aria-label={t("BookingTabs.BookingDetailsModal.closeModal")}
+              >
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M18 6L6 18M6 6L18 18"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Modal Content */}
-      <div className="px-4 sm:px-5 md:px-6 py-3 font-noto-sans">
+
+      {/* Enhanced Modal Content */}
+      <div className="px-4 py-4 font-noto-sans space-y-4">
         {/* Stay Details */}
-        <div >
-          <h3 className="text-lg sm:text-xl font-tripswift-bold text-gray-800  flex items-center py-2">
+        <div className="space-y-3">
+          <h3 className="text-lg font-tripswift-bold text-gray-800 flex items-center">
             <FaRegCalendarAlt
-              className={` text-tripswift-blue text-base sm:text-lg ${
-                i18n.language === "ar" ? "ml-1.5 sm:ml-2" : "mr-1.5 sm:mr-2"
-              }`}
+              className={`text-tripswift-blue text-base ${i18n.language === "ar" ? "ml-2" : "mr-2"
+                }`}
             />
             {t("BookingTabs.BookingDetailsModal.stayDetails")}
           </h3>
 
-          <div className="bg-tripswift-off-white px-3 sm:px-4 md:px-5 py-1 rounded-xl">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6">
-              <div>
-                <p className="text-xs sm:text-sm  text-gray-500  mb-0.5 sm:mb-1">
-                  {t("BookingTabs.BookingDetailsModal.checkIn")}
-                </p>
-                <p className="flex items-center text-tripswift-black font-tripswift-bold text-sm sm:text-base">
-                  <FaCalendarCheck
-                    className={` text-green-500 text-sm sm:text-base ${
-                      i18n.language === "ar"
-                        ? "ml-1.5 sm:ml-2"
-                        : "mr-1.5 sm:mr-2"
-                    }`}
-                  />
+          <div className="bg-gradient-to-r from-tripswift-off-white to-gray-50 p-3 rounded-xl border border-gray-100 shadow-sm">
+            {/* Date Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+              <div className="bg-white p-3 rounded-lg border border-green-100 shadow-sm">
+                <div className="flex items-center mb-1">
+                  <FaCalendarCheck className="text-green-500 mr-2" />
+                  <p className="text-sm text-gray-500 font-tripswift-medium">
+                    {t("BookingTabs.BookingDetailsModal.checkIn")}
+                  </p>
+                </div>
+                <p className="text-lg font-tripswift-bold text-gray-800">
                   {formatDateString(booking.checkInDate)}
                 </p>
               </div>
-              <div>
-                <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">
-                  {t("BookingTabs.BookingDetailsModal.checkOut")}
-                </p>
-                <p className="flex  items-center text-gray-800 font-tripswift-bold text-sm sm:text-base">
-                  <FaCalendarTimes
-                    className={` text-red-500 text-sm sm:text-base ${
-                      i18n.language === "ar"
-                        ? "ml-1.5 sm:ml-2"
-                        : "mr-1.5 sm:mr-2"
-                    }`}
-                  />
+
+              <div className="bg-white p-3 rounded-lg border border-red-100 shadow-sm">
+                <div className="flex items-center mb-1">
+                  <FaCalendarTimes className="text-red-500 mr-2" />
+                  <p className="text-sm text-gray-500 font-tripswift-medium">
+                    {t("BookingTabs.BookingDetailsModal.checkOut")}
+                  </p>
+                </div>
+                <p className="text-lg font-tripswift-bold text-gray-800">
                   {formatDateString(booking.checkOutDate)}
                 </p>
               </div>
             </div>
-            <div className="border-t border-gray-200 mt-2  pt-2 sm:pt-3">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6">
+
+            {/* Room Details */}
+            <div className="bg-white p-3 rounded-lg border border-blue-100 shadow-sm">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
-                  <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">
-                    {t("BookingTabs.BookingDetailsModal.roomType")}
-                  </p>
-                  <div className="flex items-center">
-                    <span
-                      className={`inline-flex items-center px-2 sm:px-3 py-2 sm:py-1.5 rounded-md text-xs sm:text-sm font-tripswift-medium ${getRoomTypeStyle(
-                        roomType
-                      )}`}
-                    >
-                      <span className="mr-1 sm:mr-1.5">
-                        {getRoomTypeIcon(roomType, i18n.language)}
-                      </span>
-                      {roomType}
-                    </span>
+                  <div className="flex items-center mb-1">
+                    <FaBed className="text-tripswift-blue mr-2" />
+                    <p className="text-sm text-gray-500 font-tripswift-medium">
+                      {t("BookingTabs.BookingDetailsModal.roomType")}
+                    </p>
                   </div>
+                  <span
+                    className={`inline-flex items-center px-2 py-1.5 rounded-lg text-sm font-tripswift-medium ${getRoomTypeStyle(
+                      roomType
+                    )}`}
+                  >
+                    <span className="mr-1.5">
+                      {getRoomTypeIcon(roomType, i18n.language)}
+                    </span>
+                    {roomType}
+                  </span>
                 </div>
+
                 <div>
-                  <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">
-                    {" "}
-                    {t("BookingTabs.BookingDetailsModal.rooms", {
-                      defaultValue: "Rooms",
-                    })}
+                  <div className="flex items-center mb-1">
+                    <FaUsers className="text-tripswift-blue mr-2" />
+                    <p className="text-sm text-gray-500 font-tripswift-medium">
+                      {t("BookingTabs.BookingDetailsModal.rooms")}
+                    </p>
+                  </div>
+                  <p className="text-lg font-tripswift-bold text-gray-800">
+                    {booking.numberOfRooms} {booking.numberOfRooms === 1 ? 'Room' : 'Rooms'}
                   </p>
-                  <p className="text-gray-800 font-tripswift-medium text-sm sm:text-base">
-                    {booking.numberOfRooms}
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-500 font-tripswift-medium mb-1">
+                    Duration
+                  </p>
+                  <p className="text-lg font-tripswift-bold text-gray-800">
+                    {nights} {nights === 1 ? 'Night' : 'Nights'}
                   </p>
                 </div>
               </div>
@@ -209,180 +234,156 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
           </div>
         </div>
 
-        {/*  (all guests) */}
-        <div className=" mt-1 border-t border-gray-200 ">
-          <h3 className="text-lg sm:text-xl mt-2 mb-1 font-tripswift-bold text-gray-800 flex items-center">
+        {/* Guest Details */}
+        <div className="space-y-3">
+          <h3 className="text-lg font-tripswift-bold text-gray-800 flex items-center">
             <FaUser
-              className={`text-tripswift-blue text-base sm:text-lg ${
-                i18n.language === "ar" ? "ml-1.5 sm:ml-2" : "mr-1.5 sm:mr-2"
-              }`}
+              className={`text-tripswift-blue text-base ${i18n.language === "ar" ? "ml-2" : "mr-2"
+                }`}
             />
             {t("BookingTabs.BookingDetailsModal.guestDetails")}
           </h3>
-          <div className="bg-tripswift-off-white px-3 sm:px-4 md:px-5 rounded-xl">
-            <div className="space-y-2">
-              {booking.guestDetails && booking.guestDetails.length > 0 ? (
-                booking.guestDetails.map((guest: GuestDetails, idx: number) => (
+
+          <div className="bg-gradient-to-r from-tripswift-off-white to-gray-50 p-3 rounded-xl border border-gray-100 shadow-sm">
+            {booking.guestDetails && booking.guestDetails.length > 0 ? (
+              <div className="space-y-3">
+                {booking.guestDetails.map((guest: GuestDetails, idx: number) => (
                   <div
                     key={guest._id || idx}
-                    className="flex flex-col  md:flex-row md:items-center md:gap-24 gap-2 border-b border-gray-100 last:border-b-0 last:pb-0"
+                    className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm"
                   >
-                    <div className="flex md:w-1/3  sm:items-center gap-2 font-tripswift-medium">
-                      <FaUser className="text-tripswift-blue sm:mt-0" />
-                      <span className="w-full">
-                        {guest.firstName} {guest.lastName}
-                      </span>
-                    </div>
-                    {guest.dob && (
-                      <div className="text-xs md:ml-[13px] text-gray-500 ">
-                        {t("BookingTabs.BookingDetailsModal.dob", {
-                          defaultValue: "DOB",
-                        })}
-                         : <div className=" text-gray-800 font-tripswift-medium text-sm">
-                          {formatDOB(guest.dob)}
+                    <div className="flex flex-col md:flex-row md:items-center gap-3">
+                      <div className="flex gap-2 flex-1">
+                        <div className="w-6 h-6 bg-tripswift-blue/10 rounded-full flex items-center justify-center">
+                          <FaUser className="text-tripswift-blue text-xs" />
+                        </div>
+                        <div>
+                          <p className="font-tripswift-bold text-gray-800">
+                            {guest.firstName} {guest.lastName}
+                          </p>
+                          <p className="text-xs text-gray-500">Guest {idx + 1}</p>
                         </div>
                       </div>
-                    )}
+
+                      {guest.dob && (
+                        <div className="bg-gray-50 px-2 py-1.5 rounded-lg">
+                          <p className="text-xs text-gray-500 mb-0.5">
+                            {t("BookingTabs.BookingDetailsModal.dob")}
+                          </p>
+                          <p className="text-sm font-tripswift-medium text-gray-800">
+                            {formatDOB(guest.dob)}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                ))
-              ) : (
-                <div className="text-gray-800 font-tripswift-medium text-sm sm:text-base">
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                <p className="text-gray-800 font-tripswift-medium">
                   {booking.email}
+                </p>
+              </div>
+            )}
+
+            {/* Contact Information */}
+            <div className="mt-3 bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+              <div className="flex gap-2">
+                <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                  <FaPhone className="text-green-600 text-xs" />
                 </div>
-              )}
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6 mt-2">
-              <div>
-                <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">
-                  {t("BookingTabs.BookingDetailsModal.contactNumber")}
-                </p>
-                <p
-                  className={`text-gray-800 font-tripswift-medium text-sm sm:text-base ${
-                    i18n.language === "ar" ? "text-right" : "text-left"
-                  }`}
-                  dir="ltr"
-                >
-                  {booking.phone}
-                </p>
+                <div>
+                  <p className="text-xs text-gray-500 mb-0.5">
+                    {t("BookingTabs.BookingDetailsModal.contactNumber")}
+                  </p>
+                  <p
+                    className="font-tripswift-medium text-gray-800"
+                    dir="ltr"
+                  >
+                    {booking.phone}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Payment Details */}
-        <div className="border-t mt-1 border-gray-200 ">
-          {/* <h3 className="text-lg sm:text-xl mt-2 font-tripswift-bold text-gray-800 mb-1 flex items-center">
+        <div className="space-y-3">
+          <h3 className="text-lg font-tripswift-bold text-gray-800 flex items-center">
             <FaCreditCard
-              className={` text-tripswift-blue text-base sm:text-lg ${
-                i18n.language === "ar" ? "ml-1.5 sm:ml-2" : "mr-1.5 sm:mr-2"
-              }`}
+              className={`text-tripswift-blue text-base ${i18n.language === "ar" ? "ml-2" : "mr-2"
+                }`}
             />
             {t("BookingTabs.BookingDetailsModal.paymentDetails")}
-          </h3> */}
-          <div className="bg-tripswift-off-white px-3 sm:px-4 md:px-5 py-2 rounded-xl">
-            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6">
-              <div>
-                <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.paymentMethod')}</p>
-                <p className="flex items-center font-tripswift-medium text-sm sm:text-base">
-                  {getPaymentMethodIcon(booking)} {formatCamelCase(booking.paymentType || "")}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{t('BookingTabs.BookingDetailsModal.bookingDate')}</p>
-                <p className="flex items-center text-gray-800 font-tripswift-medium text-sm sm:text-base">
-                  <FaRegCalendarCheck className="mr-1.5 sm:mr-2 text-gray-500 text-sm sm:text-base" />
-                  {booking.createdAt ? formatDateString(booking.createdAt) : "-"}
-                </p>
-              </div>
-            </div> */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6">
-              {/* <div>
-                <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">
-                  {t("BookingTabs.BookingDetailsModal.paymentMethod")}
-                </p>
-                <p className="text-gray-800 font-tripswift-medium text-sm sm:text-base">
-                  Pay at Hotel
-                </p>
-              </div> */}
-              <div>
-                <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">
-                  {t("BookingTabs.BookingDetailsModal.bookingDate")}
-                </p>
-                <p className="flex items-center text-gray-800 font-tripswift-medium text-sm sm:text-base">
-                  <FaRegCalendarCheck
-                    className={` text-gray-500 text-sm sm:text-base ${
-                      i18n.language === "ar"
-                        ? "ml-1.5 sm:ml-2"
-                        : "mr-1.5 sm:mr-2"
-                    }`}
-                  />
-                  {booking.createdAt
-                    ? formatDateString(booking.createdAt)
-                    : "-"}
-                </p>
-              </div>
-            </div>
-            <div className="border-t border-gray-200 mt-2 py-2 flex flex-col sm:flex-row justify-between items-start sm:items-center">
-              <div className="flex flex-col space-y-0.5 sm:space-y-1">
-                <p className="text-xs sm:text-sm text-gray-500">
-                  {t("BookingTabs.BookingDetailsModal.totalAmount")}
-                </p>
-                <div className="flex items-baseline gap-1 md:gap-2">
-                  <span className="text-xl sm:text-2xl font-tripswift-bold text-tripswift-blue">
-                    {/* {currency} {booking.totalAmount?.toLocaleString()} */}
-                    USD {booking.totalAmount.toLocaleString()}
-                  </span>
-                </div>
-              </div>
-              {/* {booking.ratePlanCode && (
-                <div className="text-left sm:text-right">
-                  <p className="text-xs sm:text-sm text-gray-500">{t('BookingTabs.BookingDetailsModal.ratePlan')}</p>
-                  <div className="inline-block px-2 sm:px-3 py-0.5 sm:py-1 bg-blue-50 text-blue-700 rounded-md text-xs sm:text-sm font-tripswift-medium">
-                    {booking.ratePlanCode}
+          </h3>
+
+          <div className="bg-gradient-to-r from-tripswift-off-white to-gray-50 p-3 rounded-xl border border-gray-100 shadow-sm">
+            {/* Single row with booking date and total amount */}
+            <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] p-4 rounded-xl text-white shadow-lg">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div className="flex gap-3">
+                  <FaRegCalendarCheck />
+                  <div>
+                    <p className="text-tripswift-off-white/80 text-xs mb-0.5">
+                      {t("BookingTabs.BookingDetailsModal.bookingDate")}
+                    </p>
+                    <p className="text-tripswift-off-white font-tripswift-medium">
+                      {booking.createdAt ? formatDateString(booking.createdAt) : "-"}
+                    </p>
                   </div>
                 </div>
-              )} */}
+
+                <div className="text-right">
+                  <p className="text-tripswift-off-white/80 text-sm mb-1">
+                    {t("BookingTabs.BookingDetailsModal.totalAmount")}
+                  </p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-tripswift-bold text-tripswift-off-white">
+                      USD {booking.totalAmount.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col md:flex-row gap-2 md:gap-3 border-t border-gray-200 pt-2 md:pt-3">
+        {/* Enhanced Action Buttons */}
+        <div className="flex flex-col md:flex-row gap-2 pt-3 border-t border-gray-200">
           {(booking.status === "Confirmed" || booking.status === "Modified") && !isPastCheckIn && (
             <>
               <button
-                className="flex-1 bg-tripswift-blue text-tripswift-off-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg hover:bg-[#054B8F] transition-colors duration-300 shadow-sm hover:shadow-md font-tripswift-medium flex items-center justify-center text-sm sm:text-base"
+                className="flex-1 bg-gradient-to-r from-tripswift-blue to-[#054B8F] text-tripswift-off-white py-2.5 px-4 rounded-lg hover:shadow-lg transition-all duration-300 font-tripswift-medium flex items-center justify-center hover:scale-105 active:scale-95"
                 onClick={onAmend}
               >
                 <FaEdit
-                  className={` text-sm sm:text-base ${
-                    i18n.language === "ar" ? "ml-1.5 sm:ml-2" : "mr-1.5 sm:mr-2"
-                  }`}
+                  className={`text-sm ${i18n.language === "ar" ? "ml-2" : "mr-2"
+                    }`}
                 />
                 {t("BookingTabs.BookingDetailsModal.modifyBooking")}
               </button>
               <button
-                className="flex-1 bg-tripswift-off-white text-red-600 border border-red-200 py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg hover:bg-red-50 transition-colors duration-300 font-tripswift-medium flex items-center justify-center text-sm sm:text-base"
+                className="flex-1 bg-white text-red-600 border-2 border-red-200 py-2.5 px-4 rounded-lg hover:bg-red-50 hover:border-red-300 transition-all duration-300 font-tripswift-medium flex items-center justify-center hover:scale-105 active:scale-95"
                 onClick={onCancel}
               >
                 <FaRegTimesCircle
-                  className={` text-sm sm:text-base ${
-                    i18n.language === "ar" ? "ml-1.5 sm:ml-2" : "mr-1.5 sm:mr-2"
-                  }`}
+                  className={`text-sm ${i18n.language === "ar" ? "ml-2" : "mr-2"
+                    }`}
                 />
                 {t("BookingTabs.BookingDetailsModal.cancelBooking")}
               </button>
             </>
           )}
           <button
-            className="flex-1 bg-gray-700 text-tripswift-off-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg hover:bg-gray-800 transition-colors duration-300 flex items-center justify-center font-tripswift-medium text-sm sm:text-base"
+            className="flex-1 bg-gray-700 text-tripswift-off-white py-2.5 px-4 rounded-lg hover:bg-gray-800 hover:shadow-lg transition-all duration-300 flex items-center justify-center font-tripswift-medium hover:scale-105 active:scale-95"
             onClick={() => window.print()}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className={` h-4 w-4 sm:h-5 sm:w-5 ${
-                i18n.language === "ar" ? "ml-1.5 sm:ml-2" : "mr-1.5 sm:mr-2"
-              }`}
+              className={`h-4 w-4 ${i18n.language === "ar" ? "ml-2" : "mr-2"
+                }`}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
