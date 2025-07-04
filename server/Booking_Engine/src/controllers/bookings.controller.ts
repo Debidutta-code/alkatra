@@ -655,12 +655,12 @@ export async function createReservationWithCryptoPayment(input: {
       email,
       phone,
       guests: categorizedGuests,
-      supportEmail: 'support@yourcompany.com',
-      supportPhone: '+1-800-123-4567',
-      websiteUrl: 'https://yourwebsite.com/booking',
+      ssupportEmail: 'support@alhajz.com', // Replace with actual support email
+      supportPhone: '+1-800-123-4567', // Replace with actual support phone
+      websiteUrl: 'https://book.trip-swift.ai.com/', // Replace with actual website URL
       currentYear: new Date().getFullYear(),
-      companyName: 'Your Company Name',
-      companyAddress: '1234 Example St, City, Country',
+      companyName: 'Al-Hajz', // Replace with actual company name
+      companyAddress: '1234 Example St, City, Country', // Replace with actual address
     };
 
     const template = Handlebars.compile(htmlContent);
@@ -996,12 +996,12 @@ export const updateThirdPartyReservation = CatchAsyncError(
           email,
           phone,
           guests: categorizedGuests,
-          supportEmail: "support@company.com",
-          supportPhone: "+1-800-123-4567",
-          websiteUrl: "https://www.company.com/reservations",
+          supportEmail: 'support@alhajz.com', // Replace with actual support email
+          supportPhone: '+1-800-123-4567', // Replace with actual support phone
+          websiteUrl: 'https://book.trip-swift.ai.com/', // Replace with actual website URL
           currentYear: new Date().getFullYear(),
-          companyName: "Your Company Name",
-          companyAddress: "1234 Hotel St, City, Country",
+          companyName: 'Al-Hajz', // Replace with actual company name
+          companyAddress: '1234 Example St, City, Country', // Replace with actual address
         };
 
         const template = Handlebars.compile(htmlContent);
@@ -1214,12 +1214,12 @@ export const cancelThirdPartyReservation = CatchAsyncError(
           reservationId,
           checkInDate: new Date(checkInDate).toLocaleDateString(),
           checkOutDate: new Date(checkOutDate).toLocaleDateString(),
-          supportEmail: "support@company.com",
-          supportPhone: "+1-800-123-4567",
-          websiteUrl: "https://www.company.com",
+          supportEmail: 'support@alhajz.com', // Replace with actual support email
+          supportPhone: '+1-800-123-4567', // Replace with actual support phone
+          websiteUrl: 'https://book.trip-swift.ai.com/', // Replace with actual website URL
           currentYear: new Date().getFullYear(),
-          companyName: "Your Company Name",
-          companyAddress: "1234 Hotel St, City, Country",
+          companyName: 'Al-Hajz', // Replace with actual company name
+          companyAddress: '1234 Example St, City, Country', // Replace with actual address
         };
 
         const template = Handlebars.compile(htmlContent);
