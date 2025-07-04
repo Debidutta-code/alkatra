@@ -58,7 +58,7 @@ const useFCM = (userId?: string) => {
     // Optional: Handle incoming messages
     if (messaging) {
       onMessage(messaging, (payload) => {
-        console.log('📩 Foreground message:', payload);
+        console.log('📩 Foreground message:', payload.notification?.title);
         toast.success(`New Notification Received: ${payload.notification?.title}`, {
             duration: 5000,
             icon: '🔔',
