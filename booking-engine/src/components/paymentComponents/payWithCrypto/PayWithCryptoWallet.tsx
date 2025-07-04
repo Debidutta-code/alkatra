@@ -210,7 +210,9 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
   }, [selectedNetwork, bookingDetails.amount, bookingDetails.currency, t, onConvertedAmountChange]);
 
   useEffect(()=>{
-    localStorage.setItem("selectedChainId",selectedChainId.toString());
+    if (selectedChainId !== undefined && selectedChainId !== null) {
+      localStorage.setItem("selectedChainId", selectedChainId.toString());
+    }
     localStorage.setItem("contractAddress",contractAddress);
   },[selectedChainId])
 
