@@ -7,8 +7,8 @@ import { useTranslation } from "react-i18next";
 import { format, differenceInYears, set } from "date-fns";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { onMessage } from 'firebase/messaging';
-import { messaging } from '../../../utils/firebase.config';
+// import { onMessage } from 'firebase/messaging';
+// import { messaging } from '../../../utils/firebase.config';
 // import toast from "react-hot-toast";
 // ... other imports
 import {
@@ -72,26 +72,26 @@ const PaymentProgressPage: React.FC = () => {
     const { switchChain } = useSwitchChain();
 
     // payment notify
-     useEffect(() => {
+    //  useEffect(() => {
 
-        console.log('🔔 useFCM hook initialized----------pppppp-------------------');
-      if (messaging) {
-        onMessage(messaging, (payload) => {
-          const data = payload.data;
+    //     console.log('🔔 useFCM hook initialized----------pppppp-------------------');
+    //   if (messaging) {
+    //     onMessage(messaging, (payload) => {
+    //       const data = payload.data;
     
-          if (data?.type === 'CRYPTO_PAYMENT_CONFIRMED') {
-            toast.success(`💸 ${data.message}`, { duration: 8000 });
+    //       if (data?.type === 'CRYPTO_PAYMENT_CONFIRMED') {
+    //         toast.success(`💸 ${data.message}`, { duration: 8000 });
     
-            // Optional: trigger state update or refetch wallet
-            console.log('✅ Payment data:', data);
-            return;
-          }
+    //         // Optional: trigger state update or refetch wallet
+    //         console.log('✅ Payment data:', data);
+    //         return;
+    //       }
     
-          // fallback for other notifications
-          toast(`🔔 ${payload.notification?.title}`);
-        });
-      }
-    }, []);
+    //       // fallback for other notifications
+    //       toast(`🔔 ${payload.notification?.title}`);
+    //     });
+    //   }
+    // }, []);
     
 
 
