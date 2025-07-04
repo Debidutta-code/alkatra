@@ -9,12 +9,24 @@ export const getAllHotelDetailsAccordingToLocation = async (req: Request, res: R
         const { location } = req.params;
         const propertyAddresses = await PropertyAddress.aggregate([
             {
+                // $match: {
+                //     $or: [
+                //         // { address_line_1: { $regex: location, $options: 'i' } },
+                //         // { address_line_2: { $regex: location, $options: 'i' } },
+                //         // { state: { $regex: location, $options: 'i' } },
+                //         // { city: { $regex: location, $options: 'i' } }
+                //         { address_line_1: { $eq: location, $options: 'i' } },
+                //         { address_line_2: { $eq: location, $options: 'i' } },
+                //         { state: { $eq: location, $options: 'i' } },
+                //         { city: { $eq: location, $options: 'i' } }
+                //     ]
+                // }
                 $match: {
                     $or: [
-                        { address_line_1: { $regex: location, $options: 'i' } },
-                        { address_line_2: { $regex: location, $options: 'i' } },
-                        { state: { $regex: location, $options: 'i' } },
-                        { city: { $regex: location, $options: 'i' } }
+                        { $expr: { $eq: [{ $toLower: "$address_line_1" }, location.toLowerCase()] } },
+                        { $expr: { $eq: [{ $toLower: "$address_line_2" }, location.toLowerCase()] } },
+                        { $expr: { $eq: [{ $toLower: "$state" }, location.toLowerCase()] } },
+                        { $expr: { $eq: [{ $toLower: "$city" }, location.toLowerCase()] } }
                     ]
                 }
             },

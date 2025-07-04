@@ -2,6 +2,7 @@
 import Config from '../../config';
 import axios from "axios";
 
+
 export const getHotelsByCity = async (cityCode: string) => {
   try {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -10,10 +11,25 @@ export const getHotelsByCity = async (cityCode: string) => {
     }
 
     const response = await axios.get(`${backendUrl}/pms/property/location/${cityCode}`);
-    return response.data;
-  } catch (error) {
-    console.error("Failed to fetch hotels by city:", error);
-    throw error;
+    if (response.status === 200) {
+      return response.data.data;
+    }else if(response.status == 404){
+      throw new Error(response.data.message || "No hotels found.");
+    } 
+    else {
+      throw new Error(response.data.message || "No hotels found.");
+    }
+
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
+      const message = error.response?.data?.message || "Axios request failed.";
+      console.error(`Axios error (${status}): ${message}`);
+      throw new Error(message);
+    } else {
+      console.error("Unexpected error:", error);
+      throw new Error("Something went wrong while fetching hotels.");
+    }
   }
 };
 
