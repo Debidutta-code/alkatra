@@ -364,7 +364,7 @@ export const createReservationWithStoredCard = CatchAsyncError(
           to: email,
           text: `Your booking has been confirmed`,
           subject: `Booking Confirmation - ${hotelName}`,
-          html: htmlContent,
+          html: finalHtml,
         });
       }
       catch (error: any) {
@@ -670,7 +670,7 @@ export async function createReservationWithCryptoPayment(input: {
       to: email,
       text: `Your reservation has been confirmed`,
       subject: `Reservation Confirmation - ${hotelName}`,
-      html: htmlContent,
+      html: finalHtml,
     });
 
     return {
@@ -1012,7 +1012,7 @@ export const updateThirdPartyReservation = CatchAsyncError(
           to: email,
           text: `Your reservation update has been confirmed`,
           subject: `Reservation Confirmation - ${hotelName}`,
-          html: htmlContent,
+          html: finalHtml,
         });
       } catch (error: any) {
         return res.status(500).json({ message: error.message || "Failed to update reservation" });
