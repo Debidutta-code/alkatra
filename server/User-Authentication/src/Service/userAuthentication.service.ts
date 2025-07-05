@@ -1,3 +1,4 @@
+import { updateReservation } from "../../../Booking_Engine/src/controllers/bookings.controller";
 import { ErrorMessages, formatError } from "../Error/errorMessages";
 import UserModel, { AuthType } from "../Model/auth.model";
 import { UserRepository } from "../Repository/userAuthorization.repository";
@@ -64,7 +65,7 @@ export class UserService {
       console.log("If condition")
     } else if (
       requestingUserId !== userId &&
-      requestingUserRole === "superAdmin"
+      requestingUserRole === "superAdmin" || requestingUserRole === "groupmanager"
     ) {
       console.log("Else Idf  condition")
       // SuperAdmin can update all fields of any user
@@ -143,7 +144,14 @@ export class UserService {
       throw formatError(ErrorMessages.MISSING_LOGIN_CREDENTIALS);
     }
     const user = await this.userRepository.findUserByEmailWithPassword(email);
-    if (!user || !compareHash(password, user.password)) {
+
+
+
+    if (!user || !user.password) {
+      throw formatError(ErrorMessages.INVALID_LOGIN_CREDENTIALS);
+    }
+    const isPasswordValid = await compareHash(password, user.password);
+    if (!isPasswordValid) {
       throw formatError(ErrorMessages.INVALID_LOGIN_CREDENTIALS);
     }
     const accessToken = assignToken(

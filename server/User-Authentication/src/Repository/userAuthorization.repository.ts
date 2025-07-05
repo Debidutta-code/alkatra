@@ -79,7 +79,7 @@ export class UserRepository {
   }
 
   async findUserByEmailWithPassword(email: string): Promise<AuthType | null> {
-    const user = await UserModel.findOne({ email }).select("+password");
+    const user = await UserModel.findOne({ email }).select("password email firstName lastName role");
     return user;
   }
 

@@ -1,16 +1,22 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { getToken, onMessage } from 'firebase/messaging';
 import { messaging } from '../utils/firebase.config'; // Adjust the import path as needed
 import toast from 'react-hot-toast';
+import { AppDispatch } from '@/Redux/store';
+import { addNotification } from '@/Redux/slices/notification.slice';
+import type { Notification } from '@/components/notifications/types/notification';
 
 const vapidKey = process.env.NEXT_PUBLIC_VAPIDKEY as string; // from Firebase Console
 
 const useFCM = (userId?: string) => {
-  useEffect(() => {
+  const dispatch = useDispatch<AppDispatch>();
 
+  useEffect(() => {
     console.log('🔔 useFCM hook initialized with userId-----------------------------:', userId);
+    
     const setupFCM = async () => {
       try {
         const permission = await Notification.requestPermission();
@@ -54,21 +60,44 @@ const useFCM = (userId?: string) => {
     setupFCM();
     console.log('✅ useFCM effect running, setting up onMessage...');
 
-
-    // Optional: Handle incoming messages
+    // Handle incoming messages with real-time updates
     if (messaging) {
-      onMessage(messaging, (payload) => {
+      const unsubscribe = onMessage(messaging, (payload) => {
         console.log('📩 Foreground message:', payload);
-        toast.success(`New Notification Received: ${payload.notification?.title}`, {
-            duration: 5000,
-            icon: '🔔',
-        //   position: 'top-right',
+        
+        // Create notification object that matches your Redux state structure
+        const newNotification: Notification = {
+          id: payload.messageId || `fcm-${Date.now()}`,
+          title: payload.notification?.title || 'New Notification',
+          body: payload.notification?.body || '',
+          type: payload.data?.type || 'general',
+          isRead: false,
+          timestamp: new Date().toISOString(),
+          data: { 
+            type: payload.data?.type,
+            offerCode: payload.data?.offerCode,
+            ...payload.data
+          }        };
+
+        // Add notification to Redux store (this will automatically update the count)
+        dispatch(addNotification(newNotification));
+
+        // Show toast notification
+        toast.success(`New Notification: ${payload.notification?.title}`, {
+          duration: 7000,
+          icon: '🔔',
+          // position: 'top-right',
         });
       });
+
+      // Return cleanup function
+      return () => {
+        unsubscribe();
+      };
     } else {
       console.warn('❌ Firebase Messaging is not available (unsupported browser or not initialized)');
     }
-  }, [userId]);
+  }, [userId, dispatch]);
 };
 
 export default useFCM;
