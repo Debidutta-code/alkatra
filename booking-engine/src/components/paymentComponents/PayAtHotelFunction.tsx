@@ -189,23 +189,33 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
       const bookingResponse = await confirmBookingWithStoredCard(bookingPayload, token);
       console.log("Booking response:", bookingResponse);
 
+      // Send SMS confirmation with better error handling
       try {
-        await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/send-sms`,
-          {
-            phone: bookingDetails.phone,
-            message: 
-`Your booking at ${bookingDetails.hotelName || "our hotel"} is confirmed!
-• Room Type: ${bookingDetails.roomType || "Standard"}
-• Rooms: ${bookingDetails.rooms || 1}
-• Check-in: ${formatDate(bookingDetails.checkIn)}
-• Check-out: ${formatDate(bookingDetails.checkOut)}
-• Total: ${formatCurrency(bookingDetails.amount, bookingDetails.currency)}`
-    },
-          { withCredentials: true }
-        );
-      } catch (smsError) {
-        console.error("Failed to send confirmation SMS:", smsError);
+        if (bookingDetails.phone && process.env.NEXT_PUBLIC_BACKEND_URL) {
+          await axios.post(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/send-sms`,
+            {
+              phone: bookingDetails.phone,
+              message:
+                `Your booking at ${bookingDetails.hotelName || "our hotel"} is confirmed!
+                • Room Type: ${bookingDetails.roomType || "Standard"}
+                • Rooms: ${bookingDetails.rooms || 1}
+                • Check-in: ${formatDate(bookingDetails.checkIn)}
+                • Check-out: ${formatDate(bookingDetails.checkOut)}
+                • Total: ${formatCurrency(bookingDetails.amount, bookingDetails.currency)}`
+            },
+            {
+              withCredentials: true,
+              timeout: 5000,
+              headers: {
+                'Content-Type': 'application/json',
+                ...(token && { 'Authorization': `Bearer ${token}` })
+              }
+            }
+          );
+        }
+      } catch (smsError: any) {
+        // console.error("Failed to send confirmation SMS:", smsError?.response?.data || smsError.message);
         // Don't fail the booking process if SMS fails
       }
 

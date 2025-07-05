@@ -5,7 +5,7 @@ import { stringify } from 'flatted';
 export class ApiClient {
     async sendToThirdParty(xml: string): Promise<{ message: string }> {
         try {
-            console.log('Sending XML to third-party API:', xml);
+            // console.log('Sending XML to third-party API:', xml);
             const apiUrl = process.env.WINCLOUD_TEST_API;
             if (!apiUrl) {
                 throw new Error('WINCLOUD_TEST_API environment variable is not defined');

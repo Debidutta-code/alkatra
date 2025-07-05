@@ -82,12 +82,17 @@ export const login = createAsyncThunk<
   { email: string; password: string },
   { dispatch: AppDispatch; state: RootState }
 >("auth/login", async (data, { dispatch }) => {
+  console.log("Login Api Calling here");
   const res = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/login`,
     {
       ...data,
     }
   );
+  console.log("Login response from REDUX:", res);
+  if (res.status !== 200) {
+    throw new Error(res.data.error || "Failed to login");
+  }
   const token = res.data.token;
   Cookies.set("accessToken", token);
   dispatch(setAccessToken(token));

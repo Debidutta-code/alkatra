@@ -78,29 +78,29 @@ export default function PaymentSuccess() {
       toast.error(t("Payment.PaymentSuccess.noAmountForDownload"));
       return;
     }
-  
+
     const doc = new jsPDF();
-  
+
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(12);
-  
+
     let y = 20;
-  
+
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(16);
     doc.text('Booking Confirmation', 20, y);
     y += 10;
-  
+
     doc.setLineWidth(0.5);
     doc.line(20, y, 190, y);
     y += 10;
-  
+
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(12);
-  
+
     // Call getBookingId once and reuse the result
     const bookingId = getBookingId();
-  
+
     const details = [
       `Booking ID: ${bookingId}`, // Use the stored bookingId
       `Guest Name: ${getGuestName()}`,
@@ -114,18 +114,18 @@ export default function PaymentSuccess() {
       `Payment Method: Pay at Hotel`,
       `Total Amount: ₹${amount.toLocaleString()}`
     ];
-  
+
     details.forEach(detail => {
       doc.text(detail, 20, y);
       y += 10;
     });
-  
+
     y += 10;
     doc.setLineWidth(0.5);
     doc.line(20, y, 190, y);
     y += 10;
     doc.text('Thank you for booking with us!', 20, y);
-  
+
     doc.save(`Booking_Confirmation_${bookingId}.pdf`);
     toast.success(t("Payment.PaymentSuccess.downloadSuccessToast"));
   };

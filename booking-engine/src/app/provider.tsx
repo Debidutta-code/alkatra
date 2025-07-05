@@ -6,34 +6,34 @@ import ReduxProvider from "@/Redux/ReduxProvider";
 import { PersistGate } from "redux-persist/integration/react";
 import { persistor } from "@/Redux/store";
 
-import '@rainbow-me/rainbowkit/styles.css';
+// import '@rainbow-me/rainbowkit/styles.css';
 
-import { WagmiProvider, createConfig, http } from 'wagmi';
-import {
-  getDefaultConfig,
-  RainbowKitProvider
-} from '@rainbow-me/rainbowkit';
-import {
-  mainnet,
-  polygon,
-  optimism,
-  arbitrum,
-  base,
-  polygonAmoy,
-  bsc
-} from 'wagmi/chains';
+// import { WagmiProvider, createConfig, http } from 'wagmi';
+// import {
+//   getDefaultConfig,
+//   RainbowKitProvider
+// } from '@rainbow-me/rainbowkit';
+// import {
+//   mainnet,
+//   polygon,
+//   optimism,
+//   arbitrum,
+//   base,
+//   polygonAmoy,
+//   bsc
+// } from 'wagmi/chains';
 import {
   QueryClientProvider,
   QueryClient,
 } from "@tanstack/react-query";
 
 
-const config = getDefaultConfig({
-  appName: 'My RainbowKit App',
-  projectId: 'YOUR_PROJECT_ID', 
-  chains: [mainnet, polygon, optimism, arbitrum, base, polygonAmoy,bsc],
-  ssr: true,
-});
+// const config = getDefaultConfig({
+//   appName: 'My RainbowKit App',
+//   projectId: 'YOUR_PROJECT_ID', 
+//   chains: [mainnet, polygon, optimism, arbitrum, base, polygonAmoy,bsc],
+//   ssr: true,
+// });
 
 const queryClient = new QueryClient();
 
@@ -49,9 +49,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <WagmiProvider config={config}>
+    // <WagmiProvider config={config}>
     <QueryClientProvider client={queryClient}>
-      <RainbowKitProvider>
+      {/* <RainbowKitProvider> */}
         <NextUIProvider>
           <ReduxProvider>
             <PersistGate loading={null} persistor={persistor}>
@@ -59,8 +59,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
             </PersistGate>
           </ReduxProvider>
         </NextUIProvider>
-      </RainbowKitProvider>
+      {/* </RainbowKitProvider> */}
     </QueryClientProvider>
-  </WagmiProvider>
+  // </WagmiProvider>
   );
 }

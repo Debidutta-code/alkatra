@@ -4,6 +4,7 @@
 import { QrCode, Wallet } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@nextui-org/react";
 
 
 interface PaymentOptionSelectorProps {
@@ -17,6 +18,7 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
 }) => {
   const { t, i18n } = useTranslation();
   const [cryptoSubOption, setCryptoSubOption] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Set default selection to 'payAtHotel' when component mounts
   useEffect(() => {
@@ -41,29 +43,6 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
         {t('Payment.PaymentComponents.PaymentOptionSelector.title')}
       </h3>
       <div className="flex flex-col sm:flex-row gap-4">
-        {/* <label className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all ${
-          selectedOption === 'payNow' 
-            ? 'border-tripswift-blue bg-tripswift-blue/10 text-tripswift-black' 
-            : 'border-gray-200 hover:bg-gray-50 text-tripswift-black/70'
-        }`}>
-          <input
-            type="radio"
-            name="paymentOption"
-            value="payNow"
-            checked={selectedOption === 'payNow'}
-            onChange={() => onChange('payNow')}
-            className="mr-3 text-tripswift-blue"
-          />
-          <div className="flex flex-col">
-            <span className="font-tripswift-medium text-tripswift-black">
-              {t('Payment.PaymentComponents.PaymentOptionSelector.payNow')}
-            </span>
-            <span className="text-sm text-tripswift-black/70">
-              {t('Payment.PaymentComponents.PaymentOptionSelector.payNowDescription')}
-            </span>
-          </div>
-        </label> */}
-
         <label className={`flex items-start p-4 border rounded-lg cursor-pointer transition-all ${selectedOption === 'payAtHotel' || !selectedOption
           ? 'border-tripswift-blue bg-tripswift-blue/10 text-tripswift-black'
           : 'border-gray-200 hover:bg-gray-50 text-tripswift-black/70'
@@ -72,7 +51,6 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
             type="radio"
             name="paymentOption"
             value="payAtHotel"
-            // checked={selectedOption === 'payAtHotel' || !selectedOption}
             onChange={() => {
               onChange("payAtHotel");
               setCryptoSubOption(null); // Reset crypto sub-option
@@ -87,6 +65,7 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
             </span>
           </div>
         </label>
+        
         {/* New: Pay with Crypto Option */}
         <label
           className={`flex items-start p-4 border rounded-lg cursor-pointer transition-all ${selectedOption?.startsWith("payWithCrypto") || selectedOption === "payWithCrypto"
@@ -115,6 +94,7 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
           </div>
         </label>
       </div>
+      
       {selectedOption === "payWithCrypto" && (
         <div className="mt-4 p-3 bg-tripswift-off-white rounded-lg shadow-sm">
           <h4 className="text-sm font-tripswift-medium mb-2 text-tripswift-black/80 uppercase tracking-wider">
@@ -123,13 +103,11 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => handleCryptoSubOptionChange("payWithWallet")}
-              className={`p-2.5 rounded-lg border transition-all flex items-center justify-center gap-1.5 ${cryptoSubOption === "payWithWallet"
-                  ? "border-tripswift-blue bg-tripswift-blue/10"
-                  : "border-gray-200 hover:bg-gray-50"
-                }`}
+              disabled={true}
+              className={`p-2.5 rounded-lg border transition-all flex items-center justify-center gap-1.5 opacity-50 cursor-not-allowed border-gray-200 bg-gray-100`}
             >
-              <Wallet className="w-4 h-4 text-tripswift-black" />
-              <span className="text-xs font-tripswift-medium text-tripswift-black">
+              <Wallet className="w-4 h-4 text-gray-400" />
+              <span className="text-xs font-tripswift-medium text-gray-400">
                 {t("Payment.PaymentComponents.PaymentOptionSelector.payWithWallet")}
               </span>
             </button>
@@ -137,8 +115,8 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
             <button
               onClick={() => handleCryptoSubOptionChange("payWithQR")}
               className={`p-2.5 rounded-lg border transition-all flex items-center justify-center gap-1.5 ${cryptoSubOption === "payWithQR"
-                  ? "border-tripswift-blue bg-tripswift-blue/10"
-                  : "border-gray-200 hover:bg-gray-50"
+                ? "border-tripswift-blue bg-tripswift-blue/10"
+                : "border-gray-200 hover:bg-gray-50"
                 }`}
             >
               <QrCode className="w-4 h-4 text-tripswift-black" />
@@ -149,6 +127,25 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
           </div>
         </div>
       )}
+      
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} size="sm">
+        <ModalContent>
+          <ModalHeader className="text-tripswift-black">
+            {t("Payment.PaymentComponents.PaymentOptionSelector.unavailableTitle")}
+          </ModalHeader>
+          <ModalBody>
+            <p className="text-tripswift-black/80">
+              {t("Payment.PaymentComponents.PaymentOptionSelector.unavailableMessage") ||
+                "This provision is not available in your country."}
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button color="primary" onPress={() => setIsModalOpen(false)}>
+              {t("Common.close") || "Close"}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

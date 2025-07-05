@@ -84,9 +84,6 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
     redirect_uri: `${process.env.NEXT_PUBLIC_GOOGLE_AUTH_REDIRECT_URL}/auth/google/callback`,
   });
 
-  console.log("🟢 useGoogleLogin initialized with auth-code flow and redirect URI");
-
-
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gradient-to-br from-gray-50 to-tripswift-off-white font-noto-sans">
       <div className="lg:w-1/2 relative hidden lg:block overflow-hidden">

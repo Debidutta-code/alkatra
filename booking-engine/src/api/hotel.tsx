@@ -12,7 +12,8 @@ export const getHotelsByCity = async (cityCode: string) => {
 
     const response = await axios.get(`${backendUrl}/pms/property/location/${cityCode}`);
     if (response.status === 200) {
-      return response.data.data;
+      console.log("Hotels fetched successfully in API:", response.data);
+      return response.data;
     }else if(response.status == 404){
       throw new Error(response.data.message || "No hotels found.");
     } 

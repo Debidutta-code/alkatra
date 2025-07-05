@@ -22,7 +22,7 @@ import ForgotPassword from "./ForgotPassword";
 import UpdatePassword from "./UpdatePassword";
 
 const Login: React.FC = () => {
-  const { t ,i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -48,45 +48,42 @@ const Login: React.FC = () => {
     }
   );
 
+  // src/app/(app)/login/authLogin.tsx
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    console.log("Form submitted with values:", values);
     if (!validateForm()) {
+      console.log("Login Validation errors:", errors);
+      toast.error(t('Login failed'), {
+        icon: '❌',
+      });
       return;
     }
-
     setLoading(true);
-
     try {
-      // Wait for login to complete and store the result
+      console.log("Dispatching login action...");
       const loginResult = await dispatch(login({ email: values.email, password: values.password }));
-      console.log(`After login the result ${JSON.stringify(loginResult)}`);
-
-      // Check if login was successful - this is the key fix
-      // If loginResult is undefined or null, it means login failed
-      if (!loginResult) {
+      console.log(`Login result: ${JSON.stringify(loginResult)}`);
+      if (loginResult.meta.requestStatus === 'rejected') {
         throw new Error("Login failed");
       }
-
-      Cookies.set("rememberMe", "true", { expires: 7 });
-
-      // Only if we get here, login was successful
+      if (!loginResult.payload) {
+        throw new Error("No token received from server");
+      }
       if (rememberMe) {
         Cookies.set("rememberMe", "true", { expires: 7 });
       }
-
-      toast.success(t('Auth.Login.successMessage'), {
+      toast.success(t('Login successful'), {
         icon: '👋',
         duration: 3000,
       });
-
       const redirectUrl = Cookies.get("redirectAfterLogin") || "/";
       await dispatch(getUser());
       Cookies.remove("redirectAfterLogin");
-
       router.replace(redirectUrl);
     } catch (error: any) {
-      toast.error(t('Auth.Login.errorMessage'), {
+      console.error("Login error:", error.message, error);
+      toast.error(error.message || t('Auth.Login.errorMessage'), {
         icon: '❌',
       });
     } finally {
@@ -182,7 +179,7 @@ const Login: React.FC = () => {
               onChange={() => setRememberMe(!rememberMe)}
               className="w-4 h-4 rounded-md border-tripswift-black/20 text-tripswift-blue focus:ring-tripswift-blue/20 transition-colors duration-300 mb-2"
             />
-            <label htmlFor="remember" className={` text-sm text-tripswift-black/70 font-tripswift-medium ${i18n.language==="ar"?"mr-2":"ml-2"} `}>
+            <label htmlFor="remember" className={` text-sm text-tripswift-black/70 font-tripswift-medium ${i18n.language === "ar" ? "mr-2" : "ml-2"} `}>
               {t('Auth.Login.rememberMe')}
             </label>
           </div>

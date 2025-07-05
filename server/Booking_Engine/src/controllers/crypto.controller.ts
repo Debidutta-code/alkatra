@@ -418,7 +418,6 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
   }
 });
 
-
 export const getWalletAddress = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   const collection = mongoose.connection.collection("CryptoWalletAddress");
   try {
@@ -436,7 +435,8 @@ export const getWalletAddress = CatchAsyncError(async (req: AuthenticatedRequest
 });
 
 export const getInitiatedPaymentDetails = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  const { userId, amount } = req.query;
+  const userId = req.user?.id;
+  const { amount } = req.query;
   if (!userId || !amount) {
     return res.status(400).json({
       message: `Missing userId or initiated amount fields`,

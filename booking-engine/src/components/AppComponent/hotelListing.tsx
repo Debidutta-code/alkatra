@@ -129,7 +129,7 @@ const HotelListing: React.FC = () => {
     try {
       const hotelsResponse = await getHotelsByCity(searchTerm);
       setHotelData(hotelsResponse);
-
+      console.log(`Hotels fetched for ${searchTerm}:`, hotelsResponse.data);
       if (hotelsResponse.data.length === 0) {
         toast.error(
           t("HotelListing.noHotelsError", { defaultValue: "No hotels found." })
