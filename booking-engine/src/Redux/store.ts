@@ -5,7 +5,7 @@ import {
   useSelector as useSelectorBase,
 } from "react-redux";
 
-import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import { configureStore, combineReducers, ThunkAction, Action } from "@reduxjs/toolkit";
 import authReducer from "./slices/auth.slice";
 import userFormReducer from "./slices/useForm.slice";
 import hotelReducer from "./slices/hotelcard.slice";
@@ -19,6 +19,7 @@ const persistConfig = {
   key: 'root',
   storage,
   whitelist: ["pmsHotelCard", "auth"],
+  blacklist: ["notifications"] 
 };
 
 const rootReducer = combineReducers({
@@ -58,3 +59,10 @@ export const useDispatch = () => useDispatchBase<AppDispatch>();
 export const useSelector = <TSelected = unknown>(
   selector: (state: RootState) => TSelected
 ): TSelected => useSelectorBase<RootState, TSelected>(selector);
+
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  Action<string>
+>;

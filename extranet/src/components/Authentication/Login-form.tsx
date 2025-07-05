@@ -189,7 +189,7 @@ const LoginForm = () => {
             )}
           </div>
         </div>
-        <div className="text-right">
+        {/* <div className="text-right">
           <Button
             type="button"
             variant="link"
@@ -198,7 +198,7 @@ const LoginForm = () => {
           >
             Forgot password?
           </Button>
-        </div>
+        </div> */}
         <div className="space-y-2 pt-2">
           {/* <NextUIButton
             type="submit"
