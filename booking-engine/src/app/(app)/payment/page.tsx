@@ -5,7 +5,6 @@ import CheckoutPage from "@/components/Stripe/checkoutPage";
 import PayAtHotelFunction from "@/components/paymentComponents/PayAtHotelFunction";
 import PaymentOptionSelector from "@/components/paymentComponents/PaymentOptionSelector";
 import convertToSubcurrency from "@/lib/convertToSubcurrency";
-import PayWithCryptoWallet from "@/components/paymentComponents/payWithCrypto/PayWithCryptoWallet";
 import PayWithCryptoQR from "@/components/paymentComponents/payWithCrypto/PayWithCryptoQR";
 import { formatDate, calculateNights } from "@/utils/dateUtils";
 import { Elements } from "@stripe/react-stripe-js";
@@ -328,8 +327,6 @@ function PaymentPageContent() {
                           >
                             <PayAtHotelFunction bookingDetails={bookingDetails} />
                           </Elements>
-                        ) : paymentOption === "payWithCrypto-payWithWallet" ? (
-                          <PayWithCryptoWallet bookingDetails={bookingDetails} onConvertedAmountChange={setConvertedAmount}/>
                         ) : paymentOption === "payWithCrypto-payWithQR" ? (
                           <PayWithCryptoQR
                             bookingDetails={bookingDetails}
