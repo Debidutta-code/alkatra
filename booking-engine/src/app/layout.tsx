@@ -34,9 +34,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <FCMInitializer />
           <Navbar />
-          {/* <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}> */}
+          <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
             {children}
-          {/* </GoogleOAuthProvider> */}
+          </GoogleOAuthProvider>
           <Footer />
           <Toaster position="top-right" />
         </Providers>

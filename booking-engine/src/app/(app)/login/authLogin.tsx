@@ -60,12 +60,15 @@ const Login: React.FC = () => {
     try {
       // Wait for login to complete and store the result
       const loginResult = await dispatch(login({ email: values.email, password: values.password }));
+      console.log(`After login the result ${JSON.stringify(loginResult)}`);
 
       // Check if login was successful - this is the key fix
       // If loginResult is undefined or null, it means login failed
       if (!loginResult) {
         throw new Error("Login failed");
       }
+
+      Cookies.set("rememberMe", "true", { expires: 7 });
 
       // Only if we get here, login was successful
       if (rememberMe) {

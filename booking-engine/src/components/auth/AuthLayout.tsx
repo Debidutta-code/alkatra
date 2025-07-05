@@ -81,7 +81,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       });
     },
     flow: "auth-code",
-    redirect_uri: "https://book.trip-swift.ai/auth/google/callback",
+    redirect_uri: `${process.env.NEXT_PUBLIC_GOOGLE_AUTH_REDIRECT_URL}/auth/google/callback`,
   });
 
   console.log("🟢 useGoogleLogin initialized with auth-code flow and redirect URI");
