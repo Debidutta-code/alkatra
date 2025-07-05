@@ -412,7 +412,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
                 Mark as read
               </button>
             )}
-            <button
+            {/* <button
               onClick={(e) => {
                 e.stopPropagation();
                 setShowDetails(!showDetails);
@@ -421,9 +421,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
               disabled={isLoading}
             >
               {showDetails ? 'Hide details' : 'View details'}
-            </button>
+            </button> */}
 
-            {showDetails && notification.data && (
+            {/* {showDetails && notification.data && (
               <div className="mt-2 p-2 bg-gray-50 rounded-lg text-xs">
                 {notification.data.type && (
                   <p className="text-gray-700">
@@ -436,7 +436,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
                   </p>
                 )}
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>
