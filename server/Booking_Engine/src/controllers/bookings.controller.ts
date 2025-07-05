@@ -2025,6 +2025,12 @@ export const getBookingDetailsOfUser = CatchAsyncError(
           ...matchCriteria,
           status: 'Processing',
         });
+        if (totalBookings === 0) {
+          return res.status(404).json({
+            success: false,
+            message: "No bookings found for the given user ID",
+          });
+        }
         bookings = await CryptoGuestDetails.find({
           ...matchCriteria,
           status: 'Processing',
@@ -2034,6 +2040,12 @@ export const getBookingDetailsOfUser = CatchAsyncError(
           .limit(limit);
       } else {
         totalBookings = await ThirdPartyBooking.countDocuments(matchCriteria);
+        if (totalBookings === 0) {
+          return res.status(404).json({
+            success: false,
+            message: "No bookings found for the given user ID",
+          });
+        }
         bookings = await ThirdPartyBooking.find(matchCriteria)
           .sort({ createdAt: -1 })
           .skip(skip)

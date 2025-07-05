@@ -19,8 +19,7 @@ export class ReservationProcessor {
             phone,
             reservationId,  
         } = bookingDetails;
-        let reservation_id: string;
-        console.log("ReservationProcessor: Processing reservation input data:", reservationId);
+        console.log("ReservationProcessor: Processing reservation input data:", bookingDetails);
 
         const reservationData: ThirdPartyReservationData = {
             userId,
