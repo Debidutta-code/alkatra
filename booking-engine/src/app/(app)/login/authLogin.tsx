@@ -48,7 +48,6 @@ const Login: React.FC = () => {
     }
   );
 
-  // src/app/(app)/login/authLogin.tsx
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form submitted with values:", values);
@@ -65,7 +64,7 @@ const Login: React.FC = () => {
       const loginResult = await dispatch(login({ email: values.email, password: values.password }));
       console.log(`Login result: ${JSON.stringify(loginResult)}`);
       if (loginResult.meta.requestStatus === 'rejected') {
-        throw new Error("Login failed");
+        throw new Error("Login failed: Wrong email or password");
       }
       if (!loginResult.payload) {
         throw new Error("No token received from server");
@@ -83,7 +82,7 @@ const Login: React.FC = () => {
       router.replace(redirectUrl);
     } catch (error: any) {
       console.error("Login error:", error.message, error);
-      toast.error(error.message || t('Auth.Login.errorMessage'), {
+      toast.error(error.message, {
         icon: '❌',
       });
     } finally {
