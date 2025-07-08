@@ -11,6 +11,8 @@ import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useChains,useSwitchChain,useAccount } from "wagmi";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { setPaymentData } from "@/Redux/slices/payment.slice";
 
 
 interface CryptoToken {
@@ -58,10 +60,7 @@ interface CryptoToken {
   name: string;
   imageUrl: string;
 }
-interface PayWithCryptoQRProps {
-  bookingDetails: BookingDetails;
-  onConvertedAmountChange?: (amount: number | null) => void;
-}
+
 
 const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetails, onConvertedAmountChange }) => {
   const { t, i18n } = useTranslation();
@@ -76,11 +75,11 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
   const [networks, setNetworks] = useState<CryptoToken[]>([]);
   const [paymentInitiated, setPaymentInitiated] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const [paymentData, setPaymentData] = useState<any>(null);
   const [contractAddress, setContractAddress] = useState<string >("");
   const router = useRouter();
   const { switchChain } = useSwitchChain();
   const {isConnected} = useAccount();
+   const dispatch=useDispatch();
 
   // Fetch crypto token list from API
   useEffect(() => {
@@ -88,7 +87,7 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
       try {
         const token = Cookies.get("accessToken");
         if (!token) {
-          setError(t("PayWithCryptoQR.errors.noAuthToken"));
+          setError(t("PayWithCryptoWallet.errors.noAuthToken"));
           setLoading(false);
           return;
         }
@@ -105,11 +104,11 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
         if ((data.success || data.message) && Array.isArray(data.data)) {
           setTokens(data.data);
         } else {
-          setError(t("PayWithCryptoQR.errors.fetchTokens"));
+          setError(t("PayWithCryptoWallet.errors.fetchTokens"));
         }
         setLoading(false);
       } catch (err) {
-        setError(t("PayWithCryptoQR.errors.fetchTokensError"));
+        setError(t("PayWithCryptoWallet.errors.fetchTokensError"));
         setLoading(false);
       }
     };
@@ -127,7 +126,7 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
     try {
       const token = Cookies.get("accessToken");
       if (!token) {
-        setError(t("PayWithCryptoQR.errors.noAuthToken"));
+        setError(t("PayWithCryptoWallet.errors.noAuthToken"));
         return;
       }
 
@@ -143,10 +142,10 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
       if ((data.success || data.message) && Array.isArray(data.data)) {
         setNetworks(data.data);
       } else {
-        setError(t("PayWithCryptoQR.errors.fetchNetworks"));
+        setError(t("PayWithCryptoWallet.errors.fetchNetworks"));
       }
     } catch (err) {
-      setError(t("PayWithCryptoQR.errors.fetchNetworksError"));
+      setError(t("PayWithCryptoWallet.errors.fetchNetworksError"));
     } finally {
       setNetworkLoading(false);
     }
@@ -165,7 +164,7 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
       try {
         const token = Cookies.get("accessToken");
         if (!token) {
-          setError(t("PayWithCryptoQR.errors.noAuthToken"));
+          setError(t("PayWithCryptoWallet.errors.noAuthToken"));
           return;
         }
 
@@ -188,18 +187,18 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
         if (data.success || data.message) {
           const amount = Number(data.data.convertedAmount);
           if (isNaN(amount)) {
-            setError(t("PayWithCryptoQR.errors.invalidConvertedAmount"));
+            setError(t("PayWithCryptoWallet.errors.invalidConvertedAmount"));
             onConvertedAmountChange?.(null);
             return;
           }
           setConvertedAmount(amount);
           onConvertedAmountChange?.(amount);
         } else {
-          setError(data.message || t("PayWithCryptoQR.errors.currencyConversion"));
+          setError(data.message || t("PayWithCryptoWallet.errors.currencyConversion"));
           onConvertedAmountChange?.(null);
         }
       } catch (err) {
-        setError(t("PayWithCryptoQR.errors.currencyConversionError"));
+        setError(t("PayWithCryptoWallet.errors.currencyConversionError"));
         onConvertedAmountChange?.(null);
       } finally {
         setIsProcessing(false);
@@ -219,7 +218,7 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
   // Initiate crypto payment
   const initiatePayment = async () => {
     if (!selectedToken || !selectedNetwork || !convertedAmount) {
-      setError(t("PayWithCryptoQR.errors.selectionIncomplete"));
+      setError(t("PayWithCryptoWallet.errors.selectionIncomplete"));
       return;
     }
     if(!isConnected){
@@ -233,7 +232,7 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
     try {
       const token = Cookies.get("accessToken");
       if (!token) {
-        setError(t("PayWithCryptoQR.errors.noAuthToken"));
+        setError(t("PayWithCryptoWallet.errors.noAuthToken"));
         return;
       }
 
@@ -257,7 +256,7 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
       const paymentDataResponse = paymentResponse.data;
 
       if (paymentDataResponse.success || paymentDataResponse.message) {
-        setPaymentData(paymentDataResponse.data);
+        dispatch(setPaymentData(paymentDataResponse.data))
         setPaymentInitiated(true);
 
         console.log("convertedAmount:", convertedAmount, "Type:", typeof convertedAmount);
@@ -326,31 +325,31 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
                   guests: bookingDetails.guests,
                   paymentOption:bookingDetails.paymentOption,
                 };
-                setPaymentData(updatedPaymentData);
-                localStorage.setItem("paymentData", JSON.stringify(updatedPaymentData));
-                // Step 4: Navigate to payment progress page only after all APIs succeed
+                
+                dispatch(setPaymentData(updatedPaymentData));
+                // Navigate to payment progress page only after all APIs succeed
                 router.push("/payment-progress");
               } else {
-                setError(t("PayWithCryptoQR.errors.fetchWalletAddress"));
+                setError(t("PayWithCryptoWallet.errors.fetchWalletAddress"));
                 console.error("Failed to fetch wallet address:", walletData.message);
               }
             } catch (walletError) {
-              setError(t("PayWithCryptoQR.errors.fetchWalletAddressError"));
+              setError(t("PayWithCryptoWallet.errors.fetchWalletAddressError"));
               console.error("Wallet address fetch error:", walletError);
             }
           } else {
-            setError(guestDetailsData.message || t("PayWithCryptoQR.errors.guestDetails"));
+            setError(guestDetailsData.message || t("PayWithCryptoWallet.errors.guestDetails"));
             console.error("Guest details submission failed:", guestDetailsData.message);
           }
         } catch (guestError) {
-          setError(t("PayWithCryptoQR.errors.guestDetailsError"));
+          setError(t("PayWithCryptoWallet.errors.guestDetailsError"));
           console.error("Guest details initiation error:", guestError);
         }
       } else {
-        setError(paymentDataResponse.message || t("PayWithCryptoQR.errors.initiatePayment"));
+        setError(paymentDataResponse.message || t("PayWithCryptoWallet.errors.initiatePayment"));
       }
     } catch (err) {
-      setError(t("PayWithCryptoQR.errors.initiatePaymentError"));
+      setError(t("PayWithCryptoWallet.errors.initiatePaymentError"));
     } finally {
       setIsProcessing(false);
     }
@@ -402,7 +401,7 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
                 style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
             </div>
             <span className="mt-3 text-sm text-gray-500">
-              {t("PayWithCryptoQR.loadingTokens")}
+              {t("PayWithCryptoWallet.loadingTokens")}
             </span>
           </div>
         )}
@@ -422,7 +421,7 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
           <div className="space-y-6">
             <div>
               <h4 className="text-sm font-medium text-gray-700 mb-2">
-                {t("PayWithCryptoQR.selectToken")}
+                {t("PayWithCryptoWallet.selectToken")}
               </h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                 {tokens.map((token) => (
@@ -438,7 +437,7 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
                     <div className="relative w-8 h-8 mb-2">
                       <Image
                         src={token.imageUrl}
-                        alt={t("PayWithCryptoQR.tokenLogoAlt", { token: token.name })}
+                        alt={t("PayWithCryptoWallet.tokenLogoAlt", { token: token.name })}
                         fill
                         className="rounded-full object-contain"
                       />
@@ -455,13 +454,13 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
             {selectedToken && (
               <div className="pt-2">
                 <h4 className="text-sm font-medium text-gray-700 mb-2">
-                  {t("PayWithCryptoQR.selectNetwork")}
+                  {t("PayWithCryptoWallet.selectNetwork")}
                 </h4>
                 {networkLoading ? (
                   <div className="flex items-center justify-center py-4">
                     <Loader2 className="w-4 h-4 animate-spin text-gray-500 mr-2" />
                     <span className="text-sm text-gray-500">
-                      {t("PayWithCryptoQR.loadingNetworks")}
+                      {t("PayWithCryptoWallet.loadingNetworks")}
                     </span>
                   </div>
                 ) : networks.length > 0 ? (
@@ -479,7 +478,7 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
                         <div className="relative w-8 h-8 mb-2">
                           <Image
                             src={network.imageUrl}
-                            alt={t("PayWithCryptoQR.networkLogoAlt", { network: network.name })}
+                            alt={t("PayWithCryptoWallet.networkLogoAlt", { network: network.name })}
                             fill
                             className="rounded-full object-contain"
                           />
@@ -493,7 +492,7 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
                 ) : (
                   <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg text-center">
                     <span className="text-sm text-gray-500">
-                      {t("PayWithCryptoQR.noNetworksAvailable")}
+                      {t("PayWithCryptoWallet.noNetworksAvailable")}
                     </span>
                   </div>
                 )}
@@ -506,7 +505,7 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
                 <div className="flex items-center">
                   <Loader2 className="w-4 h-4 animate-spin text-blue-500 mr-2" />
                   <span className="text-sm text-blue-700">
-                    {t("PayWithCryptoQR.convertingCurrency", { currency: bookingDetails.currency.toUpperCase() })}
+                    {t("PayWithCryptoWallet.convertingCurrency", { currency: bookingDetails.currency.toUpperCase() })}
                   </span>
                 </div>
               </div>
@@ -526,10 +525,10 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
                 {isProcessing ? (
                   <div className="flex items-center justify-center">
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    {t("PayWithCryptoQR.processing")}
+                    {t("PayWithCryptoWallet.processing")}
                   </div>
                 ) : (
-                  t("PayWithCryptoQR.initiatePayment")
+                  t("PayWithCryptoWallet.initiatePayment")
                 )}
               </button>
             )}
@@ -540,7 +539,7 @@ const PayWithCryptoWallet: React.FC<PayWithCryptoWalletProps> = ({ bookingDetail
         {!loading && !error && tokens.length === 0 && (
           <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-center">
             <span className="text-sm text-gray-500">
-              {t("PayWithCryptoQR.noTokensAvailable")}
+              {t("PayWithCryptoWallet.noTokensAvailable")}
             </span>
           </div>
         )}

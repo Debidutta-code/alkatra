@@ -87,9 +87,9 @@
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.1.0",
     "viem": "^2.31.6",
-    "wagmi": "^2.15.6",
     "zod": "^3.22.4",
-    "zustand": "^5.0.0"
+    "zustand": "^5.0.0",
+    "wagmi":"^2.14.15"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
