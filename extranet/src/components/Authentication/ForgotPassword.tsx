@@ -64,7 +64,7 @@ export default function VerifyEmailForm({ onBack }: VerifyEmailFormProps) {
 
   return (
     <div className="w-full max-w-md space-y-6 p-6 sm:p-8 bg-card rounded-xl shadow-lg border border-border mx-auto">
-      <div className="text-center space-y-2">
+      {/* <div className="text-center space-y-2">
         <Button
           variant="ghost"
           size="icon"
@@ -78,7 +78,7 @@ export default function VerifyEmailForm({ onBack }: VerifyEmailFormProps) {
         <CardDescription className="text-muted-foreground">
           Enter your email to reset your password
         </CardDescription>
-      </div>
+      </div> */}
 
       {message && (
         <div className={`rounded-lg p-4 flex items-start gap-3 ${message.type === "success"
