@@ -816,6 +816,7 @@
   },
   "Payment": {
     "PaymentPageContent": {
+      "selectCryptoMethod": "يرجى تحديد طريقة دفع بالعملة المشفرة أعلاه.",
       "invalidPayment": {
         "title": "دفع غير صالح",
         "message": "لم نتمكن من معالجة دفعتك بسبب المعلومات المفقودة.",

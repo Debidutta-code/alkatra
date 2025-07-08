@@ -82,7 +82,7 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
               onChange("payWithCrypto");
               setCryptoSubOption(null); // Reset sub-option
             }}
-            className="mt-1 text-tripswift-blue flex-shrink-0 mr-3"
+            className={`mr-3 mt-1 text-tripswift-blue flex-shrink-0  ${i18n.language === "ar" ? "ml-3" : "mr-3"}`}
           />
           <div className="flex flex-col">
             <span className="text-sm font-tripswift-semibold text-tripswift-black uppercase">
