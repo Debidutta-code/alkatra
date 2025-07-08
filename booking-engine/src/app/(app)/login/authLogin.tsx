@@ -72,7 +72,7 @@ const Login: React.FC = () => {
       if (rememberMe) {
         Cookies.set("rememberMe", "true", { expires: 7 });
       }
-      toast.success(t('Login successful'), {
+      toast.success(t('Auth.Login.successMessage'), {
         icon: '👋',
         duration: 3000,
       });

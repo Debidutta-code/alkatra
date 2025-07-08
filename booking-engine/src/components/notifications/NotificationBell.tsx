@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Bell, X, Check, CheckCheck } from 'lucide-react';
+import { Bell, X, Check, CheckCheck, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 import { useSelector, useDispatch } from 'react-redux';
@@ -17,6 +17,7 @@ import {
   clearNotifications,
   addNotification
 } from '@/Redux/slices/notification.slice';
+import toast from 'react-hot-toast';
 
 interface NotificationBellProps {
   className?: string;
@@ -56,7 +57,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
 
   useEffect(() => {
     if (!messaging) return;
-
+  
     const unsubscribe = onMessage(messaging, (payload) => {
       const newNotification = {
         id: payload.messageId || Date.now().toString(),
@@ -66,11 +67,20 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
         isRead: false,
         timestamp: new Date().toISOString()
       };
-
+  
       // Add the new notification to Redux store
       dispatch(addNotification(newNotification));
+      
+      // Show toast notification
+      if (payload.notification?.title && payload.notification?.body) {
+        showToast({
+          title: payload.notification.title,
+          message: payload.notification.body,
+          type: 'info'
+        });
+      }
     });
-
+  
     return () => unsubscribe(); // Cleanup on unmount
   }, [dispatch]);
 
@@ -445,3 +455,37 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 };
 
 export default NotificationBell;
+
+const showToast = ({ title, message, type }: { title: string; message: string; type: string }) => {
+  toast.custom((t) => (
+    <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} 
+      max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}>
+      <div className="flex-1 w-0 p-4">
+        <div className="flex items-start">
+          <div className="flex-shrink-0 pt-0.5">
+            {type === 'info' && <Bell className="h-5 w-5 text-tripswift-blue" />}
+            {type === 'success' && <Check className="h-5 w-5 text-green-500" />}
+            {type === 'warning' && <AlertTriangle className="h-5 w-5 text-yellow-500" />}
+            {type === 'error' && <X className="h-5 w-5 text-red-500" />}
+          </div>
+          <div className="ml-3 flex-1">
+            <p className="text-sm font-medium text-gray-900">{title}</p>
+            <p className="mt-1 text-sm text-gray-500">{message}</p>
+          </div>
+          <div className="ml-4 flex-shrink-0 flex">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none"
+            >
+              <span className="sr-only">Close</span>
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  ), {
+    duration: 5000,
+    position: 'top-right'
+  });
+};
