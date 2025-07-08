@@ -561,7 +561,8 @@
       "phoneNotVerified": "फोन नंबर सत्यापित नहीं है",
       "phoneInvalidError": "कृपया एक वैध फोन नंबर दर्ज करें",
       "processing": "प्रसंस्करण...",
-      "verifying": "सत्यापित कर रहे हैं"
+      "verifying": "सत्यापित कर रहे हैं",
+      "baseRatePerRoomPerNight": "मूल दर (प्रति कमरा प्रति रात)"
     }
   },
   "BookingTabs": {
@@ -854,12 +855,14 @@
       "PaymentOptionSelector": {
         "title": "भुगतान विकल्प",
         "payNow": "अभी भुगतान करें",
-        "payNowDescription": "भुगतान तुरंत पूरा करें",
+        "payNowDescription": "तुरंत भुगतान पूरा करें",
         "payAtHotel": "होटल में भुगतान करें",
-        "payAtHotelDescription": "होटल भुगतान के लिए कार्ड सुरक्षित रूप से सहेजें",
+        "payAtHotelDescription": "होटल के भुगतान के लिए कार्ड सुरक्षित रूप से सहेजें",
+        "payWithCrypto": "क्रिप्टो से भुगतान करें",
+        "payWithCryptoDescription": "अपना भुगतान पूरा करने के लिए क्रिप्टोकरेंसी का उपयोग करें",
         "chooseCryptoMethod": "क्रिप्टो भुगतान विधि चुनें",
-        "payWithWallet": "वॉलेट के साथ भुगतान करें",
-        "payWithQR": "QR कोड के साथ भुगतान करें"
+        "payWithWallet": "वॉलेट से भुगतान करें",
+        "payWithQR": "QR कोड से भुगतान करें"
       },
       "PayAtHotelFunction": {
         "infoTitle": "होटल में भुगतान की जानकारी",
@@ -893,6 +896,8 @@
       "guestNameLabel": "मेहमान का नाम",
       "guestDefaultName": "मेहमान",
       "emailLabel": "ईमेल",
+      "age": "आयु",
+      "years": "वर्ष",
       "paymentMethodLabel": "भुगतान विधि",
       "paymentMethodCreditCard": "क्रेडिट कार्ड",
       "paymentMethodPayAtHotel": "होटल में भुगतान",
@@ -915,6 +920,86 @@
       "contactSupportButton": "समर्थन से संपर्क करें",
       "phoneLabel": "फ़ोन नंबर",
       "exploreMoreHotels": "और होटल विकल्प एक्सप्लोर करें"
+    },
+    "PaymentProgress": {
+      "title": "क्रिप्टो भुगतान गेटवे",
+      "subtitle": "क्रिप्टोकरेंसी का उपयोग करके अपना होटल बुकिंग भुगतान पूरा करें",
+      "paymentInfo": "भुगतान जानकारी",
+      "guestInfo": "अतिथि जानकारी",
+      "scanAndPay": "स्कैन करें और भुगतान करें",
+      "payThroughWallet": "वॉलेट के माध्यम से भुगतान करें",
+      "token": "टोकन",
+      "network": "नेटवर्क",
+      "amount": "राशि",
+      "hotel": "होटल",
+      "checkIn": "चेक-इन",
+      "checkOut": "चेक-आउट",
+      "email": "ईमेल",
+      "phone": "फोन",
+      "guests": "अतिथि",
+      "walletAddress": "वॉलेट पता",
+      "scanInstructions": "अपने क्रिप्टो वॉलेट से स्कैन करें",
+      "paymentInstructions": "भुगतान निर्देश",
+      "viewBookings": "मेरी बुकिंग देखें",
+      "returnHome": "घर वापस जाएं",
+      "paymentSuccessful": "भुगतान सफल!",
+      "paymentConfirmed": "आपका भुगतान पुष्टि हो गया है।",
+      "status": {
+        "pending": "भुगतान की प्रतीक्षा में",
+        "completed": "भुगतान पुष्टि हुई",
+        "processing": "भुगतान प्रसंस्करण",
+        "expired": "भुगतान समाप्त",
+        "sessionExpired": "सत्र समाप्त",
+        "expiringSoon": "जल्द ही समाप्त हो रहा है",
+        "maxTimeReached": "अधिकतम समय पहुँच गया",
+        "timeRemaining": "शेष समय",
+        "securePayment": "सुरक्षित भुगतान",
+        "default": "लंबित"
+      },
+      "errors": {
+        "invalidPaymentData": "अमान्य भुगतान डेटा",
+        "noPaymentData": "कोई भुगतान डेटा नहीं मिला",
+        "noAuthToken": "प्रमाणीकरण आवश्यक"
+      },
+      "loading": {
+        "title": "भुगतान विवरण लोड हो रहा है",
+        "subtitle": "क्रिप्टो भुगतान तैयार किया जा रहा है..."
+      },
+      "error": {
+        "title": "भुगतान त्रुटि"
+      },
+      "wallet": {
+        "sendInstruction": "{{amount}} {{token}} {{network}} नेटवर्क पर {{address}} को भेजें",
+        "loadingAddress": "पता लोड हो रहा है..."
+      },
+      "modal": {
+        "waitingConfirmation": "बुकिंग पुष्टि की प्रतीक्षा",
+        "confirmationMessage": "प्रतीक्षा करें जब तक हम आपके भुगतान की पुष्टि करते हैं। इसमें 2-3 मिनट तक का समय लग सकता है। कृपया इस विंडो को बंद न करें।"
+      },
+      "actions": {
+        "checkStatus": "स्थिति जांचें",
+        "checkBooking": "बुकिंग जांचें",
+        "copyAddress": "पता कॉपी करें",
+        "addressCopied": "✓ पता क्लिपबोर्ड पर कॉपी हो गया!",
+        "takeMeToBookings": "मुझे मेरी बुकिंग पर ले चलें"
+      },
+      "support": {
+        "needHelp": "मदद चाहिए?",
+        "supportMessage": "हमारी सहायता टीम आपके क्रिप्टो भुगतान में सहायता के लिए 24/7 उपलब्ध है",
+        "contactSupport": "सहायता से संपर्क करें",
+        "securityInfo": "सुरक्षा जानकारी"
+      },
+      "walletAddressLabel": "वॉलेट पता",
+      "instructions": {
+        "sendAmount": "बिल्कुल {{amount}} मूल्य का {{token}} भेजें",
+        "useNetwork": "केवल {{network}} नेटवर्क का उपयोग करें",
+        "doubleCheck": "भेजने से पहले वॉलेट पता दोबारा जांचें",
+        "confirmationTime": "भुगतान पुष्टि स्वचालित है (5-15 मिनट)"
+      },
+      "warning": "महत्वपूर्ण: केवल {{token}} को {{network}} नेटवर्क पर भेजें। अन्य टोकन भेजने या गलत नेटवर्क का उपयोग करने से धन की हानि हो सकती है।",
+      "common": {
+        "important": "महत्वपूर्ण"
+      }
     }
   },
   "GuestBox": {
@@ -974,6 +1059,32 @@
       "selectionIncomplete": "कृपया टोकन, नेटवर्क चुनें और सुनिश्चित करें कि राशि परिवर्तित हो",
       "initiatePayment": "भुगतान शुरू करने में त्रुटि",
       "initiatePaymentError": "भुगतान शुरू करने के दौरान एक त्रुटि हुई"
+    }
+  },
+  "notifications": {
+    "title": "सूचनाएं",
+    "newNotification": "नई सूचना",
+    "unread": "अपठित",
+    "markAllRead": "सभी पढ़ा हुआ चिह्नित करें",
+    "markAsRead": "पढ़ा हुआ चिह्नित करें",
+    "retry": "फिर से कोशिश करें",
+    "loading": "सूचनाएं लोड की जा रही हैं...",
+    "noUnread": "कोई अपठित सूचना नहीं",
+    "noNotifications": "अभी तक कोई सूचना नहीं",
+    "emptyDescription": "जब कुछ आएगा तो हम आपको सूचित करेंगे",
+    "unknownTime": "अज्ञात समय",
+    "type": "प्रकार",
+    "offerCode": "ऑफर कोड",
+    "tabs": {
+      "all": "सभी",
+      "unread": "अपठित"
+    },
+    "errors": {
+      "fetchFailed": "सूचनाएं प्राप्त करने में विफल",
+      "loadFailed": "सूचनाएं लोड करने में विफल",
+      "markAllReadFailed": "सभी सूचनाओं को पढ़ा हुआ चिह्नित करने में विफल",
+      "markReadFailed": "सूचना को पढ़ा हुआ चिह्नित करने में विफल",
+      "loadingError": "सूचनाएं लोड करने में त्रुटि"
     }
   }
 }

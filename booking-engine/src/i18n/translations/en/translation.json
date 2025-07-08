@@ -538,7 +538,7 @@
       "otpInvalidError": "Invalid OTP",
       "otpVerifyError": "Error verifying OTP",
       "emailVerified": "Email verified successfully",
-      "phoneVerified":"Phone verified successfully",
+      "phoneVerified": "Phone verified successfully",
       "phoneLabel": "Phone Number",
       "phonePlaceholder": "Enter phone number",
       "phoneInfo": "For booking-related notifications",
@@ -886,6 +886,8 @@
         "payNowDescription": "Complete payment immediately",
         "payAtHotel": "Pay at Hotel",
         "payAtHotelDescription": "Securely save card for hotel payment",
+        "payWithCrypto": "Pay with Crypto",
+        "payWithCryptoDescription": "Use cryptocurrency to complete your payment",
         "chooseCryptoMethod": "Choose Crypto Payment Method",
         "payWithWallet": "Pay with Wallet",
         "payWithQR": "Pay with QR Code"
@@ -946,6 +948,88 @@
       "customerServiceMessage": "Our customer service team is available 24/7 to assist you with any questions.",
       "contactSupportButton": "Contact Support",
       "exploreMoreHotels": "Explore more hotel options"
+    },
+    "PaymentProgress": {
+      "title": "Crypto Payment Gateway",
+      "subtitle": "Complete your hotel booking payment using cryptocurrency",
+      "paymentInfo": "Payment Information",
+      "guestInfo": "Guest Information",
+      "scanAndPay": "Scan & Pay",
+      "payThroughWallet": "Pay through Wallet",
+      "token": "Token",
+      "network": "Network",
+      "amount": "Amount",
+      "hotel": "Hotel",
+      "checkIn": "Check-In",
+      "checkOut": "Check-Out",
+      "email": "Email",
+      "age": "Age",
+      "years": "years",
+      "phone": "Phone",
+      "guests": "Guests",
+      "walletAddress": "Wallet Address",
+      "scanInstructions": "Scan with your crypto wallet",
+      "paymentInstructions": "Payment Instructions",
+      "viewBookings": "View My Bookings",
+      "returnHome": "Return Home",
+      "paymentSuccessful": "Payment Successful!",
+      "paymentConfirmed": "Your payment has been confirmed.",
+      "status": {
+        "pending": "Waiting for Payment",
+        "completed": "Payment Confirmed",
+        "processing": "Processing Payment",
+        "expired": "Payment Expired",
+        "sessionExpired": "Session expired",
+        "expiringSoon": "Expiring soon",
+        "maxTimeReached": "Maximum time reached",
+        "timeRemaining": "Time remaining",
+        "securePayment": "Secure Payment",
+        "default": "Pending"
+      },
+      "errors": {
+        "invalidPaymentData": "Invalid payment data",
+        "noPaymentData": "No payment data found",
+        "noAuthToken": "Authentication required"
+      },
+      "loading": {
+        "title": "Loading Payment Details",
+        "subtitle": "Preparing crypto payment..."
+      },
+      "error": {
+        "title": "Payment Error"
+      },
+      "wallet": {
+        "sendInstruction": "Send {{amount}} {{token}} on {{network}} to {{address}}",
+        "loadingAddress": "Loading address..."
+      },
+      "modal": {
+        "waitingConfirmation": "Waiting for booking confirmation",
+        "confirmationMessage": "Wait while we confirm your payment. This may take up to 2-3 minutes. Please do not close this window."
+      },
+      "actions": {
+        "checkStatus": "Check Status",
+        "checkBooking": "Check Booking",
+        "copyAddress": "Copy address",
+        "addressCopied": "✓ Address copied to clipboard!",
+        "takeMeToBookings": "Take me to My Bookings"
+      },
+      "support": {
+        "needHelp": "Need Help?",
+        "supportMessage": "Our support team is available 24/7 to assist with your crypto payment",
+        "contactSupport": "Contact Support",
+        "securityInfo": "Security Info"
+      },
+      "walletAddressLabel": "Wallet Address",
+      "instructions": {
+        "sendAmount": "Send exactly {{amount}} worth of {{token}}",
+        "useNetwork": "Use the {{network}} network only",
+        "doubleCheck": "Double-check the wallet address before sending",
+        "confirmationTime": "Payment confirmation is automatic (5-15 minutes)"
+      },
+      "warning": "Important: Only send {{token}} on {{network}} network. Sending other tokens or using wrong network will result in loss of funds.",
+      "common": {
+        "important": "Important"
+      }
     }
   },
   "GuestBox": {
@@ -1005,6 +1089,32 @@
       "selectionIncomplete": "Please select token, network, and ensure amount is converted",
       "initiatePayment": "Error initiating payment",
       "initiatePaymentError": "An error occurred while initiating payment"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "newNotification": "New Notification",
+    "unread": "unread",
+    "markAllRead": "Mark all read",
+    "markAsRead": "Mark as read",
+    "retry": "Retry",
+    "loading": "Loading notifications...",
+    "noUnread": "No unread notifications",
+    "noNotifications": "No notifications yet",
+    "emptyDescription": "We'll notify you when something arrives",
+    "unknownTime": "Unknown time",
+    "type": "Type",
+    "offerCode": "Offer Code",
+    "tabs": {
+      "all": "All",
+      "unread": "Unread"
+    },
+    "errors": {
+      "fetchFailed": "Failed to fetch notifications",
+      "loadFailed": "Failed to load notifications",
+      "markAllReadFailed": "Failed to mark all notifications as read",
+      "markReadFailed": "Failed to mark notification as read",
+      "loadingError": "Error loading notifications"
     }
   }
 }

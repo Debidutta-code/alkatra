@@ -65,8 +65,8 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
             </span>
           </div>
         </label>
-        
-        {/* New: Pay with Crypto Option */}
+
+        {/* Pay with Crypto Option */}
         <label
           className={`flex items-start p-4 border rounded-lg cursor-pointer transition-all ${selectedOption?.startsWith("payWithCrypto") || selectedOption === "payWithCrypto"
             ? "border-tripswift-blue bg-tripswift-blue/10 text-tripswift-black"
@@ -86,15 +86,15 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
           />
           <div className="flex flex-col">
             <span className="text-sm font-tripswift-semibold text-tripswift-black uppercase">
-              Pay with Crypto
+              {t('Payment.PaymentComponents.PaymentOptionSelector.payWithCrypto')}
             </span>
             <span className="text-[10px] font-tripswift-medium text-tripswift-black/70 uppercase">
-              Use cryptocurrency to complete your payment
+              {t('Payment.PaymentComponents.PaymentOptionSelector.payWithCryptoDescription')}
             </span>
           </div>
         </label>
       </div>
-      
+
       {selectedOption === "payWithCrypto" && (
         <div className="mt-4 p-3 bg-tripswift-off-white rounded-lg shadow-sm">
           <h4 className="text-sm font-tripswift-medium mb-2 text-tripswift-black/80 uppercase tracking-wider">
@@ -127,7 +127,7 @@ const PaymentOptionSelector: React.FC<PaymentOptionSelectorProps> = ({
           </div>
         </div>
       )}
-      
+
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} size="sm">
         <ModalContent>
           <ModalHeader className="text-tripswift-black">

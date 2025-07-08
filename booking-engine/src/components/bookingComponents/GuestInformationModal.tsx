@@ -1373,7 +1373,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       {/* Total Base Amount */}
                       <div className="flex justify-between items-center py-1">
                         <span className="text-sm text-tripswift-black/70">
-                          Total Base Amount:
+                          {t("BookingComponents.GuestInformationModal.baseRatePerRoomPerNight")}:
                         </span>
                         <span className="text-sm font-tripswift-medium">
                           ₹{finalPrice.breakdown.totalBaseAmount.toLocaleString()}
@@ -1383,7 +1383,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       {/* Total Additional Charges */}
                       <div className="flex justify-between items-center py-1">
                         <span className="text-sm text-tripswift-black/70">
-                          Total Additional Charges:
+                          {t("BookingComponents.GuestInformationModal.additionalGuestCharges")}:
                         </span>
                         <span className="text-sm font-tripswift-medium">
                           ₹{finalPrice.breakdown.totalAdditionalCharges.toLocaleString()}
@@ -1393,7 +1393,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       {/* Total Amount */}
                       <div className="flex justify-between items-center py-1">
                         <span className="text-sm font-tripswift-bold text-tripswift-black">
-                          Total Amount:
+                          {t("BookingComponents.GuestInformationModal.totalAmount")}:
                         </span>
                         <span className="text-sm font-tripswift-bold">
                           ₹{finalPrice.breakdown.totalAmount.toLocaleString()}
@@ -1403,7 +1403,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       {/* Number of Nights */}
                       <div className="flex justify-between items-center py-1">
                         <span className="text-sm text-tripswift-black/70">
-                          Number of Nights:
+                          {t("BookingComponents.GuestInformationModal.nights",
+                            { count: finalPrice.numberOfNights }
+                          )}:
                         </span>
                         <span className="text-sm font-tripswift-medium">
                           {finalPrice.numberOfNights}
@@ -1414,11 +1416,11 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       {finalPrice.dailyBreakdown && finalPrice.dailyBreakdown.length > 0 && (
                         <div className="mt-2">
                           <div className="text-sm font-tripswift-medium text-tripswift-black mb-1">
-                            Daily Breakdown:
+                            {t("BookingComponents.GuestInformationModal.roomRate")}:
                           </div>
                           <div className="space-y-0.5">
                             {finalPrice.dailyBreakdown.map((day, index) => (
-                              <div key={index} className="flex justify-between items-center py-0.5 pl-4">
+                              <div key={index} className="flex justify-between items-center py-0.5">
                                 <span className="text-sm text-tripswift-black/70">
                                   {day.date}
                                 </span>
@@ -1435,7 +1437,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       <div className="border-t border-tripswift-black/10 pt-2 mt-2">
                         <div className="flex justify-between items-center">
                           <span className="text-base font-tripswift-bold text-tripswift-black">
-                            Total Amount
+                            {t("BookingComponents.GuestInformationModal.totalAmount")}
                           </span>
                           <span className="text-xl font-tripswift-bold text-tripswift-blue">
                             ₹{finalPrice.totalAmount.toLocaleString()}

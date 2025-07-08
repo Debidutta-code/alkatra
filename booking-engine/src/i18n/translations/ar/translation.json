@@ -565,7 +565,8 @@
       "phoneNotVerified": "رقم الهاتف غير مُتحقق منه",
       "phoneInvalidError": "يرجى إدخال رقم هاتف صحيح",
       "processing": "جاري المعالجة...",
-      "verifying": "جاري التحقق"
+      "verifying": "جاري التحقق",
+      "baseRatePerRoomPerNight": "السعر الأساسي (لكل غرفة لكل ليلة)"
     }
   },
   "BookingTabs": {
@@ -865,10 +866,12 @@
       "PaymentOptionSelector": {
         "title": "خيارات الدفع",
         "payNow": "ادفع الآن",
-        "payNowDescription": "أكمل الدفع فوراً",
+        "payNowDescription": "أكمل الدفع فورًا",
         "payAtHotel": "الدفع في الفندق",
         "payAtHotelDescription": "احفظ بطاقتك بأمان للدفع في الفندق",
-        "chooseCryptoMethod": "اختر طريقة الدفع بالعملات الرقمية",
+        "payWithCrypto": "الدفع بالعملات المشفرة",
+        "payWithCryptoDescription": "استخدم العملات المشفرة لإكمال دفعتك",
+        "chooseCryptoMethod": "اختر طريقة الدفع بالعملات المشفرة",
         "payWithWallet": "الدفع بالمحفظة",
         "payWithQR": "الدفع برمز QR"
       },
@@ -926,6 +929,88 @@
       "contactSupportButton": "اتصل بالدعم",
       "exploreMoreHotels": "استكشاف المزيد من خيارات الفنادق",
       "phoneLabel": "رقم الهاتف"
+    },
+    "PaymentProgress": {
+      "title": "بوابة الدفع بالعملات المشفرة",
+      "subtitle": "أكمل دفع حجز الفندق الخاص بك باستخدام العملات المشفرة",
+      "paymentInfo": "معلومات الدفع",
+      "guestInfo": "معلومات الضيف",
+      "scanAndPay": "مسح والدفع",
+      "payThroughWallet": "الدفع من خلال المحفظة",
+      "token": "الرمز",
+      "network": "الشبكة",
+      "amount": "المبلغ",
+      "hotel": "الفندق",
+      "checkIn": "تسجيل الوصول",
+      "checkOut": "تسجيل الخروج",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "guests": "الضيوف",
+      "age": "العمر",
+      "years": "سنوات",
+      "walletAddress": "عنوان المحفظة",
+      "scanInstructions": "امسح ضوئيًا باستخدام محفظة العملات المشفرة الخاصة بك",
+      "paymentInstructions": "تعليمات الدفع",
+      "viewBookings": "عرض حجوزاتي",
+      "returnHome": "العودة إلى الصفحة الرئيسية",
+      "paymentSuccessful": "تم الدفع بنجاح!",
+      "paymentConfirmed": "تم تأكيد دفعتك.",
+      "status": {
+        "pending": "بانتظار الدفع",
+        "completed": "تم تأكيد الدفع",
+        "processing": "جاري معالجة الدفع",
+        "expired": "انتهى الدفع",
+        "sessionExpired": "انتهت الجلسة",
+        "expiringSoon": "تنتهي قريبًا",
+        "maxTimeReached": "تم الوصول إلى الحد الأقصى للوقت",
+        "timeRemaining": "الوقت المتبقي",
+        "securePayment": "دفع آمن",
+        "default": "معلق"
+      },
+      "errors": {
+        "invalidPaymentData": "بيانات الدفع غير صالحة",
+        "noPaymentData": "لم يتم العثور على بيانات الدفع",
+        "noAuthToken": "مطلوب مصادقة"
+      },
+      "loading": {
+        "title": "جاري تحميل تفاصيل الدفع",
+        "subtitle": "جارٍ إعداد الدفع بالعملات المشفرة..."
+      },
+      "error": {
+        "title": "خطأ في الدفع"
+      },
+      "wallet": {
+        "sendInstruction": "إرسال {{amount}} {{token}} على شبكة {{network}} إلى {{address}}",
+        "loadingAddress": "جارٍ تحميل العنوان..."
+      },
+      "modal": {
+        "waitingConfirmation": "في انتظار تأكيد الحجز",
+        "confirmationMessage": "انتظر بينما نقوم بتأكيد دفعتك. قد يستغرق هذا ما يصل إلى 2-3 دقائق. يرجى عدم إغلاق هذه النافذة."
+      },
+      "actions": {
+        "checkStatus": "تحقق من الحالة",
+        "checkBooking": "تحقق من الحجز",
+        "copyAddress": "نسخ العنوان",
+        "addressCopied": "✓ تم نسخ العنوان إلى الحافظة!",
+        "takeMeToBookings": "خذني إلى حجوزاتي"
+      },
+      "support": {
+        "needHelp": "تحتاج مساعدة؟",
+        "supportMessage": "فريق الدعم لدينا متاح على مدار الساعة لمساعدتك في الدفع بالعملات المشفرة",
+        "contactSupport": "اتصل بالدعم",
+        "securityInfo": "معلومات الأمان"
+      },
+      "walletAddressLabel": "عنوان المحفظة",
+      "instructions": {
+        "sendAmount": "أرسل بالضبط {{amount}} بقيمة {{token}}",
+        "useNetwork": "استخدم شبكة {{network}} فقط",
+        "doubleCheck": "تحقق من عنوان المحفظة مرة أخرى قبل الإرسال",
+        "confirmationTime": "تأكيد الدفع تلقائي (5-15 دقيقة)"
+      },
+      "warning": "مهم: أرسل {{token}} فقط على شبكة {{network}}. إرسال عملات أخرى أو استخدام الشبكة الخاطئة سيؤدي إلى فقدان الأموال.",
+      "common": {
+        "important": "مهم"
+      }
     }
   },
   "GuestBox": {
@@ -985,6 +1070,32 @@
       "selectionIncomplete": "يرجى اختيار العملة والشبكة والتأكد من تحويل المبلغ",
       "initiatePayment": "خطأ في بدء الدفع",
       "initiatePaymentError": "حدث خطأ أثناء بدء الدفع"
+    }
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "newNotification": "إشعار جديد",
+    "unread": "غير مقروء",
+    "markAllRead": "تعيين الكل كمقروء",
+    "markAsRead": "تعيين كمقروء",
+    "retry": "إعادة المحاولة",
+    "loading": "جارٍ تحميل الإشعارات...",
+    "noUnread": "لا توجد إشعارات غير مقروءة",
+    "noNotifications": "لا توجد إشعارات بعد",
+    "emptyDescription": "سنقوم بإعلامك عندما يصل شيء",
+    "unknownTime": "وقت غير معروف",
+    "type": "نوع",
+    "offerCode": "كود العرض",
+    "tabs": {
+      "all": "الكل",
+      "unread": "غير مقروء"
+    },
+    "errors": {
+      "fetchFailed": "فشل في جلب الإشعارات",
+      "loadFailed": "فشل في تحميل الإشعارات",
+      "markAllReadFailed": "فشل في تعيين جميع الإشعارات كمقروءة",
+      "markReadFailed": "فشل في تعيين الإشعار كمقروء",
+      "loadingError": "خطأ في تحميل الإشعارات"
     }
   }
 }

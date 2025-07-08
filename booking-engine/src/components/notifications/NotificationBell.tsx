@@ -18,6 +18,8 @@ import {
   addNotification
 } from '@/Redux/slices/notification.slice';
 import toast from 'react-hot-toast';
+import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 interface NotificationBellProps {
   className?: string;
@@ -32,6 +34,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
   const { notifications, unreadCount, isLoading } = useSelector(
     (state: RootState) => state.notifications
   );
+  const { i18n } = useTranslation();
 
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,20 +60,20 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
 
   useEffect(() => {
     if (!messaging) return;
-  
+
     const unsubscribe = onMessage(messaging, (payload) => {
       const newNotification = {
         id: payload.messageId || Date.now().toString(),
-        title: payload.notification?.title || 'New Notification',
+        title: payload.notification?.title || t('notifications.newNotification'),
         body: payload.notification?.body || '',
         type: payload.data?.type || 'general',
         isRead: false,
         timestamp: new Date().toISOString()
       };
-  
+
       // Add the new notification to Redux store
       dispatch(addNotification(newNotification));
-      
+
       // Show toast notification
       if (payload.notification?.title && payload.notification?.body) {
         showToast({
@@ -80,7 +83,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
         });
       }
     });
-  
+
     return () => unsubscribe(); // Cleanup on unmount
   }, [dispatch]);
 
@@ -89,10 +92,10 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
     try {
       const result = await dispatch(fetchNotifications(userId));
       if ((result as any)?.meta?.requestStatus === 'rejected') {
-        throw new Error('Failed to fetch notifications');
+        throw new Error(t('notifications.errors.fetchFailed'));
       }
     } catch (err) {
-      setError('Failed to load notifications');
+      setError(t('notifications.errors.loadFailed'));
       console.error('Error loading notifications:', err);
     }
   };
@@ -114,7 +117,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
       );
       dispatch(markAllAsRead());
     } catch (err) {
-      setError('Failed to mark all notifications as read');
+      setError(t('notifications.errors.markAllReadFailed'));
       console.error('Error marking all notifications as read:', err);
     }
   };
@@ -123,11 +126,10 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
     try {
       await dispatch(updateNotificationReadStatus(userId, id));
     } catch (err) {
-      setError('Failed to mark notification as read');
+      setError(t('notifications.errors.markReadFailed'));
       console.error('Error marking notification as read:', err);
     }
   };
-
 
   const handleRemoveNotification = (id: string) => {
     dispatch(markAsRead(id));
@@ -136,17 +138,20 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
   const handleClearAll = () => {
     dispatch(clearNotifications());
   };
+
   // Filter notifications based on active tab
   const displayedNotifications = activeTab === 'unread'
     ? notifications.filter(n => !n.isRead)
     : notifications;
+
+  const isRTL = i18n.language === 'ar';
 
   return (
     <div className={`relative ${className}`}>
       <button
         onClick={handleBellClick}
         className="relative p-2.5 rounded-full hover:bg-tripswift-blue/10 transition-colors duration-300 group"
-        aria-label={`Notifications ${unreadCount > 0 ? `(${unreadCount} unread)` : ''}`}
+        aria-label={`${t('notifications.title')} ${unreadCount > 0 ? `(${unreadCount} ${t('notifications.unread')})` : ''}`}
         disabled={isLoading}
       >
         <Bell size={22} className={`text-tripswift-black group-hover:text-tripswift-blue transition-colors ${isLoading ? 'animate-pulse' : ''}`} />
@@ -155,7 +160,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-            className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[20px] h-[20px] flex items-center justify-center font-bold shadow-md"
+            className={`absolute -top-1 ${isRTL ? '-left-1' : '-right-1'} bg-red-500 text-white text-xs rounded-full min-w-[20px] h-[20px] flex items-center justify-center font-bold shadow-md`}
           >
             {unreadCount > 99 ? '99+' : unreadCount}
           </motion.div>
@@ -177,13 +182,14 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ type: 'spring', damping: 25, stiffness: 400 }}
-              className="absolute right-0 mt-3 w-96 bg-white rounded-xl shadow-xl border border-tripswift-black/5 z-50 max-h-[32rem] overflow-hidden flex flex-col"
+              className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-3 w-96 bg-white rounded-xl shadow-xl border border-tripswift-black/5 z-50 max-h-[32rem] overflow-hidden flex flex-col`}
+              dir={isRTL ? 'rtl' : 'ltr'}
             >
               <div className="bg-gradient-to-r from-tripswift-blue/10 to-tripswift-blue/5 p-4 border-b border-tripswift-black/10">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-tripswift-black text-lg flex items-center gap-2">
                     <Bell size={18} className="text-tripswift-blue" />
-                    Notifications
+                    {t('notifications.title')}
                     {isLoading && <div className="w-4 h-4 border-2 border-tripswift-blue border-t-transparent rounded-full animate-spin ml-2" />}
                   </h3>
                   <div className="flex items-center gap-3">
@@ -194,7 +200,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
                         disabled={isLoading}
                       >
                         <CheckCheck size={14} />
-                        Mark all read
+                        {t('notifications.markAllRead')}
                       </button>
                     )}
 
@@ -214,7 +220,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
                       : 'text-gray-500 hover:text-tripswift-blue'
                       }`}
                   >
-                    All ({notifications.length})
+                    {t('notifications.tabs.all')} ({notifications.length})
                   </button>
                   <button
                     onClick={() => setActiveTab('unread')}
@@ -223,7 +229,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
                       : 'text-gray-500 hover:text-tripswift-blue'
                       }`}
                   >
-                    Unread ({unreadCount})
+                    {t('notifications.tabs.unread')} ({unreadCount})
                   </button>
                 </div>
               </div>
@@ -234,19 +240,19 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
                     <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4">
                       <X size={24} className="text-red-400" />
                     </div>
-                    <p className="text-sm font-medium text-red-600">Error loading notifications</p>
+                    <p className="text-sm font-medium text-red-600">{t('notifications.errors.loadingError')}</p>
                     <p className="text-xs text-red-400 mt-1">{error}</p>
                     <button
                       onClick={loadNotifications}
                       className="mt-3 px-3 py-1 text-xs bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
                     >
-                      Retry
+                      {t('notifications.retry')}
                     </button>
                   </div>
                 ) : isLoading ? (
                   <div className="p-8 text-center text-gray-500 flex flex-col items-center">
                     <div className="w-8 h-8 border-2 border-tripswift-blue border-t-transparent rounded-full animate-spin mb-4" />
-                    <p className="text-sm font-medium text-gray-600">Loading notifications...</p>
+                    <p className="text-sm font-medium text-gray-600">{t('notifications.loading')}</p>
                   </div>
                 ) : displayedNotifications.length === 0 ? (
                   <div className="p-8 text-center text-gray-500 flex flex-col items-center">
@@ -254,9 +260,9 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
                       <Bell size={24} className="text-tripswift-blue/50" />
                     </div>
                     <p className="text-sm font-medium text-gray-600">
-                      {activeTab === 'unread' ? 'No unread notifications' : 'No notifications yet'}
+                      {activeTab === 'unread' ? t('notifications.noUnread') : t('notifications.noNotifications')}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">We'll notify you when something arrives</p>
+                    <p className="text-xs text-gray-400 mt-1">{t('notifications.emptyDescription')}</p>
                   </div>
                 ) : (
                   displayedNotifications.map((notification, index) => (
@@ -266,6 +272,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
                       onMarkAsRead={handleMarkAsRead}
                       onRemove={handleRemoveNotification}
                       isLoading={isLoading}
+                      isRTL={isRTL}
                     />
                   ))
                 )}
@@ -283,6 +290,7 @@ interface NotificationItemProps {
   onMarkAsRead: (id: string) => void;
   onRemove: (id: string) => void;
   isLoading: boolean;
+  isRTL: boolean;
 }
 
 const NotificationItem: React.FC<NotificationItemProps> = ({
@@ -290,8 +298,10 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   onMarkAsRead,
   onRemove,
   isLoading,
+  isRTL,
 }) => {
   const [showDetails, setShowDetails] = useState(false);
+
   const getNotificationIcon = () => {
     switch (notification.type) {
       case 'booking':
@@ -368,9 +378,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 10 }}
+      initial={{ opacity: 0, x: isRTL ? -10 : 10 }}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 10 }}
+      exit={{ opacity: 0, x: isRTL ? -10 : 10 }}
       transition={{ duration: 0.2 }}
       className={`px-4 py-3 hover:bg-gray-50/50 transition-colors cursor-pointer ${notification.isRead ? 'bg-white' : 'bg-blue-50/30'
         }`}
@@ -390,12 +400,31 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
               <p className="text-xs text-gray-600 mt-1 line-clamp-2">
                 {notification.body}
               </p>
+              {notification.data && (
+                <div className="mt-1 text-xs text-gray-500 space-y-1">
+                  {/* {notification.data.type && (
+                    <p>
+                      <span className="font-medium">{t('notifications.type')}:</span> {notification.data.type}
+                    </p>
+                  )} */}
+                  {notification.data.offerCode && (
+                    <div className="mt-1 flex items-center">
+                      <span className="text-xs font-medium text-gray-600 mr-1 ml-1">
+                        {t('notifications.offerCode')}:
+                      </span>
+                      <span className="text-xs font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded-md border border-green-100">
+                        {notification.data.offerCode}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
               <p className="text-xs text-gray-400 mt-2">
                 {isValidDate(notification.timestamp)
                   ? formatDistanceToNow(new Date(notification.timestamp), {
                     addSuffix: true,
                   })
-                  : 'Unknown time'}
+                  : t('notifications.unknownTime')}
               </p>
             </div>
             <div className="flex items-center gap-1">
@@ -419,34 +448,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
                 disabled={isLoading}
               >
                 <Check size={12} />
-                Mark as read
+                {t('notifications.markAsRead')}
               </button>
             )}
-            {/* <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowDetails(!showDetails);
-              }}
-              className="text-xs bg-white border border-gray-200 px-2 py-1 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-1"
-              disabled={isLoading}
-            >
-              {showDetails ? 'Hide details' : 'View details'}
-            </button> */}
-
-            {/* {showDetails && notification.data && (
-              <div className="mt-2 p-2 bg-gray-50 rounded-lg text-xs">
-                {notification.data.type && (
-                  <p className="text-gray-700">
-                    <span className="font-medium">Type:</span> {notification.data.type}
-                  </p>
-                )}
-                {notification.data.offerCode && (
-                  <p className="text-gray-700 mt-1">
-                    <span className="font-medium">Offer Code:</span> {notification.data.offerCode}
-                  </p>
-                )}
-              </div>
-            )} */}
           </div>
         </div>
       </div>
