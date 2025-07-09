@@ -198,7 +198,7 @@ export const OfferModal: React.FC<OfferModalProps> = ({
               </button>
               <button
                 type="submit"
-                className="px-4 py-1.5 bg-blue-600 text-white hover:bg-blue-700 rounded-md disabled:bg-blue-400"
+                className="px-4 py-1.5 bg-tripswift-blue text-white hover:bg-tripswift-dark-blue rounded-md disabled:bg-blue-400"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? 'Saving...' : 'Create Notification'}

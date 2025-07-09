@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import Breadcrumbs from '../../../../components/ui/breadcrumbs';
 import { PropertyImageGallery } from './photo-img-gallery';
 import {
   fetchProperty,
@@ -29,11 +28,14 @@ import { Rooms } from '../../../../components/propertyId/rooms';
 import { RatePlan } from '../../../../components/propertyId/rate-plan';
 import { RoomAmenities } from '../../../../components/propertyId/roomAmenities'
 import { Button } from '../../../../components/ui/button';
-import { Trash2 } from 'lucide-react';
+import { ArrowLeft, Trash2 } from 'lucide-react';
 import { Address } from '../../../../components/propertyId/address'; // Added this import
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { RootState } from '@src/redux/store';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../components/ui/card"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../../../components/ui/tabs";
+
 
 // Define types for our component props and state
 interface RatePlanType {
@@ -416,10 +418,9 @@ export default function Page({ params, searchParams }: Props) {
       console.error('Error updating room:', error);
     }
   };
-
-
-
-
+  const handleBack = () => {
+    window.history.back();
+  };
   const handleDeleteRoom = async (_id: string) => {
     try {
       if (!accessToken) {
@@ -532,35 +533,56 @@ export default function Page({ params, searchParams }: Props) {
   // Render the component
   return (
     <main className="py-8 px-4 md:px-8 lg:px-16 xl:px-24">
-      <div className="flex items-center justify-between mb-8">
-        <Breadcrumbs />
-      </div>
-      
+      {/* Header with back button and breadcrumb */}
+      <header className="sticky top-0 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto pr-4 sm:pr-6 lg:pr-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleBack}
+                className="bg-slate-100 hover:bg-slate-100/80 transition-all duration-200 rounded-lg px-3 py-2"
+                aria-label="Go back to previous page"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
       {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> */}
       <div className="grid grid-cols-1 gap-4">
-      <div className="mt-2 flex justify-end">
-        <Button
-          variant="destructive"
-          onClick={handleDeleteClick}
-          className="bg-red-500 hover:bg-red-600"
-        >
-          <Trash2 className="mr-2 h-4 w-4" /> Delete Property
-        </Button>
-      </div>
         <div>
           <PropertyImageGallery image={property?.data?.image} />
         </div>
 
         {/* <div className="flex flex-col md:flex-row gap-2 items-center"> */}
-          <div className="mb-4 mt-4">
-            
-            {/* <Button
-              variant="default"
-              onClick={() => router.push(`/app/rate-plan/map-rate-plan`)}
-              className="bg-tripswift-blue hover:bg-tripswift-blue-600 text-white mx-2"
-              >
-              Add Rate Plan
-            </Button> */}
+        {/* Quick Action Buttons */}
+        <div className="mb-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Quick Actions</CardTitle>
+              <CardDescription>
+                Manage your property's rate and inventory allotment
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <Button
+                  variant="default"
+                  onClick={() => router.push(`/app/rate-plan/map-rate-plan`)}
+                  className="bg-tripswift-blue hover:bg-tripswift-blue-600 text-white"
+                >
+                  Rate and Inventory Allotment
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        {/* <div className="mb-4 mt-4">
             <Button
               variant="default"
               onClick={() => router.push(`/app/rate-plan/map-rate-plan`)}
@@ -568,115 +590,131 @@ export default function Page({ params, searchParams }: Props) {
               >
               Rate and Inventory Allotment
             </Button>
-            {/* <Button
-              variant="default"
-              onClick={() => router.push(`/app/rate-plan/set-availability`)}
-              className="bg-tripswift-blue hover:bg-tripswift-blue-600 text-white mx-2"
+          </div> */}
+
+        {/* Main Content Tabs */}
+        <Tabs className="space-y-6" defaultValue="overview">
+          <div className="overflow-x-auto">
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 h-auto p-1 bg-slate-100">
+              <TabsTrigger
+                value="overview"
+                className="data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
               >
-              Add Inventory
-            </Button>
-            <Button
-              variant="default"
-              onClick={() => router.push(`/app/rate-plan/create-rate-plan`)}
-              className="bg-tripswift-blue hover:bg-tripswift-blue-600 text-white mx-2"
+                Overview
+              </TabsTrigger>
+              <TabsTrigger
+                value="address"
+                className="data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
               >
-              Create Rate Plan
-            </Button>
-            <Button
-              variant="default"
-              onClick={() => router.push(`/app/rate-plan/map-rate-plan`)}
-              className="bg-tripswift-blue hover:bg-tripswift-blue-600 text-white mx-2"
+                Address
+              </TabsTrigger>
+              <TabsTrigger
+                value="amenities"
+                className="data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
               >
-              Map Rate Plan
-            </Button> */}
+                Amenities
+              </TabsTrigger>
+              <TabsTrigger
+                value="rooms"
+                className="data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
+              >
+                Rooms
+              </TabsTrigger>
+              <TabsTrigger
+                value="room-amenities"
+                className="data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
+              >
+                Room Amenities
+              </TabsTrigger>
+            </TabsList>
           </div>
+
+          <div className="animate-fade-in">
+            <TabsContent value="overview" className="mt-6 space-y-6">
+              <PropertyDetails
+                property={property}
+                editedProperty={editedProperty}
+                editMode={editMode}
+                accessToken={accessToken as string}
+                propertyId={propertyId}
+                setProperty={setProperty}
+                handleInputChange={handleInputChange}
+                handleSaveClick={handleSaveClick}
+                handleEditClick={handleEditClick}
+              />
+            </TabsContent>
+
+            <TabsContent value="address" className="mt-6">
+              <Address
+                address={address}
+                editedAddress={editedAddress}
+                editAddressMode={editAddressMode}
+                handleAddressInputChange={handleAddressInputChange}
+                handleAddressSaveClick={handleAddressSaveClick}
+                handleAddressEditClick={handleAddressEditClick}
+                handleAddressAddClick={handleAddressAddClick}
+              />
+            </TabsContent>
+
+            <TabsContent value="amenities" className="mt-6">
+              <Amenities
+                property={property}
+                amenity={amenity}
+                setAmenity={setAmenity}
+                editedAmenity={editedAmenity}
+                editAmenityMode={editAmenityMode}
+                handleAmenityEditClick={handleAmenityEditClick}
+                handleAmenityInputChange={handleAmenityInputChange}
+                handleAmenitySaveClick={handleAmenitySaveClick}
+                handleCreateAmenity={handleCreateAmenity}
+              />
+            </TabsContent>
+
+            <TabsContent value="rooms" className="mt-6">
+              <Rooms
+                rooms={rooms}
+                onAddRoom={handleAddRoom}
+                onEditRoom={handleEditRoom}
+                onDeleteRoom={handleDeleteRoom}
+              />
+            </TabsContent>
+
+            <TabsContent value="room-amenities" className="mt-6">
+              <RoomAmenities
+                roomAmenity={roomAmenity}
+                editedRoomAmenity={roomAmenity}
+                editRoomAmenityMode={editRoomAmenityMode}
+                handleRoomAmenityEditClick={handleRoomAmenityEditClick}
+                propertyInfoId={propertyId}
+                accessToken={accessToken as string}
+              />
+            </TabsContent>
+          </div>
+        </Tabs>
         {/* </div> */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-          {/* Property Details Component */}
-          <PropertyDetails
-            property={property}
-            editedProperty={editedProperty}
-            editMode={editMode}
-            accessToken={accessToken as string}
-            propertyId={propertyId}
-            setProperty={setProperty}
-            handleInputChange={handleInputChange}
-            handleSaveClick={handleSaveClick}
-            handleEditClick={handleEditClick}
-          />
-
-          {/* Address Component */}
-          <Address
-            address={address}
-            editedAddress={editedAddress}
-            editAddressMode={editAddressMode}
-            handleAddressInputChange={handleAddressInputChange}
-            handleAddressSaveClick={handleAddressSaveClick}
-            handleAddressEditClick={handleAddressEditClick}
-            handleAddressAddClick={handleAddressAddClick}
-          />
-
-          {/* Amenities Component */}
-          <Amenities
-            property={property}
-            amenity={amenity}
-            setAmenity={setAmenity}  // Added this line
-            editedAmenity={editedAmenity}
-            editAmenityMode={editAmenityMode}
-            handleAmenityEditClick={handleAmenityEditClick}
-            handleAmenityInputChange={handleAmenityInputChange}
-            handleAmenitySaveClick={handleAmenitySaveClick}
-            handleCreateAmenity={handleCreateAmenity}
-          />
-
-          {/* Rooms Component */}
-          <Rooms
-            rooms={rooms}
-            onAddRoom={handleAddRoom}
-            onEditRoom={handleEditRoom}
-            onDeleteRoom={handleDeleteRoom}
-          />
-
-          {/* Room Amenities Component */}
-          <RoomAmenities
-            roomAmenity={roomAmenity}
-            editedRoomAmenity={roomAmenity}
-            editRoomAmenityMode={editRoomAmenityMode}
-            // handleRoomAmenitySaveClick={handleRoomAmenitySaveClick}
-            handleRoomAmenityEditClick={handleRoomAmenityEditClick}
-            // handleCreateRoomAmenity={handleCreateRoomAmenity}
-            propertyInfoId={propertyId}
-            accessToken={accessToken as string}
-          />
-
-          {/* Rate Plan Component */}
-          {/* <RatePlan
-            setRatePlanList={setRatePlanList}
-            ratePlanList={ratePlanList}
-            rooms={rooms}
-            setRatePlan={setRatePlan}
-            property_id={propertyId}
-            accessToken={accessToken as string}
-          // editMode={editRatePlanMode}
-          // setEditMode={setEditRatePlanMode}
-          // selectedRatePlan={selectedRatePlan}
-          // setSelectedRatePlan={setSelectedRatePlan}
-          // ratePlan={ratePlan}
-          // HandleUpdateRatePlan
-          // HandleAddRatePlan={HandleAddRatePlan}
-          /> */}
-        </div>
       </div>
-      {/* Delete Property Button */}
-      {/* <div className="mt-8 flex justify-end">
-        <Button
-          variant="destructive"
-          onClick={handleDeleteClick}
-          className="bg-red-500 hover:bg-red-600"
-        >
-          <Trash2 className="mr-2 h-4 w-4" /> Delete Property
-        </Button>
-      </div> */}
+      {/* Danger Zone */}
+      <Card className="border-red-200 bg-red-50/50 mt-8">
+        <CardHeader>
+          {/* <CardTitle className="text-red-700 flex items-center">
+              <Trash2 className="h-5 w-5 mr-2" />
+              Danger Zone
+            </CardTitle> */}
+          <CardDescription className="text-red-600">
+            Deleting this property will remove all associated data permanently. This action cannot be undone.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button
+            variant="destructive"
+            onClick={handleDeleteClick}
+            className="bg-red-600 hover:bg-red-700"
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete Property
+          </Button>
+        </CardContent>
+      </Card>
     </main>
   );
 }

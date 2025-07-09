@@ -150,7 +150,7 @@ const Page = () => {
           <Link href={`/app/property/${hotel._id}`}>
             <Button 
               size="sm" 
-              className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all duration-200 hover:shadow-md"
+              className="bg-tripswift-blue hover:bg-blue-700 text-white shadow-sm transition-all duration-200 hover:shadow-md"
             >
               <Eye className="w-4 h-4 mr-1" />
               View

@@ -114,7 +114,7 @@ export default function AppSidebar({ role }: { role?: string }) {
         <div className={cn(
           "group relative flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-all duration-200",
           isActive
-            ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25"
+            ? "bg-gradient-to-r from-tripswift-blue to-tripswift-blue text-white shadow-lg shadow-blue-500/25"
             : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
         )}>
           {isActive && (

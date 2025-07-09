@@ -68,8 +68,8 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <BadgePercent className="h-5 w-5 text-blue-500 mr-2" />
-            <span className="text-lg font-bold text-blue-600">
+            <BadgePercent className="h-5 w-5 text-tripswift-blue mr-2" />
+            <span className="text-lg font-bold text-tripswift-dark-blue">
               {offer.data.type || 'Promotional'} Type
             </span>
           </div>
@@ -120,7 +120,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
           </button>
           <button
             onClick={() => onView(offer)}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-tripswift-blue"
           >
             <Eye className="-ml-1 mr-2 h-4 w-4" />
             View Details

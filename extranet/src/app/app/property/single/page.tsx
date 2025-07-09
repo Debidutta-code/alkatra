@@ -173,7 +173,7 @@ const Page = () => {
 
                     <div className="flex items-center space-x-3">
                         <Link href={`/app/property/${hotel._id}`}>
-                            <Button className="bg-blue-500 hover:bg-indigo-600 text-white">
+                            <Button className="bg-tripswift-blue hover:bg-tripswift-blue-600 text-white">
                                 <Eye className="w-4 h-4 mr-1" />
                                 View
                             </Button>
@@ -246,8 +246,8 @@ const Page = () => {
             </div>
 
             {/* Content */}
-            <div className="max-w-7xl mx-auto px-6 py-8">
-                {loading ? (
+`            <div className="max-w-7xl mx-auto px-6 py-8">
+`                {loading ? (
                     <LoadingState />
                 ) : filteredProperties.length > 0 ? (
                     <div className="space-y-6">
