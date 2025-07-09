@@ -1095,7 +1095,7 @@
     "title": "Notifications",
     "newNotification": "New Notification",
     "unread": "unread",
-    "markAllRead": "Mark all read",
+    "markAllRead": "Mark all as read",
     "markAsRead": "Mark as read",
     "retry": "Retry",
     "loading": "Loading notifications...",

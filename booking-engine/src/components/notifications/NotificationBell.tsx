@@ -409,10 +409,10 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
                   )} */}
                   {notification.data.offerCode && (
                     <div className="mt-1 flex items-center">
-                      <span className="text-xs font-medium text-gray-600 mr-1 ml-1">
+                      <span className="text-xs font-medium text-gray-600">
                         {t('notifications.offerCode')}:
                       </span>
-                      <span className="text-xs font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded-md border border-green-100">
+                      <span className="text-xs font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded-md border border-green-100 mr-1 ml-1">
                         {notification.data.offerCode}
                       </span>
                     </div>

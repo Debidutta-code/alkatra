@@ -97,17 +97,14 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
           <div className="flex justify-between items-start mb-3">
             <div className="flex-1">
               <div className="flex items-center mb-1">
-                <FaHotel className="text-tripswift-off-white mr-2" />
-                <span className="text-tripswift-off-white text-sm font-tripswift-medium">
-                  {t("BookingTabs.BookingDetailsModal.accommodation")}
-                </span>
-              </div>
-              <h2 className="text-2xl font-tripswift-bold text-tripswift-off-white leading-tight mb-1">
+                <FaHotel className="text-2xl text-tripswift-off-white mr-2" />
+                <h2 className="text-2xl font-tripswift-bold text-tripswift-off-white leading-tight mt-1">
                 {booking.hotelName}
               </h2>
-              <p className="text-tripswift-off-white text-sm">
+              </div>
+              {/* <p className="text-tripswift-off-white text-sm">
                 Booking ID: {booking._id?.slice(-8).toUpperCase()}
-              </p>
+              </p> */}
             </div>
 
             {/* Status Badge - Moved to top right */}
@@ -169,7 +166,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                     {t("BookingTabs.BookingDetailsModal.checkIn")}
                   </p>
                 </div>
-                <p className="text-lg font-tripswift-bold text-gray-800">
+                <p className="font-tripswift-bold text-gray-800">
                   {formatDateString(booking.checkInDate)}
                 </p>
               </div>
@@ -181,7 +178,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                     {t("BookingTabs.BookingDetailsModal.checkOut")}
                   </p>
                 </div>
-                <p className="text-lg font-tripswift-bold text-gray-800">
+                <p className="font-tripswift-bold text-gray-800">
                   {formatDateString(booking.checkOutDate)}
                 </p>
               </div>
@@ -216,7 +213,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                       {t("BookingTabs.BookingDetailsModal.rooms")}
                     </p>
                   </div>
-                  <p className="text-lg font-tripswift-bold text-gray-800">
+                  <p className="font-tripswift-bold text-gray-800 ml-2">
                     {booking.numberOfRooms} {booking.numberOfRooms === 1 ? 'Room' : 'Rooms'}
                   </p>
                 </div>
@@ -225,7 +222,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                   <p className="text-sm text-gray-500 font-tripswift-medium mb-1">
                     Duration
                   </p>
-                  <p className="text-lg font-tripswift-bold text-gray-800">
+                  <p className="font-tripswift-bold text-gray-800">
                     {nights} {nights === 1 ? 'Night' : 'Nights'}
                   </p>
                 </div>
@@ -326,10 +323,10 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                 <div className="flex gap-3">
                   <FaRegCalendarCheck />
                   <div>
-                    <p className="text-tripswift-off-white/80 text-xs mb-0.5">
+                    <p className="text-tripswift-off-white/80 text-sm mb-1">
                       {t("BookingTabs.BookingDetailsModal.bookingDate")}
                     </p>
-                    <p className="text-tripswift-off-white font-tripswift-medium">
+                    <p className="text-tripswift-off-white font-tripswift-bold">
                       {booking.createdAt ? formatDateString(booking.createdAt) : "-"}
                     </p>
                   </div>
@@ -340,8 +337,8 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                     {t("BookingTabs.BookingDetailsModal.totalAmount")}
                   </p>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-tripswift-bold text-tripswift-off-white">
-                      USD {booking.totalAmount.toLocaleString()}
+                    <span className="font-tripswift-bold text-tripswift-off-white">
+                    {currency} {booking.totalAmount.toLocaleString()}
                     </span>
                   </div>
                 </div>
@@ -355,7 +352,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
           {(booking.status === "Confirmed" || booking.status === "Modified") && !isPastCheckIn && (
             <>
               <button
-                className="flex-1 bg-gradient-to-r from-tripswift-blue to-[#054B8F] text-tripswift-off-white py-2.5 px-4 rounded-lg hover:shadow-lg transition-all duration-300 font-tripswift-medium flex items-center justify-center hover:scale-105 active:scale-95"
+                className="flex-1 bg-gradient-to-r from-tripswift-blue to-[#054B8F] text-tripswift-off-white py-2.5 px-4 rounded-lg hover:shadow-lg transition-all duration-300 font-tripswift-medium flex items-center justify-center"
                 onClick={onAmend}
               >
                 <FaEdit
@@ -365,7 +362,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                 {t("BookingTabs.BookingDetailsModal.modifyBooking")}
               </button>
               <button
-                className="flex-1 bg-white text-red-600 border-2 border-red-200 py-2.5 px-4 rounded-lg hover:bg-red-50 hover:border-red-300 transition-all duration-300 font-tripswift-medium flex items-center justify-center hover:scale-105 active:scale-95"
+                className="flex-1 bg-white text-red-600 border-2 border-red-200 py-2.5 px-4 rounded-lg hover:bg-red-50 hover:border-red-300 transition-all duration-300 font-tripswift-medium flex items-center justify-center"
                 onClick={onCancel}
               >
                 <FaRegTimesCircle
@@ -377,7 +374,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             </>
           )}
           <button
-            className="flex-1 bg-gray-700 text-tripswift-off-white py-2.5 px-4 rounded-lg hover:bg-gray-800 hover:shadow-lg transition-all duration-300 flex items-center justify-center font-tripswift-medium hover:scale-105 active:scale-95"
+            className="flex-1 bg-gray-700 text-tripswift-off-white py-2.5 px-4 rounded-lg hover:bg-gray-800 hover:shadow-lg transition-all duration-300 flex items-center justify-center font-tripswift-medium"
             onClick={() => window.print()}
           >
             <svg

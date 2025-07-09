@@ -81,9 +81,9 @@ const BookingCard: React.FC<BookingCardProps> = ({
       </div>
 
       {/* Card Body */}
-      <div className="p-5 pt-7">
+      <div className="px-5 py-2">
         {/* Dates */}
-        <div className="flex flex-col sm:flex-row justify-between mb-5 bg-tripswift-off-white/70 p-3 rounded-lg">
+        <div className="flex justify-between items-center py-4">
           <div className="mb-3 sm:mb-0">
             <p className="text-xs text-gray-500 mb-1">{t('BookingTabs.BookingCard.checkIn')}</p>
             <p className="flex items-center text-tripswift-black font-tripswift-medium text-sm">
@@ -101,7 +101,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
         </div>
 
         {/* Room Type & Payment Method */}
-        <div className="flex flex-col sm:flex-row justify-between mb-5 bg-tripswift-off-white/70 p-3 rounded-lg border-t border-gray-100">
+        <div className="flex justify-between items-center border-t border-gray-100 py-4">
           {/* Room Type */}
           <div>
             <p className="text-xs text-gray-500 mb-1.5">{t('BookingTabs.BookingCard.roomType')}</p>
@@ -128,7 +128,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
         </div>
 
         {/* Guest & Price */}
-        <div className="flex justify-between items-center border-t border-gray-100 pt-4">
+        <div className="flex justify-between items-center border-t border-gray-100 py-4">
           <div>
             <p className="text-xs text-gray-500 mb-1">{t('BookingTabs.BookingCard.primaryGuest')}</p>
             <p className="flex items-center text-gray-800">
@@ -141,17 +141,14 @@ const BookingCard: React.FC<BookingCardProps> = ({
               <p className="text-xs text-gray-500 mb-1">{t('BookingTabs.BookingCard.rateBreakdown')}</p>
               <div className="flex items-center justify-end text-sm text-tripswift-black/70 mb-1">
               </div>
-              {/* <p className="text-lg font-tripswift-bold text-tripswift-blue">{currency} {booking.totalAmount.toLocaleString()}</p> */}
-              <p className="text-lg font-tripswift-bold text-tripswift-blue">
-                USD {booking.totalAmount.toLocaleString()}
-              </p>
+              <p className="text-lg font-tripswift-bold text-tripswift-blue">{currency} {booking.totalAmount.toLocaleString()}</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Card Footer */}
-      <div className="bg-tripswift-off-white/70 p-4 border-t border-gray-100">
+      <div className="bg-tripswift-off-white/70 py-4 px-4 border-t border-gray-100">
         <button
           className="w-full bg-tripswift-blue hover:bg-[#054B8F] text-tripswift-off-white py-2.5 px-4 rounded-lg transition-colors duration-300 text-sm font-tripswift-medium shadow-sm hover:shadow-md flex items-center justify-center"
           onClick={() => onViewDetails(booking)}
