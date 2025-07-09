@@ -68,15 +68,18 @@ import { Country, State, City, IState, ICity } from "country-state-city";
 
 const createPropertyAddressSchema = z.object({
   address_line_1: z.string().min(1, "Address line 1 is required"),
-  address_line_2: z.string().min(1, "Address line 2 is required"),
+  address_line_2: z.string(),
   country: z.string().min(1, "Country is required"),
   state: z.string().min(1, "State is required"),
   city: z.string().min(1, "City is required"),
   landmark: z.string().min(1, "Landmark Required"),
   // zip_code: z.string().min(1, "Zipcode is required"),
-  zip_code: z.string().refine((value) => /^\d{6}$/.test(value), {
-    message: "Please provide a valid 6-digit Zip Code",
-  }),
+  zip_code: z.string()
+    .min(3, "Zip Code must be at least 3 digits")
+    .max(6, "Zip Code cannot exceed 6 digits")
+    .refine((value) => /^\d+$/.test(value), {
+      message: "Zip Code must contain only numbers",
+    }),
 });
 
 type Inputs = {
@@ -447,7 +450,6 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
             <Label htmlFor="address_line_2 ">
               Address Line 2{" "}
               <span className="text-destructive">
-                <span className="text-destructive">*</span>
               </span>
             </Label>
             <Input
@@ -472,7 +474,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
             <div className="md:w-1/2 w-full">
               <Label
                 htmlFor="country"
-                className="text-gray-700  dark:text-gray-300"
+              // className="text-gray-700  dark:text-gray-300"
               >
                 Country <span className="text-destructive">*</span>
               </Label>
@@ -533,7 +535,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
             <div className=" md:w-1/2 w-full relative">
               <Label
                 htmlFor="state"
-                className="text-gray-700 dark:text-gray-300"
+              // className="text-gray-700 dark:text-gray-300"
               >
                 State <span className="text-destructive">*</span>
               </Label>
@@ -595,7 +597,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
             <div className="self-end w-full relative">
               <Label
                 htmlFor="city"
-                className="text-gray-700 dark:text-gray-300"
+              // className="text-gray-700 dark:text-gray-300"
               >
                 City <span className="text-destructive">*</span>
               </Label>
@@ -676,7 +678,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
               )}
             </div>
 
-            <div className="items-center w-full md:w-1/2 ">
+            <div className="items-center w-full md:w-1/2">
               <Label htmlFor="zip_code">
                 Zip Code <span className="text-destructive">*</span>
               </Label>
@@ -684,9 +686,18 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 id="zip_code"
                 type="text"
                 className="mt-1"
+                minLength={3}
                 maxLength={6}
                 variant={zipCodeError && "error"}
                 {...register("zip_code")}
+                onChange={(e) => {
+                  // Only allow numbers
+                  const value = e.target.value.replace(/\D/g, '');
+                  if (value.length <= 6) {
+                    e.target.value = value;
+                    setValue("zip_code", value, { shouldValidate: true });
+                  }
+                }}
               />
               {zipCodeError && (
                 <p className="text-red-500 text-sm mt-1">

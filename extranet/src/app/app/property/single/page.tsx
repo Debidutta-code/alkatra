@@ -35,7 +35,7 @@ const Page = () => {
     const [loading, setLoading] = useState(false);
     const [directProperties, setDirectProperties] = useState<Hotel[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
-    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
     const [filteredProperties, setFilteredProperties] = useState<Hotel[]>([]);
 
     const fetchAllProperties = async () => {

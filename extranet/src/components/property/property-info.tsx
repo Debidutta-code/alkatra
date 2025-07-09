@@ -1243,7 +1243,7 @@ function UploadPropertyImages({
           <div className="mt-4 flex items-center justify-center">
             <Button
               type="button"
-              className="mr-2  w-2/5"
+              className="mr-2 w-2/5"
               onClick={() => setOpen(false)}
               variant={"ghost"}
             >
@@ -1253,7 +1253,7 @@ function UploadPropertyImages({
               type="button"
               onClick={(e: any) => handleFileUpload(e)}
               className="w-[200px]"
-              disabled={loading} // Disable button while loading
+              disabled={loading}
             >
               {loading ? (
                 <span className="flex items-center">
@@ -1271,18 +1271,43 @@ function UploadPropertyImages({
             <CardHeader>
               <CardTitle>Preview</CardTitle>
             </CardHeader>
-            <CardContent className="flex items-center gap-2">
-              {!files.length
-                ? "No preview available"
-                : files.map((file) => (
-                  <Image
-                    key={file?.name}
-                    src={file?.preview}
-                    height={60}
-                    width={60}
-                    alt=""
-                  />
-                ))}
+            <CardContent className="flex flex-wrap gap-2">
+              {!files.length ? (
+                "No preview available"
+              ) : (
+                files.map((file) => (
+                  <div key={file.name} className="relative group">
+                    <Image
+                      src={file.preview}
+                      height={80}
+                      width={80}
+                      alt="Preview"
+                      className="rounded-md object-cover"
+                    />
+                    {/* Cross (Remove) Icon */}
+                    <button
+                      type="button"
+                      onClick={() => removeFile(file.name)}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                  </div>
+                ))
+              )}
             </CardContent>
           </Card>
         </div>

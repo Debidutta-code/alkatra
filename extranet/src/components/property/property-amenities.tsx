@@ -46,7 +46,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { RootState, useSelector } from "../../redux/store";
 
 const createPropertyAmenitiesSchema = z.object({
-  // destination_type: z.string().min(1, "Destination type is required"),
+  destination_type: z.string().optional(),
   property_type: z.string().min(1, "Property type is required"),
   no_of_rooms_available: z.string().min(1, "No of rooms is required"),
   wifi: z.boolean(),
@@ -226,7 +226,8 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
       console.log("error from update aminity", err);
       if (axios.isAxiosError(err)) {
         setFormLoading(false);
-        toast.error(err?.response?.data?.message);
+        // toast.error(err?.response?.data?.message);
+        toast.error("Failed to create property amenities. Please try again.");
       }
     }
   };
@@ -333,7 +334,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
           {/* Destination Type Select */}
           <div className=" inline self-end w-full md:w-1/2 relative">
             <Label htmlFor="destination_type">
-              Destination Type <span className="text-destructive">*</span>
+              Destination Type
             </Label>
             <div className="inline-block relative w-full mt-1">
               <select
@@ -348,7 +349,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                   destinationTypeError ? "border-red-500" : "border-input"
                 } py-2 px-3 h-10  rounded-md leading-tight focus:outline-none focus:border-blue-500`}
               >
-                <option value="" disabled>
+                <option value="">
                   Select Destination Type
                 </option>
                 <option value="RESORT">RESORT</option>

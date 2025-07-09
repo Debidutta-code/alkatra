@@ -61,9 +61,9 @@ export const roomSchema = z.object({
   room_name: z.string().min(1, "Room name is required"),
   room_type: z.string().min(1, "Room type is required"),
   total_room: z
-  .number({ required_error: "Total rooms is required" })
-  // .nonnegative("Room count must be positive")
-  .min(1, { message: "Value must be greater than or equal to 1" }),
+    .number({ required_error: "Total rooms is required" })
+    // .nonnegative("Room count must be positive")
+    .min(1, { message: "Value must be greater than or equal to 1" }),
 
   floor: z
     .number()
@@ -71,20 +71,20 @@ export const roomSchema = z.object({
     .optional(),
   room_view: z.string().optional(),
   room_size: z
-    .number({required_error : "Room size is required"})
+    .number({ required_error: "Room size is required" })
     // .nonnegative("Room size must be positive")
     .min(1, { message: "Value must be greater than or equal to 1" }),
 
   room_unit: z.string().min(1, "Room unit is required"),
   smoking_policy: z.string().min(1, "Smoking policy is required"),
   max_occupancy: z
-    .number({required_error:"Max occupancy is required"})
+    .number({ required_error: "Max occupancy is required" })
     // .nonnegative("Max occupancy must be positive")
-      .min(1, { message: "Value must be greater than or equal to 1" }),
+    .min(1, { message: "Value must be greater than or equal to 1" }),
   max_number_of_adults: z
-    .number({ required_error:"Enter max adults" })
+    .number({ required_error: "Enter max adults" })
     // .nonnegative("Adults cannot be negative")
-      .min(1, { message: "Value must be greater than or equal to 1" }),
+    .min(1, { message: "Value must be greater than or equal to 1" }),
   max_number_of_children: z
     .number()
     .nonnegative("Value must be greater than or equal to 0")
@@ -92,8 +92,8 @@ export const roomSchema = z.object({
   number_of_bedrooms: z
     .number({ required_error: "Enter number of bedrooms" })
     // .nonnegative("Bedrooms can't be negative")
-      .min(1, { message: "Value must be greater than or equal to 1" }),
- // Changed to min(1) - required
+    .min(1, { message: "Value must be greater than or equal to 1" }),
+  // Changed to min(1) - required
   number_of_living_room: z
     .number()
     .nonnegative("Value must be greater than or equal to 0")
@@ -458,7 +458,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
                 }))
               }
               type="string"
-              // placeholder="Single Room"
+            // placeholder="Single Room"
             />
             {room_typeError && (
               <p className="text-red-500 text-sm ">
@@ -574,7 +574,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
                 }))
               }
               type="string"
-              placeholder="Sea facing, Garden etc."
+              placeholder="Sea facing"
             />
             {room_viewError && (
               <p className="text-red-500 text-sm ">
@@ -627,11 +627,10 @@ export default function XRooms({ onNext, onPrevious }: Props) {
                   }))
                 }
                 className={`block appearance-none w-full border 
-        ${
-          room_unitError
-            ? "border-red-500"
-            : "border-gray-300 dark:border-gray-600"
-        }
+        ${room_unitError
+                    ? "border-red-500"
+                    : "border-gray-300 dark:border-gray-600"
+                  }
         bg-white dark:bg-gray-800 
         text-gray-700 dark:text-gray-200 
         py-2 px-3 h-9 rounded-md 
@@ -678,11 +677,10 @@ export default function XRooms({ onNext, onPrevious }: Props) {
                   }))
                 }
                 className={`block appearance-none w-full border 
-        ${
-          smoking_policyError
-            ? "border-red-500"
-            : "border-gray-300 dark:border-gray-600"
-        }
+        ${smoking_policyError
+                    ? "border-red-500"
+                    : "border-gray-300 dark:border-gray-600"
+                  }
         bg-white dark:bg-gray-800 
         text-gray-700 dark:text-gray-200 
         py-2 px-3 h-9 rounded-md 
@@ -986,31 +984,12 @@ function PreviewPropertyImages({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      {/* <DialogTrigger
+       <DialogTrigger
         className={buttonVariants({
           variant: "outline",
         })}
       >
-        image
-      </DialogTrigger> */}
-      <DialogTrigger className="flex items-center justify-center w-full px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-blue-600 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <span className="mr-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
-        </span>
-        Upload Images
+        Add Room Images
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -1020,20 +999,20 @@ function PreviewPropertyImages({
           {!files.length
             ? "No preview available"
             : files?.map((file, i) => (
-                <div
-                  key={`${JSON.stringify(file) + i}`}
-                  onClick={() => setCurrentImage(i)}
-                  className="rounded-md cursor-pointer overflow-hidden"
-                >
-                  <Image
-                    key={file?.public_id}
-                    src={file?.url}
-                    height={60}
-                    width={60}
-                    alt=""
-                  />
-                </div>
-              ))}
+              <div
+                key={`${JSON.stringify(file) + i}`}
+                onClick={() => setCurrentImage(i)}
+                className="rounded-md cursor-pointer overflow-hidden"
+              >
+                <Image
+                  key={file?.public_id}
+                  src={file?.url}
+                  height={60}
+                  width={60}
+                  alt=""
+                />
+              </div>
+            ))}
         </div>
         <div className="rounded-md min-h-[250px] max-h-[350px] overflow-hidden">
           <Image
@@ -1081,7 +1060,6 @@ function UploadPropertyImages({
     (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
       if (acceptedFiles?.length) {
         setFiles((previousFiles: any) => [
-          // If allowing multiple files
           ...previousFiles,
           ...acceptedFiles.map((file) =>
             Object.assign(file, { preview: URL.createObjectURL(file) })
@@ -1128,37 +1106,18 @@ function UploadPropertyImages({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      {/* <DialogTrigger
+      <DialogTrigger
         className={buttonVariants({
           variant: "outline",
         })}
       >
-        image
-      </DialogTrigger> */}
-      <DialogTrigger className="flex items-center justify-center w-full px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-600 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <span className="mr-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
-        </span>
-        Upload Images
+        Add Room Images
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Upload Images</DialogTitle>
+          <DialogTitle>Room Images</DialogTitle>
           <DialogDescription>
-            Add your images, which will be visible to the end user.
+            Add your Room images, which will be visible to the end user.
           </DialogDescription>
         </DialogHeader>
         <form>
@@ -1167,7 +1126,7 @@ function UploadPropertyImages({
             getInputProps={getInputProps}
             isDragActive={isDragActive}
           />
-          <div className="mt-4 flex  items-center justify-center">
+          <div className="mt-4 flex items-center justify-center">
             <Button
               type="button"
               className="mr-2 w-2/5"
@@ -1183,7 +1142,10 @@ function UploadPropertyImages({
               disabled={loading}
             >
               {loading ? (
-                <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                <span className="flex items-center">
+                  <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                  Uploading...
+                </span>
               ) : (
                 "Upload"
               )}
@@ -1195,18 +1157,43 @@ function UploadPropertyImages({
             <CardHeader>
               <CardTitle>Preview</CardTitle>
             </CardHeader>
-            <CardContent className="flex items-center gap-2">
-              {!files.length
-                ? "No preview available"
-                : files?.map((file) => (
+            <CardContent className="flex flex-wrap gap-2">
+              {!files.length ? (
+                "No preview available"
+              ) : (
+                files.map((file) => (
+                  <div key={file.name} className="relative group">
                     <Image
-                      key={file?.name}
-                      src={file?.preview}
-                      height={60}
-                      width={60}
-                      alt=""
+                      src={file.preview}
+                      height={80}
+                      width={80}
+                      alt="Preview"
+                      className="rounded-md object-cover"
                     />
-                  ))}
+                    {/* Cross (Remove) Icon */}
+                    <button
+                      type="button"
+                      onClick={() => removeFile(file.name)}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                  </div>
+                ))
+              )}
             </CardContent>
           </Card>
         </div>

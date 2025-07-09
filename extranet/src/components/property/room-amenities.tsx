@@ -187,7 +187,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
         coffeeMaker: !!data.coffeeMaker,
       },
       safetySecurity: {
-        cctv: !!data.cctv,
+        // cctv: !!data.cctv,
         smokeDetectors: !!data.smokeDetectors,
         fireExtinguisher: !!data.fireExtinguisher,
       },
@@ -237,7 +237,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
       toast.success("Room amenities submitted successfully!");
       onNext();
 
-      router.push("/app/property");
+      router.push("/app/property/single");
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setFormLoading(false);
@@ -624,7 +624,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                   <AccordionTrigger>Security Amenities</AccordionTrigger>
                   <AccordionContent>
                     <div>
-                      <div className="flex items-center space-x-2 mb-2">
+                      {/* <div className="flex items-center space-x-2 mb-2">
                         <Checkbox
                           id="cctv"
                           checked={roomDetails?.cctv}
@@ -640,7 +640,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                         >
                           CCTV
                         </Label>
-                      </div>
+                      </div> */}
                       <div className="flex items-center space-x-2 mb-2">
                         <Checkbox
                           id="smokeDetectors"
@@ -883,7 +883,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
               className="lg:w-[180px] md:w-[120px] w-[100px]"
               type="submit"
             >
-              Next
+              Submit
             </Button>
           </div>
         </div>
