@@ -110,30 +110,13 @@ function Offers() {
   const handleSaveOffer = async (offerData: Partial<Notification>) => {
     try {
       if (modalState.mode === 'create') {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/notification/create-notification`,
-          {
-            title: offerData.title,
-            body: offerData.body,
-            data: {
-              type: offerData.data?.type || 'Promotional',
-              offerCode: offerData.data?.offerCode || ''
-            }
-          }
-        );
+        const newOffer = {
+          ...offerData,
+          createdBy: `${user?.firstName} ${user?.lastName}`
+        } as Notification;
 
-        if (response.data?.offer) {
-          const newOffer = {
-            ...offerData,
-            id: response.data.offer._id,
-            createdAt: response.data.offer.createdAt,
-            updatedAt: response.data.offer.createdAt,
-            createdBy: `${user?.firstName} ${user?.lastName}`
-          } as Notification;
-
-          setOffers(prev => [newOffer, ...prev]);
-          toast.success('Notification created successfully!');
-        }
+        setOffers(prev => [newOffer, ...prev]);
+        toast.success('Notification created successfully!');
       }
       setModalState(prev => ({ ...prev, isOpen: false }));
     } catch (error) {

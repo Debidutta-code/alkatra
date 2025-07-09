@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar, Eye, Send, BadgePercent, FileText, User } from 'lucide-react';
+import React, { useState } from 'react';
+import { Calendar, Eye, Send, BadgePercent, FileText } from 'lucide-react';
 import { Notification } from '../types/notification';
-import { useSelector, useDispatch, RootState } from '../../../../redux/store';
-import { getUser } from '../../../../redux/slices/authSlice';
+import { useSelector, RootState } from '../../../../redux/store';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
@@ -13,50 +12,8 @@ interface OfferCardProps {
 }
 
 export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
-  const [offerDetails, setOfferDetails] = useState<Notification>(offer);
-  const [loading, setLoading] = useState(false);
   const [publishing, setPublishing] = useState(false);
-  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    const fetchOffer = async () => {
-      try {
-        if (!user?.id || !isAuthenticated) {
-          await dispatch(getUser());
-          return;
-        }
-
-        setLoading(true);
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/notification/get-notification`
-        );
-
-        const fetchedOffer = response.data.offers[0];
-        setOfferDetails({
-          id: fetchedOffer._id,
-          title: fetchedOffer.title,
-          body: fetchedOffer.body,
-          data: {
-            type: fetchedOffer.data.type,
-            offerCode: fetchedOffer.data.offerCode,
-            _id: fetchedOffer.data._id
-          },
-          createdAt: fetchedOffer.createdAt,
-          updatedAt: fetchedOffer.createdAt,
-          createdBy: `${user.firstName} ${user.lastName}`
-        });
-      } catch (error: any) {
-        if (error.response?.status !== 404) {
-          toast.error('Failed to fetch notification details');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOffer();
-  }, [offer.id, dispatch, user, isAuthenticated]);
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const handlePublish = async () => {
     if (!user?.id) {
@@ -69,11 +26,11 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/notification/send-notification`,
         {
-          title: offerDetails.title,
-          body: offerDetails.body,
+          title: offer.title,
+          body: offer.body,
           data: {
-            type: offerDetails.data.type,
-            offerCode: offerDetails.data.offerCode,
+            type: offer.data.type,
+            offerCode: offer.data.offerCode,
             userId: user.id
           }
         }
@@ -98,10 +55,10 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
             <h3 className="text-xl font-semibold text-gray-900 mb-1 truncate">
-              {offerDetails.title}
+              {offer.title}
             </h3>
             <p className="text-sm text-gray-600 line-clamp-2">
-              {offerDetails.body}
+              {offer.body}
             </p>
           </div>
         </div>
@@ -116,10 +73,6 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
               {offer.data.type || 'Promotional'} Type
             </span>
           </div>
-          {/* <div className="flex items-center text-sm text-gray-500">
-            <User className="h-4 w-4 mr-1" />
-            <span>Created by {offerDetails.createdBy}</span>
-          </div> */}
         </div>
       </div>
 
@@ -141,8 +94,8 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
             <div>
               <p className="text-sm font-medium text-gray-500">Created At</p>
               <p className="text-sm text-gray-900">
-                {offerDetails.createdAt ? (
-                  format(new Date(offerDetails.createdAt), 'PPP')
+                {offer.createdAt ? (
+                  format(new Date(offer.createdAt), 'PPP')
                 ) : (
                   'No date available'
                 )}
@@ -157,20 +110,20 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onView }) => {
         <div className="flex justify-end space-x-3">
           <button
             onClick={handlePublish}
-            disabled={publishing || loading}
-            className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${publishing ? 'opacity-70 cursor-not-allowed' : ''
-              }`}
+            disabled={publishing}
+            className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${
+              publishing ? 'opacity-70 cursor-not-allowed' : ''
+            }`}
           >
             <Send className="-ml-1 mr-2 h-4 w-4" />
             {publishing ? 'Sending...' : 'Send Notification'}
           </button>
           <button
-            onClick={() => onView(offerDetails)}
-            disabled={loading}
+            onClick={() => onView(offer)}
             className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             <Eye className="-ml-1 mr-2 h-4 w-4" />
-            {loading ? 'Loading...' : 'View Details'}
+            View Details
           </button>
         </div>
       </div>
