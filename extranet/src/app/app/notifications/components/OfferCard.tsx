@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Eye, Send, BadgePercent, FileText, User } from 'lucide-react';
-import { Notification } from '../types/offer';
+import { Notification } from '../types/notification';
 import { useSelector, useDispatch, RootState } from '../../../../redux/store';
 import { getUser } from '../../../../redux/slices/authSlice';
 import axios from 'axios';

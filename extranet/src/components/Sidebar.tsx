@@ -94,7 +94,7 @@ export default function AppSidebar({ role }: { role?: string }) {
     },
     {
       title: "Notifications",
-      href: "/app/offers",
+      href: "/app/notifications",
       icon: Crown,
     },
     {
