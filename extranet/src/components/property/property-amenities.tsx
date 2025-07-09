@@ -46,7 +46,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { RootState, useSelector } from "../../redux/store";
 
 const createPropertyAmenitiesSchema = z.object({
-  destination_type: z.string().min(1, "Destination type is required"),
+  // destination_type: z.string().min(1, "Destination type is required"),
   property_type: z.string().min(1, "Property type is required"),
   no_of_rooms_available: z.string().min(1, "No of rooms is required"),
   wifi: z.boolean(),

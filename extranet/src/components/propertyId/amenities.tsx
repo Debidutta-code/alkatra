@@ -70,7 +70,7 @@ interface AmenityData {
 }
 
 // Define the EditedAmenity interface
-interface EditedAmenity extends AmenityData {}
+interface EditedAmenity extends AmenityData { }
 
 // Define a type for the keys of the amenities
 type AmenityKeys = keyof AmenityData["amenities"];
@@ -247,13 +247,13 @@ export function Amenities({
       const selectedAmenities = Object.fromEntries(
         Object.entries(data.amenities).filter(([key, value]) => value === true)
       );
- if (Object.keys(selectedAmenities).length === 0) {
+      if (Object.keys(selectedAmenities).length === 0) {
         setAmenityError("Please select at least one amenity.");
         toast.error("Please select at least one amenity.");
         setIsSubmitting(false);
         return;
       }
-      setAmenityError(null); 
+      setAmenityError(null);
       const newData = {
         destination_type: selectedDestinationType || data.destination_type,
         property_type: selectedPropertyType || data.property_type,
@@ -308,161 +308,157 @@ export function Amenities({
   ) => (
     <div className="max-h-[90vh] overflow-y-auto px-4">
       <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-4">
-      <div className="grid grid-cols-1 gap-2 ">
-        <div className="space-y-1.5">
-          <Label htmlFor="destination_type">
-            Destination Type <span className="text-destructive">*</span>
-          </Label>
-          <Select
-            {...register("destination_type", {
-              required: "Destination type is required",
-            })}
-            onValueChange={(value) => {
-              setSelectedDestinationType(value);
-              setValue("destination_type", value);
-              clearErrors("destination_type"); // ✅ Clear error here
-            }}
-            value={selectedDestinationType}
-            defaultValue={amenity?.destination_type}
+        <div className="grid grid-cols-1 gap-2 ">
+          <div className="space-y-1.5">
+            <Label htmlFor="destination_type">Destination Type</Label>
+            <Select
+              {...register("destination_type")}
+              onValueChange={(value) => {
+                setSelectedDestinationType(value);
+                setValue("destination_type", value);
+                clearErrors("destination_type");
+              }}
+              value={selectedDestinationType}
+              defaultValue={amenity?.destination_type}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Destination Type" />
+              </SelectTrigger>
+              <SelectContent>
+                {destinationTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.destination_type && (
+              <p className="text-destructive text-sm mt-1">
+                {errors.destination_type.message}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="property_type">
+              Property Type <span className="text-destructive">*</span>
+            </Label>
+            <Select
+              {...register("property_type", {
+                required: "Property type is required",
+              })}
+              onValueChange={(value) => {
+                setSelectedPropertyType(value);
+                setValue("property_type", value);
+                clearErrors("property_type"); // ✅ Clear error here
+              }}
+              value={selectedPropertyType}
+              defaultValue={amenity?.property_type}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Property Type" />
+              </SelectTrigger>
+              <SelectContent>
+                {propertyTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.property_type && (
+              <p className="text-destructive text-sm mt-1">
+                {errors.property_type.message}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="no_of_rooms_available">
+              Rooms Available <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="no_of_rooms_available"
+              {...register("no_of_rooms_available", {
+                required: "Rooms Available is required",
+                valueAsNumber: true,
+              })}
+              type="number"
+              min={0}
+              placeholder="Total No. of Rooms Available"
+              defaultValue={amenity?.no_of_rooms_available}
+            />
+            {errors.no_of_rooms_available && (
+              <p className="text-destructive text-sm mt-1">
+                {errors.no_of_rooms_available.message}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div >
+          <h3 className="text-base font-medium mb-3">Available Amenities</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {AmenityData.map((amenity) => (
+              <div key={amenity} className="flex items-center space-x-2">
+                <Checkbox
+                  id={amenity}
+                  checked={watch(`amenities.${amenity}`) || false}
+                  onCheckedChange={(value: boolean) => {
+                    setValue(`amenities.${amenity}`, value);
+                    const isAnyAmenitySelected = AmenityData.some((key) =>
+                      key === amenity ? value : watch(`amenities.${key}`)
+                    );
+
+                    if (isAnyAmenitySelected) {
+                      setAmenityError(null);
+                    }
+                  }}
+                />
+                <label
+                  htmlFor={amenity}
+                  className="text-sm font-medium leading-none flex items-center"
+                >
+                  {amenityIcons[amenity]}
+                  {amenity
+                    .split("_")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ")}
+                </label>
+              </div>
+            ))}
+          </div>
+          {amenityError && (
+            <p className="text-destructive text-sm mt-1">{amenityError}</p>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button
+            type="button"
+            onClick={() =>
+              formTitle === "Create Amenities"
+                ? setShowCreateModal(false)
+                : handleAmenityEditClick()
+            }
+            className="mt-2 md:mt-0"
+            variant="outline"
+            disabled={isSubmitting}
           >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select Destination Type" />
-            </SelectTrigger>
-            <SelectContent>
-              {destinationTypes.map((type) => (
-                <SelectItem key={type} value={type}>
-                  {type}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.destination_type && (
-            <p className="text-destructive text-sm mt-1">
-              {errors.destination_type.message}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="property_type">
-            Property Type <span className="text-destructive">*</span>
-          </Label>
-          <Select
-            {...register("property_type", {
-              required: "Property type is required",
-            })}
-            onValueChange={(value) => {
-              setSelectedPropertyType(value);
-              setValue("property_type", value);
-              clearErrors("property_type"); // ✅ Clear error here
-            }}
-            value={selectedPropertyType}
-            defaultValue={amenity?.property_type}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select Property Type" />
-            </SelectTrigger>
-            <SelectContent>
-              {propertyTypes.map((type) => (
-                <SelectItem key={type} value={type}>
-                  {type}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.property_type && (
-            <p className="text-destructive text-sm mt-1">
-              {errors.property_type.message}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="no_of_rooms_available">
-            Rooms Available <span className="text-destructive">*</span>
-          </Label>
-          <Input
-            id="no_of_rooms_available"
-            {...register("no_of_rooms_available", {
-              required: "Rooms Available is required",
-              valueAsNumber: true,
-            })}
-            type="number"
-            min={0}
-            placeholder="Total No. of Rooms Available"
-            defaultValue={amenity?.no_of_rooms_available}
-          />
-          {errors.no_of_rooms_available && (
-            <p className="text-destructive text-sm mt-1">
-              {errors.no_of_rooms_available.message}
-            </p>
-          )}
-        </div>
-      </div>
-
-      <div >
-        <h3 className="text-base font-medium mb-3">Available Amenities</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {AmenityData.map((amenity) => (
-            <div key={amenity} className="flex items-center space-x-2">
-              <Checkbox
-                id={amenity}
-                checked={watch(`amenities.${amenity}`) || false}
-                onCheckedChange={(value: boolean) => {
-                  setValue(`amenities.${amenity}`, value);
-                  const isAnyAmenitySelected = AmenityData.some((key) =>
-                    key === amenity ? value : watch(`amenities.${key}`)
-                  );
-
-                  if (isAnyAmenitySelected) {
-                    setAmenityError(null);
-                  }
-                }}
-              />
-              <label
-                htmlFor={amenity}
-                className="text-sm font-medium leading-none flex items-center"
-              >
-                {amenityIcons[amenity]}
-                {amenity
-                  .split("_")
-                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                  .join(" ")}
-              </label>
-            </div>
-          ))}
-        </div>
-        {amenityError && (
-          <p className="text-destructive text-sm mt-1">{amenityError}</p>
-        )}
-      </div>
-
-      <DialogFooter>
-        <Button
-          type="button"
-          onClick={() =>
-            formTitle === "Create Amenities"
-              ? setShowCreateModal(false)
-              : handleAmenityEditClick()
-          }
-          className="mt-2 md:mt-0"
-          variant="outline"
-          disabled={isSubmitting}
-        >
-          Cancel
-        </Button>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? (
-            <span className="flex items-center">
-              <span className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
-              {formTitle === "Create Amenities" ? "Creating..." : "Updating..."}
-            </span>
-          ) : (
-            submitButtonText
-          )}
-        </Button>
-      </DialogFooter>
-    </form>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <span className="flex items-center">
+                <span className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                {formTitle === "Create Amenities" ? "Creating..." : "Updating..."}
+              </span>
+            ) : (
+              submitButtonText
+            )}
+          </Button>
+        </DialogFooter>
+      </form>
     </div>
   );
 

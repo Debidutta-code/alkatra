@@ -74,16 +74,16 @@ export default function AppSidebar({ role }: { role?: string }) {
       icon: LayoutDashboard,
     },
     {
-      title: "Grouped Properties",
+      title: "Hotel Groups",
       href: "/app/property/grouped",
       icon: Layers,
-      restricted: role !== "superAdmin" && role !== "groupManager"
+      restricted: role !== "superAdmin" 
     },
     {
-      title: "Direct Properties",
+      title: "Hotels",
       href: "/app/property/single",
       icon: Building2,
-      restricted: role !== "superAdmin"
+      restricted: role !== "superAdmin"&& role !== "groupManager"
     },
     {
       title: `${propertyId.status?`${propertyId?.name}`:"No Property Available"}`,

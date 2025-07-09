@@ -103,7 +103,7 @@ export const login = (data: { email: string; password: string }) =>
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
         const message = error.response?.data?.message || "Login failed";
-        toast.error(message);
+        // toast.error(message);
       } else {
         toast.error("An unexpected error occurred");
       }

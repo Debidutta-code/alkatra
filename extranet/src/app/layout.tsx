@@ -21,7 +21,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "TripSwift - Property Management System",
+  title: "Al Hajz - Extranet",
   description: "Complete solution for managing your property bookings, rates, and revenue",
   keywords: [
     "property management",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     "revenue management"
   ],
   authors: [
-    { name: "TripSwift Team" }
+    { name: "Al Hajz Team" }
   ],
   icons: {
     icon: "/favicon.ico",
