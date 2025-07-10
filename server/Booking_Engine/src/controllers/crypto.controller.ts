@@ -403,7 +403,7 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
       numberOfRooms: guestDetails.numberOfRooms,
       roomTypeCode: guestDetails.roomTypeCode,
       roomTotalPrice: guestDetails.totalAmount,
-      currencyCode: guestDetails.currencyCode,
+      currencyCode: guestDetails.currencyCode.toUpperCase(),
       email: guestDetails.email,
       phone: guestDetails.phone,
       guests: guestDetails.guestDetails ?? [],

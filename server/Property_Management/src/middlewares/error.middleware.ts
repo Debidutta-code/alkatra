@@ -58,6 +58,11 @@ export const errorHandler: ErrorRequestHandler = (
   res: Response,
   _next: NextFunction
 ) => {
+  // Avoid sending response twice
+  if (res.headersSent) {
+    return;
+  }
+
   err.statusCode = +err.statusCode || 500;
   err.status = err.status || "error";
 
@@ -65,6 +70,7 @@ export const errorHandler: ErrorRequestHandler = (
     sendDevError(err, res);
   } else if (process.env.NODE_ENV === "production") {
     let error = { ...err };
+
     if (error.name === "CastError") error = handleCastError(error);
     if (error.code === 11000) error = handleDuplicateFieldsError(error);
     if (error.name === "ValidationError") error = handleValidationError(error);
@@ -72,6 +78,8 @@ export const errorHandler: ErrorRequestHandler = (
       error = handleTokenExpiredError(error);
     if (error.name === "JsonWebTokenError")
       error = handleJsonWebTokenError(error);
+
     sendProdError(error, res);
   }
 };
+

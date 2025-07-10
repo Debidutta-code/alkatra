@@ -24,14 +24,14 @@ class EmailService {
 
     const msg = {
       to,
-      from: senderEmail , // Must be verified in SendGrid
+      from: senderEmail , 
       subject,
       ...(text && { text }),
       ...(html && { html }),
     };
 
     try {
-      await sgMail.send(msg as any); // Cast to `any` to bypass strict internal type
+      await sgMail.send(msg as any); 
       console.log(`✅ Email sent to ${to}`);
     } catch (error: any) {
       console.error('❌ SendGrid Error:', error.response?.body || error.message);
