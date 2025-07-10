@@ -14,17 +14,30 @@ export class TwilioService {
   }
 
   async sendSMS(to: string, message: string): Promise<void> {
-    try {
-      const result = await this.client.messages.create({
-        body: message,
-        from: this.from,
-        to,
-      });
+    const mode = process.env.MODE;
+    if (!mode) {
+      console.error("❌ MODE is not defined in .env");
+      return;
+    }
 
-      console.log('✅ SMS sent:', result.sid);
-    } catch (error) {
-      console.error('❌ Failed to send SMS:', error);
-      throw error;
+    if (mode === 'development') {
+      console.log(`🛑 Skipped sending SMS in development mode: To=${to}, Message="${message}"`);
+      return;
+    }
+    else if (mode === 'production') {
+      try {
+        const result = await this.client.messages.create({
+          body: message,
+          from: this.from,
+          to,
+        });
+
+        console.log('✅ SMS sent:', result.sid);
+      } catch (error) {
+        console.error('❌ Failed to send SMS:', error);
+        throw error;
+      }
     }
   }
 }
+

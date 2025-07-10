@@ -18,6 +18,7 @@ import { AmendReservationInput } from "../../../wincloud/src/interface/amendRese
 import { CryptoGuestDetails } from "../models/cryptoUserPaymentInitialStage.model";
 import EmailService from '../../../Customer-Authentication/src/services/email.service';
 import Handlebars from "handlebars";
+import { Inventory } from "../../../wincloud/src/model/inventoryModel";
 
 
 const calculateAgeCategory = (dob: string) => {
@@ -34,6 +35,234 @@ const calculateAgeCategory = (dob: string) => {
   if (age <= 12) return { age, category: "Child", ageCode: "8" };
   return { age, category: "Adult", ageCode: "10" };
 };
+
+const reduceRoomsAfterBookingConfirmed = async (
+  res: Response,
+  hotelCode: string,
+  roomTypeCode: string,
+  numberOfRooms: number,
+  dates: Date[]
+) => {
+  console.log(`Get data for reduce rooms ${hotelCode} | ${roomTypeCode} | ${numberOfRooms} | ${dates}`);
+
+  const requiredFields = { hotelCode, roomTypeCode, numberOfRooms, dates };
+  const missingFields = Object.entries(requiredFields)
+    .filter(([key, value]) => value === undefined || value === null || value === "" || (key === 'startDate' && (!Array.isArray(value) || value.length !== 2)))
+    .map(([key]) => key);
+
+  if (missingFields.length > 0) {
+    return {
+      message: `Missing required fields: ${missingFields.join(", ")}`,
+    };
+  }
+
+  const [checkInDate, checkOutDate] = dates;
+
+  if (checkInDate > checkOutDate) {
+    return{
+      message: "Check-in date must be before or equal to check-out date",
+    };
+  }
+
+  try {
+    const inventoryRecords = await Inventory.find({
+      hotelCode,
+      invTypeCode: roomTypeCode,
+      'availability.startDate': {
+        $gte: new Date(checkInDate),
+        $lte: new Date(checkOutDate),
+      },
+    });
+
+    if (!inventoryRecords || inventoryRecords.length === 0) {
+      return{ message: "No available rooms found for the specified criteria" };
+    }
+
+    const bulkOps = [];
+
+    for (const item of inventoryRecords) {
+      const currentCount = item.availability?.count || 0;
+      if (currentCount < numberOfRooms) {
+        return{
+          message: `Not enough rooms for date ${item.availability?.startDate}. Available: ${currentCount}, requested: ${numberOfRooms}`,
+        };
+      }
+
+      const newCount = currentCount - numberOfRooms;
+
+      bulkOps.push({
+        updateOne: {
+          filter: { _id: item._id },
+          update: {
+            $set: {
+              'availability.count': newCount,
+              updatedAt: new Date(),
+            },
+          },
+        },
+      });
+    }
+
+    const result = await Inventory.bulkWrite(bulkOps);
+
+    return{
+      message: "Room counts reduced successfully for booking",
+      result,
+    };
+
+  } catch (error: any) {
+    console.error("❌ Error reducing rooms after booking confirmed:", error.message || error);
+    return { message: "Failed to reduce rooms after booking confirmed" };
+  }
+};
+
+const reduceRoomsAfterBookingConfirmedCrypto = async (
+  hotelCode: string,
+  roomTypeCode: string,
+  numberOfRooms: number,
+  dates: Date[]
+): Promise<{ message: string; result: any }> => {
+  console.log(`(Crypto) Reduce rooms: ${hotelCode} | ${roomTypeCode} | ${numberOfRooms} | ${dates}`);
+
+  const requiredFields = { hotelCode, roomTypeCode, numberOfRooms, dates };
+  const missingFields = Object.entries(requiredFields)
+    .filter(([_, value]) =>
+      value === undefined ||
+      value === null ||
+      value === "" ||
+      (Array.isArray(dates) && dates.length !== 2)
+    )
+    .map(([key]) => key);
+
+  if (missingFields.length > 0) {
+    throw new Error(`Missing required fields: ${missingFields.join(", ")}`);
+  }
+
+  const [checkInDate, checkOutDate] = dates;
+
+  if (checkInDate > checkOutDate) {
+    throw new Error("Check-in date must be before or equal to check-out date");
+  }
+
+  const inventoryRecords = await Inventory.find({
+    hotelCode,
+    invTypeCode: roomTypeCode,
+    'availability.startDate': {
+      $gte: new Date(checkInDate),
+      $lte: new Date(checkOutDate),
+    },
+  });
+
+  if (!inventoryRecords || inventoryRecords.length === 0) {
+    throw new Error("No available rooms found for the specified criteria");
+  }
+
+  const bulkOps = [];
+
+  for (const item of inventoryRecords) {
+    const currentCount = item.availability?.count || 0;
+    if (currentCount < numberOfRooms) {
+      throw new Error(
+        `Not enough rooms for date ${item.availability?.startDate}. Available: ${currentCount}, requested: ${numberOfRooms}`
+      );
+    }
+
+    const newCount = currentCount - numberOfRooms;
+
+    bulkOps.push({
+      updateOne: {
+        filter: { _id: item._id },
+        update: {
+          $set: {
+            'availability.count': newCount,
+            updatedAt: new Date(),
+          },
+        },
+      },
+    });
+  }
+
+  const result = await Inventory.bulkWrite(bulkOps);
+  return {
+    message: "Room counts reduced successfully for booking (Crypto)",
+    result,
+  };
+};
+
+const increaseRoomsAfterBookingCancelled = async (
+  res: Response,
+  hotelCode: string,
+  roomTypeCode: string,
+  numberOfRooms: number,
+  dates: Date[]
+) => {
+  console.log(`Get data to increase rooms ${hotelCode} | ${roomTypeCode} | ${numberOfRooms} | ${dates}`);
+
+  const requiredFields = { hotelCode, roomTypeCode, numberOfRooms, dates };
+  const missingFields = Object.entries(requiredFields)
+    .filter(([key, value]) => value === undefined || value === null || value === "" || (key === 'startDate' && (!Array.isArray(value) || value.length !== 2)))
+    .map(([key]) => key);
+
+  if (missingFields.length > 0) {
+    return {
+      message: `Missing required fields: ${missingFields.join(", ")}`,
+    }
+  }
+
+  const [checkInDate, checkOutDate] = dates;
+
+  if (checkInDate > checkOutDate) {
+    return {
+      message: "Check-in date must be before or equal to check-out date",
+    };
+  }
+
+  try {
+    const inventoryRecords = await Inventory.find({
+      hotelCode,
+      invTypeCode: roomTypeCode,
+      'availability.startDate': {
+        $gte: new Date(checkInDate),
+        $lte: new Date(checkOutDate),
+      },
+    });
+
+    if (!inventoryRecords || inventoryRecords.length === 0) {
+      return { message: "No matching room inventory records found for the given dates." };
+    }
+
+    const bulkOps = [];
+
+    for (const item of inventoryRecords) {
+      const currentCount = item.availability?.count || 0;
+      const newCount = currentCount + numberOfRooms;
+
+      bulkOps.push({
+        updateOne: {
+          filter: { _id: item._id },
+          update: {
+            $set: {
+              'availability.count': newCount,
+              updatedAt: new Date(),
+            },
+          },
+        },
+      });
+    }
+
+    const result = await Inventory.bulkWrite(bulkOps);
+
+    return {
+      message: "Room counts increased successfully after cancellation.",
+      result,
+    };
+
+  } catch (error: any) {
+    console.error("❌ Error increasing rooms after booking cancellation:", error.message || error);
+    throw new Error(`Failed to increase rooms after booking cancellation: ${error.message}`);
+  }
+};
+
 
 // New controller function to create a reservation with stored card (Pay at Hotel)
 export const createReservationWithStoredCard = CatchAsyncError(
@@ -154,6 +383,23 @@ export const createReservationWithStoredCard = CatchAsyncError(
     try {
       const thirdPartyService = new ThirdPartyReservationService();
       await thirdPartyService.processThirdPartyReservation(reservationInput);
+      try {
+        const reduceRoomResult = await reduceRoomsAfterBookingConfirmed(
+          res,
+          hotelCode,
+          roomTypeCode,
+          numberOfRooms,
+          [checkIn, checkOutDate]
+        );
+        if (!reduceRoomResult) {
+          return res.status(400).json({ message: "Failed to reduce rooms" });
+        }
+      } catch (error) {
+        if (error) {
+          const errorMessage = error instanceof Error ? error.message : "Failed to reduce rooms";
+          return res.status(400).json({ message: errorMessage });
+        }        
+      }
       try {
         const htmlContent = `<!DOCTYPE html>
         <html lang="en">
@@ -335,23 +581,23 @@ export const createReservationWithStoredCard = CatchAsyncError(
         </html>`;
 
         const templateData = {
-          guestName: `${guests[0].firstName} ${guests[0].lastName}`, // Primary guest name
+          guestName: `${guests[0].firstName} ${guests[0].lastName}`,
           hotelName: hotelName,
-          checkInDate: new Date(checkInDate).toLocaleDateString(), // Format date
-          checkOutDate: new Date(checkOutDate).toLocaleDateString(), // Format date
+          checkInDate: new Date(checkInDate).toLocaleDateString(),
+          checkOutDate: new Date(checkOutDate).toLocaleDateString(),
           roomTypeCode: roomTypeCode,
           numberOfRooms: numberOfRooms,
           roomTotalPrice: roomTotalPrice,
           currencyCode: currencyCode,
           email: email,
           phone: phone,
-          guests: categorizedGuests, // Array of guests w
-          supportEmail: 'support@alhajz.com', // Replace with actual support email
-          supportPhone: '+1-800-123-4567', // Replace with actual support phone
-          websiteUrl: 'https://book.trip-swift.ai.com/', // Replace with actual website URL
+          guests: categorizedGuests,
+          supportEmail: 'support@alhajz.com',
+          supportPhone: '+1-800-123-4567',
+          websiteUrl: 'https://book.trip-swift.ai',
           currentYear: new Date().getFullYear(),
-          companyName: 'Al-Hajz', // Replace with actual company name
-          companyAddress: '1234 Example St, City, Country', // Replace with actual address
+          companyName: 'Al-Hajz',
+          companyAddress: '1234 Example St, City, Country',
         };
 
         // Compile the Handlebars template
@@ -464,6 +710,12 @@ export async function createReservationWithCryptoPayment(input: {
 
     const thirdPartyService = new ThirdPartyReservationService();
     await thirdPartyService.processThirdPartyReservation(reservationInput);
+    await reduceRoomsAfterBookingConfirmedCrypto(
+      hotelCode,
+      roomTypeCode,
+      numberOfRooms,
+      [checkIn, checkOut]
+    );
 
     const htmlContent = `<!DOCTYPE html>
         <html lang="en">
@@ -655,12 +907,12 @@ export async function createReservationWithCryptoPayment(input: {
       email,
       phone,
       guests: categorizedGuests,
-      ssupportEmail: 'support@alhajz.com', // Replace with actual support email
-      supportPhone: '+1-800-123-4567', // Replace with actual support phone
-      websiteUrl: 'https://book.trip-swift.ai.com/', // Replace with actual website URL
+      supportEmail: 'support@alhajz.com',
+      supportPhone: '+1-800-123-4567',
+      websiteUrl: 'https://book.trip-swift.ai',
       currentYear: new Date().getFullYear(),
-      companyName: 'Al-Hajz', // Replace with actual company name
-      companyAddress: '1234 Example St, City, Country', // Replace with actual address
+      companyName: 'Al-Hajz',
+      companyAddress: '1234 Example St, City, Country',
     };
 
     const template = Handlebars.compile(htmlContent);
@@ -795,6 +1047,7 @@ export const updateThirdPartyReservation = CatchAsyncError(
       try {
         const thirdPartyService = new ThirdPartyAmendReservationService();
         await thirdPartyService.processAmendReservation(amendReservationInput);
+        await reduceRoomsAfterBookingConfirmed(res, hotelCode, roomTypeCode, numberOfRooms, [checkIn, checkOutDate]);
         const htmlContent = `<!DOCTYPE html>
 <html lang="en">
 
@@ -996,12 +1249,12 @@ export const updateThirdPartyReservation = CatchAsyncError(
           email,
           phone,
           guests: categorizedGuests,
-          supportEmail: 'support@alhajz.com', // Replace with actual support email
-          supportPhone: '+1-800-123-4567', // Replace with actual support phone
-          websiteUrl: 'https://book.trip-swift.ai.com/', // Replace with actual website URL
+          supportEmail: 'support@alhajz.com', 
+          supportPhone: '+1-800-123-4567', 
+          websiteUrl: 'https://book.trip-swift.ai', 
           currentYear: new Date().getFullYear(),
-          companyName: 'Al-Hajz', // Replace with actual company name
-          companyAddress: '1234 Example St, City, Country', // Replace with actual address
+          companyName: 'Al-Hajz', 
+          companyAddress: '1234 Example St, City, Country',
         };
 
         const template = Handlebars.compile(htmlContent);
@@ -1078,148 +1331,149 @@ export const cancelThirdPartyReservation = CatchAsyncError(
       try {
         const thirdPartyService = new ThirdPartyCancelReservationService();
         const result = await thirdPartyService.processCancelReservation(cancelReservationInput);
+        await increaseRoomsAfterBookingCancelled(res, hotelCode, existingReservation.roomTypeCode, existingReservation.numberOfRooms, [checkInDate, checkOutDate]);
 
         const htmlContent = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 500px;
-            margin: 20px auto;
-            background-color: #ffffff;
-            border-radius: 6px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .header {
-            background-color: #d32f2f;
-            color: #ffffff;
-            padding: 15px;
-            text-align: center;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 20px;
-        }
-        .content {
-            padding: 15px;
-        }
-        .content p {
-            color: #666666;
-            line-height: 1.5;
-            margin: 8px 0;
-            font-size: 14px;
-        }
-        .details-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-        }
-        .details-table th,
-        .details-table td {
-            padding: 8px;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .details-table th {
-            background-color: #f8f8f8;
-            color: #333333;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        .details-table td {
-            color: #666666;
-            font-size: 14px;
-        }
-        .button {
-            display: inline-block;
-            padding: 8px 16px;
-            margin: 15px 0;
-            background-color: #d32f2f;
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        .footer {
-            background-color: #f4f4f4;
-            padding: 10px;
-            text-align: center;
-            color: #888888;
-            font-size: 12px;
-        }
-        @media only screen and (max-width: 500px) {
-            .container {
-                width: 100%;
-                margin: 10px;
-            }
-            .header h1 {
-                font-size: 18px;
-            }
-            .content p {
-                font-size: 13px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Booking Cancellation Confirmation</h1>
-        </div>
-        <div class="content">
-            <p>Dear {{guestName}},</p>
-            <p>Your reservation with {{hotelName}} has been successfully cancelled. Below are the details of the cancelled booking.</p>
-            <table class="details-table">
-                <tr>
-                    <th>Reservation ID</th>
-                    <td>{{reservationId}}</td>
-                </tr>
-                <tr>
-                    <th>Hotel Name</th>
-                    <td>{{hotelName}}</td>
-                </tr>
-                <tr>
-                    <th>Check-In Date</th>
-                    <td>{{checkInDate}}</td>
-                </tr>
-                <tr>
-                    <th>Check-Out Date</th>
-                    <td>{{checkOutDate}}</td>
-                </tr>
-            </table>
-            <p>If you have any questions or need assistance, please contact us at <a href="mailto:{{supportEmail}}">{{supportEmail}}</a> or call {{supportPhone}}.</p>
-            <a href="{{websiteUrl}}" class="button">Visit Our Website</a>
-        </div>
-        <div class="footer">
-            <p>© {{currentYear}} {{companyName}}. All rights reserved.</p>
-            <p>{{companyAddress}}</p>
-        </div>
-    </div>
-</body>
-</html>`;
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #f4f4f4;
+                    margin: 0;
+                    padding: 0;
+                }
+                .container {
+                    max-width: 500px;
+                    margin: 20px auto;
+                    background-color: #ffffff;
+                    border-radius: 6px;
+                    overflow: hidden;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                }
+                .header {
+                    background-color: #d32f2f;
+                    color: #ffffff;
+                    padding: 15px;
+                    text-align: center;
+                }
+                .header h1 {
+                    margin: 0;
+                    font-size: 20px;
+                }
+                .content {
+                    padding: 15px;
+                }
+                .content p {
+                    color: #666666;
+                    line-height: 1.5;
+                    margin: 8px 0;
+                    font-size: 14px;
+                }
+                .details-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 15px 0;
+                }
+                .details-table th,
+                .details-table td {
+                    padding: 8px;
+                    text-align: left;
+                    border-bottom: 1px solid #e0e0e0;
+                }
+                .details-table th {
+                    background-color: #f8f8f8;
+                    color: #333333;
+                    font-weight: bold;
+                    font-size: 14px;
+                }
+                .details-table td {
+                    color: #666666;
+                    font-size: 14px;
+                }
+                .button {
+                    display: inline-block;
+                    padding: 8px 16px;
+                    margin: 15px 0;
+                    background-color: #d32f2f;
+                    color: #ffffff;
+                    text-decoration: none;
+                    border-radius: 4px;
+                    font-size: 14px;
+                    font-weight: bold;
+                }
+                .footer {
+                    background-color: #f4f4f4;
+                    padding: 10px;
+                    text-align: center;
+                    color: #888888;
+                    font-size: 12px;
+                }
+                @media only screen and (max-width: 500px) {
+                    .container {
+                        width: 100%;
+                        margin: 10px;
+                    }
+                    .header h1 {
+                        font-size: 18px;
+                    }
+                    .content p {
+                        font-size: 13px;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>Booking Cancellation Confirmation</h1>
+                </div>
+                <div class="content">
+                    <p>Dear {{guestName}},</p>
+                    <p>Your reservation with {{hotelName}} has been successfully cancelled. Below are the details of the cancelled booking.</p>
+                    <table class="details-table">
+                        <tr>
+                            <th>Hotel Name</th>
+                            <td>{{hotelName}}</td>
+                        </tr>
+                        <tr>
+                            <th>Check-In Date</th>
+                            <td>{{checkInDate}}</td>
+                        </tr>
+                        <tr>
+                            <th>Check-Out Date</th>
+                            <td>{{checkOutDate}}</td>
+                        </tr>
+                        <tr>
+                            <th>Amount</th>
+                            <td>{{amount}}</td>
+                        </tr>
+                    </table>
+                    <p>If you have any questions or need assistance, please contact us at <a href="mailto:{{supportEmail}}">{{supportEmail}}</a> or call {{supportPhone}}.</p>
+                    <a href="{{websiteUrl}}" class="button">Visit Our Website</a>
+                </div>
+                <div class="footer">
+                    <p>© {{currentYear}} {{companyName}}. All rights reserved.</p>
+                    <p>{{companyAddress}}</p>
+                </div>
+            </div>
+        </body>
+        </html>`;
 
         const templateData = {
           guestName: `${firstName} ${lastName}`,
           hotelName,
-          reservationId,
+          amount: `${existingReservation.totalAmount} ${existingReservation.currencyCode}`,
           checkInDate: new Date(checkInDate).toLocaleDateString(),
           checkOutDate: new Date(checkOutDate).toLocaleDateString(),
-          supportEmail: 'support@alhajz.com', // Replace with actual support email
-          supportPhone: '+1-800-123-4567', // Replace with actual support phone
-          websiteUrl: 'https://book.trip-swift.ai.com/', // Replace with actual website URL
+          supportEmail: 'support@alhajz.com', 
+          supportPhone: '+1-800-123-4567', 
+          websiteUrl: 'https://book.trip-swift.ai', 
           currentYear: new Date().getFullYear(),
-          companyName: 'Al-Hajz', // Replace with actual company name
-          companyAddress: '1234 Example St, City, Country', // Replace with actual address
+          companyName: 'Al-Hajz', 
+          companyAddress: '1234 Example St, City, Country',
         };
 
         const template = Handlebars.compile(htmlContent);

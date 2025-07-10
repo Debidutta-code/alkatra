@@ -24,28 +24,4 @@ export class InventoryRepository {
 
     return Inventory.bulkWrite(operations);
   }
-
-  // async createInventory(data: InventoryData): Promise<any> {
-  //   // console.log(`@@@@@@@@@@@@@@@@@@@@@@\nRepository Creating inventory for hotel: ${JSON.stringify(data, null, 2)}`);
-  //   // const inventory = new Inventory({
-  //   //   hotelCode: data.hotelCode,
-  //   //   // hotelName: data.hotelName,
-  //   //   invTypeCode: data.invTypeCode,
-  //   //   startDate: new Date(data.startDate),
-  //   //   endDate: new Date(data.endDate),
-  //   //   count: data.count,
-  //   // });
-
-  //   const inventory = new Inventory({
-  //     hotelCode: data.hotelCode,
-  //     invTypeCode: data.invTypeCode,
-  //     availability: {
-  //       startDate: new Date(data.availability.startDate),
-  //       endDate: new Date(data.availability.endDate),
-  //       count: data.availability.count,
-  //     }
-  //   });
-  //   const savedInventory = await inventory.save();
-  //   return savedInventory.toJSON();
-  // }
 }

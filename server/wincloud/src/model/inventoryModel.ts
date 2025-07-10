@@ -1,12 +1,12 @@
 import { Schema, model, Document } from 'mongoose';
 
-interface Availability {
+export interface Availability {
   startDate: Date;
   endDate: Date;
   count: number;
 }
 
-interface IInventory extends Document {
+export interface IInventory extends Document {
   hotelCode: string;
   hotelName: string;
   invTypeCode: string;

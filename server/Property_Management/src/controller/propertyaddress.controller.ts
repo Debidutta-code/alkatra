@@ -13,32 +13,43 @@ const createPropertyAddress = catchAsync(
       country,
       state,
       city,
-      location,
       landmark,
-      neighbour_area,
       zip_code,
     } = req.body;
+    console.log("req.body: ", req.body)
 
-    if (!req.body) {
-      next(new AppError("Please fill all the required fields", 400));
+    if (
+      !property_id ||
+      !address_line_1 ||
+      !country ||
+      !state ||
+      !city ||
+      !landmark ||
+      !zip_code
+    ) {
+      return next(new AppError("Please fill all the required fields", 400));
     }
 
     const newPropertyAddress = await PropertyAddress.create({
       property_id,
       address_line_1,
-      address_line_2,
+      address_line_2, 
       country,
       state,
       city,
-      location,
       landmark,
-      neighbour_area,
       zip_code: parseInt(zip_code),
     });
 
-    await PropertyInfo.findByIdAndUpdate(property_id, {
+    const updatedPropertyInfo = await PropertyInfo.findByIdAndUpdate(property_id, {
       property_address: newPropertyAddress._id,
     });
+    
+    if (!updatedPropertyInfo) {
+      return next(
+        new AppError(`No property found with this id ${property_id}`, 404)
+      );
+    }
 
     const address = await PropertyAddress.find({ propertyInfo: property_id });
 
@@ -52,6 +63,7 @@ const createPropertyAddress = catchAsync(
   }
 );
 
+
 const updatePropertyAddress = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const propertAddressId = req.params.id;
@@ -63,9 +75,7 @@ const updatePropertyAddress = catchAsync(
       country,
       state,
       city,
-      location,
       landmark,
-      neighbour_area,
       zip_code,
     } = req.body;
 
@@ -87,9 +97,7 @@ const updatePropertyAddress = catchAsync(
           country,
           state,
           city,
-          location,
           landmark,
-          neighbour_area,
           zip_code,
         },
       },
@@ -98,7 +106,7 @@ const updatePropertyAddress = catchAsync(
     return res.status(200).json({
       status: "success",
       error: false,
-      message: "Property addreaa updated successfully",
+      message: "Property address updated successfully",
       data: updatePropertyAddress,
     });
   }
