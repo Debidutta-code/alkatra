@@ -123,8 +123,8 @@ export const logout = () =>
       );
       toast.success("Logged out successfully");
     } catch (error) {
-      console.error("Logout API error:", error);
-      toast.success("Logged out (session cleared)");
+      // console.error("Logout API error:", error);
+      // toast.success("Logged out (session cleared)");
     } finally {
       dispatch(removeAccessToken());
     }
