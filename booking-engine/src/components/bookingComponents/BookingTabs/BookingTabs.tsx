@@ -1,12 +1,10 @@
-// BookingTabs.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useSelector } from "react-redux";
 import { Booking, BookingTabType, PaginationResponse } from "./types";
-import { parseISO } from "date-fns";
 import CancellationModal from "@/components/bookingComponents/CancellationModal";
 import AmendReservationModal from "@/components/bookingComponents/AmendReservationModal";
 import BookingHeader from "./BookingHeader";
@@ -19,7 +17,6 @@ import BookingPagination from "./BookingPagination";
 import BookingDetailsModal from "./BookingDetailsModal";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
-
 
 interface RootState {
   auth: {
@@ -34,10 +31,23 @@ interface RootState {
 }
 
 export default function BookingTabs() {
-  const { t } = useTranslation(); // Initialize useTranslation
+  const { t } = useTranslation();
 
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
+  const [bookingsCache, setBookingsCache] = useState<{
+    [key in BookingTabType]: {
+      bookings: Booking[];
+      totalBookings: number;
+      totalPages: number;
+      currentPage: number;
+      loaded: boolean;
+    }
+  }>({
+    all: { bookings: [], totalBookings: 0, totalPages: 1, currentPage: 1, loaded: false },
+    upcoming: { bookings: [], totalBookings: 0, totalPages: 1, currentPage: 1, loaded: false },
+    completed: { bookings: [], totalBookings: 0, totalPages: 1, currentPage: 1, loaded: false },
+    cancelled: { bookings: [], totalBookings: 0, totalPages: 1, currentPage: 1, loaded: false },
+  });
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
@@ -45,21 +55,21 @@ export default function BookingTabs() {
   const [showCancellationUI, setShowCancellationUI] = useState(false);
   const [showAmendUI, setShowAmendUI] = useState(false);
   const [activeTab, setActiveTab] = useState<BookingTabType>('all');
-
-  // Pagination states
-  const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(6);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalBookings, setTotalBookings] = useState(0);
 
   const authUser = useSelector((state: RootState) => state.auth.user);
   const token = Cookies.get("accessToken");
   const router = useRouter();
 
-  //it helps us to 
+  const currentTabData = bookingsCache[activeTab];
+  const currentBookings = currentTabData.bookings;
+  const currentPage = currentTabData.currentPage;
+  const totalPages = currentTabData.totalPages;
+  const totalBookings = currentTabData.totalBookings;
+
   useEffect(() => {
     const handlePopState = () => {
-      router.replace("/"); // force redirect home on back
+      router.replace("/");
     };
 
     window.history.pushState(null, "", window.location.href);
@@ -68,86 +78,135 @@ export default function BookingTabs() {
     return () => {
       window.removeEventListener("popstate", handlePopState);
     };
-  }, []);
+  }, [router]);
+
+  const fetchBookings = useCallback(async (
+    tab: BookingTabType,
+    page: number = 1,
+    isTabChange: boolean = false
+  ) => {
+    if (!authUser?._id) {
+      setError(t("BookingTabs.userNotLoggedIn"));
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      console.log(`Fetching bookings for tab: ${tab}, page: ${page}, filterData:`, tab === 'all' ? '' : tab);
+
+      const response = await axios.get<PaginationResponse>(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/booking/customers/booking/details/${authUser._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: {
+            page: page,
+            limit: itemsPerPage,
+            filterData: tab === 'all' ? '' : tab,
+          },
+        }
+      );
+
+      console.log(`API Response for ${tab}:`, {
+        bookingsCount: response.data.bookings?.length || 0,
+        totalBookings: response.data.totalBookings,
+        totalPages: response.data.totalPages
+      });
+
+      setBookingsCache(prev => ({
+        ...prev,
+        [tab]: {
+          bookings: response.data.bookings || [],
+          totalBookings: response.data.totalBookings || 0,
+          totalPages: response.data.totalPages || 1,
+          currentPage: page,
+          loaded: true,
+        }
+      }));
+
+      setLoading(false);
+    } catch (err) {
+      console.error(`Error fetching bookings for ${tab}:`, err);
+      setError(t("BookingTabs.noBooking"));
+      setLoading(false);
+
+      setBookingsCache(prev => ({
+        ...prev,
+        [tab]: {
+          bookings: [],
+          totalBookings: 0,
+          totalPages: 1,
+          currentPage: page,
+          loaded: true,
+        }
+      }));
+    }
+  }, [authUser, token, itemsPerPage, t]);
+
   useEffect(() => {
-    const fetchBookings = async () => {
-      if (!authUser?._id) {
-        setError(t("BookingTabs.userNotLoggedIn"));
-        setLoading(false);
-        return;
+    if (!currentTabData.loaded) {
+      fetchBookings(activeTab, currentPage, currentPage === 1);
+    }
+  }, [activeTab, currentPage, fetchBookings, currentTabData.loaded]);
+
+  const handleTabChange = (newTab: BookingTabType) => {
+    setActiveTab(newTab);
+    setError(null);
+    setBookingsCache(prev => ({
+      ...prev,
+      [newTab]: {
+        ...prev[newTab],
+        currentPage: 1,
+        loaded: false,
       }
+    }));
+  };
 
-      try {
-        console.log('Fetching bookings with filterData:', activeTab === 'all' ? '' : activeTab);
-        const response = await axios.get<PaginationResponse>(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/booking/customers/booking/details/${authUser?._id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            params: {
-              page: currentPage,
-              limit: itemsPerPage,
-              filterData: activeTab === 'all' ? '' : activeTab,
-            },
-          }
-        );
-        setBookings(response.data.bookings || []);
-        setTotalBookings(response.data.totalBookings);
-        setTotalPages(response.data.totalPages);
-        setLoading(false);
-      } catch (err) {
-        setError(t("BookingTabs.noBooking"));
-        setLoading(false);
-      }
-    };
+  const handlePageChange = (pageNumber: number) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setBookingsCache(prev => ({
+        ...prev,
+        [activeTab]: {
+          ...prev[activeTab],
+          currentPage: pageNumber,
+          loaded: false,
+        }
+      }));
+    }
+  };
 
-    fetchBookings();
-  }, [authUser, token, currentPage, itemsPerPage, activeTab, t]);
+  const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newItemsPerPage = parseInt(e.target.value);
+    setItemsPerPage(newItemsPerPage);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [activeTab]);
+    setBookingsCache(prev => ({
+      all: { ...prev.all, loaded: false, currentPage: 1 },
+      upcoming: { ...prev.upcoming, loaded: false, currentPage: 1 },
+      completed: { ...prev.completed, loaded: false, currentPage: 1 },
+      cancelled: { ...prev.cancelled, loaded: false, currentPage: 1 },
+    }));
+  };
 
-  useEffect(() => {
-    setFilteredBookings(bookings);
-  }, [bookings]);
-
-  // Filter bookings based on active tab
-  // useEffect(() => {
-  //   const today = new Date();
-  //   if (!bookings) {
-  //     setFilteredBookings([]);
-  //     return;
-  //   }
-  //   if (activeTab === 'all') {
-  //     setFilteredBookings(bookings);
-  //   } else if (activeTab === 'upcoming') {
-  //     setFilteredBookings(bookings.filter(booking => {
-  //       const checkoutDate = parseISO(booking.checkOutDate);
-  //       return checkoutDate >= today && booking.status !== 'Cancelled';
-  //     }));
-  //   } else if (activeTab === 'completed') {
-  //     setFilteredBookings(bookings.filter(booking => {
-  //       const checkoutDate = parseISO(booking.checkOutDate);
-  //       return checkoutDate < today && booking.status !== 'Cancelled';
-  //     }));
-  //   } else if (activeTab === 'cancelled') {
-  //     setFilteredBookings(bookings.filter(booking => booking.status === 'Cancelled'));
-  //   }
-  // }, [activeTab, bookings]);
-
-  useEffect(() => {
-    setFilteredBookings(bookings);
-  }, [bookings]);
-
-  // Function to handle cancellation completion
   const handleCancellationComplete = (bookingId: string) => {
-    setBookings(prevBookings => prevBookings.map(booking =>
-      booking._id === bookingId
-        ? { ...booking, status: "Cancelled" }
-        : booking
-    ));
+    setBookingsCache(prev => {
+      const newCache = { ...prev };
+      Object.keys(newCache).forEach(tab => {
+        newCache[tab as BookingTabType] = {
+          ...newCache[tab as BookingTabType],
+          bookings: newCache[tab as BookingTabType].bookings.map(booking =>
+            booking._id === bookingId
+              ? { ...booking, status: "Cancelled" }
+              : booking
+          ),
+          loaded: false,
+        };
+      });
+      return newCache;
+    });
 
     if (selectedBooking && selectedBooking._id === bookingId) {
       setSelectedBooking({
@@ -157,26 +216,37 @@ export default function BookingTabs() {
     }
 
     setShowCancellationUI(false);
+
+    fetchBookings(activeTab, currentPage, true);
   };
 
-  // Function to handle amendment completion
   const handleAmendmentComplete = (bookingId: string, amendedData: any) => {
-    setBookings(prevBookings => prevBookings.map(booking =>
-      booking._id === bookingId
-        ? {
-          ...booking,
-          checkInDate: amendedData.checkInDate,
-          checkOutDate: amendedData.checkOutDate,
-          ratePlanCode: amendedData.ratePlanCode,
-          roomTypeCode: amendedData.roomTypeCode,
-          numberOfRooms: amendedData.numberOfRooms,
-          totalAmount: amendedData.roomTotalPrice,
-          currencyCode: amendedData.currencyCode,
-          guestDetails: amendedData.guests,
-          status: 'Modified',
-        }
-        : booking
-    ));
+    setBookingsCache(prev => {
+      const newCache = { ...prev };
+      Object.keys(newCache).forEach(tab => {
+        newCache[tab as BookingTabType] = {
+          ...newCache[tab as BookingTabType],
+          bookings: newCache[tab as BookingTabType].bookings.map(booking =>
+            booking._id === bookingId
+              ? {
+                ...booking,
+                checkInDate: amendedData.checkInDate,
+                checkOutDate: amendedData.checkOutDate,
+                ratePlanCode: amendedData.ratePlanCode,
+                roomTypeCode: amendedData.roomTypeCode,
+                numberOfRooms: amendedData.numberOfRooms,
+                totalAmount: amendedData.roomTotalPrice,
+                currencyCode: amendedData.currencyCode,
+                guestDetails: amendedData.guests,
+                status: 'Modified',
+              }
+              : booking
+          ),
+          loaded: false,
+        };
+      });
+      return newCache;
+    });
 
     if (selectedBooking && selectedBooking._id === bookingId) {
       setSelectedBooking({
@@ -194,6 +264,8 @@ export default function BookingTabs() {
     }
 
     setShowAmendUI(false);
+
+    fetchBookings(activeTab, currentPage, true);
   };
 
   // Function to handle view details button click
@@ -220,20 +292,6 @@ export default function BookingTabs() {
     setShowAmendUI(false);
   };
 
-  // Pagination page change handler
-  const handlePageChange = (pageNumber: number) => {
-    if (pageNumber >= 1 && pageNumber <= totalPages) {
-      setCurrentPage(pageNumber);
-    }
-  };
-
-  // Items per page change handler
-  const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newItemsPerPage = parseInt(e.target.value);
-    setItemsPerPage(newItemsPerPage);
-    setCurrentPage(1); // Reset to first page when changing items per page
-  };
-
   return (
     <div className="w-full min-h-screen bg-gray-50 font-noto-sans">
       {/* Header Section */}
@@ -241,18 +299,18 @@ export default function BookingTabs() {
 
       <div className="container w-full mx-auto px-4 py-8 md:py-12 -mt-6">
         {/* Tabs Navigation */}
-        <BookingTabsNavigation activeTab={activeTab} setActiveTab={ setActiveTab} />
+        <BookingTabsNavigation activeTab={activeTab} setActiveTab={handleTabChange} />
 
         {loading ? (
           <LoadingState />
         ) : error ? (
           <ErrorState errorMessage={error} />
-        ) : !filteredBookings || filteredBookings.length === 0 ? (
+        ) : !currentBookings || currentBookings.length === 0 ? (
           <EmptyState activeTab={activeTab} />
         ) : (
           <>
-            <div className="grid grid-cols-1  lg:grid-cols-2 gap-6">
-              {filteredBookings.map((booking) => (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {currentBookings.map((booking) => (
                 <BookingCard
                   key={booking._id}
                   booking={booking}
