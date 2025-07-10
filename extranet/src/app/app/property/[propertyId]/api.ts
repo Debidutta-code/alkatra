@@ -47,7 +47,7 @@ interface RoomAmenityData {
   fireExtinguisher: boolean;
   shampooConditioner: boolean;
   soap: boolean;
-  hairdryer: boolean;
+  hairDryer: boolean;
   workDesk: boolean;
   readingChair: boolean;
   additionalLighting: boolean;
