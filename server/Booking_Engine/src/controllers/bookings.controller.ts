@@ -51,17 +51,17 @@ const reduceRoomsAfterBookingConfirmed = async (
     .map(([key]) => key);
 
   if (missingFields.length > 0) {
-    return res.status(400).json({
+    return {
       message: `Missing required fields: ${missingFields.join(", ")}`,
-    });
+    };
   }
 
   const [checkInDate, checkOutDate] = dates;
 
   if (checkInDate > checkOutDate) {
-    return res.status(400).json({
+    return{
       message: "Check-in date must be before or equal to check-out date",
-    });
+    };
   }
 
   try {
@@ -75,7 +75,7 @@ const reduceRoomsAfterBookingConfirmed = async (
     });
 
     if (!inventoryRecords || inventoryRecords.length === 0) {
-      return res.status(404).json({ message: "No available rooms found for the specified criteria" });
+      return{ message: "No available rooms found for the specified criteria" };
     }
 
     const bulkOps = [];
@@ -83,9 +83,9 @@ const reduceRoomsAfterBookingConfirmed = async (
     for (const item of inventoryRecords) {
       const currentCount = item.availability?.count || 0;
       if (currentCount < numberOfRooms) {
-        return res.status(400).json({
+        return{
           message: `Not enough rooms for date ${item.availability?.startDate}. Available: ${currentCount}, requested: ${numberOfRooms}`,
-        });
+        };
       }
 
       const newCount = currentCount - numberOfRooms;
@@ -105,14 +105,14 @@ const reduceRoomsAfterBookingConfirmed = async (
 
     const result = await Inventory.bulkWrite(bulkOps);
 
-    return res.status(200).json({
+    return{
       message: "Room counts reduced successfully for booking",
       result,
-    });
+    };
 
   } catch (error: any) {
     console.error("❌ Error reducing rooms after booking confirmed:", error.message || error);
-    return res.status(500).json({ message: "Failed to reduce rooms after booking confirmed" });
+    return { message: "Failed to reduce rooms after booking confirmed" };
   }
 };
 
@@ -204,17 +204,17 @@ const increaseRoomsAfterBookingCancelled = async (
     .map(([key]) => key);
 
   if (missingFields.length > 0) {
-    return res.status(400).json({
+    return {
       message: `Missing required fields: ${missingFields.join(", ")}`,
-    });
+    }
   }
 
   const [checkInDate, checkOutDate] = dates;
 
   if (checkInDate > checkOutDate) {
-    return res.status(400).json({
+    return {
       message: "Check-in date must be before or equal to check-out date",
-    });
+    };
   }
 
   try {
@@ -228,7 +228,7 @@ const increaseRoomsAfterBookingCancelled = async (
     });
 
     if (!inventoryRecords || inventoryRecords.length === 0) {
-      return res.status(404).json({ message: "No matching room inventory records found for the given dates." });
+      return { message: "No matching room inventory records found for the given dates." };
     }
 
     const bulkOps = [];
@@ -252,14 +252,14 @@ const increaseRoomsAfterBookingCancelled = async (
 
     const result = await Inventory.bulkWrite(bulkOps);
 
-    return res.status(200).json({
+    return {
       message: "Room counts increased successfully after cancellation.",
       result,
-    });
+    };
 
   } catch (error: any) {
     console.error("❌ Error increasing rooms after booking cancellation:", error.message || error);
-    return res.status(500).json({ message: "Failed to increase rooms after booking cancellation" });
+    throw new Error(`Failed to increase rooms after booking cancellation: ${error.message}`);
   }
 };
 
@@ -391,6 +391,9 @@ export const createReservationWithStoredCard = CatchAsyncError(
           numberOfRooms,
           [checkIn, checkOutDate]
         );
+        if (!reduceRoomResult) {
+          return res.status(400).json({ message: "Failed to reduce rooms" });
+        }
       } catch (error) {
         if (error) {
           const errorMessage = error instanceof Error ? error.message : "Failed to reduce rooms";
@@ -1331,133 +1334,133 @@ export const cancelThirdPartyReservation = CatchAsyncError(
         await increaseRoomsAfterBookingCancelled(res, hotelCode, existingReservation.roomTypeCode, existingReservation.numberOfRooms, [checkInDate, checkOutDate]);
 
         const htmlContent = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 500px;
-            margin: 20px auto;
-            background-color: #ffffff;
-            border-radius: 6px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .header {
-            background-color: #d32f2f;
-            color: #ffffff;
-            padding: 15px;
-            text-align: center;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 20px;
-        }
-        .content {
-            padding: 15px;
-        }
-        .content p {
-            color: #666666;
-            line-height: 1.5;
-            margin: 8px 0;
-            font-size: 14px;
-        }
-        .details-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-        }
-        .details-table th,
-        .details-table td {
-            padding: 8px;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .details-table th {
-            background-color: #f8f8f8;
-            color: #333333;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        .details-table td {
-            color: #666666;
-            font-size: 14px;
-        }
-        .button {
-            display: inline-block;
-            padding: 8px 16px;
-            margin: 15px 0;
-            background-color: #d32f2f;
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        .footer {
-            background-color: #f4f4f4;
-            padding: 10px;
-            text-align: center;
-            color: #888888;
-            font-size: 12px;
-        }
-        @media only screen and (max-width: 500px) {
-            .container {
-                width: 100%;
-                margin: 10px;
-            }
-            .header h1 {
-                font-size: 18px;
-            }
-            .content p {
-                font-size: 13px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Booking Cancellation Confirmation</h1>
-        </div>
-        <div class="content">
-            <p>Dear {{guestName}},</p>
-            <p>Your reservation with {{hotelName}} has been successfully cancelled. Below are the details of the cancelled booking.</p>
-            <table class="details-table">
-                <tr>
-                    <th>Hotel Name</th>
-                    <td>{{hotelName}}</td>
-                </tr>
-                <tr>
-                    <th>Check-In Date</th>
-                    <td>{{checkInDate}}</td>
-                </tr>
-                <tr>
-                    <th>Check-Out Date</th>
-                    <td>{{checkOutDate}}</td>
-                </tr>
-                <tr>
-                    <th>Amount</th>
-                    <td>{{amount}}</td>
-                </tr>
-            </table>
-            <p>If you have any questions or need assistance, please contact us at <a href="mailto:{{supportEmail}}">{{supportEmail}}</a> or call {{supportPhone}}.</p>
-            <a href="{{websiteUrl}}" class="button">Visit Our Website</a>
-        </div>
-        <div class="footer">
-            <p>© {{currentYear}} {{companyName}}. All rights reserved.</p>
-            <p>{{companyAddress}}</p>
-        </div>
-    </div>
-</body>
-</html>`;
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #f4f4f4;
+                    margin: 0;
+                    padding: 0;
+                }
+                .container {
+                    max-width: 500px;
+                    margin: 20px auto;
+                    background-color: #ffffff;
+                    border-radius: 6px;
+                    overflow: hidden;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                }
+                .header {
+                    background-color: #d32f2f;
+                    color: #ffffff;
+                    padding: 15px;
+                    text-align: center;
+                }
+                .header h1 {
+                    margin: 0;
+                    font-size: 20px;
+                }
+                .content {
+                    padding: 15px;
+                }
+                .content p {
+                    color: #666666;
+                    line-height: 1.5;
+                    margin: 8px 0;
+                    font-size: 14px;
+                }
+                .details-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 15px 0;
+                }
+                .details-table th,
+                .details-table td {
+                    padding: 8px;
+                    text-align: left;
+                    border-bottom: 1px solid #e0e0e0;
+                }
+                .details-table th {
+                    background-color: #f8f8f8;
+                    color: #333333;
+                    font-weight: bold;
+                    font-size: 14px;
+                }
+                .details-table td {
+                    color: #666666;
+                    font-size: 14px;
+                }
+                .button {
+                    display: inline-block;
+                    padding: 8px 16px;
+                    margin: 15px 0;
+                    background-color: #d32f2f;
+                    color: #ffffff;
+                    text-decoration: none;
+                    border-radius: 4px;
+                    font-size: 14px;
+                    font-weight: bold;
+                }
+                .footer {
+                    background-color: #f4f4f4;
+                    padding: 10px;
+                    text-align: center;
+                    color: #888888;
+                    font-size: 12px;
+                }
+                @media only screen and (max-width: 500px) {
+                    .container {
+                        width: 100%;
+                        margin: 10px;
+                    }
+                    .header h1 {
+                        font-size: 18px;
+                    }
+                    .content p {
+                        font-size: 13px;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>Booking Cancellation Confirmation</h1>
+                </div>
+                <div class="content">
+                    <p>Dear {{guestName}},</p>
+                    <p>Your reservation with {{hotelName}} has been successfully cancelled. Below are the details of the cancelled booking.</p>
+                    <table class="details-table">
+                        <tr>
+                            <th>Hotel Name</th>
+                            <td>{{hotelName}}</td>
+                        </tr>
+                        <tr>
+                            <th>Check-In Date</th>
+                            <td>{{checkInDate}}</td>
+                        </tr>
+                        <tr>
+                            <th>Check-Out Date</th>
+                            <td>{{checkOutDate}}</td>
+                        </tr>
+                        <tr>
+                            <th>Amount</th>
+                            <td>{{amount}}</td>
+                        </tr>
+                    </table>
+                    <p>If you have any questions or need assistance, please contact us at <a href="mailto:{{supportEmail}}">{{supportEmail}}</a> or call {{supportPhone}}.</p>
+                    <a href="{{websiteUrl}}" class="button">Visit Our Website</a>
+                </div>
+                <div class="footer">
+                    <p>© {{currentYear}} {{companyName}}. All rights reserved.</p>
+                    <p>{{companyAddress}}</p>
+                </div>
+            </div>
+        </body>
+        </html>`;
 
         const templateData = {
           guestName: `${firstName} ${lastName}`,
