@@ -146,14 +146,14 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
           </div>
           <div className="bg-tripswift-off-white items-center rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] overflow-hidden transition-all duration-300 hover:shadow-[0_20px_80px_rgba(7,109,179,0.07)]">
             <div className="h-2 bg-gradient-to-r from-tripswift-blue to-[#054B8F]"></div>
-            <div className="px-10 py-6 rounded-t-xl">
+            <div className="px-10 py-4 rounded-t-xl">
               <h2 className="text-2xl font-tripswift-bold text-tripswift-black mb-2 tracking-tight">{title}</h2>
-              <p className="text-tripswift-black/60 mb-6">{subtitle}</p>
+              <p className="text-tripswift-black/60 mb-4">{subtitle}</p>
               {children}
             </div>
             <button
               onClick={() => googleLoginHook()}
-              className="w-full h-14 flex items-center justify-center gap-3 rounded-lg px-4 mb-4"
+              className="w-full h-14 flex items-center justify-center gap-3 rounded-lg px-4 mb-2"
             >
               <svg className="w-5 h-5" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" fill="#EA4335" />
