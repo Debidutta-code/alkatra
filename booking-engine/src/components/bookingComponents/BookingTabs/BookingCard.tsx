@@ -139,7 +139,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
           <div className="text-right">
             <div className="flex flex-col">
               <p className="text-xs text-gray-500 mb-1">{t('BookingTabs.BookingCard.rateBreakdown')}</p>
-              <div className="flex items-center justify-end text-sm text-tripswift-black/70 mb-1">
+              <div className="flex items-center justify-end text-sm text-tripswift-black/70">
               </div>
               <p className="text-lg font-tripswift-bold text-tripswift-blue">{currency} {booking.totalAmount.toLocaleString()}</p>
             </div>
