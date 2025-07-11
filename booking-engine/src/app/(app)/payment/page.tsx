@@ -64,7 +64,7 @@ function PaymentPageContent() {
   const checkOut = searchParams.get('checkOut') || '';
   const userId = authUser?._id || searchParams.get('userId') || '';
   const hotelName = searchParams.get('hotelName') || 'Unknown Hotel';
-  const hotelCode=searchParams.get('hotelCode') || 'Unknown Hotel Code';
+  const hotelCode=searchParams.get('hotelCode') || 'WINCLOUD';
   const ratePlanCode = searchParams.get('ratePlanCode')?.toUpperCase() || '';
   const roomType = searchParams.get('roomType') || '';
 
