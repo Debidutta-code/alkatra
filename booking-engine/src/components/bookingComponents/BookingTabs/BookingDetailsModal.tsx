@@ -71,16 +71,11 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
     };
   }, [onClose]);
 
-  const formatCamelCase = (text: string): string =>
-    text.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase());
+  const formatCamelCase = (text: string): string => text.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase());
 
-  const roomType =
-    booking.roomTypeCode || t("BookingTabs.BookingDetailsModal.standardRoom");
+  const roomType = booking.roomTypeCode || t("BookingTabs.BookingDetailsModal.standardRoom");
   const currency = booking.currencyCode?.toUpperCase() || "INR";
-  const isPastCheckIn =
-    new Date(booking.checkInDate).setHours(0, 0, 0, 0) <
-    new Date().setHours(0, 0, 0, 0);
-
+  const isPastCheckIn = new Date(booking.checkInDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0);
   const nights = calculateNights(booking.checkInDate, booking.checkOutDate);
 
   return (
@@ -97,7 +92,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
           <div className="flex justify-between items-start mb-3">
             <div className="flex-1">
               <div className="flex items-center mb-1">
-                <FaHotel className="text-2xl text-tripswift-off-white mr-2" />
+                <FaHotel className="text-2xl text-tripswift-off-white mr-2 ml-2" />
                 <h2 className="text-2xl font-tripswift-bold text-tripswift-off-white leading-tight mt-1">
                 {booking.hotelName}
               </h2>
@@ -161,24 +156,24 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
               <div className="bg-white p-3 rounded-lg border border-green-100 shadow-sm">
                 <div className="flex items-center mb-1">
-                  <FaCalendarCheck className="text-green-500 mr-2" />
+                  <FaCalendarCheck className="text-green-500 mr-2 ml-2" />
                   <p className="text-sm text-gray-500 font-tripswift-medium">
                     {t("BookingTabs.BookingDetailsModal.checkIn")}
                   </p>
                 </div>
-                <p className="font-tripswift-bold text-gray-800">
+                <p className="font-tripswift-bold text-gray-800 ml-8">
                   {formatDateString(booking.checkInDate)}
                 </p>
               </div>
 
               <div className="bg-white p-3 rounded-lg border border-red-100 shadow-sm">
                 <div className="flex items-center mb-1">
-                  <FaCalendarTimes className="text-red-500 mr-2" />
+                  <FaCalendarTimes className="text-red-500 mr-2 ml-2" />
                   <p className="text-sm text-gray-500 font-tripswift-medium">
                     {t("BookingTabs.BookingDetailsModal.checkOut")}
                   </p>
                 </div>
-                <p className="font-tripswift-bold text-gray-800">
+                <p className="font-tripswift-bold text-gray-800 ml-8">
                   {formatDateString(booking.checkOutDate)}
                 </p>
               </div>
@@ -189,7 +184,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
                   <div className="flex items-center mb-1">
-                    <FaBed className="text-tripswift-blue mr-2" />
+                    <FaBed className="text-tripswift-blue mr-2 ml-2" />
                     <p className="text-sm text-gray-500 font-tripswift-medium">
                       {t("BookingTabs.BookingDetailsModal.roomType")}
                     </p>
@@ -208,7 +203,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
 
                 <div>
                   <div className="flex items-center mb-1">
-                    <FaUsers className="text-tripswift-blue mr-2" />
+                    <FaUsers className="text-tripswift-blue mr-2 ml-2" />
                     <p className="text-sm text-gray-500 font-tripswift-medium">
                       {t("BookingTabs.BookingDetailsModal.rooms")}
                     </p>

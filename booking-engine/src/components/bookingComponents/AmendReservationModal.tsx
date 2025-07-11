@@ -500,7 +500,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
             {/* Stay Dates */}
             <div className="space-y-3 sm:space-y-4">
               <div className="flex items-start">
-                <div className="w-8 sm:w-10  rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 sm:mr-3 shadow-sm flex-shrink-0">
+                <div className="w-8 sm:w-10  rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 ml-2 sm:mr-3 shadow-sm flex-shrink-0">
                   <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
                 </div>
                 <div>
@@ -522,7 +522,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
             {/* Room Details */}
             <div className="space-y-3 sm:space-y-4">
               <div className="flex items-start">
-                <div className="w-8 sm:w-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 sm:mr-3 shadow-sm flex-shrink-0">
+                <div className="w-8 sm:w-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 ml-2 sm:mr-3 shadow-sm flex-shrink-0">
                   <BedIcon className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
                 </div>
                 <div>
@@ -539,7 +539,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
             {/* Rate Plan */}
             <div className="space-y-3 sm:space-y-4">
               <div className="flex items-start">
-                <div className="w-8  sm:w-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 sm:mr-3 shadow-sm flex-shrink-0">
+                <div className="w-8  sm:w-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 ml-2 sm:mr-3 shadow-sm flex-shrink-0">
                   <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
                 </div>
                 <div>
@@ -618,7 +618,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
           {amendmentType === "dates" && (
             <div className="space-y-2 bg-white p-3 sm:p-4 rounded-lg border border-tripswift-blue/20">
               <div className="flex items-center gap-1">
-                <CalendarDays className="h-4 w-4 text-tripswift-blue" />
+                <CalendarDays className="h-4 w-4 text-tripswift-blue mr-2 ml-2" />
                 <h4 className="text-base sm:text-lg font-tripswift-bold text-tripswift-black">
                   {t('BookingTabs.AmendReservationModal.changeDates')}
                 </h4>
@@ -688,7 +688,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
               {errors["dateRange"] && (
                 <div className="px-2 py-1 bg-red-50 border border-red-200 rounded-md text-xs">
                   <p className="text-red-600 flex items-center">
-                    <AlertCircle className="h-3.5 w-3.5 mr-1" />
+                    <AlertCircle className="h-3.5 w-3.5 mr-2 ml-2" />
                     {errors["dateRange"]}
                   </p>
                 </div>
@@ -697,7 +697,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
               {dateRange && dateRange[0] && dateRange[1] && (
                 <div className="px-2 py-1.5 bg-tripswift-blue/10 rounded-md text-xs">
                   <div className="flex items-center">
-                    <Clock className="h-3.5 w-3.5 text-tripswift-blue mr-1" />
+                    <Clock className="h-3.5 w-3.5 text-tripswift-blue mr-2 ml-2" />
                     <span>
                       {t('BookingTabs.AmendReservationModal.stayDuration', {
                         count: dateRange[1].diff(dateRange[0], 'day')
