@@ -7,6 +7,8 @@ import { Loader2 } from "lucide-react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
+import { setPaymentData } from "@/Redux/slices/payment.slice";
+import { useDispatch } from "react-redux";
 
 
 interface CryptoToken {
@@ -37,9 +39,8 @@ const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onCon
   const [error, setError] = useState<string | null>(null);
   const [convertedAmount, setConvertedAmount] = useState<number | null>(null);
   const [paymentInitiated, setPaymentInitiated] = useState<boolean>(false);
-  const [paymentData, setPaymentData] = useState<any>(null);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
-
+  const dispatch=useDispatch();
 
  
   // Fetch crypto token list from API
@@ -202,7 +203,7 @@ const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onCon
       const paymentDataResponse = paymentResponse.data;
 
       if (paymentDataResponse.success || paymentDataResponse.message) {
-        setPaymentData(paymentDataResponse.data);
+        dispatch(setPaymentData(paymentDataResponse.data));
         setPaymentInitiated(true);
 
         console.log("convertedAmount:", convertedAmount, "Type:", typeof convertedAmount);
@@ -268,10 +269,9 @@ const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onCon
                   email: bookingDetails.email,
                   phone: bookingDetails.phone,
                   guests: bookingDetails.guests,
+                  paymentOption:bookingDetails.paymentOption
                 };
-                setPaymentData(updatedPaymentData);
-                localStorage.setItem("paymentData", JSON.stringify(updatedPaymentData));
-                // Step 4: Navigate to payment progress page only after all APIs succeed
+                dispatch(setPaymentData(updatedPaymentData));
                 router.push("/payment-progress");
               } else {
                 setError(t("PayWithCryptoQR.errors.fetchWalletAddress"));

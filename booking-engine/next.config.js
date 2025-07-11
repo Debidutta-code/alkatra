@@ -49,8 +49,10 @@ const nextConfig = {
         tls: false,
       };
     }
+    config.externals.push('pino-pretty','lokijs','encoding');
     return config;
   },
+  
   async redirects() {
     return [
       {

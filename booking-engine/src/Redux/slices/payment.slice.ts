@@ -19,6 +19,7 @@ interface PaymentData {
   email?: string;
   phone?: string;
   guests?: any;
+  paymentOption: string;
 }
 
 interface PaymentState {
