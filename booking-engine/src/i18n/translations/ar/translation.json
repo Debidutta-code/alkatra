@@ -787,6 +787,8 @@
       "nightsStay_other": "{{count}} ليالي",
       "roomType": "نوع الغرفة",
       "roomName": "اسم الغرفة",
+      "roomsCount_one": "{{count}} غرفة",
+      "roomsCount_other": "{{count}} غرف",
       "guestDetails": "تفاصيل الضيف",
       "guestName": "اسم الضيف",
       "contactNumber": "رقم الاتصال",
@@ -811,7 +813,10 @@
       "cancelBooking": "إلغاء الحجز",
       "dob": "تاريخ الميلاد",
       "rooms": "غرف",
-      "printItinerary": "طباعة خط سير الرحلة"
+      "printItinerary": "طباعة خط سير الرحلة",
+      "guest": "ضيف",
+      "printFooter": "شكرًا لحجزك. إذا كانت لديك أي أسئلة، يرجى الاتصال بخدمة العملاء لدينا.",
+      "printTitle": "تأكيد الحجز"
     }
   },
   "Payment": {
