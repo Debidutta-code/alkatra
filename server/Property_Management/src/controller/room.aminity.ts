@@ -9,24 +9,30 @@ import { Room } from "../model/room.model"
 const createRoomAminity = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { propertyInfo_id,
-        // name, type,
-        amenities } = req.body;
-
+      const { propertyInfo_id, room_type, amenities } = req.body;
       console.log("###################\nIncoming creating amenities",req.body);
 
       if (!req.body) {
         next(new AppError("Please fill all the required fields", 400));
       }
 
+      const roomTypeDetails = await Room.find({
+        propertyInfo_id,
+        room_type,
+      });      
+      if (roomTypeDetails.length === 0) {
+        return next(new AppError(`No room found with ${propertyInfo_id} type ${room_type} for this property`, 404));
+      }
+
       const roomAminitycreate = await RoomAminity.create({
         propertyInfo_id,
-        // name,
-        // type,
+        room_type,
         amenities,
       });
+
       const updatedInfo = await PropertyInfo.findByIdAndUpdate(
         propertyInfo_id,
+        room_type,
         { room_Aminity: roomAminitycreate._id }
       );
 
@@ -53,9 +59,10 @@ const createRoomAminity = catchAsync(
 // update room amenity
 const updateRoomAmenity = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { propertyInfo_id, amenities } = req.body;
+    const { propertyInfo_id, room_type, amenities } = req.body;
     console.log("========= Incoming Data =========");
     console.log("PropertyInfo ID:", propertyInfo_id);
+    console.log("Room Type:", room_type);
     console.log("Amenities:", amenities);
     console.log("=================================");
     if (!req.body) {
@@ -63,7 +70,7 @@ const updateRoomAmenity = async (req: Request, res: Response, next: NextFunction
     }
 
     const updatedRoomAminity = await RoomAminity.findOneAndUpdate(
-      { propertyInfo_id },
+      { propertyInfo_id, room_type },
       { $set: { amenities } },
       { new: true }
     );
@@ -85,10 +92,12 @@ const updateRoomAmenity = async (req: Request, res: Response, next: NextFunction
 
 const getRoomAminity = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const propertyInfo_id = req.params.id;  
+    const propertyInfo_id = req.params.id; 
+    const room_id = req.params.room_id; 
     console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$\n", propertyInfo_id);
+    console.log("Room ID:", room_id);
 
-    const roomAminity = await RoomAminity.findOne({ propertyInfo_id }).lean();
+    const roomAminity = await RoomAminity.findOne({ propertyInfo_id, room_id }).lean();
     console.log("roomAminity:", roomAminity);
 
     if (!roomAminity) {

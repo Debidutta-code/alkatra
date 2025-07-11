@@ -62,6 +62,7 @@ interface AccessibilityFeaturesAmenities {
 
 interface RoomAminityType extends Document {
   propertyInfo_id: Types.ObjectId | PropertyInfoType;
+  room_type: string;
   amenities: {
     basic: RoomAmenities;
     furniture: FurnitureAmenities;
@@ -83,12 +84,17 @@ const roomAminitySchema = new Schema<RoomAminityType>({
     ref: "PropertyInfo",
     required: true,
   },
+  room_type: {
+    type: String,
+    ref: "Room",
+    required: true,
+  },
   amenities: {
     basic: {
       bed: {
         type: String,
         enum: ["single", "double", "king", "twin", "queen"],
-        default: "single", // You can set a default value
+        default: "single",
       },
       bathroom: { type: Boolean, default: false },
       towels: { type: Boolean, default: false },
@@ -124,7 +130,7 @@ const roomAminitySchema = new Schema<RoomAminityType>({
       soap: { type: Boolean, default: false },
       hairdryer: { type: Boolean, default: false },
     },
-   
+
     workLeisure: {
       workDesk: { type: Boolean, default: false },
       readingChair: { type: Boolean, default: false },
