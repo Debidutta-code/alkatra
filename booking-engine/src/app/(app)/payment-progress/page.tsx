@@ -10,7 +10,6 @@ import Cookies from "js-cookie";
 // import { onMessage } from 'firebase/messaging';
 // import { messaging } from '../../../utils/firebase.config';
 // import toast from "react-hot-toast";
-// ... other imports
 import {
     CheckCircle,
     Clock,
@@ -30,6 +29,9 @@ import { sendToken } from "./metamaskServices";
 import toast from "react-hot-toast";
 import { messaging } from "@/utils/firebase.config";
 import { onMessage } from "firebase/messaging";
+import { useDispatch, useSelector, UseSelector } from "react-redux";
+import { setPaymentData, clearPaymentData } from "@/Redux/slices/payment.slice";
+import { RootState } from "@/Redux/store";
 
 interface PaymentData {
     token: string;
@@ -55,7 +57,6 @@ interface PaymentData {
 const PaymentProgressPage: React.FC = () => {
     const { t, i18n } = useTranslation();
     const router = useRouter();
-    const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -63,10 +64,11 @@ const PaymentProgressPage: React.FC = () => {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [hasPaymentWithWallet, setHasPaymentWithWallet] = useState(false);
     const [selectedChainId, setSelectedChainId] = useState<number>(0);
-    const [contractAddress, setContractAddress] = useState<string | null>(null);
+    const [contaractAddress, setContractAddress] = useState<string | null>(null);
     const [walletPaymentProgressStatus, setWalletPaymentProgressStatus] = useState(false);
     const [showWalletTransactionPopup, setShowWalletTransactionPopup] = useState(false);
-
+    const dispatch = useDispatch();
+    const paymentData = useSelector((state: RootState) => state.payment.paymentData);
     // payment notify
     useEffect(() => {
         console.log('🔔 useFCM hook initialized----------pppppp-------------------');
@@ -76,11 +78,13 @@ const PaymentProgressPage: React.FC = () => {
                 if (data?.type === 'CRYPTO_PAYMENT_CONFIRMED') {
                     toast.success(`💸 ${data.message}`, { duration: 8000 });
                     console.log('✅ Payment data:', data);
-                    setPaymentData((prev) => prev ? { ...prev, status: "completed" } : prev);
+                    if (paymentData) {
+                        dispatch(setPaymentData({ ...paymentData, status: "completed" }));
+                    }
                     setShowSuccessModal(true);
                     successTimeoutRef.current = setTimeout(() => {
                         console.log("Executing redirect to /my-trip");
-                        localStorage.removeItem("paymentData");
+                        dispatch(clearPaymentData());
                         router.replace("/my-trip");
                     }, 2000);
                     return;
@@ -106,17 +110,13 @@ const PaymentProgressPage: React.FC = () => {
 
         return () => clearInterval(timer);
     }, []);
-
-    // Retrieve payment data from localStorage
-    // Inside the useEffect for retrieving payment data
+    // Inside the useEffect for retrieving payment data for QR
     useEffect(() => {
-
-        console.log("Retrieving payment data from localStorage...");
         const timer = setTimeout(() => {
-            const storedData = localStorage.getItem("paymentData");
+            const storedData = paymentData;
             if (storedData) {
                 try {
-                    const parsedData: PaymentData = JSON.parse(storedData);
+                    const parsedData: PaymentData = storedData;
                     if (
                         parsedData.payment_id &&
                         parsedData.token &&
@@ -124,7 +124,7 @@ const PaymentProgressPage: React.FC = () => {
                         parsedData.amount &&
                         parsedData.status
                     ) {
-                        setPaymentData(parsedData);
+                        //    dispatch( setPaymentData(parsedData));
                         if (parsedData.paymentOption && parsedData.paymentOption === "payWithCrypto-payWithWallet") {
                             setHasPaymentWithWallet(true);
                         } else {
@@ -182,14 +182,16 @@ const PaymentProgressPage: React.FC = () => {
             );
 
             if (response.status === 200 && response.data.message === "Payment confirmed successfully") {
-                setPaymentData((prev) => prev ? { ...prev, status: "completed" } : prev);
+                if (paymentData) {
+                    dispatch(setPaymentData({ ...paymentData, status: "completed" }));
+                }
                 setShowWalletTransactionPopup(false);
                 setShowSuccessModal(true);
 
                 // Set new timeout
                 successTimeoutRef.current = setTimeout(() => {
                     console.log("Executing redirect to /my-trip");
-                    localStorage.removeItem("paymentData");
+                    dispatch(clearPaymentData());
                     router.replace("/my-trip");
                 }, 3000);
                 return;
@@ -200,7 +202,7 @@ const PaymentProgressPage: React.FC = () => {
         setTimeout(checkPaymentStatus, 10000);
     };
 
-    // Handle copy address
+
     const handleCopyAddress = async () => {
         if (!paymentData?.address) return;
         try {
@@ -214,7 +216,7 @@ const PaymentProgressPage: React.FC = () => {
 
     // Handle navigation back to payment page
     const checkBooking = () => {
-        localStorage.removeItem("paymentData");
+        dispatch(clearPaymentData());
         router.push("/my-trip");
     };
 
@@ -841,17 +843,9 @@ const PaymentProgressPage: React.FC = () => {
                         <p className="text-tripswift-black/70 mb-6">
                             {t('Payment.PaymentProgress.paymentConfirmed')}
                         </p>
-
-                        {/* <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
-        <div
-          className="bg-green-600 h-2.5 rounded-full"
-          style={{ animation: 'progressBar 3s linear forwards' }}
-        ></div>
-      </div> */}
-
                         <button
                             onClick={() => {
-                                localStorage.removeItem("paymentData");
+                                dispatch(clearPaymentData());
                                 router.replace("/my-trip");
                             }}
                             className="w-full py-3 px-4 bg-tripswift-blue text-tripswift-off-white rounded-lg hover:bg-tripswift-blue/90 transition-all duration-300 font-tripswift-medium"
