@@ -908,7 +908,7 @@ export default function PropertyInfo({ onNext }: Props) {
                   className={`block appearance-none w-full  border ${propertyCategoryError
                     ? "border-red-500"
                     : "border-gray-300 dark:border-gray-600"
-                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 rounded-md leading-tight focus:outline-none focus:border-primary-500`}
+                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 rounded-md text-sm leading-tight focus:outline-none focus:border-primary-500`}
                 >
                   <option value="" disabled>
                     Select Property Category
@@ -973,7 +973,7 @@ export default function PropertyInfo({ onNext }: Props) {
                   className={`block appearance-none w-full border ${propertyTypeError
                     ? "border-red-500"
                     : "border-gray-300 dark:border-gray-600"
-                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 rounded-md leading-tight focus:outline-none focus:border-blue-500`}
+                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 rounded-md text-sm leading-tight focus:outline-none focus:border-blue-500`}
                 >
                   <option value="" disabled>
                     Select Property Type

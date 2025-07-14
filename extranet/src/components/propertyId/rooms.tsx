@@ -98,7 +98,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
       errors.total_room = "Total Room is required."
     }
     else if(newRoom.total_room <= 0){
-      errors.total_room = "Value must be greater than zero"
+      errors.total_room = "Minimum allowed value is 1"
     }
     ;
     if (newRoom.floor < 0) errors.floor = "Value must be greater than or equal to zero";
@@ -107,7 +107,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
        errors.room_size = "Room Size is required."
     }
     else if(newRoom.room_size <= 0){
-      errors.room_size = "Value must be greater than zero"
+      errors.room_size = "Minimum allowed value is 1"
     };
     if (!newRoom.room_unit) errors.room_unit = "Room Unit is required.";
     if (!newRoom.smoking_policy) errors.smoking_policy = "Smoking Policy is required.";
@@ -115,20 +115,20 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
       errors.max_occupancy = "Max Occupancy is required."
     }
     else if(newRoom.max_occupancy <= 0){
-      errors.max_occupancy = "Value must be greater than zero"
+      errors.max_occupancy = "Minimum allowed value is 1"
 
     };
     if (newRoom.max_number_of_adults === 0){
        errors.max_number_of_adults = "Max number of adults is required."
     }
     else if(newRoom.max_number_of_adults <= 0){
-             errors.max_number_of_adults = "Value must be greater than zero"
+             errors.max_number_of_adults = "Minimum allowed value is 1"
 
     };
     if (newRoom.max_number_of_children < 0) errors.max_number_of_children = "Value must be greater than or equal to zero";
     if (newRoom.number_of_bedrooms === 0) {errors.number_of_bedrooms = "Number of bedrooms is required."}
     else if(newRoom.number_of_bedrooms <= 0){
-      errors.number_of_bedrooms ="Value must be greater than zero"
+      errors.number_of_bedrooms ="Minimum allowed value is 1"
     };
     if (newRoom.number_of_living_room < 0) errors.number_of_living_room = "Value must be greater than or equal to zero";
     if (newRoom.extra_bed < 0) errors.extra_bed = "Value must be greater than or equal to zero";

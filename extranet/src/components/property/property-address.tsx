@@ -72,7 +72,7 @@ const createPropertyAddressSchema = z.object({
   country: z.string().min(1, "Country is required"),
   state: z.string().min(1, "State is required"),
   city: z.string().min(1, "City is required"),
-  landmark: z.string().min(1, "Landmark Required"),
+  landmark: z.string().min(1, "Landmark is required"),
   // zip_code: z.string().min(1, "Zipcode is required"),
   zip_code: z.string()
     .min(3, "Zip Code must be at least 3 digits")
@@ -482,7 +482,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 <select
                   {...register("country")}
                   className={`block appearance-none w-full border ${countryError ? "border-red-500" : "border-gray-300 dark:border-gray-600"
-                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 md:h-12.1 md:px-3 text-sm rounded-md leading-tight focus:outline-none focus:border-primary-500`}
+                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 md:h-12.1 md:px-3 rounded-md text-sm leading-tight focus:outline-none focus:border-primary-500`}
                   value={selectedCountry}
                   onChange={(e) => {
                     handleCountryChange(e.target.value);
@@ -543,7 +543,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 <select
                   {...register("state")}
                   className={`block appearance-none w-full border ${stateError ? "border-red-500" : "border-gray-300 dark:border-gray-600"
-                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 md:h-12.1 md:px-3 rounded-md leading-tight focus:outline-none focus:border-primary-500`}
+                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 md:h-12.1 md:px-3 rounded-md text-sm leading-tight focus:outline-none focus:border-primary-500`}
                   value={selectedState}
                   onChange={(e) => {
                     setSelectedState(e.target.value);
@@ -605,7 +605,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 <select
                   {...register("city")}
                   className={`block appearance-none w-full border ${cityError ? "border-red-500" : "border-gray-300 dark:border-gray-600"
-                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 md:h-12.1 md:px-3 rounded-md leading-tight focus:outline-none focus:border-primary-500`}
+                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 md:h-12.1 md:px-3 rounded-md text-sm leading-tight focus:outline-none focus:border-primary-500`}
                   value={selectedCity}
                   onChange={(e) => {
                     setSelectedCity(e.target.value);

@@ -45,7 +45,7 @@ interface SafetySecurityAmenities {
 interface ToiletriesAmenities {
   shampooConditioner: boolean;
   soap: boolean;
-  hairdryer: boolean;
+  hairDryer: boolean;
 }
 
 
@@ -128,7 +128,7 @@ const roomAminitySchema = new Schema<RoomAminityType>({
     toiletries: {
       shampooConditioner: { type: Boolean, default: false },
       soap: { type: Boolean, default: false },
-      hairdryer: { type: Boolean, default: false },
+      hairDryer: { type: Boolean, default: false },
     },
 
     workLeisure: {

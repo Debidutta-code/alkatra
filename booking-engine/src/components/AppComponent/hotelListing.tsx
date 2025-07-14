@@ -310,7 +310,7 @@ const HotelListing: React.FC = () => {
             </p>
           </div>
 
-          <div className="w-[290px] md:w-full ">
+          <div className="w-[290px] md:w-full">
             <CompactSearchBar
               initialLocation={location || destination || ""}
               initialCheckin={checkinDate || ""}

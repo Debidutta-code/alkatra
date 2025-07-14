@@ -776,6 +776,8 @@
       "nightsStay_other": "{{count}} रातें",
       "roomType": "कमरे का प्रकार",
       "roomName": "कमरे का नाम",
+      "roomsCount_one": "{{count}} कमरा",
+      "roomsCount_other": "{{count}} कमरे",
       "guestDetails": "अतिथि विवरण",
       "guestName": "अतिथि का नाम",
       "contactNumber": "संपर्क नंबर",
@@ -800,7 +802,10 @@
       "cancelBooking": "बुकिंग रद्द करें",
       "dob": "जन्म तिथि",
       "rooms": "कमरे",
-      "printItinerary": "मार्ग विवरण प्रिंट करें"
+      "printItinerary": "मार्ग विवरण प्रिंट करें",
+      "guest": "मेहमान",
+      "printFooter": "आपकी बुकिंग के लिए धन्यवाद। किसी भी प्रश्न के लिए, कृपया हमारी ग्राहक सेवा से संपर्क करें।",
+      "printTitle": "बुकिंग पुष्टि"
     }
   },
   "Payment": {

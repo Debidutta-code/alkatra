@@ -24,7 +24,8 @@ import {
   Calendar,
   BedIcon,
   ShieldAlert,
-  CreditCard
+  CreditCard,
+  AlertCircle
 } from "lucide-react";
 
 interface AmendReservationModalProps {
@@ -257,7 +258,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomRentPrice`,
           {
-            hotelCode: "WINCLOUD",
+            hotelCode: booking.hotelCode,
             invTypeCode: roomTypeCode,
             startDate: dateRange[0].format('YYYY-MM-DD'),
             endDate: dateRange[1].format('YYYY-MM-DD'),
@@ -325,7 +326,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
       const finalPriceResponse = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomRentPrice`,
         {
-          hotelCode: "WINCLOUD",
+          hotelCode: booking.hotelCode,
           invTypeCode: selectedRoom?.room_type,
           startDate: checkInDate,
           endDate: checkOutDate,
@@ -499,7 +500,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
             {/* Stay Dates */}
             <div className="space-y-3 sm:space-y-4">
               <div className="flex items-start">
-                <div className="w-8 sm:w-10  rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 sm:mr-3 shadow-sm flex-shrink-0">
+                <div className="w-8 sm:w-10  rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 ml-2 sm:mr-3 shadow-sm flex-shrink-0">
                   <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
                 </div>
                 <div>
@@ -521,7 +522,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
             {/* Room Details */}
             <div className="space-y-3 sm:space-y-4">
               <div className="flex items-start">
-                <div className="w-8 sm:w-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 sm:mr-3 shadow-sm flex-shrink-0">
+                <div className="w-8 sm:w-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 ml-2 sm:mr-3 shadow-sm flex-shrink-0">
                   <BedIcon className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
                 </div>
                 <div>
@@ -538,7 +539,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
             {/* Rate Plan */}
             <div className="space-y-3 sm:space-y-4">
               <div className="flex items-start">
-                <div className="w-8  sm:w-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 sm:mr-3 shadow-sm flex-shrink-0">
+                <div className="w-8  sm:w-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 ml-2 sm:mr-3 shadow-sm flex-shrink-0">
                   <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
                 </div>
                 <div>
@@ -615,51 +616,93 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         <div className="bg-tripswift-off-white border border-gray-200 rounded-xl shadow-sm p-3 sm:p-4 md:p-6 mb-2 sm:mb-4 transition duration-300">
           {/* Dates Amendment Form */}
           {amendmentType === "dates" && (
-            <div className="space-y-2 sm:space-y-3 bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-tripswift-blue/20">
-              <div className="flex items-center gap-1 sm:gap-2 mb-2 sm:mb-3">
-                <CalendarDays className="h-5 w-5 text-tripswift-blue flex-shrink-0" />
-                <h4 className="text-lg sm:text-xl font-tripswift-bold text-tripswift-black">
+            <div className="space-y-2 bg-white p-3 sm:p-4 rounded-lg border border-tripswift-blue/20">
+              <div className="flex items-center gap-1">
+                <CalendarDays className="h-4 w-4 text-tripswift-blue mr-2 ml-2" />
+                <h4 className="text-base sm:text-lg font-tripswift-bold text-tripswift-black">
                   {t('BookingTabs.AmendReservationModal.changeDates')}
                 </h4>
               </div>
-              <div className="relative">
-                <label className="block text-sm font-tripswift-medium text-tripswift-black/70 mb-1">
-                  {t('BookingTabs.AmendReservationModal.selectNewDates')}
-                </label>
-                <div className="relative flex items-center gap-1 sm:gap-2 bg-tripswift-off-white rounded-lg p-2 border border-tripswift-blue/20 hover:border-tripswift-blue/50 transition-colors">
-                  <Calendar className="h-4 w-4 text-tripswift-blue/70 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <RangePicker
-                    value={dateRange}
-                    onChange={(dates) => {
-                      setDateRange(dates as [Dayjs, Dayjs]);
-                      setErrors((prev) => ({ ...prev, dateRange: '' }));
-                    }}
-                    disabledDate={current => {
-                      if (!booking.checkInDate) return false;
-                      const minDate = dayjs(booking.checkInDate).startOf('day');
-                      return current && current < minDate;
-                    }}
-                    format="DD/MM/YYYY"
-                    className="w-full pl-10 bg-transparent border-none focus:ring-0 hover:bg-tripswift-blue/5 transition-colors"
-                    style={{ height: '28px', fontSize: '6px', fontFamily: 'Noto Sans, sans-serif' }}
-                    placeholder={[
-                      t('BookingTabs.AmendReservationModal.checkInDate'),
-                      t('BookingTabs.AmendReservationModal.checkOutDate')
-                    ]}
-                    suffixIcon={null}
-                  />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1">
+                {/* Check-in Date */}
+                <div>
+                  <label className="block text-xs font-tripswift-medium text-tripswift-black/70">
+                    {t('BookingTabs.AmendReservationModal.checkInDate')}
+                  </label>
+                  <div className="relative mt-0.5">
+                    <div className="flex items-center bg-tripswift-off-white rounded-md p-1.5 border border-tripswift-blue/20">
+                      <Calendar className="h-3.5 w-3.5 text-tripswift-blue/70 absolute left-2.5" />
+                      <DatePicker
+                        value={dateRange?.[0]}
+                        onChange={(date) => {
+                          const newRange = [date, dateRange?.[1]];
+                          setDateRange(newRange as [Dayjs, Dayjs]);
+                          setErrors((prev) => ({ ...prev, dateRange: '' }));
+                        }}
+                        disabledDate={current => {
+                          if (!booking.checkInDate) return false;
+                          const minDate = dayjs(booking.checkInDate).startOf('day');
+                          return current && current < minDate;
+                        }}
+                        format="DD/MM/YYYY"
+                        className="w-full pl-8 bg-transparent border-none focus:ring-0 text-sm"
+                        style={{ height: '32px' }}
+                        placeholder={t('BookingTabs.AmendReservationModal.selectCheckIn')}
+                        suffixIcon={null}
+                      />
+                    </div>
+                  </div>
                 </div>
-                {errors["dateRange"] && (
-                  <p className="text-xs text-red-600 mt-0.5">{errors["dateRange"]}</p>
-                )}
+
+                {/* Check-out Date */}
+                <div>
+                  <label className="block text-xs font-tripswift-medium text-tripswift-black/70">
+                    {t('BookingTabs.AmendReservationModal.checkOutDate')}
+                  </label>
+                  <div className="relative mt-0.5">
+                    <div className="flex items-center bg-tripswift-off-white rounded-md p-1.5 border border-tripswift-blue/20">
+                      <Calendar className="h-3.5 w-3.5 text-tripswift-blue/70 absolute left-2.5" />
+                      <DatePicker
+                        value={dateRange?.[1]}
+                        onChange={(date) => {
+                          const newRange = [dateRange?.[0], date];
+                          setDateRange(newRange as [Dayjs, Dayjs]);
+                          setErrors((prev) => ({ ...prev, dateRange: '' }));
+                        }}
+                        disabledDate={current => {
+                          if (!dateRange?.[0]) return current && current <= dayjs();
+                          return current && current <= dateRange[0];
+                        }}
+                        format="DD/MM/YYYY"
+                        className="w-full pl-8 bg-transparent border-none focus:ring-0 text-sm"
+                        style={{ height: '32px' }}
+                        placeholder={t('BookingTabs.AmendReservationModal.selectCheckOut')}
+                        suffixIcon={null}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              {errors["dateRange"] && (
+                <div className="px-2 py-1 bg-red-50 border border-red-200 rounded-md text-xs">
+                  <p className="text-red-600 flex items-center">
+                    <AlertCircle className="h-3.5 w-3.5 mr-2 ml-2" />
+                    {errors["dateRange"]}
+                  </p>
+                </div>
+              )}
+
               {dateRange && dateRange[0] && dateRange[1] && (
-                <div className="px-3 py-2 bg-tripswift-blue/10 rounded-lg text-sm text-tripswift-blue/90 font-tripswift-medium flex items-center">
-                  <Clock className={`h-4 w-4 text-tripswift-blue mr-2 flex-shrink-0 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
-                  <div>
-                    {t('BookingTabs.AmendReservationModal.stayDuration', {
-                      count: dateRange[1].diff(dateRange[0], 'day')
-                    })}
+                <div className="px-2 py-1.5 bg-tripswift-blue/10 rounded-md text-xs">
+                  <div className="flex items-center">
+                    <Clock className="h-3.5 w-3.5 text-tripswift-blue mr-2 ml-2" />
+                    <span>
+                      {t('BookingTabs.AmendReservationModal.stayDuration', {
+                        count: dateRange[1].diff(dateRange[0], 'day')
+                      })}
+                    </span>
                   </div>
                 </div>
               )}

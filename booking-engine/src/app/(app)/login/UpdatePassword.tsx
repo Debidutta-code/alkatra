@@ -110,12 +110,21 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack }) => {
         }
       );
       console.log("Reset Password API Response:", response.status);
-      if (response.status == 200) {
+      if (response.status === 200) {
         setMessage(t("Auth.UpdatePassword.successMessage"));
         setNewPassword("");
         setConfirmPassword("");
-          router.push("/login?fromReset=true");
-      } else {
+        setTimeout(() => {
+          window.location.href = "/login?fromReset=true";
+        }, 1500);
+      }
+      // if (response.status == 200) {
+      //   setMessage(t("Auth.UpdatePassword.successMessage"));
+      //   setNewPassword("");
+      //   setConfirmPassword("");
+      //     router.push("/login?fromReset=true");
+      // } 
+      else {
         setError(response.data.message || t("Auth.UpdatePassword.errors.generic"));
       }
     } catch (error: any) {

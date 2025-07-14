@@ -202,7 +202,7 @@ const Page = () => {
                                     <Building2 className="w-4 h-4 mr-1" />
                                     <span>{directProperties.length} Direct {directProperties.length === 1 ? 'Property' : 'Properties'}</span>
                                 </div>
-                                
+
                             </div>
                         </div>
 
@@ -246,8 +246,8 @@ const Page = () => {
             </div>
 
             {/* Content */}
-`            <div className="max-w-7xl mx-auto px-6 py-8">
-`                {loading ? (
+            <div className="max-w-7xl mx-auto px-6 py-8">
+                {loading ? (
                     <LoadingState />
                 ) : filteredProperties.length > 0 ? (
                     <div className="space-y-6">

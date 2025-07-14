@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import PhoneInput from "react-phone-number-input";
-import "react-phone-number-input/style.css";
 import { useDispatch, useSelector } from "react-redux";
 import { setGuestDetails, setAmount } from "@/Redux/slices/pmsHotelCard.slice";
 import { User, Mail, Phone, Calendar, CreditCard, X, Loader2 } from "lucide-react";
 import { formatDate, calculateNights } from "@/utils/dateUtils";
 import { useTranslation } from "react-i18next";
+import { verifyApi } from "@/api/verify";
 import axios from "axios";
 
 // Interfaces remain unchanged
@@ -363,81 +363,42 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       }));
       return;
     }
+
     setIsEmailVerifying(true);
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/send-otp`,
-        {
-          identifier: email,
-          type: "mail_verification",
-        },
-        { withCredentials: true }
+      const response = await verifyApi.sendEmailOtp(email);
+      setUpdateMessage(
+        response.message || t("BookingComponents.GuestInformationModal.otpSent")
       );
-
-      if (response.data.success) {
-        setUpdateMessage(
-          response.data.message ||
-          t("BookingComponents.GuestInformationModal.otpSent")
-        );
-        setEmailOtpSent(true);
-        setEmailCountdown(300); // 5 minutes
-        setEmailVerified(false);
-      } else {
-        setErrorMessage(
-          response.data.message ||
-          t("BookingComponents.GuestInformationModal.otpSendFailed")
-        );
-      }
+      setEmailOtpSent(true);
+      setEmailCountdown(300);
+      setEmailVerified(false);
     } catch (err: any) {
-      console.error("Email OTP Request Error:", err);
       setErrorMessage(
-        t("BookingComponents.GuestInformationModal.otpSendError")
+        err.message || t("BookingComponents.GuestInformationModal.otpSendFailed")
       );
-    }
-    finally {
+    } finally {
       setIsEmailVerifying(false);
     }
   };
 
   const handleVerifyEmailOtp = async () => {
     if (!emailOtp.trim()) {
-      setErrorMessage(
-        t("BookingComponents.GuestInformationModal.otpEmptyError")
-      );
+      setErrorMessage(t("BookingComponents.GuestInformationModal.otpEmptyError"));
       return;
     }
 
     try {
+      const response = await verifyApi.verifyEmailOtp(email, emailOtp);
+      setUpdateMessage(t("BookingComponents.GuestInformationModal.emailVerified"));
+      setEmailVerified(true);
+      setEmailOtpSent(false);
+      setEmailCountdown(0);
+      setEmailOtp("");
       setErrorMessage(null);
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/verify-otp`,
-        {
-          identifier: email,
-          otp: emailOtp,
-          type: "mail_verification",
-        },
-        { withCredentials: true }
-      );
-
-      if (response.data.success) {
-        setUpdateMessage(
-          t("BookingComponents.GuestInformationModal.emailVerified")
-        );
-        setEmailVerified(true);
-        setEmailOtpSent(false);
-        setEmailCountdown(0);
-        setEmailOtp("");
-        setErrorMessage(null);
-      } else {
-        setErrorMessage(
-          response.data.message ||
-          t("BookingComponents.GuestInformationModal.otpInvalidError")
-        );
-      }
     } catch (err: any) {
-      console.error("Email OTP Verify Error:", err);
       setErrorMessage(
-        t("BookingComponents.GuestInformationModal.otpVerifyError")
+        err.message || t("BookingComponents.GuestInformationModal.otpInvalidError")
       );
     }
   };
@@ -450,84 +411,43 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       }));
       return;
     }
+
     setIsPhoneVerifying(true);
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/send-otp`,
-        {
-          identifier: phone,
-          type: "number_verification",
-        },
-        { withCredentials: true }
+      const response = await verifyApi.sendPhoneOtp(phone);
+      setUpdateMessage(
+        response.message || t("BookingComponents.GuestInformationModal.otpSent")
       );
-
-      if (response.data.success) {
-        setUpdateMessage(
-          response.data.message ||
-          t("BookingComponents.GuestInformationModal.otpSent")
-        );
-        setPhoneOtpSent(true);
-        setPhoneCountdown(300);
-        setPhoneVerified(false);
-        // Clear any existing phone errors
-        setErrors(prev => ({ ...prev, phone: '' }));
-      } else {
-        setErrorMessage(
-          response.data.message ||
-          t("BookingComponents.GuestInformationModal.otpSendFailed")
-        );
-      }
+      setPhoneOtpSent(true);
+      setPhoneCountdown(300);
+      setPhoneVerified(false);
+      setErrors(prev => ({ ...prev, phone: '' }));
     } catch (err: any) {
-      console.error("Phone OTP Request Error:", err);
       setErrorMessage(
-        t("BookingComponents.GuestInformationModal.otpSendError")
+        err.message || t("BookingComponents.GuestInformationModal.otpSendFailed")
       );
-    }
-    finally {
+    } finally {
       setIsPhoneVerifying(false);
     }
   };
 
   const handleVerifyPhoneOtp = async () => {
     if (!phoneOtp.trim()) {
-      setErrorMessage(
-        t("BookingComponents.GuestInformationModal.otpEmptyError")
-      );
+      setErrorMessage(t("BookingComponents.GuestInformationModal.otpEmptyError"));
       return;
     }
 
     try {
-      setErrorMessage(null); // Clear any existing error
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/verify-otp`,
-        {
-          identifier: phone,
-          otp: phoneOtp,
-          type: "number_verification",
-        },
-        { withCredentials: true }
-      );
-
-      if (response.data.success) {
-        setUpdateMessage(
-          t("BookingComponents.GuestInformationModal.phoneVerified")
-        );
-        setPhoneVerified(true);
-        setPhoneOtpSent(false);
-        setPhoneCountdown(0);
-        setPhoneOtp("");
-        setErrorMessage(null);
-      } else {
-        setErrorMessage(
-          response.data.message ||
-          t("BookingComponents.GuestInformationModal.otpInvalidError")
-        );
-      }
+      const response = await verifyApi.verifyPhoneOtp(phone || "", phoneOtp);
+      setUpdateMessage(t("BookingComponents.GuestInformationModal.phoneVerified"));
+      setPhoneVerified(true);
+      setPhoneOtpSent(false);
+      setPhoneCountdown(0);
+      setPhoneOtp("");
+      setErrorMessage(null);
     } catch (err: any) {
-      console.error("Phone OTP Verify Error:", err);
       setErrorMessage(
-        err.response?.data?.message ||
-        t("BookingComponents.GuestInformationModal.otpVerifyError")
+        err.message || t("BookingComponents.GuestInformationModal.otpInvalidError")
       );
     }
   };
@@ -577,12 +497,13 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       valid = false;
     }
 
+    // In handleUpdate function
     if (!phone) {
       newErrors["phone"] = t("BookingComponents.GuestInformationModal.phoneError");
       valid = false;
-    } else {
-      const numericPhone = phone.replace(/\D/g, '');
-      if (numericPhone.length < 8 || (phone.startsWith('+91') && numericPhone.length !== 12)) {
+    } else if (phone.startsWith("+91")) {
+      const digits = phone.replace(/\D/g, "").substring(2); // Remove +91 and non-digits
+      if (digits.length !== 10) {
         newErrors["phone"] = t("BookingComponents.GuestInformationModal.phoneLengthError");
         valid = false;
       }
@@ -748,14 +669,22 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   };
 
   const handlePhoneChange = (value: string | undefined) => {
-    if (value && value.startsWith("+91")) {
-      // Remove all non-digit characters
-      const digits = value.replace(/\D/g, "");
-      // If more than 12 characters (+91 + 10 digits), truncate
-      const formattedValue =
-        digits.length > 12 ? `+${digits.substring(0, 12)}` : value;
-      setPhone(formattedValue);
+    if (!value) {
+      setPhone("");
+      return;
+    }
+
+    // For Indian numbers (+91)
+    if (value.startsWith("+91")) {
+      // Remove all non-digit characters and +91
+      const digits = value.replace(/\D/g, "").substring(2);
+
+      // Only update if we have exactly 10 digits or are building towards it
+      if (digits.length <= 10) {
+        setPhone(`+91${digits}`);
+      }
     } else {
+      // For other countries
       setPhone(value);
     }
   };
@@ -1141,25 +1070,15 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                           id="phone"
                           name="phone"
                           value={phone}
-                          onChange={(value) => {
-                            // Clear phone error when typing a valid number
-                            if (errors.phone && value && /^\+\d{8,}$/.test(value)) {
-                              setErrors(prev => ({ ...prev, phone: '' }));
-                            }
-                            if (phoneVerified && value !== phone) {
-                              setPhoneVerified(false);
-                              setPhoneOtpSent(false);
-                              setPhoneOtp("");
-                              setPhoneCountdown(0);
-                            }
-                            handlePhoneChange(value);
-                          }}
-                          maxLength={16}
+                          onChange={handlePhoneChange}
                           defaultCountry="IN"
                           placeholder={t("BookingComponents.GuestInformationModal.phonePlaceholder")}
                           className={`w-full px-2 sm:px-3 h-9 sm:h-11 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-xs sm:text-sm font-tripswift-regular ${errors.phone ? "border-red-600" : "border-tripswift-black/20"
                             }`}
                           international
+                          limitMaxLength
+                          countryCallingCodeEditable={false}
+                          maxLength={15}
                         />
                         {!phoneVerified && (
                           <button

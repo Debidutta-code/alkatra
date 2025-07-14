@@ -56,7 +56,7 @@ const roomSchema = z.object({
   fireExtinguisher: z.boolean(),
   shampooConditioner: z.boolean(),
   soap: z.boolean(),
-  hairdryer: z.boolean(),
+  hairDryer: z.boolean(),
   workDesk: z.boolean(),
   readingChair: z.boolean(),
   additionalLighting: z.boolean(),
@@ -88,7 +88,7 @@ type Inputs = {
   fireExtinguisher: boolean;
   shampooConditioner: boolean;
   soap: boolean;
-  hairdryer: boolean;
+  hairDryer: boolean;
   workDesk: boolean;
   readingChair: boolean;
   additionalLighting: boolean;
@@ -142,7 +142,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
       fireExtinguisher: false,
       shampooConditioner: false,
       soap: false,
-      hairdryer: false,
+      hairDryer: false,
       workDesk: false,
       readingChair: false,
       additionalLighting: false,
@@ -199,7 +199,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
       toiletries: {
         shampooConditioner: !!data.shampooConditioner,
         soap: !!data.soap,
-        hairdryer: !!data.hairdryer,
+        hairDryer: !!data.hairDryer,
       },
 
       workLeisure: {
@@ -237,7 +237,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
       toast.success("Room amenities submitted successfully!");
       onNext();
 
-      router.push("/app/property/single");
+      router.push(`/app/property/${property_id}`);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setFormLoading(false);
@@ -727,19 +727,19 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                       </div>
                       <div className="flex items-center space-x-2">
                         <Checkbox
-                          id="hairdryer"
-                          checked={roomDetails?.hairdryer}
-                          {...register("hairdryer")}
+                          id="hairDryer"
+                          checked={roomDetails?.hairDryer}
+                          {...register("hairDryer")}
                           onCheckedChange={(value: boolean) => {
                             setroomDetails({
                               ...roomDetails,
-                              hairdryer: value,
+                              hairDryer: value,
                             });
-                            setValue("hairdryer", value);
+                            setValue("hairDryer", value);
                           }}
                         />
                         <Label
-                          htmlFor="hairdryer"
+                          htmlFor="hairDryer"
                           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                           Hair Dryer

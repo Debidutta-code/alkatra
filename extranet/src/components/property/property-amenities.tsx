@@ -347,7 +347,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 }
                 className={`block appearance-none w-full bg-background border ${
                   destinationTypeError ? "border-red-500" : "border-input"
-                } py-2 px-3 h-10  rounded-md leading-tight focus:outline-none focus:border-blue-500`}
+                } py-2 px-3 h-10  rounded-md text-sm leading-tight focus:outline-none focus:border-blue-500`}
               >
                 <option value="">
                   Select Destination Type
@@ -391,7 +391,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 }
                 className={`block appearance-none w-full bg-background border ${
                   propertyTypeError ? "border-red-500" : "border-input"
-                } py-2 px-3 h-10 rounded-md leading-tight focus:outline-none focus:border-blue-500`}
+                } py-2 px-3 h-10 rounded-md text-sm leading-tight focus:outline-none focus:border-blue-500`}
               >
                 <option value="" disabled>
                   Select Property Type

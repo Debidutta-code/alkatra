@@ -458,7 +458,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
                 }))
               }
               type="string"
-            // placeholder="Single Room"
+              placeholder="Single Room"
             />
             {room_typeError && (
               <p className="text-red-500 text-sm ">
@@ -529,6 +529,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
                 }))
               }
               type="number"
+              placeholder="Total Rooms"
             />
             {total_roomError && (
               <p className="text-red-500 text-sm">
@@ -553,6 +554,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
                 }))
               }
               type="number"
+              placeholder="Floor"
             />
             {floorError && (
               <p className="text-red-500 text-sm ">{floorError.message}</p>
@@ -604,6 +606,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
                 }))
               }
               type="number"
+              placeholder="Room Size"
             />
             {room_sizeError && (
               <p className="text-red-500 text-sm ">
@@ -633,7 +636,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
                   }
         bg-white dark:bg-gray-800 
         text-gray-700 dark:text-gray-200 
-        py-2 px-3 h-9 rounded-md 
+        py-2 px-3 h-9 rounded-md text-sm 
         leading-tight focus:outline-none focus:border-blue-500`}
               >
                 <option value="" disabled>
@@ -683,7 +686,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
                   }
         bg-white dark:bg-gray-800 
         text-gray-700 dark:text-gray-200 
-        py-2 px-3 h-9 rounded-md 
+        py-2 px-3 h-9 rounded-md text-sm 
         leading-tight focus:outline-none focus:border-blue-500`}
               >
                 <option value="" disabled>
@@ -733,6 +736,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
                 }))
               }
               type="number"
+              placeholder="Max Occupancy"
             />
             {max_occupancyError && (
               <p className="text-red-500 text-sm ">
@@ -762,6 +766,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
                 }))
               }
               type="number"
+              placeholder="Max Adults"
             />
             {max_number_of_adultsError && (
               <p className="text-red-500 text-sm ">
@@ -791,6 +796,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
                 }))
               }
               type="number"
+              placeholder="Max Childrens"
             />
             {max_number_of_childrenError && (
               <p className="text-red-500 text-sm ">
@@ -820,6 +826,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
                 }))
               }
               type="number"
+              placeholder="Bedrooms"
             />
             {number_of_bedroomsError && (
               <p className="text-red-500 text-sm ">
@@ -849,6 +856,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
                 }))
               }
               type="number"
+              placeholder="Living Rooms"
             />
             {number_of_living_roomError && (
               <p className="text-red-500 text-sm ">
@@ -873,6 +881,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
                 }))
               }
               type="number"
+              placeholder="Extra Bed"
             />
             {extra_bedError && (
               <p className="text-red-500 text-sm">
@@ -984,7 +993,7 @@ function PreviewPropertyImages({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-       <DialogTrigger
+      <DialogTrigger
         className={buttonVariants({
           variant: "outline",
         })}

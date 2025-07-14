@@ -515,10 +515,10 @@
       "guestInformation": "Guest Information",
       "dob": "Date Of Birth",
       "firstNameLabel": "First Name",
-      "firstNamePlaceholder": "Enter your first name",
+      "firstNamePlaceholder": "Enter first name",
       "firstNameError": "First Name is required",
       "lastNameLabel": "Last Name",
-      "lastNamePlaceholder": "Enter your last name",
+      "lastNamePlaceholder": "Enter last name",
       "lastNameError": "Last Name is required ",
       "emailLabel": "Email Address",
       "emailPlaceholder": "your.email@example.com",
@@ -786,6 +786,7 @@
       }
     },
     "BookingDetailsModal": {
+      "bookingId": "Booking ID",
       "bookingNumber": "Booking #{{id}}",
       "closeModal": "Close modal",
       "status": {
@@ -801,8 +802,8 @@
       "nightsStay_other": "{{count}} Nights",
       "roomType": "Room Type",
       "roomName": "Room Name",
-      "roomsSingular": "Room",
-      "roomsPlural": "Rooms",
+      "roomsCount_one": "{{count}} Room",
+      "roomsCount_other": "{{count}} Rooms",
       "guestDetails": "Guest Details",
       "guestName": "Guest Name",
       "contactNumber": "Contact Number",
@@ -827,7 +828,10 @@
       "cancelBooking": "Cancel Booking",
       "printItinerary": "Print Itinerary",
       "rooms": "Rooms",
-      "dob": "Date Of Birth"
+      "dob": "Date Of Birth",
+      "guest": "Guest",
+      "printFooter": "Thank you for your booking. For any questions, please contact our customer service.",
+      "printTitle": "Booking Confirmation"
     }
   },
   "Payment": {
