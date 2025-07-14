@@ -361,6 +361,7 @@ export const createReservationWithStoredCard = CatchAsyncError(
     const reservationInput: ReservationInput = {
       bookingDetails: {
         reservationId: "",
+        paymentMethod: "payAtHotel",
         userId,
         checkInDate,
         checkOutDate,
@@ -691,6 +692,7 @@ export async function createReservationWithCryptoPayment(input: {
     const reservationInput: ReservationInput = {
       bookingDetails: {
         reservationId: reservationId ?? "",
+        paymentMethod: "crypto",
         userId,
         checkInDate,
         checkOutDate,
@@ -935,8 +937,7 @@ export async function createReservationWithCryptoPayment(input: {
     console.error("❌ Error creating reservation with crypto:", error.message || error);
     throw new Error(`Failed to create reservation: ${error.message || "Unknown error"}`);
   }
-}
-
+};
 
 export const updateThirdPartyReservation = CatchAsyncError(
   async (req: any, res: Response, next: NextFunction) => {

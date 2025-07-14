@@ -18,6 +18,7 @@ export class ReservationProcessor {
             email,
             phone,
             reservationId,  
+            paymentMethod,
         } = bookingDetails;
         console.log("ReservationProcessor: Processing reservation input data:", bookingDetails);
 
@@ -35,13 +36,10 @@ export class ReservationProcessor {
             guests,
             email,
             phone,
-            // userId: "someUserId", 
-            // propertyId: "somePropertyId",
-            // roomIds: ["room1", "room2"], 
-            // status: "Confirmed", 
             reservationId: reservationId || uuidv4(),
             ageCodeSummary,
-            roomTotalPrice
+            roomTotalPrice,
+            paymentMethod,
         };
 
         return reservationData;

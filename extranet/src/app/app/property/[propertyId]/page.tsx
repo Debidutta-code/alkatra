@@ -137,11 +137,10 @@ export default function Page({ params, searchParams }: Props) {
   const [editedAddress, setEditedAddress] = useState<AddressData | null>(null);
   const [editAddressMode, setEditAddressMode] = useState<boolean>(false);
 
-  // Get access token from cookies
-  // const accessToken = Cookies.get('accessToken');
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const propertyId = params.propertyId;
-  // Fetch initial data
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -214,7 +213,6 @@ export default function Page({ params, searchParams }: Props) {
   };
 
   const handleAddressAddClick = async (e: any) => {
-    // e.preventDefault()
     try {
       if (!accessToken || !editedAddress) {
         console.error('Access token is undefined or not set, or editedAddress is null');
@@ -350,31 +348,19 @@ export default function Page({ params, searchParams }: Props) {
         console.error('Access token is undefined or not set');
         return;
       }
-      // console.log("New Room", newRoom);
-      // console.log("property id",params.propertyId)
       const addedRoom = await addPropertyRoom(params.propertyId, accessToken, newRoom);
-      // console.log("property id",params.propertyId);
-      //     console.log("new room data after property id",newRoom);
-
-      //         console.log("property id",accessToken);
-
-
+      
       (addedRoom !== null ?
         toast.success('Room added successfully!') :
         toast.error('Room could not be added!')
       );
 
-      // console.log("room data", addedRoom);
-      // console.log("rooms before set",rooms)
       setRooms((prevRooms) => {
         const roomContainer = prevRooms[0] || {};
         const newKey = Object.keys(roomContainer).length;
         return [{ ...roomContainer, [newKey]: addedRoom.new_room }];
       });
 
-
-      // setRooms((prevRooms)=>[...prevRooms , addedRoom.new_room])
-      // console.log("rooms after set",rooms)
     } catch (error) {
       console.error('Error adding new room:', error);
     }
@@ -484,7 +470,7 @@ export default function Page({ params, searchParams }: Props) {
         console.error('Access token is undefined or not set');
         return;
       }
-      const createdRoomAmenity = await createPropertyRoomAmenity(params.propertyId, accessToken, newRoomAmenity);
+      const createdRoomAmenity = await createPropertyRoomAmenity(params.propertyId, accessToken, newRoomAmenity, );
       setRoomAmenity(createdRoomAmenity);
       setEditedRoomAmenity(createdRoomAmenity);
       // Optionally, refetch the entire property data

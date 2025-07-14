@@ -7,7 +7,7 @@ export class ThirdPartyReservationRepository {
     xmlSent: string,
     apiResponse: string
   ): Promise<void> {
-
+    const isCrypto = data.paymentMethod === 'crypto';
     const booking = new ThirdPartyBooking({
       userId: data.userId,
       guestDetails: data.guests,
@@ -25,6 +25,8 @@ export class ThirdPartyReservationRepository {
       totalAmount: data.amountBeforeTax,
       currencyCode: data.currencyCode,
       status: 'Confirmed',
+      paymentMethod: data.paymentMethod,
+      cryptoPayment: isCrypto,
     });
     console.log(`The currency code in WINCLOUD Repository ${booking.currencyCode}`)
     const savedBooking = await booking.save();
