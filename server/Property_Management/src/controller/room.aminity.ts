@@ -55,7 +55,6 @@ const createRoomAminity = catchAsync(
     }
   }
 );
-
 // update room amenity
 const updateRoomAmenity = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -94,23 +93,33 @@ const getRoomAminity = async (req: Request, res: Response, next: NextFunction) =
   try {
     const propertyInfo_id = req.params.id; 
     const room_type = req.params.room_type; 
+
     console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$-property_id", propertyInfo_id);
     console.log("Room Type:", room_type);
-    if (!propertyInfo_id || !room_type) {
-      return next(new AppError("Please provide propertyInfo_id and room_type", 400));
-    } 
 
-    const roomAminity = await RoomAminity.findOne({ propertyInfo_id, room_type }).lean();
-    console.log("roomAminity:", roomAminity);
+    if (!propertyInfo_id) {
+      return next(new AppError("Please provide propertyInfo_id", 400));
+    }
 
-    if (!roomAminity) {
-      return next(new AppError(`No property found with this id ${propertyInfo_id}`, 404));
+    let roomAminity;
+
+    if (room_type) {
+      roomAminity = await RoomAminity.findOne({ propertyInfo_id, room_type }).lean();
+      if (!roomAminity) {
+        return next(new AppError(`No amenities found for room type "${room_type}" in property ${propertyInfo_id}`, 404));
+      }
+    } else {
+      roomAminity = await RoomAminity.find({ propertyInfo_id }).lean();
+      if (!roomAminity || roomAminity.length === 0) {
+        return next(new AppError(`No amenities found for property ${propertyInfo_id}`, 404));
+      }
     }
 
     res.status(200).json({
       success: true,
       data: roomAminity
-    })
+    });
+    
   } catch (error: any) {
     console.log(error.message);
     return res.status(500).json({ 
@@ -119,5 +128,6 @@ const getRoomAminity = async (req: Request, res: Response, next: NextFunction) =
     });
   }
 }
+
 
 export { createRoomAminity, updateRoomAmenity, getRoomAminity };

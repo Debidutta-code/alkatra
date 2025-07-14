@@ -1168,10 +1168,6 @@ export const updateThirdPartyReservation = CatchAsyncError(
       <h2>Updated Reservation Details</h2>
       <table class="details-table">
         <tr>
-          <th>Reservation ID</th>
-          <td>{{reservationId}}</td>
-        </tr>
-        <tr>
           <th>Hotel Name</th>
           <td>{{hotelName}}</td>
         </tr>
@@ -1240,7 +1236,6 @@ export const updateThirdPartyReservation = CatchAsyncError(
         const templateData = {
           guestName: `${guests[0].firstName} ${guests[0].lastName}`,
           hotelName,
-          reservationId,
           checkInDate: new Date(checkInDate).toLocaleDateString(),
           checkOutDate: new Date(checkOutDate).toLocaleDateString(),
           roomTypeCode,
