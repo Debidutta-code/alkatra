@@ -297,139 +297,156 @@ const getRoomsByPropertyId = catchAsync(async (req: Request, res: Response, next
   });
 })
 
+const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const propertyInfoId = req.params.id;
+  const numberOfRooms = req.query.numberOfRooms;
+  const { startDate, endDate, hotelCode = "WINCLOUD" } = req.body;
+  console.log(startDate, endDate)
 
-const getRoomsByPropertyId2 = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const propertyInfoId = req.params.id;
-    const { startDate, endDate, hotelCode = "WINCLOUD" } = req.body;
-    console.log(startDate, endDate)
-    // Validate mandatory fields
-    if (!startDate) {
-      return next(new AppError("startDate is required", 400));
-    }
+  if (!startDate) {
+    return next(new AppError("startDate is required", 400));
+  }
 
-    if (!endDate) {
-      return next(new AppError("endDate is required", 400));
-    }
+  if (!endDate) {
+    return next(new AppError("endDate is required", 400));
+  }
 
-    if (!hotelCode) {
-      return next(new AppError("hotelCode is required", 400));
-    }
+  if (!hotelCode) {
+    return next(new AppError("hotelCode is required", 400));
+  }
 
-    // Optimized aggregation pipeline
-    const roomsWithRates = await Room.aggregate([
-      // Match rooms for the specific property
-      {
-        $match: {
-          propertyInfo_id: new mongoose.Types.ObjectId(propertyInfoId)
-        }
-      },
+  // if (!propertyInfoId || !numberOfRooms) {
+  //   return next(new AppError("Property Info Id and Number of Rooms are required", 400));
+  // }
 
-      // Lookup and process rate information in one go
-      {
-        $lookup: {
-          from: "rateamountdatewises",
-          let: { roomType: "$room_type" },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $eq: ["$invTypeCode", "$$roomType"] },
-                    { $eq: ["$hotelCode", hotelCode] },
-                    { $eq: ["$startDate", new Date(startDate)] },
-                  ]
-                }
-              }
-            },
-            { $sort: { startDate: 1 } },
-            { $limit: 1 },
-            {
-              $project: {
-                room_price: { $arrayElemAt: ["$baseByGuestAmts.amountBeforeTax", 0] },
-                currency_code: "$currencyCode",
-                rate_plan_code: "$ratePlanCode",
-                available_guest_rates: "$baseByGuestAmts",
-                rate_images: "$image" 
+  const roomsWithRates = await Room.aggregate([
+    {
+      $match: {
+        propertyInfo_id: new mongoose.Types.ObjectId(propertyInfoId)
+      }
+    },
+    {
+      $lookup: {
+        from: "rateamountdatewises",
+        let: { roomType: "$room_type" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$invTypeCode", "$$roomType"] },
+                  { $eq: ["$hotelCode", hotelCode] },
+                  { $eq: ["$startDate", new Date(startDate)] },
+                ]
               }
             }
-          ],
-          as: "rateInfo"
-        }
-      },
-      {
-        $project: {
-          _id: 1,
-          propertyInfo_id: 1,
-          room_name: 1,
-          room_type: 1,
-          total_room: 1,
-          available_rooms: 1,
-          floor: 1,
-          room_view: 1,
-          room_size: 1,
-          room_unit: 1,
-          smoking_policy: 1,
-          max_occupancy: 1,
-          max_number_of_adults: 1,
-          max_number_of_children: 1,
-          number_of_bedrooms: 1,
-          number_of_living_room: 1,
-          extra_bed: 1,
-          description: 1,
-          image: 1, 
-          available: 1,
-          rateplan_created: 1,
-          createdAt: 1,
-          updatedAt: 1,
-          __v: 1,
-          room_price: { $arrayElemAt: ["$rateInfo.room_price", 0] },
-          currency_code: { $arrayElemAt: ["$rateInfo.currency_code", 0] },
-          rate_plan_code: { $arrayElemAt: ["$rateInfo.rate_plan_code", 0] },
-          available_guest_rates: { $arrayElemAt: ["$rateInfo.available_guest_rates", 0] },
-          rate_images: { $arrayElemAt: ["$rateInfo.rate_images", 0] }, 
-          has_valid_rate: { $gt: [{ $size: "$rateInfo" }, 0] }
-        }
+          },
+          { $sort: { startDate: 1 } },
+          { $limit: 1 },
+          {
+            $project: {
+              room_price: { $arrayElemAt: ["$baseByGuestAmts.amountBeforeTax", 0] },
+              currency_code: "$currencyCode",
+              rate_plan_code: "$ratePlanCode",
+              available_guest_rates: "$baseByGuestAmts",
+              rate_images: "$image"
+            }
+          }
+        ],
+        as: "rateInfo"
       }
-    ]);
-
-    if (!roomsWithRates || roomsWithRates.length === 0) {
-      return next(
-        new AppError(`No property found with this id ${propertyInfoId}`, 404)
-      );
+    },
+    {
+      $project: {
+        _id: 1,
+        propertyInfo_id: 1,
+        room_name: 1,
+        room_type: 1,
+        total_room: 1,
+        available_rooms: 1,
+        floor: 1,
+        room_view: 1,
+        room_size: 1,
+        room_unit: 1,
+        smoking_policy: 1,
+        max_occupancy: 1,
+        max_number_of_adults: 1,
+        max_number_of_children: 1,
+        number_of_bedrooms: 1,
+        number_of_living_room: 1,
+        extra_bed: 1,
+        description: 1,
+        image: 1,
+        available: 1,
+        rateplan_created: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        __v: 1,
+        room_price: { $arrayElemAt: ["$rateInfo.room_price", 0] },
+        currency_code: { $arrayElemAt: ["$rateInfo.currency_code", 0] },
+        rate_plan_code: { $arrayElemAt: ["$rateInfo.rate_plan_code", 0] },
+        available_guest_rates: { $arrayElemAt: ["$rateInfo.available_guest_rates", 0] },
+        rate_images: { $arrayElemAt: ["$rateInfo.rate_images", 0] },
+        has_valid_rate: { $gt: [{ $size: "$rateInfo" }, 0] }
+      }
     }
+  ]);
 
-    const couponCode = await generateCouponCode();
-    const deepLinkUrl = `${process.env.DEEP_LINK}/property/${propertyInfoId}?coupon=${couponCode.code}&startDate=${startDate}&endDate=${endDate}`;
+  if (!roomsWithRates || roomsWithRates.length === 0) {
+    return next(
+      new AppError(`No property found with this id ${propertyInfoId}`, 404)
+    );
+  }
 
-    let qrCodeData: string;
-    try {
-      qrCodeData = await QRCode.toDataURL(deepLinkUrl);
-    } catch (error) {
-      return next(new AppError("Failed to generate QR code", 500));
-    }
+  // const sufficientRooms = roomsWithRates.some(room => room.available_rooms >= numberOfRooms);
+  // console.log(`The sufficientRooms: ${sufficientRooms}, numberOfRooms: ${numberOfRooms}, roomsWithRates: ${JSON.stringify(roomsWithRates)}`);
+  // if (!sufficientRooms) {
+  //   return next(
+  //     new AppError(
+  //       `Not enough rooms available. Requested: ${numberOfRooms}, Available: ${Math.max(...roomsWithRates.map(room => room.available_rooms) || [0])}`,
+  //       400
+  //     )
+  //   );
+  // }
 
-    res.status(200).json({
-      status: "success",
-      error: false,
-      message: "Rooms fetched by property id with rate plan successfully",
-      data: roomsWithRates,
-      qrCode: qrCodeData,
-      couponCode: couponCode.code,
-      deepLink: deepLinkUrl,
-      searchCriteria: {
-        startDate,
-        endDate,
-        propertyId: propertyInfoId,
-        hotelCode,
-      },
+  const hasSUTRoom = roomsWithRates.some(room => room.room_type === 'SUT');
+  if (!hasSUTRoom) {
+    return res.status(400).json({
+      status: "fail",
+      error: true,
+      message: `No rooms available for the selected dates: ${startDate} to ${endDate}`
     });
   }
+
+  const couponCode = await generateCouponCode();
+  const deepLinkUrl = `${process.env.DEEP_LINK}/property/${propertyInfoId}?coupon=${couponCode.code}&startDate=${startDate}&endDate=${endDate}`;
+
+  let qrCodeData: string;
+  try {
+    qrCodeData = await QRCode.toDataURL(deepLinkUrl);
+  } catch (error) {
+    return next(new AppError("Failed to generate QR code", 500));
+  }
+
+  res.status(200).json({
+    status: "success",
+    error: false,
+    message: "Rooms fetched by property id with rate plan successfully",
+    data: roomsWithRates,
+    qrCode: qrCodeData,
+    couponCode: couponCode.code,
+    deepLink: deepLinkUrl,
+    searchCriteria: {
+      startDate,
+      endDate,
+      propertyId: propertyInfoId,
+      hotelCode,
+    },
+  });
+}
 );
 
-
-
-export const getRoomsForBooking = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+const getRoomsForBooking = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const propertyInfoId = req.params.id;
 
   const rooms = await Room.aggregate([
@@ -488,9 +505,10 @@ const getAllRoomTypes = catchAsync(async (req: Request, res: Response, next: Nex
   try {
     const response = await RoomType.find().exec()
     return res.status(200).json({ data: response, success: true })
-  } catch (error:any) {
+  } catch (error: any) {
     return res.status(200).json({ success: false, message: "Error occur while getting all the roomTypes", error: error.message })
   }
 })
-export { createRoom, getAllRoomTypes, updateRoom, deleteRoom, getRoomById, getRooms, getRoomsByPropertyId, getRoomsByPropertyId2 };
+
+export { createRoom, getAllRoomTypes, updateRoom, deleteRoom, getRoomById, getRooms, getRoomsByPropertyId, getRoomsByPropertyId2, getRoomsForBooking };
 

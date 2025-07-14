@@ -93,11 +93,14 @@ const updateRoomAmenity = async (req: Request, res: Response, next: NextFunction
 const getRoomAminity = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const propertyInfo_id = req.params.id; 
-    const room_id = req.params.room_id; 
-    console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$\n", propertyInfo_id);
-    console.log("Room ID:", room_id);
+    const room_type = req.params.room_type; 
+    console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$-property_id", propertyInfo_id);
+    console.log("Room Type:", room_type);
+    if (!propertyInfo_id || !room_type) {
+      return next(new AppError("Please provide propertyInfo_id and room_type", 400));
+    } 
 
-    const roomAminity = await RoomAminity.findOne({ propertyInfo_id, room_id }).lean();
+    const roomAminity = await RoomAminity.findOne({ propertyInfo_id, room_type }).lean();
     console.log("roomAminity:", roomAminity);
 
     if (!roomAminity) {

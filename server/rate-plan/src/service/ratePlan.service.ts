@@ -9,6 +9,7 @@ interface UpdatePlanData {
   price: number;
   availability: number;
 }
+
 interface BaseGuestAmount {
   amountBeforeTax: number;
   numberOfGuests: number;
@@ -48,15 +49,17 @@ interface RateCalculationResult {
     requestedRooms: number;
   };
 }
+
 interface checkAvailabilityInterface {
   message: string;
   success: boolean,
   isAvailable: boolean;
   error?: string
 }
+
 class RatePlanService {
+
   public static async createRatePlan(ratePlanData: any) {
-    // Extract scheduling fields
     const {
       type,
       weeklyDays,
@@ -87,8 +90,6 @@ class RatePlanService {
   }
 
   public static async updateRatePlan(ratePlanData: UpdatePlanData[]) {
-    // Optional: Add validation or preprocessing here if needed
-
     const updatedRatePlan = await RatePlanDao.updateRatePlan(ratePlanData);
     return {
       success: true,
@@ -96,6 +97,7 @@ class RatePlanService {
       data: updatedRatePlan,
     };
   }
+
   public static async getRatePlanByHotel(hotelCode: string, invTypeCode?: string, startDate?: Date, endDate?: Date, page?: number) {
     const ratePlans = await RatePlanDao.getRatePlanByHotel(hotelCode, invTypeCode && invTypeCode, startDate && startDate, endDate && endDate, page && page);
     // console.log(ratePlans)
@@ -105,6 +107,7 @@ class RatePlanService {
       data: ratePlans,
     };
   }
+
   public static async getRatePlanByHotelCode(hotelCode: string) {
     const ratePlans = await RatePlanDao.getRatePlanByHotelCode(hotelCode);
 
@@ -118,6 +121,7 @@ class RatePlanService {
   }
 
 }
+
 class RoomPriceService {
   public static async getRoomPriceService(hotelCode: string, invTypeCode: string) {
     try {
@@ -136,6 +140,7 @@ class RoomPriceService {
       }
     }
   }
+
   public static async getAllRoomTypeService() {
     try {
       const responses = await RatePlanDao.getAllRoomType()
@@ -151,6 +156,7 @@ class RoomPriceService {
       }
     }
   }
+
   public static async checkAvailabilityService(hotelcode: string,
     invTypeCode: string,
     startDate: Date,
@@ -200,11 +206,11 @@ class RoomRentCalculationService {
       // Input validation
       const validationResult = this.validateInputs(
         hotelcode,
-        invTypeCode, 
-        startDate, 
+        invTypeCode = 'SUT',
+        startDate,
         endDate,
-        noOfChildrens, 
-        noOfAdults, 
+        noOfChildrens,
+        noOfAdults,
         noOfRooms
       );
 
@@ -218,7 +224,7 @@ class RoomRentCalculationService {
       const startDate2 = startDate;
       const endDate2 = endDate;
       const start = startOfDay(startDate);
-      const end = startOfDay(endDate); 
+      const end = startOfDay(endDate);
       const numberOfNights = differenceInDays(end, start);
 
       if (numberOfNights <= 0) {
@@ -239,15 +245,15 @@ class RoomRentCalculationService {
 
       // Get inventory with rates
       const inventory = await HotelPricesDao.getInventoryWithRates(
-        hotelcode, 
-        invTypeCode, 
-        new Date(startDate2), 
+        hotelcode,
+        invTypeCode,
+        new Date(startDate2),
         endOfDay(endDate2)
       );
 
       console.log('=== Inventory Data Debug ===');
-      console.log('Inventory Length:', inventory?.length || 0);
-      
+      console.log('Inventory Length:', inventory?.length);
+
       if (inventory && inventory.length > 0) {
         inventory.forEach((item, index) => {
           console.log(`Inventory Item ${index}:`, {
@@ -447,7 +453,7 @@ class RoomRentCalculationService {
       // Generate stay dates (exclude checkout day)
       const currentDate = new Date(startDate);
       const stayDates: Date[] = [];
-      
+
       while (currentDate < endDate) {
         stayDates.push(new Date(currentDate));
         currentDate.setDate(currentDate.getDate() + 1);
@@ -457,10 +463,10 @@ class RoomRentCalculationService {
 
       for (const date of stayDates) {
         console.log(`\n=== Processing Date: ${date.toDateString()} ===`);
-        
+
         const dayOfWeek = this.getDayOfWeek(date);
         console.log('Day of Week:', dayOfWeek);
-        
+
         let bestRateForDay: any = null;
         let lowestAmountForDay = Infinity;
         let applicableRatesCount = 0;
@@ -475,7 +481,7 @@ class RoomRentCalculationService {
 
           const rate = item.rate;
           const isApplicable = this.isRateApplicableForDate(rate, date, dayOfWeek);
-          console.log(`Rate ${rate.ratePlanCode} (${rate.startDate} to ${rate.endDate}):`, 
+          console.log(`Rate ${rate.ratePlanCode} (${rate.startDate} to ${rate.endDate}):`,
             isApplicable ? 'APPLICABLE' : 'NOT APPLICABLE');
 
           if (!isApplicable) {
@@ -483,7 +489,7 @@ class RoomRentCalculationService {
           }
 
           applicableRatesCount++;
-          
+
           const rateCalculation = this.calculateSingleRateAmountForOneDay(
             rate,
             noOfAdults,
@@ -585,13 +591,13 @@ class RoomRentCalculationService {
     // Normalize dates to compare only the date part (ignore time)
     const rateStartDate = new Date(rate.startDate);
     const checkDate = new Date(date);
-    
+
     // Set all times to start of day for accurate comparison
     rateStartDate.setHours(0, 0, 0, 0);
     checkDate.setHours(0, 0, 0, 0);
 
     console.log(`  Date Check: Rate Start Date (${rateStartDate.toDateString()}) vs Check Date (${checkDate.toDateString()})`);
-    
+
     // Only check if the rate's start date matches the query date (ignore end date)
     if (checkDate.getTime() !== rateStartDate.getTime()) {
       console.log(`  Date check: FAILED - Rate start date doesn't match query date`);
@@ -603,7 +609,7 @@ class RoomRentCalculationService {
     if (rate.days && typeof rate.days === 'object') {
       const dayApplicable = rate.days[dayOfWeek];
       console.log(`  Day of week check: ${dayOfWeek} = ${dayApplicable}`);
-      
+
       if (dayApplicable === false) {
         console.log(`  Day of week check: FAILED`);
         return false;
@@ -650,7 +656,7 @@ class RoomRentCalculationService {
       // Find the base rate that covers the most guests without exceeding total guests
       // OR if we have more guests than any base rate covers, use the highest base rate
       const maxBaseRateGuests = Math.max(...sortedBaseRates.map(r => r.numberOfGuests));
-      
+
       if (totalGuests <= maxBaseRateGuests) {
         // Find the smallest base rate that covers all our guests
         selectedBaseRate = sortedBaseRates.find(rate => rate.numberOfGuests >= totalGuests) || null;
@@ -684,7 +690,7 @@ class RoomRentCalculationService {
       // FIXED: More accurate calculation of who pays additional charges
       if (totalGuests > baseGuestsIncluded) {
         console.log('    Total guests exceed base coverage, calculating additional charges...');
-        
+
         const extraGuests = totalGuests - baseGuestsIncluded;
         console.log('    Extra guests beyond base coverage:', extraGuests);
 
@@ -722,7 +728,7 @@ class RoomRentCalculationService {
           if (childRate) {
             additionalChildrenCharges = extraChildren * childRate.amount;
             console.log(`    Children charges: ${extraChildren} x ${childRate.amount} = ${additionalChildrenCharges}`);
-            
+
             // Add breakdown for charged children
             for (let i = 0; i < extraChildren; i++) {
               childrenChargesBreakdown.push({
@@ -732,7 +738,7 @@ class RoomRentCalculationService {
                 note: 'Additional charge beyond base rate'
               });
             }
-            
+
             // Add breakdown for free children (if any)
             for (let i = extraChildren; i < noOfChildrens; i++) {
               childrenChargesBreakdown.push({
@@ -766,7 +772,7 @@ class RoomRentCalculationService {
         }
       } else {
         console.log('    All guests covered by base rate');
-        
+
         for (let i = 0; i < noOfChildrens; i++) {
           childrenChargesBreakdown.push({
             childIndex: i + 1,
