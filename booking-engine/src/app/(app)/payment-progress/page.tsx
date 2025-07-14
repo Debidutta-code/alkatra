@@ -7,10 +7,9 @@ import { useTranslation } from "react-i18next";
 import { format, differenceInYears, set } from "date-fns";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { onMessage } from 'firebase/messaging';
-import { messaging } from '../../../utils/firebase.config';
-import toast from "react-hot-toast";
-// ... other imports
+// import { onMessage } from 'firebase/messaging';
+// import { messaging } from '../../../utils/firebase.config';
+// import toast from "react-hot-toast";
 import {
     CheckCircle,
     Clock,
@@ -29,9 +28,11 @@ import { QRCodeCanvas } from "qrcode.react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useWalletClient, useChainId } from "wagmi";
 import { sendToken } from "./metamaskServices";
+import toast from "react-hot-toast";
+import { messaging } from "@/utils/firebase.config";
+import { onMessage } from "firebase/messaging";
 import { useDispatch, useSelector, UseSelector } from "react-redux";
-import { useSwitchChain } from "wagmi";
-import { setPaymentData ,clearPaymentData} from "@/Redux/slices/payment.slice";
+import { setPaymentData, clearPaymentData } from "@/Redux/slices/payment.slice";
 import { RootState } from "@/Redux/store";
 
 interface PaymentData {
@@ -58,7 +59,6 @@ interface PaymentData {
 const PaymentProgressPage: React.FC = () => {
     const { t, i18n } = useTranslation();
     const router = useRouter();
-    // const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -67,13 +67,10 @@ const PaymentProgressPage: React.FC = () => {
     const [hasPaymentWithWallet, setHasPaymentWithWallet] = useState(false);
     const [selectedChainId, setSelectedChainId] = useState<number>(0);
     const [contaractAddress, setContractAddress] = useState<string | null>(null);
-    const { data: walletClient } = useWalletClient();
-    const chainId = useChainId();
     const [walletPaymentProgressStatus, setWalletPaymentProgressStatus] = useState(false);
     const [showWalletTransactionPopup, setShowWalletTransactionPopup] = useState(false);
-    const { switchChain } = useSwitchChain();
-    const dispatch=useDispatch();
-    const paymentData=useSelector((state:RootState)=>state.payment.paymentData);
+    const dispatch = useDispatch();
+    const paymentData = useSelector((state: RootState) => state.payment.paymentData);
     // payment notify
     useEffect(() => {
 
@@ -87,6 +84,15 @@ const PaymentProgressPage: React.FC = () => {
 
                     // Optional: trigger state update or refetch wallet
                     console.log('✅ Payment data:', data);
+                    if (paymentData) {
+                        dispatch(setPaymentData({ ...paymentData, status: "completed" }));
+                    }
+                    setShowSuccessModal(true);
+                    successTimeoutRef.current = setTimeout(() => {
+                        console.log("Executing redirect to /my-trip");
+                        dispatch(clearPaymentData());
+                        router.replace("/my-trip");
+                    }, 2000);
                     return;
                 }
 
@@ -114,12 +120,8 @@ const PaymentProgressPage: React.FC = () => {
 
         return () => clearInterval(timer);
     }, []);
-
-    
     // Inside the useEffect for retrieving payment data for QR
     useEffect(() => {
-
-       
         const timer = setTimeout(() => {
             const storedData = paymentData;
             if (storedData) {
@@ -132,7 +134,7 @@ const PaymentProgressPage: React.FC = () => {
                         parsedData.amount &&
                         parsedData.status
                     ) {
-                    //    dispatch( setPaymentData(parsedData));
+                        //    dispatch( setPaymentData(parsedData));
                         if (parsedData.paymentOption && parsedData.paymentOption === "payWithCrypto-payWithWallet") {
                             setHasPaymentWithWallet(true);
                         } else {
@@ -254,8 +256,7 @@ const PaymentProgressPage: React.FC = () => {
             if (response.status === 200 && response.data.message === "Payment confirmed successfully") {
                 if (paymentData) {
                     dispatch(setPaymentData({ ...paymentData, status: "completed" }));
-                  }
-                  
+                }
                 setShowWalletTransactionPopup(false);
                 setShowSuccessModal(true);
 
@@ -969,14 +970,6 @@ const PaymentProgressPage: React.FC = () => {
                         <p className="text-tripswift-black/70 mb-6">
                             {t('Payment.PaymentProgress.paymentConfirmed')}
                         </p>
-
-                        {/* <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
-        <div
-          className="bg-green-600 h-2.5 rounded-full"
-          style={{ animation: 'progressBar 3s linear forwards' }}
-        ></div>
-      </div> */}
-
                         <button
                             onClick={() => {
                                 dispatch(clearPaymentData());

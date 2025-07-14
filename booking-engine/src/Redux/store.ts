@@ -18,7 +18,8 @@ import storage from "./storage";
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ["pmsHotelCard", "auth","payment"],
+  whitelist: ["pmsHotelCard", "auth", "payment"],
+  blacklist: ["notifications"] 
 };
 
 const rootReducer = combineReducers({

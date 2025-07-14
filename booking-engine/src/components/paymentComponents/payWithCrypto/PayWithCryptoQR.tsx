@@ -40,8 +40,8 @@ const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onCon
   const [convertedAmount, setConvertedAmount] = useState<number | null>(null);
   const [paymentInitiated, setPaymentInitiated] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const dispatch=useDispatch();
 
+  const dispatch=useDispatch();
  
   // Fetch crypto token list from API
   useEffect(() => {
