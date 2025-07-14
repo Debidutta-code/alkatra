@@ -209,12 +209,12 @@
 //     convertCurrency();
 //   }, [selectedNetwork, bookingDetails.amount, bookingDetails.currency, t, onConvertedAmountChange]);
 
-  useEffect(()=>{
-    if (selectedChainId !== undefined && selectedChainId !== null) {
-      localStorage.setItem("selectedChainId", selectedChainId.toString());
-    }
-    localStorage.setItem("contractAddress",contractAddress);
-  },[selectedChainId])
+  // useEffect(()=>{
+  //   if (selectedChainId !== undefined && selectedChainId !== null) {
+  //     localStorage.setItem("selectedChainId", selectedChainId.toString());
+  //   }
+  //   localStorage.setItem("contractAddress",contractAddress);
+  // },[selectedChainId])
 
 //   // Initiate crypto payment
 //   const initiatePayment = async () => {

@@ -371,54 +371,54 @@ const PaymentProgressPage: React.FC = () => {
         );
     }
 
-    const handleNetworkSelect = (chainId: number) => {
+    // const handleNetworkSelect = (chainId: number) => {
 
-        switchChain({ chainId: Number(chainId) });
-    };
+    //     switchChain({ chainId: Number(chainId) });
+    // };
 
 
-    const payWithWallet = async () => {
-        if (!walletClient) {
-            toast.error("Please connect your wallet first.");
-            return;
-        }
+    // const payWithWallet = async () => {
+    //     if (!walletClient) {
+    //         toast.error("Please connect your wallet first.");
+    //         return;
+    //     }
 
-        if (
-            paymentData &&
-            paymentData.blockchain &&
-            paymentData.token &&
-            paymentData.amount &&
-            paymentData.address &&
-            contaractAddress
-        ) {
-            try {
-                setWalletPaymentProgressStatus(true);
-                const receipt = await sendToken(
-                    walletClient,
-                    paymentData.blockchain,
-                    paymentData.token,
-                    paymentData.amount,
-                    paymentData.address,
-                    chainId,
-                    selectedChainId,
-                    contaractAddress
-                );
-                console.log("Transaction receipt:", receipt);
-                if (receipt) {
-                    checkPaymentStatus();
-                    setShowWalletTransactionPopup(true);
+    //     if (
+    //         paymentData &&
+    //         paymentData.blockchain &&
+    //         paymentData.token &&
+    //         paymentData.amount &&
+    //         paymentData.address &&
+    //         contaractAddress
+    //     ) {
+    //         try {
+    //             setWalletPaymentProgressStatus(true);
+    //             const receipt = await sendToken(
+    //                 walletClient,
+    //                 paymentData.blockchain,
+    //                 paymentData.token,
+    //                 paymentData.amount,
+    //                 paymentData.address,
+    //                 chainId,
+    //                 selectedChainId,
+    //                 contaractAddress
+    //             );
+    //             console.log("Transaction receipt:", receipt);
+    //             if (receipt) {
+    //                 checkPaymentStatus();
+    //                 setShowWalletTransactionPopup(true);
 
-                }
-                return receipt;
-            } catch (error) {
+    //             }
+    //             return receipt;
+    //         } catch (error) {
 
-            } finally {
-                setWalletPaymentProgressStatus(false);
-            }
-        } else {
-            toast.error("Missing required payment details.");
-        }
-    };
+    //         } finally {
+    //             setWalletPaymentProgressStatus(false);
+    //         }
+    //     } else {
+    //         toast.error("Missing required payment details.");
+    //     }
+    // };
 
 
     return (
@@ -678,7 +678,7 @@ const PaymentProgressPage: React.FC = () => {
                                                         </span>
 
                                                         {/* Pay button */}
-                                                        <div className=" flex justify-start text-center">
+                                                        {/* <div className=" flex justify-start text-center">
                                                             <button
                                                                 onClick={() => {
                                                                     if (chainId !== selectedChainId) {
@@ -699,7 +699,7 @@ const PaymentProgressPage: React.FC = () => {
                                                                         ? "Switch Chain"
                                                                         : "Click to pay"}
                                                             </button>
-                                                        </div>
+                                                        </div> */}
 
                                                         {/* Popup */}
                                                         {showWalletTransactionPopup && (
