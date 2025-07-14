@@ -2,12 +2,12 @@ import { ThirdPartyBooking, ReservationLog } from '../model/reservationModel';
 import { ThirdPartyReservationData } from '../interface/reservationInterface';
 
 export class ThirdPartyReservationRepository {
+  
   async createThirdPartyBooking(
     data: ThirdPartyReservationData,
     xmlSent: string,
     apiResponse: string
   ): Promise<void> {
-    const isCrypto = data.paymentMethod === 'crypto';
     const booking = new ThirdPartyBooking({
       userId: data.userId,
       guestDetails: data.guests,
@@ -26,7 +26,6 @@ export class ThirdPartyReservationRepository {
       currencyCode: data.currencyCode,
       status: 'Confirmed',
       paymentMethod: data.paymentMethod,
-      cryptoPayment: isCrypto,
     });
     console.log(`The currency code in WINCLOUD Repository ${booking.currencyCode}`)
     const savedBooking = await booking.save();

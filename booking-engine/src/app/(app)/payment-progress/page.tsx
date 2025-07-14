@@ -172,107 +172,107 @@ const PaymentProgressPage: React.FC = () => {
     const successTimeoutRef = useRef<NodeJS.Timeout>();
 
     // Add this useEffect hook after the existing useEffect block
-    useEffect(() => {
-        let intervalId: NodeJS.Timeout;
-        const checkPaymentStatus = async () => {
-            if (!paymentData?.payment_id || paymentData.status === "completed") return;
+    // useEffect(() => {
+    //     let intervalId: NodeJS.Timeout;
+    //     const checkPaymentStatus = async () => {
+    //         if (!paymentData?.payment_id || paymentData.status === "completed") return;
 
-            try {
-                const token = Cookies.get("accessToken");
-                if (!token) {
-                    setError(t("PayWithCryptoQR.errors.noAuthToken"));
-                    return;
-                }
+    //         try {
+    //             const token = Cookies.get("accessToken");
+    //             if (!token) {
+    //                 setError(t("PayWithCryptoQR.errors.noAuthToken"));
+    //                 return;
+    //             }
 
-                const response = await axios.get(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/crypto/get-payment-status?paymentId=${paymentData.payment_id}&amount=${paymentData.amount}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "application/json",
-                        },
-                    }
-                );
+    //             const response = await axios.get(
+    //                 `${process.env.NEXT_PUBLIC_BACKEND_URL}/crypto/get-payment-status?paymentId=${paymentData.payment_id}&amount=${paymentData.amount}`,
+    //                 {
+    //                     headers: {
+    //                         Authorization: `Bearer ${token}`,
+    //                         "Content-Type": "application/json",
+    //                     },
+    //                 }
+    //             );
 
-                if (response.status === 200 && response.data.message === "Payment confirmed successfully") {
-                    if (paymentData) {
-                        dispatch(setPaymentData({ ...paymentData, status: "completed" }));
-                      }
+    //             if (response.status === 200 && response.data.message === "Payment confirmed successfully") {
+    //                 if (paymentData) {
+    //                     dispatch(setPaymentData({ ...paymentData, status: "completed" }));
+    //                   }
                       
-                    setShowSuccessModal(true);
-                    clearInterval(intervalId);
+    //                 setShowSuccessModal(true);
+    //                 clearInterval(intervalId);
 
-                    // Clear any existing timeout
-                    if (successTimeoutRef.current) {
-                        clearTimeout(successTimeoutRef.current);
-                    }
+    //                 // Clear any existing timeout
+    //                 if (successTimeoutRef.current) {
+    //                     clearTimeout(successTimeoutRef.current);
+    //                 }
 
-                    // Set new timeout
-                    successTimeoutRef.current = setTimeout(() => {
-                        console.log("Executing redirect to /my-trip");
-                        dispatch(clearPaymentData());
-                        router.replace("/my-trip"); // Using replace instead of push
-                    }, 3000);
-                }
-            } catch (err) {
-                console.error("Payment status check failed:", err);
-            }
-        };
+    //                 // Set new timeout
+    //                 successTimeoutRef.current = setTimeout(() => {
+    //                     console.log("Executing redirect to /my-trip");
+    //                     dispatch(clearPaymentData());
+    //                     router.replace("/my-trip"); // Using replace instead of push
+    //                 }, 3000);
+    //             }
+    //         } catch (err) {
+    //             console.error("Payment status check failed:", err);
+    //         }
+    //     };
 
-        if (paymentData?.status !== "completed") {
-            checkPaymentStatus();
-            intervalId = setInterval(checkPaymentStatus, 10000);
-        }
+    //     if (paymentData?.status !== "completed") {
+    //         checkPaymentStatus();
+    //         intervalId = setInterval(checkPaymentStatus, 10000);
+    //     }
 
-        return () => {
-            clearInterval(intervalId);
-            if (successTimeoutRef.current) {
-                clearTimeout(successTimeoutRef.current);
-            }
-        };
-    }, [paymentData?.payment_id, paymentData?.amount, paymentData?.status, t, router]);
+    //     return () => {
+    //         clearInterval(intervalId);
+    //         if (successTimeoutRef.current) {
+    //             clearTimeout(successTimeoutRef.current);
+    //         }
+    //     };
+    // }, [paymentData?.payment_id, paymentData?.amount, paymentData?.status, t, router]);
 
 
     // api call for paymment status in wallet payment section
-    const checkPaymentStatus = async () => {
-        if (!paymentData?.payment_id || paymentData.status === "completed") return;
+    // const checkPaymentStatus = async () => {
+    //     if (!paymentData?.payment_id || paymentData.status === "completed") return;
 
-        try {
-            const token = Cookies.get("accessToken");
-            if (!token) {
-                setError(t("PayWithCryptoQR.errors.noAuthToken"));
-                return;
-            }
-            const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/crypto/get-payment-status?paymentId=${paymentData.payment_id}&amount=${paymentData.amount}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
+    //     try {
+    //         const token = Cookies.get("accessToken");
+    //         if (!token) {
+    //             setError(t("PayWithCryptoQR.errors.noAuthToken"));
+    //             return;
+    //         }
+    //         const response = await axios.get(
+    //             `${process.env.NEXT_PUBLIC_BACKEND_URL}/crypto/get-payment-status?paymentId=${paymentData.payment_id}&amount=${paymentData.amount}`,
+    //             {
+    //                 headers: {
+    //                     Authorization: `Bearer ${token}`,
+    //                     "Content-Type": "application/json",
+    //                 },
+    //             }
+    //         );
 
-            if (response.status === 200 && response.data.message === "Payment confirmed successfully") {
-                if (paymentData) {
-                    dispatch(setPaymentData({ ...paymentData, status: "completed" }));
-                }
-                setShowWalletTransactionPopup(false);
-                setShowSuccessModal(true);
+    //         if (response.status === 200 && response.data.message === "Payment confirmed successfully") {
+    //             if (paymentData) {
+    //                 dispatch(setPaymentData({ ...paymentData, status: "completed" }));
+    //             }
+    //             setShowWalletTransactionPopup(false);
+    //             setShowSuccessModal(true);
 
-                // Set new timeout
-                successTimeoutRef.current = setTimeout(() => {
-                    console.log("Executing redirect to /my-trip");
-                    dispatch(clearPaymentData());
-                    router.replace("/my-trip");
-                }, 3000);
-                return;
-            }
-        } catch (err) {
-            console.error("Payment status check failed:", err);
-        }
-        setTimeout(checkPaymentStatus, 10000);
-    };
+    //             // Set new timeout
+    //             successTimeoutRef.current = setTimeout(() => {
+    //                 console.log("Executing redirect to /my-trip");
+    //                 dispatch(clearPaymentData());
+    //                 router.replace("/my-trip");
+    //             }, 3000);
+    //             return;
+    //         }
+    //     } catch (err) {
+    //         console.error("Payment status check failed:", err);
+    //     }
+    //     setTimeout(checkPaymentStatus, 10000);
+    // };
 
 
     const handleCopyAddress = async () => {
