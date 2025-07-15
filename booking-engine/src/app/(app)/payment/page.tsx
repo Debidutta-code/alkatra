@@ -64,7 +64,7 @@ function PaymentPageContent() {
   const checkOut = searchParams.get('checkOut') || '';
   const userId = authUser?._id || searchParams.get('userId') || '';
   const hotelName = searchParams.get('hotelName') || 'Unknown Hotel';
-  const hotelCode=searchParams.get('hotelCode') || 'WINCLOUD';
+  const hotelCode = searchParams.get('hotelCode') || 'WINCLOUD';
   const ratePlanCode = searchParams.get('ratePlanCode')?.toUpperCase() || '';
   const roomType = searchParams.get('roomType') || '';
 
@@ -131,7 +131,7 @@ function PaymentPageContent() {
     infants,
     guests,
     paymentOption
-    
+
   };
   console.log("Booking details:", JSON.stringify(bookingDetails, null, 2));
 
@@ -205,12 +205,20 @@ function PaymentPageContent() {
                   </div>
                   <div className="p-6">
                     <div className="flex flex-col md:flex-row md:justify-between gap-6">
-                      <div className={`flex  items-start `}>
+                      <div className={`flex items-start`}>
                         <CalendarRange className={`text-tripswift-blue flex-shrink-0`} size={20} />
                         <div className={` ${i18n.language === "ar" ? "mr-3" : "ml-3"}`}>
                           <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentPageContent.bookingSummary.stayDates')}</p>
-                          <p className="text-sm text-tripswift-black/60 truncate max-w-[200px]">
-                            {formatDate(checkIn, { weekday: 'short', month: 'short', day: 'numeric' })} - {formatDate(checkOut, { weekday: 'short', month: 'short', day: 'numeric' })}
+                          <p className={`text-sm text-tripswift-black/60 break-words ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+                            {i18n.language === "ar" ? (
+                              <>
+                                {formatDate(checkOut, { weekday: 'short', month: 'short', day: 'numeric' })} - {formatDate(checkIn, { weekday: 'short', month: 'short', day: 'numeric' })}
+                              </>
+                            ) : (
+                              <>
+                                {formatDate(checkIn, { weekday: 'short', month: 'short', day: 'numeric' })} - {formatDate(checkOut, { weekday: 'short', month: 'short', day: 'numeric' })}
+                              </>
+                            )}
                           </p>
                           <p className="text-sm text-tripswift-black/60">
                             {nights} {nights === 1 ? t('Payment.PaymentPageContent.bookingSummary.night') : t('Payment.PaymentPageContent.bookingSummary.nights')}
@@ -222,11 +230,17 @@ function PaymentPageContent() {
                         <Users className="text-tripswift-blue flex-shrink-0" size={20} />
                         <div className={` ${i18n.language === "ar" ? "mr-3" : "ml-3"}`}>
                           <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentPageContent.bookingSummary.guests')}</p>
-                          <p className="text-sm text-tripswift-black/60 truncate max-w-[200px]">
-                            {rooms} {rooms === 1 ? t('Payment.PaymentPageContent.bookingSummary.room') : t('Payment.PaymentPageContent.bookingSummary.rooms')} · {adults} {adults === 1 ? t('Payment.PaymentPageContent.bookingSummary.adult') : t('Payment.PaymentPageContent.bookingSummary.adults')}
-                            {children > 0 ? ` · ${children} ${children === 1 ? t('Payment.PaymentPageContent.bookingSummary.child') : t('Payment.PaymentPageContent.bookingSummary.children')}` : ''}
-                            {infants > 0 ? ` · ${infants} ${infants === 1 ? t('Payment.PaymentPageContent.bookingSummary.infant') : t('Payment.PaymentPageContent.bookingSummary.infants')}` : ''}
-                          </p>
+                          <div className="text-sm text-tripswift-black/60">
+                            <div>
+                              · {rooms} {rooms === 1 ? t('Payment.PaymentPageContent.bookingSummary.room') : t('Payment.PaymentPageContent.bookingSummary.rooms')} · {adults} {adults === 1 ? t('Payment.PaymentPageContent.bookingSummary.adult') : t('Payment.PaymentPageContent.bookingSummary.adults')}
+                              {children > 0 ? ` · ${children} ${children === 1 ? t('Payment.PaymentPageContent.bookingSummary.child') : t('Payment.PaymentPageContent.bookingSummary.children')}` : ''}
+                            </div>
+                            {infants > 0 && (
+                              <div>
+                                · {infants} {infants === 1 ? t('Payment.PaymentPageContent.bookingSummary.infant') : t('Payment.PaymentPageContent.bookingSummary.infants')}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
 

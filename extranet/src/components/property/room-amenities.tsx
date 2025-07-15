@@ -117,6 +117,32 @@ export default function Rooms({ onNext, onPrevious }: Props) {
   const router = useRouter();
   const pathname = usePathname();
 
+  useEffect(() => {
+    const fetchRoomDetails = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${property_id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        const propertyRoom = response.data.data.property_room;
+        if (Array.isArray(propertyRoom) && propertyRoom.length > 0) {
+          setroomDetails(propertyRoom[0]);
+        } else {
+          setroomDetails(null);
+          // toast.error("No room details found for this property");
+        }
+      } catch (error) {
+        // console.error("Error fetching room details:", error);
+        // toast.error("Failed to fetch room details");
+      }
+    };
+    if (property_id) fetchRoomDetails();
+  }, [property_id, accessToken]);
+
   const form = useForm<Inputs>({
     defaultValues: {
       // name: "",
@@ -187,7 +213,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
         coffeeMaker: !!data.coffeeMaker,
       },
       safetySecurity: {
-        // cctv: !!data.cctv,
+        cctv: !!data.cctv,
         smokeDetectors: !!data.smokeDetectors,
         fireExtinguisher: !!data.fireExtinguisher,
       },
@@ -201,23 +227,30 @@ export default function Rooms({ onNext, onPrevious }: Props) {
         soap: !!data.soap,
         hairDryer: !!data.hairDryer,
       },
-
       workLeisure: {
         workDesk: !!data.workDesk,
         readingChair: !!data.readingChair,
         additionalLighting: !!data.additionalLighting,
       },
     };
-
+  
+    // Validate room_type
+    // if (!roomDetails?.room_type) {
+    //   toast.error("Room type is missing. Please ensure a room is created first.");
+    //   setFormLoading(false);
+    //   return;
+    // }
+  
     const roomBody = {
       ...data,
       propertyInfo_id: property_id,
-      // property_id:property_id
+      room_type: roomDetails.room_type, // Use room_type directly
       amenities,
     };
+  
     setFormLoading(true);
-
-    console.log("onSubmit data:", data);
+  
+    console.log("onSubmit data:", roomBody);
     try {
       const {
         data: { data: newRoom },
@@ -230,18 +263,17 @@ export default function Rooms({ onNext, onPrevious }: Props) {
           },
         }
       );
-
+  
       console.log("NewRoom Data:", newRoom);
       setFormLoading(false);
-
+  
       toast.success("Room amenities submitted successfully!");
       onNext();
-
       router.push(`/app/property/${property_id}`);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setFormLoading(false);
-        toast.error(err?.response?.data?.message);
+        toast.error("Failed to submit room amenities");
       }
     }
   };

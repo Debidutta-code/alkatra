@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
-import { Users, TrendingUp, Activity, DollarSign, Eye, UserCheck, Settings, Bell, Search, Filter, Download, RefreshCw } from 'lucide-react';
+import React, { useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { Users, TrendingUp, Activity, DollarSign, Eye, UserCheck, Settings, Bell, Search, Filter, Download, RefreshCw, ArrowUpRight, ArrowDownRight, MoreVertical, Calendar, Zap, ChevronDown, Clock, PieChart as PieChartIcon, BarChart2, LineChart as LineChartIcon, Home, BookOpen } from 'lucide-react';
 
 const Analytics = () => {
   const [userRole, setUserRole] = useState('superadmin');
   const [timeRange, setTimeRange] = useState('7d');
   const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
 
   // Mock data
   const userGrowthData = [
@@ -25,9 +26,9 @@ const Analytics = () => {
   ];
 
   const categoryData = [
-    { name: 'Premium Users', value: 35, color: '#8b5cf6' },
-    { name: 'Basic Users', value: 45, color: '#06b6d4' },
-    { name: 'Trial Users', value: 20, color: '#10b981' }
+    { name: 'Premium', value: 35, color: '#8b5cf6' },
+    { name: 'Basic', value: 45, color: '#06b6d4' },
+    { name: 'Trial', value: 20, color: '#f59e0b' },
   ];
 
   const activityData = [
@@ -39,215 +40,378 @@ const Analytics = () => {
     { time: '20:00', active: 280 }
   ];
 
+  const bookingData = [
+    { day: 'Mon', bookings: 120 },
+    { day: 'Tue', bookings: 210 },
+    { day: 'Wed', bookings: 180 },
+    { day: 'Thu', bookings: 240 },
+    { day: 'Fri', bookings: 320 },
+    { day: 'Sat', bookings: 400 },
+    { day: 'Sun', bookings: 380 }
+  ];
+
   const handleRefresh = () => {
     setIsLoading(true);
     setTimeout(() => setIsLoading(false), 1500);
   };
 
-  const StatCard = ({ title, value, change, icon: Icon, trend, color }:{title:string,value:string,change:any,icon:any,trend:any,color:any}) => (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-      <div className="flex items-center justify-between">
+  const StatCard = ({ title, value, change, icon: Icon, trend, color, subtitle }: { title: string, value: string, change: any, icon: any, trend: any, color: any, subtitle?: string }) => (
+    <div className="relative group bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white via-white to-gray-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
+
+      <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
-          <p className="text-3xl font-bold text-gray-900">{value}</p>
-          <p className={`text-sm font-medium ${trend === 'up' ? 'text-green-600' : 'text-red-600'} flex items-center mt-2`}>
-            <TrendingUp className={`w-4 h-4 mr-1 ${trend === 'down' ? 'rotate-180' : ''}`} />
-            {change}
-          </p>
+          <p className="text-sm font-medium text-gray-500 mb-1">{title}</p>
+          <p className="text-2xl font-bold text-gray-900 mb-2">{value}</p>
+          <div className={`flex items-center gap-1 text-sm ${trend === 'up' ? 'text-emerald-600' : 'text-red-600'}`}>
+            {trend === 'up' ? (
+              <ArrowUpRight className="w-4 h-4" />
+            ) : (
+              <ArrowDownRight className="w-4 h-4" />
+            )}
+            <span>{change}</span>
+            <span className="text-gray-400 ml-1">vs last month</span>
+          </div>
         </div>
-        <div className={`p-4 rounded-2xl ${color}`}>
-          <Icon className="w-8 h-8 text-white" />
+        <div className={`p-3 rounded-lg ${color} shadow-xs`}>
+          <Icon className="w-5 h-5 text-white" />
         </div>
       </div>
+      {subtitle && <p className="text-xs text-gray-400 mt-3">{subtitle}</p>}
+    </div>
+  );
+
+  const ChartCard = ({ title, subtitle, children, className = '' }: { title: string, subtitle: string, children: React.ReactNode, className?: string }) => (
+    <div className={`bg-white rounded-2xl p-5 shadow-sm border border-gray-100 ${className}`}>
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h3 className="font-semibold text-gray-900">{title}</h3>
+          <p className="text-sm text-gray-500">{subtitle}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button className="p-1.5 rounded-lg hover:bg-gray-50 text-gray-500">
+            <MoreVertical className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+      {children}
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br md:mx-8 from-indigo-50 via-white to-purple-50">
+    <div className="min-h-screen md:mx-8 bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-4">
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                Analytics Dashboard
-              </h1>
-              
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 bg-gradient-to-br from-tripswift-blue to-tripswift-dark-blue rounded-lg flex items-center justify-center shadow-xs">
+                  <Zap className="w-4 h-4 text-white" />
+                </div>
+                <h1 className="text-xl font-bold text-gray-900">Hotel Analytics</h1>
+              </div>
+
+              <div className="hidden md:flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                {['overview', 'guests', 'revenue', 'bookings'].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`px-3 py-1.5 text-sm rounded-md capitalize ${activeTab === tab ? 'bg-white shadow-sm text-tripswift-blue' : 'text-gray-600 hover:text-gray-900'}`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex items-center space-x-3">
-              {/* <button className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-                <Search className="w-5 h-5" />
-              </button> */}
-              <button className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-                <Filter className="w-5 h-5" />
-              </button>
-              {/* <button className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-                <Download className="w-5 h-5" />
-              </button> */}
-              <button 
+
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <button className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700 transition-colors">
+                  <span>Last 7 days</span>
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+              </div>
+              <button
                 onClick={handleRefresh}
-                className={`p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors ${isLoading ? 'animate-spin' : ''}`}
+                className={`p-2 rounded-lg hover:bg-gray-100 text-gray-500 ${isLoading ? 'animate-spin' : ''}`}
               >
-                <RefreshCw className="w-5 h-5" />
+                <RefreshCw className="w-4 h-4" />
               </button>
-              {/* <button className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-                <Bell className="w-5 h-5" />
-              </button> */}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
           <StatCard
-            title="Total Users"
+            title="Total Guests"
             value="24,583"
-            change="+12.5%"
+            change="+7.5%"
             icon={Users}
             trend="up"
-            color="bg-gradient-to-br from-blue-500 to-blue-600"
+            color="bg-blue-500"
+            subtitle="Active this month"
           />
           <StatCard
-            title={userRole === 'superadmin' ? 'Revenue' : 'Group Performance'}
-            value={userRole === 'superadmin' ? '$89,247' : '94.2%'}
-            change={userRole === 'superadmin' ? '+23.1%' : '+8.7%'}
+            title={userRole === 'superadmin' ? 'Revenue' : 'Occupancy'}
+            value={userRole === 'superadmin' ? '$89,247' : '82.4%'}
+            change={userRole === 'superadmin' ? '+6.1%' : '+8.7%'}
             icon={userRole === 'superadmin' ? DollarSign : TrendingUp}
             trend="up"
-            color="bg-gradient-to-br from-green-500 to-green-600"
+            color="bg-emerald-500"
+            subtitle="Monthly target: 85%"
           />
           <StatCard
-            title="Active Sessions"
+            title="Active Hotels"
             value="1,429"
             change="+5.8%"
-            icon={Activity}
+            icon={Home}
             trend="up"
-            color="bg-gradient-to-br from-purple-500 to-purple-600"
+            color="bg-purple-500"
+            subtitle="Peak: 1,650"
           />
           <StatCard
-            title="Conversion Rate"
-            value="3.2%"
-            change="+0.4%"
-            icon={UserCheck}
+            title="Total Bookings"
+            value="8,742"
+            change="+8.2%"
+            icon={BookOpen}
             trend="up"
-            color="bg-gradient-to-br from-orange-500 to-orange-600"
+            color="bg-amber-500"
+            subtitle="Current month"
           />
         </div>
 
-        {/* Charts Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        {/* Main Charts Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
           {/* User Growth Chart */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">User Growth</h3>
-              <div className="flex items-center space-x-2">
-                <div className="flex items-center space-x-1">
-                  <div className="w-3 h-3 bg-indigo-500 rounded-full"></div>
-                  <span className="text-sm text-gray-600">Total Users</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="text-sm text-gray-600">Active Users</span>
-                </div>
+          <ChartCard
+            title="Guest Growth"
+            subtitle="Monthly active guest progression"
+            className="lg:col-span-2"
+          >
+            <div className="h-64 mt-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={userGrowthData}>
+                  <defs>
+                    <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.05} />
+                    </linearGradient>
+                    <linearGradient id="colorActive" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
+                  <XAxis
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#6b7280', fontSize: 12 }}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#6b7280', fontSize: 12 }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      padding: '8px 12px',
+                      fontSize: '14px'
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="users"
+                    stroke="#3b82f6"
+                    fillOpacity={1}
+                    fill="url(#colorUsers)"
+                    strokeWidth={2}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="active"
+                    stroke="#10b981"
+                    fillOpacity={1}
+                    fill="url(#colorActive)"
+                    strokeWidth={2}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex items-center justify-center gap-4 mt-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-tripswift-blue rounded-full"></div>
+                <span className="text-sm text-gray-600">Total Guests</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-emerald-500 rounded-full"></div>
+                <span className="text-sm text-gray-600">Active Guests</span>
               </div>
             </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={userGrowthData}>
-                <defs>
-                  <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="colorActive" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="name" stroke="#64748b" fontSize={12} />
-                <YAxis stroke="#64748b" fontSize={12} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'white', 
-                    border: 'none', 
-                    borderRadius: '12px', 
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' 
-                  }} 
-                />
-                <Area type="monotone" dataKey="users" stroke="#6366f1" fillOpacity={1} fill="url(#colorUsers)" strokeWidth={3} />
-                <Area type="monotone" dataKey="active" stroke="#10b981" fillOpacity={1} fill="url(#colorActive)" strokeWidth={3} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+          </ChartCard>
 
-          {/* Revenue/Performance Chart */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {userRole === 'superadmin' ? 'Revenue Overview' : 'Group Performance'}
-              </h3>
+          {/* Guest Distribution Chart */}
+          <ChartCard
+            title="Guest Distribution"
+            subtitle="Breakdown by membership type"
+          >
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={categoryData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={2}
+                    dataKey="value"
+                  >
+                    {categoryData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      padding: '8px 12px',
+                      fontSize: '14px'
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={revenueData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="name" stroke="#64748b" fontSize={12} />
-                <YAxis stroke="#64748b" fontSize={12} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'white', 
-                    border: 'none', 
-                    borderRadius: '12px', 
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' 
-                  }} 
-                />
-                <Bar dataKey="revenue" fill="url(#barGradient)" radius={8} />
-                <Bar dataKey="profit" fill="url(#barGradient2)" radius={8} />
-                <defs>
-                  <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#8b5cf6" />
-                    <stop offset="100%" stopColor="#a855f7" />
-                  </linearGradient>
-                  <linearGradient id="barGradient2" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#06b6d4" />
-                    <stop offset="100%" stopColor="#0891b2" />
-                  </linearGradient>
-                </defs>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+            <div className="grid grid-cols-3 gap-2 mt-2">
+              {categoryData.map((item, index) => (
+                <div key={index} className="flex flex-col items-center p-2">
+                  <div className="w-3 h-3 rounded-full mb-1" style={{ backgroundColor: item.color }}></div>
+                  <span className="text-xs font-medium text-gray-600">{item.name}</span>
+                  <span className="text-sm font-bold text-gray-900">{item.value}%</span>
+                </div>
+              ))}
+            </div>
+          </ChartCard>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          
+        {/* Secondary Charts Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Revenue/Performance Chart */}
+          <ChartCard
+            title={userRole === 'superadmin' ? 'Revenue' : 'Occupancy Rate'}
+            subtitle="Weekly breakdown and trends"
+            className="lg:col-span-2"
+          >
+            <div className="h-64 mt-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={revenueData} barCategoryGap="20%">
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
+                  <XAxis
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#6b7280', fontSize: 12 }}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#6b7280', fontSize: 12 }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      padding: '8px 12px',
+                      fontSize: '14px'
+                    }}
+                  />
+                  <Bar
+                    dataKey="revenue"
+                    fill="#8b5cf6"
+                    radius={[4, 4, 0, 0]}
+                    animationDuration={1500}
+                  />
+                  <Bar
+                    dataKey="profit"
+                    fill="#06b6d4"
+                    radius={[4, 4, 0, 0]}
+                    animationDuration={1500}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex items-center justify-center gap-4 mt-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-violet-500 rounded-full"></div>
+                <span className="text-sm text-gray-600">Revenue</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-cyan-500 rounded-full"></div>
+                <span className="text-sm text-gray-600">Profit</span>
+              </div>
+            </div>
+          </ChartCard>
 
-          {/* Activity Timeline */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Daily Activity</h3>
-            <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={activityData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="time" stroke="#64748b" fontSize={12} />
-                <YAxis stroke="#64748b" fontSize={12} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'white', 
-                    border: 'none', 
-                    borderRadius: '12px', 
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' 
-                  }} 
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="active" 
-                  stroke="#f59e0b" 
-                  strokeWidth={3}
-                  dot={{ fill: '#f59e0b', strokeWidth: 2, r: 4 }}
-                  activeDot={{ r: 6, stroke: '#f59e0b', strokeWidth: 2 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+          {/* Bookings Chart */}
+          <ChartCard
+            title="Daily Bookings"
+            subtitle="Number of bookings per day"
+          >
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={bookingData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                  <XAxis
+                    dataKey="day"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#6b7280', fontSize: 12 }}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#6b7280', fontSize: 12 }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      padding: '8px 12px',
+                      fontSize: '14px'
+                    }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="bookings"
+                    stroke="#3b82f6"
+                    strokeWidth={2}
+                    dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+                    activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2, fill: '#fff' }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex items-center justify-center mt-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-tripswift-blue rounded-full"></div>
+                <span className="text-sm text-gray-600">Bookings</span>
+              </div>
+            </div>
+          </ChartCard>
         </div>
       </div>
     </div>

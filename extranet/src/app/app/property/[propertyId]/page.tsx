@@ -136,6 +136,9 @@ export default function Page({ params, searchParams }: Props) {
   const [address, setAddress] = useState<AddressData | null>(null);
   const [editedAddress, setEditedAddress] = useState<AddressData | null>(null);
   const [editAddressMode, setEditAddressMode] = useState<boolean>(false);
+  const [roomType, setRoomType] = useState<string | null>(null);
+  const [availableRoomTypes, setAvailableRoomTypes] = useState<string[]>([]);
+
 
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const propertyId = params.propertyId;
@@ -243,7 +246,7 @@ export default function Page({ params, searchParams }: Props) {
 
       await deleteProperty(propertyId, accessToken);
       toast.success('Property deleted successfully!'); // Display toast message
-      router.push('/app/property');
+      setTimeout(() => router.back());
     } catch (error) {
       console.error('Error deleting property:', error);
     }
@@ -341,6 +344,16 @@ export default function Page({ params, searchParams }: Props) {
       console.error('Failed to fetch rooms:', err);
     }
   };
+
+  useEffect(() => {
+    if (rooms && rooms.length > 0) {
+      const roomTypes = Object.values(rooms[0] || {})
+        .map((room: any) => room.room_type)
+        .filter((type: string, index: number, array: string[]) => array.indexOf(type) === index);
+      setAvailableRoomTypes(roomTypes);
+    }
+  }, [rooms]);
+  
   // Handlers for rooms
   const handleAddRoom = async (newRoom: RoomType) => {
     try {
@@ -349,23 +362,22 @@ export default function Page({ params, searchParams }: Props) {
         return;
       }
       const addedRoom = await addPropertyRoom(params.propertyId, accessToken, newRoom);
-      
-      (addedRoom !== null ?
-        toast.success('Room added successfully!') :
-        toast.error('Room could not be added!')
-      );
-
+      // (addedRoom !== null ?
+      //   toast.success('Room added successfully!') : toast.error('Room could not be added!')
+      // );
       setRooms((prevRooms) => {
         const roomContainer = prevRooms[0] || {};
         const newKey = Object.keys(roomContainer).length;
         return [{ ...roomContainer, [newKey]: addedRoom.new_room }];
       });
-
+      // Store room_type and open RoomAmenities modal
+      setRoomType(addedRoom.new_room.room_type);
+      setEditRoomAmenityMode(true); // Open RoomAmenities modal
     } catch (error) {
       console.error('Error adding new room:', error);
     }
   };
-
+  
   // console.log("updated room data",rooms)
   const handleEditRoom = async (updatedRoom: RoomType) => {
     try {
@@ -667,12 +679,13 @@ export default function Page({ params, searchParams }: Props) {
 
             <TabsContent value="room-amenities" className="mt-6">
               <RoomAmenities
-                roomAmenity={roomAmenity}
+                roomAmenities={roomAmenity}
                 editedRoomAmenity={roomAmenity}
                 editRoomAmenityMode={editRoomAmenityMode}
                 handleRoomAmenityEditClick={handleRoomAmenityEditClick}
                 propertyInfoId={propertyId}
                 accessToken={accessToken as string}
+                availableRoomTypes={availableRoomTypes}
               />
             </TabsContent>
           </div>
