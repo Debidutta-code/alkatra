@@ -217,7 +217,7 @@ const RoomsPage: React.FC = () => {
         console.error("Error fetching rooms:", error);
 
         // Check if the error is an AxiosError and has a response with status 400
-        if (axios.isAxiosError(error) && error.response?.status === 400) {
+        if (axios.isAxiosError(error)) {
           setShowRoomNotAvailable(true);
         } else {
           // For other errors, show empty rooms as before
