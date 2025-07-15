@@ -394,6 +394,7 @@
     "showingRooms_other": "{{count}} कमरे दिखाए जा रहे हैं",
     "noRoomsAvailableTitle": "कोई कमरा उपलब्ध नहीं है",
     "noRoomsAvailableMessage": "हमें आपके मानदंडों से मेल खाने वाले कोई कमरे नहीं मिले। कृपया अपने खोज फ़िल्टर या तारीखें समायोजित करने का प्रयास करें।",
+    "goBack": "वापस जाएं",
     "clearFilters": "फ़िल्टर साफ़ करें",
     "loadingRoomsMessage": "उपलब्ध कमरों को लोड हो रहा है...",
     "qrCode": {

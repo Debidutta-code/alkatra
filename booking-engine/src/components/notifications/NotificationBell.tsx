@@ -392,8 +392,15 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1">
               <p
-                className={`text-sm font-medium text-gray-900 ${!notification.isRead ? 'font-semibold' : ''
+                className={`text-sm font-medium text-gray-900 leading-5 ${!notification.isRead ? 'font-semibold' : ''
                   }`}
+                style={{
+                  unicodeBidi: 'plaintext',
+                  direction: isRTL ? 'rtl' : 'ltr',
+                  textAlign: isRTL ? 'right' : 'left',
+                  lineHeight: '1.4',
+                  wordBreak: 'break-word'
+                }}
               >
                 {notification.title}
               </p>

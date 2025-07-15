@@ -50,8 +50,11 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         console.log("✅ Step 4: Dispatch result:", result);
 
         toast.success(
-          t("Successfully logged in"),
-          { icon: "👋" }
+          t(`Auth.Login.successMessage`),
+          {
+            icon: '👋',
+            duration: 3000,
+          }
         );
 
         console.log("➡️ Step 5: Redirecting to home");
