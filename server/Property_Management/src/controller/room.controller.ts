@@ -9,7 +9,8 @@ import PropertyPrice from "../model/ratePlan.model";
 import QRCode from 'qrcode';
 import { v4 as uuidv4 } from "uuid";
 import { generateCouponCode } from "../../../Coupon_Management/services/couponService";
-import RoomType from "../model/RoomTypes.model"
+import RoomType from "../model/RoomTypes.model";
+import { Inventory } from "../../../wincloud/src/model/inventoryModel";
 
 interface UpdateFields {
   room_name?: string;
@@ -38,6 +39,7 @@ interface RedirectParams {
 interface RedirectQuery {
   coupon?: string;
 }
+
 
 // create room
 const createRoom = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -299,30 +301,72 @@ const getRoomsByPropertyId = catchAsync(async (req: Request, res: Response, next
 
 const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const propertyInfoId = req.params.id;
-  const numberOfRooms = req.query.numberOfRooms;
+  const numberOfRooms = parseInt(req.query.numberOfRooms as string);
   const { startDate, endDate, hotelCode = "WINCLOUD" } = req.body;
-  console.log(startDate, endDate)
 
-  if (!startDate) {
-    return next(new AppError("startDate is required", 400));
+  if (!startDate || !endDate || !hotelCode || !propertyInfoId || !numberOfRooms) {
+    return next(new AppError("Required fields are missing", 400));
   }
 
-  if (!endDate) {
-    return next(new AppError("endDate is required", 400));
+  const parsedStartDate = new Date(startDate);
+  const parsedEndDate = new Date(endDate);
+
+  if (isNaN(parsedStartDate.getTime()) || isNaN(parsedEndDate.getTime())) {
+    return next(new AppError("Invalid date format for startDate or endDate", 400));
   }
 
-  if (!hotelCode) {
-    return next(new AppError("hotelCode is required", 400));
+  const normalizedStartDate = new Date(Date.UTC(
+    parsedStartDate.getUTCFullYear(),
+    parsedStartDate.getUTCMonth(),
+    parsedStartDate.getUTCDate()
+  ));
+  const normalizedEndDate = new Date(Date.UTC(
+    parsedEndDate.getUTCFullYear(),
+    parsedEndDate.getUTCMonth(),
+    parsedEndDate.getUTCDate()
+  ));
+
+  // 1. Match Room
+  const room = await Room.findOne({
+    propertyInfo_id: propertyInfoId,
+    room_type: { $regex: '^SUT$', $options: 'i' }
+  });
+
+  if (!room) {
+    return res.status(404).json({
+      status: "fail",
+      error: true,
+      message: "No room found with given property ID and room type"
+    });
   }
 
-  // if (!propertyInfoId || !numberOfRooms) {
-  //   return next(new AppError("Property Info Id and Number of Rooms are required", 400));
-  // }
+  // 2. Check Inventory for all dates in range
+  const dateList: Date[] = [];
+  let current = new Date(normalizedStartDate);
+  while (current <= normalizedEndDate) {
+    dateList.push(new Date(current));
+    current.setDate(current.getDate() + 1);
+  }
 
+  for (const date of dateList) {
+    const available = await Inventory.findOne({
+      hotelCode,
+      invTypeCode: { $regex: '^SUT$', $options: 'i' },
+      'availability.startDate': date,
+      'availability.count': { $gte: numberOfRooms }
+    });
+
+    if (!available) {
+      return next(new AppError(`No availability on ${date.toISOString().split('T')[0]} for ${numberOfRooms} rooms`, 400));
+    }
+  }
+
+  // 3. Fetch Room with rate info
   const roomsWithRates = await Room.aggregate([
     {
       $match: {
-        propertyInfo_id: new mongoose.Types.ObjectId(propertyInfoId)
+        propertyInfo_id: new mongoose.Types.ObjectId(propertyInfoId),
+        room_type: { $regex: '^SUT$', $options: 'i' }
       }
     },
     {
@@ -336,7 +380,7 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
                 $and: [
                   { $eq: ["$invTypeCode", "$$roomType"] },
                   { $eq: ["$hotelCode", hotelCode] },
-                  { $eq: ["$startDate", new Date(startDate)] },
+                  { $eq: ["$startDate", normalizedStartDate] }
                 ]
               }
             }
@@ -393,45 +437,22 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
   ]);
 
   if (!roomsWithRates || roomsWithRates.length === 0) {
-    return next(
-      new AppError(`No property found with this id ${propertyInfoId}`, 404)
-    );
-  }
-
-  // const sufficientRooms = roomsWithRates.some(room => room.available_rooms >= numberOfRooms);
-  // console.log(`The sufficientRooms: ${sufficientRooms}, numberOfRooms: ${numberOfRooms}, roomsWithRates: ${JSON.stringify(roomsWithRates)}`);
-  // if (!sufficientRooms) {
-  //   return next(
-  //     new AppError(
-  //       `Not enough rooms available. Requested: ${numberOfRooms}, Available: ${Math.max(...roomsWithRates.map(room => room.available_rooms) || [0])}`,
-  //       400
-  //     )
-  //   );
-  // }
-
-  const hasSUTRoom = roomsWithRates.some(room => room.room_type === 'SUT');
-  if (!hasSUTRoom) {
     return res.status(400).json({
       status: "fail",
       error: true,
-      message: `No rooms available for the selected dates: ${startDate} to ${endDate}`
+      message: `No room rates found for selected range: ${startDate} to ${endDate}`
     });
   }
 
+  // Generate coupon and QR
   const couponCode = await generateCouponCode();
   const deepLinkUrl = `${process.env.DEEP_LINK}/property/${propertyInfoId}?coupon=${couponCode.code}&startDate=${startDate}&endDate=${endDate}`;
-
-  let qrCodeData: string;
-  try {
-    qrCodeData = await QRCode.toDataURL(deepLinkUrl);
-  } catch (error) {
-    return next(new AppError("Failed to generate QR code", 500));
-  }
+  const qrCodeData = await QRCode.toDataURL(deepLinkUrl);
 
   res.status(200).json({
     status: "success",
     error: false,
-    message: "Rooms fetched by property id with rate plan successfully",
+    message: "Rooms fetched successfully",
     data: roomsWithRates,
     qrCode: qrCodeData,
     couponCode: couponCode.code,
@@ -443,8 +464,7 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
       hotelCode,
     },
   });
-}
-);
+});
 
 const getRoomsForBooking = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const propertyInfoId = req.params.id;
@@ -499,7 +519,7 @@ const getRoomsForBooking = catchAsync(async (req: Request, res: Response, next: 
     message: "Room  fetched by property id successfully",
     data: rooms,
   });
-})
+});
 
 const getAllRoomTypes = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -508,7 +528,7 @@ const getAllRoomTypes = catchAsync(async (req: Request, res: Response, next: Nex
   } catch (error: any) {
     return res.status(200).json({ success: false, message: "Error occur while getting all the roomTypes", error: error.message })
   }
-})
+});
 
 export { createRoom, getAllRoomTypes, updateRoom, deleteRoom, getRoomById, getRooms, getRoomsByPropertyId, getRoomsByPropertyId2, getRoomsForBooking };
 

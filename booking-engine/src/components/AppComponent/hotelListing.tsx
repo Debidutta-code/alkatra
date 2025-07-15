@@ -207,6 +207,9 @@ const HotelListing: React.FC = () => {
     // Store guest details in localStorage for consistency
     if (guestDetails && Object.keys(guestDetails).length > 0) {
       localStorage.setItem("guest_details", JSON.stringify(guestDetails));
+      if (guestDetails.rooms) {
+        localStorage.setItem("rooms", guestDetails.rooms.toString());
+      }
     }
 
     // Pass guest details in the URL

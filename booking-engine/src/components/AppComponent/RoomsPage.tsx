@@ -170,7 +170,7 @@ const RoomsPage: React.FC = () => {
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`
         );
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}?numberOfRooms=${guestDetails?.rooms || 1}`,
           {
             startDate: checkInDate,
             endDate: checkOutDate,
