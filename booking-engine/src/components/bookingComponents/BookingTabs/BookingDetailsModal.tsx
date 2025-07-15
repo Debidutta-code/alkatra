@@ -294,72 +294,97 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
         </div>
 
         {/* Payment Details */}
-        <div className="space-y-3">
-          <h3 className="text-lg font-tripswift-bold text-gray-800 flex items-center">
-            <FaCreditCard
-              className={`text-tripswift-blue text-base ${i18n.language === "ar" ? "ml-2" : "mr-2"
-                }`}
-            />
-            {t("BookingTabs.BookingDetailsModal.paymentDetails")}
-          </h3>
+        {booking.paymentMethod && booking.totalAmount ? (
+          <div className="space-y-3">
+            <h3 className="text-lg font-tripswift-bold text-gray-800 flex items-center">
+              <FaCreditCard
+                className={`text-tripswift-blue text-base ${i18n.language === "ar" ? "ml-2" : "mr-2"}`}
+              />
+              {t("BookingTabs.BookingDetailsModal.paymentDetails")}
+            </h3>
 
-          <div className="bg-gradient-to-r from-tripswift-off-white to-gray-50 p-3 rounded-xl border border-gray-100 shadow-sm">
-            {/* Single row with booking date and total amount */}
-            <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] p-4 rounded-xl text-white shadow-lg">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div className="flex gap-3">
-                  <FaRegCalendarCheck />
-                  <div>
-                    <p className="text-tripswift-off-white/80 text-sm mb-1">
-                      {t("BookingTabs.BookingDetailsModal.bookingDate")}
-                    </p>
-                    <p className="text-tripswift-off-white font-tripswift-bold">
-                      {booking.createdAt ? formatDateString(booking.createdAt) : "-"}
-                    </p>
-                  </div>
-                </div>
+            <div className="bg-gradient-to-r from-tripswift-off-white to-gray-50 p-3 rounded-xl border border-gray-100 shadow-sm">
+              <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] p-4 rounded-xl text-white shadow-lg">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Booking Date */}
+                    <div className="flex items-start gap-3">
+                      <FaRegCalendarCheck className="mt-1" />
+                      <div>
+                        <p className="text-tripswift-off-white/80 text-sm mb-1">
+                          {t("BookingTabs.BookingDetailsModal.bookingDate")}
+                        </p>
+                        <p className="text-tripswift-off-white font-tripswift-bold">
+                          {booking.createdAt ? formatDateString(booking.createdAt) : "-"}
+                        </p>
+                      </div>
+                    </div>
 
-                <div className="text-right">
-                  <p className="text-tripswift-off-white/80 text-sm mb-1">
-                    {t("BookingTabs.BookingDetailsModal.totalAmount")}
-                  </p>
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-tripswift-bold text-tripswift-off-white">
-                      {currency} {booking.totalAmount.toLocaleString()}
-                    </span>
+                    {/* Payment Method */}
+                    <div className="flex items-start gap-3">
+                      <FaCreditCard className="mt-1" />
+                      <div>
+                        <p className="text-tripswift-off-white/80 text-sm mb-1">
+                          {t("BookingTabs.BookingDetailsModal.paymentMethod")}
+                        </p>
+                        <p className="text-tripswift-off-white font-tripswift-bold">
+                          {booking.paymentMethod
+                            ? booking.paymentMethod.charAt(0).toUpperCase() +
+                            booking.paymentMethod.slice(1).replace(/([A-Z])/g, " $1").trim()
+                            : t("BookingTabs.BookingDetailsModal.unknownPayment")}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Total Amount */}
+                    <div className="flex items-start gap-3">
+                      <div>
+                        <p className="text-tripswift-off-white/80 text-sm mb-1">
+                          {t("BookingTabs.BookingDetailsModal.totalAmount")}
+                        </p>
+                        <p className="text-tripswift-off-white font-tripswift-bold">
+                          {currency} {booking.totalAmount.toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        ) : null}
+
 
         {/* Enhanced Action Buttons */}
         <div className="flex flex-col md:flex-row gap-2 pt-3 border-t border-gray-200 no-print">
           {(booking.status === "Confirmed" || booking.status === "Modified") && !isPastCheckIn && (
             <>
               <button
-                className="flex-1 bg-gradient-to-r from-tripswift-blue to-[#054B8F] text-tripswift-off-white py-2.5 px-4 rounded-lg hover:shadow-lg transition-all duration-300 font-tripswift-medium flex items-center justify-center"
-                onClick={onAmend}
+                className={`flex-1 py-2.5 px-4 rounded-lg transition-all duration-300 font-tripswift-medium flex items-center justify-center
+        ${booking.paymentMethod === "crypto"
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-tripswift-blue to-[#054B8F] text-tripswift-off-white hover:shadow-lg"}`}
+                onClick={() => booking.paymentMethod !== "crypto" && onAmend()}
+                disabled={booking.paymentMethod === "crypto"}
               >
-                <FaEdit
-                  className={`text-sm ${i18n.language === "ar" ? "ml-2" : "mr-2"
-                    }`}
-                />
+                <FaEdit className={`text-sm ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
                 {t("BookingTabs.BookingDetailsModal.modifyBooking")}
               </button>
+
               <button
-                className="flex-1 bg-white text-red-600 border-2 border-red-200 py-2.5 px-4 rounded-lg hover:bg-red-50 hover:border-red-300 transition-all duration-300 font-tripswift-medium flex items-center justify-center"
-                onClick={onCancel}
+                className={`flex-1 py-2.5 px-4 rounded-lg transition-all duration-300 font-tripswift-medium flex items-center justify-center
+        ${booking.paymentMethod === "crypto"
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-white text-red-600 border-2 border-red-200 hover:bg-red-50 hover:border-red-300"}`}
+                onClick={() => booking.paymentMethod !== "crypto" && onCancel()}
+                disabled={booking.paymentMethod === "crypto"}
               >
-                <FaRegTimesCircle
-                  className={`text-sm ${i18n.language === "ar" ? "ml-2" : "mr-2"
-                    }`}
-                />
+                <FaRegTimesCircle className={`text-sm ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
                 {t("BookingTabs.BookingDetailsModal.cancelBooking")}
               </button>
             </>
           )}
+
           <button
             className="flex-1 bg-gray-700 text-tripswift-off-white py-2.5 px-4 rounded-lg hover:bg-gray-800 hover:shadow-lg transition-all duration-300 flex items-center justify-center font-tripswift-medium"
             onClick={() => printBookingItinerary(booking, t, formatDOB)}

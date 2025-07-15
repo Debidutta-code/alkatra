@@ -47,7 +47,7 @@ interface RoomAmenityData {
   fireExtinguisher: boolean;
   shampooConditioner: boolean;
   soap: boolean;
-  hairDryer: boolean;
+  hairdryer: boolean;
   workDesk: boolean;
   readingChair: boolean;
   additionalLighting: boolean;
@@ -243,7 +243,7 @@ export async function createPropertyAmenity(propertyId: string, accessToken: str
 // Update property room amenities
 export async function updatePropertyRoomAmenity(propertyId: string, accessToken: string, updatedData: RoomAmenityData) {
   try {
-    const newAmenity = {...updatedData, propertyInfo_id: propertyId}
+    const newAmenity = {...updatedData, propertyInfo_id: propertyId, }
     const response = await axios.patch(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/amenite/roomaminity`,
       newAmenity,

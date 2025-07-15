@@ -52,8 +52,8 @@ const createAminity = catchAsync(
       amenities,
     } = req.body;
 
-    if (!req.body) {
-      next(new AppError("Please fill all the required fields", 400));
+    if (!propertyInfo_id || !property_type || no_of_rooms_available === undefined || !amenities) {
+      return next(new AppError("Please fill all the required fields", 400));
     }
 
     const newAminity = await propertyAminity.create({
@@ -68,13 +68,18 @@ const createAminity = catchAsync(
       property_amenities: newAminity._id,
     });
 
+    if (!property) {
+      return next(new AppError("Property not found", 404));
+    }
+
     res.status(201).json({
       status: "success",
       error: false,
-      message: " successfully",
+      message: "Property amenities created successfully",
       data: newAminity,
     });
   }
 );
+
 
 export { updatePropertyAmenity, createAminity };

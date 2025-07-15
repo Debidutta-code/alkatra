@@ -19,6 +19,7 @@ export interface Booking {
   paymentType: string;
   _id: string;
   reservationId: string;
+  paymentMethod?: string;
   hotelCode: string;
   hotelName: string;
   ratePlanCode: string;

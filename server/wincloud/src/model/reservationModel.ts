@@ -8,6 +8,8 @@ interface IGuestDetails {
 
 interface IThirdPartyBooking extends Document {
     reservationId: string;
+    paymentMethod: string;
+    // cryptoPayment: boolean;
     hotelCode: string;
     hotelName: string;
     ratePlanCode: string;
@@ -33,6 +35,8 @@ interface IThirdPartyBooking extends Document {
 interface IReservationLog extends Document {
     bookingId?: string;
     reservationId: string;
+    paymentMethod: string;
+    // cryptoPayment: boolean;
     hotelCode: string;
     hotelName: string;
     ratePlanCode: string;
@@ -59,6 +63,8 @@ const guestDetailsSchema = new Schema<IGuestDetails>({
 
 const thirdPartyBookingSchema = new Schema<IThirdPartyBooking>({
     reservationId: { type: String, required: true, unique: true },
+    paymentMethod: { type: String, required: true },
+    // cryptoPayment: { type: Boolean, required: true },
     hotelCode: { type: String, required: true },
     hotelName: { type: String, required: false },
     ratePlanCode: { type: String, required: true },
@@ -79,6 +85,8 @@ const thirdPartyBookingSchema = new Schema<IThirdPartyBooking>({
 
 const reservationLogSchema = new Schema<IReservationLog>({
     bookingId: { type: String, required: false },
+    paymentMethod: { type: String, required: false },
+    // cryptoPayment: { type: Boolean, required: true },
     reservationId: { type: String, required: true},
     hotelCode: { type: String, required: true },
     hotelName: { type: String, required: true },

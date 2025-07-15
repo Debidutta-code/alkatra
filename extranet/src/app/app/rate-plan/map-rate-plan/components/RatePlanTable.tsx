@@ -47,7 +47,7 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
           Rate Plan Data ({availableData.length} items)
         </h2>
         <div className="flex items-center space-x-4">
-          {modifiedValues.length > 0 && (
+          {modifiedValues.length&&modifiedValues.length > 0 && (
             <div className="flex items-center space-x-2">
               <span className="text-sm text-orange-600 font-medium">
                 {modifiedValues.length} unsaved changes

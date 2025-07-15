@@ -140,11 +140,10 @@ export default function Page({ params, searchParams }: Props) {
   const [availableRoomTypes, setAvailableRoomTypes] = useState<string[]>([]);
 
 
-  // Get access token from cookies
-  // const accessToken = Cookies.get('accessToken');
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const propertyId = params.propertyId;
-  // Fetch initial data
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -217,7 +216,6 @@ export default function Page({ params, searchParams }: Props) {
   };
 
   const handleAddressAddClick = async (e: any) => {
-    // e.preventDefault()
     try {
       if (!accessToken || !editedAddress) {
         console.error('Access token is undefined or not set, or editedAddress is null');
@@ -484,7 +482,7 @@ export default function Page({ params, searchParams }: Props) {
         console.error('Access token is undefined or not set');
         return;
       }
-      const createdRoomAmenity = await createPropertyRoomAmenity(params.propertyId, accessToken, newRoomAmenity);
+      const createdRoomAmenity = await createPropertyRoomAmenity(params.propertyId, accessToken, newRoomAmenity, );
       setRoomAmenity(createdRoomAmenity);
       setEditedRoomAmenity(createdRoomAmenity);
       // Optionally, refetch the entire property data

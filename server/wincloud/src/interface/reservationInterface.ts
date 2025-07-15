@@ -8,6 +8,7 @@ export interface GuestDetails {
 export interface ReservationInput {
   bookingDetails: {
     reservationId: string;
+    paymentMethod: string;
     userId: string;
     checkInDate: string;
     checkOutDate: string;
@@ -27,6 +28,7 @@ export interface ReservationInput {
 
 
 export interface ThirdPartyReservationData {
+  paymentMethod: string;
   hotelCode: string;
   hotelName?: string;
   ratePlanCode: string;

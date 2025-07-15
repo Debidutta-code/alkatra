@@ -102,7 +102,7 @@ export class NotificationController {
       const skip = (page - 1) * limit;
 
       // Fetch offers with pagination
-      const offers = await OfferModel.find().skip(skip).limit(limit).lean();
+      const offers = await OfferModel.find().sort({ _id: -1 }).skip(skip).limit(limit).lean();
       const totalOffers = await OfferModel.countDocuments();
 
       if (offers.length === 0) {
@@ -146,7 +146,7 @@ export class NotificationController {
 
       res.status(200).json({
         message: 'Notifications fetched successfully',
-        notifications,
+        notifications: notifications.reverse(),
         total: notifications.length,
       });
     } catch (error: any) {

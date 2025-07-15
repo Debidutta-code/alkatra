@@ -55,7 +55,6 @@ const createRoomAminity = catchAsync(
     }
   }
 );
-
 // update room amenity
 const updateRoomAmenity = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -129,5 +128,6 @@ const getRoomAminity = async (req: Request, res: Response, next: NextFunction) =
     });
   }
 }
+
 
 export { createRoomAminity, updateRoomAmenity, getRoomAminity };
