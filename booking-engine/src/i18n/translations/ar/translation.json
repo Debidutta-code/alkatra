@@ -398,6 +398,7 @@
     "showingRooms_other": "عرض {{count}} غرف",
     "noRoomsAvailableTitle": "لا توجد غرف متاحة",
     "noRoomsAvailableMessage": "لم نتمكن من العثور على أي غرف مطابقة لمعايير البحث الخاصة بك. حاول تعديل فلاتر البحث أو التواريخ.",
+    "goBack": "العودة إلى البحث",
     "clearFilters": "مسح الفلاتر",
     "loadingRoomsMessage": "جارٍ تحميل الغرف المتاحة...",
     "qrCode": {

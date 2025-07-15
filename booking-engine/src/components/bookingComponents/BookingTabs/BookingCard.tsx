@@ -82,27 +82,27 @@ const BookingCard: React.FC<BookingCardProps> = ({
       </div>
 
       {/* Card Body */}
-      <div className="px-5 py-2">
+      <div className="px-3 py-2 sm:px-5">
         {/* Dates */}
-        <div className="flex justify-between items-center py-4">
-          <div className="mb-3 sm:mb-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8 lg:gap-48 py-3 sm:py-4">
+          <div>
             <p className="text-xs text-gray-500 mb-1">{t('BookingTabs.BookingCard.checkIn')}</p>
             <p className="flex items-center text-tripswift-black font-tripswift-medium text-sm">
-              <FaCalendarCheck className={` text-green-500 flex-shrink-0 mb-1 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
+              <FaCalendarCheck className={`text-green-500 flex-shrink-0 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
               {formatDate(booking.checkInDate)}
             </p>
           </div>
           <div>
             <p className="text-xs text-gray-500 mb-1">{t('BookingTabs.BookingCard.checkOut')}</p>
             <p className="flex items-center text-tripswift-black font-tripswift-medium text-sm">
-              <FaCalendarTimes className={` text-green-500 flex-shrink-0 mb-1 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
+              <FaCalendarTimes className={`text-green-500 flex-shrink-0 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
               {formatDate(booking.checkOutDate)}
             </p>
           </div>
         </div>
 
         {/* Room Type & Payment Method */}
-        <div className="flex justify-between items-center border-t border-gray-100 py-4">
+        <div className={`grid gap-4 sm:gap-8 lg:gap-48 border-t border-gray-100 py-3 sm:py-4 ${booking.paymentMethod ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
           {/* Room Type */}
           <div>
             <p className="text-xs text-gray-500 mb-1.5">{t('BookingTabs.BookingCard.roomType')}</p>
@@ -119,25 +119,22 @@ const BookingCard: React.FC<BookingCardProps> = ({
               </div>
             </div>
           )}
-
         </div>
 
         {/* Guest & Price */}
-        <div className="flex justify-between items-center border-t border-gray-100 py-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8 lg:gap-48 border-t border-gray-100 py-3 sm:py-4">
           <div>
             <p className="text-xs text-gray-500 mb-1">{t('BookingTabs.BookingCard.primaryGuest')}</p>
-            <p className="flex items-center text-gray-800">
-              <FaUser className={`mr-2 text-tripswift-blue/70 flex-shrink-0 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
-              <span className="font-tripswift-medium">{primaryGuest}</span>
+            <p className="flex items-center text-tripswift-black font-tripswift-medium text-sm">
+              <FaUser className={`text-tripswift-blue/70 flex-shrink-0 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
+              {primaryGuest}
             </p>
           </div>
-          <div className="text-right">
-            <div className="flex flex-col">
-              <p className="text-xs text-gray-500 mb-1">{t('BookingTabs.BookingCard.rateBreakdown')}</p>
-              <div className="flex items-center justify-end text-sm text-tripswift-black/70">
-              </div>
-              <p className="text-lg font-tripswift-bold text-tripswift-blue">{currency} {booking.totalAmount.toLocaleString()}</p>
-            </div>
+          <div>
+            <p className="text-xs text-gray-500 mb-1">{t('BookingTabs.BookingCard.rateBreakdown')}</p>
+            <p className="flex items-center text-tripswift-black font-tripswift-medium text-sm">
+              <span className="text-base sm:text-lg font-tripswift-bold text-tripswift-blue">{currency} {booking.totalAmount.toLocaleString()}</span>
+            </p>
           </div>
         </div>
       </div>
@@ -151,7 +148,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
           <FaTicketAlt className={` ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
           {t('BookingTabs.BookingCard.viewBookingDetails')}
         </button>
-        
+
         {(booking.status === "Confirmed" || booking.status === "Modified") && !isPastCheckIn && activeTab !== 'completed' && (
           <div className="grid grid-cols-2 gap-3 mt-3">
             <button

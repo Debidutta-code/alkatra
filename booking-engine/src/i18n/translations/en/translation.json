@@ -394,6 +394,7 @@
     "showingRooms_other": "Showing {{count}} rooms",
     "noRoomsAvailableTitle": "No Rooms Available",
     "noRoomsAvailableMessage": "We couldn't find any rooms matching your criteria. Try adjusting your search filters or dates.",
+    "goBack": "Go Back",
     "clearFilters": "Clear Filters",
     "loadingRoomsMessage": "Loading available rooms...",
     "priceNotAvailable": "",
