@@ -206,9 +206,9 @@ export default function AppSidebar({ role }: { role?: string }) {
           {/* Navigation Items */}
           <nav className="space-y-2">
             <div className="mb-4">
-              <h3 className="px-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+              {/* <h3 className="px-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
                 Navigation
-              </h3>
+              </h3> */}
               <div className="space-y-1">
                 {visibleItems.map((item) => (
                   <NavItem key={item.href} item={item} />

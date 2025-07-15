@@ -779,9 +779,17 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                   </h3>
                   <div className="flex items-center py-1">
                     <Calendar className="text-tripswift-blue h-5 w-5" />
-                    <div className="flex flex-wrap">
-                      <span className="text-sm bg-tripswift-blue/10 px-3 rounded-full font-tripswift-medium text-tripswift-black/80">
-                        {formatDate(checkInDate)} - {formatDate(checkOutDate)}
+                    <div className={`flex flex-wrap ${i18n.language === "ar" ? "mr-3" : "ml-3"}`}>
+                      <span className={`text-sm bg-tripswift-blue/10 px-3 rounded-full font-tripswift-medium text-tripswift-black/80 ${i18n.language === "ar" ? "text-right ml-2" : "text-left mr-2"}`}>
+                        {i18n.language === "ar" ? (
+                          <>
+                            {formatDate(checkOutDate)} - {formatDate(checkInDate)}
+                          </>
+                        ) : (
+                          <>
+                            {formatDate(checkInDate)} - {formatDate(checkOutDate)}
+                          </>
+                        )}
                       </span>
                       <span className="text-sm bg-tripswift-blue/10 px-3 rounded-full font-tripswift-medium text-tripswift-black/80">
                         {nightsCount} {nightsText}
@@ -801,13 +809,12 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                     {guests.map((guest, index) => (
                       <div key={`${guest.type}-${index}`} className="space-y-2">
                         <h4 className="text-base font-tripswift-bold text-tripswift-black capitalize">
-                          {guest.type}{" "}
+                          {t(`BookingComponents.GuestInformationModal.${guest.type}Singular`)}{" "}
                           {index -
                             (guest.type === "child"
                               ? guestData?.guests || 1
                               : guest.type === "infant"
-                                ? (guestData?.guests || 1) +
-                                (guestData?.children || 0)
+                                ? (guestData?.guests || 1) + (guestData?.children || 0)
                                 : 0) +
                             1}
                         </h4>
@@ -1295,7 +1302,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                           {t("BookingComponents.GuestInformationModal.baseRatePerRoomPerNight")}:
                         </span>
                         <span className="text-sm font-tripswift-medium">
-                          ₹{finalPrice.breakdown.totalBaseAmount.toLocaleString()}
+                          {finalPrice.dailyBreakdown?.[0]?.currencyCode} {finalPrice.breakdown.totalBaseAmount.toLocaleString()}
                         </span>
                       </div>
 
@@ -1305,7 +1312,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                           {t("BookingComponents.GuestInformationModal.additionalGuestCharges")}:
                         </span>
                         <span className="text-sm font-tripswift-medium">
-                          ₹{finalPrice.breakdown.totalAdditionalCharges.toLocaleString()}
+                          {finalPrice.dailyBreakdown?.[0]?.currencyCode} {finalPrice.breakdown.totalAdditionalCharges.toLocaleString()}
                         </span>
                       </div>
 
@@ -1315,7 +1322,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                           {t("BookingComponents.GuestInformationModal.totalAmount")}:
                         </span>
                         <span className="text-sm font-tripswift-bold">
-                          ₹{finalPrice.breakdown.totalAmount.toLocaleString()}
+                          {finalPrice.dailyBreakdown?.[0]?.currencyCode} {finalPrice.breakdown.totalAmount.toLocaleString()}
                         </span>
                       </div>
 
@@ -1344,7 +1351,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                                   {day.date}
                                 </span>
                                 <span className="text-sm font-tripswift-medium">
-                                  ₹{day.totalForAllRooms.toLocaleString()}
+                                  {day.currencyCode} {day.totalForAllRooms.toLocaleString()}
                                 </span>
                               </div>
                             ))}
@@ -1359,7 +1366,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                             {t("BookingComponents.GuestInformationModal.totalAmount")}
                           </span>
                           <span className="text-xl font-tripswift-bold text-tripswift-blue">
-                            ₹{finalPrice.totalAmount.toLocaleString()}
+                            {finalPrice.dailyBreakdown?.[0]?.currencyCode} {finalPrice.totalAmount.toLocaleString()}
                           </span>
                         </div>
                       </div>

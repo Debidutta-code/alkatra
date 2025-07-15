@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { RoomCard } from "@/components/AppComponent/RoomCard";
 import GuestInformationModal, {
   Guest,
@@ -33,6 +33,8 @@ import {
   ImageIcon,
   Users,
   Filter,
+  AlertCircle,
+  X,
 } from "lucide-react";
 
 import LoadingSkeleton from "../hotelListingComponents/LoadingSkeleton";
@@ -93,6 +95,7 @@ interface PropertyDetails {
     __v?: number;
   };
 }
+
 const RoomsPage: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -113,6 +116,10 @@ const RoomsPage: React.FC = () => {
   });
   const [showPropertyDetails, setShowPropertyDetails] = useState<boolean>(true);
   const [selectedImage, setSelectedImage] = useState<number>(0);
+
+  // New state for handling 400 error
+  const [showRoomNotAvailable, setShowRoomNotAvailable] = useState<boolean>(false);
+
   // Get guest details from Redux
   const { guestDetails } = useSelector((state) => state.hotel);
 
@@ -161,14 +168,36 @@ const RoomsPage: React.FC = () => {
     return display;
   };
 
+  // Fetch property details
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchProperty = async () => {
       if (!propertyId) return;
-      setIsLoading(true);
+
       try {
         const propertyResponse = await axios.get(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`
         );
+        const propDetails = propertyResponse.data.property ||
+          propertyResponse.data.data ||
+          propertyResponse.data;
+        console.log("Property Details:", propDetails);
+        setPropertyDetails(propDetails);
+      } catch (error) {
+        console.error("Error fetching property:", error);
+      }
+    };
+
+    fetchProperty();
+  }, [propertyId]);
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+      if (!propertyId) return;
+
+      setIsLoading(true);
+      setShowRoomNotAvailable(false); // Reset error state
+
+      try {
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}`,
           {
@@ -184,22 +213,34 @@ const RoomsPage: React.FC = () => {
             couponCode: response.data.couponCode || "",
           });
         }
-        const propDetails =
-          propertyResponse.data.property ||
-          propertyResponse.data.data ||
-          propertyResponse.data;
-        console.log("Property Details:", propDetails); // Add this log
-        setPropertyDetails(propDetails);
       } catch (error) {
-        console.error("Error fetching data:", error);
-        setRooms({ success: true, data: [] });
+        console.error("Error fetching rooms:", error);
+
+        // Check if the error is an AxiosError and has a response with status 400
+        if (axios.isAxiosError(error) && error.response?.status === 400) {
+          setShowRoomNotAvailable(true);
+        } else {
+          // For other errors, show empty rooms as before
+          setRooms({ success: true, data: [] });
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchData();
+    fetchRooms();
   }, [propertyId, checkInDate, checkOutDate]);
+
+  useEffect(() => {
+    if (showRoomNotAvailable) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showRoomNotAvailable]);
 
   // Helper function to convert amenities to the expected format
   const convertAmenities = (room: Room) => {
@@ -265,12 +306,7 @@ const RoomsPage: React.FC = () => {
         return "check-circle";
       };
 
-      // const iconName = getIconName(amenity);
-      // const translationKey = amenityTranslationMap[amenity.toLowerCase()] || "RoomsPage.RoomCard.amenities.default";
-
       return {
-        // icon: iconName,
-        // name: t(translationKey),
         icon: getIconName(amenity),
         name: amenity,
       };
@@ -290,6 +326,7 @@ const RoomsPage: React.FC = () => {
     dispatch(setRoomId(room._id));
     dispatch(setAmount(room.room_price.toString()));
   };
+
   const confirmBooking = (formData: {
     email: string;
     phone: string;
@@ -309,7 +346,6 @@ const RoomsPage: React.FC = () => {
     const queryParams = new URLSearchParams({
       roomId: formData.roomId,
       propertyId: formData.propertyId,
-      // amount: formData.amount,
       currency: selectedRoom?.currency_code || "",
       checkIn: formData.checkIn,
       checkOut: formData.checkOut,
@@ -325,7 +361,7 @@ const RoomsPage: React.FC = () => {
       ...(formData.infants ? { infants: formData.infants.toString() } : {}),
       ...(formData.guests
         ? { guests: encodeURIComponent(JSON.stringify(formData.guests)) }
-        : {}), // ADD THIS LINE
+        : {}),
     }).toString();
 
     router.push(`/payment?${queryParams}`);
@@ -352,6 +388,7 @@ const RoomsPage: React.FC = () => {
       return true;
     });
   }, [rooms, filterType, searchQuery]);
+
   // Helper function to format address
   const getFormattedAddress = (addressObj: any): string => {
     if (!addressObj) return "";
@@ -367,6 +404,7 @@ const RoomsPage: React.FC = () => {
 
     return parts.join(", ");
   };
+
   const getAmenityIcon = (amenity: string) => {
     switch (amenity) {
       case "wifi":
@@ -400,7 +438,41 @@ const RoomsPage: React.FC = () => {
     }
   };
   return (
-    <div className="bg-[#F5F7FA] min-h-screen font-noto-sans">
+    <div className="bg-[#F5F7FA] min-h-screen font-noto-sans relative">
+      {/* Room Not Available Overlay */}
+      {showRoomNotAvailable && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6 relative">
+            {/* Icon */}
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+                <AlertCircle className="h-8 w-8 text-red-600" />
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="text-center">
+              <h3 className="text-xl font-tripswift-semibold text-gray-900 mb-2">
+                {t("RoomsPage.noRoomsAvailableTitle")}
+              </h3>
+              <p className="text-gray-600 mb-6 font-tripswift-regular">
+                {t("RoomsPage.noRoomsAvailableMessage")}
+              </p>
+
+              {/* Action buttons */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={() => router.back()}
+                  className="flex-1 bg-tripswift-blue hover:bg-tripswift-blue/90 text-white font-tripswift-medium py-2.5 px-4 rounded-lg transition-colors duration-200"
+                >
+                  {t("RoomsPage.goBack", { defaultValue: "Go Back" })}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Property Details Section - Using TripSwift classes */}
       <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] text-tripswift-off-white">
         <div className="container mx-auto px-4 py-5">
@@ -476,6 +548,7 @@ const RoomsPage: React.FC = () => {
           </div>
         </div>
       </div>
+
       <div className="container mx-auto px-4 py-4">
         <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           {/* Collapsible header - TripSwift branded */}

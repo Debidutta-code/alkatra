@@ -99,7 +99,7 @@ const LoginForm = () => {
   }
 
   return (
-<div className="w-full max-w-md sm:max-w-lg lg:max-w-xl xl:max-w-2xl px-4 sm:px-6 md:px-8">
+    <div className="w-full max-w-md sm:max-w-lg lg:max-w-xl xl:max-w-2xl px-4 sm:px-6 md:px-8">
       {/* Logo at the top of the login form */}
       <div className="flex justify-center lg:hidden mb-4">
         <div className="relative w-[160px] h-[60px]  ">
@@ -113,10 +113,8 @@ const LoginForm = () => {
         </div>
       </div>
       <div className="mb-6 text-center">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-800">
-          <h1 className="text-2xl  font-bold tracking-tight text-gray-800">
-            Welcome Back to <span className="text-primary">Al HaJz</span>
-          </h1>
+        <h1 className="text-2xl font-bold tracking-tight text-gray-800">
+          Welcome Back to <span className="text-primary">Al HaJz</span>
         </h1>
         <p className="text-sm sm:text-base text-muted-foreground mt-2">
           Sign in to manage your properties

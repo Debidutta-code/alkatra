@@ -246,7 +246,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
   };
 
   const handleSaveRoom = async () => {
-    if (!validateForm()) return; // Validate before saving
+    if (!validateForm()) return;
     setIsSubmitting(true);
     try {
       if (editMode) {

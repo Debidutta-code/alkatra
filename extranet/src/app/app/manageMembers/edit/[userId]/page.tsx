@@ -345,7 +345,7 @@ const EditMember = ({ params }: PageProps) => {
                   <Input
                     id="email"
                     name="email"
-                    type="email"
+                    type="text"
                     value={formData.email}
                     onChange={handleChange}
                     className={`h-10 pl-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${

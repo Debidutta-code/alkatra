@@ -47,7 +47,7 @@ import { ModeToggle } from "./../mode-toggle";
 import Cookies from "js-cookie";
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
-import { SidebarTrigger, useSidebar  } from "@src/components/ui/sidebar";
+import { SidebarTrigger, useSidebar } from "@src/components/ui/sidebar";
 
 type Props = {};
 
@@ -69,7 +69,7 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [noNav, setNoNav] = useState(false);
-  const { open , isMobile } = useSidebar();
+  const { open, isMobile } = useSidebar();
 
   const { user, isAuthenticated } = useSelector(
     (state: RootState) => state.auth
@@ -105,76 +105,88 @@ export default function Navbar() {
   // }, [theme]);
 
   return (
-   <nav
-  className={cn(
-    "md:h-[14vh] h-[12vh] border-b flex items-center justify-between px-6 transition-all duration-300",
-    noNav && "hidden",
-    open && !isMobile
-      ? " w-[calc(100vw-16rem)] md:pr-16 lg:pr-20"
-      : " w-[calc(100vw-4rem)]",
-    isMobile && "w-full ml-0"
-  )}
->
-  {/* Left: Toggle + Logo */}
-  <div className="flex md:px-8  items-center gap-2 min-w-0">
-    <NavbarSidebarToggle />
-    {/* <Image ... /> */}
-  </div>
+    <nav
+      className={cn(
+        "md:h-[14vh] h-[12vh] border-b flex items-center justify-between px-6 transition-all duration-300",
+        noNav && "hidden",
+        open && !isMobile
+          ? " w-[calc(100vw-16rem)] md:pr-16 lg:pr-20"
+          : " w-[calc(100vw-4rem)]",
+        isMobile && "w-full ml-0"
+      )}
+    >
+      {/* Left: Toggle + Logo */}
+      <div className="flex md:px-8  items-center gap-2 min-w-0">
+        <NavbarSidebarToggle />
+        {/* <Image ... /> */}
+      </div>
 
-  {/* Right: Menus and Avatar */}
-  <div className="flex items-center sm:gap-2 flex-wrap justify-end min-w-0">
-    <NavigationMenu>
-      <NavigationMenuList>
-        <NavigationMenuItem>
-          <NavigationMenuTrigger>Properties</NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <div className="p-4 w-[200px] space-y-2">
-              <Link href="/app/bookings">
-                <Button variant="ghost" className="w-full justify-start">
-                  Manage Bookings
-                </Button>
-              </Link>
-              <Link href="/app/revenue">
-                <Button variant="ghost" className="w-full justify-start">
-                  Revenue
-                </Button>
-              </Link>
-              {user && (user.role === "superAdmin" || user.role === "groupManager") && (
-                <Link href="/app/manageMembers">
-                  <Button variant="ghost" className="w-full justify-start">
-                    Manage Members
-                  </Button>
-                </Link>
-              )}
-            </div>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-      </NavigationMenuList>
-    </NavigationMenu>
+      {/* Right: Menus and Avatar */}
+      <div className="flex items-center sm:gap-2 flex-wrap justify-end min-w-0">
+        <NavigationMenu>
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              <NavigationMenuTrigger>Properties</NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <div className="p-4 w-[200px] space-y-2">
+                  <Link href="/app/bookings">
+                    <Button variant="ghost" className="w-full justify-start">
+                      Manage Bookings
+                    </Button>
+                  </Link>
+                  <Link href="/app/revenue">
+                    <Button variant="ghost" className="w-full justify-start">
+                      Revenue
+                    </Button>
+                  </Link>
+                  {user && (user.role === "superAdmin" || user.role === "groupManager") && (
+                    <Link href="/app/manageMembers">
+                      <Button variant="ghost" className="w-full justify-start">
+                        Manage Members
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
 
-    <Menubar>
-      <MenubarMenu>
-        <MenubarTrigger className="sm:space-x-2 space-x-1">
-          <Avatar className="h-6 w-6">
-            <AvatarImage src="https://www.flaticon.com/free-icons/user" />
-            <AvatarFallback>{user?.firstName?.charAt(0).toUpperCase()}</AvatarFallback>
-          </Avatar>
-          {user &&
-            user.firstName.charAt(0).toUpperCase() +
-              user.firstName.slice(1).toLowerCase()}
-        </MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem onClick={handleLogout}>
-            Logout
-            <MenubarShortcut>
-              <LogOut size={20} />
-            </MenubarShortcut>
-          </MenubarItem>
-        </MenubarContent>
-      </MenubarMenu>
-    </Menubar>
-  </div>
-</nav>
+        <Menubar>
+          <MenubarMenu>
+            <MenubarTrigger className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+              <Avatar className="h-7 w-7 border">
+                <AvatarImage
+                  src={"https://avatar.vercel.sh"}
+                  alt={`${user?.firstName}'s avatar`}
+                />
+                <AvatarFallback className="bg-primary text-primary-foreground font-medium">
+                  {user?.firstName?.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="hidden sm:flex flex-col items-start">
+                <span className="text-sm font-medium">
+                  {user &&
+                    user.firstName.charAt(0).toUpperCase() +
+                    user.firstName.slice(1).toLowerCase()}
+                </span>
+                {/* <span className="text-xs text-muted-foreground">
+      {user?.role || "Guest"}
+    </span> */}
+              </div>
+            </MenubarTrigger>
+            <MenubarContent>
+              <MenubarItem onClick={handleLogout}>
+                Logout
+                <MenubarShortcut>
+                  <LogOut size={20} />
+                </MenubarShortcut>
+              </MenubarItem>
+            </MenubarContent>
+          </MenubarMenu>
+        </Menubar>
+      </div>
+    </nav>
 
   );
 }
