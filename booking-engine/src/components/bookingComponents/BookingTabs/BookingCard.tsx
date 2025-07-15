@@ -57,9 +57,8 @@ const BookingCard: React.FC<BookingCardProps> = ({
     ? booking.paymentMethod.charAt(0).toUpperCase() + booking.paymentMethod.slice(1).replace(/([A-Z])/g, ' $1').trim()
     : 'Unknown';
 
-  const isPastCheckIn =
-    new Date(booking.checkInDate).setHours(0, 0, 0, 0) <
-    new Date().setHours(0, 0, 0, 0);
+  const isPastOrTodayCheckIn = new Date(booking.checkInDate).setHours(0, 0, 0, 0) <= new Date().setHours(0, 0, 0, 0);
+
 
   return (
     <div className="bg-tripswift-off-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 group font-noto-sans">
@@ -151,34 +150,31 @@ const BookingCard: React.FC<BookingCardProps> = ({
           <FaTicketAlt className={` ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
           {t('BookingTabs.BookingCard.viewBookingDetails')}
         </button>
-        
-        {(booking.status === "Confirmed" || booking.status === "Modified") && !isPastCheckIn && activeTab !== 'completed' && (
-          <div className="grid grid-cols-2 gap-3 mt-3">
-            <button
-              className={`py-2 px-4 rounded-lg transition-colors duration-300 text-xs font-tripswift-medium flex items-center justify-center
-        ${booking.paymentMethod === 'crypto'
-                  ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
-                  : 'bg-tripswift-off-white hover:bg-gray-100 text-tripswift-blue border border-tripswift-blue/30'}`}
-              onClick={() => booking.paymentMethod !== 'crypto' && onModify(booking)}
-              disabled={booking.paymentMethod === 'crypto'}
-            >
-              <FaEdit className={` ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
-              {t('BookingTabs.BookingCard.modify')}
-            </button>
 
-            <button
-              className={`py-2 px-4 rounded-lg transition-colors duration-300 text-xs font-tripswift-medium flex items-center justify-center
-        ${booking.paymentMethod === 'crypto'
-                  ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
-                  : 'bg-tripswift-off-white hover:bg-gray-100 text-red-600 border border-red-200'}`}
-              onClick={() => booking.paymentMethod !== 'crypto' && onCancel(booking)}
-              disabled={booking.paymentMethod === 'crypto'}
-            >
-              <FaRegTimesCircle className={` ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
-              {t('BookingTabs.BookingCard.cancel')}
-            </button>
-          </div>
-        )}
+        {(booking.status === "Confirmed" || booking.status === "Modified") &&
+          !isPastOrTodayCheckIn &&
+          activeTab !== 'completed' &&
+          booking.paymentMethod !== 'crypto' && (
+            <div className="grid grid-cols-2 gap-3 mt-3">
+              <button
+                className="py-2 px-4 rounded-lg transition-colors duration-300 text-xs font-tripswift-medium flex items-center justify-center
+         bg-tripswift-off-white hover:bg-gray-100 text-tripswift-blue border border-tripswift-blue/30"
+                onClick={() => onModify(booking)}
+              >
+                <FaEdit className={`${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
+                {t('BookingTabs.BookingCard.modify')}
+              </button>
+
+              <button
+                className="py-2 px-4 rounded-lg transition-colors duration-300 text-xs font-tripswift-medium flex items-center justify-center
+         bg-tripswift-off-white hover:bg-gray-100 text-red-600 border border-red-200"
+                onClick={() => onCancel(booking)}
+              >
+                <FaRegTimesCircle className={`${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
+                {t('BookingTabs.BookingCard.cancel')}
+              </button>
+            </div>
+          )}
 
       </div>
     </div>

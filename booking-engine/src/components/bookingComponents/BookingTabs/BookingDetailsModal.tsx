@@ -71,7 +71,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
   const formatCamelCase = (text: string): string => text.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase());
   const roomType = booking.roomTypeCode;
   const currency = booking.currencyCode?.toUpperCase();
-  const isPastCheckIn = new Date(booking.checkInDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0);
+  const isPastOrTodayCheckIn = new Date(booking.checkInDate).setHours(0, 0, 0, 0) <= new Date().setHours(0, 0, 0, 0);
   const nights = calculateNights(booking.checkInDate, booking.checkOutDate);
 
   return (
@@ -357,33 +357,30 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
 
         {/* Enhanced Action Buttons */}
         <div className="flex flex-col md:flex-row gap-2 pt-3 border-t border-gray-200 no-print">
-          {(booking.status === "Confirmed" || booking.status === "Modified") && !isPastCheckIn && (
-            <>
-              <button
-                className={`flex-1 py-2.5 px-4 rounded-lg transition-all duration-300 font-tripswift-medium flex items-center justify-center
-        ${booking.paymentMethod === "crypto"
-                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                    : "bg-gradient-to-r from-tripswift-blue to-[#054B8F] text-tripswift-off-white hover:shadow-lg"}`}
-                onClick={() => booking.paymentMethod !== "crypto" && onAmend()}
-                disabled={booking.paymentMethod === "crypto"}
-              >
-                <FaEdit className={`text-sm ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
-                {t("BookingTabs.BookingDetailsModal.modifyBooking")}
-              </button>
+          {(booking.status === "Confirmed" || booking.status === "Modified") &&
+            !isPastOrTodayCheckIn &&
+            booking.paymentMethod !== "crypto" && (
+              <>
+                <button
+                  className="flex-1 py-2.5 px-4 rounded-lg transition-all duration-300 font-tripswift-medium flex items-center justify-center
+          bg-gradient-to-r from-tripswift-blue to-[#054B8F] text-tripswift-off-white hover:shadow-lg"
+                  onClick={onAmend}
+                >
+                  <FaEdit className={`text-sm ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
+                  {t("BookingTabs.BookingDetailsModal.modifyBooking")}
+                </button>
 
-              <button
-                className={`flex-1 py-2.5 px-4 rounded-lg transition-all duration-300 font-tripswift-medium flex items-center justify-center
-        ${booking.paymentMethod === "crypto"
-                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                    : "bg-white text-red-600 border-2 border-red-200 hover:bg-red-50 hover:border-red-300"}`}
-                onClick={() => booking.paymentMethod !== "crypto" && onCancel()}
-                disabled={booking.paymentMethod === "crypto"}
-              >
-                <FaRegTimesCircle className={`text-sm ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
-                {t("BookingTabs.BookingDetailsModal.cancelBooking")}
-              </button>
-            </>
-          )}
+                <button
+                  className="flex-1 py-2.5 px-4 rounded-lg transition-all duration-300 font-tripswift-medium flex items-center justify-center
+          bg-white text-red-600 border-2 border-red-200 hover:bg-red-50 hover:border-red-300"
+                  onClick={onCancel}
+                >
+                  <FaRegTimesCircle className={`text-sm ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
+                  {t("BookingTabs.BookingDetailsModal.cancelBooking")}
+                </button>
+              </>
+            )}
+
 
           <button
             className="flex-1 bg-gray-700 text-tripswift-off-white py-2.5 px-4 rounded-lg hover:bg-gray-800 hover:shadow-lg transition-all duration-300 flex items-center justify-center font-tripswift-medium"
