@@ -808,6 +808,7 @@
       "guestDetails": "Guest Details",
       "guestName": "Guest Name",
       "contactNumber": "Contact Number",
+      "email":"Email",
       "adults": "Adults",
       "children": "Children",
       "specialRequests": "Special Requests",

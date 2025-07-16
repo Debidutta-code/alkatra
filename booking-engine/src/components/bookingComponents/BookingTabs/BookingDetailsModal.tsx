@@ -16,6 +16,7 @@ import {
   FaBed,
   FaUsers,
   FaPhone,
+  FaEnvelope,
 } from "react-icons/fa";
 import {
   formatDateString,
@@ -271,23 +272,45 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
               </div>
             )}
 
-            {/* Contact Information */}
+            {/* Contact Information - Email and Phone in Single Row */}
             <div className="mt-3 bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
-              <div className="flex gap-2">
-                <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                  <FaPhone className="text-green-600 text-xs" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-0.5">
-                    {t("BookingTabs.BookingDetailsModal.contactNumber")}
-                  </p>
-                  <p
-                    className="font-tripswift-medium text-gray-800"
-                    dir="ltr"
-                  >
-                    {booking.phone}
-                  </p>
-                </div>
+              <div className="flex flex-col md:flex-row md:items-center gap-3">
+                {/* Email */}
+                {booking.email && (
+                  <div className="flex gap-2 flex-1">
+                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                      <FaEnvelope className="text-blue-600 text-xs" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-0.5">
+                        {t("BookingTabs.BookingDetailsModal.email")}
+                      </p>
+                      <p className="font-tripswift-medium text-gray-800">
+                        {booking.email}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Phone */}
+                {booking.phone && (
+                  <div className="flex gap-2 p-2">
+                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                      <FaPhone className="text-green-600 text-xs" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-0.5">
+                        {t("BookingTabs.BookingDetailsModal.contactNumber")}
+                      </p>
+                      <p
+                        className="font-tripswift-medium text-gray-800"
+                        dir="ltr"
+                      >
+                        {booking.phone}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -306,7 +329,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             <div className="bg-gradient-to-r from-tripswift-off-white to-gray-50 p-3 rounded-xl border border-gray-100 shadow-sm">
               <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] p-4 rounded-xl text-white shadow-lg">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                     {/* Booking Date */}
                     <div className="flex items-start gap-3">
                       <FaRegCalendarCheck className="mt-1" />
