@@ -107,7 +107,7 @@ export default function Navbar() {
   return (
     <nav
       className={cn(
-        "md:h-[14vh] h-[12vh] border-b flex items-center justify-between px-6 transition-all duration-300",
+        "md:h-[14vh] h-[12vh] border-b border-gray-200/60 flex items-center justify-between px-6 transition-all duration-300",
         noNav && "hidden",
         open && !isMobile
           ? " w-[calc(100vw-16rem)] md:pr-16 lg:pr-20"
@@ -160,7 +160,7 @@ export default function Navbar() {
                   src={"https://avatar.vercel.sh"}
                   alt={`${user?.firstName}'s avatar`}
                 />
-                <AvatarFallback className="bg-primary text-primary-foreground font-medium">
+                <AvatarFallback className="bg-gradient-to-br from-tripswift-blue to-purple-600 text-primary-foreground font-medium">
                   {user?.firstName?.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -190,4 +190,3 @@ export default function Navbar() {
 
   );
 }
-

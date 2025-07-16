@@ -796,7 +796,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
                 }))
               }
               type="number"
-              placeholder="Max Childrens"
+              placeholder="Max Children"
             />
             {max_number_of_childrenError && (
               <p className="text-red-500 text-sm ">

@@ -169,7 +169,7 @@ const Page = () => {
         <div className="max-w-7xl mx-auto  px-4 sm:px-6 md:px-8  py-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
             <div>
-              <h1 className="text-3xl  font-bold text-gray-900 dark:text-white mb-2">
+              <h1 className="text-2xl  font-bold text-gray-900 dark:text-white mb-2">
                 Property Portfolio
               </h1>
               <div className="flex items-center space-x-6 text-sm text-gray-600 dark:text-gray-400">

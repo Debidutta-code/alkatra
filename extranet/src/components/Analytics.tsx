@@ -109,7 +109,7 @@ const Analytics = () => {
                 <div className="w-9 h-9 bg-gradient-to-br from-tripswift-blue to-tripswift-dark-blue rounded-lg flex items-center justify-center shadow-xs">
                   <Zap className="w-4 h-4 text-white" />
                 </div>
-                <h1 className="text-xl font-bold text-gray-900">Hotel Analytics</h1>
+                <h1 className="text-2xl font-bold text-gray-900">Hotel Analytics</h1>
               </div>
 
               <div className="hidden md:flex items-center gap-1 bg-gray-100 rounded-lg p-1">

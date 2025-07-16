@@ -175,7 +175,7 @@ export default function AppSidebar({ role }: { role?: string }) {
     <div className="">
       <Sidebar
         className="border-r-2 border-gray-400">
-        <SidebarHeader className="border-b border-gray-200/60 dark:border-gray-800/60 h-[12vh] md:h-[14vh] bg-gradient-to-r from-white via-gray-50/50 to-white dark:from-gray-900 dark:via-gray-800/50 dark:to-gray-900">
+        <SidebarHeader className="border-b border-gray-200/60 dark:border-gray-800/60 h-[12vh] md:h-[14vh] bg-gradient-to-r from-white via-blue-50/50 to-white dark:from-gray-900 dark:via-gray-800/50 dark:to-gray-900">
           <div className="flex items-center justify-between  px-3 h-full">
             <div className="flex items-center gap-3">
               <div className="w-auto max-w-[120px]  h-auto">

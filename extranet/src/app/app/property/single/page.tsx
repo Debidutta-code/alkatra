@@ -193,13 +193,13 @@ const Page = () => {
                         <div>
                             <div className="flex items-center space-x-3 mb-2">
                                 <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
-                                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                                     Direct Properties
                                 </h1>
                             </div>
                             <div className="flex items-center space-x-6 text-sm text-gray-600 dark:text-gray-400">
                                 <div className="flex items-center">
-                                    <Building2 className="w-4 h-4 mr-1" />
+                                    <Building2 className="w-4 h-4 mr-2" />
                                     <span>{directProperties.length} Direct {directProperties.length === 1 ? 'Property' : 'Properties'}</span>
                                 </div>
 

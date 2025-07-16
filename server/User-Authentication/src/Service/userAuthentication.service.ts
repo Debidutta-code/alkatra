@@ -65,7 +65,7 @@ export class UserService {
       console.log("If condition")
     } else if (
       requestingUserId !== userId &&
-      requestingUserRole === "superAdmin" || requestingUserRole === "groupmanager"
+      requestingUserRole === "superAdmin" || requestingUserRole === "groupManager"
     ) {
       console.log("Else Idf  condition")
       // SuperAdmin can update all fields of any user
