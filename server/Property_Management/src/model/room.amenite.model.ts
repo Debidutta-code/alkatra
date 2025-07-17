@@ -1,8 +1,6 @@
 import mongoose, { Document, Schema, Types } from "mongoose";
 import { PropertyInfoType } from "./property.info.model";
 
-
-
 type BedType = "single" | "double" | "king" | "twin" | "queen";
 
 interface RoomAmenities {
@@ -10,6 +8,13 @@ interface RoomAmenities {
   bathroom: boolean;
   towels: boolean;
   linensBedding: boolean;
+  linens: boolean; // Added
+  bidet: boolean; // Added
+  toiletPaper: boolean; // Added
+  towelsSheets: boolean; // Added (extra fee)
+  freeToiletries: boolean; // Added
+  shower: boolean; // Added
+  toilet: boolean; // Added
 }
 
 interface FurnitureAmenities {
@@ -17,12 +22,22 @@ interface FurnitureAmenities {
   desk: boolean;
   dresserWardrobe: boolean;
   sofaSeating: boolean;
+  sofa: boolean; // Added
+  wardrobeOrCloset: boolean; // Added
+  diningTable: boolean; // Added
+  diningArea: boolean; // Added
+  sittingArea: boolean; // Added
+  readingChair: boolean; // Moved from WorkLeisure
+  balcony: boolean; // Added
 }
 
 interface TechnologyAmenities {
   television: boolean;
   telephone: boolean;
   wifiInternet: boolean;
+  flatScreenTV: boolean; // Added
+  satelliteChannels: boolean; // Added
+  cableChannels: boolean; // Added
 }
 
 interface ClimateControlAmenities {
@@ -34,6 +49,13 @@ interface KitchenetteMiniBarAmenities {
   smallRefrigerator: boolean;
   microwave: boolean;
   coffeeMaker: boolean;
+  refrigerator: boolean; // Added (full size)
+  kitchenware: boolean; // Added
+  electricKettle: boolean; // Added
+  oven: boolean; // Added
+  stovetop: boolean; // Added
+  teaCoffeeMaker: boolean; // Added
+  kitchen: boolean; // Added (full kitchen)
 }
 
 interface SafetySecurityAmenities {
@@ -48,16 +70,18 @@ interface ToiletriesAmenities {
   hairDryer: boolean;
 }
 
-
 interface WorkLeisureAmenities {
   workDesk: boolean;
-  readingChair: boolean;
   additionalLighting: boolean;
+  ironingFacilities: boolean; // Added
+  iron: boolean; // Added
 }
 
 interface AccessibilityFeaturesAmenities {
   accessibleBathroom: boolean;
   wheelchairAccessibility: boolean;
+  upperFloorsAccessibleByElevator: boolean; // Added
+  entireUnitWheelchairAccessible: boolean; // Added
 }
 
 interface RoomAminityType extends Document {
@@ -74,11 +98,9 @@ interface RoomAminityType extends Document {
     workLeisure: WorkLeisureAmenities;
     accessibilityFeatures: AccessibilityFeaturesAmenities;
   };
-  // name: string;
-  // type: string;
 }
 
-const roomAminitySchema = new Schema<RoomAminityType>({
+const roomAminitySchema = new Schema({
   propertyInfo_id: {
     type: Schema.Types.ObjectId,
     ref: "PropertyInfo",
@@ -99,17 +121,34 @@ const roomAminitySchema = new Schema<RoomAminityType>({
       bathroom: { type: Boolean, default: false },
       towels: { type: Boolean, default: false },
       linensBedding: { type: Boolean, default: false },
+      linens: { type: Boolean, default: false },
+      bidet: { type: Boolean, default: false },
+      toiletPaper: { type: Boolean, default: false },
+      towelsSheets: { type: Boolean, default: false }, // extra fee
+      freeToiletries: { type: Boolean, default: false },
+      shower: { type: Boolean, default: false },
+      toilet: { type: Boolean, default: false },
     },
     furniture: {
       tableChairs: { type: Boolean, default: false },
       desk: { type: Boolean, default: false },
       dresserWardrobe: { type: Boolean, default: false },
       sofaSeating: { type: Boolean, default: false },
+      sofa: { type: Boolean, default: false },
+      wardrobeOrCloset: { type: Boolean, default: false },
+      diningTable: { type: Boolean, default: false },
+      diningArea: { type: Boolean, default: false },
+      sittingArea: { type: Boolean, default: false },
+      readingChair: { type: Boolean, default: false },
+      balcony: { type: Boolean, default: false },
     },
     technology: {
       television: { type: Boolean, default: false },
       telephone: { type: Boolean, default: false },
       wifiInternet: { type: Boolean, default: false },
+      flatScreenTV: { type: Boolean, default: false },
+      satelliteChannels: { type: Boolean, default: false },
+      cableChannels: { type: Boolean, default: false },
     },
     climateControl: {
       airConditioning: { type: Boolean, default: false },
@@ -119,6 +158,13 @@ const roomAminitySchema = new Schema<RoomAminityType>({
       smallRefrigerator: { type: Boolean, default: false },
       microwave: { type: Boolean, default: false },
       coffeeMaker: { type: Boolean, default: false },
+      refrigerator: { type: Boolean, default: false },
+      kitchenware: { type: Boolean, default: false },
+      electricKettle: { type: Boolean, default: false },
+      oven: { type: Boolean, default: false },
+      stovetop: { type: Boolean, default: false },
+      teaCoffeeMaker: { type: Boolean, default: false },
+      kitchen: { type: Boolean, default: false },
     },
     safetySecurity: {
       safe: { type: Boolean, default: false },
@@ -130,23 +176,21 @@ const roomAminitySchema = new Schema<RoomAminityType>({
       soap: { type: Boolean, default: false },
       hairDryer: { type: Boolean, default: false },
     },
-
     workLeisure: {
       workDesk: { type: Boolean, default: false },
-      readingChair: { type: Boolean, default: false },
       additionalLighting: { type: Boolean, default: false },
+      ironingFacilities: { type: Boolean, default: false },
+      iron: { type: Boolean, default: false },
     },
     accessibilityFeatures: {
       accessibleBathroom: { type: Boolean, default: false },
       wheelchairAccessibility: { type: Boolean, default: false },
+      upperFloorsAccessibleByElevator: { type: Boolean, default: false },
+      entireUnitWheelchairAccessible: { type: Boolean, default: false },
     },
   },
-
 });
 
-const RoomAminity = mongoose.model<RoomAminityType>(
-  "RoomAminity",
-  roomAminitySchema
-);
+const RoomAminity = mongoose.model("RoomAminity", roomAminitySchema);
 
 export { RoomAminity, RoomAminityType };

@@ -33,67 +33,80 @@ import { RootState } from "@src/redux/store";
 const BedType = z.enum(["single", "double", "king", "twin", "queen"]);
 
 const roomSchema = z.object({
-  // name: z.string().min(1, { message: "Room name is required" }),
-  // type: z.string().min(1, { message: "Room type is required" }),
+  // Basic Room Amenities
   bed: BedType,
   bathroom: z.boolean(),
   towels: z.boolean(),
   linensBedding: z.boolean(),
+  linens: z.boolean(),
+  bidet: z.boolean(),
+  toiletPaper: z.boolean(),
+  towelsSheets: z.boolean(),
+  freeToiletries: z.boolean(),
+  shower: z.boolean(),
+  toilet: z.boolean(),
+  
+  // Furniture Amenities
   tableChairs: z.boolean(),
   desk: z.boolean(),
   dresserWardrobe: z.boolean(),
   sofaSeating: z.boolean(),
+  sofa: z.boolean(),
+  wardrobeOrCloset: z.boolean(),
+  diningTable: z.boolean(),
+  diningArea: z.boolean(),
+  sittingArea: z.boolean(),
+  readingChair: z.boolean(),
+  balcony: z.boolean(),
+  
+  // Technology Amenities
   television: z.boolean(),
   telephone: z.boolean(),
   wifiInternet: z.boolean(),
+  flatScreenTV: z.boolean(),
+  satelliteChannels: z.boolean(),
+  cableChannels: z.boolean(),
+  
+  // Climate Control
   airConditioning: z.boolean(),
   heating: z.boolean(),
+  
+  // Kitchen/MiniBar Amenities
   smallRefrigerator: z.boolean(),
   microwave: z.boolean(),
   coffeeMaker: z.boolean(),
-  cctv: z.boolean(),
+  refrigerator: z.boolean(),
+  kitchenware: z.boolean(),
+  electricKettle: z.boolean(),
+  oven: z.boolean(),
+  stovetop: z.boolean(),
+  teaCoffeeMaker: z.boolean(),
+  kitchen: z.boolean(),
+  
+  // Safety/Security
+  safe: z.boolean(),
   smokeDetectors: z.boolean(),
   fireExtinguisher: z.boolean(),
+  
+  // Toiletries
   shampooConditioner: z.boolean(),
   soap: z.boolean(),
   hairDryer: z.boolean(),
+  
+  // Work/Leisure
   workDesk: z.boolean(),
-  readingChair: z.boolean(),
   additionalLighting: z.boolean(),
+  ironingFacilities: z.boolean(),
+  iron: z.boolean(),
+  
+  // Accessibility
   accessibleBathroom: z.boolean(),
   wheelchairAccessibility: z.boolean(),
+  upperFloorsAccessibleByElevator: z.boolean(),
+  entireUnitWheelchairAccessible: z.boolean(),
 });
 
-type Inputs = {
-  // name: string;
-  // type: string;
-  bed: "single" | "double" | "king" | "twin" | "queen";
-  bathroom: boolean;
-  towels: boolean;
-  linensBedding: boolean;
-  tableChairs: boolean;
-  desk: boolean;
-  dresserWardrobe: boolean;
-  sofaSeating: boolean;
-  television: boolean;
-  telephone: boolean;
-  wifiInternet: boolean;
-  airConditioning: boolean;
-  heating: boolean;
-  smallRefrigerator: boolean;
-  microwave: boolean;
-  coffeeMaker: boolean;
-  cctv: boolean;
-  smokeDetectors: boolean;
-  fireExtinguisher: boolean;
-  shampooConditioner: boolean;
-  soap: boolean;
-  hairDryer: boolean;
-  workDesk: boolean;
-  readingChair: boolean;
-  additionalLighting: boolean;
-  accessibleBathroom: boolean;
-  wheelchairAccessibility: boolean;
+type Inputs = z.infer<typeof roomSchema> & {
   description: string;
 };
 
@@ -101,18 +114,15 @@ type Props = {
   onPrevious: () => void;
   onNext: () => void;
 };
+
 export default function Rooms({ onNext, onPrevious }: Props) {
   const [openDialog, setOpenDialog] = useState(false);
   const [currenStep, setCurrentStep] = useState(0);
-
   const [loading, setLoading] = useState<boolean>(false);
   const [formLoading, setFormLoading] = useState<boolean>(false);
   const [roomDetails, setroomDetails] = useState<any>(null);
-  // const { accessToken } = useSelector((state: RootState) => state.auth);
-  // const accessToken = Cookies.get("accessToken");
+  
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
-  console.log("Token from room aminities tsx", accessToken);
-
   const property_id = useSearchParams().get("property_id");
   const router = useRouter();
   const pathname = usePathname();
@@ -133,11 +143,9 @@ export default function Rooms({ onNext, onPrevious }: Props) {
           setroomDetails(propertyRoom[0]);
         } else {
           setroomDetails(null);
-          // toast.error("No room details found for this property");
         }
       } catch (error) {
-        // console.error("Error fetching room details:", error);
-        // toast.error("Failed to fetch room details");
+        // Handle error
       }
     };
     if (property_id) fetchRoomDetails();
@@ -145,82 +153,139 @@ export default function Rooms({ onNext, onPrevious }: Props) {
 
   const form = useForm<Inputs>({
     defaultValues: {
-      // name: "",
-      // type: "",
+      // Basic Room Amenities
       bed: "single",
       bathroom: false,
       towels: false,
       linensBedding: false,
+      linens: false,
+      bidet: false,
+      toiletPaper: false,
+      towelsSheets: false,
+      freeToiletries: false,
+      shower: false,
+      toilet: false,
+      
+      // Furniture Amenities
       tableChairs: false,
       desk: false,
       dresserWardrobe: false,
       sofaSeating: false,
+      sofa: false,
+      wardrobeOrCloset: false,
+      diningTable: false,
+      diningArea: false,
+      sittingArea: false,
+      readingChair: false,
+      balcony: false,
+      
+      // Technology Amenities
       television: false,
       telephone: false,
       wifiInternet: false,
+      flatScreenTV: false,
+      satelliteChannels: false,
+      cableChannels: false,
+      
+      // Climate Control
       airConditioning: false,
       heating: false,
+      
+      // Kitchen/MiniBar Amenities
       smallRefrigerator: false,
       microwave: false,
       coffeeMaker: false,
-      cctv: false,
+      refrigerator: false,
+      kitchenware: false,
+      electricKettle: false,
+      oven: false,
+      stovetop: false,
+      teaCoffeeMaker: false,
+      kitchen: false,
+      
+      // Safety/Security
+      safe: false,
       smokeDetectors: false,
       fireExtinguisher: false,
+      
+      // Toiletries
       shampooConditioner: false,
       soap: false,
       hairDryer: false,
+      
+      // Work/Leisure
       workDesk: false,
-      readingChair: false,
       additionalLighting: false,
+      ironingFacilities: false,
+      iron: false,
+      
+      // Accessibility
       accessibleBathroom: false,
       wheelchairAccessibility: false,
+      upperFloorsAccessibleByElevator: false,
+      entireUnitWheelchairAccessible: false,
     },
     resolver: zodResolver(roomSchema),
   });
 
-  const { register, control, handleSubmit, setValue, formState, getValues } =
-    form;
-
-  useEffect(() => {
-    console.log({ errors: formState.errors });
-  }, [formState.errors]);
+  const { register, control, handleSubmit, setValue, formState, getValues } = form;
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     const amenities = {
-      accessibilityFeatures: {
-        accessibleBathroom: !!data.accessibleBathroom,
-        wheelchairAccessibility: !!data.wheelchairAccessibility,
-      },
       basic: {
         bed: data.bed,
         bathroom: !!data.bathroom,
         towels: !!data.towels,
         linensBedding: !!data.linensBedding,
-      },
-      climateControl: {
-        airConditioning: !!data.airConditioning,
-        heating: !!data.heating,
+        linens: !!data.linens,
+        bidet: !!data.bidet,
+        toiletPaper: !!data.toiletPaper,
+        towelsSheets: !!data.towelsSheets,
+        freeToiletries: !!data.freeToiletries,
+        shower: !!data.shower,
+        toilet: !!data.toilet,
       },
       furniture: {
         tableChairs: !!data.tableChairs,
         desk: !!data.desk,
         dresserWardrobe: !!data.dresserWardrobe,
         sofaSeating: !!data.sofaSeating,
-      },
-      kitchenetteMiniBar: {
-        smallRefrigerator: !!data.smallRefrigerator,
-        microwave: !!data.microwave,
-        coffeeMaker: !!data.coffeeMaker,
-      },
-      safetySecurity: {
-        cctv: !!data.cctv,
-        smokeDetectors: !!data.smokeDetectors,
-        fireExtinguisher: !!data.fireExtinguisher,
+        sofa: !!data.sofa,
+        wardrobeOrCloset: !!data.wardrobeOrCloset,
+        diningTable: !!data.diningTable,
+        diningArea: !!data.diningArea,
+        sittingArea: !!data.sittingArea,
+        readingChair: !!data.readingChair,
+        balcony: !!data.balcony,
       },
       technology: {
         television: !!data.television,
         telephone: !!data.telephone,
         wifiInternet: !!data.wifiInternet,
+        flatScreenTV: !!data.flatScreenTV,
+        satelliteChannels: !!data.satelliteChannels,
+        cableChannels: !!data.cableChannels,
+      },
+      climateControl: {
+        airConditioning: !!data.airConditioning,
+        heating: !!data.heating,
+      },
+      kitchenetteMiniBar: {
+        smallRefrigerator: !!data.smallRefrigerator,
+        microwave: !!data.microwave,
+        coffeeMaker: !!data.coffeeMaker,
+        refrigerator: !!data.refrigerator,
+        kitchenware: !!data.kitchenware,
+        electricKettle: !!data.electricKettle,
+        oven: !!data.oven,
+        stovetop: !!data.stovetop,
+        teaCoffeeMaker: !!data.teaCoffeeMaker,
+        kitchen: !!data.kitchen,
+      },
+      safetySecurity: {
+        safe: !!data.safe,
+        smokeDetectors: !!data.smokeDetectors,
+        fireExtinguisher: !!data.fireExtinguisher,
       },
       toiletries: {
         shampooConditioner: !!data.shampooConditioner,
@@ -229,28 +294,27 @@ export default function Rooms({ onNext, onPrevious }: Props) {
       },
       workLeisure: {
         workDesk: !!data.workDesk,
-        readingChair: !!data.readingChair,
         additionalLighting: !!data.additionalLighting,
+        ironingFacilities: !!data.ironingFacilities,
+        iron: !!data.iron,
+      },
+      accessibilityFeatures: {
+        accessibleBathroom: !!data.accessibleBathroom,
+        wheelchairAccessibility: !!data.wheelchairAccessibility,
+        upperFloorsAccessibleByElevator: !!data.upperFloorsAccessibleByElevator,
+        entireUnitWheelchairAccessible: !!data.entireUnitWheelchairAccessible,
       },
     };
-  
-    // Validate room_type
-    // if (!roomDetails?.room_type) {
-    //   toast.error("Room type is missing. Please ensure a room is created first.");
-    //   setFormLoading(false);
-    //   return;
-    // }
-  
+
     const roomBody = {
       ...data,
       propertyInfo_id: property_id,
-      room_type: roomDetails.room_type, // Use room_type directly
+      room_type: roomDetails.room_type,
       amenities,
     };
-  
+
     setFormLoading(true);
-  
-    console.log("onSubmit data:", roomBody);
+
     try {
       const {
         data: { data: newRoom },
@@ -263,10 +327,8 @@ export default function Rooms({ onNext, onPrevious }: Props) {
           },
         }
       );
-  
-      console.log("NewRoom Data:", newRoom);
+
       setFormLoading(false);
-  
       toast.success("Room amenities submitted successfully!");
       onNext();
       router.push(`/app/property/${property_id}`);
@@ -278,6 +340,27 @@ export default function Rooms({ onNext, onPrevious }: Props) {
     }
   };
 
+  // Helper function to create checkbox
+  const createCheckbox = (id: string, label: string, value: any) => (
+    <div className="flex items-center space-x-2 mb-2">
+      <Checkbox
+        id={id}
+        checked={roomDetails?.[id] || false}
+        {...register(id as any)}
+        onCheckedChange={(checked: boolean) => {
+          setroomDetails({ ...roomDetails, [id]: checked });
+          setValue(id as any, checked);
+        }}
+      />
+      <Label
+        htmlFor={id}
+        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+      >
+        {label}
+      </Label>
+    </div>
+  );
+
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
@@ -286,11 +369,13 @@ export default function Rooms({ onNext, onPrevious }: Props) {
           <CardHeader>
             <CardTitle>Amenities</CardTitle>
           </CardHeader>
-          <CardContent className="flex gap-4 flex-wrap ">
+          <CardContent className="flex gap-4 flex-wrap">
             <ScrollArea className="h-72 w-full px-6">
               <Accordion type="multiple" className="w-full">
+                
+                {/* Basic Room Amenities */}
                 <AccordionItem value="amenity-1">
-                  <AccordionTrigger>Room Amenities</AccordionTrigger>
+                  <AccordionTrigger>Basic Room Amenities</AccordionTrigger>
                   <AccordionContent className="flex flex-col gap-4 items-start justify-between">
                     <div className="w-full">
                       <Label>Bed Type</Label>
@@ -308,8 +393,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                           {["single", "double", "king", "twin", "queen"]?.map(
                             (item, index) => (
                               <SelectItem key={`${item + index}`} value={item}>
-                                {item.charAt(0).toUpperCase() +
-                                  item.substring(1)}
+                                {item.charAt(0).toUpperCase() + item.substring(1)}
                               </SelectItem>
                             )
                           )}
@@ -319,585 +403,141 @@ export default function Rooms({ onNext, onPrevious }: Props) {
 
                     <div className="w-full">
                       <div className="flex flex-col space-y-2">
-                        {" "}
-                        {/* Bathroom */}
-                        <div className="flex items-center space-x-2">
-                          <Checkbox
-                            id="bathroom"
-                            checked={roomDetails?.bathroom}
-                            {...register("bathroom")}
-                            onCheckedChange={(value: boolean) => {
-                              setroomDetails({
-                                ...roomDetails,
-                                bathroom: value,
-                              });
-                              setValue("bathroom", value as any);
-                            }}
-                          />
-                          <label
-                            htmlFor="bathroom"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            Bathroom
-                          </label>
-                        </div>
-                        {/* Towels */}
-                        <div className="flex items-center space-x-2">
-                          <Checkbox
-                            id="towels"
-                            checked={roomDetails?.towels}
-                            {...register("towels")}
-                            onCheckedChange={(value: boolean) => {
-                              setroomDetails({ ...roomDetails, towels: value });
-                              setValue("towels", value as any);
-                            }}
-                          />
-                          <label
-                            htmlFor="towels"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            Towels
-                          </label>
-                        </div>
-                        {/* Linens Bedding */}
-                        <div className="flex items-center space-x-2">
-                          <Checkbox
-                            id="linensBedding"
-                            checked={roomDetails?.linensBedding}
-                            {...register("linensBedding")}
-                            onCheckedChange={(value: boolean) => {
-                              setroomDetails({
-                                ...roomDetails,
-                                linensBedding: value,
-                              });
-                              setValue("linensBedding", value);
-                            }}
-                          />
-                          <label
-                            htmlFor="linensBedding"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            Linens Bedding
-                          </label>
-                        </div>
+                        {createCheckbox("bathroom", "Bathroom", roomDetails?.bathroom)}
+                        {createCheckbox("towels", "Towels", roomDetails?.towels)}
+                        {createCheckbox("linensBedding", "Linens Bedding", roomDetails?.linensBedding)}
+                        {createCheckbox("linens", "Linens", roomDetails?.linens)}
+                        {createCheckbox("bidet", "Bidet", roomDetails?.bidet)}
+                        {createCheckbox("toiletPaper", "Toilet Paper", roomDetails?.toiletPaper)}
+                        {createCheckbox("towelsSheets", "Towels/Sheets (extra fee)", roomDetails?.towelsSheets)}
+                        {createCheckbox("freeToiletries", "Free Toiletries", roomDetails?.freeToiletries)}
+                        {createCheckbox("shower", "Shower", roomDetails?.shower)}
+                        {createCheckbox("toilet", "Toilet", roomDetails?.toilet)}
                       </div>
                     </div>
                   </AccordionContent>
                 </AccordionItem>
 
+                {/* Furniture Amenities */}
                 <AccordionItem value="amenity-2">
                   <AccordionTrigger>Furniture Amenities</AccordionTrigger>
                   <AccordionContent>
                     <div>
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Checkbox
-                          id="tableChairs"
-                          checked={roomDetails?.tableChairs}
-                          {...register("tableChairs")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({
-                              ...roomDetails,
-                              tableChairs: value,
-                            });
-                            setValue("tableChairs", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="tableChairs"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Table Chairs
-                        </Label>
-                      </div>
-
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Checkbox
-                          id="desk"
-                          checked={roomDetails?.desk}
-                          {...register("desk")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, desk: value });
-                            setValue("desk", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="desk"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Desk
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Checkbox
-                          id="dresserWardrobe"
-                          checked={roomDetails?.dresserWardrobe}
-                          {...register("dresserWardrobe")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({
-                              ...roomDetails,
-                              dresserWardrobe: value,
-                            });
-                            setValue("dresserWardrobe", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="dresserWardrobe"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Dresser Wardrobe
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="sofaSeating"
-                          checked={roomDetails?.sofaSeating}
-                          {...register("sofaSeating")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({
-                              ...roomDetails,
-                              sofaSeating: value,
-                            });
-                            setValue("sofaSeating", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="sofaSeating"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Sofa Seating
-                        </Label>
-                      </div>
+                      {createCheckbox("tableChairs", "Table Chairs", roomDetails?.tableChairs)}
+                      {createCheckbox("desk", "Desk", roomDetails?.desk)}
+                      {createCheckbox("dresserWardrobe", "Dresser Wardrobe", roomDetails?.dresserWardrobe)}
+                      {createCheckbox("sofaSeating", "Sofa Seating", roomDetails?.sofaSeating)}
+                      {createCheckbox("sofa", "Sofa", roomDetails?.sofa)}
+                      {createCheckbox("wardrobeOrCloset", "Wardrobe or Closet", roomDetails?.wardrobeOrCloset)}
+                      {createCheckbox("diningTable", "Dining Table", roomDetails?.diningTable)}
+                      {createCheckbox("diningArea", "Dining Area", roomDetails?.diningArea)}
+                      {createCheckbox("sittingArea", "Sitting Area", roomDetails?.sittingArea)}
+                      {createCheckbox("readingChair", "Reading Chair", roomDetails?.readingChair)}
+                      {createCheckbox("balcony", "Balcony", roomDetails?.balcony)}
                     </div>
                   </AccordionContent>
                 </AccordionItem>
 
+                {/* Technology Amenities */}
                 <AccordionItem value="amenity-3">
                   <AccordionTrigger>Technology Amenities</AccordionTrigger>
                   <AccordionContent>
                     <div>
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Checkbox
-                          id="television"
-                          checked={roomDetails?.television}
-                          {...register("television")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({
-                              ...roomDetails,
-                              television: value,
-                            });
-                            setValue("television", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="television"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Television
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Checkbox
-                          id="telephone"
-                          checked={roomDetails?.telephone}
-                          {...register("telephone")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({
-                              ...roomDetails,
-                              telephone: value,
-                            });
-                            setValue("telephone", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="telephone"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Telephone
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Checkbox
-                          id="wifiInternet"
-                          checked={roomDetails?.wifiInternet}
-                          {...register("wifiInternet")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({
-                              ...roomDetails,
-                              wifiInternet: value,
-                            });
-                            setValue("wifiInternet", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="wifiInternet"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Wifi Internet
-                        </Label>
-                      </div>
+                      {createCheckbox("television", "Television", roomDetails?.television)}
+                      {createCheckbox("telephone", "Telephone", roomDetails?.telephone)}
+                      {createCheckbox("wifiInternet", "Wifi Internet", roomDetails?.wifiInternet)}
+                      {createCheckbox("flatScreenTV", "Flat-screen TV", roomDetails?.flatScreenTV)}
+                      {createCheckbox("satelliteChannels", "Satellite Channels", roomDetails?.satelliteChannels)}
+                      {createCheckbox("cableChannels", "Cable Channels", roomDetails?.cableChannels)}
                     </div>
                   </AccordionContent>
                 </AccordionItem>
 
+                {/* Climate Control Amenities */}
                 <AccordionItem value="amenity-4">
                   <AccordionTrigger>Climate Control Amenities</AccordionTrigger>
                   <AccordionContent>
                     <div>
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Checkbox
-                          id="airConditioning"
-                          checked={roomDetails?.airConditioning}
-                          {...register("airConditioning")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({
-                              ...roomDetails,
-                              airConditioning: value,
-                            });
-                            setValue("airConditioning", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="airConditioning"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Air Conditioning
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="heating"
-                          checked={roomDetails?.heating}
-                          {...register("heating")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, heating: value });
-                            setValue("heating", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="heating"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Heating
-                        </Label>
-                      </div>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="amenity-5">
-                  <AccordionTrigger>
-                    Kitchenette MiniBar Amenities
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div>
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Checkbox
-                          id="smallRefrigerator"
-                          checked={roomDetails?.smallRefrigerator}
-                          {...register("smallRefrigerator")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({
-                              ...roomDetails,
-                              smallRefrigerator: value,
-                            });
-                            setValue("smallRefrigerator", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="smallRefrigerator"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Small Refrigerator
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Checkbox
-                          id="microwave"
-                          checked={roomDetails?.microwave}
-                          {...register("microwave")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({
-                              ...roomDetails,
-                              microwave: value,
-                            });
-                            setValue("microwave", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="microwave"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Microwave
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="coffeeMaker"
-                          checked={roomDetails?.coffeeMaker}
-                          {...register("coffeeMaker")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({
-                              ...roomDetails,
-                              coffeeMaker: value,
-                            });
-                            setValue("coffeeMaker", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="coffeeMaker"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Coffee Maker
-                        </Label>
-                      </div>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="amenity-6">
-                  <AccordionTrigger>Security Amenities</AccordionTrigger>
-                  <AccordionContent>
-                    <div>
-                      {/* <div className="flex items-center space-x-2 mb-2">
-                        <Checkbox
-                          id="cctv"
-                          checked={roomDetails?.cctv}
-                          {...register("cctv")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, cctv: value });
-                            setValue("cctv", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="cctv"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          CCTV
-                        </Label>
-                      </div> */}
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Checkbox
-                          id="smokeDetectors"
-                          checked={roomDetails?.smokeDetectors}
-                          {...register("smokeDetectors")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({
-                              ...roomDetails,
-                              smokeDetectors: value,
-                            });
-                            setValue("smokeDetectors", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="smokeDetectors"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Smoke Detectors
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="fireExtinguisher"
-                          checked={roomDetails?.fireExtinguisher}
-                          {...register("fireExtinguisher")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({
-                              ...roomDetails,
-                              fireExtinguisher: value,
-                            });
-                            setValue("fireExtinguisher", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="fireExtinguisher"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Fire Extinguisher
-                        </Label>
-                      </div>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="amenity-7">
-                  <AccordionTrigger>Toiletries Amenities</AccordionTrigger>
-                  <AccordionContent>
-                    <div>
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Checkbox
-                          id="shampooConditioner"
-                          checked={roomDetails?.shampooConditioner}
-                          {...register("shampooConditioner")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({
-                              ...roomDetails,
-                              shampooConditioner: value,
-                            });
-                            setValue("shampooConditioner", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="shampooConditioner"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Shampoo Conditioner
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Checkbox
-                          id="soap"
-                          checked={roomDetails?.soap}
-                          {...register("soap")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, soap: value });
-                            setValue("soap", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="soap"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Soap
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="hairDryer"
-                          checked={roomDetails?.hairDryer}
-                          {...register("hairDryer")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({
-                              ...roomDetails,
-                              hairDryer: value,
-                            });
-                            setValue("hairDryer", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="hairDryer"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Hair Dryer
-                        </Label>
-                      </div>
+                      {createCheckbox("airConditioning", "Air Conditioning", roomDetails?.airConditioning)}
+                      {createCheckbox("heating", "Heating", roomDetails?.heating)}
                     </div>
                   </AccordionContent>
                 </AccordionItem>
 
+                {/* Kitchen/MiniBar Amenities */}
+                <AccordionItem value="amenity-5">
+                  <AccordionTrigger>Kitchen/MiniBar Amenities</AccordionTrigger>
+                  <AccordionContent>
+                    <div>
+                      {createCheckbox("smallRefrigerator", "Small Refrigerator", roomDetails?.smallRefrigerator)}
+                      {createCheckbox("microwave", "Microwave", roomDetails?.microwave)}
+                      {createCheckbox("coffeeMaker", "Coffee Maker", roomDetails?.coffeeMaker)}
+                      {createCheckbox("refrigerator", "Refrigerator", roomDetails?.refrigerator)}
+                      {createCheckbox("kitchenware", "Kitchenware", roomDetails?.kitchenware)}
+                      {createCheckbox("electricKettle", "Electric Kettle", roomDetails?.electricKettle)}
+                      {createCheckbox("oven", "Oven", roomDetails?.oven)}
+                      {createCheckbox("stovetop", "Stovetop", roomDetails?.stovetop)}
+                      {createCheckbox("teaCoffeeMaker", "Tea/Coffee Maker", roomDetails?.teaCoffeeMaker)}
+                      {createCheckbox("kitchen", "Kitchen", roomDetails?.kitchen)}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Safety/Security Amenities */}
+                <AccordionItem value="amenity-6">
+                  <AccordionTrigger>Safety/Security Amenities</AccordionTrigger>
+                  <AccordionContent>
+                    <div>
+                      {createCheckbox("safe", "Safe", roomDetails?.safe)}
+                      {createCheckbox("smokeDetectors", "Smoke Detectors", roomDetails?.smokeDetectors)}
+                      {createCheckbox("fireExtinguisher", "Fire Extinguisher", roomDetails?.fireExtinguisher)}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Toiletries Amenities */}
+                <AccordionItem value="amenity-7">
+                  <AccordionTrigger>Toiletries Amenities</AccordionTrigger>
+                  <AccordionContent>
+                    <div>
+                      {createCheckbox("shampooConditioner", "Shampoo Conditioner", roomDetails?.shampooConditioner)}
+                      {createCheckbox("soap", "Soap", roomDetails?.soap)}
+                      {createCheckbox("hairDryer", "Hair Dryer", roomDetails?.hairDryer)}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Work/Leisure Amenities */}
+                <AccordionItem value="amenity-8">
+                  <AccordionTrigger>Work/Leisure Amenities</AccordionTrigger>
+                  <AccordionContent>
+                    <div>
+                      {createCheckbox("workDesk", "Work Desk", roomDetails?.workDesk)}
+                      {createCheckbox("additionalLighting", "Additional Lighting", roomDetails?.additionalLighting)}
+                      {createCheckbox("ironingFacilities", "Ironing Facilities", roomDetails?.ironingFacilities)}
+                      {createCheckbox("iron", "Iron", roomDetails?.iron)}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Accessibility Features */}
                 <AccordionItem value="amenity-9">
-                  <AccordionTrigger>Work Leisure Amenities</AccordionTrigger>
+                  <AccordionTrigger>Accessibility Features</AccordionTrigger>
                   <AccordionContent>
                     <div>
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Checkbox
-                          id="workDesk"
-                          checked={roomDetails?.workDesk}
-                          {...register("workDesk")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({ ...roomDetails, workDesk: value });
-                            setValue("workDesk", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="workDesk"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Work Desk
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Checkbox
-                          id="readingChair"
-                          checked={roomDetails?.readingChair}
-                          {...register("readingChair")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({
-                              ...roomDetails,
-                              readingChair: value,
-                            });
-                            setValue("readingChair", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="readingChair"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Reading Chair
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="additionalLighting"
-                          checked={roomDetails?.additionalLighting}
-                          {...register("additionalLighting")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({
-                              ...roomDetails,
-                              additionalLighting: value,
-                            });
-                            setValue("additionalLighting", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="additionalLighting"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Additional Lighting
-                        </Label>
-                      </div>
+                      {createCheckbox("accessibleBathroom", "Accessible Bathroom", roomDetails?.accessibleBathroom)}
+                      {createCheckbox("wheelchairAccessibility", "Wheelchair Accessibility", roomDetails?.wheelchairAccessibility)}
+                      {createCheckbox("upperFloorsAccessibleByElevator", "Upper Floors Accessible by Elevator", roomDetails?.upperFloorsAccessibleByElevator)}
+                      {createCheckbox("entireUnitWheelchairAccessible", "Entire Unit Wheelchair Accessible", roomDetails?.entireUnitWheelchairAccessible)}
                     </div>
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="amenity-10">
-                  <AccordionTrigger>
-                    Accessibility Features Amenities
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div>
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Checkbox
-                          id="accessibleBathroom"
-                          checked={roomDetails?.accessibleBathroom}
-                          {...register("accessibleBathroom")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({
-                              ...roomDetails,
-                              accessibleBathroom: value,
-                            });
-                            setValue("accessibleBathroom", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="accessibleBathroom"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Accessible Bathroom
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Checkbox
-                          id="wheelchairAccessibility"
-                          checked={roomDetails?.wheelchairAccessibility}
-                          {...register("wheelchairAccessibility")}
-                          onCheckedChange={(value: boolean) => {
-                            setroomDetails({
-                              ...roomDetails,
-                              wheelchairAccessibility: value,
-                            });
-                            setValue("wheelchairAccessibility", value);
-                          }}
-                        />
-                        <Label
-                          htmlFor="wheelchairAccessibility"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Wheelchair Accessibility
-                        </Label>
-                      </div>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
+
               </Accordion>
             </ScrollArea>
           </CardContent>
         </Card>
+        
         <div className="flex justify-end gap-4 w-full mt-4">
           <div className="mt-2">
             <Button
@@ -909,13 +549,13 @@ export default function Rooms({ onNext, onPrevious }: Props) {
               Back
             </Button>
           </div>
-
           <div className="mt-2">
             <Button
               className="lg:w-[180px] md:w-[120px] w-[100px]"
               type="submit"
+              disabled={formLoading}
             >
-              Submit
+              {formLoading ? "Submitting..." : "Submit"}
             </Button>
           </div>
         </div>

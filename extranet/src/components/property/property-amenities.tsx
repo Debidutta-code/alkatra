@@ -62,6 +62,9 @@ const createPropertyAmenitiesSchema = z.object({
   business_facilities: z.boolean(),
   laundry_services: z.boolean(),
   child_friendly_facilities: z.boolean(),
+  non_smoking_rooms: z.boolean(),
+  facilities_for_disabled_guests: z.boolean(),
+  family_rooms: z.boolean(),
 });
 
 type Inputs = {
@@ -81,6 +84,9 @@ type Inputs = {
   business_facilities: boolean;
   laundry_services: boolean;
   child_friendly_facilities: boolean;
+  non_smoking_rooms: boolean;
+  facilities_for_disabled_guests: boolean;
+  family_rooms: boolean;
 };
 
 type Props = {
@@ -116,6 +122,9 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
       business_facilities: false,
       laundry_services: false,
       child_friendly_facilities: false,
+      non_smoking_rooms: false,
+      facilities_for_disabled_guests: false,
+      family_rooms: false,
     },
     resolver: zodResolver(createPropertyAmenitiesSchema),
   });
@@ -161,6 +170,9 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
       business_facilities: !!data.business_facilities,
       laundry_services: !!data.laundry_services,
       child_friendly_facilities: !!data.child_friendly_facilities,
+      non_smoking_rooms: !!data.non_smoking_rooms,
+      facilities_for_disabled_guests: !!data.facilities_for_disabled_guests,
+      family_rooms: !!data.family_rooms,
     };
 
     console.log("_____+_+_+_+_+_+_+_+_+_+_+_+_+_+_", amenities);
@@ -324,6 +336,18 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
         "child_friendly_facilities",
         propertyAminity?.amenities?.child_friendly_facilities || false
       );
+      setValue(
+        "non_smoking_rooms",
+        propertyAminity?.amenities?.non_smoking_rooms || false
+      );
+      setValue(
+        "facilities_for_disabled_guests",
+        propertyAminity?.amenities?.facilities_for_disabled_guests || false
+      );
+      setValue(
+        "family_rooms",
+        propertyAminity?.amenities?.family_rooms || false
+      );
     }
   }, [propertyAminity]);
   return (
@@ -345,9 +369,8 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                     destination_type: e.target.value,
                   }))
                 }
-                className={`block appearance-none w-full bg-background border ${
-                  destinationTypeError ? "border-red-500" : "border-input"
-                } py-2 px-3 h-10  rounded-md text-sm leading-tight focus:outline-none focus:border-blue-500`}
+                className={`block appearance-none w-full bg-background border ${destinationTypeError ? "border-red-500" : "border-input"
+                  } py-2 px-3 h-10  rounded-md text-sm leading-tight focus:outline-none focus:border-blue-500`}
               >
                 <option value="">
                   Select Destination Type
@@ -389,9 +412,8 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                     property_type: e.target.value,
                   }))
                 }
-                className={`block appearance-none w-full bg-background border ${
-                  propertyTypeError ? "border-red-500" : "border-input"
-                } py-2 px-3 h-10 rounded-md text-sm leading-tight focus:outline-none focus:border-blue-500`}
+                className={`block appearance-none w-full bg-background border ${propertyTypeError ? "border-red-500" : "border-input"
+                  } py-2 px-3 h-10 rounded-md text-sm leading-tight focus:outline-none focus:border-blue-500`}
               >
                 <option value="" disabled>
                   Select Property Type
@@ -736,6 +758,72 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 Child Friendly Facilities
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="non_smoking_rooms"
+                checked={propertyAminity?.amenities?.non_smoking_rooms}
+                {...register("non_smoking_rooms")}
+                onCheckedChange={(value: boolean) => {
+                  setValue("non_smoking_rooms", value);
+                  setPropertyAminity((prev: any) => {
+                    const newAmenities = prev?.amenities
+                      ? { ...prev.amenities, non_smoking_rooms: value }
+                      : { non_smoking_rooms: value };
+                    return { ...prev, amenities: newAmenities };
+                  });
+                }}
+              />
+              <label
+                htmlFor="non_smoking_rooms"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Non-Smoking Rooms
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="facilities_for_disabled_guests"
+                checked={propertyAminity?.amenities?.facilities_for_disabled_guests}
+                {...register("facilities_for_disabled_guests")}
+                onCheckedChange={(value: boolean) => {
+                  setValue("facilities_for_disabled_guests", value);
+                  setPropertyAminity((prev: any) => {
+                    const newAmenities = prev?.amenities
+                      ? { ...prev.amenities, facilities_for_disabled_guests: value }
+                      : { facilities_for_disabled_guests: value };
+                    return { ...prev, amenities: newAmenities };
+                  });
+                }}
+              />
+              <label
+                htmlFor="facilities_for_disabled_guests"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Facilities for disabled guests
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="family_rooms"
+                checked={propertyAminity?.amenities?.family_rooms}
+                {...register("family_rooms")}
+                onCheckedChange={(value: boolean) => {
+                  setValue("family_rooms", value);
+                  setPropertyAminity((prev: any) => {
+                    const newAmenities = prev?.amenities
+                      ? { ...prev.amenities, family_rooms: value }
+                      : { family_rooms: value };
+                    return { ...prev, amenities: newAmenities };
+                  });
+                }}
+              />
+              <label
+                htmlFor="family_rooms"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Family rooms
               </label>
             </div>
           </CardContent>

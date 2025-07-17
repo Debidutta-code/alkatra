@@ -26,6 +26,11 @@ import {
   Briefcase,
   ShowerHead,
   Baby,
+  ShieldCheck,
+  Home,
+  Ban,
+  Accessibility,
+  Users,
 } from "lucide-react";
 import { Checkbox } from "../../components/ui/checkbox";
 import { useForm } from "react-hook-form";
@@ -47,7 +52,7 @@ import {
 import { Skeleton } from "../../components/ui/skeleton";
 import toast from "react-hot-toast";
 
-// Define the AmenityData interface
+// Define the AmenityData interface - Updated with all amenities from schema
 interface AmenityData {
   destination_type: string;
   property_type: string;
@@ -66,6 +71,9 @@ interface AmenityData {
     business_facilities?: boolean;
     laundry_services?: boolean;
     child_friendly_facilities?: boolean;
+    non_smoking_rooms?: boolean;
+    facilities_for_disabled_guests?: boolean;
+    family_rooms?: boolean;
   };
 }
 
@@ -95,6 +103,7 @@ interface AmenitiesProps {
   handleCreateAmenity: (newAmenity: EditedAmenity) => Promise<void>;
 }
 
+// Updated AmenityData array with all amenities from schema
 const AmenityData: AmenityKeys[] = [
   "wifi",
   "swimming_pool",
@@ -109,6 +118,9 @@ const AmenityData: AmenityKeys[] = [
   "business_facilities",
   "laundry_services",
   "child_friendly_facilities",
+  "non_smoking_rooms",
+  "facilities_for_disabled_guests",
+  "family_rooms",
 ];
 
 // Define options for destination types and property types
@@ -116,7 +128,7 @@ const destinationTypes = ["RESORT", "VACATION RENTAL"];
 
 const propertyTypes = ["COMMERCIAL PROPERTY", "INDUSTRIAL PROPERTY"];
 
-// Map amenity keys to icons
+// Updated amenity icons mapping with new amenities
 const amenityIcons: Record<string, React.ReactNode> = {
   wifi: <Wifi className="h-3.5 w-3.5 mr-1" />,
   swimming_pool: <Droplets className="h-3.5 w-3.5 mr-1" />,
@@ -131,6 +143,36 @@ const amenityIcons: Record<string, React.ReactNode> = {
   business_facilities: <Briefcase className="h-3.5 w-3.5 mr-1" />,
   laundry_services: <ShowerHead className="h-3.5 w-3.5 mr-1" />,
   child_friendly_facilities: <Baby className="h-3.5 w-3.5 mr-1" />,
+  non_smoking_rooms: <Ban className="h-3.5 w-3.5 mr-1" />,
+  facilities_for_disabled_guests: <Accessibility className="h-3.5 w-3.5 mr-1" />,
+  family_rooms: <Users className="h-3.5 w-3.5 mr-1" />,
+};
+
+// Helper function to format amenity labels
+const formatAmenityLabel = (amenityKey: string): string => {
+  const labelMap: Record<string, string> = {
+    wifi: "WiFi",
+    swimming_pool: "Swimming Pool",
+    fitness_center: "Fitness Center",
+    spa_and_wellness: "Spa & Wellness",
+    restaurant: "Restaurant",
+    room_service: "Room Service",
+    bar_and_lounge: "Bar & Lounge",
+    parking: "Parking",
+    concierge_services: "Concierge Services",
+    pet_friendly: "Pet Friendly",
+    business_facilities: "Business Facilities",
+    laundry_services: "Laundry Services",
+    child_friendly_facilities: "Child Friendly Facilities",
+    non_smoking_rooms: "Non-Smoking Rooms",
+    facilities_for_disabled_guests: "Facilities for Disabled Guests",
+    family_rooms: "Family Rooms",
+  };
+  
+  return labelMap[amenityKey] || amenityKey
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 };
 
 export function Amenities({
@@ -350,7 +392,7 @@ export function Amenities({
               onValueChange={(value) => {
                 setSelectedPropertyType(value);
                 setValue("property_type", value);
-                clearErrors("property_type"); // ✅ Clear error here
+                clearErrors("property_type");
               }}
               value={selectedPropertyType}
               defaultValue={amenity?.property_type}
@@ -396,7 +438,7 @@ export function Amenities({
           </div>
         </div>
 
-        <div >
+        <div>
           <h3 className="text-base font-medium mb-3">Available Amenities</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {AmenityData.map((amenity) => (
@@ -417,13 +459,10 @@ export function Amenities({
                 />
                 <label
                   htmlFor={amenity}
-                  className="text-sm font-medium leading-none flex items-center"
+                  className="text-sm font-medium leading-none flex items-center cursor-pointer"
                 >
                   {amenityIcons[amenity]}
-                  {amenity
-                    .split("_")
-                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(" ")}
+                  {formatAmenityLabel(amenity)}
                 </label>
               </div>
             ))}
@@ -576,13 +615,7 @@ export function Amenities({
                           className="bg-primary text-primary-foreground flex items-center px-3 py-1"
                         >
                           {amenityIcons[amenityKey]}
-                          {amenityKey
-                            .split("_")
-                            .map(
-                              (word) =>
-                                word.charAt(0).toUpperCase() + word.slice(1)
-                            )
-                            .join(" ")}
+                          {formatAmenityLabel(amenityKey)}
                         </Badge>
                       );
                     }

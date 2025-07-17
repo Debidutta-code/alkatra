@@ -59,7 +59,7 @@ function NavbarSidebarToggle() {
   if (open && !isMobile) return null;
 
   return (
-    <div className="">
+    <div className="ml-2">
       <SidebarTrigger />
     </div>
   );
@@ -106,14 +106,16 @@ export default function Navbar() {
 
   return (
     <nav
-      className={cn(
-        "md:h-[14vh] h-[12vh] border-b border-gray-200/60 flex items-center justify-between px-6 transition-all duration-300",
-        noNav && "hidden",
-        open && !isMobile
-          ? " w-[calc(100vw-16rem)] md:pr-16 lg:pr-20"
-          : " w-[calc(100vw-4rem)]",
-        isMobile && "w-full ml-0"
-      )}
+      // className={cn(
+      //   "md:h-[14vh] h-[12vh] border-b border-gray-200/60 flex items-center justify-between px-10 transition-all duration-300",
+      //   noNav && "hidden",
+      //   open && !isMobile
+      //     ? " w-[calc(100vw-16rem)] md:pr-16 lg:pr-20"
+      //     : " w-[calc(100vw-4rem)]",
+      //   isMobile && "w-full ml-0"
+      // )}
+      className={`md:h-[14vh] h-[12vh] border-b px-10 ${noNav ? "hidden" : "flex items-center justify-between"
+      } `}
     >
       {/* Left: Toggle + Logo */}
       <div className="flex md:px-8  items-center gap-2 min-w-0">

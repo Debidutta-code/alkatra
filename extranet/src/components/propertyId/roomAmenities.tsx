@@ -19,7 +19,83 @@ interface AmenityCategory {
 
 interface BasicAmenities {
   bed: "single" | "double" | "king" | "twin" | "queen";
-  [key: string]: boolean | string;
+  bathroom: boolean;
+  towels: boolean;
+  linensBedding: boolean;
+  linens: boolean;
+  bidet: boolean;
+  toiletPaper: boolean;
+  towelsSheets: boolean;
+  freeToiletries: boolean;
+  shower: boolean;
+  toilet: boolean;
+}
+
+interface FurnitureAmenities {
+  tableChairs: boolean;
+  desk: boolean;
+  dresserWardrobe: boolean;
+  sofaSeating: boolean;
+  sofa: boolean;
+  wardrobeOrCloset: boolean;
+  diningTable: boolean;
+  diningArea: boolean;
+  sittingArea: boolean;
+  readingChair: boolean;
+  balcony: boolean;
+}
+
+interface TechnologyAmenities {
+  television: boolean;
+  telephone: boolean;
+  wifiInternet: boolean;
+  flatScreenTV: boolean;
+  satelliteChannels: boolean;
+  cableChannels: boolean;
+}
+
+interface ClimateControlAmenities {
+  airConditioning: boolean;
+  heating: boolean;
+}
+
+interface KitchenetteMiniBarAmenities {
+  smallRefrigerator: boolean;
+  microwave: boolean;
+  coffeeMaker: boolean;
+  refrigerator: boolean;
+  kitchenware: boolean;
+  electricKettle: boolean;
+  oven: boolean;
+  stovetop: boolean;
+  teaCoffeeMaker: boolean;
+  kitchen: boolean;
+}
+
+interface SafetySecurityAmenities {
+  safe: boolean;
+  smokeDetectors: boolean;
+  fireExtinguisher: boolean;
+}
+
+interface ToiletriesAmenities {
+  shampooConditioner: boolean;
+  soap: boolean;
+  hairDryer: boolean;
+}
+
+interface WorkLeisureAmenities {
+  workDesk: boolean;
+  additionalLighting: boolean;
+  ironingFacilities: boolean;
+  iron: boolean;
+}
+
+interface AccessibilityFeaturesAmenities {
+  accessibleBathroom: boolean;
+  wheelchairAccessibility: boolean;
+  upperFloorsAccessibleByElevator: boolean;
+  entireUnitWheelchairAccessible: boolean;
 }
 
 interface RoomAmenity {
@@ -28,7 +104,14 @@ interface RoomAmenity {
   room_type: string;
   amenities: {
     basic: BasicAmenities;
-    [key: string]: AmenityCategory | BasicAmenities;
+    furniture: FurnitureAmenities;
+    technology: TechnologyAmenities;
+    climateControl: ClimateControlAmenities;
+    kitchenetteMiniBar: KitchenetteMiniBarAmenities;
+    safetySecurity: SafetySecurityAmenities;
+    toiletries: ToiletriesAmenities;
+    workLeisure: WorkLeisureAmenities;
+    accessibilityFeatures: AccessibilityFeaturesAmenities;
   };
   __v?: number;
 }
@@ -46,21 +129,80 @@ interface RoomAmenitiesProps {
 
 const bedTypes = ["single", "double", "king", "twin", "queen"];
 
+// Updated amenity categories with all new amenities
 const amenityCategories = {
-  basic: ["bathroom", "towels", "linensBedding"],
-  furniture: ["tableChairs", "desk", "dresserWardrobe", "sofaSeating"],
-  technology: ["television", "telephone", "wifiInternet"],
+  basic: [
+    "bathroom", "towels", "linensBedding", "linens", "bidet", 
+    "toiletPaper", "towelsSheets", "freeToiletries", "shower", "toilet"
+  ],
+  furniture: [
+    "tableChairs", "desk", "dresserWardrobe", "sofaSeating", "sofa", 
+    "wardrobeOrCloset", "diningTable", "diningArea", "sittingArea", 
+    "readingChair", "balcony"
+  ],
+  technology: [
+    "television", "telephone", "wifiInternet", "flatScreenTV", 
+    "satelliteChannels", "cableChannels"
+  ],
   climateControl: ["airConditioning", "heating"],
-  kitchenetteMiniBar: ["smallRefrigerator", "microwave", "coffeeMaker"],
-  safetySecurity: ["smokeDetectors", "fireExtinguisher"],
+  kitchenetteMiniBar: [
+    "smallRefrigerator", "microwave", "coffeeMaker", "refrigerator", 
+    "kitchenware", "electricKettle", "oven", "stovetop", 
+    "teaCoffeeMaker", "kitchen"
+  ],
+  safetySecurity: ["safe", "smokeDetectors", "fireExtinguisher"],
   toiletries: ["shampooConditioner", "soap", "hairDryer"],
-  workLeisure: ["workDesk", "readingChair", "additionalLighting"],
-  accessibilityFeatures: ["accessibleBathroom", "wheelchairAccessibility"],
+  workLeisure: ["workDesk", "additionalLighting", "ironingFacilities", "iron"],
+  accessibilityFeatures: [
+    "accessibleBathroom", "wheelchairAccessibility", 
+    "upperFloorsAccessibleByElevator", "entireUnitWheelchairAccessible"
+  ],
 };
 
 // Utility functions
 const formatAmenityName = (amenity: string): string => {
   if (amenity === amenity.toUpperCase()) return amenity;
+  
+  // Custom formatting for specific amenities
+  const customNames: Record<string, string> = {
+    wifiInternet: "WiFi Internet",
+    flatScreenTV: "Flat Screen TV",
+    satelliteChannels: "Satellite Channels",
+    cableChannels: "Cable Channels",
+    airConditioning: "Air Conditioning",
+    smallRefrigerator: "Small Refrigerator",
+    coffeeMaker: "Coffee Maker",
+    electricKettle: "Electric Kettle",
+    teaCoffeeMaker: "Tea/Coffee Maker",
+    smokeDetectors: "Smoke Detectors",
+    fireExtinguisher: "Fire Extinguisher",
+    shampooConditioner: "Shampoo & Conditioner",
+    hairDryer: "Hair Dryer",
+    workDesk: "Work Desk",
+    additionalLighting: "Additional Lighting",
+    ironingFacilities: "Ironing Facilities",
+    accessibleBathroom: "Accessible Bathroom",
+    wheelchairAccessibility: "Wheelchair Accessibility",
+    upperFloorsAccessibleByElevator: "Upper Floors Accessible by Elevator",
+    entireUnitWheelchairAccessible: "Entire Unit Wheelchair Accessible",
+    linensBedding: "Linens & Bedding",
+    freeToiletries: "Free Toiletries",
+    toiletPaper: "Toilet Paper",
+    towelsSheets: "Towels & Sheets",
+    wardrobeOrCloset: "Wardrobe/Closet",
+    diningTable: "Dining Table",
+    diningArea: "Dining Area",
+    sittingArea: "Sitting Area",
+    readingChair: "Reading Chair",
+    dresserWardrobe: "Dresser/Wardrobe",
+    sofaSeating: "Sofa Seating",
+    tableChairs: "Table & Chairs"
+  };
+
+  if (customNames[amenity]) {
+    return customNames[amenity];
+  }
+
   return amenity
     .replace(/([A-Z])/g, ' $1')
     .replace(/^./, char => char.toUpperCase())
@@ -70,7 +212,7 @@ const formatAmenityName = (amenity: string): string => {
 
 const getCategoryDisplayName = (category: string): string => {
   const displayNames: Record<string, string> = {
-    safetySecurity: "Safety and Security",
+    safetySecurity: "Safety & Security",
     kitchenetteMiniBar: "Kitchenette & Mini Bar",
     workLeisure: "Work & Leisure",
     accessibilityFeatures: "Accessibility Features",
@@ -78,7 +220,7 @@ const getCategoryDisplayName = (category: string): string => {
   };
   return displayNames[category] ||
     category.charAt(0).toUpperCase() +
-    category.slice(1).replace(/([A-Z])/g, ' $1').replace("And", " and");
+    category.slice(1).replace(/([A-Z])/g, ' $1').replace("And", " & ");
 };
 
 const createEmptyAmenityStructure = (propertyInfoId: string, selectedRoomType: string): RoomAmenity => {
@@ -87,23 +229,80 @@ const createEmptyAmenityStructure = (propertyInfoId: string, selectedRoomType: s
     propertyInfo_id: propertyInfoId,
     room_type: selectedRoomType,
     amenities: {
-      basic: { bed: "single" } as BasicAmenities
+      basic: {
+        bed: "single",
+        bathroom: false,
+        towels: false,
+        linensBedding: false,
+        linens: false,
+        bidet: false,
+        toiletPaper: false,
+        towelsSheets: false,
+        freeToiletries: false,
+        shower: false,
+        toilet: false
+      },
+      furniture: {
+        tableChairs: false,
+        desk: false,
+        dresserWardrobe: false,
+        sofaSeating: false,
+        sofa: false,
+        wardrobeOrCloset: false,
+        diningTable: false,
+        diningArea: false,
+        sittingArea: false,
+        readingChair: false,
+        balcony: false
+      },
+      technology: {
+        television: false,
+        telephone: false,
+        wifiInternet: false,
+        flatScreenTV: false,
+        satelliteChannels: false,
+        cableChannels: false
+      },
+      climateControl: {
+        airConditioning: false,
+        heating: false
+      },
+      kitchenetteMiniBar: {
+        smallRefrigerator: false,
+        microwave: false,
+        coffeeMaker: false,
+        refrigerator: false,
+        kitchenware: false,
+        electricKettle: false,
+        oven: false,
+        stovetop: false,
+        teaCoffeeMaker: false,
+        kitchen: false
+      },
+      safetySecurity: {
+        safe: false,
+        smokeDetectors: false,
+        fireExtinguisher: false
+      },
+      toiletries: {
+        shampooConditioner: false,
+        soap: false,
+        hairDryer: false
+      },
+      workLeisure: {
+        workDesk: false,
+        additionalLighting: false,
+        ironingFacilities: false,
+        iron: false
+      },
+      accessibilityFeatures: {
+        accessibleBathroom: false,
+        wheelchairAccessibility: false,
+        upperFloorsAccessibleByElevator: false,
+        entireUnitWheelchairAccessible: false
+      }
     }
   };
-
-  Object.entries(amenityCategories).forEach(([category, amenities]) => {
-    if (category !== 'basic') {
-      emptyAmenities.amenities[category] = {} as AmenityCategory;
-    }
-
-    amenities.forEach(amenity => {
-      if (category === 'basic' && amenity !== 'bed') {
-        emptyAmenities.amenities.basic[amenity] = false;
-      } else if (category !== 'basic') {
-        (emptyAmenities.amenities[category as keyof typeof emptyAmenities.amenities] as AmenityCategory)[amenity] = false;
-      }
-    });
-  });
 
   return emptyAmenities;
 };
@@ -116,24 +315,21 @@ const initializeAmenityStructure = (amenityData: RoomAmenity): RoomAmenity => {
     clonedData.amenities = {};
   }
 
-  Object.entries(amenityCategories).forEach(([category, amenities]) => {
+  // Initialize with empty structure and merge existing data
+  const emptyStructure = createEmptyAmenityStructure(amenityData.propertyInfo_id, amenityData.room_type);
+  
+  // Merge existing data with complete structure
+  Object.keys(emptyStructure.amenities).forEach(category => {
     if (!clonedData.amenities[category]) {
-      clonedData.amenities[category] = {};
-      
-      if (category === 'basic') {
-        clonedData.amenities.basic = { bed: "single" };
-      }
-    }
-
-    amenities.forEach(amenity => {
-      if (category === 'basic' && amenity === 'bed') {
-        if (!clonedData.amenities.basic.bed) {
-          clonedData.amenities.basic.bed = "single";
+      clonedData.amenities[category] = emptyStructure.amenities[category as keyof typeof emptyStructure.amenities];
+    } else {
+      // Merge existing values with defaults
+      Object.keys(emptyStructure.amenities[category as keyof typeof emptyStructure.amenities]).forEach(amenity => {
+        if (clonedData.amenities[category][amenity] === undefined) {
+          clonedData.amenities[category][amenity] = emptyStructure.amenities[category as keyof typeof emptyStructure.amenities][amenity as keyof typeof emptyStructure.amenities[keyof typeof emptyStructure.amenities]];
         }
-      } else if (clonedData.amenities[category][amenity] === undefined) {
-        clonedData.amenities[category][amenity] = false;
-      }
-    });
+      });
+    }
   });
 
   return clonedData;
@@ -270,33 +466,6 @@ export function RoomAmenities({
     handleRoomAmenityEditClick();
   };
 
-  // const handleDeleteRoomAmenity = async () => {
-  //   if (!currentRoomAmenity || !currentRoomAmenity._id) return;
-
-  //   try {
-  //     setIsLoading(true);
-  //     const response = await axios.delete(
-  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/amenite/delete-room-amenity/${currentRoomAmenity._id}`,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${accessToken}`,
-  //         },
-  //       }
-  //     );
-
-  //     if (response.status === 200) {
-  //       toast.success("Room amenities deleted successfully");
-  //       setCurrentRoomAmenity(null);
-  //       setSelectedRoomType(availableRoomTypes[0] || "");
-  //       reset(createEmptyAmenityStructure(propertyInfoId, selectedRoomType));
-  //     }
-  //   } catch (error) {
-  //     toast.error("Failed to delete room amenities");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
   const RoomTypeSelector = () => {
     return (
       <div className="mb-4 flex items-end gap-4">
@@ -387,9 +556,9 @@ export function RoomAmenities({
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     {Object.entries(amenityCategories).map(([category, amenities]) => {
-                      const categoryAmenities = currentRoomAmenity.amenities[category] || {};
+                      const categoryAmenities = currentRoomAmenity.amenities[category as keyof typeof currentRoomAmenity.amenities] || {};
                       const activeAmenities = amenities.filter(amenity =>
-                        category === 'basic' && amenity === 'bed' ? false : categoryAmenities[amenity] === true
+                        category === 'basic' && amenity === 'bed' ? false : (categoryAmenities as any)[amenity] === true
                       );
 
                       if (activeAmenities.length === 0) return null;
@@ -419,18 +588,6 @@ export function RoomAmenities({
                       );
                     })}
                   </div>
-
-                  {/* <div className="flex justify-end mt-4">
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={handleDeleteRoomAmenity}
-                      disabled={isLoading}
-                    >
-                      <Trash2 className="h-4 w-4 mr-1.5" />
-                      Delete Amenities
-                    </Button>
-                  </div> */}
                 </>
               ) : (
                 <div className="flex flex-col items-center justify-center py-10 bg-accent/20 rounded-lg border border-border/50">
@@ -458,7 +615,7 @@ export function RoomAmenities({
         if (!open) handleCancel();
         setShowModal(open);
       }}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto"
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto"
           onInteractOutside={(e) => e.preventDefault()}
           onPointerDownOutside={(e) => e.preventDefault()}>
           <DialogHeader>
@@ -500,7 +657,7 @@ export function RoomAmenities({
                       {getCategoryDisplayName(category)}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-4">
+                  <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 p-4">
                     {amenities.map((amenity) => (
                       category === 'basic' && amenity === 'bed' ? null : (
                         <div key={amenity} className="flex items-center space-x-2 p-2 rounded hover:bg-accent/30">
