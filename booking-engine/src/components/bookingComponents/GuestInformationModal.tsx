@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import PhoneInput from "react-phone-number-input";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 import { useDispatch, useSelector } from "react-redux";
 import { setGuestDetails, setAmount } from "@/Redux/slices/pmsHotelCard.slice";
 import { User, Mail, Phone, Calendar, CreditCard, X, Loader2 } from "lucide-react";
@@ -161,7 +162,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   });
 
   const [email, setEmail] = useState<string>(authUser?.email || "");
-  const [phone, setPhone] = useState<string | undefined>("");
+  const [phone, setPhone] = useState<string>("");
   const [isFormUpdated, setIsFormUpdated] = useState(false);
   const [updateMessage, setUpdateMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -272,24 +273,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         })
       );
       setEmail(guestData.email || "");
-      if (guestData.phone) {
-        setPhone(
-          guestData.phone.startsWith("+")
-            ? guestData.phone
-            : `+${guestData.phone}`
-        );
-      } else {
-        setPhone("");
-      }
     } else if (authUser) {
       setEmail(authUser.email);
-      if (authUser.phone) {
-        setPhone(
-          authUser.phone.startsWith("+") ? authUser.phone : `+${authUser.phone}`
-        );
-      } else {
-        setPhone("");
-      }
     }
   }, [authUser, guestData]);
 
@@ -404,14 +389,6 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   };
 
   const handleVerifyPhone = async () => {
-    if (!phone || !/^\+\d{8,}$/.test(phone)) {
-      setErrors(prev => ({
-        ...prev,
-        phone: t("BookingComponents.GuestInformationModal.phoneInvalidError"),
-      }));
-      return;
-    }
-
     setIsPhoneVerifying(true);
     try {
       const response = await verifyApi.sendPhoneOtp(phone);
@@ -497,17 +474,6 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       valid = false;
     }
 
-    // In handleUpdate function
-    if (!phone) {
-      newErrors["phone"] = t("BookingComponents.GuestInformationModal.phoneError");
-      valid = false;
-    } else if (phone.startsWith("+91")) {
-      const digits = phone.replace(/\D/g, "").substring(2); // Remove +91 and non-digits
-      if (digits.length !== 10) {
-        newErrors["phone"] = t("BookingComponents.GuestInformationModal.phoneLengthError");
-        valid = false;
-      }
-    }
     if (!phoneVerified) {
       newErrors["phone"] = t(
         "BookingComponents.GuestInformationModal.phoneNotVerified"
@@ -668,26 +634,13 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     return display;
   };
 
-  const handlePhoneChange = (value: string | undefined) => {
-    if (!value) {
-      setPhone("");
-      return;
-    }
-
-    // For Indian numbers (+91)
-    if (value.startsWith("+91")) {
-      // Remove all non-digit characters and +91
-      const digits = value.replace(/\D/g, "").substring(2);
-
-      // Only update if we have exactly 10 digits or are building towards it
-      if (digits.length <= 10) {
-        setPhone(`+91${digits}`);
-      }
-    } else {
-      // For other countries
-      setPhone(value);
+  const handlePhoneChange = (value: string) => {
+    setPhone(value);
+    if (errors.phone) {
+      setErrors(prev => ({ ...prev, phone: '' }));
     }
   };
+
   return (
     <>
       {/* Backdrop */}
@@ -1010,8 +963,11 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                               handleVerifyEmail();
                             }}
                             type="button"
-                            disabled={isEmailVerifying}
-                            className="bg-tripswift-blue text-tripswift-off-white px-4 py-2 rounded-lg text-sm hover:bg-tripswift-blue/90 transition whitespace-nowrap"
+                            disabled={isEmailVerifying || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)}
+                            className={`px-4 py-2 rounded-lg text-sm transition whitespace-nowrap ${isEmailVerifying || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+                              ? 'bg-gray-300 text-black cursor-not-allowed'
+                              : 'bg-tripswift-blue text-tripswift-off-white hover:bg-tripswift-blue/90'
+                              }`}
                           >
                             {isEmailVerifying ? (
                               <>
@@ -1074,30 +1030,47 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       </label>
                       <div dir={i18n.language === "ar" ? "rtl" : "ltr"} className="flex flex-col md:flex-row md:items-center gap-2">
                         <PhoneInput
-                          id="phone"
-                          name="phone"
+                          country={'in'}
                           value={phone}
                           onChange={handlePhoneChange}
-                          defaultCountry="IN"
                           placeholder={t("BookingComponents.GuestInformationModal.phonePlaceholder")}
-                          className={`w-full px-2 sm:px-3 h-9 sm:h-11 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-xs sm:text-sm font-tripswift-regular ${errors.phone ? "border-red-600" : "border-tripswift-black/20"
-                            }`}
-                          international
-                          limitMaxLength
-                          countryCallingCodeEditable={false}
-                          maxLength={15}
+                          inputProps={{
+                            name: 'phone',
+                            id: 'phone',
+                            className: `w-full px-14 py-2 h-10 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-xs sm:text-sm font-tripswift-regular ${errors.phone ? "border-red-600" : "border-tripswift-black/20"}`
+                          }}
+                          containerClass="w-full"
+                          // inputClass={`w-full px-3 py-2 h-10 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-tripswift-blue/20 focus:border-tripswift-blue text-xs sm:text-sm font-tripswift-regular ${errors.phone ? "border-red-600" : "border-tripswift-black/20"}`}
+                          buttonClass="!border-tripswift-black/20 !bg-white !hover:bg-gray-50 !rounded-l-lg !h-10 !px-1"
+                          dropdownClass="text-sm !absolute !bottom-full !mb-1 !top-auto"
+                          dropdownStyle={{
+                            position: 'absolute',
+                            bottom: '100%',
+                            top: 'auto',
+                            marginBottom: '4px',
+                            zIndex: 9999,
+                            backgroundColor: 'white',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '8px',
+                          }}
+                          countryCodeEditable={false}
+                          enableSearch={true}
+                          disableSearchIcon={true}
                         />
                         {!phoneVerified && (
                           <button
                             onClick={() => {
-                              if (phone && /^\+\d{8,}$/.test(phone)) {
+                              if (phone && phone.replace(/\D/g, '').replace(/^91/, '').length >= 10) {
                                 setErrors(prev => ({ ...prev, phone: '' }));
                               }
                               handleVerifyPhone();
                             }}
                             type="button"
-                            disabled={isPhoneVerifying}
-                            className="bg-tripswift-blue text-tripswift-off-white px-4 py-2 rounded-lg text-sm hover:bg-tripswift-blue/90 transition whitespace-nowrap"
+                            disabled={isPhoneVerifying || !phone || phone.replace(/\D/g, '').replace(/^91/, '').length < 10}
+                            className={`px-4 py-2 rounded-lg text-sm transition whitespace-nowrap ${isPhoneVerifying || !phone || phone.replace(/\D/g, '').replace(/^91/, '').length < 10
+                              ? 'bg-gray-300 text-black cursor-not-allowed'
+                              : 'bg-tripswift-blue text-tripswift-off-white hover:bg-tripswift-blue/90'
+                              }`}
                           >
                             {isPhoneVerifying ? (
                               <>
