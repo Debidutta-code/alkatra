@@ -230,7 +230,7 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
     phone,
     guests
   } = req.body;
-
+  console.log(`The guest details we get is:\n#################### ${JSON.stringify(req.body)}`);
   const requiredFields = {
     checkInDate,
     checkOutDate,
@@ -289,7 +289,7 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
     const reservationId = uuidv4();
     const newBooking = new CryptoGuestDetails({
       reservationId,
-      hotelCode,
+      hotelCode: "WINCLOUD",
       hotelName,
       ratePlanCode,
       roomTypeCode,
@@ -301,7 +301,7 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
       ageCodeSummary: ageCodeCount,
       numberOfRooms,
       totalAmount: roomTotalPrice,
-      // currencyCode,
+      // currencyCode: currencyCode.toUpperCase() || "USD",
       userId,
       status: "Processing",
       createdAt: new Date(),
@@ -362,7 +362,8 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
     });
 
     if (payment) {
-      await notification.sendCryptoPaymentNotification(payment.customer_id.toString(), parseFloat(amount), txHash)
+      // await notification.sendCryptoPaymentNotification(payment.customer_id.toString(), parseFloat(amount), txHash)
+      console.log(`The payment details we get is ${payment}`);
       console.log("----------11111111111111111111-------------------------")
     }
 
@@ -370,6 +371,7 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
       totalAmount: parseFloat(amount),
       status: "Processing",
     });
+    console.log(">>>>>>>>>>>>>", guestDetails);
 
     if (!payment) {
       return res.status(404).json({
@@ -391,13 +393,14 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
     (guestDetails as any).senderWalletAddress = senderWalletAddress;
     await payment.save();
     await guestDetails.save();
+    console.log("Payment and guest details updated successfully");
 
-    await createReservationWithCryptoPayment({
+    const cryptoPaymentDetails = await createReservationWithCryptoPayment({
       reservationId: guestDetails.reservationId,
       userId: guestDetails?.userId ?? "",
       checkInDate: guestDetails.checkInDate,
       checkOutDate: guestDetails.checkOutDate,
-      hotelCode: guestDetails.hotelCode,
+      hotelCode: guestDetails.hotelCode || "WINCLOUD",
       hotelName: guestDetails.hotelName,
       ratePlanCode: guestDetails.ratePlanCode,
       numberOfRooms: guestDetails.numberOfRooms,
@@ -408,6 +411,10 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
       phone: guestDetails.phone,
       guests: guestDetails.guestDetails ?? [],
     });
+    if (cryptoPaymentDetails) {
+      await notification.sendCryptoPaymentNotification(payment.customer_id.toString(), parseFloat(amount), txHash)
+      console.log("----------11111111111111111111-------------------------")
+    }
 
     return res.status(200).json({
       message: "Payment confirmed successfully",

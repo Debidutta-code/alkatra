@@ -24,6 +24,7 @@
     "@nextui-org/react": "^2.2.9",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-slot": "^1.1.0",
+    "@rainbow-me/rainbowkit": "^2.2.8",
     "@react-oauth/google": "^0.12.2",
     "@reduxjs/toolkit": "^2.2.7",
     "@stripe/react-stripe-js": "^2.8.1",
@@ -86,10 +87,10 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.1.0",
-    "viem": "^2.31.6",
+    "viem": "^2.32.0",
+    "wagmi": "^2.15.7",
     "zod": "^3.22.4",
-    "zustand": "^5.0.0",
-    "wagmi":"^2.14.15"
+    "zustand": "^5.0.0"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",

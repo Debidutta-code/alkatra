@@ -9,6 +9,7 @@ import cron from "node-cron";
 import CryptoPaymentDetails from './Booking_Engine/src/models/cryptoPayment.model';
 import cors from 'cors';
 import passport from 'passport';
+import { CryptoGuestDetails } from "./Booking_Engine/src/models/cryptoUserPaymentInitialStage.model";
 
 
 // Middleware
@@ -57,10 +58,10 @@ initializeExpressRoutes({ app }).then(async () => {
 })();
 
 // CORN job implemented to auto cancel
-cron.schedule("*/15 * * * *", async () => {
+cron.schedule("*/1 * * * *", async () => {
   try {
     const fortyMinutesAgo = new Date(Date.now() - 40 * 60 * 1000);
-    const result = await CryptoPaymentDetails.updateMany(
+    const cryptoPaymentDetails = await CryptoPaymentDetails.updateMany(
       {
         status: "Pending",
         createdAt: { $lte: fortyMinutesAgo }
@@ -69,9 +70,23 @@ cron.schedule("*/15 * * * *", async () => {
         $set: { status: "Cancelled" }
       }
     );
-    if (result.modifiedCount > 0) {
-      console.log(`[AUTO-CANCEL] ${result.modifiedCount} pending payments marked as Cancelled.`);
+    const cryptoGuestDetails = await CryptoGuestDetails.updateMany(
+      {
+        status: "Processing",
+        createdAt: { $lte: fortyMinutesAgo }
+      },
+      {
+        $set: { status: "Cancelled" }
+      }
+    );
+    console.log("--------***-----------");
+    if (cryptoPaymentDetails.modifiedCount > 0) {
+      console.log(`[AUTO-CANCEL] ${cryptoPaymentDetails.modifiedCount} pending payments marked as Cancelled.`);
     }
+    if (cryptoGuestDetails.modifiedCount > 0) {
+      console.log(`[AUTO-CANCEL] ${cryptoGuestDetails.modifiedCount} processing payments marked as Cancelled.`);
+    }
+    console.log("--------***-----------");
   } catch (error) {
     console.error("[AUTO-CANCEL ERROR]", error);
   }

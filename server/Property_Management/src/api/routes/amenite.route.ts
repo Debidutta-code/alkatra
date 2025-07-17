@@ -10,7 +10,7 @@ import {
 } from "../../controller/amenite.controller";
 // import { protect } from "./../../middlewares/auth.middleware";
 import { protect } from "../../../../User-Authentication/src/Middleware/auth.middleware";
-import{ createRoomAminity, getRoomAminity, updateRoomAmenity } from "../../controller/room.aminity"
+import{ createRoomAminity, deleteRoomAmenity, getRoomAminity, updateRoomAmenity } from "../../controller/room.aminity"
 
 const router = Router();
 
@@ -28,6 +28,7 @@ export default (app: Router) => {
 
   router.route("/roomaminity").post(createRoomAminity as any)
   router.route("/update-room-amenity").patch(protect as any, updateRoomAmenity as any)
+  router.route("/delete-room-amenity").delete(protect as any, deleteRoomAmenity as any)
 
 };
 

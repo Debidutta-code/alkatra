@@ -55,7 +55,7 @@ const createRoomAminity = catchAsync(
     }
   }
 );
-// update room amenity
+
 const updateRoomAmenity = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { propertyInfo_id, room_type, amenities } = req.body;
@@ -87,7 +87,7 @@ const updateRoomAmenity = async (req: Request, res: Response, next: NextFunction
       message: "Internal server error",
     });
   }
-}
+};
 
 const getRoomAminity = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -127,7 +127,29 @@ const getRoomAminity = async (req: Request, res: Response, next: NextFunction) =
       message: "Internal server error",
     });
   }
-}
+};
+
+const deleteRoomAmenity = async (req: Request, res: Response, next: NextFunction) => {
+  const { propertyInfo_id, room_type } = req.body;
+  if (!propertyInfo_id || !room_type) {
+    return next(new AppError("Please provide propertyInfo_id and room_type", 400));
+  }
+  const roomAminityDetails = await RoomAminity.findOne({ propertyInfo_id, room_type });
+  if (!roomAminityDetails){
+    return next(new AppError(`No room amenity found for property ${propertyInfo_id} and room type ${room_type}`, 404));
+  }
+  // const roomAminityDetails = await RoomAminity.findOneAndDelete({ propertyInfo_id, room_type });
+  // if (!roomAminityDetails) {
+  //   return next(new AppError(`No room amenity found for property ${propertyInfo_id} and room type ${room_type}`, 404));
+  // }
+  res.status(200).json({
+    status: "success",
+    error: false,
+    message: "Room amenity deleted successfully",
+    data: roomAminityDetails,
+  });
+  console.log("Room amenity deleted successfully:", roomAminityDetails);
+};
 
 
-export { createRoomAminity, updateRoomAmenity, getRoomAminity };
+export { createRoomAminity, updateRoomAmenity, getRoomAminity, deleteRoomAmenity };
