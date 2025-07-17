@@ -169,19 +169,34 @@ export default function PropertyInfo({ onNext }: Props) {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
       );
-      setPropertyDetails(response.data.data);
+      
+      if (response.data && response.data.data) {
+        setPropertyDetails(response.data.data);
+      } else {
+        setPropertyDetails(null);
+        toast.error("Property not found");
+        router.push("/app/property/create");
+      }
       setLoading(false);
     } catch (error: any) {
       if (error.code === "ECONNRESET") {
         console.log("Connection reset, retrying...");
-        // Retry logic here
         fetchPropertyDetails();
+      } else if (error.response?.status === 404) {
+        toast.error("Property not found");
+        router.push("/app/property/create");
       } else {
         console.error("Error fetching property details:", error);
-        setLoading(false);
+        toast.error("Failed to fetch property details");
       }
+      setLoading(false);
     }
   };
 
@@ -263,9 +278,11 @@ export default function PropertyInfo({ onNext }: Props) {
       setValue("property_category", propertyDetails?.property_category?._id || "");
       setValue("property_type", propertyDetails?.property_type || "");
       setValue("star_rating", propertyDetails.star_rating || "1");
-      // setValue("image", propertyDetails.image || "")
-      if (propertyDetails.image.length > 0) {
-        setPropertyImageUrls(propertyDetails?.image);
+      // Add null check for image
+      if (propertyDetails.image && propertyDetails.image.length > 0) {
+        setPropertyImageUrls(propertyDetails.image);
+      } else {
+        setPropertyImageUrls([]); // Set empty array if no images
       }
     }
   }, [propertyDetails]);

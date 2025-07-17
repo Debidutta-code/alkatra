@@ -1,4 +1,3 @@
-
 "use client"
 import { useEffect, useState } from "react";
 import {
@@ -28,6 +27,7 @@ import { Badge } from "./ui/badge";
 import axios from "axios"
 import { RootState } from "@src/redux/store";
 import { useSelector } from "react-redux";
+
 interface NavigationItem {
   title: string;
   href: string;
@@ -46,6 +46,7 @@ export default function AppSidebar({ role }: { role?: string }) {
     name: "",
     status: false
   })
+  
   const fetchHotelAdminHotel = async (accessToken: string) => {
     try {
       const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/getHotelManagerRooms`, {
@@ -60,13 +61,16 @@ export default function AppSidebar({ role }: { role?: string }) {
       }
       console.log("PropertyIdDetails", response?.data)
     } catch (error) {
-
+      // Handle error - property doesn't exist
+      setPropertyId({ ...propertyId, status: false })
     }
   }
+  
   useEffect(() => {
     if (!accessToken || role != "hotelManager") return;
     fetchHotelAdminHotel(accessToken);
   }, [accessToken]);
+  
   const navigationItems: NavigationItem[] = [
     {
       title: "Dashboard",
@@ -86,8 +90,8 @@ export default function AppSidebar({ role }: { role?: string }) {
       restricted: role !== "superAdmin" && role !== "groupManager"
     },
     {
-      title: `${propertyId.status ? `${propertyId?.name}` : "No Property Available"}`,
-      href: `/app/property/${propertyId?.id}`,
+      title: `${propertyId.status ? `${propertyId?.name}` : "Create Property"}`,
+      href: propertyId.status ? `/app/property/${propertyId?.id}` : "/app/property/create",
       icon: Hotel,
       restricted: role !== "hotelManager",
       description: `${!propertyId?.status ? "Create Your Property First" : ""}`

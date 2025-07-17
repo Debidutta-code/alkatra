@@ -361,7 +361,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
         setPropertyImageUrls(urls);
       }
     } catch (error) {
-      console.error("Error uploading property images:", error);
+      console.error("Error uploading room images:", error);
     } finally {
       setLoading(false); // Stop loading
     }

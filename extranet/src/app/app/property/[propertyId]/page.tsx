@@ -22,6 +22,7 @@ import {
 } from './api';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
+import { DeleteSuccessModal } from '../../../../components/propertyId/DeleteSuccessModal';
 import { PropertyDetails } from '../../../../components/propertyId/property-details';
 import { Amenities } from '../../../../components/propertyId/amenities';
 import { Rooms } from '../../../../components/propertyId/rooms';
@@ -138,6 +139,7 @@ export default function Page({ params, searchParams }: Props) {
   const [editAddressMode, setEditAddressMode] = useState<boolean>(false);
   const [roomType, setRoomType] = useState<string | null>(null);
   const [availableRoomTypes, setAvailableRoomTypes] = useState<string[]>([]);
+  const [showDeleteSuccessModal, setShowDeleteSuccessModal] = useState<boolean>(false);
 
 
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
@@ -235,7 +237,6 @@ export default function Page({ params, searchParams }: Props) {
     }
   };
 
-  // Handler for deleting the property
   const handleDeleteClick = async () => {
     try {
       if (!accessToken) {
@@ -246,10 +247,24 @@ export default function Page({ params, searchParams }: Props) {
 
       await deleteProperty(propertyId, accessToken);
       toast.success('Property deleted successfully!'); // Display toast message
-      setTimeout(() => router.back());
+
+      // Show the modal instead of navigating immediately
+      setShowDeleteSuccessModal(true);
     } catch (error) {
       console.error('Error deleting property:', error);
+      toast.error('Failed to delete property. Please try again.');
     }
+  };
+
+  // Add these handler functions
+  const handleCreateProperty = () => {
+    setShowDeleteSuccessModal(false);
+    router.push('/app/property/create');
+  };
+
+  const handleGoBack = () => {
+    setShowDeleteSuccessModal(false);
+    router.push('/app');
   };
 
   // Handlers for property details
@@ -353,7 +368,7 @@ export default function Page({ params, searchParams }: Props) {
       setAvailableRoomTypes(roomTypes);
     }
   }, [rooms]);
-  
+
   // Handlers for rooms
   const handleAddRoom = async (newRoom: RoomType) => {
     try {
@@ -377,7 +392,7 @@ export default function Page({ params, searchParams }: Props) {
       console.error('Error adding new room:', error);
     }
   };
-  
+
   // console.log("updated room data",rooms)
   const handleEditRoom = async (updatedRoom: RoomType) => {
     try {
@@ -482,7 +497,7 @@ export default function Page({ params, searchParams }: Props) {
         console.error('Access token is undefined or not set');
         return;
       }
-      const createdRoomAmenity = await createPropertyRoomAmenity(params.propertyId, accessToken, newRoomAmenity, );
+      const createdRoomAmenity = await createPropertyRoomAmenity(params.propertyId, accessToken, newRoomAmenity,);
       setRoomAmenity(createdRoomAmenity);
       setEditedRoomAmenity(createdRoomAmenity);
       // Optionally, refetch the entire property data
@@ -714,6 +729,11 @@ export default function Page({ params, searchParams }: Props) {
           </Button>
         </CardContent>
       </Card>
+      <DeleteSuccessModal
+        isOpen={showDeleteSuccessModal}
+        onCreateProperty={handleCreateProperty}
+        onGoBack={handleGoBack}
+      />
     </main>
   );
 }

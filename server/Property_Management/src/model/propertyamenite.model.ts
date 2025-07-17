@@ -15,11 +15,13 @@ type OtherAmenity = {
   businessFacilities: boolean;
   laundryServices: boolean;
   childFriendlyFacilities: boolean;
+  nonSmokingRooms: boolean;
+  facilitiesForDisabledGuests: boolean;
+  familyRooms: boolean;
 };
 
 interface PropertyAmenitiesType extends Document {
-
-  propertyInfo_id: Types.ObjectId |PropertyInfoType;
+  propertyInfo_id: Types.ObjectId | PropertyInfoType;
   destination_type: string;
   property_type: string;
   no_of_rooms_available: number;
@@ -27,7 +29,6 @@ interface PropertyAmenitiesType extends Document {
 }
 
 const propertyAmenitiesSchema = new Schema<PropertyAmenitiesType>({
- 
   propertyInfo_id: { type: Schema.Types.ObjectId, ref: 'PropertyInfo', required: true },
   destination_type: { type: String, required: false },
   property_type: { type: String, required: true },
@@ -46,8 +47,12 @@ const propertyAmenitiesSchema = new Schema<PropertyAmenitiesType>({
     business_facilities: { type: Boolean, default: false },
     laundry_services: { type: Boolean, default: false },
     child_friendly_facilities: { type: Boolean, default: false },
+    non_smoking_rooms: { type: Boolean, default: false },
+    facilities_for_disabled_guests: { type: Boolean, default: false },
+    family_rooms: { type: Boolean, default: false },
   },
 });
-const propertyAminity=mongoose.model<PropertyAmenitiesType>("propertyAminity",propertyAmenitiesSchema)
 
-export  { propertyAminity,PropertyAmenitiesType}
+const propertyAminity = mongoose.model<PropertyAmenitiesType>("propertyAminity", propertyAmenitiesSchema);
+
+export { propertyAminity, PropertyAmenitiesType };
