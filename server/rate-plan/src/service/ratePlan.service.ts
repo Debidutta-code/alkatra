@@ -206,7 +206,7 @@ class RoomRentCalculationService {
       // Input validation
       const validationResult = this.validateInputs(
         hotelcode,
-        invTypeCode = 'SUT',
+        invTypeCode,
         startDate,
         endDate,
         noOfChildrens,

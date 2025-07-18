@@ -163,13 +163,53 @@
 //     }
 // }
 
+// ----------------***************************--------------------------------------
+
+// import { RateAmount } from '../model/ratePlanModel';
+// import { RatePlanData } from '../interface/ratePlanInterface';
+// import { FilterQuery, UpdateQuery } from 'mongoose';
+
+// export class RatePlanRepository {
+//     async upsertRateAmount(data: RatePlanData[]): Promise<any> {
+//         console.log(`@@@@@@@@@@@@@@@@@@@@@@\nRepository Upserting rate amounts for hotels: ${JSON.stringify(data, null, 2)}`);
+//         const operations = data.map(plan => ({
+//             updateOne: {
+//                 filter: {
+//                     hotelCode: plan.hotelCode,
+//                     hotelName: plan.hotelName,
+//                     invTypeCode: plan.invTypeCode,
+//                     ratePlanCode: plan.ratePlanCode,
+//                 },
+//                 update: {
+//                     $set: {
+//                         // ratePlanCode: plan.ratePlanCode,
+//                         startDate: new Date(plan.startDate),
+//                         endDate: new Date(plan.endDate),
+//                         days: plan.days,
+//                         currencyCode: plan.currencyCode,
+//                         baseByGuestAmts: plan.baseByGuestAmts,
+//                         additionalGuestAmounts: plan.additionalGuestAmounts,
+//                         updatedAt: new Date(),
+//                     },
+//                 },
+//                 upsert: true,
+//             },
+//         }));
+//         console.log(`Upserting rate amount for hotel rate plan completed`);
+//         return await RateAmount.bulkWrite(operations);
+//     }
+// }
+
+
 import { RateAmount } from '../model/ratePlanModel';
 import { RatePlanData } from '../interface/ratePlanInterface';
 import { FilterQuery, UpdateQuery } from 'mongoose';
+import RateAmountDateWise from '../model/ratePlanDateWise.model'; 
 
 export class RatePlanRepository {
     async upsertRateAmount(data: RatePlanData[]): Promise<any> {
         console.log(`@@@@@@@@@@@@@@@@@@@@@@\nRepository Upserting rate amounts for hotels: ${JSON.stringify(data, null, 2)}`);
+
         const operations = data.map(plan => ({
             updateOne: {
                 filter: {
@@ -180,7 +220,6 @@ export class RatePlanRepository {
                 },
                 update: {
                     $set: {
-                        // ratePlanCode: plan.ratePlanCode,
                         startDate: new Date(plan.startDate),
                         endDate: new Date(plan.endDate),
                         days: plan.days,
@@ -193,26 +232,39 @@ export class RatePlanRepository {
                 upsert: true,
             },
         }));
-        console.log(`Upserting rate amount for hotel completed`);
-        return await RateAmount.bulkWrite(operations);
+
+        const result = await RateAmount.bulkWrite(operations);
+        console.log(`✅ Upserted RateAmount records`);
+
+        // --- Now add date-wise entries ---
+        const dateWiseRecords = [];
+
+        for (const plan of data) {
+            const start = new Date(plan.startDate);
+            const end = new Date(plan.endDate);
+
+            for (let date = new Date(start); date < end; date.setDate(date.getDate() + 1)) {
+                dateWiseRecords.push({
+                    hotelCode: plan.hotelCode,
+                    hotelName: plan.hotelName,
+                    invTypeCode: plan.invTypeCode,
+                    ratePlanCode: plan.ratePlanCode,
+                    startDate: new Date(date),
+                    endDate: new Date(date.getTime() + 86400000), // +1 day
+                    days: plan.days,
+                    currencyCode: plan.currencyCode,
+                    baseByGuestAmts: plan.baseByGuestAmts,
+                    additionalGuestAmounts: plan.additionalGuestAmounts,
+                    createdAt: new Date()
+                });
+            }
+        }
+
+        if (dateWiseRecords.length > 0) {
+            await RateAmountDateWise.insertMany(dateWiseRecords, { ordered: false });
+            console.log(`✅ Inserted ${dateWiseRecords.length} date-wise records`);
+        }
+
+        return result;
     }
-
-    // async createRateAmount(data: RatePlanData): Promise<any> {
-    //     console.log(`@@@@@@@@@@@@@@@@@@@@@@\nRepository Creating rate amount for hotel: ${JSON.stringify(data, null, 2)}`);
-    //     const rateAmount = new RateAmount({
-    //         hotelCode: data.hotelCode,
-    //         hotelName: data.hotelName,
-    //         invTypeCode: data.invTypeCode,
-    //         ratePlanCode: data.ratePlanCode,
-    //         startDate: new Date(data.startDate),
-    //         endDate: new Date(data.endDate),
-    //         days: data.days,
-    //         currencyCode: data.currencyCode,
-    //         baseByGuestAmts: data.baseByGuestAmts,
-    //         additionalGuestAmounts: data.additionalGuestAmounts,
-    //     });
-    //     const savedRateAmount = await rateAmount.save();
-    //     return savedRateAmount.toJSON();
-    // }
-
 }

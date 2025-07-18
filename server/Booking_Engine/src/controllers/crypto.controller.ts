@@ -289,7 +289,7 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
     const reservationId = uuidv4();
     const newBooking = new CryptoGuestDetails({
       reservationId,
-      hotelCode: "WINCLOUD",
+      hotelCode,
       hotelName,
       ratePlanCode,
       roomTypeCode,

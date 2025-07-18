@@ -209,7 +209,7 @@ const createpropertyInfo = catchAsync(
       property_email,
       property_contact,
       star_rating,
-      // property_code,
+      property_code,
       image,
       description,
       property_category,
@@ -224,7 +224,7 @@ const createpropertyInfo = catchAsync(
       property_email,
       property_contact,
       star_rating,
-      // property_code,
+      property_code,
       image,
       description,
       property_category,
@@ -263,7 +263,7 @@ const createpropertyInfo = catchAsync(
         new AppError("A property already exists with this email", 400)
       );
     }
-    const propertyCode = await generateUniquePropertyCode();
+    // const propertyCode = await generateUniquePropertyCode();
 
     const newProperty = new PropertyInfo({
       user_id: user.id,
@@ -271,7 +271,7 @@ const createpropertyInfo = catchAsync(
       property_email,
       property_contact,
       star_rating,
-      property_code:propertyCode,
+      property_code,
       image,
       property_category,
       property_type,

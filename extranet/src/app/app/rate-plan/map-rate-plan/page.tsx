@@ -56,17 +56,22 @@ const MapRatePlanPage: React.FC = () => {
   const fetchRatePlans = async () => {
     try {
       setIsLoading(true);
-      const response = await ratePlanServices("WINCLOUD", currentPage, selectedRoomType, dateRange?.from, dateRange?.to);
+      const hotelCode = sessionStorage.getItem("propertyCode") ;
+      if (!hotelCode) {
+        toast.error('Hotel code not found in session storage');
+        return;
+      }
+      const response = await ratePlanServices(hotelCode, currentPage, selectedRoomType, dateRange?.from, dateRange?.to);
 
       setData(response.data);
       setOriginalData(response.data);
       setFilteredData(response.data);
       const patchedPagination = {
-      ...response.pagination,
-      totalPage: response.pagination.totalPages,
-    };
-      console.log("Pagination response",response.pagination)
-      console.log("patched ",patchedPagination)
+        ...response.pagination,
+        totalPage: response.pagination.totalPages,
+      };
+      console.log("Pagination response", response.pagination);
+      console.log("patched ", patchedPagination);
       setPaginationResults(patchedPagination)
       setEditButtonClicked(false);
       setModifiedValues([]);
