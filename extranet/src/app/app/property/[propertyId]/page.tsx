@@ -8,7 +8,6 @@ import {
   updatePropertyAmenity,
   updatePropertyRoom,
   deletePropertyRoom,
-  fetchAllRatePlanOfOwner,
   addPropertyRoom,
   deleteProperty,
   createPropertyAmenity,
@@ -17,28 +16,24 @@ import {
   updatePropertyAddress,
   addPropertyAddress,
   updateRatePlan,
-  fetchPriceById,
   addRatePlan
 } from './api';
-import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { DeleteSuccessModal } from '../../../../components/propertyId/DeleteSuccessModal';
 import { PropertyDetails } from '../../../../components/propertyId/property-details';
 import { Amenities } from '../../../../components/propertyId/amenities';
 import { Rooms } from '../../../../components/propertyId/rooms';
-import { RatePlan } from '../../../../components/propertyId/rate-plan';
 import { RoomAmenities } from '../../../../components/propertyId/roomAmenities'
 import { Button } from '../../../../components/ui/button';
-import { ArrowLeft, Trash2 } from 'lucide-react';
-import { Address } from '../../../../components/propertyId/address'; // Added this import
+import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { Address } from '../../../../components/propertyId/address';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { RootState } from '@src/redux/store';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../../../components/ui/tabs";
+import { Property } from '@src/redux/slices/propertySlice';
 
-
-// Define types for our component props and state
 interface RatePlanType {
   _id: string,
   property_id: string,
@@ -54,7 +49,6 @@ interface RatePlanType {
   max_book_advance: number
 }
 
-// interface for room
 export interface RoomType {
   _id: string;
   propertyInfo_id: string;
@@ -120,8 +114,6 @@ type Props = {
 
 export default function Page({ params, searchParams }: Props) {
   const router = useRouter();
-
-  // State declarations
   const [property, setProperty] = useState<any>(null);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [editedProperty, setEditedProperty] = useState<any>(null);
@@ -140,11 +132,8 @@ export default function Page({ params, searchParams }: Props) {
   const [roomType, setRoomType] = useState<string | null>(null);
   const [availableRoomTypes, setAvailableRoomTypes] = useState<string[]>([]);
   const [showDeleteSuccessModal, setShowDeleteSuccessModal] = useState<boolean>(false);
-
-
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const propertyId = params.propertyId;
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -153,28 +142,17 @@ export default function Page({ params, searchParams }: Props) {
           console.error('Access token is undefined or not set');
           return;
         }
-
         const propertyData = await fetchProperty(accessToken, propertyId);
-        // const ratePlanList = await fetchAllRatePlanOfOwner(accessToken);
-        // const choosedRatePlan = await fetchPriceById(params.propertyId);
-
-        // Set state with fetched data
-        console.log("property data at property page", propertyData.data.rate_plan)
         setProperty(propertyData);
         setRatePlanList(propertyData.data.rate_plan);
         setEditedProperty({ ...propertyData.data });
         setAmenity(propertyData.data.property_amenities);
         setEditedAmenity({ ...propertyData.data.property_amenities });
-
-        // Set address data
         setAddress(propertyData.data.property_address);
         setEditedAddress({ ...propertyData.data.property_address });
-        console.log("property datat", propertyData)
-        console.log("before use effect the room data", Rooms)
         if (propertyData.data.property_room) {
           setRooms([{ ...propertyData.data.property_room }]);
         }
-
         if (propertyData.data.room_Aminity) {
           setRoomAmenity(propertyData.data.room_Aminity);
           setEditedRoomAmenity({ ...propertyData.data.room_Aminity });
@@ -182,8 +160,6 @@ export default function Page({ params, searchParams }: Props) {
       }
       catch (error: any) {
         if (error.code === 'ECONNRESET') {
-          console.log('Connection reset, retrying...');
-          // Retry logic here
           fetchData();
         } else {
           console.error('Error fetching property data:', error);
@@ -209,7 +185,6 @@ export default function Page({ params, searchParams }: Props) {
         return;
       }
       const updateAmenityResponse = await updatePropertyAddress(params.propertyId, accessToken, editedAddress);
-      console.log("updateAmenityResponse", updateAmenityResponse)
       setEditAddressMode(false);
       setAddress({ ...editedAddress });
     } catch (error) {
@@ -244,30 +219,22 @@ export default function Page({ params, searchParams }: Props) {
         return;
       }
       const propertyId = params.propertyId;
-
       await deleteProperty(propertyId, accessToken);
-      toast.success('Property deleted successfully!'); // Display toast message
-
-      // Show the modal instead of navigating immediately
+      toast.success('Property deleted successfully!');
       setShowDeleteSuccessModal(true);
     } catch (error) {
       console.error('Error deleting property:', error);
       toast.error('Failed to delete property. Please try again.');
     }
   };
-
-  // Add these handler functions
   const handleCreateProperty = () => {
     setShowDeleteSuccessModal(false);
     router.push('/app/property/create');
   };
-
   const handleGoBack = () => {
     setShowDeleteSuccessModal(false);
     router.push('/app');
   };
-
-  // Handlers for property details
   const handleEditClick = () => setEditMode(!editMode);
   const handleSaveClick = async () => {
     try {
@@ -276,7 +243,6 @@ export default function Page({ params, searchParams }: Props) {
         return;
       }
       const response = await updateProperty(params.propertyId, accessToken, editedProperty);
-      console.log(response.data)
       setEditMode(false);
       setProperty({ data: { ...editedProperty } });
       if (response.data) {
@@ -310,8 +276,8 @@ export default function Page({ params, searchParams }: Props) {
       setEditAmenityMode(false);
       setAmenity(updateAmenityResponse.data);
       setProperty((prev: any) => ({
-        ...prev, // Spread previous state to maintain other properties
-        property_amenities: updateAmenityResponse.data // Update property_amenities with new data
+        ...prev,
+        property_amenities: updateAmenityResponse.data
       }));
     } catch (error) {
       console.error('Error updating amenity data:', error);
@@ -335,8 +301,6 @@ export default function Page({ params, searchParams }: Props) {
 
       setAmenity(createdAmenity);
       setEditedAmenity(createdAmenity);
-
-      // Optionally, refetch the entire property data
       const updatedProperty = await fetchProperty(accessToken, params.propertyId);
       setProperty(updatedProperty);
     } catch (error) {
@@ -347,7 +311,6 @@ export default function Page({ params, searchParams }: Props) {
 
 
   useEffect(() => {
-    console.log("🔥 ROOMS STATE UPDATED:", rooms);
   }, [rooms]);
 
   const fetchRooms = async () => {
@@ -369,7 +332,6 @@ export default function Page({ params, searchParams }: Props) {
     }
   }, [rooms]);
 
-  // Handlers for rooms
   const handleAddRoom = async (newRoom: RoomType) => {
     try {
       if (!accessToken) {
@@ -377,23 +339,18 @@ export default function Page({ params, searchParams }: Props) {
         return;
       }
       const addedRoom = await addPropertyRoom(params.propertyId, accessToken, newRoom);
-      // (addedRoom !== null ?
-      //   toast.success('Room added successfully!') : toast.error('Room could not be added!')
-      // );
       setRooms((prevRooms) => {
         const roomContainer = prevRooms[0] || {};
         const newKey = Object.keys(roomContainer).length;
         return [{ ...roomContainer, [newKey]: addedRoom.new_room }];
       });
-      // Store room_type and open RoomAmenities modal
       setRoomType(addedRoom.new_room.room_type);
-      setEditRoomAmenityMode(true); // Open RoomAmenities modal
+      setEditRoomAmenityMode(true);
     } catch (error) {
       console.error('Error adding new room:', error);
     }
   };
 
-  // console.log("updated room data",rooms)
   const handleEditRoom = async (updatedRoom: RoomType) => {
     try {
       if (!accessToken) {
@@ -466,17 +423,11 @@ export default function Page({ params, searchParams }: Props) {
     }
   };
 
-
-
-
-  // Room Amenities handlers
   const handleRoomAmenityEditClick = () => setEditRoomAmenityMode(!editRoomAmenityMode);
-
   const handleRoomAmenityInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setEditedRoomAmenity({ ...editedRoomAmenity, [name]: value });
   };
-
   const handleRoomAmenitySaveClick = async () => {
     try {
       if (!accessToken) {
@@ -500,7 +451,6 @@ export default function Page({ params, searchParams }: Props) {
       const createdRoomAmenity = await createPropertyRoomAmenity(params.propertyId, accessToken, newRoomAmenity,);
       setRoomAmenity(createdRoomAmenity);
       setEditedRoomAmenity(createdRoomAmenity);
-      // Optionally, refetch the entire property data
       const updatedProperty = await fetchProperty(accessToken, params.propertyId);
       setProperty(updatedProperty);
     } catch (error) {
@@ -517,9 +467,7 @@ export default function Page({ params, searchParams }: Props) {
         return;
       }
       const updatedRatePlan = await updateRatePlan(params.propertyId, accessToken, newRatePlan);
-      console.log("updated rate plan at page.tsxx", updatedRatePlan)
       setRatePlan(updatedRatePlan.newList)
-
     } catch (error) {
       console.error('Error creating room amenity:', error);
       throw error;
@@ -534,8 +482,6 @@ export default function Page({ params, searchParams }: Props) {
         return;
       }
       const addedRatePlan = await addRatePlan(params.propertyId, accessToken, newRatePlan);
-      console.log(addedRatePlan);
-      // setRatePlan(newRatePlan.newList)
 
     } catch (error) {
       console.error('Error creating room amenity:', error);
@@ -543,10 +489,8 @@ export default function Page({ params, searchParams }: Props) {
     }
   };
 
-  // Render the component
   return (
     <main className="py-8 px-4 md:px-8 lg:px-16 xl:px-24">
-      {/* Header with back button and breadcrumb */}
       <header className="sticky top-0 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto pr-4 sm:pr-6 lg:pr-8">
           <div className="flex items-center justify-between h-16">
@@ -566,14 +510,28 @@ export default function Page({ params, searchParams }: Props) {
         </div>
       </header>
 
-      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> */}
       <div className="grid grid-cols-1 gap-4">
-        <div>
-          <PropertyImageGallery image={property?.data?.image} />
+        <div className="relative">
+          <PropertyImageGallery
+            image={property?.data?.image || []}
+            onImagesUpdate={(updatedImages) => {
+              setEditedProperty((prev: Property) => ({
+                ...prev,
+                image: updatedImages
+              }));
+              setProperty((prev: { data: Property }) => ({
+                ...prev,
+                data: {
+                  ...prev.data,
+                  image: updatedImages
+                }
+              }));
+            }}
+            editable={true}
+            propertyId={params.propertyId}
+            accessToken={accessToken}
+          />
         </div>
-
-        {/* <div className="flex flex-col md:flex-row gap-2 items-center"> */}
-        {/* Quick Action Buttons */}
         <div className="mb-8">
           <Card>
             <CardHeader>
@@ -595,17 +553,7 @@ export default function Page({ params, searchParams }: Props) {
             </CardContent>
           </Card>
         </div>
-        {/* <div className="mb-4 mt-4">
-            <Button
-              variant="default"
-              onClick={() => router.push(`/app/rate-plan/map-rate-plan`)}
-              className="bg-tripswift-blue hover:bg-tripswift-blue-600 text-white mx-2"
-              >
-              Rate and Inventory Allotment
-            </Button>
-          </div> */}
 
-        {/* Main Content Tabs */}
         <Tabs className="space-y-6" defaultValue="overview">
           <div className="overflow-x-auto">
             <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 h-auto p-1 bg-slate-100">
@@ -705,15 +653,9 @@ export default function Page({ params, searchParams }: Props) {
             </TabsContent>
           </div>
         </Tabs>
-        {/* </div> */}
       </div>
-      {/* Danger Zone */}
       <Card className="border-red-200 bg-red-50/50 mt-8">
         <CardHeader>
-          {/* <CardTitle className="text-red-700 flex items-center">
-              <Trash2 className="h-5 w-5 mr-2" />
-              Danger Zone
-            </CardTitle> */}
           <CardDescription className="text-red-600">
             Deleting this property will remove all associated data permanently. This action cannot be undone.
           </CardDescription>

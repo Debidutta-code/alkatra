@@ -12,11 +12,6 @@ import { Label } from "../../components/ui/label";
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-// Interfaces
-interface AmenityCategory {
-  [key: string]: boolean;
-}
-
 interface BasicAmenities {
   bed: "single" | "double" | "king" | "twin" | "queen";
   bathroom: boolean;
@@ -132,29 +127,29 @@ const bedTypes = ["single", "double", "king", "twin", "queen"];
 // Updated amenity categories with all new amenities
 const amenityCategories = {
   basic: [
-    "bathroom", "towels", "linensBedding", "linens", "bidet", 
+    "bathroom", "towels", "linensBedding", "linens", "bidet",
     "toiletPaper", "towelsSheets", "freeToiletries", "shower", "toilet"
   ],
   furniture: [
-    "tableChairs", "desk", "dresserWardrobe", "sofaSeating", "sofa", 
-    "wardrobeOrCloset", "diningTable", "diningArea", "sittingArea", 
+    "tableChairs", "desk", "dresserWardrobe", "sofaSeating", "sofa",
+    "wardrobeOrCloset", "diningTable", "diningArea", "sittingArea",
     "readingChair", "balcony"
   ],
   technology: [
-    "television", "telephone", "wifiInternet", "flatScreenTV", 
+    "television", "telephone", "wifiInternet", "flatScreenTV",
     "satelliteChannels", "cableChannels"
   ],
   climateControl: ["airConditioning", "heating"],
   kitchenetteMiniBar: [
-    "smallRefrigerator", "microwave", "coffeeMaker", "refrigerator", 
-    "kitchenware", "electricKettle", "oven", "stovetop", 
+    "smallRefrigerator", "microwave", "coffeeMaker", "refrigerator",
+    "kitchenware", "electricKettle", "oven", "stovetop",
     "teaCoffeeMaker", "kitchen"
   ],
   safetySecurity: ["safe", "smokeDetectors", "fireExtinguisher"],
   toiletries: ["shampooConditioner", "soap", "hairDryer"],
   workLeisure: ["workDesk", "additionalLighting", "ironingFacilities", "iron"],
   accessibilityFeatures: [
-    "accessibleBathroom", "wheelchairAccessibility", 
+    "accessibleBathroom", "wheelchairAccessibility",
     "upperFloorsAccessibleByElevator", "entireUnitWheelchairAccessible"
   ],
 };
@@ -162,7 +157,7 @@ const amenityCategories = {
 // Utility functions
 const formatAmenityName = (amenity: string): string => {
   if (amenity === amenity.toUpperCase()) return amenity;
-  
+
   // Custom formatting for specific amenities
   const customNames: Record<string, string> = {
     wifiInternet: "WiFi Internet",
@@ -309,21 +304,15 @@ const createEmptyAmenityStructure = (propertyInfoId: string, selectedRoomType: s
 
 const initializeAmenityStructure = (amenityData: RoomAmenity): RoomAmenity => {
   const clonedData = JSON.parse(JSON.stringify(amenityData));
-
-  // Ensure all categories exist with proper structure
   if (!clonedData.amenities) {
     clonedData.amenities = {};
   }
 
-  // Initialize with empty structure and merge existing data
   const emptyStructure = createEmptyAmenityStructure(amenityData.propertyInfo_id, amenityData.room_type);
-  
-  // Merge existing data with complete structure
   Object.keys(emptyStructure.amenities).forEach(category => {
     if (!clonedData.amenities[category]) {
       clonedData.amenities[category] = emptyStructure.amenities[category as keyof typeof emptyStructure.amenities];
     } else {
-      // Merge existing values with defaults
       Object.keys(emptyStructure.amenities[category as keyof typeof emptyStructure.amenities]).forEach(amenity => {
         if (clonedData.amenities[category][amenity] === undefined) {
           clonedData.amenities[category][amenity] = emptyStructure.amenities[category as keyof typeof emptyStructure.amenities][amenity as keyof typeof emptyStructure.amenities[keyof typeof emptyStructure.amenities]];
@@ -374,10 +363,10 @@ export function RoomAmenities({
 
       if (response.status === 200 && response.data.data) {
         const amenitiesArray = response.data.data;
-        
+
         if (amenitiesArray.length > 0) {
           // Find amenities for selected room type
-          const roomAmenityData = amenitiesArray.find((item: RoomAmenity) => 
+          const roomAmenityData = amenitiesArray.find((item: RoomAmenity) =>
             item.room_type === selectedRoomType
           );
 
@@ -418,16 +407,12 @@ export function RoomAmenities({
         room_type: selectedRoomType,
         amenities: data.amenities
       };
-
-      // Determine if we're updating or creating
       const isUpdate = currentRoomAmenity !== null;
-
       const endpoint = isUpdate
         ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/amenite/update-room-amenity`
         : `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/amenite/roomaminity`;
-      
-      const method = isUpdate ? "patch" : "post";
 
+      const method = isUpdate ? "patch" : "post";
       const response = await axios({
         method,
         url: endpoint,
@@ -444,8 +429,6 @@ export function RoomAmenities({
             ? "Room amenities updated successfully!"
             : "Room amenities created successfully!"
         );
-        
-        // Refresh the data
         await fetchRoomAmenities();
         setShowModal(false);
         handleRoomAmenityEditClick();

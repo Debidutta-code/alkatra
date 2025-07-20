@@ -4,24 +4,17 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../../redux/store";
 import axios from "axios";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card";
 import { Button } from "../../../../components/ui/button";
 import { Input } from "../../../../components/ui/input";
 import { Badge } from "../../../../components/ui/badge";
 import {
-    Loader2,
-    Search,
-    MapPin,
-    Star,
     Eye,
     Building2,
     Filter,
     Grid3X3,
     List,
-    Heart,
-    Calendar,
-    Users
 } from "lucide-react";
+import { Triangle } from "react-loader-spinner";
 import Link from "next/link";
 
 interface Hotel {
@@ -81,14 +74,18 @@ const Page = () => {
 
     const LoadingState = () => (
         <div className="flex flex-col items-center justify-center py-24">
-            <div className="relative">
-                <div className="w-16 h-16 border-4 border-emerald-200 rounded-full animate-pulse"></div>
-                <Loader2 className="w-8 h-8 text-emerald-600 animate-spin absolute top-4 left-4" />
-            </div>
-            <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">Loading your direct properties...</p>
+            <Triangle
+                visible={true}
+                height={80}
+                width={80}
+                color="#076DB3"
+                ariaLabel="triangle-loading"
+            />
+            <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">
+                Loading your hotels...
+            </p>
         </div>
     );
-
     const EmptyState = () => (
         <div className="flex flex-col items-center justify-center py-24">
             <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
@@ -102,7 +99,7 @@ const Page = () => {
     );
 
     const HotelCard: any = ({ hotel }: { hotel: Hotel }) => (
-        <div className="group relative bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-emerald-200 dark:hover:border-emerald-600">
+        <div className="group relative bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-tripswift-blue dark:hover:border-tripswift-dark-blue">
             <div className="relative overflow-hidden">
                 <img
                     src={hotel.image[0] || "/api/placeholder/400/240"}
@@ -118,7 +115,7 @@ const Page = () => {
             <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
-                        <h3 className="font-bold text-gray-900 dark:text-white text-xl mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-1">
+                        <h3 className="font-bold text-gray-900 dark:text-white text-xl mb-2 group-hover:text-tripswift-blue dark:group-hover:text-tripswift-dark-blue transition-colors line-clamp-1">
                             {hotel.name}
                         </h3>
                     </div>
@@ -143,7 +140,7 @@ const Page = () => {
     );
 
     const HotelListItem = ({ hotel }: { hotel: Hotel }) => (
-        <div className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-emerald-200 dark:hover:border-emerald-600">
+        <div className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-tripswift-blue dark:hover:border-tripswift-dark-blue">
             <div className="flex">
                 <div className="relative w-48 h-32 overflow-hidden">
                     <img
@@ -159,7 +156,7 @@ const Page = () => {
 
                 <div className="flex-1 p-6 flex items-center justify-between">
                     <div className="flex-1">
-                        <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                        <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-2 group-hover:text-tripswift-dark-blue dark:group-hover:text-tripswift-blue transition-colors">
                             {hotel.name}
                         </h3>
 
@@ -192,7 +189,7 @@ const Page = () => {
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
                         <div>
                             <div className="flex items-center space-x-3 mb-2">
-                                <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
+                                <div className="w-3 h-3 bg-tripswift-blue rounded-full animate-pulse"></div>
                                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                                     Direct Properties
                                 </h1>
@@ -208,12 +205,12 @@ const Page = () => {
 
                         <div className="flex items-center space-x-4">
                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                                {/* <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" /> */}
                                 <Input
                                     placeholder="Search direct properties..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-10 w-64 bg-white/70 dark:bg-gray-800/70 border-gray-200 dark:border-gray-700 focus:border-emerald-500 focus:ring-emerald-500 backdrop-blur-sm"
+                                    className="pl-10 w-64 bg-white/70 dark:bg-gray-800/70 border-gray-200 dark:border-gray-700 focus:border-tripswift-blue focus:ring-tripswift-blue backdrop-blur-sm"
                                 />
                             </div>
 

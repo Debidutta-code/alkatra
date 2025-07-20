@@ -1,11 +1,9 @@
-/* eslint-disable react/jsx-key */
 "use client";
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "./../ui/card";
+import { CardContent, CardFooter, CardTitle, } from "./../ui/card";
 import { Label } from "./../ui/label";
 import { Input } from "./../ui/input";
 import { Button } from "./../ui/button";
-import { Checkbox } from "./../ui/checkbox";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -16,7 +14,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 const createRatePlanSchema = z.object({
   applicable_room_type: z.string().min(1, "Applicable room type is required"),
   meal_plan: z.string().min(1, "Meal plan is required"),
-  // room_price: z.number().nonnegative("Room price is required and must be a positive number"),
   rate_plan_name: z.string().min(1, "Rate plan name is required"),
   rate_plan_description: z.string().min(1, "Rate plan description is required"),
   min_length_stay: z.number().int().min(0, "Minimum length stay is required and must be a positive number"),
@@ -31,10 +28,10 @@ type Inputs = {
   room_price: number,
   rate_plan_name: string,
   rate_plan_description?: string,
-  min_length_stay: number,    // minimum days a guest can stay
-  max_length_stay?: number,    // maximum days a guest can stay
-  min_book_advance: number,   // advance booking, minimum days before arrival
-  max_book_advance?: number    // advance booking, maximum days before arrival
+  min_length_stay: number,
+  max_length_stay?: number,
+  min_book_advance: number,
+  max_book_advance?: number
 };
 type Props = { onPrevious: () => void };
 export default function RatePlan({ onPrevious }: Props) {
@@ -53,18 +50,16 @@ export default function RatePlan({ onPrevious }: Props) {
       room_price: 0,
       rate_plan_name: "",
       rate_plan_description: "",
-      min_length_stay: 0,    // minimum days a guest can stay
-      max_length_stay: 0,    // maximum days a guest can stay
-      min_book_advance: 0,   // advance booking, minimum days before arrival
-      max_book_advance: 0,    // advance booking, maximum days before arrival
+      min_length_stay: 0,
+      max_length_stay: 0,
+      min_book_advance: 0,
+      max_book_advance: 0,
     },
     resolver: zodResolver(createRatePlanSchema),
   });
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting }, getValues } = form;
   const onSubmit = async (data: Inputs) => {
     setLoading(true);
-    // const payload = Object.fromEntries(category.map(item => [item.id, item]));
-    console.log("Sending Data ", data);
     try {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/price/${property_id}`, data, {
         headers: {
@@ -116,19 +111,6 @@ export default function RatePlan({ onPrevious }: Props) {
   useEffect(() => {
     getRoomsByPropertyId()
   }, [])
-
-
-  // function handleCategoryChange(e: any) {
-  //   const price_list = priceCategory.filter((category: any) => category.price_category == e.target.value)
-  //   // console.log(price_list)
-  //   setCategory(price_list)
-  // }
-
-  // const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-  //   const selectedValue = e.target.value;
-  //   // setValue("price_category", selectedValue);
-  // };
-
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

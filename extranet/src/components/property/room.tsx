@@ -1,7 +1,6 @@
 "use client";
 
 import React, {
-  MouseEventHandler,
   useCallback,
   useEffect,
   useState,
@@ -9,8 +8,6 @@ import React, {
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "./../ui/card";
@@ -18,14 +15,6 @@ import { Label } from "./../ui/label";
 import { Input } from "./../ui/input";
 import { Button, buttonVariants } from "./../ui/button";
 import { ReloadIcon } from "@radix-ui/react-icons";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "./../ui/select";
 import {
   Dialog,
   DialogContent,
@@ -38,24 +27,15 @@ import Image from "next/image";
 import { FileRejection, useDropzone } from "react-dropzone";
 import Dropzone from "../dropzone";
 import { Checkbox } from "./../ui/checkbox";
-import axios, { Axios, AxiosError } from "axios";
-import { boolean, number, z } from "zod";
+import axios, {  } from "axios";
+import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
-import { BookOpen, MapPinned, ShowerHead } from "lucide-react";
 import { cn } from "./../../lib/utils";
 import { Textarea } from "./../ui/textarea";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { RootState, useSelector } from "../../redux/store";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "./../ui/accordion";
-import { ScrollArea } from "./../ui/scrollarea";
-import Cookies from "js-cookie";
 
 export const roomSchema = z.object({
   room_name: z.string().min(1, "Room name is required"),
@@ -72,36 +52,30 @@ export const roomSchema = z.object({
   room_view: z.string().optional(),
   room_size: z
     .number({ required_error: "Room size is required" })
-    // .nonnegative("Room size must be positive")
     .min(1, { message: "Value must be greater than or equal to 1" }),
-
   room_unit: z.string().min(1, "Room unit is required"),
   smoking_policy: z.string().min(1, "Smoking policy is required"),
   max_occupancy: z
     .number({ required_error: "Max occupancy is required" })
-    // .nonnegative("Max occupancy must be positive")
     .min(1, { message: "Value must be greater than or equal to 1" }),
   max_number_of_adults: z
     .number({ required_error: "Enter max adults" })
-    // .nonnegative("Adults cannot be negative")
     .min(1, { message: "Value must be greater than or equal to 1" }),
   max_number_of_children: z
     .number()
     .nonnegative("Value must be greater than or equal to 0")
-    .optional(), // Changed to min(1) - required
+    .optional(),
   number_of_bedrooms: z
     .number({ required_error: "Enter number of bedrooms" })
-    // .nonnegative("Bedrooms can't be negative")
     .min(1, { message: "Value must be greater than or equal to 1" }),
-  // Changed to min(1) - required
   number_of_living_room: z
     .number()
     .nonnegative("Value must be greater than or equal to 0")
-    .optional(), // Changed to min(1) - required
+    .optional(),
   extra_bed: z
     .number()
     .nonnegative("Value must be greater than or equal to 0")
-    .optional(), // Changed to min(1) - required
+    .optional(),
   description: z.string().optional(),
   image: z.array(z.string()).optional(),
   available: z.boolean(),
@@ -127,7 +101,6 @@ type Inputs = {
   available: boolean;
 };
 
-/////////
 interface IFileWithPreview extends File {
   preview: string;
 }
@@ -223,56 +196,12 @@ export default function XRooms({ onNext, onPrevious }: Props) {
     },
   } = formState;
 
-  // useEffect(() => {
-  //   async function getAllPrice() {
-  //     try {
-  //       const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/price/getAll`, {
-  //         headers: {
-  //           Authorization: `Bearer ${accessToken}`,
-  //         }
-  //       },
-  //       )
-  //       console.log(response.data?.priceList[0])
-  //       setPriceCategory(response.data?.priceList)
-  //     } catch (error) {
-  //       console.log(error)
-  //       toast.error("Failed to fetch Rateplans")
-  //     }
-  //   }
-
-  //   getAllPrice()
-  // }, [])
-
   function handleCategoryChange(e: any) {
     const price_list = priceCategory.filter(
       (category: any) => category.price_category == e.target.value
     );
     setCategory(price_list);
   }
-
-  // useEffect(() => {
-  //   room_nameError && toast.error(room_nameError.message!);
-  //   room_typeError && toast.error(room_typeError.message!);
-  //   total_roomError && toast.error(total_roomError.message!);
-  //   floorError && toast.error(floorError.message!);
-  //   room_viewError && toast.error(room_viewError.message!);
-  //   room_sizeError && toast.error(room_sizeError.message!);
-  //   room_unitError && toast.error(room_unitError.message!);
-  //   smoking_policyError && toast.error(smoking_policyError.message!);
-  //   max_occupancyError && toast.error(max_occupancyError.message!);
-  //   max_number_of_adultsError && toast.error(max_number_of_adultsError.message!);
-  //   max_number_of_childrenError && toast.error(max_number_of_childrenError.message!);
-  //   number_of_bedroomsError && toast.error(number_of_bedroomsError.message!);
-  //   number_of_living_roomError && toast.error(number_of_living_roomError.message!);
-  //   extra_bedError && toast.error(extra_bedError.message!);
-  //   descriptionError && toast.error(descriptionError.message!);
-  //   imageError && toast.error(imageError.message!);
-  // }, [
-  //   room_nameError, room_typeError, total_roomError,
-  //   floorError, room_viewError, room_sizeError, room_unitError,
-  //   smoking_policyError, max_occupancyError, max_number_of_adultsError,
-  //   max_number_of_childrenError, number_of_bedroomsError, number_of_living_roomError, extra_bedError, descriptionError, imageError
-  // ]);
 
   useEffect(() => {
     console.log({ errors: formState.errors });
@@ -343,9 +272,8 @@ export default function XRooms({ onNext, onPrevious }: Props) {
   const handlePropertyImageUpload = async () => {
     try {
       if (files.length) {
-        setLoading(true); // Start loading
+        setLoading(true);
         const data = packFiles(files);
-
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/upload`,
           data,
@@ -355,7 +283,6 @@ export default function XRooms({ onNext, onPrevious }: Props) {
             },
           }
         );
-
         const urls = response.data.data.urls;
         setOpenDialog(false);
         setPropertyImageUrls(urls);
@@ -363,7 +290,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
     } catch (error) {
       console.error("Error uploading room images:", error);
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 
@@ -466,47 +393,6 @@ export default function XRooms({ onNext, onPrevious }: Props) {
               </p>
             )}
           </div>
-
-          {/* <div className="self-end w-full relative">
-            <Label htmlFor="Name">Room Name </Label>
-            <div className="inline-block relative w-full">
-              <select
-                {...register("room_name")}
-                onChange={(e) => setRoomDetails(prevDetails => ({ ...prevDetails!, name: e.target.value }))}
-                className={`block appearance-none w-full border ${room_nameError ? "border-red-500" : "border-gray-300"
-                  } text-white-700py-2 px-3 md:h-12.1 md:px-3 md:py-3 rounded-md leading-tight focus:outline-none focus:border-blue-500`}
-              >
-                <option value="SINGLE ROOM" className="bg-white-300 text-white-800">SINGLE ROOM</option>
-                <option value="DOUBLE ROOM" className="bg-white-300 text-white-800">DOUBLE ROOM</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white-700">
-                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 0 1 1.414-1.414L10 8.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4z" />
-                </svg>
-              </div>
-            </div>
-          </div> */}
-
-          {/* <div className="self-end w-full relative">
-            <Label htmlFor="type">Room Type </Label>
-            <div className="inline-block relative w-full">
-              <select
-                {...register("room_type")}
-                onChange={(e) => setRoomDetails(prevDetails => ({ ...prevDetails!, type: e.target.value }))}
-                className={`block appearance-none w-full border ${room_typeError ? "border-red-500" : "border-gray-300"
-                  } text-white-700py-2 px-3 md:h-12.1 md:px-3 md:py-3 rounded-md leading-tight focus:outline-none focus:border-blue-500`}
-              >
-                <option value="QUEEN ROOM" className="bg-white-300 text-white-800">QUEEN ROOM</option>
-                <option value="KING ROOM" className="bg-white-300 text-white-800">KING ROOM</option>
-                <option value=" TWIN ROOM" className="bg-white-300 text-white-800">TWIN ROOM</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white-700">
-                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 0 1 1.414-1.414L10 8.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4z" />
-                </svg>
-              </div>
-            </div>
-          </div> */}
         </div>
 
         {/* box 2 */}
@@ -1209,226 +1095,4 @@ function UploadPropertyImages({
       </DialogContent>
     </Dialog>
   );
-}
-{
-  /* <div class="p-2 pt-0"><div class="space-y-2"><div class="gap-10 tracking-normal"><div class="gap-2"><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 whitespace-nowrap">Property ID :</p><p class="font-semibold">66e41c557a463a764b29723c</p></div><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 ">Name :</p><p class="font-semibold">Kafil's Plaza</p></div><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 ">Email :</p><p class="font-semibold">kafils@gmail.com</p></div><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 ">Contact :</p><p class="font-semibold">6371545555</p></div></div></div></div></div> */
-}
-
-{
-  /* <div class="p-2 pt-0"><div class="space-y-2"><div class="gap-10 tracking-normal"><div class="gap-2"><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 whitespace-nowrap">Property ID :</p><p class="font-semibold">66e41c557a463a764b29723c</p></div><div class=" flex flex-row gap-6 "><p class="dark:text-gray-300 ">Name :</p><p class="font-semibold flex">Kafil's Plaza</p></div><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 ">Email :</p><p class="font-semibold">kafils@gmail.com</p></div><div class=" flex flex-row gap-2 "><p class="dark:text-gray-300 ">Contact :</p><p class="font-semibold">6371545555</p></div></div></div></div></div> */
-}
-
-// const roomSchema = z.object({
-//   name: z.string().min(1, "Room name is required"),
-//   type: z.string().min(1, "Room type is required"),
-//   price: z
-//     .string()
-//     .min(1, "Room price is required")
-//     .refine((price) => parseInt(price) > 0, {
-//       message: "Price cannot be 0 ",
-//     }),
-//   available: z.boolean(),
-//   capacity: z
-//     .string()
-//     .min(1, "Room capacity is required")
-//     .refine((capacity) => parseInt(capacity) > 0, {
-//       message: "Capacity cannot be 0 ",
-//     }),
-//   description: z.string(),
-//   total_room: z
-//     .string()
-//     .min(1, "Total room should be at least 1")
-//     .refine((total_room) => parseInt(total_room) > 0, {
-//       message: "Total room cannot be 0 ",
-//     }),
-// });
-
-// type Inputs = {
-//   name: string;
-//   type: string;
-//   price: string;
-//   available: boolean;
-//   capacity: string;
-//   description: string;
-//   total_room: string;
-// };
-
-// interface RoomDetails {
-//   name: string;
-//   type: string;
-//   price: string;
-//   available: boolean;
-//   capacity: string;
-//   description: string;
-//   total_room: string;
-// }
-
-// const form = useForm<Inputs>({
-//   defaultValues: {
-//     name: "",
-//     type: "",
-//     price: "0",
-//     available: false,
-//     capacity: "0",
-//     description: "",
-//     total_room: "0",
-//   },
-//   resolver: zodResolver(roomSchema),
-// });
-
-// const onSubmit: SubmitHandler<Inputs> = async (data) => {
-//   /////////////
-//   const imageUrls = propertyImageUrls.map(
-//     (propertyImage) => propertyImage.url
-//   );
-//   console.log(data);
-//   const roomBody = {
-//     ...data,
-//     propertyInfo_id: property_id,
-//     image: imageUrls,
-//   };
-
-//   setFormLoading(true);
-
-//   try {
-//     const {
-//       data: { data: newRoom },
-//     } = await axios.post(`http://localhost:8040/api/v1/room`, roomBody, {
-//       headers: {
-//         Authorization: `Bearer ${accessToken}`,
-//       },
-//     });
-//     console.log({ newRoom });
-//     setFormLoading(false);
-
-//     onNext();
-//   } catch (err) {
-//     if (axios.isAxiosError(err)) {
-//       setFormLoading(false);
-//       toast.error(err?.response?.data?.message);
-//     }
-//   }
-// };
-
-{
-  /* <div className="w-full">
-            <Label htmlFor="price">Price</Label>
-            <Input
-              id="price"
-              size={"md"}
-              value={roomDetails?.price}
-              {...register("price")}
-              onChange={(e) => setRoomDetails(prevDetails => ({
-                ...prevDetails!,
-                price: e.target.value
-              }))}
-              type="number"
-            />
-          </div> */
-}
-
-{
-  /* <div className="self-end w-full relative">
-            <Label htmlFor="price">Price</Label>
-            <Input
-              id="price"
-              size={"md"}
-              value={roomDetails?.price}
-              {...register("price")}
-              onChange={(e) => setRoomDetails(prevDetails => ({
-                ...prevDetails!,
-                price: e.target.value
-              }))}
-              type="number"
-            />
-          </div> */
-}
-
-{
-  /* <div className="self-end w-full relative">
-            <Label htmlFor="roomPlan">Room Plan</Label>
-            <div className="inline-block relative w-full">
-              <select
-                id="price"
-                onChange={handleCategoryChange}
-                className={`block appearance-none w-full border ${typeError ? "border-red-500" : "border-gray-300"} 
-                  text-white-700py-2 px-3 md:h-12.1 md:px-3 md:py-3 rounded-md leading-tight focus:outline-none focus:border-blue-500`
-                }>
-                <option value="default" disabled>
-                  Select a plan
-                </option>
-                {
-                  priceCategory?.map((category: any) => (
-                    <option key={category?._id} value={category?.price_category}>
-                      {category?.price_category}
-                    </option>
-                  ))
-                }
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white-700">
-                <svg
-                  className="fill-current h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M5.293 7.293a1 1 0 0 1 1.414-1.414L10 8.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4z"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div> */
-}
-
-{
-  /* <div className="w-full">
-            <Label htmlFor="capacity">Capacity</Label>
-            <Input
-              // variant={capacityError && "error"}
-              value={roomDetails?.capacity}
-              id="capacity"
-              {...register("capacity")}
-              onChange={(e) => setRoomDetails(prevDetails => ({
-                ...prevDetails!,
-                capacity: e.target.value
-              }))}
-              type="number"
-              size={"md"}
-            />
-          </div>
-          <div className="w-full">
-            <Label htmlFor="total_room">Total Room</Label>
-            <Input
-              id="total_room"
-              value={roomDetails?.total_room}
-              {...register("total_room")}
-              onChange={(e) => setRoomDetails(prevDetails => ({
-                ...prevDetails!,
-                total_room: e.target.value
-              }))}
-              type="number"
-              size="md"
-            />
-          </div> */
-}
-// </div>
-
-{
-  /* <div className="w-full flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Label htmlFor="available">Available</Label>
-              <Checkbox
-                id="available"
-                {...register("available")}
-                checked={roomDetails?.available || false}
-                onCheckedChange={(value: boolean) => {
-                  setValue("available", value)
-                  setRoomDetails((prev: any) => {
-                    return { ...prev, available: value };
-                  });
-                }}
-              />
-            </div>
-          </div> */
 }

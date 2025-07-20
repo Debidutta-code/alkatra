@@ -1,69 +1,22 @@
 "use client";
 
 import React, {
-  MouseEventHandler,
-  useCallback,
   useEffect,
   useState,
 } from "react";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
   CardTitle,
 } from "./../ui/card";
 import { Label } from "./../ui/label";
 import { Input } from "./../ui/input";
-import { Button, buttonVariants } from "./../ui/button";
-// import { ReloadIcon } from "@radix-ui/react-icons";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./../ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./../ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuCheckboxItem,
-  DropdownMenuRadioItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuGroup,
-  DropdownMenuPortal,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuRadioGroup,
-} from "./../ui/dropdown-menu";
-
-import { Checkbox } from "./../ui/checkbox";
-import axios, { Axios, AxiosError } from "axios";
-import { boolean, number, z } from "zod";
+import { Button } from "./../ui/button";
+import axios, {  } from "axios";
+import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
-import { BookOpen, MapPinned, ShowerHead } from "lucide-react";
-import { cn } from "./../../lib/utils";
-import { Textarea } from "./../ui/textarea";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { RootState, useSelector } from "../../redux/store";
-import Cookies from "js-cookie";
-import error from "next/error";
 import { Country, State, City, IState, ICity } from "country-state-city";
 
 const createPropertyAddressSchema = z.object({
@@ -73,7 +26,6 @@ const createPropertyAddressSchema = z.object({
   state: z.string().min(1, "State is required"),
   city: z.string().min(1, "City is required"),
   landmark: z.string().min(1, "Landmark is required"),
-  // zip_code: z.string().min(1, "Zipcode is required"),
   zip_code: z.string()
     .min(3, "Zip Code must be at least 3 digits")
     .max(6, "Zip Code cannot exceed 6 digits")
@@ -91,12 +43,6 @@ type Inputs = {
   landmark: string;
   zip_code: string;
 };
-
-// type State = {
-//   countryCode: any;
-//   isoCode: string;
-//   name: string;
-// };
 
 type Country = {
   isoCode: string;
@@ -122,16 +68,13 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
   const [loading, setLoading] = useState<boolean>(false);
   const [formLoading, setFormLoading] = useState<boolean>(false);
   const [error, setError] = useState(null);
-
   const [countries, setCountries] = useState<Country[]>([]);
   const [states, setStates] = useState<State[]>([]);
   const [cities, setCities] = useState<City[]>([]);
-
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedState, setSelectedState] = useState("");
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
-
   const [showCountryOptions, setShowCountryOptions] = useState(false);
 
   useEffect(() => {
@@ -173,31 +116,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
     setCities([]);
     setSelectedCity("");
   };
-
-  const toggleCountryOptions = () => {
-    setShowCountryOptions(!showCountryOptions);
-  };
-
-  // useEffect(() => {
-  //   if (selectedCountry && selectedState) {
-  //     const fetchedCities = City.getCitiesOfState(
-  //       selectedCountry,
-  //       selectedState
-  //     );
-  //     console.log("Fetched Cities:", fetchedCities);
-  //     setCities(fetchedCities);
-  //   }
-  // }, [selectedCountry, selectedState]);
-
-  // const { accessToken } = useSelector((state: RootState) => state.auth);
-  //  const property_id = useSearchParams().get("property_id");
-
   const property_id: string = useSearchParams().get("property_id") ?? "";
-
-  const router = useRouter();
-  // console.log("Router Details",router);
-  const pathname = usePathname();
-
   const form = useForm<Inputs>({
     defaultValues: {
       address_line_1: "",
@@ -211,7 +130,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
     resolver: zodResolver(createPropertyAddressSchema),
   });
 
-  const { register, control, handleSubmit, formState, setValue } = form;
+  const { register, handleSubmit, formState, setValue } = form;
   const {
     errors: {
       address_line_1: addressLine1Error,
@@ -265,35 +184,6 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
       setValue("state", propertyAddress.state || "");
       setSelectedCity(propertyAddress.city || "");
       setValue("city", propertyAddress.city || "");
-      // setValue("country", propertyAddress.country || "");
-      // setValue("state", propertyAddress.state || "");
-      // setValue("city", propertyAddress.city || "");
-
-      // const selectedCountryObj: any = countries.find(
-      //   (country) => country.isoCode === propertyAddress.country
-      // );
-      // setSelectedCountry(selectedCountryObj?.isoCode);
-      // const countryIsoCode = selectedCountryObj
-      //   ? selectedCountryObj.isoCode
-      //   : "";
-      // setValue("country", countryIsoCode);
-
-      // const selectedStateObj: any = states.find(
-      //   (state) =>
-      //     state.isoCode === propertyAddress.state &&
-      //     state.countryCode === countryIsoCode
-      //   // console.log(state.isoCode ,"===", countryIsoCode)
-      // );
-      // const stateName = selectedStateObj ? selectedStateObj.isoCode : "";
-      // setValue("state", stateName);
-      // setSelectedState(selectedStateObj?.isoCode);
-
-      // const selectedCityObj = cities.find(
-      //   (city) => city.name === propertyAddress.city
-      // );
-      // const cityName = selectedCityObj ? selectedCityObj.name : "";
-      // setValue("city", cityName);
-      // setSelectedCity(cityName);
       setValue("landmark", propertyAddress.landmark || "");
       setValue("zip_code", propertyAddress.zip_code.toString() || "");
     }
@@ -304,68 +194,12 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${property_id}`
       );
-      const propertyInfoData = response.data;
       onPrevious();
     } catch (error) {
       console.error("Error fetching property info data:", error);
     }
   };
 
-  // useEffect(() => {
-  //   addressLine1Error && toast.error(addressLine1Error.message!);
-  //   addressLine2Error && toast.error(addressLine2Error.message!);
-  //   countryError && toast.error(countryError.message!);
-  //   stateError && toast.error(stateError.message!);
-  //   cityError && toast.error(cityError.message!);
-  //   landmarkError && toast.error(landmarkError.message!);
-  //   zipCodeError && toast.error(zipCodeError.message!);
-  // }, [
-  //   addressLine1Error,
-  //   addressLine2Error,
-  //   countryError,
-  //   stateError,
-  //   cityError,
-  //   landmarkError,
-  //   zipCodeError,
-  // ]);
-  // const accessToken = Cookies.get("accessToken");
-
-  // console.log("Token from proerty adress tsx",accessToken)
-
-  // const onSubmit: SubmitHandler<Inputs> = async (data) => {
-  //   // console.log({ addressData: data });
-
-  //   const propertyCreateBody = {
-  //     ...data,
-  //     property_id: property_id,
-  //   };
-
-  //   setFormLoading(true);
-
-  //   try {
-  //     const {
-  //       data: { data: propertyAddressCreateResponse },
-  //     } = await axios.post(
-  //       `http://localhost:8040/api/v1/property/address`,
-  //       propertyCreateBody,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${accessToken}`,
-  //         },
-  //       }
-  //     );
-  //     console.log(propertyAddressCreateResponse);
-  //     setFormLoading(false);
-
-  //     onNext();
-  //     console.log("create new one")
-  //   } catch (err) {
-  //     if (axios.isAxiosError(err)) {
-  //       setFormLoading(false);
-  //       toast.error(err?.response?.data?.message);
-  //     }
-  //   }
-  // };
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setFormLoading(true);
@@ -384,20 +218,9 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
         );
         toast.success("Property address updated successfully!");
       } else {
-        // const selectedCountryObj = countries.find(
-        //   (country) => country.isoCode === selectedCountry
-        // );
-        // const countryName = selectedCountryObj ? selectedCountryObj.name : "";
-        // const selectedStateObj = states.find(
-        //   (state) => state.isoCode === selectedState
-        // );
-        // const stateName = selectedStateObj ? selectedStateObj.name : "";
-
         const propertyCreateBody = {
           ...data,
           property_id: property_id,
-          // country: countryName,
-          // state: stateName,
         };
         await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/address`,
@@ -468,13 +291,10 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
         </div>
 
         <div className=" flex md:flex-row w-full flex-col justify-center md:gap-3">
-          {/* Commented inputs for country and state */}
-
           <div className=" md:w-2/3  relative flex flex-col md:flex-row md:gap-3 ">
             <div className="md:w-1/2 w-full">
               <Label
                 htmlFor="country"
-              // className="text-gray-700  dark:text-gray-300"
               >
                 Country <span className="text-destructive">*</span>
               </Label>
@@ -535,7 +355,6 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
             <div className=" md:w-1/2 w-full relative">
               <Label
                 htmlFor="state"
-              // className="text-gray-700 dark:text-gray-300"
               >
                 State <span className="text-destructive">*</span>
               </Label>
@@ -597,7 +416,6 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
             <div className="self-end w-full relative">
               <Label
                 htmlFor="city"
-              // className="text-gray-700 dark:text-gray-300"
               >
                 City <span className="text-destructive">*</span>
               </Label>
@@ -658,7 +476,6 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
         </div>
 
         <div className="items-center justify-center gap-4">
-          {/* Commented city input */}
           <div className="flex md:flex-row flex-col md:gap-3  ">
             <div className="w-full md:w-1/2 ">
               <Label htmlFor="landmark">
@@ -691,7 +508,6 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
                 variant={zipCodeError && "error"}
                 {...register("zip_code")}
                 onChange={(e) => {
-                  // Only allow numbers
                   const value = e.target.value.replace(/\D/g, '');
                   if (value.length <= 6) {
                     e.target.value = value;

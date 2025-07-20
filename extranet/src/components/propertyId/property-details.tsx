@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Save, PenTool } from "lucide-react";
-import { PropertyData, EditedProperty, PropertyDetailsProps } from '../../types/property_type';
+import { PropertyDetailsProps } from '../../types/property_type';
 import { updateProperty } from '../../app/app/property/[propertyId]/api';
 import toast from 'react-hot-toast';
 
@@ -19,7 +19,7 @@ export function PropertyDetails({
   const [errors, setErrors] = useState({
     property_name: false,
     property_email: false,
-    property_contact: false
+    property_contact: false,
   });
   const [emailErrorMessage, setEmailErrorMessage] = useState('');
 
@@ -45,7 +45,7 @@ export function PropertyDetails({
       property_contact:
         !editedProperty.property_contact ||
         editedProperty.property_contact.trim().length !== 10 ||
-        !/^\d{10}$/.test(editedProperty.property_contact.trim())
+        !/^\d{10}$/.test(editedProperty.property_contact.trim()),
     };
 
     // Perform specific email validation
@@ -84,6 +84,17 @@ export function PropertyDetails({
       console.error('Error updating property data:', error);
       toast.error('Failed to update property');
     }
+  };
+
+  // Handler for textarea changes
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const syntheticEvent = {
+      target: {
+        name: e.target.name,
+        value: e.target.value
+      }
+    } as React.ChangeEvent<HTMLInputElement>;
+    handleInputChange?.(syntheticEvent);
   };
 
   return (
@@ -183,6 +194,22 @@ export function PropertyDetails({
                 )}
               </div>
             </div>
+
+            <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+              <label className="text-sm text-gray-500">
+                Description
+              </label>
+              <div>
+                <textarea
+                  name="description"
+                  value={editedProperty.description || ""}
+                  onChange={handleTextareaChange}
+                  placeholder="Enter description"
+                  rows={4}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
+                />
+              </div>
+            </div>
           </div>
         ) : (
           <div className="space-y-0">
@@ -206,12 +233,12 @@ export function PropertyDetails({
                     {property.data.property_contact || 'N/A'}
                   </div>
                 </div>
-                {/* <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">Property Type</div>
+                <div className="py-2 flex items-start">
+                  <div className="w-1/4 text-sm text-gray-500">Description</div>
                   <div className="w-3/4 text-sm font-medium break-words overflow-hidden">
-                    {property.data. || 'N/A'}
-                //   </div> */}
-                {/* // </div> */}
+                    {property.data.description || 'N/A'}
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="bg-muted/50 rounded-lg p-6 text-center">

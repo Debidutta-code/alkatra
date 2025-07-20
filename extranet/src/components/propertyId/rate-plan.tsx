@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardContent,
   CardTitle,
-  CardFooter,
 } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -28,8 +27,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "../../components/ui/dialog";
-import { PenTool, Plus, X, Save } from "lucide-react";
-import { Skeleton } from "../../components/ui/skeleton";
+import { PenTool, Plus, X } from "lucide-react";
 
 export const globalRoomMappings = {
   roomNameToId: {} as Record<string, string>,

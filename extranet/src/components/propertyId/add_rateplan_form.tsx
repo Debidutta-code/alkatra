@@ -21,14 +21,13 @@ type Inputs = {
     room_price: number,
     rate_plan_name: string,
     rate_plan_description?: string,
-    min_length_stay: number,    // minimum days a guest can stay
-    max_length_stay?: number,    // maximum days a guest can stay
-    min_book_advance: number,   // advance booking, minimum days before arrival
-    max_book_advance?: number    // advance booking, maximum days before arrival
+    min_length_stay: number,
+    max_length_stay?: number,
+    min_book_advance: number,
+    max_book_advance?: number
 };
 
 export const AddRatePlanForm = (arrayOfRooms: any) => {
-
     const form = useForm<Inputs>({
         defaultValues: {
             applicable_room_type: "",
@@ -36,10 +35,10 @@ export const AddRatePlanForm = (arrayOfRooms: any) => {
             room_price: 0,
             rate_plan_name: "",
             rate_plan_description: "",
-            min_length_stay: 0,    // minimum days a guest can stay
-            max_length_stay: 0,    // maximum days a guest can stay
-            min_book_advance: 0,   // advance booking, minimum days before arrival
-            max_book_advance: 0,    // advance booking, maximum days before arrival
+            min_length_stay: 0,
+            max_length_stay: 0,
+            min_book_advance: 0,
+            max_book_advance: 0,
         },
         resolver: zodResolver(createRatePlanSchema),
     });
@@ -52,7 +51,6 @@ export const AddRatePlanForm = (arrayOfRooms: any) => {
                 <select
                     className="block w-full px-4 py-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm focus:outline-white h-12"
                     {...register("applicable_room_type")}
-                // onChange={handleSelectChange}
                 >
                     <option value="">Select a rate plan</option>
                     {arrayOfRooms?.map((room: any) => (
@@ -62,25 +60,7 @@ export const AddRatePlanForm = (arrayOfRooms: any) => {
                         </option>
                     ))}
                 </select>
-                {/* <select
-                    id='applicable_room_type'
-                    className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-                    style={{ width: "400px" }}
-                    onChange={(e) => {
-                        // const selected = ratePlanList.find(plan => plan.price_category === e.target.value);
-                        // selected && setSelectedRatePlan(selected);
-                    }}
-                >
-                    <option value="">Select a rate plan</option>
-                    {arrayOfRooms?.map((room: any) => (
-                        room.rateplan_created === false &&
-                        <option key={room._id} value={room.room_name}>
-                            {room.room_name}
-                        </option>
-                    ))}
-                </select> */}
             </div>
-
             <button type='submit'>Submit</button>
         </form>
     )

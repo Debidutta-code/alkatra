@@ -15,7 +15,6 @@ const AmenityData = [
     "concierge_services", "pet_friendly", "business_facilities",
     "laundry_services", "child_friendly_facilities"
 ]
-
 const CreateAmenity = (handleCreateAmenity: any, requestType: any) => {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -40,12 +39,11 @@ const CreateAmenity = (handleCreateAmenity: any, requestType: any) => {
 
             await handleCreateAmenity(newData);
             setShowModal(false);
-            reset(); // Reset the form after successful submission
-        } 
+            reset();
+        }
         catch (error) {
             console.error('Error creating amenities:', error);
-            // TODO: Display error message to user
-        } 
+        }
         finally {
             setIsSubmitting(false);
         }
@@ -77,7 +75,6 @@ const CreateAmenity = (handleCreateAmenity: any, requestType: any) => {
                                 <CardTitle>Other Amenities</CardTitle>
                             </CardHeader>
                             <CardContent className="flex gap-4 flex-wrap">
-                                {/* Dynamically generate checkboxes for amenities */}
                                 {AmenityData.map((amenity: any) => (
                                     <div key={amenity} className="flex items-center space-x-2">
                                         <Checkbox

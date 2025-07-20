@@ -42,7 +42,7 @@ export default function RootLayout({
           <Triangle
             height="80"
             width="80"
-            color="#4fa94d"
+            color="#076DB3"
             ariaLabel="triangle-loading"
             visible={true}
           />

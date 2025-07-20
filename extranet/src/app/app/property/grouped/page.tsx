@@ -8,15 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../../../components
 import { Button } from "../../../../components/ui/button";
 import { Input } from "../../../../components/ui/input";
 import { Badge } from "../../../../components/ui/badge";
-import { 
-  Loader2, 
-  Search, 
-  MapPin, 
-  Star, 
-  Eye, 
+import { Triangle } from "react-loader-spinner";
+import {
+  Search,
+  Eye,
   Building2,
   Users,
-  Filter,
   Grid3X3,
   List
 } from "lucide-react";
@@ -92,11 +89,16 @@ const Page = () => {
 
   const LoadingState = () => (
     <div className="flex flex-col items-center justify-center py-24">
-      <div className="relative">
-        <div className="w-16 h-16 border-4 border-blue-200 rounded-full animate-pulse"></div>
-        <Loader2 className="w-8 h-8 text-blue-600 animate-spin absolute top-4 left-4" />
-      </div>
-      <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">Loading your properties...</p>
+      <Triangle
+        visible={true}
+        height={80}
+        width={80}
+        color="#076DB3"
+        ariaLabel="triangle-loading"
+      />
+      <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">
+        Loading your properties...
+      </p>
     </div>
   );
 
@@ -116,7 +118,7 @@ const Page = () => {
     <div className="group relative bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600">
       <div className="relative overflow-hidden">
         <img
-          src={hotel.image[0] }
+          src={hotel.image[0]}
           alt={`No image available for ${hotel.name}`}
           className="w-full h-48 object-cover transition-transform duration-300 "
           onError={(e) => {
@@ -126,7 +128,7 @@ const Page = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       </div>
-      
+
       <div className="p-5">
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
@@ -139,17 +141,17 @@ const Page = () => {
             </p>
           </div>
         </div>
-        
+
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Badge variant="secondary" className="text-xs">
               Active
             </Badge>
           </div>
-          
+
           <Link href={`/app/property/${hotel._id}`}>
-            <Button 
-              size="sm" 
+            <Button
+              size="sm"
               className="bg-tripswift-blue hover:bg-blue-700 text-white shadow-sm transition-all duration-200 hover:shadow-md"
             >
               <Eye className="w-4 h-4 mr-1" />
@@ -162,7 +164,7 @@ const Page = () => {
   );
 
   return (
-    
+
     <div className="min-h-screen bg-gradient-to-br md:mx-8 from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       {/* Header Section */}
       <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 top-0 z-10 backdrop-blur-sm bg-white/95 dark:bg-gray-900/95">
@@ -183,39 +185,39 @@ const Page = () => {
                 </div>
               </div>
             </div>
-            
-           <div className="flex flex-wrap items-center gap-3">
-  {/* Search Input */}
-  <div className="relative flex-grow min-w-[200px] sm:min-w-[250px]">
-    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-    <Input
-      placeholder="Search properties or groups..."
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-      className="pl-10 w-full bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500"
-    />
-  </div>
 
-  {/* View Mode Toggle */}
-  <div className="flex gap-2 items-center dark:bg-gray-800 rounded-lg p-1">
-    <Button
-      variant={viewMode === 'grid' ? 'default' : 'ghost'}
-      size="sm"
-      onClick={() => setViewMode('grid')}
-      className="px-3"
-    >
-      <Grid3X3 className="w-4 h-4" />
-    </Button>
-    <Button
-      variant={viewMode === 'list' ? 'default' : 'ghost'}
-      size="sm"
-      onClick={() => setViewMode('list')}
-      className="px-3"
-    >
-      <List className="w-4 h-4" />
-    </Button>
-  </div>
-</div>
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Search Input */}
+              <div className="relative flex-grow min-w-[200px] sm:min-w-[250px]">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  placeholder="Search properties or groups..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-full bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* View Mode Toggle */}
+              <div className="flex gap-2 items-center dark:bg-gray-800 rounded-lg p-1">
+                <Button
+                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('grid')}
+                  className="px-3"
+                >
+                  <Grid3X3 className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                  className="px-3"
+                >
+                  <List className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
 
           </div>
         </div>
@@ -246,17 +248,16 @@ const Page = () => {
                       </Badge>
                     </div>
                   </CardHeader>
-                  
+
                   <CardContent className="pt-0">
-                    <div className={`grid gap-2 md:gap-6 ${
-                      viewMode === 'grid' 
-                        ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3' 
-                        : 'grid-cols-1 md:grid-cols-2'
-                    }`}>
+                    <div className={`grid gap-2 md:gap-6 ${viewMode === 'grid'
+                      ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3'
+                      : 'grid-cols-1 md:grid-cols-2'
+                      }`}>
                       {group.hotels.map((hotel) => (
-                        <HotelCard 
-                          key={hotel._id} 
-                          hotel={hotel} 
+                        <HotelCard
+                          key={hotel._id}
+                          hotel={hotel}
                           groupName={group.groupManagerName}
                         />
                       ))}

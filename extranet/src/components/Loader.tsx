@@ -19,7 +19,7 @@ const Loader: React.FC = () => {
         visible={true}
         height={100}
         width={100}
-        color="#282D4D"
+        color="#076DB3"
         ariaLabel="triangle-loading"
       />
     </div>

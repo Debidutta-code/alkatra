@@ -6,11 +6,15 @@ import { Checkbox } from "../../components/ui/checkbox";
 import { Label } from "../../components/ui/label";
 import Image from 'next/image';
 import toast from 'react-hot-toast';
-import { Plus, Save, Trash2, Upload, PenTool } from "lucide-react";
+import { Plus, Save, Trash2, Upload, PenTool, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../../components/ui/dialog";
+import { useDropzone, FileRejection } from 'react-dropzone';
 
-// Define the RoomType interface
+interface IFileWithPreview extends File {
+  preview: string;
+}
+
 interface RoomType {
   _id: string;
   propertyInfo_id: string;
@@ -77,7 +81,9 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const arrayOfRooms = convertObjectOfObjectsToArray(rooms[0] || rooms);
   const [expandedDescriptions, setExpandedDescriptions] = useState<{ [key: string]: boolean }>({});
-
+  const [currentImageIndex, setCurrentImageIndex] = useState<{ [key: string]: number }>({});
+  const [files, setFiles] = useState<IFileWithPreview[]>([]);
+  const [rejected, setRejected] = useState<FileRejection[]>([]);
   // Function to toggle description expansion
   const toggleDescription = (roomId: string) => {
     setExpandedDescriptions(prev => ({
@@ -97,16 +103,16 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
     if (newRoom.total_room === 0) {
       errors.total_room = "Total Room is required."
     }
-    else if(newRoom.total_room <= 0){
+    else if (newRoom.total_room <= 0) {
       errors.total_room = "Minimum allowed value is 1"
     }
     ;
     if (newRoom.floor < 0) errors.floor = "Value must be greater than or equal to zero";
     // if (!newRoom.room_view) errors.room_view = "Room View is required.";
-    if (newRoom.room_size === 0){
-       errors.room_size = "Room Size is required."
+    if (newRoom.room_size === 0) {
+      errors.room_size = "Room Size is required."
     }
-    else if(newRoom.room_size <= 0){
+    else if (newRoom.room_size <= 0) {
       errors.room_size = "Minimum allowed value is 1"
     };
     if (!newRoom.room_unit) errors.room_unit = "Room Unit is required.";
@@ -114,26 +120,24 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
     if (newRoom.max_occupancy === 0) {
       errors.max_occupancy = "Max Occupancy is required."
     }
-    else if(newRoom.max_occupancy <= 0){
+    else if (newRoom.max_occupancy <= 0) {
       errors.max_occupancy = "Minimum allowed value is 1"
 
     };
-    if (newRoom.max_number_of_adults === 0){
-       errors.max_number_of_adults = "Max number of adults is required."
+    if (newRoom.max_number_of_adults === 0) {
+      errors.max_number_of_adults = "Max number of adults is required."
     }
-    else if(newRoom.max_number_of_adults <= 0){
-             errors.max_number_of_adults = "Minimum allowed value is 1"
+    else if (newRoom.max_number_of_adults <= 0) {
+      errors.max_number_of_adults = "Minimum allowed value is 1"
 
     };
     if (newRoom.max_number_of_children < 0) errors.max_number_of_children = "Value must be greater than or equal to zero";
-    if (newRoom.number_of_bedrooms === 0) {errors.number_of_bedrooms = "Number of bedrooms is required."}
-    else if(newRoom.number_of_bedrooms <= 0){
-      errors.number_of_bedrooms ="Minimum allowed value is 1"
+    if (newRoom.number_of_bedrooms === 0) { errors.number_of_bedrooms = "Number of bedrooms is required." }
+    else if (newRoom.number_of_bedrooms <= 0) {
+      errors.number_of_bedrooms = "Minimum allowed value is 1"
     };
     if (newRoom.number_of_living_room < 0) errors.number_of_living_room = "Value must be greater than or equal to zero";
     if (newRoom.extra_bed < 0) errors.extra_bed = "Value must be greater than or equal to zero";
-    // if (!newRoom.description) errors.description = "Description is required.";
-    // if (newRoom.image.length === 0) errors.image = "Room image is required.";
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -160,8 +164,10 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
       image: [],
       available: false
     });
-    setSelectedImage(null);
+    setFiles([]);
+    setRejected([]);
     setValidationErrors({});
+    setEditMode(false);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -185,7 +191,8 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
 
   const handleEditRoom = (room: RoomType) => {
     setNewRoom(room);
-    setSelectedImage(room.image?.[0] || null);
+    setFiles([]); // Clear any uploaded files
+    setRejected([]); // Clear any rejected files
     setShowModal(true);
     setEditMode(true);
   };
@@ -247,15 +254,40 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
 
   const handleSaveRoom = async () => {
     if (!validateForm()) return;
+
+    // Validate at least one image exists (either existing or new)
+    if (newRoom.image.length === 0 && files.length === 0) {
+      setValidationErrors(prev => ({ ...prev, image: "At least one image is required" }));
+      return;
+    }
+
     setIsSubmitting(true);
+
     try {
+      // Convert files to base64 strings
+      const imagePromises = files.map(file => {
+        return new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.readAsDataURL(file);
+        });
+      });
+
+      const newImages = await Promise.all(imagePromises);
+
+      const roomToSave = {
+        ...newRoom,
+        image: [...newRoom.image, ...newImages] // Combine existing and new images
+      };
+
       if (editMode) {
-        await onEditRoom(newRoom);
+        await onEditRoom(roomToSave);
         toast.success(`Room ${newRoom.room_name} updated successfully!`);
       } else {
-        await onAddRoom(newRoom);
+        await onAddRoom(roomToSave);
         toast.success(`Room ${newRoom.room_name} added successfully!`);
       }
+
       setShowModal(false);
       resetRoomForm();
     } catch (error) {
@@ -278,22 +310,56 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
 
   const handleCloseModal = () => {
     setShowModal(false);
+    setEditMode(false);
     resetRoomForm();
   };
 
   useEffect(() => {
     if (showModal) {
-      document.body.style.overflow = "hidden"; // Disable scrolling on background
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "auto"; // Re-enable scrolling when modal closes
+      document.body.style.overflow = "auto";
+      // Reset form when modal closes
+      if (!showModal) {
+        resetRoomForm();
+      }
     }
     return () => {
-      document.body.style.overflow = "auto"; // Cleanup when component unmounts
+      document.body.style.overflow = "auto";
     };
   }, [showModal]);
-  
 
-  // Render the Room Form in Dialog
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: {
+      'image/*': ['.jpeg', '.jpg', '.png', '.webp']
+    },
+    maxSize: 5 * 1024 * 1024, // 5MB
+    onDrop: (acceptedFiles, rejectedFiles) => {
+      if (acceptedFiles?.length) {
+        setFiles(previousFiles => [
+          ...previousFiles,
+          ...acceptedFiles.map(file =>
+            Object.assign(file, { preview: URL.createObjectURL(file) })
+          )
+        ]);
+      }
+
+      if (rejectedFiles?.length) {
+        setRejected(previousFiles => [...previousFiles, ...rejectedFiles]);
+      }
+    }
+  });
+
+  const removeFile = (name: string) => {
+    setFiles(files => files.filter(file => file.name !== name));
+  };
+
+  useEffect(() => {
+    return () => {
+      files.forEach(file => URL.revokeObjectURL(file.preview));
+    };
+  }, [files]);
+
   const renderRoomForm = () => (
     <>
       <div className="space-y-1">
@@ -328,7 +394,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
 
         {/* Total Rooms, Floor and Room View */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-1">
+          <div className="space-y-1 ">
             <Label htmlFor="total_room">Total Room <span className="text-destructive">*</span></Label>
             <Input
               id="total_room"
@@ -350,7 +416,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
               name="floor"
               min={0}
               type="number"
-              value={newRoom.floor ===0 ? "":newRoom.floor}
+              value={newRoom.floor === 0 ? "" : newRoom.floor}
               onChange={handleInputChange}
               placeholder="Floor"
               className={validationErrors.floor ? "border-destructive" : ""}
@@ -358,14 +424,14 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
             {validationErrors.floor && <p className="text-destructive text-sm">{validationErrors.floor}</p>}
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-1 ">
             <Label htmlFor="room_view">Room View </Label>
             <Input
               id="room_view"
               name="room_view"
               value={newRoom.room_view}
               onChange={handleInputChange}
-              placeholder="Garden/City/Ocean View"
+              placeholder="Sea facing"
               className={validationErrors.room_view ? "border-destructive" : ""}
             />
             {validationErrors.room_view && <p className="text-destructive text-sm">{validationErrors.room_view}</p>}
@@ -381,7 +447,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
               name="room_size"
               type="number"
               min={1}
-              value={newRoom.room_size===0 ? "": newRoom.room_size}
+              value={newRoom.room_size === 0 ? "" : newRoom.room_size}
               onChange={handleInputChange}
               placeholder="Room Size"
               className={validationErrors.room_size ? "border-destructive" : ""}
@@ -433,7 +499,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
               name="max_occupancy"
               type="number"
               min={1}
-              value={newRoom.max_occupancy ===0 ? "" : newRoom.max_occupancy}
+              value={newRoom.max_occupancy === 0 ? "" : newRoom.max_occupancy}
               onChange={handleInputChange}
               placeholder="Max Occupancy"
               className={validationErrors.max_occupancy ? "border-destructive" : ""}
@@ -448,7 +514,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
               name="max_number_of_adults"
               type="number"
               min={1}
-              value={newRoom.max_number_of_adults === 0 ? "":newRoom.max_number_of_adults}
+              value={newRoom.max_number_of_adults === 0 ? "" : newRoom.max_number_of_adults}
               onChange={handleInputChange}
               placeholder="Max number of adults"
               className={validationErrors.max_number_of_adults ? "border-destructive" : ""}
@@ -463,7 +529,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
               name="max_number_of_children"
               type="number"
               min={0}
-              value={newRoom.max_number_of_children === 0 ? "": newRoom.max_number_of_children}
+              value={newRoom.max_number_of_children === 0 ? "" : newRoom.max_number_of_children}
               onChange={handleInputChange}
               placeholder="Max number of children"
               className={validationErrors.max_number_of_children ? "border-destructive" : ""}
@@ -481,7 +547,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
               name="number_of_bedrooms"
               type="number"
               min={1}
-              value={newRoom.number_of_bedrooms=== 0 ?"" : newRoom.number_of_bedrooms}
+              value={newRoom.number_of_bedrooms === 0 ? "" : newRoom.number_of_bedrooms}
               onChange={handleInputChange}
               placeholder="Number of bedrooms"
               className={validationErrors.number_of_bedrooms ? "border-destructive" : ""}
@@ -496,7 +562,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
               name="number_of_living_room"
               type="number"
               min={0}
-              value={newRoom.number_of_living_room===0 ?"":newRoom.number_of_living_room}
+              value={newRoom.number_of_living_room === 0 ? "" : newRoom.number_of_living_room}
               onChange={handleInputChange}
               placeholder="Number of living rooms"
               className={validationErrors.number_of_living_room ? "border-destructive" : ""}
@@ -511,7 +577,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
               name="extra_bed"
               type="number"
               min={0}
-              value={newRoom.extra_bed ===0 ? "":newRoom.extra_bed}
+              value={newRoom.extra_bed === 0 ? "" : newRoom.extra_bed}
               onChange={handleInputChange}
               placeholder="Extra Bed"
               className={validationErrors.extra_bed ? "border-destructive" : ""}
@@ -524,7 +590,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
         <div className="space-y-1">
           <Label htmlFor="description" className="flex items-center">
             Description
-            <span className="ml-2 text-xs text-muted-foreground">
+            <span className="ml-2 text-sm text-muted-foreground">
               {newRoom.description.length} / 500 characters
             </span>
           </Label>
@@ -532,10 +598,9 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
             id="description"
             name="description"
             value={newRoom.description}
-            style={{resize:"none"}}
+            style={{ resize: "none" }}
             rows={3}
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-              // Create a synthetic event object compatible with handleInputChange
               const syntheticEvent = {
                 target: {
                   name: 'description',
@@ -543,15 +608,15 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
                 }
               } as React.ChangeEvent<HTMLInputElement>;
 
-              // Limit input to 500 characters
               const inputValue = e.target.value;
               if (inputValue.length <= 500) {
                 handleInputChange(syntheticEvent);
               }
             }}
             placeholder="Provide a detailed description of the room (max 500 characters)"
-            className={`w-full p-2 border rounded-md ${validationErrors.description ? "border-destructive" : ""} ${newRoom.description.length > 450 ? "border-yellow-500" : ""} sm:h-20 h-24`}
+            className={`w-full p-2 border rounded-md text-sm ${validationErrors.description ? "border-destructive" : ""} ${newRoom.description.length > 450 ? "border-yellow-500" : ""} sm:h-20 h-24`}
           />
+
           {validationErrors.description && (
             <p className="text-destructive text-sm">{validationErrors.description}</p>
           )}
@@ -563,8 +628,9 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
         </div>
 
         {/* Availability and Image Upload */}
-        <div className="flex flex-row justify-between gap-4 pt-2 md:pt-0">
-          <div className="flex items-center space-x-2">
+        <div className="space-y-6 pt-2 md:pt-0">
+          {/* Availability Checkbox */}
+          <div className="flex items-center space-x-2 p-4 rounded-lg border border-gray-200 bg-gray-50/50">
             <Checkbox
               id="available"
               checked={newRoom.available}
@@ -572,39 +638,178 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
                 handleCheckboxChange("available", checked === true)
               }
             />
-            <Label htmlFor="available">Available</Label>
+            <Label htmlFor="available" className="text-sm font-medium">
+              Mark this room as available for booking
+            </Label>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <Button
-              variant="outline"
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className={validationErrors.image ? "border-destructive" : ""}
-            >
-              <Upload className="h-4 w-4 mr-2" /> Upload Image
-            </Button>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleImageChange}
-              accept="image/*"
-              style={{ display: 'none' }}
-            />
+          {/* Image Upload Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-semibold">Room Images</Label>
+              <span className="text-xs text-muted-foreground">
+                {(newRoom.image?.length || 0) + files.length} image{((newRoom.image?.length || 0) + files.length) !== 1 ? 's' : ''} selected
+              </span>
+            </div>
 
-            {selectedImage ? (
-              <div className="flex items-center gap-2">
-                <span className="text-sm">Preview:</span>
-                <Image
-                  src={selectedImage}
-                  alt="Room preview"
-                  className="w-12 h-12 object-cover rounded"
-                  width={48}
-                  height={48}
-                />
+            {/* Main Upload Area */}
+            <div
+              {...getRootProps({
+                className: `relative border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-300 ${isDragActive ? 'border-primary bg-primary/10 scale-[1.02]' : 'border-gray-300'
+                  } ${validationErrors.image ? "border-destructive" : ""}`
+              })}
+            >
+              <input {...getInputProps()} />
+              <div className="flex flex-col items-center justify-center gap-3">
+                <div className={`p-3 rounded-full transition-colors ${isDragActive ? 'bg-primary/20' : 'bg-gray-100'}`}>
+                  <Upload className={`h-8 w-8 ${isDragActive ? 'text-primary' : 'text-gray-500'}`} />
+                </div>
+                {isDragActive ? (
+                  <div className="space-y-1">
+                    <p className="text-base font-medium text-primary">Drop your images here</p>
+                    <p className="text-sm text-gray-600">Release to upload</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <p className="text-base font-medium text-gray-700">
+                      Upload room images
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Drag & drop or <span className="text-primary font-medium underline">browse</span> to choose files
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      JPEG, PNG, WebP up to 5MB each
+                    </p>
+                  </div>
+                )}
               </div>
-            ) : (
-              validationErrors.image && <p className="text-destructive text-sm">{validationErrors.image}</p>
+            </div>
+
+            {/* Image Previews */}
+            {(editMode && newRoom.image?.length > 0 || files.length > 0) && (
+              <div className="space-y-4">
+                {/* Existing Images */}
+                {editMode && newRoom.image?.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="h-px bg-gray-200 flex-1"></div>
+                      <span className="text-sm font-medium text-gray-600 px-3">Current Images</span>
+                      <div className="h-px bg-gray-200 flex-1"></div>
+                    </div>
+                    <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+                      {newRoom.image.map((image, index) => (
+                        <div key={`existing-${index}`} className="relative group">
+                          <div className="aspect-square rounded-lg overflow-hidden border-2 border-gray-200 bg-gray-50">
+                            <Image
+                              src={image}
+                              alt={`Existing image ${index + 1}`}
+                              width={100}
+                              height={100}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setNewRoom(prev => ({
+                                ...prev,
+                                image: prev.image.filter((_, i) => i !== index)
+                              }));
+                            }}
+                            className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-lg hover:scale-110"
+                            title="Remove image"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Newly Uploaded Images */}
+                {files.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="h-px bg-gray-200 flex-1"></div>
+                      <span className="text-sm font-medium text-green-600 px-3">New Images</span>
+                      <div className="h-px bg-gray-200 flex-1"></div>
+                    </div>
+                    <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+                      {files.map((file, index) => (
+                        <div key={file.name} className="relative group">
+                          <div className="aspect-square rounded-lg overflow-hidden border-2 border-green-200 bg-green-50">
+                            <Image
+                              src={file.preview}
+                              alt={`Preview ${index + 1}`}
+                              width={100}
+                              height={100}
+                              className="w-full h-full object-cover"
+                              onLoad={() => {
+                                URL.revokeObjectURL(file.preview);
+                              }}
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeFile(file.name)}
+                            className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-lg hover:scale-110"
+                            title="Remove image"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                          {/* New image indicator */}
+                          <div className="absolute bottom-1 right-1 bg-green-500 text-white rounded-full p-1">
+                            <Plus className="h-2 w-2" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Error Messages */}
+            {rejected.length > 0 && (
+              <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0">
+                    <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center">
+                      <span className="text-red-600 text-xs font-bold">!</span>
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-medium text-red-800 mb-2">Some files couldn't be uploaded</h3>
+                    <div className="space-y-2">
+                      {rejected.map(({ file, errors }) => (
+                        <div key={file.name} className="text-sm text-red-700">
+                          <p className="font-medium">{file.name}</p>
+                          <ul className="mt-1 space-y-1">
+                            {errors.map(e => (
+                              <li key={e.code} className="text-xs text-red-600 ml-4">
+                                • {e.message}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* General Image Validation Error */}
+            {validationErrors.image && (
+              <div className="rounded-lg border border-red-200 bg-red-50 p-3">
+                <p className="text-sm text-red-600 flex items-center gap-2">
+                  <span className="w-4 h-4 rounded-full bg-red-100 flex items-center justify-center">
+                    <span className="text-red-600 text-xs font-bold">!</span>
+                  </span>
+                  {validationErrors.image}
+                </p>
+              </div>
             )}
           </div>
         </div>
@@ -645,23 +850,27 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
   return (
     <Card className="w-full shadow-sm hover:shadow-md transition-shadow duration-300">
       <CardHeader className="flex flex-row items-center justify-between border-b pb-3">
-      <CardTitle className="text-primary font-semibold text-lg sm:text-xl">Room Management</CardTitle>
-  <Button
-    variant="outline"
-    size="sm"
-    onClick={handleCreateRoom}
-    aria-label="Add a new room"
-  >
-    <Plus className="h-4 w-4 mr-1" /> Add Room
-  </Button>
+        <CardTitle className="text-primary font-semibold text-lg sm:text-xl">Room Management</CardTitle>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleCreateRoom}
+          aria-label="Add a new room"
+        >
+          <Plus className="h-4 w-4 mr-1" /> Add Room
+        </Button>
       </CardHeader>
 
       <CardContent className="pt-6">
         {/* Create/Edit Room Dialog */}
-        <Dialog open={showModal} onOpenChange={setShowModal}>
-          <DialogContent className="max-w-[95vw] md:max-w-[80vw] lg:max-w-[65vw] xl:max-w-[50vw] max-h-[95vh] overflow-y-auto"
-          onInteractOutside={(e) => e.preventDefault()}
-    onPointerDownOutside={(e) => e.preventDefault()}>
+        <Dialog open={showModal} onOpenChange={(open) => {
+          if (!open) {
+            handleCloseModal();
+          }
+        }}>
+          <DialogContent
+            className="max-w-[95vw] md:max-w-[80vw] lg:max-w-[65vw] xl:max-w-[50vw] max-h-[95vh] overflow-y-auto"
+          >
             <DialogHeader>
               <DialogTitle>
                 {editMode ? 'Edit Room' : 'Add New Room'}
@@ -681,19 +890,108 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
                   className="overflow-hidden hover:shadow-lg transition-shadow duration-300 border-2"
                 >
                   <CardContent className="p-0">
-                    {/* Large Image Section */}
-                    <div className="w-full h-64 md:h-80 overflow-hidden">
+                    {/* Enhanced Large Image Section with Multiple Images */}
+                    <div className="w-full h-64 md:h-80 overflow-hidden relative group">
                       {room.image && room.image.length > 0 ? (
-                        <Image
-                          src={room.image[0]}
-                          alt={room.room_name}
-                          className="w-full h-full object-cover"
-                          width={1000}
-                          height={400}
-                        />
+                        <div className="relative w-full h-full">
+                          {/* Main Image Display */}
+                          <div className="w-full h-full overflow-hidden">
+                            <Image
+                              src={room.image[currentImageIndex[room._id] || 0]}
+                              alt={`${room.room_name} - Image ${(currentImageIndex[room._id] || 0) + 1}`}
+                              className="w-full h-full object-cover transition-transform duration-300"
+                              width={1000}
+                              height={400}
+                            />
+                          </div>
+
+                          {/* Navigation Arrows - Only show if multiple images */}
+                          {room.image.length > 1 && (
+                            <>
+                              <button
+                                onClick={() => {
+                                  const newIndex = (currentImageIndex[room._id] || 0) === 0
+                                    ? room.image.length - 1
+                                    : (currentImageIndex[room._id] || 0) - 1;
+                                  setCurrentImageIndex(prev => ({ ...prev, [room._id]: newIndex }));
+                                }}
+                                className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                aria-label="Previous image"
+                              >
+                                <ChevronLeft className="h-4 w-4" />
+                              </button>
+
+                              <button
+                                onClick={() => {
+                                  const newIndex = (currentImageIndex[room._id] || 0) === room.image.length - 1
+                                    ? 0
+                                    : (currentImageIndex[room._id] || 0) + 1;
+                                  setCurrentImageIndex(prev => ({ ...prev, [room._id]: newIndex }));
+                                }}
+                                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                aria-label="Next image"
+                              >
+                                <ChevronRight className="h-4 w-4" />
+                              </button>
+                            </>
+                          )}
+
+                          {/* Image Counter Badge */}
+                          {room.image.length > 1 && (
+                            <div className="absolute top-3 right-3 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-medium">
+                              {(currentImageIndex[room._id] || 0) + 1} / {room.image.length}
+                            </div>
+                          )}
+
+                          {/* Dot Indicators - Only show if multiple images */}
+                          {room.image.length > 1 && (
+                            <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                              {room.image.map((_, index) => (
+                                <button
+                                  key={index}
+                                  onClick={() => setCurrentImageIndex(prev => ({ ...prev, [room._id]: index }))}
+                                  className={`w-2 h-2 rounded-full transition-all duration-300 ${index === (currentImageIndex[room._id] || 0)
+                                    ? 'bg-white scale-125'
+                                    : 'bg-white/50 hover:bg-white/70'
+                                    }`}
+                                  aria-label={`Go to image ${index + 1}`}
+                                />
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Thumbnail Strip - Show on hover for multiple images */}
+                          {room.image.length > 1 && (
+                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 opacity-100 transition-opacity duration-300">
+                              <div className="flex space-x-2 overflow-x-auto scrollbar-hide">
+                                {room.image.map((img, index) => (
+                                  <button
+                                    key={index}
+                                    onClick={() => setCurrentImageIndex(prev => ({ ...prev, [room._id]: index }))}
+                                    className={`flex-shrink-0 w-16 h-12 rounded-md overflow-hidden border-2 transition-all duration-300 ${index === (currentImageIndex[room._id] || 0)
+                                      ? 'border-white scale-105'
+                                      : 'border-white/50 hover:border-white/80'
+                                      }`}
+                                  >
+                                    <Image
+                                      src={img}
+                                      alt={`${room.room_name} thumbnail ${index + 1}`}
+                                      className="w-full h-full object-cover"
+                                      width={64}
+                                      height={48}
+                                    />
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       ) : (
                         <div className="w-full h-full bg-muted flex items-center justify-center">
-                          <p className="text-muted-foreground">No Image Available</p>
+                          <div className="text-center">
+                            <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
+                            <p className="text-muted-foreground">No Image Available</p>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -793,9 +1091,9 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
                         </div>
                       </div>
 
-
                       {/* Action Buttons */}
-                      <div className="flex flex-col sm:flex-row sm:justify-end mt-6 space-y-1 sm:space-y-0 sm:space-x-4 px-4 sm:px-0">                        <Button
+                      <div className="flex flex-col sm:flex-row sm:justify-end mt-6 space-y-1 sm:space-y-0 sm:space-x-4 px-4 sm:px-0">
+                        <Button
                           variant="destructive"
                           onClick={() => handleDeleteRoom(room._id, room.room_name)}
                         >

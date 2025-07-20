@@ -4,7 +4,6 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -26,8 +25,6 @@ import {
   Briefcase,
   ShowerHead,
   Baby,
-  ShieldCheck,
-  Home,
   Ban,
   Accessibility,
   Users,
@@ -52,7 +49,6 @@ import {
 import { Skeleton } from "../../components/ui/skeleton";
 import toast from "react-hot-toast";
 
-// Define the AmenityData interface - Updated with all amenities from schema
 interface AmenityData {
   destination_type: string;
   property_type: string;
@@ -77,10 +73,8 @@ interface AmenityData {
   };
 }
 
-// Define the EditedAmenity interface
 interface EditedAmenity extends AmenityData { }
 
-// Define a type for the keys of the amenities
 type AmenityKeys = keyof AmenityData["amenities"];
 
 interface PropertyData {
@@ -102,8 +96,6 @@ interface AmenitiesProps {
   property: { data: PropertyData };
   handleCreateAmenity: (newAmenity: EditedAmenity) => Promise<void>;
 }
-
-// Updated AmenityData array with all amenities from schema
 const AmenityData: AmenityKeys[] = [
   "wifi",
   "swimming_pool",
@@ -122,13 +114,8 @@ const AmenityData: AmenityKeys[] = [
   "facilities_for_disabled_guests",
   "family_rooms",
 ];
-
-// Define options for destination types and property types
 const destinationTypes = ["RESORT", "VACATION RENTAL"];
-
 const propertyTypes = ["COMMERCIAL PROPERTY", "INDUSTRIAL PROPERTY"];
-
-// Updated amenity icons mapping with new amenities
 const amenityIcons: Record<string, React.ReactNode> = {
   wifi: <Wifi className="h-3.5 w-3.5 mr-1" />,
   swimming_pool: <Droplets className="h-3.5 w-3.5 mr-1" />,
@@ -148,7 +135,6 @@ const amenityIcons: Record<string, React.ReactNode> = {
   family_rooms: <Users className="h-3.5 w-3.5 mr-1" />,
 };
 
-// Helper function to format amenity labels
 const formatAmenityLabel = (amenityKey: string): string => {
   const labelMap: Record<string, string> = {
     wifi: "WiFi",
@@ -192,13 +178,9 @@ export function Amenities({
     Record<string, boolean>
   >({});
   const [amenityError, setAmenityError] = useState<string | null>(null);
-
-  // State for selected dropdown values
   const [selectedDestinationType, setSelectedDestinationType] =
     useState<string>("");
   const [selectedPropertyType, setSelectedPropertyType] = useState<string>("");
-
-  // Use react-hook-form for form handling
   const {
     register,
     handleSubmit,
@@ -206,7 +188,6 @@ export function Amenities({
     reset,
     setValue,
     watch,
-    control,
     clearErrors,
   } = useForm<EditedAmenity>({
     defaultValues: editedAmenity,
@@ -218,12 +199,8 @@ export function Amenities({
       setValue("destination_type", amenity.destination_type);
       setValue("property_type", amenity.property_type);
       setValue("no_of_rooms_available", amenity.no_of_rooms_available);
-
-      // Set local state for dropdown values
       setSelectedDestinationType(amenity.destination_type);
       setSelectedPropertyType(amenity.property_type);
-
-      // Set the values for amenities checkboxes
       AmenityData.forEach((key) => {
         setValue(`amenities.${key}`, amenity.amenities[key] || false);
       });
@@ -236,7 +213,6 @@ export function Amenities({
     }
   }, [property]);
 
-  // Handle form submission for creating amenities
   const onSubmit = async (data: EditedAmenity) => {
     setIsSubmitting(true);
 
@@ -246,28 +222,20 @@ export function Amenities({
           ([_, value]) => value === true
         )
       );
-
-      // Check if at least one amenity is selected
       if (Object.keys(selectedAmenities).length === 0) {
         setAmenityError("Please select at least one amenity.");
         toast.error("Please select at least one amenity.");
         setIsSubmitting(false);
         return;
       }
-      setAmenityError(null); // Clear error if user fixed it
-
+      setAmenityError(null);
       const newData = {
         destination_type: selectedDestinationType || data.destination_type,
         property_type: selectedPropertyType || data.property_type,
         no_of_rooms_available: data.no_of_rooms_available,
         amenities: { ...selectedAmenities },
       };
-
-      console.log("new data", newData);
-
       await handleCreateAmenity(newData);
-
-      // Success flow
       setShowCreateModal(false);
       reset();
       setSelectedDestinationType("");
@@ -281,13 +249,11 @@ export function Amenities({
       setIsSubmitting(false);
     }
   };
-
-  // Handle form submission for editing amenities
   const onEditSubmit = async (data: EditedAmenity) => {
     setIsSubmitting(true);
     try {
       const selectedAmenities = Object.fromEntries(
-        Object.entries(data.amenities).filter(([key, value]) => value === true)
+        Object.entries(data.amenities).filter(([, value]) => value === true)
       );
       if (Object.keys(selectedAmenities).length === 0) {
         setAmenityError("Please select at least one amenity.");
@@ -304,16 +270,10 @@ export function Amenities({
           ...selectedAmenities,
         },
       };
-
       await handleAmenitySaveClick(newData);
       handleAmenityEditClick();
       reset();
-
-      // Update the amenity state to reflect the new data
       setAmenity(newData);
-      console.log("new data", newData);
-
-      // Show success toast notification
       toast.success("Property Amenities updated successfully!");
     } catch (error) {
       console.error("Error editing amenities:", error);
@@ -322,27 +282,12 @@ export function Amenities({
       setIsSubmitting(false);
     }
   };
-
-  // Handle selection changes for dropdowns
-  const handleDestinationTypeChange = (value: string) => {
-    setValue("destination_type", value);
-    setSelectedDestinationType(value);
-  };
-
-  const handlePropertyTypeChange = (value: string) => {
-    setValue("property_type", value);
-    setSelectedPropertyType(value);
-  };
-
-  // Function to get formatted property detail
   const getPropertyDetail = (label: string, value: string | number) => (
     <div className="flex flex-col space-y-1 mb-3">
       <span className="text-xs text-muted-foreground">{label}</span>
       <span className="text-sm font-medium">{value}</span>
     </div>
   );
-
-  // Render amenity form
   const renderAmenityForm = (
     onSubmitHandler: (data: EditedAmenity) => Promise<void>,
     formTitle: string,

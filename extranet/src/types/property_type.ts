@@ -43,11 +43,13 @@ export interface PropertyData {
     property_name: string;
     property_email: string;
     property_contact: string;
+    description:string;
 }
 export interface EditedProperty {
     property_name: string;
     property_email: string;
     property_contact: string;
+    description: string;
 }
 export interface PropertyDetailsProps {
     property: { data: PropertyData };
