@@ -84,7 +84,7 @@ cron.schedule("*/1 * * * *", async () => {
       console.log(`[AUTO-CANCEL] ${cryptoPaymentDetails.modifiedCount} pending payments marked as Cancelled.`);
     }
     if (cryptoGuestDetails.modifiedCount > 0) {
-      console.log(`[AUTO-CANCEL] ${cryptoGuestDetails.modifiedCount} processing payments marked as Cancelled.`);
+      console.log(`[AUTO-CANCEL] ${cryptoGuestDetails.modifiedCount} processing guest details initiated payments marked as Cancelled.`);
     }
     console.log("--------***-----------");
   } catch (error) {

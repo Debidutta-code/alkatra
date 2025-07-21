@@ -37,9 +37,25 @@ interface Room {
   _id: string;
   room_name: string;
   room_type: string;
-  room_price: number;
+  room_price?: number | null; // Optional to match backend
+  currency_code: string;
+  has_valid_rate: boolean;
+  max_occupancy: number;
   propertyInfo_id?: string;
   property_id?: string;
+  rate_plan_code: string;
+  room_size: number;
+  baseByGuestAmts?: {
+    amountBeforeTax: number;
+    numberOfGuests: number;
+    _id: string;
+  }[];
+  image?: string[];
+  amenities?: string[];
+  description?: string;
+  max_number_of_adults?: number;
+  max_number_of_children?: number;
+  room_view?: string;
   [key: string]: any;
 }
 
@@ -205,11 +221,12 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     guestData: any
   ) => {
     try {
-      console.log("gust data", guestData);
+      console.log("guest data", guestData);
+      const hotelCode = sessionStorage.getItem("propertyCode");
       const finalPriceResponse = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomRentPrice`,
         {
-          hotelCode: "WINCLOUD",
+          hotelCode: hotelCode,
           invTypeCode: selectedRoom?.room_type,
           startDate: checkInDate,
           endDate: checkOutDate,

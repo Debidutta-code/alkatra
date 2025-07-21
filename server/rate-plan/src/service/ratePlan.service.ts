@@ -204,6 +204,7 @@ class RoomRentCalculationService {
 
     try {
       // Input validation
+      console.log(`The data we get in RatePlanService:${hotelcode}, ${invTypeCode}, ${startDate}, ${endDate}, ${noOfChildrens}, ${noOfAdults}, ${noOfRooms}`);
       const validationResult = this.validateInputs(
         hotelcode,
         invTypeCode,
@@ -280,7 +281,6 @@ class RoomRentCalculationService {
         };
       }
 
-      // Properly collect available rooms from inventory
       const availableRooms: number[] = [];
       inventory.forEach((i) => {
         if (i.inventory?.availability?.count && i.inventory.availability.count > 0) {
@@ -290,7 +290,6 @@ class RoomRentCalculationService {
 
       console.log('Available Rooms Array:', availableRooms);
 
-      // Skip room availability check if no availability data (focus on rates only)
       let minimumRoomAvailable = 0;
       if (availableRooms.length > 0) {
         minimumRoomAvailable = Math.min(...availableRooms);
@@ -303,9 +302,8 @@ class RoomRentCalculationService {
           };
         }
       } else {
-        // If no availability data, assume sufficient rooms (focus on rate calculation)
         console.log('No availability data found, proceeding with rate calculation only');
-        minimumRoomAvailable = noOfRooms; // Assume requested rooms are available
+        minimumRoomAvailable = noOfRooms;
       }
 
       // Calculate total rent day-by-day

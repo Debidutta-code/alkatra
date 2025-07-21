@@ -27,6 +27,7 @@ import {
   CreditCard,
   AlertCircle
 } from "lucide-react";
+import { error } from "console";
 
 interface AmendReservationModalProps {
   booking: Booking;
@@ -254,11 +255,15 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
           children: guestBreakdown.children,
           infants: guestBreakdown.infants,
         };
-
+        const hotelCode = sessionStorage.getItem("propertyCode");
+        if (!hotelCode) {
+          return error(t('Hotel code not found in Amend Reservation Modal'));
+        }
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomRentPrice`,
           {
-            hotelCode: booking.hotelCode,
+            // hotelCode: booking.hotelCode,
+            hotelCode: hotelCode,
             invTypeCode: roomTypeCode,
             startDate: dateRange[0].format('YYYY-MM-DD'),
             endDate: dateRange[1].format('YYYY-MM-DD'),
@@ -323,10 +328,13 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
     guestData: any
   ) => {
     try {
+      const hotelCode = sessionStorage.getItem("propertyCode");
+
       const finalPriceResponse = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomRentPrice`,
         {
-          hotelCode: booking.hotelCode,
+          // hotelCode: booking.hotelCode,
+          hotelCode: hotelCode,
           invTypeCode: selectedRoom?.room_type,
           startDate: checkInDate,
           endDate: checkOutDate,

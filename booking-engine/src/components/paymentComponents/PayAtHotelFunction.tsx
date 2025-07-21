@@ -160,11 +160,11 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
         throw new Error(t('Payment.PaymentComponents.PayAtHotelFunction.cardSetupFailedError'));
       }
       console.log("Card setup successful, creating booking...");
-
+      const hotelCode = sessionStorage.getItem("propertyCode");
       const bookingPayload = {
         checkInDate: bookingDetails.checkIn,
         checkOutDate: bookingDetails.checkOut,
-        hotelCode: "WINCLOUD",
+        hotelCode: hotelCode || '',
         hotelName: bookingDetails.hotelName || " ",
         ratePlanCode: bookingDetails.ratePlanCode || " ",
         numberOfRooms: bookingDetails.rooms || 1,

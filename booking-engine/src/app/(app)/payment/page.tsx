@@ -63,8 +63,8 @@ function PaymentPageContent() {
   const checkIn = searchParams.get('checkIn') || '';
   const checkOut = searchParams.get('checkOut') || '';
   const userId = authUser?._id || searchParams.get('userId') || '';
-  const hotelName = searchParams.get('hotelName') || 'Unknown Hotel';
-  const hotelCode = searchParams.get('hotelCode') || 'WINCLOUD';
+  const hotelName = searchParams.get('hotelName');
+  const hotelCode = searchParams.get('hotelCode');
   const ratePlanCode = searchParams.get('ratePlanCode')?.toUpperCase() || '';
   const roomType = searchParams.get('roomType') || '';
 
@@ -102,13 +102,10 @@ function PaymentPageContent() {
     }
   })();
 
-  // Calculate nights between check-in and check-out
   const nights = calculateNights(checkIn, checkOut);
 
-  // Calculate rate per night
   const ratePerNight = amount / (nights || 1);
 
-  // Compile all booking details in one object to pass to payment components
   const bookingDetails = {
     roomId,
     propertyId,
@@ -339,7 +336,12 @@ function PaymentPageContent() {
                               },
                             }}
                           >
-                            <PayAtHotelFunction bookingDetails={bookingDetails} />
+                            <PayAtHotelFunction
+                              bookingDetails={{
+                                ...bookingDetails,
+                                hotelName: bookingDetails.hotelName ?? undefined // Convert null to undefined
+                              }}
+                            />
                           </Elements>
                         ) : paymentOption === "payWithCrypto-payWithQR" ? (
                           <PayWithCryptoQR

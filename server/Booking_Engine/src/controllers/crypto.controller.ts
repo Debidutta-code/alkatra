@@ -104,6 +104,7 @@ export const getCryptoDetails = CatchAsyncError(
 export const currencyConversion = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const { currency, amount } = req.body;
+    console.log(`The data get from UI for currency conversion is:\n#################### ${JSON.stringify(req.body)}`);
     const requiredFields = { currency, amount };
 
     const missingFields = Object.entries(requiredFields)
@@ -114,6 +115,16 @@ export const currencyConversion = CatchAsyncError(async (req: AuthenticatedReque
       return res.status(400).json({
         message: `Missing required fields: ${missingFields.join(", ")}`,
       });
+    }
+
+    if (currency.toUpperCase() === "USD") {
+      return res.status(200).json({
+      message: "Currency conversion successful",
+      data: {
+        convertedAmount : amount,
+        conversionRate: 0,
+      },
+    });
     }
 
     let conversionRate = parseFloat(process.env.CURRENCY_CONVERSION_BASE_RATE || "0");

@@ -303,8 +303,8 @@ const updatePropertyInfo = catchAsync(
       property_name,
       property_email,
       property_contact,
-      star_rating,
-      property_code,
+      // star_rating,
+      // property_code,
       image,
       description,
     } = req.body;
@@ -324,12 +324,12 @@ const updatePropertyInfo = catchAsync(
     }
 
     // Check for duplicate property_code if changed
-    if (property_code && property_code !== property.property_code) {
-      const existingCode = await PropertyInfo.findOne({ property_code });
-      if (existingCode) {
-        return next(new AppError("A property already exists with this property code", 400));
-      }
-    }
+    // if (property_code && property_code !== property.property_code) {
+    //   const existingCode = await PropertyInfo.findOne({ property_code });
+    //   if (existingCode) {
+    //     return next(new AppError("A property already exists with this property code", 400));
+    //   }
+    // }
     const updateProperty = await PropertyInfo.findByIdAndUpdate(
       propertInfoId,
       {
@@ -337,8 +337,8 @@ const updatePropertyInfo = catchAsync(
           property_name,
           property_email,
           property_contact,
-          star_rating,
-          property_code,
+          // star_rating,
+          // property_code,
           image,
           description,
         }

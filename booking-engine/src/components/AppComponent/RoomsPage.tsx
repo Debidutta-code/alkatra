@@ -50,9 +50,14 @@ interface Room {
   propertyInfo_id: string;
   rate_plan_code: string;
   room_name: string;
-  room_price: number;
   room_size: number;
   room_type: string;
+  room_price?: number | null;
+  baseByGuestAmts?: {
+    amountBeforeTax: number;
+    numberOfGuests: number;
+    _id: string;
+  }[];
   image?: string[];
   amenities?: string[];
   description?: string;
@@ -65,9 +70,11 @@ interface RoomResponse {
   success: boolean;
   data: Room[];
 }
+
 interface PropertyDetails {
   _id?: string;
   property_name: string;
+  property_code: string;
   property_address:
   | string
   | {
@@ -108,14 +115,14 @@ const RoomsPage: React.FC = () => {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [filterType, setFilterType] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [propertyDetails, setPropertyDetails] =
-    useState<PropertyDetails | null>(null);
+  const [propertyDetails, setPropertyDetails] = useState<PropertyDetails | null>(null);
   const [qrCodeData, setQrCodeData] = useState({
     qrCode: null,
     couponCode: null,
   });
   const [showPropertyDetails, setShowPropertyDetails] = useState<boolean>(true);
   const [selectedImage, setSelectedImage] = useState<number>(0);
+  const [propertyCode, setPropertyCode] = useState<string>("");
 
   // New state for handling 400 error
   const [showRoomNotAvailable, setShowRoomNotAvailable] = useState<boolean>(false);
@@ -182,6 +189,8 @@ const RoomsPage: React.FC = () => {
           propertyResponse.data;
         console.log("Property Details:", propDetails);
         setPropertyDetails(propDetails);
+        setPropertyCode(propDetails.property_code);
+        sessionStorage.setItem("propertyCode", propDetails.property_code);
       } catch (error) {
         console.error("Error fetching property:", error);
       }
@@ -196,14 +205,17 @@ const RoomsPage: React.FC = () => {
 
       setIsLoading(true);
       setShowRoomNotAvailable(false); // Reset error state
-
+      console.log("Fetching rooms for property:", propertyId, "with code:", propertyCode);
+      if (!propertyCode) {
+        return;
+      }
       try {
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}?numberOfRooms=${guestDetails?.rooms || 1}`,
           {
             startDate: checkInDate,
             endDate: checkOutDate,
-            hotelCode: "WINCLOUD",
+            hotelCode: propertyCode,
           }
         );
         setRooms(response.data);
@@ -229,8 +241,10 @@ const RoomsPage: React.FC = () => {
     };
 
     fetchRooms();
-  }, [propertyId, checkInDate, checkOutDate]);
-
+  }, [propertyId, checkInDate, checkOutDate, propertyCode]);
+  useEffect(() => {
+    console.log("The property code we get from api: ", propertyCode);
+  }, [propertyCode]);
   useEffect(() => {
     if (showRoomNotAvailable) {
       document.body.style.overflow = 'hidden';
@@ -324,7 +338,14 @@ const RoomsPage: React.FC = () => {
     setSelectedRoom(room);
     setIsModalOpen(true);
     dispatch(setRoomId(room._id));
-    dispatch(setAmount(room.room_price.toString()));
+
+    // Use amountBeforeTax from baseByGuestAmts
+    const guestCount = guestDetails?.guests || 1;
+    const matchingRate =
+      room.baseByGuestAmts?.find((rate) => rate.numberOfGuests === guestCount) ||
+      room.baseByGuestAmts?.[0];
+    const amount = matchingRate ? matchingRate.amountBeforeTax.toFixed(2) : "0.00";
+    dispatch(setAmount(amount));
   };
 
   const confirmBooking = (formData: {
@@ -352,9 +373,9 @@ const RoomsPage: React.FC = () => {
       email: formData.email,
       phone: formData.phone,
       userId: formData.userId || "",
-      hotelName: propertyDetails?.property_name || "Unknown Hotel",
-      ratePlanCode: selectedRoom?.rate_plan_code || "SUT",
-      roomType: selectedRoom?.room_type || "SUT",
+      hotelName: propertyDetails?.property_name || "",
+      ratePlanCode: selectedRoom?.rate_plan_code || "",
+      roomType: selectedRoom?.room_type || "",
       ...(formData.rooms ? { rooms: formData.rooms.toString() } : {}),
       ...(formData.adults ? { adults: formData.adults.toString() } : {}),
       ...(formData.children ? { children: formData.children.toString() } : {}),
@@ -363,7 +384,6 @@ const RoomsPage: React.FC = () => {
         ? { guests: encodeURIComponent(JSON.stringify(formData.guests)) }
         : {}),
     }).toString();
-
     router.push(`/payment?${queryParams}`);
   };
 
@@ -1063,22 +1083,30 @@ const RoomsPage: React.FC = () => {
 
         {/* Rooms grid */}
         {!isLoading && filteredRooms.length > 0 && (
-          <div className="space-y-3.5">
-            {filteredRooms.map((room) => (
-              <RoomCard
-                key={room._id}
-                data={convertAmenities(room)}
-                price={
-                  room.has_valid_rate
-                    ? `${room.currency_code} ${room.room_price}`
-                    : t("RoomsPage.priceNotAvailable")
-                }
-                onBookNow={() => handleBookNow(room)}
-                isPriceAvailable={room.has_valid_rate}
-              />
-            ))}
-          </div>
-        )}
+  <div className="space-y-3.5">
+    {filteredRooms.map((room) => {
+      // Determine the price to display
+      let displayPrice = t("RoomsPage.priceNotAvailable");
+      if (room.has_valid_rate && room.baseByGuestAmts && room.baseByGuestAmts.length > 0) {
+        const guestCount = guestDetails?.guests || 1;
+        const matchingRate =
+          room.baseByGuestAmts.find((rate) => rate.numberOfGuests === guestCount) ||
+          room.baseByGuestAmts[0]; // Fallback to first rate
+        displayPrice = `${room.currency_code} ${matchingRate.amountBeforeTax.toFixed(2)}`;
+      }
+
+      return (
+        <RoomCard
+          key={room._id}
+          data={convertAmenities(room)}
+          price={displayPrice}
+          onBookNow={() => handleBookNow(room)}
+          isPriceAvailable={room.has_valid_rate}
+        />
+      );
+    })}
+  </div>
+)}
       </div>
 
       {/* Guest Information Modal */}

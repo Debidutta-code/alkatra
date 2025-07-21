@@ -25,9 +25,14 @@ interface RoomData {
   propertyInfo_id: string;
   rate_plan_code: string;
   room_name: string;
-  room_price: number;
   room_size: number;
   room_type: string;
+  room_price?: number | null; // Optional, as it’s null in backend
+  baseByGuestAmts?: {
+    amountBeforeTax: number;
+    numberOfGuests: number;
+    _id: string;
+  }[];
   // Optional fields
   image?: string[];
   amenities?: { icon: string; name: string }[];

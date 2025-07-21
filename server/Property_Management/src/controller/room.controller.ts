@@ -208,7 +208,7 @@ const getRoomById = catchAsync(async (req: Request, res: Response, next: NextFun
     return next(new AppError("Room Id is required", 400));
   }
 
-  // console.log("Room: ", await Room.find({ propertyInfo_id: id }));
+
 
   const room = await Room.aggregate([
     { $match: { _id: new mongoose.Types.ObjectId(id) } },
@@ -301,6 +301,7 @@ const getRoomsByPropertyId = catchAsync(async (req: Request, res: Response, next
 })
 
 const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  console.log("Entering into getRoomsByPropertyId2 controller");
   const propertyInfoId = req.params.id;
   const numberOfRooms = parseInt(req.query.numberOfRooms as string);
   let { startDate, endDate, hotelCode } = req.body;
@@ -309,6 +310,26 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
     return next(new AppError("Required fields are missing", 400));
   }
 
+  console.log(`The data get from UI: ${startDate}, ${endDate}, ${hotelCode}`);
+
+  // 1. match Property Id with property details schema
+  const propertyDetails = await PropertyInfo.findById(propertyInfoId);
+  if (!propertyDetails || propertyDetails.property_code !== hotelCode) {
+    return next(new AppError(`Property not found or propertycode mismatch`, 404));
+  }
+
+  // 2. Match Room
+  const room = await Room.find({ propertyInfo_id: propertyInfoId });
+  if (!room) {
+    return res.status(404).json({
+      status: "fail",
+      error: true,
+      message: "No room found with given property ID and room type"
+    });
+  }
+  const roomTypes = room.map(r => r.room_type);
+
+  // Date validation
   const parsedStartDate = new Date(startDate);
   const parsedEndDate = new Date(endDate);
 
@@ -327,20 +348,9 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
     parsedEndDate.getUTCDate()
   ));
 
-  // 1. Match Room
-  const room = await Room.find({
-    propertyInfo_id: propertyInfoId,
-    // room_type: { $regex: '^SUT$', $options: 'i' }
-  });
-
-  if (!room) {
-    return res.status(404).json({
-      status: "fail",
-      error: true,
-      message: "No room found with given property ID and room type"
-    });
+  if (normalizedStartDate > normalizedEndDate) {
+    return next(new AppError("startDate cannot be after endDate", 400));
   }
-  const roomTypes = room.map(r => r.room_type);
 
   // 2. Check Inventory for all dates in range
   const dateList: Date[] = [];
@@ -351,99 +361,255 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
   }
 
   for (const date of dateList) {
-    const available = await Inventory.find({
+    const roomAvailability = await Inventory.find({
       hotelCode,
       invTypeCode: { $in: roomTypes },
       'availability.startDate': date,
       'availability.count': { $gte: numberOfRooms }
     });
 
-    if (!available) {
+    if (!roomAvailability) {
       return next(new AppError(`No availability on ${date.toISOString().split('T')[0]} for ${numberOfRooms} rooms`, 400));
     }
   }
+  // 3. Fetch Room with Rates
+  // const roomsWithRates = await Room.aggregate([
+  //   {
+  //     $match: {
+  //       propertyInfo_id: new mongoose.Types.ObjectId(propertyInfoId),
+  //       room_type: { $in: roomTypes }
+  //     }
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: "rateamountdatewises",
+  //       let: {
+  //         roomType: "$room_type",
+  //         hotelCode: hotelCode,
+  //         start: normalizedStartDate,
+  //         end: new Date(normalizedStartDate.getTime() + 24 * 60 * 60 * 1000)
+  //       },
+  //       pipeline: [
+  //         {
+  //           $match: {
+  //             $expr: {
+  //               $and: [
+  //                 { $eq: ["$hotelCode", "$$hotelCode"] },
+  //                 { $eq: ["$invTypeCode", "$$roomType"] },
+  //                 {
+  //                   $and: [
+  //                     { $gte: ["$startDate", "$$start"] },
+  //                     { $lte: ["$startDate", "$$end"] }
+  //                   ]
+  //                 }
+  //               ]
+  //             }
+  //           }
+  //         },
+  //         { $sort: { startDate: 1 } },
+  //         { $limit: 1 }
+  //       ],
+  //       as: "rateInfo"
+  //     }
+  //   },
 
-  // If you have a separate Rooms collection, use this approach:
+  //   {
+  //     $project: {
+  //       _id: 1,
+  //       propertyInfo_id: 1,
+  //       room_name: 1,
+  //       room_type: 1,
+  //       total_room: 1,
+  //       available_rooms: 1,
+  //       floor: 1,
+  //       room_view: 1,
+  //       room_size: 1,
+  //       room_unit: 1,
+  //       smoking_policy: 1,
+  //       max_occupancy: 1,
+  //       max_number_of_adults: 1,
+  //       max_number_of_children: 1,
+  //       number_of_bedrooms: 1,
+  //       number_of_living_room: 1,
+  //       extra_bed: 1,
+  //       description: 1,
+  //       image: 1,
+  //       available: 1,
+  //       rateplan_created: 1,
+
+  //       // Rate information from RateAmountDateWise
+  //       hotelCode: { $arrayElemAt: ["$rateInfo.hotelCode", 0] },
+  //       hotelName: { $arrayElemAt: ["$rateInfo.hotelName", 0] },
+  //       ratePlanCode: { $arrayElemAt: ["$rateInfo.ratePlanCode", 0] },
+  //       startDate: { $arrayElemAt: ["$rateInfo.startDate", 0] },
+  //       endDate: { $arrayElemAt: ["$rateInfo.endDate", 0] },
+  //       days: { $arrayElemAt: ["$rateInfo.days", 0] },
+  //       currencyCode: { $arrayElemAt: ["$rateInfo.currencyCode", 0] },
+  //       baseByGuestAmts: { $arrayElemAt: ["$rateInfo.baseByGuestAmts", 0] },
+  //       additionalGuestAmounts: { $arrayElemAt: ["$rateInfo.additionalGuestAmounts", 0] },
+
+  //       // Processed rate fields
+  //       // room_price: {
+  //       //   $round: [
+  //       //     {
+  //       //       $arrayElemAt: [
+  //       //         { $arrayElemAt: ["$rateInfo.baseByGuestAmts.amountBeforeTax", 0] },
+  //       //         0
+  //       //       ]
+  //       //     },
+  //       //     2
+  //       //   ] 
+  //       // },
+  //       room_price: {
+  //         $round: [
+  //           {
+  //             $getField: {
+  //               field: "amountBeforeTax",
+  //               input: { $arrayElemAt: ["$rateInfo.baseByGuestAmts", 0] }
+  //             }
+  //           },
+  //           2
+  //         ]
+  //       },
+
+
+  //       currency_code: { $arrayElemAt: ["$rateInfo.currencyCode", 0] },
+  //       rate_plan_code: { $arrayElemAt: ["$rateInfo.ratePlanCode", 0] },
+  //       available_guest_rates: { $arrayElemAt: ["$rateInfo.baseByGuestAmts", 0] },
+  //       additional_guest_amounts: { $arrayElemAt: ["$rateInfo.additionalGuestAmounts", 0] },
+  //       has_valid_rate: { $gt: [{ $size: "$rateInfo" }, 0] }
+  //     }
+  //   }
+  // ]);
+
   const roomsWithRates = await Room.aggregate([
-    {
-      $match: {
-        propertyInfo_id: new mongoose.Types.ObjectId(propertyInfoId),
-        room_type: { $in: roomTypes }
-      }
-    },
-    {
-      $lookup: {
-        from: "rateamountdatewises", // MongoDB collection name (lowercase + plural)
-        let: { roomType: "$room_type" },
-        pipeline: [
+  {
+    $match: {
+      propertyInfo_id: new mongoose.Types.ObjectId(propertyInfoId),
+      room_type: { $in: roomTypes }
+    }
+  },
+
+  // Debug stage after $match
+  {
+    $addFields: {
+      debug_afterMatch_roomType: "$room_type"
+    }
+  },
+
+  {
+    $lookup: {
+      from: "rateamountdatewises",
+      let: {
+        roomType: "$room_type",
+        hotelCode: hotelCode,
+        start: normalizedStartDate,
+        end: new Date(normalizedStartDate.getTime() + 24 * 60 * 60 * 1000)
+      },
+      pipeline: [
+        {
+          $match: {
+            $expr: {
+              $and: [
+                { $eq: ["$hotelCode", "$$hotelCode"] },
+                { $eq: ["$invTypeCode", "$$roomType"] },
+                {
+                  $and: [
+                    { $gte: ["$startDate", "$$start"] },
+                    { $lt: ["$startDate", "$$end"] }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        { $sort: { startDate: 1 } },
+        { $limit: 1 },
+        // Debug stage inside $lookup pipeline
+        {
+          $addFields: {
+            debug_rate_match: true,
+            debug_roomType: "$invTypeCode",
+            debug_startDate: "$startDate",
+            debug_hotelCode: "$hotelCode"
+          }
+        }
+      ],
+      as: "rateInfo"
+    }
+  },
+
+  // Debug after lookup
+  {
+    $addFields: {
+      debug_rateInfo_count: { $size: "$rateInfo" },
+      debug_firstRateStartDate: { $arrayElemAt: ["$rateInfo.startDate", 0] },
+      debug_firstRateRoomType: { $arrayElemAt: ["$rateInfo.invTypeCode", 0] }
+    }
+  },
+
+  {
+    $project: {
+      _id: 1,
+      propertyInfo_id: 1,
+      room_name: 1,
+      room_type: 1,
+      total_room: 1,
+      available_rooms: 1,
+      floor: 1,
+      room_view: 1,
+      room_size: 1,
+      room_unit: 1,
+      smoking_policy: 1,
+      max_occupancy: 1,
+      max_number_of_adults: 1,
+      max_number_of_children: 1,
+      number_of_bedrooms: 1,
+      number_of_living_room: 1,
+      extra_bed: 1,
+      description: 1,
+      image: 1,
+      available: 1,
+      rateplan_created: 1,
+
+      // Rate information from RateAmountDateWise
+      hotelCode: { $arrayElemAt: ["$rateInfo.hotelCode", 0] },
+      hotelName: { $arrayElemAt: ["$rateInfo.hotelName", 0] },
+      ratePlanCode: { $arrayElemAt: ["$rateInfo.ratePlanCode", 0] },
+      startDate: { $arrayElemAt: ["$rateInfo.startDate", 0] },
+      endDate: { $arrayElemAt: ["$rateInfo.endDate", 0] },
+      days: { $arrayElemAt: ["$rateInfo.days", 0] },
+      currencyCode: { $arrayElemAt: ["$rateInfo.currencyCode", 0] },
+      baseByGuestAmts: { $arrayElemAt: ["$rateInfo.baseByGuestAmts", 0] },
+      additionalGuestAmounts: { $arrayElemAt: ["$rateInfo.additionalGuestAmounts", 0] },
+
+      // Processed rate fields
+      room_price: {
+        $round: [
           {
-            $match: {
-              $expr: {
-                $and: [
-                  { $eq: ["$invTypeCode", "$$roomType"] },
-                  { $eq: ["$hotelCode", hotelCode] },
-                  { $eq: ["$startDate", normalizedStartDate] }
-                ]
-              }
+            $getField: {
+              field: "amountBeforeTax",
+              input: { $arrayElemAt: ["$rateInfo.baseByGuestAmts", 0] }
             }
           },
-          { $sort: { startDate: 1 } },
-          { $limit: 1 }
-        ],
-        as: "rateInfo"
-      }
-    },
-    {
-      $project: {
-        // Room collection fields
-        _id: 1,
-        propertyInfo_id: 1,
-        room_name: 1,
-        room_type: 1,
-        total_room: 1,
-        available_rooms: 1,
-        floor: 1,
-        room_view: 1,
-        room_size: 1,
-        room_unit: 1,
-        smoking_policy: 1,
-        max_occupancy: 1,
-        max_number_of_adults: 1,
-        max_number_of_children: 1,
-        number_of_bedrooms: 1,
-        number_of_living_room: 1,
-        extra_bed: 1,
-        description: 1,
-        image: 1,
-        available: 1,
-        rateplan_created: 1,
+          2
+        ]
+      },
 
-        // Rate information from RateAmountDateWise
-        hotelCode: { $arrayElemAt: ["$rateInfo.hotelCode", 0] },
-        hotelName: { $arrayElemAt: ["$rateInfo.hotelName", 0] },
-        ratePlanCode: { $arrayElemAt: ["$rateInfo.ratePlanCode", 0] },
-        startDate: { $arrayElemAt: ["$rateInfo.startDate", 0] },
-        endDate: { $arrayElemAt: ["$rateInfo.endDate", 0] },
-        days: { $arrayElemAt: ["$rateInfo.days", 0] },
-        currencyCode: { $arrayElemAt: ["$rateInfo.currencyCode", 0] },
-        baseByGuestAmts: { $arrayElemAt: ["$rateInfo.baseByGuestAmts", 0] },
-        additionalGuestAmounts: { $arrayElemAt: ["$rateInfo.additionalGuestAmounts", 0] },
+      currency_code: { $arrayElemAt: ["$rateInfo.currencyCode", 0] },
+      rate_plan_code: { $arrayElemAt: ["$rateInfo.ratePlanCode", 0] },
+      available_guest_rates: { $arrayElemAt: ["$rateInfo.baseByGuestAmts", 0] },
+      additional_guest_amounts: { $arrayElemAt: ["$rateInfo.additionalGuestAmounts", 0] },
+      has_valid_rate: { $gt: [{ $size: "$rateInfo" }, 0] },
 
-        // Processed rate fields
-        room_price: {
-          $arrayElemAt: [
-            { $arrayElemAt: ["$rateInfo.baseByGuestAmts.amountBeforeTax", 0] },
-            0
-          ]
-        },
-        currency_code: { $arrayElemAt: ["$rateInfo.currencyCode", 0] },
-        rate_plan_code: { $arrayElemAt: ["$rateInfo.ratePlanCode", 0] },
-        available_guest_rates: { $arrayElemAt: ["$rateInfo.baseByGuestAmts", 0] },
-        additional_guest_amounts: { $arrayElemAt: ["$rateInfo.additionalGuestAmounts", 0] },
-        has_valid_rate: { $gt: [{ $size: "$rateInfo" }, 0] }
-      }
+      // Debug fields
+      debug_afterMatch_roomType: 1,
+      debug_rateInfo_count: 1,
+      debug_firstRateStartDate: 1,
+      debug_firstRateRoomType: 1
     }
-  ]);
+  }
+]);
 
   if (!roomsWithRates || roomsWithRates.length === 0) {
     return res.status(400).json({
@@ -475,134 +641,6 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
   });
 });
 
-// const getRoomsByPropertyId2 = catchAsync(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const propertyInfoCode = req.query.code as string;
-//     const { startDate, endDate, hotelCode } = req.body;
-//     console.log(startDate, endDate, hotelCode);
-
-//     if (!startDate) {
-//       return next(new AppError("startDate is required", 400));
-//     }
-
-//     if (!endDate) {
-//       return next(new AppError("endDate is required", 400));
-//     }
-
-//     if (!hotelCode) {
-//       return next(new AppError("hotelCode is required", 400));
-//     }
-
-//     const property = await PropertyInfo.findOne({
-//       property_code: hotelCode,
-//     });
-
-//     if (!property) {
-//       return next(
-//         new AppError(`No property found with code ${hotelCode}`, 404)
-//       );
-//     }
-
-//     const propertyInfoId = property.id;
-//     const rooms = await Room.find({ propertyInfo_id: propertyInfoId });
-//     const roomsWithRates: any[] = [];
-//     for (const singleRoom of rooms) {
-//       // console.log(singleRoom.room_type);
-//       const ratePlans: string[] = await Inventory.find({
-//         hotelCode: hotelCode,
-//         invTypeCode: singleRoom.room_type
-//       }).distinct("ratePlans");
-
-//       console.log("Rate Plans Array:", ratePlans);
-//       if (!ratePlans || ratePlans.length === 0) {
-//         console.log(`No rate plans found for room type: ${singleRoom.room_type}`);
-//         roomsWithRates.push({
-//           _id: singleRoom._id,
-//           propertyInfo_id: propertyInfoId,
-//           room_name: singleRoom.room_name,
-//           room_type: singleRoom.room_type,
-//           room_size: singleRoom.room_size,
-//           max_occupancy: singleRoom.max_occupancy,
-//           room_price: [],
-//           rate_plan_code: [],
-//           has_valid_rate: false,
-//           description: singleRoom.description || "",
-//           images: singleRoom.image || [],
-//           room_unit: singleRoom.room_unit,
-//           room_view: singleRoom.room_view,
-//         });
-//         continue;
-//       }
-//       const temp=[]
-//       console.log(singleRoom.room_type,ratePlans)
-//       for(const ratePlan of ratePlans){
-//         console.log(ratePlan)
-//         const ratesArray = await RateAmountDateWise.findOne({
-//           hotelCode: hotelCode,
-//           ratePlanCode: ratePlan,
-//           roomTypeCode:singleRoom.room_type,
-//           startDate: startDate,
-//         })
-//         if (ratesArray) {
-//           // Merge ratesArray with ratePlanName into a plain object
-//           temp.push({
-//             ...ratesArray.toObject()
-//           });
-//       }
-//     }
-
-
-
-//       roomsWithRates.push({
-//         _id: singleRoom._id,
-//         propertyInfo_id: propertyInfoId,
-//         room_name: singleRoom.room_name,
-//         room_type: singleRoom.room_type,
-//         room_size: singleRoom.room_size,
-//         max_occupancy: singleRoom.max_occupancy,
-//         room_price: temp,
-//         has_valid_rate: temp.length > 0,
-//         description: singleRoom.description || "",
-//         images: singleRoom.image || [],
-//         room_unit: singleRoom.room_unit,
-//         room_view: singleRoom.room_view,
-//       });
-//     }
-
-//     if (!roomsWithRates || roomsWithRates.length === 0) {
-//       return next(
-//         new AppError(`No rooms found for property with id ${propertyInfoId}`, 404)
-//       );
-//     }
-
-//     const couponCode = await generateCouponCode();
-//     const deepLinkUrl = `${process.env.DEEP_LINK}/property/${propertyInfoId}?coupon=${couponCode.code}`;
-
-//     let qrCodeData: string;
-//     try {
-//       qrCodeData = await QRCode.toDataURL(deepLinkUrl);
-//     } catch (error) {
-//       return next(new AppError("Failed to generate QR code", 500));
-//     }
-
-//     res.status(200).json({
-//       status: "success",
-//       error: false,
-//       message: "Rooms fetched by property id with rate plan successfully",
-//       data: roomsWithRates,
-//       qrCode: qrCodeData,
-//       couponCode: couponCode.code,
-//       deepLink: deepLinkUrl,
-//       propertyName:property.property_name,
-//       searchCriteria: {
-//         startDate,
-//         endDate,
-//         propertyId: propertyInfoId,
-//         hotelCode,
-//       },
-//     });
-//   }
-// );
 
 const getRoomsForBooking = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const propertyInfoId = req.params.id;
