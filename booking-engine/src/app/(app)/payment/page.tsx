@@ -74,9 +74,11 @@ function PaymentPageContent() {
   const children = parseInt(searchParams.get('children') || '0', 10);
   const infants = parseInt(searchParams.get('infants') || '0', 10);
   const amountFromRedux = useSelector((state: any) => state.pmsHotelCard.amount);
+  console.log(`>>>>>>>>>>>>>>>>>###################The amount we get from Redux is: ${amountFromRedux}`);
   const { i18n } = useTranslation();
   // Use amount from Redux only
-  const amount = amountFromRedux ? parseInt(amountFromRedux, 10) : 0;
+  const amount = amountFromRedux || '0';
+  console.log(`<><><><><><><><><><><><>The amount we are Getting from amountFromRedux is: ${amount}`);
   // Parse guests from query parameters
   const guests: Guest[] = (() => {
     try {
@@ -388,8 +390,8 @@ function PaymentPageContent() {
                           <div className="font-tripswift-bold text-lg">{t('Payment.PaymentPageContent.priceDetails.total')}</div>
                           <div className="font-tripswift-bold text-xl text-tripswift-blue">
                             {(paymentOption === "payWithCrypto-payWithQR" || paymentOption === "payWithCrypto-payWithWallet") && convertedAmount !== null
-                              ? `USD ${convertedAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                              : `${currency.toUpperCase()} ${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}                          </div>
+                              ? `USD ${convertedAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 })}`
+                              : `${currency.toUpperCase()} ${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 })}`}                          </div>
                         </div>
 
                         {paymentOption === 'payAtHotel' && (

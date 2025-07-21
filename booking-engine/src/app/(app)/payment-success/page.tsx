@@ -676,7 +676,7 @@ export default function PaymentSuccess() {
                         {t("Payment.PaymentSuccess.total")}
                       </span>
                       <span className="font-tripswift-bold text-base sm:text-lg text-tripswift-blue">
-                        ₹{amount.toLocaleString()}
+                        ${amount.toLocaleString()}
                       </span>
                     </div>
                     <div className="text-[10px] sm:text-xs text-tripswift-black/50 text-right mt-1">

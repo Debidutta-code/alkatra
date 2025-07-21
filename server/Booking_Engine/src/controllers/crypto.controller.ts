@@ -102,6 +102,7 @@ export const getCryptoDetails = CatchAsyncError(
 
 
 export const currencyConversion = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  console.log("Entered in CURRENCY CONVERSION controller");
   try {
     const { currency, amount } = req.body;
     console.log(`The data get from UI for currency conversion is:\n#################### ${JSON.stringify(req.body)}`);
@@ -118,6 +119,7 @@ export const currencyConversion = CatchAsyncError(async (req: AuthenticatedReque
     }
 
     if (currency.toUpperCase() === "USD") {
+      console.log(`The currency is ${currency} and amount is ${amount}`);
       return res.status(200).json({
       message: "Currency conversion successful",
       data: {
@@ -136,6 +138,7 @@ export const currencyConversion = CatchAsyncError(async (req: AuthenticatedReque
     }
 
     convertedAmount = parseFloat((parseFloat(amount) / conversionRate).toFixed(2));
+    console.log(`The converted amount is ${convertedAmount} and conversion rate is ${conversionRate}`);
 
     return res.status(200).json({
       message: "Currency conversion successful",
@@ -151,6 +154,7 @@ export const currencyConversion = CatchAsyncError(async (req: AuthenticatedReque
 
 
 export const cryptoPaymentInitiate = async (req: AuthenticatedRequest, res: Response) => {
+  console.log(`Enter into CRYPTO PAYMENT INITIATE controller`);
   try {
     const userId = req.user?.id;
     if (!userId) {

@@ -582,6 +582,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         return;
       }
       const totalPrice = finalPrice?.totalAmount ?? 0;
+      console.log("@@@@@@@@@@@@@>>>>>>>>>>>Total Price:", totalPrice);
+      console.log("@@@@@@@@@@@@@>>>>>>>>>>>Total Price with String:", totalPrice.toString());
       dispatch(setAmount(totalPrice.toString()));
       console.log("Booking Payload:", {
         firstName: guests[0]?.firstName || "",

@@ -27,7 +27,7 @@ import {
   CreditCard,
   AlertCircle
 } from "lucide-react";
-import { error } from "console";
+// import { error } from "console";
 
 interface AmendReservationModalProps {
   booking: Booking;
@@ -257,7 +257,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         };
         const hotelCode = sessionStorage.getItem("propertyCode");
         if (!hotelCode) {
-          return error(t('Hotel code not found in Amend Reservation Modal'));
+          return Error(t('Hotel code not found in Amend Reservation Modal'));
         }
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomRentPrice`,

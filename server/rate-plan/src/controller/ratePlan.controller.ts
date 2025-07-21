@@ -141,7 +141,7 @@ class RoomPrice {
             console.error("Error in getRoomRentController:", response.message)
             return;
         }
-        console.log(response)
+        console.log(`The response we get from Get-Room-Rent-Controller${JSON.stringify(response)}`)
         return response
     }
 
