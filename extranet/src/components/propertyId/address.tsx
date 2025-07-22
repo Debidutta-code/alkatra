@@ -26,7 +26,6 @@ import {
   DialogFooter,
 } from "../../components/ui/dialog";
 
-// Define the address data interface
 interface AddressData {
   address_line_1: string;
   address_line_2: string;
@@ -37,7 +36,6 @@ interface AddressData {
   zip_code: string;
 }
 
-// Define the component props with more specific event handler types
 interface AddressProps {
   address: AddressData | null;
   editedAddress: AddressData | null;
@@ -77,15 +75,10 @@ export function Address({
     const fetchedCountries = Country.getAllCountries();
     setCountries(fetchedCountries);
   }, []);
-  // console.log("countries", countries);
   useEffect(() => {
     if (selectedCountry) {
-      // console.log("selected ", selectedCountry);
       const fetchedStates = State.getStatesOfCountry(selectedCountry);
       setStates(fetchedStates);
-      // Reset state and city when country changes
-      // setSelectedState("");
-      // setSelectedCity("");
     }
   }, [selectedCountry]);
 
@@ -96,11 +89,8 @@ export function Address({
         selectedState
       );
       setCities(fetchedCities);
-      // Reset city when state changes
-      // setSelectedCity("");
     }
   }, [selectedState, selectedCountry]);
-  // console.log("country", address);
 
   useEffect(() => {
     if (editAddressMode && address) {
@@ -110,9 +100,8 @@ export function Address({
     }
   }, [editAddressMode, address]);
 
-  // Validation function
   const validateField = (name: string, value: any): string | null => {
-    const stringValue = String(value || ""); // Ensure value is a string
+    const stringValue = String(value || "");
 
     switch (name) {
       case "address_line_1":
@@ -238,16 +227,12 @@ export function Address({
   const handleCityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const cityName = event.target.value;
     setSelectedCity(cityName);
-
-    // Clear city error
     const newErrors = { ...validationErrors };
     delete newErrors["city"];
     setValidationErrors(newErrors);
-
     handleSelectChange(event, "city");
   };
 
-  // Modify save click to validate before saving
   const handleSaveWithValidation = async () => {
     if (validateAllFields()) {
       try {
@@ -259,7 +244,6 @@ export function Address({
     }
   };
 
-  // Modify add click to validate before adding
   const handleAddWithValidation = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
@@ -275,7 +259,6 @@ export function Address({
     }
   };
 
-  // Custom select dropdown component
   const SelectDropdown = ({
     name,
     value,
@@ -316,7 +299,6 @@ export function Address({
     );
   };
 
-  // Render edit form with validation
   const renderEditForm = () => (
     <div className="pt-4 space-y-6">
       <div className="grid grid-cols-[120px_1fr] items-center">
@@ -461,7 +443,6 @@ export function Address({
     </div>
   );
 
-  // Render address form for modal
   const renderAddressFormDialog = () => (
     <div className="lg:max-h-[90vh] max-h-[70vh] overflow-y-auto px-4 space-y-2 w-full">
       <div className="grid mt-3 grid-cols-1">

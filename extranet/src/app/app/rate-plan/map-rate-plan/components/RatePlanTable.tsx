@@ -143,7 +143,7 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
                               ? `border-2 ${isModified ? 'border-orange-400 bg-orange-50' : 'border-tripswift-blue bg-white'} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm`
                               : 'border-none bg-transparent focus:outline-none'
                           }`}
-                          step="0.01"
+                          // step="0.01" 
                           min={0}
                           disabled={!editButtonVal}
                           readOnly={!editButtonVal}

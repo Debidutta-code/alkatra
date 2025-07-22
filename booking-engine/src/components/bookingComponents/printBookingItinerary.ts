@@ -88,12 +88,28 @@ export const generatePrintContent = (
             padding-bottom: 10px;
             border-bottom: 1px dashed #eee;
           }
+          .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+          }
+          .payment-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+          }
           .total-amount {
             font-size: 18px;
             font-weight: bold;
             color: #054B8F;
             text-align: right;
             margin-top: 20px;
+            padding: 10px;
+            border: 2px solid #054B8F;
+            border-radius: 5px;
+            background-color: #f8f9fa;
           }
           .footer {
             text-align: center;
@@ -161,22 +177,53 @@ export const generatePrintContent = (
             `).join('') : `
             <div class="value">${booking.email}</div>
           `}
-          <div style="margin-top: 15px;">
-            <div class="label">${t("BookingTabs.BookingDetailsModal.contactNumber")}</div>
-            <div class="value">${booking.phone}</div>
+          
+          <div class="contact-grid">
+            ${booking.email ? `
+              <div class="detail-item">
+                <div class="label">${t("BookingTabs.BookingDetailsModal.email")}</div>
+                <div class="value">${booking.email}</div>
+              </div>
+            ` : ''}
+            ${booking.phone ? `
+              <div class="detail-item">
+                <div class="label">${t("BookingTabs.BookingDetailsModal.contactNumber")}</div>
+                <div class="value">${booking.phone}</div>
+              </div>
+            ` : ''}
           </div>
         </div>
         
-        <div class="section">
-          <div class="section-title">${t("BookingTabs.BookingDetailsModal.paymentDetails")}</div>
-          <div class="detail-item">
-            <div class="label">${t("BookingTabs.BookingDetailsModal.bookingDate")}</div>
-            <div class="value">${booking.createdAt ? formatDateString(booking.createdAt) : "-"}</div>
+        ${booking.paymentMethod || booking.totalAmount ? `
+          <div class="section">
+            <div class="section-title">${t("BookingTabs.BookingDetailsModal.paymentDetails")}</div>
+            <div class="payment-grid">
+              ${booking.createdAt ? `
+                <div class="detail-item">
+                  <div class="label">${t("BookingTabs.BookingDetailsModal.bookingDate")}</div>
+                  <div class="value">${formatDateString(booking.createdAt)}</div>
+                </div>
+              ` : ''}
+              ${booking.paymentMethod ? `
+                <div class="detail-item">
+                  <div class="label">${t("BookingTabs.BookingDetailsModal.paymentMethod")}</div>
+                  <div class="value">${booking.paymentMethod.charAt(0).toUpperCase() + booking.paymentMethod.slice(1).replace(/([A-Z])/g, " $1").trim()}</div>
+                </div>
+              ` : ''}
+              ${booking.totalAmount ? `
+                <div class="detail-item">
+                  <div class="label">${t("BookingTabs.BookingDetailsModal.totalAmount")}</div>
+                  <div class="value">${currency} ${booking.totalAmount.toLocaleString()}</div>
+                </div>
+              ` : ''}
+            </div>
+            ${booking.totalAmount ? `
+              <div class="total-amount">
+                ${t("BookingTabs.BookingDetailsModal.totalAmount")}: ${currency} ${booking.totalAmount.toLocaleString()}
+              </div>
+            ` : ''}
           </div>
-          <div class="total-amount">
-            ${t("BookingTabs.BookingDetailsModal.totalAmount")}: ${currency} ${booking.totalAmount.toLocaleString()}
-          </div>
-        </div>
+        ` : ''}
         
         <div class="footer">
           ${t("BookingTabs.BookingDetailsModal.printFooter")}

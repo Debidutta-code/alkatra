@@ -1,16 +1,6 @@
 'use client'
 import React, { useState, useEffect } from "react";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "../../components/ui/card";
-import Link from "next/link";
-import { ChevronRight, Plus, Building2 } from "lucide-react";
-import PropertySlide from "../../components/property/property-slide";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
@@ -20,7 +10,6 @@ import Analytics from "../Analytics";
 const Home: React.FC = () => {
   const [properties, setProperties] = useState<any[]>([]);
   const [draftProperties, setDraftProperties] = useState<any[]>([]);
-
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const userRole = useSelector((state: RootState) => state.auth.user?.role);
   useEffect(() => {
@@ -49,9 +38,7 @@ const Home: React.FC = () => {
 
   return (
     <main className="min-h-screen bg-tripswift-off-white dark:bg-tripswift-black">
-
       <Analytics />
-
     </main>
   );
 };
