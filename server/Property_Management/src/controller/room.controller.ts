@@ -372,244 +372,135 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
       return next(new AppError(`No availability on ${date.toISOString().split('T')[0]} for ${numberOfRooms} rooms`, 400));
     }
   }
-  // 3. Fetch Room with Rates
-  // const roomsWithRates = await Room.aggregate([
-  //   {
-  //     $match: {
-  //       propertyInfo_id: new mongoose.Types.ObjectId(propertyInfoId),
-  //       room_type: { $in: roomTypes }
-  //     }
-  //   },
-  //   {
-  //     $lookup: {
-  //       from: "rateamountdatewises",
-  //       let: {
-  //         roomType: "$room_type",
-  //         hotelCode: hotelCode,
-  //         start: normalizedStartDate,
-  //         end: new Date(normalizedStartDate.getTime() + 24 * 60 * 60 * 1000)
-  //       },
-  //       pipeline: [
-  //         {
-  //           $match: {
-  //             $expr: {
-  //               $and: [
-  //                 { $eq: ["$hotelCode", "$$hotelCode"] },
-  //                 { $eq: ["$invTypeCode", "$$roomType"] },
-  //                 {
-  //                   $and: [
-  //                     { $gte: ["$startDate", "$$start"] },
-  //                     { $lte: ["$startDate", "$$end"] }
-  //                   ]
-  //                 }
-  //               ]
-  //             }
-  //           }
-  //         },
-  //         { $sort: { startDate: 1 } },
-  //         { $limit: 1 }
-  //       ],
-  //       as: "rateInfo"
-  //     }
-  //   },
-
-  //   {
-  //     $project: {
-  //       _id: 1,
-  //       propertyInfo_id: 1,
-  //       room_name: 1,
-  //       room_type: 1,
-  //       total_room: 1,
-  //       available_rooms: 1,
-  //       floor: 1,
-  //       room_view: 1,
-  //       room_size: 1,
-  //       room_unit: 1,
-  //       smoking_policy: 1,
-  //       max_occupancy: 1,
-  //       max_number_of_adults: 1,
-  //       max_number_of_children: 1,
-  //       number_of_bedrooms: 1,
-  //       number_of_living_room: 1,
-  //       extra_bed: 1,
-  //       description: 1,
-  //       image: 1,
-  //       available: 1,
-  //       rateplan_created: 1,
-
-  //       // Rate information from RateAmountDateWise
-  //       hotelCode: { $arrayElemAt: ["$rateInfo.hotelCode", 0] },
-  //       hotelName: { $arrayElemAt: ["$rateInfo.hotelName", 0] },
-  //       ratePlanCode: { $arrayElemAt: ["$rateInfo.ratePlanCode", 0] },
-  //       startDate: { $arrayElemAt: ["$rateInfo.startDate", 0] },
-  //       endDate: { $arrayElemAt: ["$rateInfo.endDate", 0] },
-  //       days: { $arrayElemAt: ["$rateInfo.days", 0] },
-  //       currencyCode: { $arrayElemAt: ["$rateInfo.currencyCode", 0] },
-  //       baseByGuestAmts: { $arrayElemAt: ["$rateInfo.baseByGuestAmts", 0] },
-  //       additionalGuestAmounts: { $arrayElemAt: ["$rateInfo.additionalGuestAmounts", 0] },
-
-  //       // Processed rate fields
-  //       // room_price: {
-  //       //   $round: [
-  //       //     {
-  //       //       $arrayElemAt: [
-  //       //         { $arrayElemAt: ["$rateInfo.baseByGuestAmts.amountBeforeTax", 0] },
-  //       //         0
-  //       //       ]
-  //       //     },
-  //       //     2
-  //       //   ] 
-  //       // },
-  //       room_price: {
-  //         $round: [
-  //           {
-  //             $getField: {
-  //               field: "amountBeforeTax",
-  //               input: { $arrayElemAt: ["$rateInfo.baseByGuestAmts", 0] }
-  //             }
-  //           },
-  //           2
-  //         ]
-  //       },
-
-
-  //       currency_code: { $arrayElemAt: ["$rateInfo.currencyCode", 0] },
-  //       rate_plan_code: { $arrayElemAt: ["$rateInfo.ratePlanCode", 0] },
-  //       available_guest_rates: { $arrayElemAt: ["$rateInfo.baseByGuestAmts", 0] },
-  //       additional_guest_amounts: { $arrayElemAt: ["$rateInfo.additionalGuestAmounts", 0] },
-  //       has_valid_rate: { $gt: [{ $size: "$rateInfo" }, 0] }
-  //     }
-  //   }
-  // ]);
-
   const roomsWithRates = await Room.aggregate([
-  {
-    $match: {
-      propertyInfo_id: new mongoose.Types.ObjectId(propertyInfoId),
-      room_type: { $in: roomTypes }
-    }
-  },
+    {
+      $match: {
+        propertyInfo_id: new mongoose.Types.ObjectId(propertyInfoId),
+        room_type: { $in: roomTypes }
+      }
+    },
 
-  // Debug stage after $match
-  {
-    $addFields: {
-      debug_afterMatch_roomType: "$room_type"
-    }
-  },
+    // Debug stage after $match
+    {
+      $addFields: {
+        debug_afterMatch_roomType: "$room_type"
+      }
+    },
 
-  {
-    $lookup: {
-      from: "rateamountdatewises",
-      let: {
-        roomType: "$room_type",
-        hotelCode: hotelCode,
-        start: normalizedStartDate,
-        end: new Date(normalizedStartDate.getTime() + 24 * 60 * 60 * 1000)
-      },
-      pipeline: [
-        {
-          $match: {
-            $expr: {
-              $and: [
-                { $eq: ["$hotelCode", "$$hotelCode"] },
-                { $eq: ["$invTypeCode", "$$roomType"] },
+    {
+      $lookup: {
+        from: "rateamountdatewises",
+        let: {
+          roomType: "$room_type",
+          hotelCode: hotelCode,
+          start: normalizedStartDate,
+          end: new Date(normalizedStartDate.getTime() + 24 * 60 * 60 * 1000)
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$hotelCode", "$$hotelCode"] },
+                  { $eq: ["$invTypeCode", "$$roomType"] },
+                  {
+                    $and: [
+                      { $gte: ["$startDate", "$$start"] },
+                      { $lt: ["$startDate", "$$end"] }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          { $sort: { startDate: 1 } },
+          { $limit: 1 },
+          // Debug stage inside $lookup pipeline
+          {
+            $addFields: {
+              debug_rate_match: true,
+              debug_roomType: "$invTypeCode",
+              debug_startDate: "$startDate",
+              debug_hotelCode: "$hotelCode"
+            }
+          }
+        ],
+        as: "rateInfo"
+      }
+    },
+
+    // Debug after lookup
+    {
+      $addFields: {
+        debug_rateInfo_count: { $size: "$rateInfo" },
+        debug_firstRateStartDate: { $arrayElemAt: ["$rateInfo.startDate", 0] },
+        debug_firstRateRoomType: { $arrayElemAt: ["$rateInfo.invTypeCode", 0] }
+      }
+    },
+
+    {
+      $project: {
+        _id: 1,
+        propertyInfo_id: 1,
+        room_name: 1,
+        room_type: 1,
+        total_room: 1,
+        available_rooms: 1,
+        floor: 1,
+        room_view: 1,
+        room_size: 1,
+        room_unit: 1,
+        smoking_policy: 1,
+        max_occupancy: 1,
+        max_number_of_adults: 1,
+        max_number_of_children: 1,
+        number_of_bedrooms: 1,
+        number_of_living_room: 1,
+        extra_bed: 1,
+        description: 1,
+        image: 1,
+        available: 1,
+        rateplan_created: 1,
+
+        // Rate information from RateAmountDateWise
+        hotelCode: { $arrayElemAt: ["$rateInfo.hotelCode", 0] },
+        hotelName: { $arrayElemAt: ["$rateInfo.hotelName", 0] },
+        ratePlanCode: { $arrayElemAt: ["$rateInfo.ratePlanCode", 0] },
+        startDate: { $arrayElemAt: ["$rateInfo.startDate", 0] },
+        endDate: { $arrayElemAt: ["$rateInfo.endDate", 0] },
+        days: { $arrayElemAt: ["$rateInfo.days", 0] },
+        currencyCode: { $arrayElemAt: ["$rateInfo.currencyCode", 0] },
+        baseByGuestAmts: { $arrayElemAt: ["$rateInfo.baseByGuestAmts", 0] },
+        additionalGuestAmounts: { $arrayElemAt: ["$rateInfo.additionalGuestAmounts", 0] },
+        room_price: {
+          $let: {
+            vars: {
+              firstRate: { $arrayElemAt: ["$rateInfo", 0] }
+            },
+            in: {
+              $round: [
                 {
-                  $and: [
-                    { $gte: ["$startDate", "$$start"] },
-                    { $lt: ["$startDate", "$$end"] }
-                  ]
-                }
+                  $arrayElemAt: ["$$firstRate.baseByGuestAmts.amountBeforeTax", 0]
+                },
+                2
               ]
             }
           }
         },
-        { $sort: { startDate: 1 } },
-        { $limit: 1 },
-        // Debug stage inside $lookup pipeline
-        {
-          $addFields: {
-            debug_rate_match: true,
-            debug_roomType: "$invTypeCode",
-            debug_startDate: "$startDate",
-            debug_hotelCode: "$hotelCode"
-          }
-        }
-      ],
-      as: "rateInfo"
+        currency_code: { $arrayElemAt: ["$rateInfo.currencyCode", 0] },
+        rate_plan_code: { $arrayElemAt: ["$rateInfo.ratePlanCode", 0] },
+        available_guest_rates: { $arrayElemAt: ["$rateInfo.baseByGuestAmts", 0] },
+        additional_guest_amounts: { $arrayElemAt: ["$rateInfo.additionalGuestAmounts", 0] },
+        has_valid_rate: { $gt: [{ $size: "$rateInfo" }, 0] },
+
+        // Debug fields
+        debug_afterMatch_roomType: 1,
+        debug_rateInfo_count: 1,
+        debug_firstRateStartDate: 1,
+        debug_firstRateRoomType: 1
+      }
     }
-  },
-
-  // Debug after lookup
-  {
-    $addFields: {
-      debug_rateInfo_count: { $size: "$rateInfo" },
-      debug_firstRateStartDate: { $arrayElemAt: ["$rateInfo.startDate", 0] },
-      debug_firstRateRoomType: { $arrayElemAt: ["$rateInfo.invTypeCode", 0] }
-    }
-  },
-
-  {
-    $project: {
-      _id: 1,
-      propertyInfo_id: 1,
-      room_name: 1,
-      room_type: 1,
-      total_room: 1,
-      available_rooms: 1,
-      floor: 1,
-      room_view: 1,
-      room_size: 1,
-      room_unit: 1,
-      smoking_policy: 1,
-      max_occupancy: 1,
-      max_number_of_adults: 1,
-      max_number_of_children: 1,
-      number_of_bedrooms: 1,
-      number_of_living_room: 1,
-      extra_bed: 1,
-      description: 1,
-      image: 1,
-      available: 1,
-      rateplan_created: 1,
-
-      // Rate information from RateAmountDateWise
-      hotelCode: { $arrayElemAt: ["$rateInfo.hotelCode", 0] },
-      hotelName: { $arrayElemAt: ["$rateInfo.hotelName", 0] },
-      ratePlanCode: { $arrayElemAt: ["$rateInfo.ratePlanCode", 0] },
-      startDate: { $arrayElemAt: ["$rateInfo.startDate", 0] },
-      endDate: { $arrayElemAt: ["$rateInfo.endDate", 0] },
-      days: { $arrayElemAt: ["$rateInfo.days", 0] },
-      currencyCode: { $arrayElemAt: ["$rateInfo.currencyCode", 0] },
-      baseByGuestAmts: { $arrayElemAt: ["$rateInfo.baseByGuestAmts", 0] },
-      additionalGuestAmounts: { $arrayElemAt: ["$rateInfo.additionalGuestAmounts", 0] },
-
-      // Processed rate fields
-      room_price: {
-        $round: [
-          {
-            $getField: {
-              field: "amountBeforeTax",
-              input: { $arrayElemAt: ["$rateInfo.baseByGuestAmts", 0] }
-            }
-          },
-          2
-        ]
-      },
-
-      currency_code: { $arrayElemAt: ["$rateInfo.currencyCode", 0] },
-      rate_plan_code: { $arrayElemAt: ["$rateInfo.ratePlanCode", 0] },
-      available_guest_rates: { $arrayElemAt: ["$rateInfo.baseByGuestAmts", 0] },
-      additional_guest_amounts: { $arrayElemAt: ["$rateInfo.additionalGuestAmounts", 0] },
-      has_valid_rate: { $gt: [{ $size: "$rateInfo" }, 0] },
-
-      // Debug fields
-      debug_afterMatch_roomType: 1,
-      debug_rateInfo_count: 1,
-      debug_firstRateStartDate: 1,
-      debug_firstRateRoomType: 1
-    }
-  }
-]);
+  ]);
 
   if (!roomsWithRates || roomsWithRates.length === 0) {
     return res.status(400).json({
