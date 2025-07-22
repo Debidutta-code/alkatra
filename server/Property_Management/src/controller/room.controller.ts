@@ -472,6 +472,8 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
         currencyCode: { $arrayElemAt: ["$rateInfo.currencyCode", 0] },
         baseByGuestAmts: { $arrayElemAt: ["$rateInfo.baseByGuestAmts", 0] },
         additionalGuestAmounts: { $arrayElemAt: ["$rateInfo.additionalGuestAmounts", 0] },
+
+        // Getting room price
         room_price: {
           $let: {
             vars: {

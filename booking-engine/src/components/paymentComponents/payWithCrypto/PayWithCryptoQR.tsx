@@ -210,12 +210,13 @@ const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onCon
 
         // Step 2: Call guest-details-initiate API
         try {
+          const propertyCode = sessionStorage.getItem("propertyCode");
           const guestDetailsResponse = await axios.post(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/crypto/guest-details-initiate`,
             {
               checkInDate: bookingDetails.checkIn,
               checkOutDate: bookingDetails.checkOut,
-              hotelCode: bookingDetails.hotelCode || "WINCLOUD",
+              hotelCode: propertyCode,
               hotelName: bookingDetails.hotelName,
               ratePlanCode: bookingDetails.ratePlanCode,
               numberOfRooms: bookingDetails.rooms,

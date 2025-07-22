@@ -23,7 +23,7 @@ export async function prepareAmendReservationData(data: AmendReservationInput): 
         checkOutDate: data.bookingDetails?.checkOutDate,
         ageCodeSummary: data.ageCodeSummary,
         amountBeforeTax: data.bookingDetails?.roomTotalPrice,
-        currencyCode: 'INR',
+        currencyCode: data.bookingDetails?.currencyCode || 'USD',
         userId: data.bookingDetails?.userId || '',
         status: 'Modified',
         reservationId: data.bookingDetails?.reservationId,

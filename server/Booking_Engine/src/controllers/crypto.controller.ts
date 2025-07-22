@@ -119,6 +119,7 @@ export const currencyConversion = CatchAsyncError(async (req: AuthenticatedReque
     }
 
     if (currency.toUpperCase() === "USD") {
+      convertedAmount = amount || 0;
       console.log(`The currency is ${currency} and amount is ${amount}`);
       return res.status(200).json({
       message: "Currency conversion successful",
@@ -153,56 +154,154 @@ export const currencyConversion = CatchAsyncError(async (req: AuthenticatedReque
 });
 
 
+// export const cryptoPaymentInitiate = async (req: AuthenticatedRequest, res: Response) => {
+//   console.log(`Enter into CRYPTO PAYMENT INITIATE controller`);
+//   try {
+//     const userId = req.user?.id;
+//     if (!userId) {
+//       return res.status(401).json({ message: "User ID not found in token" });
+//     }
+//     console.log(`The user id we get in CRYPTO PAYMENT INITIATE ${userId}`);
+
+//     const { token, blockchain, currency, amount } = req.body;
+//     const requiredFields = { token, blockchain, currency, amount, userId };
+
+//     const missingFields = Object.entries(requiredFields)
+//       .filter(([_, value]) => value === undefined || value === null || value === "")
+//       .map(([key]) => key);
+
+//     if (missingFields.length > 0) {
+//       return res.status(400).json({
+//         message: `Missing required fields: ${missingFields.join(", ")}`,
+//       });
+//     }
+
+//     if (amount !== convertedAmount) {
+//       return res.status(400).json({
+//         message: "Amount not matched in crypto payment initiation",
+//       });
+//     }
+//     console.log(`The amount we get in CRYPTO PAYMENT INITIATE ${amount} and ${convertedAmount}`);
+
+//     const baseAmount = parseFloat(amount);
+//     const fortyMinuteAgo = new Date(Date.now() - 40 * 60 * 1000);
+
+//     let finalAmount: number | null = null;
+
+//     for (let i = 0; i < 100; i++) {
+//       const candidateAmount = parseFloat((baseAmount + i / 100).toFixed(2));
+
+//       const exists = await CryptoPaymentDetails.findOne({
+//         amount: candidateAmount,
+//         status: "Pending",
+//         createdAt: { $gte: fortyMinuteAgo },
+//       });
+
+//       if (!exists) {
+//         finalAmount = candidateAmount;
+//         break;
+//       }
+//       console.log(`The crypto details we found in fortyMinuteAgo ${exists}`);
+//     }
+
+//     if (finalAmount === null) {
+//       return res.status(500).json({ message: "All amount variations are already used. Try again later." });
+//     }
+//     console.log(`The Final Amount in fortyMinuteAgo ${finalAmount}`);
+
+//     const cryptoPaymentDetails = new CryptoPaymentDetails({
+//       customer_id: new Types.ObjectId(userId),
+//       token,
+//       blockchain,
+//       payment_id: uuidv4(),
+//       amount: finalAmount,
+//       status: "Pending",
+//     });
+
+//     await cryptoPaymentDetails.save();
+//     convertedAmount = finalAmount;
+
+//     return res.status(200).json({
+//       message: "Crypto payment initiated successfully",
+//       data: cryptoPaymentDetails,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({ message: "Internal server error", error });
+//   }
+// };
+
 export const cryptoPaymentInitiate = async (req: AuthenticatedRequest, res: Response) => {
   console.log(`Enter into CRYPTO PAYMENT INITIATE controller`);
   try {
     const userId = req.user?.id;
+    console.log(`userId extracted: ${userId}`);
+    
     if (!userId) {
+      console.log("User ID not found in token");
       return res.status(401).json({ message: "User ID not found in token" });
     }
 
     const { token, blockchain, currency, amount } = req.body;
+    console.log(`Request Body - token: ${token}, blockchain: ${blockchain}, currency: ${currency}, amount: ${amount}`);
+
     const requiredFields = { token, blockchain, currency, amount, userId };
+    console.log("Required fields object constructed");
 
     const missingFields = Object.entries(requiredFields)
       .filter(([_, value]) => value === undefined || value === null || value === "")
       .map(([key]) => key);
+    console.log(`Missing fields: ${missingFields}`);
 
     if (missingFields.length > 0) {
+      console.log("Validation failed due to missing fields");
       return res.status(400).json({
         message: `Missing required fields: ${missingFields.join(", ")}`,
       });
     }
 
+    console.log("All required fields are present");
+
     if (amount !== convertedAmount) {
+      console.log(`Amount mismatch: amount = ${amount}, convertedAmount = ${convertedAmount}`);
       return res.status(400).json({
         message: "Amount not matched in crypto payment initiation",
       });
     }
 
+    console.log(`Amount matched: ${amount} === ${convertedAmount}`);
+
     const baseAmount = parseFloat(amount);
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    console.log(`Parsed baseAmount: ${baseAmount}`);
+
+    const fortyMinuteAgo = new Date(Date.now() - 40 * 60 * 1000);
+    console.log(`Calculated timestamp for 40 minutes ago: ${fortyMinuteAgo}`);
 
     let finalAmount: number | null = null;
+    console.log("Initialized finalAmount to null");
 
     for (let i = 0; i < 100; i++) {
       const candidateAmount = parseFloat((baseAmount + i / 100).toFixed(2));
+      console.log(`Trying candidateAmount: ${candidateAmount}`);
 
       const exists = await CryptoPaymentDetails.findOne({
         amount: candidateAmount,
         status: "Pending",
-        createdAt: { $gte: oneHourAgo },
+        createdAt: { $gte: fortyMinuteAgo },
       });
+      console.log(`Query result for candidateAmount ${candidateAmount}: ${exists ? "Already exists" : "Does not exist"}`);
 
       if (!exists) {
         finalAmount = candidateAmount;
+        console.log(`Selected finalAmount: ${finalAmount}`);
         break;
       }
     }
 
     if (finalAmount === null) {
+      console.log("No available finalAmount found in 100 tries");
       return res.status(500).json({ message: "All amount variations are already used. Try again later." });
     }
+
     const cryptoPaymentDetails = new CryptoPaymentDetails({
       customer_id: new Types.ObjectId(userId),
       token,
@@ -211,15 +310,20 @@ export const cryptoPaymentInitiate = async (req: AuthenticatedRequest, res: Resp
       amount: finalAmount,
       status: "Pending",
     });
+    console.log("Constructed cryptoPaymentDetails object");
 
     await cryptoPaymentDetails.save();
+    console.log("Saved cryptoPaymentDetails to DB");
+
     convertedAmount = finalAmount;
+    console.log(`Updated convertedAmount to: ${convertedAmount}`);
 
     return res.status(200).json({
       message: "Crypto payment initiated successfully",
       data: cryptoPaymentDetails,
     });
   } catch (error) {
+    console.log("Error occurred:", error);
     return res.status(500).json({ message: "Internal server error", error });
   }
 };
