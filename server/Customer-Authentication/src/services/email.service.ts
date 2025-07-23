@@ -35,7 +35,7 @@ class EmailService {
       console.log(`✅ Email sent to ${to}`);
     } catch (error: any) {
       console.error('❌ SendGrid Error:', error.response?.body || error.message);
-      throw new Error('Email sending failed');
+      // throw new Error('Email sending failed');
     }
   }
 }
