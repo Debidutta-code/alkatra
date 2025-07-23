@@ -61,6 +61,7 @@ interface Room {
   image?: string[];
   amenities?: string[];
   description?: string;
+  available_rooms?: number;
   max_number_of_adults?: number;
   max_number_of_children?: number;
   room_view?: string;
@@ -904,28 +905,6 @@ const RoomsPage: React.FC = () => {
                 <div className="lg:col-span-1">
                   {/* Property amenities */}
                   <div className="bg-tripswift-blue/5 p-4 rounded-xl mb-2">
-                    {/* <h3 className="text-section-heading mb-3">{t('RoomsPage.propertyAmenities')}</h3>
-
-                    {propertyDetails?.property_amenities?.amenities &&
-                      Object.keys(propertyDetails.property_amenities.amenities).length > 0 ? (
-                      <div className="flex flex-wrap gap-2">
-                        {Object.entries(propertyDetails.property_amenities.amenities)
-                          .filter(([_, hasAmenity]) => hasAmenity)
-                          .slice(0, 8)
-                          .map(([amenity]) => (
-                            <div
-                              key={amenity}
-                              className="flex items-center text-xs font-tripswift-medium text-tripswift-blue bg-tripswift-blue/5 border border-tripswift-blue/20 px-2 py-1 rounded-md"
-                            >
-                              {getAmenityIcon(amenity)}
-                              <span className="capitalize ml-1">{t(RoomsPage.amenitiesList.${amenity})}</span>
-                            </div>
-                          ))}
-                      </div>
-                    ) : (
-                      <p className="text-description">{t('RoomsPage.noAmenitiesSpecified')}</p>
-                    )} */}
-                    {/* QR Code Section - Add this */}
                     {qrCodeData.qrCode && qrCodeData.couponCode && (
                       <QRCodeDisplay qrCode={qrCodeData.qrCode} />
                     )}
@@ -1083,30 +1062,30 @@ const RoomsPage: React.FC = () => {
 
         {/* Rooms grid */}
         {!isLoading && filteredRooms.length > 0 && (
-  <div className="space-y-3.5">
-    {filteredRooms.map((room) => {
-      // Determine the price to display
-      let displayPrice = t("RoomsPage.priceNotAvailable");
-      if (room.has_valid_rate && room.baseByGuestAmts && room.baseByGuestAmts.length > 0) {
-        const guestCount = guestDetails?.guests || 1;
-        const matchingRate =
-          room.baseByGuestAmts.find((rate) => rate.numberOfGuests === guestCount) ||
-          room.baseByGuestAmts[0]; // Fallback to first rate
-        displayPrice = `${room.currency_code} ${matchingRate.amountBeforeTax.toFixed(2)}`;
-      }
+          <div className="space-y-3.5">
+            {filteredRooms.map((room) => {
+              // Determine the price to display
+              let displayPrice = t("RoomsPage.priceNotAvailable");
+              if (room.has_valid_rate && room.baseByGuestAmts && room.baseByGuestAmts.length > 0) {
+                const guestCount = guestDetails?.guests || 1;
+                const matchingRate =
+                  room.baseByGuestAmts.find((rate) => rate.numberOfGuests === guestCount) ||
+                  room.baseByGuestAmts[0]; // Fallback to first rate
+                displayPrice = `${room.currency_code} ${matchingRate.amountBeforeTax.toFixed(2)}`;
+              }
 
-      return (
-        <RoomCard
-          key={room._id}
-          data={convertAmenities(room)}
-          price={displayPrice}
-          onBookNow={() => handleBookNow(room)}
-          isPriceAvailable={room.has_valid_rate}
-        />
-      );
-    })}
-  </div>
-)}
+              return (
+                <RoomCard
+                  key={room._id}
+                  data={convertAmenities(room)}
+                  price={displayPrice}
+                  onBookNow={() => handleBookNow(room)}
+                  isPriceAvailable={room.has_valid_rate}
+                />
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Guest Information Modal */}

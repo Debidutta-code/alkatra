@@ -379,14 +379,6 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
         room_type: { $in: roomTypes }
       }
     },
-
-    // Debug stage after $match
-    {
-      $addFields: {
-        debug_afterMatch_roomType: "$room_type"
-      }
-    },
-
     {
       $lookup: {
         from: "rateamountdatewises",
@@ -415,26 +407,51 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
           },
           { $sort: { startDate: 1 } },
           { $limit: 1 },
-          // Debug stage inside $lookup pipeline
-          {
-            $addFields: {
-              debug_rate_match: true,
-              debug_roomType: "$invTypeCode",
-              debug_startDate: "$startDate",
-              debug_hotelCode: "$hotelCode"
-            }
-          }
         ],
         as: "rateInfo"
       }
     },
-
-    // Debug after lookup
+    {
+      $lookup: {
+        from: "inventories",
+        let: {
+          roomType: "$room_type",
+          hotelCode: hotelCode,
+          start: normalizedStartDate,
+          end: new Date(normalizedStartDate.getTime() + 24 * 60 * 60 * 1000)
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$hotelCode", "$$hotelCode"] },
+                  { $eq: ["$invTypeCode", "$$roomType"] },
+                  {
+                    $and: [
+                      { $eq: ["$startDate", "$$start"] },
+                      // { $lt: ["$startDate", "$$end"] }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            $group: {
+              _id: "$invTypeCode",
+              minAvailableRooms: { $min: "$availability.count" }
+            }
+          }
+        ],
+        as: "inventoryInfo"
+      }
+    },
     {
       $addFields: {
-        debug_rateInfo_count: { $size: "$rateInfo" },
-        debug_firstRateStartDate: { $arrayElemAt: ["$rateInfo.startDate", 0] },
-        debug_firstRateRoomType: { $arrayElemAt: ["$rateInfo.invTypeCode", 0] }
+        available_rooms: {
+          $ifNull: [{ $arrayElemAt: ["$inventoryInfo.minAvailableRooms", 0] }, 0]
+        },
       }
     },
 
@@ -445,7 +462,7 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
         room_name: 1,
         room_type: 1,
         total_room: 1,
-        available_rooms: 1,
+        // available_rooms: 1,
         floor: 1,
         room_view: 1,
         room_size: 1,
@@ -494,12 +511,6 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
         available_guest_rates: { $arrayElemAt: ["$rateInfo.baseByGuestAmts", 0] },
         additional_guest_amounts: { $arrayElemAt: ["$rateInfo.additionalGuestAmounts", 0] },
         has_valid_rate: { $gt: [{ $size: "$rateInfo" }, 0] },
-
-        // Debug fields
-        debug_afterMatch_roomType: 1,
-        debug_rateInfo_count: 1,
-        debug_firstRateStartDate: 1,
-        debug_firstRateRoomType: 1
       }
     }
   ]);

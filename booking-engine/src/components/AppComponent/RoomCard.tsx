@@ -20,6 +20,7 @@ import { getPolicyType, getPolicyStyling, getPolicyBulletPoints } from "@/utils/
 interface RoomData {
   _id: string;
   currency_code: string;
+  available_rooms?: number;
   has_valid_rate: boolean;
   max_occupancy: number;
   propertyInfo_id: string;
@@ -167,7 +168,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
       default: return <FaCheckCircle className={iconClass} />;
     }
   };
-  const {i18n}=useTranslation();
+  const { i18n } = useTranslation();
   return (
     <>
       <Card className="w-full min-h-48 shadow-sm hover:shadow-md transition-shadow duration-300 bg-tripswift-off-white border border-gray-200 rounded-xl flex flex-col md:flex-row overflow-hidden font-noto-sans">
@@ -211,6 +212,15 @@ export const RoomCard: React.FC<RoomCardProps> = ({
                 <h3 className="text-room-title">
                   {data.room_name} - {data.room_type}
                 </h3>
+                
+                {/* Available number of rooms */}
+                {/* <span className="flex items-center text-red-600 semibold text-sm">
+                  <svg className="w-4 h-4 mr-1 fill-red-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                    <path d="M8 0a8 8 0 1 0 8 8A8 8 0 0 0 8 0zm.93 12.588a1.07 1.07 0 1 1-1.07-1.07 1.07 1.07 0 0 1 1.07 1.07zM8.93 4.412l-.25 4a.682.682 0 0 1-1.36 0l-.25-4a.682.682 0 0 1 1.36 0z" />
+                  </svg>
+                  Only {data.available_rooms} left on our site
+                </span> */}
+
               </div>
 
               {/* <div className="flex items-center text-yellow-400 gap-0.5 pt-1">
@@ -235,7 +245,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
             {/* Room specs section */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 p-1.5 rounded-md">
               <div className="flex items-center text-xs font-tripswift-medium text-tripswift-black/70">
-                <FaUser className={` h-3 w-3 text-tripswift-blue ${i18n.language==="ar" ? "ml-2":"mr-2"}`} />
+                <FaUser className={` h-3 w-3 text-tripswift-blue ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
                 <span>
                   {data.max_number_of_adults || data.max_occupancy} {t('RoomsPage.RoomCard.adults')}
                 </span>
@@ -243,14 +253,14 @@ export const RoomCard: React.FC<RoomCardProps> = ({
 
               {(data.max_number_of_children || 0) > 0 && (
                 <div className="flex items-center text-xs font-tripswift-medium text-tripswift-black/70">
-                  <FaChild className={` h-3 w-3 text-tripswift-blue ${i18n.language==="ar" ? "ml-2":"mr-2"}`}/>
+                  <FaChild className={` h-3 w-3 text-tripswift-blue ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
                   <span>{data.max_number_of_children} {t('RoomsPage.RoomCard.children')}</span>
                 </div>
               )}
 
               {data.room_size > 0 && (
                 <div className="flex items-center text-xs font-tripswift-medium text-tripswift-black/70">
-                  <FaRulerCombined className={` h-3 w-3 text-tripswift-blue ${i18n.language==="ar" ? "ml-2":"mr-2"}`} />
+                  <FaRulerCombined className={` h-3 w-3 text-tripswift-blue ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
                   <span>{data.room_size} {data.room_unit || "m²"}</span>
                 </div>
               )}
@@ -258,7 +268,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
               {data.room_view && (
                 <div className="flex flex-wrap gap-1.5">
                   <span className="bg-tripswift-blue/5 text-tripswift-black/70 text-xs px-0.5 py-1 rounded-full font-tripswift-medium inline-flex items-center">
-                    <FaTree className={` h-3 w-3 text-tripswift-blue ${i18n.language==="ar" ? "ml-2":"mr-2"}`} />
+                    <FaTree className={` h-3 w-3 text-tripswift-blue ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
                     {data.room_view}
                   </span>
                 </div>
@@ -269,7 +279,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
             <div className="flex flex-wrap gap-x-2 gap-y-1.5">
               {getRoomAmenities().map((amenity, index) => (
                 <div key={index} className="flex items-center text-xs bg-blue-50 text-tripswift-blue/80 font-tripswift-medium px-2 py-1 rounded-full">
-                  {React.cloneElement(amenity.icon, { className :` h-3 w-3  ${i18n.language==="ar" ? "ml-2":"mr-2"}` })}
+                  {React.cloneElement(amenity.icon, { className: ` h-3 w-3  ${i18n.language === "ar" ? "ml-2" : "mr-2"}` })}
                   <span className="truncate">{amenity.name}</span>
                 </div>
               ))}
@@ -288,7 +298,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
                     {price}
                   </span>
                   {isPriceAvailable && (
-                    <span className={`text-tripswift-black/60 text-lg  font-tripswift-regular ${i18n.language==="ar" ? "mr-2":"ml-2"}`}>
+                    <span className={`text-tripswift-black/60 text-lg  font-tripswift-regular ${i18n.language === "ar" ? "mr-2" : "ml-2"}`}>
                       / {t('RoomsPage.RoomCard.night')}
                     </span>
                   )}
@@ -320,11 +330,11 @@ export const RoomCard: React.FC<RoomCardProps> = ({
                 onClick={() => setShowPolicyModal(true)}
                 className="text-xs text-tripswift-black/60 hover:text-tripswift-blue transition-colors duration-300 flex items-center font-tripswift-regular"
               >
-                <FaInfoCircle className={` h-3 w-3  ${i18n.language==="ar" ? "ml-2":"mr-2"}`} /> {t('RoomsPage.RoomCard.viewBookingPolicies')}
+                <FaInfoCircle className={` h-3 w-3  ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} /> {t('RoomsPage.RoomCard.viewBookingPolicies')}
               </button>
 
               <div className="flex items-center text-xs text-tripswift-black/60 font-tripswift-regular">
-                <FaShieldAlt className={` h-3 w-3 text-green-600  ${i18n.language==="ar" ? "ml-2":"mr-2"}`} />
+                <FaShieldAlt className={` h-3 w-3 text-green-600  ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
                 <span>{t('RoomsPage.RoomCard.securePayment')}</span>
               </div>
             </div>
