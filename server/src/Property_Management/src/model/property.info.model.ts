@@ -1,15 +1,12 @@
 import mongoose, { Document, Schema, Types } from "mongoose";
 import { PropertyAddressType } from "./property.address.model";
 import { RoomType } from "./room.model";
-import { UserType } from "./user.model";
 import { Category, PropertyCategory } from "./propertycategory.model";
 import { PropertyAmenitiesType } from "./propertyamenite.model";
 import { RoomAminity, RoomAminityType } from "./room.amenite.model";
-import { RatePlan } from "./ratePlan.model";
-import { BrandType } from "./brand.model";
 
 interface PropertyInfoType extends Document {
-  user_id: Types.ObjectId | UserType;
+  user_id: Types.ObjectId ;
   property_name: string;
   property_email: string;
   property_contact: string;
@@ -24,8 +21,7 @@ interface PropertyInfoType extends Document {
   property_category: Types.ObjectId | PropertyCategory;
   property_type: Types.ObjectId;
   isDraft: boolean;
-  rate_plan: Types.ObjectId | RatePlan;
-  brand: Types.ObjectId | BrandType;
+  rate_plan: Types.ObjectId ;
 }
 
 const propertyInfoSchema = new Schema<PropertyInfoType>({
@@ -44,8 +40,7 @@ const propertyInfoSchema = new Schema<PropertyInfoType>({
   image: [{ type: String }],
   description: { type: String },
   isDraft: { type: Boolean, default: true, },
-  rate_plan: [{ type: Schema.Types.ObjectId, ref: "RatePlan" }],
-  brand: { type: Schema.Types.ObjectId, ref: "Brand" },
+  rate_plan: [{ type: Schema.Types.ObjectId }],
 });
 
 const PropertyInfo = mongoose.model<PropertyInfoType>("PropertyInfo", propertyInfoSchema);

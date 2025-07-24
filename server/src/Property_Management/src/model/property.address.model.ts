@@ -1,6 +1,5 @@
 import mongoose, { Document, Schema, Types } from "mongoose";
 import { PropertyInfoType, PropertyInfo } from "./property.info.model";
-import { LocationType, Location } from "./property.location.model";
 
 interface PropertyAddressType extends Document {
   property_id: Types.ObjectId | PropertyInfoType;

@@ -1,91 +1,91 @@
-import { NextFunction, Response } from "express";
-import { AppError } from "../../utils/appError";
-import { Request, catchAsync } from "../../utils/catchAsync";
-import AmeniteCategory from "../../model/amenitecategory.model";
-import { PropertyInfo } from "../../model/property.info.model";
+// import { NextFunction, Response } from "express";
+// import { AppError } from "../../utils/appError";
+// import { Request, catchAsync } from "../../utils/catchAsync";
+// import AmeniteCategory from "../../model/amenitecategory.model";
+// import { PropertyInfo } from "../../model/property.info.model";
 
-const createAmeniteCategory = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    if (!req.body) {
-      next(new AppError("Please fill all the required fields", 400));
-    }
+// const createAmeniteCategory = catchAsync(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     if (!req.body) {
+//       next(new AppError("Please fill all the required fields", 400));
+//     }
 
-    const ameniteCategory = new AmeniteCategory({
-      ...req.body,
-    });
+//     const ameniteCategory = new AmeniteCategory({
+//       ...req.body,
+//     });
 
-    await ameniteCategory.save();
+//     await ameniteCategory.save();
 
-    res.status(201).json({
-      status: "success",
-      error: false,
-      message: "Amenite category added successfully",
-      data: {
-        ameniteCategory,
-      },
-    });
-  }
-);
+//     res.status(201).json({
+//       status: "success",
+//       error: false,
+//       message: "Amenite category added successfully",
+//       data: {
+//         ameniteCategory,
+//       },
+//     });
+//   }
+// );
 
-const getAllAmeniteCategoriesAndAllAmeniteDetails = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const ameniteCategoriesAndAllAmeniteDetails =
-      await AmeniteCategory.aggregate([
-        {
-          $lookup: {
-            from: "amenites",
-            localField: "_id",
-            foreignField: "category",
-            as: "amenities",
-            pipeline: [
-              {
-                $lookup: {
-                  from: "ameniteattributes",
-                  localField: "_id",
-                  foreignField: "amenity",
-                  as: "template.attributes",
-                  pipeline: [
-                    {
-                      $project: {
-                        _id: 1,
-                        attributeName: 1,
-                      },
-                    },
-                  ],
-                },
-              },
-              {
-                $project: {
-                  _id: 1,
-                  name: 1,
-                  code: 1,
-                  isSelected: 1,
-                  "template.type": 1,
-                  "template.attributes": 1,
-                },
-              },
-            ],
-          },
-        },
-        {
-          $project: {
-            category: 1,
-            categoryCode: 1,
-            amenities: 1,
-          },
-        },
-      ]);
+// const getAllAmeniteCategoriesAndAllAmeniteDetails = catchAsync(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const ameniteCategoriesAndAllAmeniteDetails =
+//       await AmeniteCategory.aggregate([
+//         {
+//           $lookup: {
+//             from: "amenites",
+//             localField: "_id",
+//             foreignField: "category",
+//             as: "amenities",
+//             pipeline: [
+//               {
+//                 $lookup: {
+//                   from: "ameniteattributes",
+//                   localField: "_id",
+//                   foreignField: "amenity",
+//                   as: "template.attributes",
+//                   pipeline: [
+//                     {
+//                       $project: {
+//                         _id: 1,
+//                         attributeName: 1,
+//                       },
+//                     },
+//                   ],
+//                 },
+//               },
+//               {
+//                 $project: {
+//                   _id: 1,
+//                   name: 1,
+//                   code: 1,
+//                   isSelected: 1,
+//                   "template.type": 1,
+//                   "template.attributes": 1,
+//                 },
+//               },
+//             ],
+//           },
+//         },
+//         {
+//           $project: {
+//             category: 1,
+//             categoryCode: 1,
+//             amenities: 1,
+//           },
+//         },
+//       ]);
 
-    res.status(200).json({
-      status: "success",
-      error: false,
-      message: "Amenite category and other details fetched successfully",
-      data: {
-        ameniteCategoriesAndAllAmeniteDetails,
-      },
-    });
-  }
-);
+//     res.status(200).json({
+//       status: "success",
+//       error: false,
+//       message: "Amenite category and other details fetched successfully",
+//       data: {
+//         ameniteCategoriesAndAllAmeniteDetails,
+//       },
+//     });
+//   }
+// );
 
 // const getAmeniteCategory = catchAsync(
 //   async (req: Request, res: Response, next: NextFunction) => {
@@ -142,10 +142,10 @@ const getAllAmeniteCategoriesAndAllAmeniteDetails = catchAsync(
 //   }
 // );
 
-export {
-  createAmeniteCategory,
-  getAllAmeniteCategoriesAndAllAmeniteDetails,
-  // getPropertyAmeniteCategory,
-  // getPropertyAminitesategories,
-  // getDestinationType,
-};
+// export {
+//   createAmeniteCategory,
+//   getAllAmeniteCategoriesAndAllAmeniteDetails,
+//   getPropertyAmeniteCategory,
+//   getPropertyAminitesategories,
+//   getDestinationType,
+// };

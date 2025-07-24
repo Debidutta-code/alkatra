@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { cryptoPaymentInitiate, currencyConversion, getCryptoDetails, getInitiatedPaymentDetails, getPaymentSuccessResponse, getWalletAddress, pushCryptoPaymentDetails, storeGuestDetailsForCryptoPayment } from "../controllers/crypto.controller";
-import { authenticateCustomer } from "../../../Customer-Authentication/src/middleware/authMiddleware";
+import { authenticateCustomer } from "../../../Customer_Authentication/src/middleware/authMiddleware";
 
 const router = Router();
 

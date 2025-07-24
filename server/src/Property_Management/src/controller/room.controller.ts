@@ -5,13 +5,10 @@ import { Room } from "../model/room.model";
 import { PropertyInfo } from "../model/property.info.model";
 import PropertyRatePlan from "../model/ratePlan.model";
 import mongoose from "mongoose";
-import PropertyPrice from "../model/ratePlan.model";
 import QRCode from 'qrcode';
-import { v4 as uuidv4 } from "uuid";
 import { generateCouponCode } from "../../../Coupon_Management/services/couponService";
 import RoomType from "../model/RoomTypes.model";
 import { Inventory } from "../../../wincloud/src/model/inventoryModel";
-import RateAmountDateWise from "../../../wincloud/src/model/ratePlanDateWise.model";
 
 interface UpdateFields {
   room_name?: string;
@@ -611,4 +608,3 @@ const getAllRoomTypes = catchAsync(async (req: Request, res: Response, next: Nex
 });
 
 export { createRoom, getAllRoomTypes, updateRoom, deleteRoom, getRoomById, getRooms, getRoomsByPropertyId, getRoomsByPropertyId2, getRoomsForBooking };
-

@@ -63,7 +63,6 @@ const createPropertyAddress = catchAsync(
   }
 );
 
-
 const updatePropertyAddress = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const propertAddressId = req.params.id;
@@ -219,6 +218,7 @@ const updatePropertyAddressBypropertyid = async (
     return next(error);
   }
 };
+
 const getUniqueCities = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const uniqueCities = await PropertyAddress.aggregate([
       {
@@ -252,6 +252,7 @@ const getUniqueCities = catchAsync(async (req: Request, res: Response, next: Nex
       data: uniqueCities.map(item => item.city)
   });
 });
+
 export {
   createPropertyAddress,
   updatePropertyAddress,

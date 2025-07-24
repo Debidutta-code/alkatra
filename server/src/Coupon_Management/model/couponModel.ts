@@ -16,4 +16,5 @@ const couponCodeSchema = new Schema<ICouponCode>({
   createdAt: { type: Date, default: Date.now },
 });
 
-export default mongoose.model<ICouponCode>('CouponCodeModel', couponCodeSchema);
+const couponModel= mongoose.model<ICouponCode>('CouponCodeModel', couponCodeSchema);
+export default couponModel;

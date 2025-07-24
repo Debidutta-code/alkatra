@@ -38,4 +38,5 @@ CustomerSchema.pre<ICustomer>("findOneAndUpdate", function (next) {
     next();
 });
 
-export default mongoose.model<ICustomer>("CustomerModel", CustomerSchema);
+const customerModel = mongoose.model<ICustomer>("CustomerModel", CustomerSchema);
+export default customerModel;

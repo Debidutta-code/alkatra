@@ -3,10 +3,7 @@ import { Request, catchAsync } from "../utils/catchAsync";
 import { AppError } from "../utils/appError";
 import PropertyCategory from "../model/propertycategory.model";
 import { Role } from "../utils/jwtHelper";
-import PropertyType from "../model/propertytype.model";
 import mongoose from "mongoose";
-import { UserType } from "../model/user.model";
-import { PropertyInfo } from "../model/property.info.model";
 
 const getAllPropertyCategories = catchAsync(
   async (req: Request<{}, Role>, res: Response, next: NextFunction) => {

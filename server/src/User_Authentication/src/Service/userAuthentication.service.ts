@@ -37,6 +37,7 @@ export class UserService {
   constructor() {
     this.userRepository = new UserRepository();
   }
+
   async getUserById(userId: string | undefined): Promise<AuthType> {
     if (!userId) {
       throw formatError(ErrorMessages.INVALID_ID);
@@ -47,6 +48,7 @@ export class UserService {
     }
     return user;
   }
+
   async updateUserProfile(
     userId: string,
     requestingUserId: string,
@@ -91,6 +93,7 @@ export class UserService {
     }
     return updatedUser;
   }
+
   async getAllUsers(
     page: number,
     limit: number,
@@ -109,6 +112,7 @@ export class UserService {
       return await this.userRepository.getAllUsers(page, limit, userRole);
     }
   }
+  
   async registerUser(data: RegisterBody): Promise<AuthType> {
     const { firstName, lastName, email, password, role, createdBy } = data;
     if (!firstName || !lastName || !email || !password) {

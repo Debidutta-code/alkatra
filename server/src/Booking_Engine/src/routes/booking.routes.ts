@@ -44,7 +44,7 @@ router.route("/cancel-reservation/:id").patch(authenticateCustomer as any, cance
 // router.route("/count/:id").get(authenticateCustomer as any, countBookings);  
 // router.route("/owner/revenue/:id").get(authenticateCustomer as any, getRevenueByOwner);
 // router.route("/property/revenue/:id").get(authenticateCustomer as any, getRevenueByProperty);
-// router.route("/customers/booking/details/:id").get(authenticateCustomer as any, getBookingDetailsOfUser);
+router.route("/customers/booking/details/:id").get(authenticateCustomer as any, getBookingDetailsOfUser);
 
 
 export default router;

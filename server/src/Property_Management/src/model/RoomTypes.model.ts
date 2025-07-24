@@ -17,7 +17,7 @@ const RoomTypesSchema = new Schema<IRoomType>({
 });
 
 // Create the model with proper typing
-const RoomType: Model<IRoomType> = mongoose.models.RoomType || 
-                                  model<IRoomType>("RoomType", RoomTypesSchema);
+const RoomType: Model<IRoomType> = mongoose.models.RoomType ||
+    model<IRoomType>("RoomType", RoomTypesSchema);
 
 export default RoomType;

@@ -2,7 +2,6 @@ import { NextFunction, Response } from "express";
 import { Request, catchAsync } from "../utils/catchAsync";
 import { cloudinary } from "../utils/cloudinary";
 import { AppError } from "../utils/appError";
-import fs from "fs";
 
 export const uploadHandler = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
