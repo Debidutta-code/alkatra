@@ -22,7 +22,7 @@
 		"strictPropertyInitialization": false
 	},
 	"include": [
-		"index.ts",
+		"src/index.ts",
         "./authentication/**/*",
         "Booking_Engine/**/*",
         "./payment/**/*",
