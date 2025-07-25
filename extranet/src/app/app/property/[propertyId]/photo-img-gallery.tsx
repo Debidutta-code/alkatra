@@ -5,7 +5,7 @@ import React, { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "../../../../components/ui/button";
 import { Card, CardContent } from "../../../../components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../../../..//components/ui/dialog";
-import { Plus, Trash2, Upload, Loader2, Edit3, Eye, ImageIcon, ChevronRight, ChevronLeft } from "lucide-react";
+import { Plus, Trash2, Upload, Loader2, Edit3, Eye, ImageIcon, ChevronRight, ChevronLeft, } from "lucide-react";
 import { useDropzone, FileRejection } from "react-dropzone";
 import toast from "react-hot-toast";
 import axios from "axios";
@@ -35,9 +35,12 @@ export function PropertyImageGallery({
   const [currentImage, setCurrentImage] = useState(0);
   const [editMode, setEditMode] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState<string | null>(null);
   const [files, setFiles] = useState<IFileWithPreview[]>([]);
   const [rejected, setRejected] = useState<FileRejection[]>([]);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [imageToDelete, setImageToDelete] = useState<{ url: string; index: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Clean up object URLs when component unmounts
@@ -46,6 +49,13 @@ export function PropertyImageGallery({
       files.forEach(file => URL.revokeObjectURL(file.preview));
     };
   }, [files]);
+
+  // Adjust current image index when images are deleted
+  useEffect(() => {
+    if (currentImage >= image.length && image.length > 0) {
+      setCurrentImage(image.length - 1);
+    }
+  }, [image.length, currentImage]);
 
   const handleImageUpload = async () => {
     if (!files.length) return;
@@ -88,6 +98,39 @@ export function PropertyImageGallery({
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleDeleteImage = async (imageUrl: string, index: number) => {
+    setDeleting(imageUrl);
+    try {
+      const updatedImages = image.filter((_, i) => i !== index);
+
+      // Update the UI immediately
+      if (onImagesUpdate) {
+        onImagesUpdate(updatedImages);
+      }
+
+      // Update the property record
+      await updateProperty(propertyId, accessToken, { image: updatedImages });
+
+      toast.success("Image deleted successfully!");
+      setDeleteConfirmOpen(false);
+      setImageToDelete(null);
+    } catch (error) {
+      console.error('Delete failed:', error);
+      toast.error("Failed to delete image");
+      // Revert the UI update on error
+      if (onImagesUpdate) {
+        onImagesUpdate(image);
+      }
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  const confirmDelete = (imageUrl: string, index: number) => {
+    setImageToDelete({ url: imageUrl, index });
+    setDeleteConfirmOpen(true);
   };
 
   // Drag and drop handlers for reordering
@@ -181,9 +224,9 @@ export function PropertyImageGallery({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="relative">
-                <div className={`w-2.5 h-2.5 rounded-full ${editMode ? 'bg-emerald-500' : 'bg-gray-400'} transition-colors duration-300`}></div>
+                <div className={`w-2.5 h-2.5 rounded-full ${editMode ? 'bg-tripswift-blue' : 'bg-gray-400'} transition-colors duration-300`}></div>
                 {editMode && (
-                  <div className="absolute inset-0 w-2.5 h-2.5 bg-emerald-500 rounded-full animate-ping opacity-75"></div>
+                  <div className="absolute inset-0 w-2.5 h-2.5 bg-tripswift-blue rounded-full animate-ping opacity-75"></div>
                 )}
               </div>
               <div className="flex flex-col">
@@ -191,38 +234,36 @@ export function PropertyImageGallery({
                   {editMode ? "Edit Mode" : "View Mode"}
                 </span>
                 <span className="text-xs text-gray-500">
-                  {editMode ? "Click or drag images to modify" : "Gallery view active"}
+                  {editMode ? "Click or drag images to modify, click X to delete" : "Gallery view active"}
                 </span>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
+              <button
                 onClick={() => setEditMode(!editMode)}
-                size="sm"
-                className={`h-9 px-4 font-medium transition-all duration-200 ${editMode
-                    ? "text-gray-600 hover:text-gray-800 hover:bg-gray-100"
-                    : "bg-gradient-to-r from-tripswift-blue to-purple-600 hover:from-tripswift-dark-blue hover:to-purple-700 text-white shadow-sm hover:shadow-md"
+                className={`h-9 px-4 font-medium transition-all duration-200 rounded-md flex items-center gap-2 ${editMode
+                  ? "text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200"
+                  : "bg-gradient-to-r from-tripswift-blue to-purple-600 hover:from-tripswift-dark-blue hover:to-purple-700 text-white shadow-sm hover:shadow-md"
                   }`}
               >
                 {editMode ? (
                   <>
-                    <Eye className="w-4 h-4 mr-2" />
-                    Preview
+                    <Eye className="w-4 h-4" />
+                    <span>Preview</span>
                   </>
                 ) : (
                   <>
-                    <Edit3 className="w-4 h-4 mr-2" />
-                    Edit
+                    <Edit3 className="w-4 h-4" />
+                    <span>Edit</span>
                   </>
                 )}
-              </Button>
+              </button>
 
               {editMode && (
                 <Button
                   onClick={() => setUploadDialogOpen(true)}
-                  className="h-9 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-medium shadow-sm hover:shadow-md transition-all duration-200"
+                  className="h-9 px-4 bg-gradient-to-r from-tripswift-blue to-purple-600 hover:from-tripswift-dark-blue hover:to-purple-700 text-white font-medium shadow-sm hover:shadow-md transition-all duration-200"
                   size="sm"
                 >
                   <Upload className="w-4 h-4 mr-2" />
@@ -237,10 +278,10 @@ export function PropertyImageGallery({
       <div
         {...(editMode ? getRootProps() : {})}
         className={`relative rounded-xl overflow-hidden transition-all duration-500 ${editMode && isDragActive
-            ? 'ring-4 ring-tripswift-blue/30 shadow-2xl transform scale-[1.01]'
-            : editMode
-              ? 'ring-2 ring-blue-200/60 shadow-lg'
-              : 'shadow-xl hover:shadow-2xl'
+          ? 'ring-4 ring-tripswift-blue/30 shadow-2xl transform scale-[1.01]'
+          : editMode
+            ? 'ring-2 ring-blue-200/60 shadow-lg'
+            : 'shadow-xl hover:shadow-2xl'
           }`}
       >
         {editMode && <input {...getInputProps()} />}
@@ -264,13 +305,31 @@ export function PropertyImageGallery({
               src={image[currentImage]}
               alt="Property showcase"
               fill
-              className="object-cover transition-all duration-700 group-hover:scale-105"
+              className="object-cover transition-all duration-700"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
               priority
             />
 
             {/* Enhanced gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+            {/* Delete button for current image in edit mode */}
+            {/* {editMode && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  confirmDelete(image[currentImage], currentImage);
+                }}
+                disabled={deleting === image[currentImage]}
+                className="absolute top-6 right-6 w-10 h-10 bg-red-500/80 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-600/90 transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {deleting === image[currentImage] ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Trash2 className="w-5 h-5" />
+                )}
+              </button>
+            )} */}
 
             {/* Modern image counter */}
             <div className="absolute top-6 left-6">
@@ -311,26 +370,27 @@ export function PropertyImageGallery({
       </div>
 
       {/* Enhanced thumbnail navigation */}
-      <div className="space-y-4">
+      <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <h4 className="text-sm font-semibold text-gray-900">Gallery ({image.length} images)</h4>
           {image.length > 6 && (
             <div className="text-xs text-gray-500">Scroll to see more</div>
           )}
         </div>
 
         <div className="relative">
-          <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
+          <div className="flex gap-2 overflow-x-auto pb-6 scrollbar-hide px-2">
             {image.map((img, i) => (
-              <button
+              <div
                 key={`${img}-${i}`}
-                className={`relative flex-shrink-0 group transition-all duration-300 ${currentImage === i
-                    ? "ring-3 ring-tripswift-blue ring-offset-2 transform scale-105"
-                    : "hover:ring-2 hover:ring-gray-300 hover:ring-offset-1 hover:transform hover:scale-102"
-                  }`}
-                onClick={() => setCurrentImage(i)}
+                className={`relative flex-shrink-0 group transition-all duration-300 ${editMode ? 'p-2' : 'p-1'}`}
               >
-                <div className="relative w-20 h-20 rounded-xl overflow-hidden">
+                <button
+                  className={`relative block w-20 h-20 rounded-xl overflow-hidden transition-all duration-300 ${currentImage === i
+                    ? "ring-3 ring-tripswift-blue ring-offset-2 transform scale-105 shadow-xl"
+                    : "hover:ring-2 hover:ring-gray-300 hover:ring-offset-1 hover:transform hover:scale-102 shadow-md hover:shadow-lg"
+                    }`}
+                  onClick={() => setCurrentImage(i)}
+                >
                   <Image
                     src={img}
                     alt={`Gallery image ${i + 1}`}
@@ -342,7 +402,7 @@ export function PropertyImageGallery({
                   {/* Active state overlay */}
                   {currentImage === i && (
                     <div className="absolute inset-0 bg-tripswift-blue/20 backdrop-blur-[1px] flex items-center justify-center">
-                      <div className="w-3 h-3 bg-white rounded-full shadow-lg"></div>
+                      <div className="w-3 h-3 bg-white rounded-full shadow-lg animate-pulse"></div>
                     </div>
                   )}
 
@@ -350,31 +410,70 @@ export function PropertyImageGallery({
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
 
                   {/* Image number indicator */}
-                  <div className="absolute bottom-1 right-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded-md font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <div className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded-md font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     {i + 1}
                   </div>
-                </div>
-              </button>
+
+                  {/* Edit mode indicator */}
+                  {editMode && (
+                    <div className="absolute top-1 left-1 w-2 h-2 bg-red-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 animate-pulse"></div>
+                  )}
+                </button>
+
+                {/* Enhanced Delete button for thumbnails in edit mode */}
+                {editMode && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      confirmDelete(img, i);
+                    }}
+                    disabled={deleting === img}
+                    className="absolute -top-1 -right-1 w-7 h-7 bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed z-20 border-2 border-white"
+                    title="Delete image"
+                  >
+                    {deleting === img ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Trash2 className="w-3.5 h-3.5 font-bold" />
+                    )}
+                  </button>
+                )}
+
+                {/* Subtle border glow effect for better visibility */}
+                {editMode && (
+                  <div className="absolute inset-0 rounded-xl border border-red-200/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
+                )}
+              </div>
             ))}
           </div>
 
-          {/* Scroll progress indicator */}
-          {image.length > 6 && (
-            <div className="flex justify-center mt-3">
-              <div className="flex gap-1.5">
-                {Array.from({ length: Math.min(5, Math.ceil(image.length / 3)) }).map((_, i) => (
-                  <div
-                    key={i}
-                    className={`h-1 rounded-full transition-all duration-300 ${i === 0 ? 'w-6 bg-tripswift-blue' : 'w-2 bg-gray-300'
-                      }`}
-                  />
-                ))}
+          {/* Enhanced scroll progress indicator */}
+          {image.length > 5 && (
+            <div className="flex justify-center mt-4">
+              <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-full px-3 py-2 shadow-sm border border-gray-200/50">
+                <div className="flex gap-1.5">
+                  {Array.from({ length: Math.min(6, Math.ceil(image.length / 2)) }).map((_, i) => (
+                    <div
+                      key={i}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${i === 0
+                        ? 'w-8 bg-gradient-to-r from-tripswift-blue to-purple-600'
+                        : i === 1
+                          ? 'w-4 bg-tripswift-blue/60'
+                          : 'w-2 bg-gray-300'
+                        }`}
+                    />
+                  ))}
+                </div>
+                <span className="text-xs text-gray-500 font-medium ml-1">
+                  {image.length} images
+                </span>
               </div>
             </div>
           )}
         </div>
       </div>
 
+      {/* Upload Dialog */}
       <UploadDialog
         open={uploadDialogOpen}
         setOpen={setUploadDialogOpen}
@@ -387,11 +486,56 @@ export function PropertyImageGallery({
         fileInputRef={fileInputRef}
         removeFile={removeFile}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-red-600">Delete Image</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this image? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-3 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDeleteConfirmOpen(false);
+                setImageToDelete(null);
+              }}
+              disabled={deleting !== null}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (imageToDelete) {
+                  handleDeleteImage(imageToDelete.url, imageToDelete.index);
+                }
+              }}
+              disabled={deleting !== null}
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
-// Enhanced Upload Dialog Component
+// Enhanced Upload Dialog Component (unchanged from original)
 function UploadDialog({
   open,
   setOpen,
