@@ -234,7 +234,7 @@ export function PropertyImageGallery({
                   {editMode ? "Edit Mode" : "View Mode"}
                 </span>
                 <span className="text-xs text-gray-500">
-                  {editMode ? "Click or drag images to modify, click X to delete" : "Gallery view active"}
+                  {editMode ? "Click or drag images to modify" : "Gallery view active"}
                 </span>
               </div>
             </div>

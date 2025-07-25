@@ -6,7 +6,6 @@ type BedType = "single" | "double" | "king" | "twin" | "queen";
 interface RoomAmenities {
   bed: BedType;
   bathroom: boolean;
-  towels: boolean;
   linensBedding: boolean;
   linens: boolean; // Added
   bidet: boolean; // Added
@@ -23,7 +22,6 @@ interface FurnitureAmenities {
   dresserWardrobe: boolean;
   sofaSeating: boolean;
   sofa: boolean; // Added
-  wardrobeOrCloset: boolean; // Added
   diningTable: boolean; // Added
   diningArea: boolean; // Added
   sittingArea: boolean; // Added
@@ -48,14 +46,12 @@ interface ClimateControlAmenities {
 interface KitchenetteMiniBarAmenities {
   smallRefrigerator: boolean;
   microwave: boolean;
-  coffeeMaker: boolean;
   refrigerator: boolean; // Added (full size)
   kitchenware: boolean; // Added
   electricKettle: boolean; // Added
   oven: boolean; // Added
   stovetop: boolean; // Added
   teaCoffeeMaker: boolean; // Added
-  kitchen: boolean; // Added (full kitchen)
 }
 
 interface SafetySecurityAmenities {
@@ -74,7 +70,6 @@ interface WorkLeisureAmenities {
   workDesk: boolean;
   additionalLighting: boolean;
   ironingFacilities: boolean; // Added
-  iron: boolean; // Added
 }
 
 interface AccessibilityFeaturesAmenities {
@@ -119,7 +114,6 @@ const roomAminitySchema = new Schema({
         default: "single",
       },
       bathroom: { type: Boolean, default: false },
-      towels: { type: Boolean, default: false },
       linensBedding: { type: Boolean, default: false },
       linens: { type: Boolean, default: false },
       bidet: { type: Boolean, default: false },
@@ -135,7 +129,6 @@ const roomAminitySchema = new Schema({
       dresserWardrobe: { type: Boolean, default: false },
       sofaSeating: { type: Boolean, default: false },
       sofa: { type: Boolean, default: false },
-      wardrobeOrCloset: { type: Boolean, default: false },
       diningTable: { type: Boolean, default: false },
       diningArea: { type: Boolean, default: false },
       sittingArea: { type: Boolean, default: false },
@@ -157,14 +150,12 @@ const roomAminitySchema = new Schema({
     kitchenetteMiniBar: {
       smallRefrigerator: { type: Boolean, default: false },
       microwave: { type: Boolean, default: false },
-      coffeeMaker: { type: Boolean, default: false },
       refrigerator: { type: Boolean, default: false },
       kitchenware: { type: Boolean, default: false },
       electricKettle: { type: Boolean, default: false },
       oven: { type: Boolean, default: false },
       stovetop: { type: Boolean, default: false },
       teaCoffeeMaker: { type: Boolean, default: false },
-      kitchen: { type: Boolean, default: false },
     },
     safetySecurity: {
       safe: { type: Boolean, default: false },
@@ -180,7 +171,6 @@ const roomAminitySchema = new Schema({
       workDesk: { type: Boolean, default: false },
       additionalLighting: { type: Boolean, default: false },
       ironingFacilities: { type: Boolean, default: false },
-      iron: { type: Boolean, default: false },
     },
     accessibilityFeatures: {
       accessibleBathroom: { type: Boolean, default: false },
