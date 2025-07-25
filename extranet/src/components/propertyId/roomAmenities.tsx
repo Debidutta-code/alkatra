@@ -15,7 +15,6 @@ import toast from 'react-hot-toast';
 interface BasicAmenities {
   bed: "single" | "double" | "king" | "twin" | "queen";
   bathroom: boolean;
-  towels: boolean;
   linensBedding: boolean;
   linens: boolean;
   bidet: boolean;
@@ -32,7 +31,6 @@ interface FurnitureAmenities {
   dresserWardrobe: boolean;
   sofaSeating: boolean;
   sofa: boolean;
-  wardrobeOrCloset: boolean;
   diningTable: boolean;
   diningArea: boolean;
   sittingArea: boolean;
@@ -57,14 +55,12 @@ interface ClimateControlAmenities {
 interface KitchenetteMiniBarAmenities {
   smallRefrigerator: boolean;
   microwave: boolean;
-  coffeeMaker: boolean;
   refrigerator: boolean;
   kitchenware: boolean;
   electricKettle: boolean;
   oven: boolean;
   stovetop: boolean;
   teaCoffeeMaker: boolean;
-  kitchen: boolean;
 }
 
 interface SafetySecurityAmenities {
@@ -83,7 +79,6 @@ interface WorkLeisureAmenities {
   workDesk: boolean;
   additionalLighting: boolean;
   ironingFacilities: boolean;
-  iron: boolean;
 }
 
 interface AccessibilityFeaturesAmenities {
@@ -127,12 +122,11 @@ const bedTypes = ["single", "double", "king", "twin", "queen"];
 // Updated amenity categories with all new amenities
 const amenityCategories = {
   basic: [
-    "bathroom", "towels", "linensBedding", "linens", "bidet",
+    "bathroom", "linensBedding", "linens", "bidet",
     "toiletPaper", "towelsSheets", "freeToiletries", "shower", "toilet"
   ],
   furniture: [
-    "tableChairs", "desk", "dresserWardrobe", "sofaSeating", "sofa",
-    "wardrobeOrCloset", "diningTable", "diningArea", "sittingArea",
+    "tableChairs", "desk", "dresserWardrobe", "sofaSeating", "sofa", "diningTable", "diningArea", "sittingArea",
     "readingChair", "balcony"
   ],
   technology: [
@@ -141,13 +135,13 @@ const amenityCategories = {
   ],
   climateControl: ["airConditioning", "heating"],
   kitchenetteMiniBar: [
-    "smallRefrigerator", "microwave", "coffeeMaker", "refrigerator",
+    "smallRefrigerator", "microwave", "refrigerator",
     "kitchenware", "electricKettle", "oven", "stovetop",
-    "teaCoffeeMaker", "kitchen"
+    "teaCoffeeMaker"
   ],
   safetySecurity: ["safe", "smokeDetectors", "fireExtinguisher"],
   toiletries: ["shampooConditioner", "soap", "hairDryer"],
-  workLeisure: ["workDesk", "additionalLighting", "ironingFacilities", "iron"],
+  workLeisure: ["workDesk", "additionalLighting", "ironingFacilities"],
   accessibilityFeatures: [
     "accessibleBathroom", "wheelchairAccessibility",
     "upperFloorsAccessibleByElevator", "entireUnitWheelchairAccessible"
@@ -166,7 +160,6 @@ const formatAmenityName = (amenity: string): string => {
     cableChannels: "Cable Channels",
     airConditioning: "Air Conditioning",
     smallRefrigerator: "Small Refrigerator",
-    coffeeMaker: "Coffee Maker",
     electricKettle: "Electric Kettle",
     teaCoffeeMaker: "Tea/Coffee Maker",
     smokeDetectors: "Smoke Detectors",
@@ -184,7 +177,6 @@ const formatAmenityName = (amenity: string): string => {
     freeToiletries: "Free Toiletries",
     toiletPaper: "Toilet Paper",
     towelsSheets: "Towels & Sheets",
-    wardrobeOrCloset: "Wardrobe/Closet",
     diningTable: "Dining Table",
     diningArea: "Dining Area",
     sittingArea: "Sitting Area",
@@ -227,7 +219,6 @@ const createEmptyAmenityStructure = (propertyInfoId: string, selectedRoomType: s
       basic: {
         bed: "single",
         bathroom: false,
-        towels: false,
         linensBedding: false,
         linens: false,
         bidet: false,
@@ -243,7 +234,6 @@ const createEmptyAmenityStructure = (propertyInfoId: string, selectedRoomType: s
         dresserWardrobe: false,
         sofaSeating: false,
         sofa: false,
-        wardrobeOrCloset: false,
         diningTable: false,
         diningArea: false,
         sittingArea: false,
@@ -265,14 +255,12 @@ const createEmptyAmenityStructure = (propertyInfoId: string, selectedRoomType: s
       kitchenetteMiniBar: {
         smallRefrigerator: false,
         microwave: false,
-        coffeeMaker: false,
         refrigerator: false,
         kitchenware: false,
         electricKettle: false,
         oven: false,
         stovetop: false,
         teaCoffeeMaker: false,
-        kitchen: false
       },
       safetySecurity: {
         safe: false,
@@ -288,7 +276,6 @@ const createEmptyAmenityStructure = (propertyInfoId: string, selectedRoomType: s
         workDesk: false,
         additionalLighting: false,
         ironingFacilities: false,
-        iron: false
       },
       accessibilityFeatures: {
         accessibleBathroom: false,

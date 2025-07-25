@@ -36,7 +36,6 @@ const roomSchema = z.object({
   // Basic Room Amenities
   bed: BedType,
   bathroom: z.boolean(),
-  towels: z.boolean(),
   linensBedding: z.boolean(),
   linens: z.boolean(),
   bidet: z.boolean(),
@@ -45,20 +44,19 @@ const roomSchema = z.object({
   freeToiletries: z.boolean(),
   shower: z.boolean(),
   toilet: z.boolean(),
-  
+
   // Furniture Amenities
   tableChairs: z.boolean(),
   desk: z.boolean(),
   dresserWardrobe: z.boolean(),
   sofaSeating: z.boolean(),
   sofa: z.boolean(),
-  wardrobeOrCloset: z.boolean(),
   diningTable: z.boolean(),
   diningArea: z.boolean(),
   sittingArea: z.boolean(),
   readingChair: z.boolean(),
   balcony: z.boolean(),
-  
+
   // Technology Amenities
   television: z.boolean(),
   telephone: z.boolean(),
@@ -66,39 +64,36 @@ const roomSchema = z.object({
   flatScreenTV: z.boolean(),
   satelliteChannels: z.boolean(),
   cableChannels: z.boolean(),
-  
+
   // Climate Control
   airConditioning: z.boolean(),
   heating: z.boolean(),
-  
+
   // Kitchen/MiniBar Amenities
   smallRefrigerator: z.boolean(),
   microwave: z.boolean(),
-  coffeeMaker: z.boolean(),
   refrigerator: z.boolean(),
   kitchenware: z.boolean(),
   electricKettle: z.boolean(),
   oven: z.boolean(),
   stovetop: z.boolean(),
   teaCoffeeMaker: z.boolean(),
-  kitchen: z.boolean(),
-  
+
   // Safety/Security
   safe: z.boolean(),
   smokeDetectors: z.boolean(),
   fireExtinguisher: z.boolean(),
-  
+
   // Toiletries
   shampooConditioner: z.boolean(),
   soap: z.boolean(),
   hairDryer: z.boolean(),
-  
+
   // Work/Leisure
   workDesk: z.boolean(),
   additionalLighting: z.boolean(),
   ironingFacilities: z.boolean(),
-  iron: z.boolean(),
-  
+
   // Accessibility
   accessibleBathroom: z.boolean(),
   wheelchairAccessibility: z.boolean(),
@@ -121,7 +116,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
   const [loading, setLoading] = useState<boolean>(false);
   const [formLoading, setFormLoading] = useState<boolean>(false);
   const [roomDetails, setroomDetails] = useState<any>(null);
-  
+
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const property_id = useSearchParams().get("property_id");
   const router = useRouter();
@@ -156,7 +151,6 @@ export default function Rooms({ onNext, onPrevious }: Props) {
       // Basic Room Amenities
       bed: "single",
       bathroom: false,
-      towels: false,
       linensBedding: false,
       linens: false,
       bidet: false,
@@ -165,20 +159,19 @@ export default function Rooms({ onNext, onPrevious }: Props) {
       freeToiletries: false,
       shower: false,
       toilet: false,
-      
+
       // Furniture Amenities
       tableChairs: false,
       desk: false,
       dresserWardrobe: false,
       sofaSeating: false,
       sofa: false,
-      wardrobeOrCloset: false,
       diningTable: false,
       diningArea: false,
       sittingArea: false,
       readingChair: false,
       balcony: false,
-      
+
       // Technology Amenities
       television: false,
       telephone: false,
@@ -186,39 +179,36 @@ export default function Rooms({ onNext, onPrevious }: Props) {
       flatScreenTV: false,
       satelliteChannels: false,
       cableChannels: false,
-      
+
       // Climate Control
       airConditioning: false,
       heating: false,
-      
+
       // Kitchen/MiniBar Amenities
       smallRefrigerator: false,
       microwave: false,
-      coffeeMaker: false,
       refrigerator: false,
       kitchenware: false,
       electricKettle: false,
       oven: false,
       stovetop: false,
       teaCoffeeMaker: false,
-      kitchen: false,
-      
+
       // Safety/Security
       safe: false,
       smokeDetectors: false,
       fireExtinguisher: false,
-      
+
       // Toiletries
       shampooConditioner: false,
       soap: false,
       hairDryer: false,
-      
+
       // Work/Leisure
       workDesk: false,
       additionalLighting: false,
       ironingFacilities: false,
-      iron: false,
-      
+
       // Accessibility
       accessibleBathroom: false,
       wheelchairAccessibility: false,
@@ -235,7 +225,6 @@ export default function Rooms({ onNext, onPrevious }: Props) {
       basic: {
         bed: data.bed,
         bathroom: !!data.bathroom,
-        towels: !!data.towels,
         linensBedding: !!data.linensBedding,
         linens: !!data.linens,
         bidet: !!data.bidet,
@@ -251,7 +240,6 @@ export default function Rooms({ onNext, onPrevious }: Props) {
         dresserWardrobe: !!data.dresserWardrobe,
         sofaSeating: !!data.sofaSeating,
         sofa: !!data.sofa,
-        wardrobeOrCloset: !!data.wardrobeOrCloset,
         diningTable: !!data.diningTable,
         diningArea: !!data.diningArea,
         sittingArea: !!data.sittingArea,
@@ -273,14 +261,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
       kitchenetteMiniBar: {
         smallRefrigerator: !!data.smallRefrigerator,
         microwave: !!data.microwave,
-        coffeeMaker: !!data.coffeeMaker,
         refrigerator: !!data.refrigerator,
         kitchenware: !!data.kitchenware,
         electricKettle: !!data.electricKettle,
         oven: !!data.oven,
         stovetop: !!data.stovetop,
         teaCoffeeMaker: !!data.teaCoffeeMaker,
-        kitchen: !!data.kitchen,
       },
       safetySecurity: {
         safe: !!data.safe,
@@ -296,7 +282,6 @@ export default function Rooms({ onNext, onPrevious }: Props) {
         workDesk: !!data.workDesk,
         additionalLighting: !!data.additionalLighting,
         ironingFacilities: !!data.ironingFacilities,
-        iron: !!data.iron,
       },
       accessibilityFeatures: {
         accessibleBathroom: !!data.accessibleBathroom,
@@ -372,7 +357,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
           <CardContent className="flex gap-4 flex-wrap">
             <ScrollArea className="h-72 w-full px-6">
               <Accordion type="multiple" className="w-full">
-                
+
                 {/* Basic Room Amenities */}
                 <AccordionItem value="amenity-1">
                   <AccordionTrigger>Basic Room Amenities</AccordionTrigger>
@@ -404,7 +389,6 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                     <div className="w-full">
                       <div className="flex flex-col space-y-2">
                         {createCheckbox("bathroom", "Bathroom", roomDetails?.bathroom)}
-                        {createCheckbox("towels", "Towels", roomDetails?.towels)}
                         {createCheckbox("linensBedding", "Linens Bedding", roomDetails?.linensBedding)}
                         {createCheckbox("linens", "Linens", roomDetails?.linens)}
                         {createCheckbox("bidet", "Bidet", roomDetails?.bidet)}
@@ -428,7 +412,6 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                       {createCheckbox("dresserWardrobe", "Dresser Wardrobe", roomDetails?.dresserWardrobe)}
                       {createCheckbox("sofaSeating", "Sofa Seating", roomDetails?.sofaSeating)}
                       {createCheckbox("sofa", "Sofa", roomDetails?.sofa)}
-                      {createCheckbox("wardrobeOrCloset", "Wardrobe or Closet", roomDetails?.wardrobeOrCloset)}
                       {createCheckbox("diningTable", "Dining Table", roomDetails?.diningTable)}
                       {createCheckbox("diningArea", "Dining Area", roomDetails?.diningArea)}
                       {createCheckbox("sittingArea", "Sitting Area", roomDetails?.sittingArea)}
@@ -471,14 +454,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                     <div>
                       {createCheckbox("smallRefrigerator", "Small Refrigerator", roomDetails?.smallRefrigerator)}
                       {createCheckbox("microwave", "Microwave", roomDetails?.microwave)}
-                      {createCheckbox("coffeeMaker", "Coffee Maker", roomDetails?.coffeeMaker)}
                       {createCheckbox("refrigerator", "Refrigerator", roomDetails?.refrigerator)}
                       {createCheckbox("kitchenware", "Kitchenware", roomDetails?.kitchenware)}
                       {createCheckbox("electricKettle", "Electric Kettle", roomDetails?.electricKettle)}
                       {createCheckbox("oven", "Oven", roomDetails?.oven)}
                       {createCheckbox("stovetop", "Stovetop", roomDetails?.stovetop)}
                       {createCheckbox("teaCoffeeMaker", "Tea/Coffee Maker", roomDetails?.teaCoffeeMaker)}
-                      {createCheckbox("kitchen", "Kitchen", roomDetails?.kitchen)}
                     </div>
                   </AccordionContent>
                 </AccordionItem>
@@ -515,7 +496,6 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                       {createCheckbox("workDesk", "Work Desk", roomDetails?.workDesk)}
                       {createCheckbox("additionalLighting", "Additional Lighting", roomDetails?.additionalLighting)}
                       {createCheckbox("ironingFacilities", "Ironing Facilities", roomDetails?.ironingFacilities)}
-                      {createCheckbox("iron", "Iron", roomDetails?.iron)}
                     </div>
                   </AccordionContent>
                 </AccordionItem>
@@ -537,7 +517,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
             </ScrollArea>
           </CardContent>
         </Card>
-        
+
         <div className="flex justify-end gap-4 w-full mt-4">
           <div className="mt-2">
             <Button
