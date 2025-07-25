@@ -11,8 +11,15 @@ export interface IInventory extends Document {
   hotelName: string;
   invTypeCode: string;
   availability: Availability;
-  // createdAt: Date;
+  // createdAtIST: Date;
+  // updatedAtIST: Date;
 }
+
+// const getISTTime = () => {
+//   const utc = new Date();
+//   const istOffset = 5.5 * 60 * 60 * 1000; 
+//   return new Date(utc.getTime() + istOffset);
+// };
 
 const availabilitySchema = new Schema<Availability>({
   startDate: { type: Date, required: true },
@@ -26,7 +33,8 @@ const inventorySchema = new Schema<IInventory>(
     hotelName: { type: String, required: true },
     invTypeCode: { type: String, required: true },
     availability: { type: availabilitySchema, required: true },
-    // createdAt: { type: Date, default: Date.now },
+    // createdAtIST: { type: Date, default: getISTTime },
+    // updatedAtIST: { type: Date, default: getISTTime },
   },
   { timestamps: true }
 );

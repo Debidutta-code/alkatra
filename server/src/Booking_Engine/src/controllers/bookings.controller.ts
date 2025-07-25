@@ -13,7 +13,6 @@ import EmailService from '../../../Customer_Authentication/src/services/email.se
 import Handlebars from "handlebars";
 import { Inventory } from "../../../wincloud/src/model/inventoryModel";
 
-
 const calculateAgeCategory = (dob: string) => {
   const birthDate = new Date(dob);
   const today = new Date();
@@ -52,7 +51,7 @@ const reduceRoomsAfterBookingConfirmed = async (
   const [checkInDate, checkOutDate] = dates;
 
   if (checkInDate > checkOutDate) {
-    return{
+    return {
       message: "Check-in date must be before or equal to check-out date",
     };
   }
@@ -68,7 +67,7 @@ const reduceRoomsAfterBookingConfirmed = async (
     });
 
     if (!inventoryRecords || inventoryRecords.length === 0) {
-      return{ message: "No available rooms found for the specified criteria" };
+      return { message: "No available rooms found for the specified criteria" };
     }
 
     const bulkOps = [];
@@ -76,7 +75,7 @@ const reduceRoomsAfterBookingConfirmed = async (
     for (const item of inventoryRecords) {
       const currentCount = item.availability?.count || 0;
       if (currentCount < numberOfRooms) {
-        return{
+        return {
           message: `Not enough rooms for date ${item.availability?.startDate}. Available: ${currentCount}, requested: ${numberOfRooms}`,
         };
       }
@@ -98,7 +97,7 @@ const reduceRoomsAfterBookingConfirmed = async (
 
     const result = await Inventory.bulkWrite(bulkOps);
 
-    return{
+    return {
       message: "Room counts reduced successfully for booking",
       result,
     };
@@ -392,7 +391,7 @@ export const createReservationWithStoredCard = CatchAsyncError(
         if (error) {
           const errorMessage = error instanceof Error ? error.message : "Failed to reduce rooms";
           return res.status(400).json({ message: errorMessage });
-        }        
+        }
       }
       try {
         const htmlContent = `<!DOCTYPE html>
@@ -1238,11 +1237,11 @@ export const updateThirdPartyReservation = CatchAsyncError(
           email,
           phone,
           guests: categorizedGuests,
-          supportEmail: 'support@alhajz.com', 
-          supportPhone: '+1-800-123-4567', 
-          websiteUrl: 'https://book.trip-swift.ai', 
+          supportEmail: 'support@alhajz.com',
+          supportPhone: '+1-800-123-4567',
+          websiteUrl: 'https://book.trip-swift.ai',
           currentYear: new Date().getFullYear(),
-          companyName: 'Al-Hajz', 
+          companyName: 'Al-Hajz',
           companyAddress: '1234 Example St, City, Country',
         };
 
@@ -1457,11 +1456,11 @@ export const cancelThirdPartyReservation = CatchAsyncError(
           amount: `${existingReservation.totalAmount} ${existingReservation.currencyCode}`,
           checkInDate: new Date(checkInDate).toLocaleDateString(),
           checkOutDate: new Date(checkOutDate).toLocaleDateString(),
-          supportEmail: 'support@alhajz.com', 
-          supportPhone: '+1-800-123-4567', 
-          websiteUrl: 'https://book.trip-swift.ai', 
+          supportEmail: 'support@alhajz.com',
+          supportPhone: '+1-800-123-4567',
+          websiteUrl: 'https://book.trip-swift.ai',
           currentYear: new Date().getFullYear(),
-          companyName: 'Al-Hajz', 
+          companyName: 'Al-Hajz',
           companyAddress: '1234 Example St, City, Country',
         };
 
