@@ -1,11 +1,11 @@
 import { connect } from "mongoose";
-import config from "./Common_API/index";
+import config from "./common/index";
 import { app } from "./app";
-import { initializeExpressRoutes } from "./Common_API/express";
+import { initializeExpressRoutes } from "./common/express";
 import cron from "node-cron";
-import CryptoPaymentDetails from './Booking_Engine/src/models/cryptoPayment.model';
+import CryptoPaymentDetails from './booking_engine/src/models/cryptoPayment.model';
 import passport from 'passport';
-import { CryptoGuestDetails } from "./Booking_Engine/src/models/cryptoUserPaymentInitialStage.model";
+import { CryptoGuestDetails } from "./booking_engine/src/models/cryptoUserPaymentInitialStage.model";
 
 
 // Middleware

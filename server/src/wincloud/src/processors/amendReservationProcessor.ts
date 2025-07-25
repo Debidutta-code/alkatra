@@ -1,6 +1,6 @@
 // amendReservationProcessor.ts
 import { AmendReservationInput, ThirdPartyAmendReservationData } from '../interface/amendReservationInterface';
-import { PropertyInfo } from '../../../Property_Management/src/model/property.info.model';
+import { PropertyInfo } from '../../../property_management/src/model/property.info.model';
 import { ThirdPartyBooking } from '../model/reservationModel';
 
 

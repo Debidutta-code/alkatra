@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 import { parseStringPromise } from 'xml2js';
 import { AmendReservationInput, ThirdPartyAmendReservationData } from '../interface/amendReservationInterface';
-import { PropertyInfo } from '../../../Property_Management/src/model/property.info.model';
+import { PropertyInfo } from '../../../property_management/src/model/property.info.model';
 import { generateAmendReservationXML } from '../formatters/amendReservationXmlFormatter';
 import { prepareAmendReservationData } from '../processors/amendReservationProcessor';
 import { ThirdPartyBooking } from '../model/reservationModel';
