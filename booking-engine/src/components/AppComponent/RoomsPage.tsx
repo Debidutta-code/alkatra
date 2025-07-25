@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { RoomCard } from "@/components/AppComponent/RoomCard";
 import GuestInformationModal, {
   Guest,
@@ -34,7 +34,8 @@ import {
   Users,
   Filter,
   AlertCircle,
-  X,
+  Ban,
+  Accessibility
 } from "lucide-react";
 
 import LoadingSkeleton from "../hotelListingComponents/LoadingSkeleton";
@@ -454,6 +455,12 @@ const RoomsPage: React.FC = () => {
         return <Droplets className="h-4 w-4 text-tripswift-blue" />;
       case "child_friendly_facilities":
         return <Star className="h-4 w-4 text-tripswift-blue" />;
+      case "non_smoking_rooms":
+        return <Ban className="h-4 w-4 text-tripswift-blue" />;
+      case "facilities_for_disabled_guests":
+        return <Accessibility className="h-4 w-4 text-tripswift-blue" />;
+      case "family_rooms":
+        return <Users className="h-4 w-4 text-tripswift-blue" />;
       default:
         return <CheckCircle className="h-4 w-4 text-tripswift-blue" />;
     }

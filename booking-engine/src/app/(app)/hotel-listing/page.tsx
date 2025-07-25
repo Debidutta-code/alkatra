@@ -1,14 +1,14 @@
-import HotelList from "@/components/hotelListingComponents/HotelList";
-import React from "react";
+// import HotelList from "@/components/hotelListingComponents/HotelList";
+// import React from "react";
 
-type Props = {};
+// type Props = {};
 
-const page = (props: Props) => {
-  return (
-    <div>
-      <HotelList />
-    </div>
-  );
-};
+// const page = (props: Props) => {
+//   return (
+//     <div>
+//       <HotelList />
+//     </div>
+//   );
+// };
 
-export default page;
+// export default page;

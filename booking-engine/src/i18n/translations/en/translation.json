@@ -298,7 +298,8 @@
         "pet_friendly": "Pet Friendly",
         "business_facilities": "Business Facilities",
         "laundry_services": "Laundry Services",
-        "child_friendly_facilities": "Child Friendly Facilities"
+        "child_friendly_facilities": "Child Friendly Facilities",
+        "non_smoking_rooms": ""
       },
       "sortOptions": {
         "recommended": "Recommended",

@@ -8,11 +8,9 @@ import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { logout } from "@/Redux/slices/auth.slice";
 import { useTranslation } from "react-i18next";
-
 import {
-  FaStar, FaRegStar, FaShower, FaThermometerHalf, FaPhone, FaTv, FaCouch, FaChair, FaDoorClosed, FaDesktop, FaWifi, FaSnowflake, FaSmokingBan, FaBed, FaChild, FaUser, FaTree,
-  FaCheckCircle, FaTshirt, FaShoppingCart, FaPercent, FaTimes, FaInfoCircle, FaRulerCombined, FaBath,
-  FaShieldAlt,
+  FaShower, FaThermometerHalf, FaPhone, FaTv, FaCouch, FaChair, FaDoorClosed, FaDesktop, FaWifi, FaSnowflake, FaSmokingBan, FaBed, FaChild, FaUser, FaTree,
+  FaCheckCircle, FaPercent, FaTimes, FaInfoCircle, FaRulerCombined, FaBath, FaShieldAlt, FaChevronLeft, FaChevronRight
 } from "react-icons/fa";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { getPolicyType, getPolicyStyling, getPolicyBulletPoints } from "@/utils/cancellationPolicies";
@@ -28,13 +26,12 @@ interface RoomData {
   room_name: string;
   room_size: number;
   room_type: string;
-  room_price?: number | null; // Optional, as it’s null in backend
+  room_price?: number | null;
   baseByGuestAmts?: {
     amountBeforeTax: number;
     numberOfGuests: number;
     _id: string;
   }[];
-  // Optional fields
   image?: string[];
   amenities?: { icon: string; name: string }[];
   description?: string;
@@ -63,40 +60,30 @@ export const RoomCard: React.FC<RoomCardProps> = ({
 }) => {
   const { t } = useTranslation();
   const [showPolicyModal, setShowPolicyModal] = useState(false);
-
   const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1617104678098-de229db51175?q=80&w=1514&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
   const selectedImage = data.image && data.image.length > 0 ? data.image[0] : DEFAULT_IMAGE;
-
   const router = useRouter();
   const dispatch = useDispatch();
-
   const policyType = getPolicyType(data.cancellation_policy);
   const policyStyling = getPolicyStyling(policyType);
-  const policyBulletPoints = getPolicyBulletPoints(policyType, t); // Pass translation function
-
-  // Handle discount display
+  const policyBulletPoints = getPolicyBulletPoints(policyType, t);
   const hasOriginalPrice = !!data.original_price;
   const originalPrice = data.original_price || 0;
   const discountPercentage = data.discount_percentage || 0;
   const hasDiscount = discountPercentage > 0 && hasOriginalPrice;
-
   const rating = data.rating !== undefined ? data.rating : 5;
   const maxRating = 5;
-
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const truncateDescription = (text: string, wordLimit: number = 8) => {
     if (!text) return "";
     const words = text.trim().split(/\s+/);
     if (words.length <= wordLimit) return text;
     return words.slice(0, wordLimit).join(" ") + "...";
   };
-
   const truncatedDescription = truncateDescription(data.description || "");
-
   const handleBookNow = () => {
-    if (!isPriceAvailable) return; // Don't proceed if price not available
-
+    if (!isPriceAvailable) return;
     const accessToken = Cookies.get("accessToken");
-
     if (!accessToken) {
       const fullUrl = window.location.href;
       Cookies.set("redirectAfterLogin", fullUrl);
@@ -104,7 +91,6 @@ export const RoomCard: React.FC<RoomCardProps> = ({
       dispatch(logout());
       return;
     }
-
     try {
       const decodedToken: { exp: number } = jwtDecode(accessToken);
       const currentTime = Math.floor(Date.now() / 1000);
@@ -175,9 +161,11 @@ export const RoomCard: React.FC<RoomCardProps> = ({
         {/* Image Section */}
         <div className="relative w-full md:w-[45%] h-48 md:h-auto flex-shrink-0 overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10"></div>
+
+          {/* Main Image */}
           <Image
-            src={selectedImage}
-            alt={`${data.room_name || t('RoomsPage.RoomCard.roomImageAlt')} image`}
+            src={data.image && data.image.length > 0 ? data.image[currentImageIndex] : DEFAULT_IMAGE}
+            alt={`${data.room_name || t('RoomsPage.RoomCard.roomImageAlt')} image ${currentImageIndex + 1}`}
             layout="fill"
             objectFit="cover"
             className="w-full h-full object-cover transition-transform"
@@ -188,20 +176,79 @@ export const RoomCard: React.FC<RoomCardProps> = ({
             }}
           />
 
-          {/* Discount tag */}
+          {/* Navigation arrows - only show if multiple images */}
+          {data.image && data.image.length > 1 && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentImageIndex(prev =>
+                    prev === 0 ? data.image!.length - 1 : prev - 1
+                  );
+                }}
+                className="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                aria-label="Previous image"
+              >
+                <FaChevronLeft className="h-3 w-3" />
+              </button>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentImageIndex(prev =>
+                    prev === data.image!.length - 1 ? 0 : prev + 1
+                  );
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                aria-label="Next image"
+              >
+                <FaChevronRight className="h-3 w-3" />
+              </button>
+            </>
+          )}
+
+          {/* Image indicators - only show if multiple images */}
+          {data.image && data.image.length > 1 && (
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-1.5">
+              {data.image.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentImageIndex(index);
+                  }}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentImageIndex
+                      ? 'bg-white'
+                      : 'bg-white/50 hover:bg-white/75'
+                    }`}
+                  aria-label={`View image ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Image counter */}
+          {data.image && data.image.length > 1 && (
+            <div className="absolute top-3 right-3 z-20 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+              {currentImageIndex + 1}/{data.image.length}
+            </div>
+          )}
+
+          {/* Existing discount tag */}
           {isPriceAvailable && hasDiscount && (
             <div className="absolute top-3 left-3 z-20 bg-red-600 text-tripswift-off-white text-xs font-tripswift-semibold py-1 px-2.5 rounded-full flex items-center shadow-md">
               <FaPercent className="h-2.5 w-2.5 mr-1" /> {discountPercentage}% {t('RoomsPage.RoomCard.off')}
             </div>
           )}
 
-          {/* Not Available Badge */}
+          {/* Existing Not Available Badge */}
           {!isPriceAvailable && (
             <div className="absolute top-3 left-3 z-20 bg-gray-600 text-tripswift-off-white text-xs font-tripswift-semibold py-1 px-2.5 rounded-full flex items-center shadow-md">
               {t('RoomsPage.RoomCard.notAvailable')}
             </div>
           )}
         </div>
+
 
         {/* Details Section */}
         <div className="w-full md:w-[55%] flex flex-col p-3 sm:p-4">
@@ -212,7 +259,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
                 <h3 className="text-room-title">
                   {data.room_name} - {data.room_type}
                 </h3>
-                
+
                 {/* Available number of rooms */}
                 {/* <span className="flex items-center text-red-600 semibold text-sm">
                   <svg className="w-4 h-4 mr-1 fill-red-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">

@@ -16,11 +16,8 @@ import {
   MapPin,
   Search,
   CreditCard,
-  Check,
   Star,
   Shield,
-  ChevronRight,
-  MapIcon,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useSelector } from "@/Redux/store";
