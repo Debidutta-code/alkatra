@@ -16,45 +16,45 @@ class OTPService {
 
     console.log(`🔍 Sending OTP in ${mode} mode for type: ${type}`);
 
-const otp = mode === 'production' ? this.generateOTP() : '123456';
+    const otp = mode === 'production' ? this.generateOTP() : '123456';
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 mins
 
-      await OTPDao.createOTP({ identifier, otp, type, expiresAt, status: OTPStatus.PENDING });
+    await OTPDao.createOTP({ identifier, otp, type, expiresAt, status: OTPStatus.PENDING });
     try {
-  if (type === OTPType.MAIL_VERIFICATION) {
-    const subject = `Your OTP for ${type.toUpperCase()}`;
-    const html = `<p>Your OTP is: <strong>${otp}</strong></p><p>This code will expire in 5 minutes.</p>`;
+      if (type === OTPType.MAIL_VERIFICATION) {
+        const subject = `Your OTP for ${type.toUpperCase()}`;
+        const html = `<p>Your OTP is: <strong>${otp}</strong></p><p>This code will expire in 5 minutes.</p>`;
 
-    if (process.env.MODE === 'production') {
-      await emailService.sendEmail({
-        to: identifier,
-        subject,
-        html,
-        text: `Your OTP is ${otp}`,
-      });
-    } else {
-      console.log('📧 [DEV MODE] Email not sent. OTP:', otp);
-    }
+        if (process.env.MODE === 'production') {
+          await emailService.sendEmail({
+            to: identifier,
+            subject,
+            html,
+            text: `Your OTP is ${otp}`,
+          });
+        } else {
+          console.log('📧 [DEV MODE] Email not sent. OTP:', otp);
+        }
 
-  } else if (type === OTPType.NUMBER_VERYFICATION) {
-    const message = `Your OTP is ${otp}. This code will expire in 5 minutes.`;
+      } else if (type === OTPType.NUMBER_VERYFICATION) {
+        const message = `Your OTP is ${otp}. This code will expire in 5 minutes.`;
 
-    if (process.env.MODE === 'production') {
-      await twilioService.sendSMS(identifier, message);
-    } else {
-      console.log('📱 [DEV MODE] SMS not sent. OTP:', otp);
-    }
-  }
-} catch (error) {
-        console.error('❌ Failed to send OTP email:', error);
-        throw new Error('OTP sending failed. Please try again.'); // 
-    // optionally: delete the OTP record or handle the failure
-  
+        if (process.env.MODE === 'production') {
+          await twilioService.sendSMS(identifier, message);
+        } else {
+          console.log('📱 [DEV MODE] SMS not sent. OTP:', otp);
+        }
       }
-      
+    } catch (error) {
+      console.error('❌ Failed to send OTP email:', error);
+      throw new Error('OTP sending failed. Please try again.'); // 
+      // optionally: delete the OTP record or handle the failure
+
+    }
+
   }
 
- async verifyOTP(identifier: string, inputOtp: string, type: OTPType): Promise<{ success: boolean; message: string }> {
+  async verifyOTP(identifier: string, inputOtp: string, type: OTPType): Promise<{ success: boolean; message: string }> {
     const record = await OTPDao.findLatestOTP(identifier, type);
 
     if (!record) {

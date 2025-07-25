@@ -522,7 +522,7 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
 
   // Generate coupon and QR
   const couponCode = await generateCouponCode();
-  const deepLinkUrl = `${process.env.DEEP_LINK}/property/${propertyInfoId}?coupon=${couponCode.code}&startDate=${startDate}&endDate=${endDate}`;
+  const deepLinkUrl = `${process.env.DEEP_LINK}/property/${propertyInfoId}?coupon=${couponCode.code}&startDate=${startDate}&endDate=${endDate}$hotelCode=${hotelCode}`;
   const qrCodeData = await QRCode.toDataURL(deepLinkUrl);
 
   res.status(200).json({
