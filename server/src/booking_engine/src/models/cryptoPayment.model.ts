@@ -1,13 +1,6 @@
 import mongoose from "mongoose";
 import convertToLocalTime from '../../../utils/timezone_convert';
 
-const getISTTime = () => {
-  const now = new Date();
-  const istOffset = 5.5 * 60 * 60 * 1000;
-  const istTime = new Date(now.getTime() + istOffset);
-  return istTime;
-};
-
 const cryptoPaymentSchema = new mongoose.Schema({
   customer_id: {
     type: mongoose.Schema.Types.ObjectId,
@@ -45,17 +38,16 @@ const cryptoPaymentSchema = new mongoose.Schema({
   },
   initiatedTime: {
     type: Date,
-    default: getISTTime,
+    default: convertToLocalTime(),
   },
   createdAt: {
     type: Date,
+    default: convertToLocalTime(),
   },
   updatedAt: {
     type: Date,
-    
+    default: convertToLocalTime(),    
   }
-}, {
-  timestamps: true,
 });
 
 const cryptoPaymentLogSchema = new mongoose.Schema({
@@ -81,10 +73,18 @@ const cryptoPaymentLogSchema = new mongoose.Schema({
   },
   initiatedTime: {
     type: Date,
-    default: getISTTime,
+    default: convertToLocalTime,
   },
+  createdAt: {
+    type: Date,
+    default: convertToLocalTime,
+  },
+  updatedAt: {
+    type: Date,
+    default: convertToLocalTime,    
+  }
 }, {
-  timestamps: true,
+  timestamps: false,
 });
 
 export default mongoose.model("CryptoPaymentDetails", cryptoPaymentSchema);

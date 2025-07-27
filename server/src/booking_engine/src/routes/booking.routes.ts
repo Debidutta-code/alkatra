@@ -10,9 +10,9 @@ import {
   // deleteReservation,
   // getBookingsForDashboard,
   // updateStatusOfBooking,
-  // countBookings,
   // getRevenueByOwner,
   // getRevenueByProperty,
+  getBookingDetailsForExtranet,
   getBookingDetailsOfUser,
   createReservationWithStoredCard,
   cancelThirdPartyReservation,
@@ -21,6 +21,7 @@ import {
 
 
 import { authenticateCustomer } from "../../../customer_authentication/src/middleware/authMiddleware";
+import { protect } from "../../../user_authentication/src/Middleware/auth.middleware";
 
 const router = Router();
 router.route("/customers/booking/details/:id").get(getBookingDetailsOfUser);
@@ -41,7 +42,7 @@ router.route("/cancel-reservation/:id").patch(authenticateCustomer as any, cance
   
 // router.route("/room/:id").get(authenticateCustomer as any, getReservationByRoom);
 
-// router.route("/count/:id").get(authenticateCustomer as any, countBookings);  
+router.route("/count/:id").get(protect as any, getBookingDetailsForExtranet);  
 // router.route("/owner/revenue/:id").get(authenticateCustomer as any, getRevenueByOwner);
 // router.route("/property/revenue/:id").get(authenticateCustomer as any, getRevenueByProperty);
 router.route("/customers/booking/details/:id").get(authenticateCustomer as any, getBookingDetailsOfUser);

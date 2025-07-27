@@ -12,6 +12,9 @@ import { CryptoGuestDetails } from "../models/cryptoUserPaymentInitialStage.mode
 import EmailService from '../../../customer_authentication/src/services/email.service';
 import Handlebars from "handlebars";
 import { Inventory } from "../../../wincloud/src/model/inventoryModel";
+import { CustomRequest } from "../../../user_authentication/src/Utils/types";
+import Auth from "../../../user_authentication/src/Model/auth.model";
+import { PropertyInfo } from "../../../property_management/src/model/property.info.model";
 
 const calculateAgeCategory = (dob: string) => {
   const birthDate = new Date(dob);
@@ -2321,3 +2324,175 @@ export const getBookingDetailsOfUser = CatchAsyncError(
     }
   }
 );
+
+// export const getBookingDetailsForExtranet = CatchAsyncError(async (req: CustomRequest, res: Response, next: NextFunction) => {
+//   try {
+//     const owner_id = req.user?.id;
+//     const owner_role = req.role;
+//     let bookingDetails = [];
+//     let count = 0;
+//     if (!owner_id || !owner_role) {
+//       return res.status(400).json({ message: "Owner Id or Role not provided. Please provide them" });
+//     }
+
+//     const page = parseInt(req.query.page as string) || 1;
+//     const limit = parseInt(req.query.limit as string) || 10;
+//     if (!page || !limit) {
+//       return res.status(400).json({ message: "Page or Limit not found. Please provide page and limit" });
+//     }
+
+//     const skip = (page - 1) * limit;
+//     if (skip === undefined || skip === null || isNaN(skip)) {
+//       throw new Error("Skip value not generated");
+//     }
+
+//     if (owner_role === "superAdmin") {
+//       bookingDetails = await ThirdPartyBooking.find({});
+//       if (bookingDetails.length <= 0) {
+//         return res.status(400).json({ message: "Can't find any booking details" });
+//       }
+//       count = bookingDetails.length;
+//     }
+//     else if (owner_role === "groupManager") {
+//       const groupOwnerDetails = await Auth.findById({ _id: owner_id });
+//       if (!groupOwnerDetails) {
+//         throw new Error("Can't find Group Owner Details. Please provide correct details");
+//       }
+//       const hotelUserDetails = await Auth.find({ createdBy: groupOwnerDetails.email });
+//       if (!hotelUserDetails || hotelUserDetails.length === 0) {
+//         throw new Error("Can't find User details");
+//       }
+
+//       const userIds = hotelUserDetails.map(user => user._id);
+//       console.log(`The user details ${userIds}`);
+//       const properties = await PropertyInfo.find({ user_id: { $in: userIds } });
+//       if (!properties || properties.length === 0) {
+//         throw new Error("No properties found for the group manager");
+//       }
+
+//       const propertyCodes = properties.map(property => property.property_code);
+//       bookingDetails = await ThirdPartyBooking.find({ hotelCode: { $in: propertyCodes } })
+//         .skip(skip)
+//         .limit(limit);
+//       if (bookingDetails.length <= 0) {
+//         return res.status(400).json({ message: "Can't find any booking details for the properties" });
+//       }
+//       count = await ThirdPartyBooking.countDocuments({ hotelCode: { $in: propertyCodes } });
+//     }
+//     else if (owner_role === "hotelManager") {
+//       const properties = await PropertyInfo.find({ user_id: { $in: owner_id } });
+//       if (!properties || properties.length === 0) {
+//         throw new Error("No properties found for the group manager");
+//       }
+
+//       const propertyCodes = properties.map(property => property.property_code);
+//       bookingDetails = await ThirdPartyBooking.find({ hotelCode: { $in: propertyCodes } })
+//         .skip(skip)
+//         .limit(limit);
+//       if (bookingDetails.length <= 0) {
+//         return res.status(400).json({ message: "Can't find any booking details for the properties" });
+//       }
+//       count = await ThirdPartyBooking.countDocuments({ hotelCode: { $in: propertyCodes } });
+//     }
+//     return res.json({
+//       success: true,
+//       // count: count,
+//       bookingDetails: bookingDetails,
+//     });
+//   } catch (error: any) {
+//     console.log("Error counting bookings:", error);
+//     return next(new ErrorHandler(error.message, 400));
+//   }
+// }
+// );
+
+const validatePagination = (page: number, limit: number): void => {
+  if (isNaN(page) || page < 1) {
+    throw new Error('Invalid page number. Page must be a positive integer.');
+  }
+  if (isNaN(limit) || limit < 1 || limit > 100) {
+    throw new Error('Invalid limit. Limit must be between 1 and 100.');
+  }
+};
+
+const getBookingQuery = async (query: any, skip: number, limit: number) => {
+  const [bookingDetails, count] = await Promise.all([
+    ThirdPartyBooking.find(query).skip(skip).limit(limit).sort({ createdAt: -1 }),
+    ThirdPartyBooking.countDocuments(query),
+  ]);
+  return { bookingDetails, count };
+};
+
+export const getBookingDetailsForExtranet = CatchAsyncError(async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const owner_id = req.user?.id;
+    const owner_role = req.role;
+
+    if (!owner_id || !owner_role) {
+      return res.status(400).json({ success: false, message: 'Owner ID or Role not provided' });
+    }
+
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    validatePagination(page, limit);
+    const skip = (page - 1) * limit;
+
+    let bookingDetails = [];
+    let count = 0;
+
+    if (owner_role === 'superAdmin') {
+      const result = await getBookingQuery({}, skip, limit);
+      bookingDetails = result.bookingDetails;
+      count = result.count;
+    } else if (owner_role === 'groupManager') {
+      const groupOwnerDetails = await Auth.findById(owner_id);
+      if (!groupOwnerDetails) {
+        throw new Error('Group owner details not found');
+      }
+
+      const hotelUserDetails = await Auth.find({ createdBy: groupOwnerDetails.email });
+      if (!hotelUserDetails || hotelUserDetails.length === 0) {
+        throw new Error('No user details found for group manager');
+      }
+
+      const userIds = hotelUserDetails.map(user => user._id);
+      const properties = await PropertyInfo.find({ user_id: { $in: userIds } });
+      if (!properties || properties.length === 0) {
+        throw new Error('No properties found for the group manager');
+      }
+
+      const propertyCodes = properties.map(property => property.property_code);
+      const result = await getBookingQuery({ hotelCode: { $in: propertyCodes } }, skip, limit);
+      bookingDetails = result.bookingDetails;
+      count = result.count;
+    } else if (owner_role === 'hotelManager') {
+      const properties = await PropertyInfo.find({ user_id: owner_id });
+      if (!properties || properties.length === 0) {
+        throw new Error('No properties found for the hotel manager');
+      }
+
+      const propertyCodes = properties.map(property => property.property_code);
+      const result = await getBookingQuery({ hotelCode: { $in: propertyCodes } }, skip, limit);
+      bookingDetails = result.bookingDetails;
+      count = result.count;
+    } else {
+      throw new Error('Invalid role provided');
+    }
+
+    if (bookingDetails.length === 0) {
+      return res.status(404).json({ success: false, message: 'No booking details found' });
+    }
+
+    return res.json({
+      success: true,
+      count,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+      bookingDetails,
+    });
+  } catch (error: any) {
+    console.error('Error fetching booking details:', error.message);
+    return next(new ErrorHandler(error.message, 400));
+  }
+});
