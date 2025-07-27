@@ -3,7 +3,6 @@ import { format, isWithinInterval, parseISO } from '../utils/dateUtils';
 import Cookies from 'js-cookie';
 import { fetchRatePlans, getAllRatePlans,modifyRatePlans } from "../API"
 
-
 export const filterData = (
   data: RatePlanInterFace[],
   dateRange: DateRange | undefined,
@@ -38,9 +37,13 @@ export const filterData = (
     filtered = filtered.filter(item => item?.invTypeCode === selectedRoomType);
   }
 
-  // Filter by rate plan (using _id as identifier)
   if (selectedRatePlan) {
-    filtered = filtered.filter(item => item?.rates?.ratePlanCode === selectedRatePlan);
+    filtered = filtered.filter(item => {
+      if (item?.rates && item.rates.ratePlanCode) {
+        return item.rates.ratePlanCode === selectedRatePlan;
+      }
+      return false;
+    });
   }
 
   return filtered;
@@ -66,7 +69,6 @@ export const updatePrice = (
   );
 
   if (originalIndex !== -1) {
-    // Update the base amount for the first guest (assuming single guest pricing)
     if (updatedData[originalIndex].rates?.baseByGuestAmts) {
       updatedData[originalIndex].rates.baseByGuestAmts.amountBeforeTax = newPrice;
     }
@@ -101,22 +103,30 @@ export const updateAvailability = (
   return updatedData;
 };
 
-// Helper function to get price from the rates? structure
 export const getPrice = (item: RatePlanInterFace): number => {
-  if (item.rates?.baseByGuestAmts) {
-    return item.rates?.baseByGuestAmts.amountBeforeTax;
+  if (!item.rates || !item.rates.baseByGuestAmts) {
+    return 0;
   }
-  return 0;
+  return item.rates.baseByGuestAmts.amountBeforeTax;
 };
 
 // Helper function to get availability count
 export const getAvailability = (item: RatePlanInterFace): number => {
-  return item.availability.count;
+  return item.availability.count || 0;
 };
 
 // Helper function to get currency code
 export const getCurrencyCode = (item: RatePlanInterFace): string => {
-  return item.rates?.currencyCode;
+  if (!item.rates) {
+    return 'N/A';
+  }
+  return item.rates.currencyCode || 'N/A';
+};
+export const getRatePlanCode = (item: RatePlanInterFace): string => {
+  if (!item.rates) {
+    return 'No Rate Plan';
+  }
+  return item.rates.ratePlanCode || 'No Rate Plan';
 };
 
 // Helper function to get date range string for display
@@ -124,6 +134,14 @@ export const getDateRangeString = (item: RatePlanInterFace): string => {
   const startDate = format(new Date(item.availability.startDate), 'PPP');
   const endDate = format(new Date(item.availability.endDate), 'PPP');
   return `${startDate} - ${endDate}`;
+};
+
+export const hasRateData = (item: RatePlanInterFace): boolean => {
+  return item.rates !== null && item.rates !== undefined;
+};
+
+export const functioncanEditPrice = (item: RatePlanInterFace): boolean => {
+  return hasRateData(item) && item.rates?.baseByGuestAmts !== undefined;
 };
 
 export const saveData = async (data: modifiedRatePlanInterface[]): Promise<void> => {
@@ -145,6 +163,7 @@ export const saveData = async (data: modifiedRatePlanInterface[]): Promise<void>
   
   await new Promise(resolve => setTimeout(resolve, 1000));
 };
+
 export const ratePlanServices = async (hotelCode: string, pageNo: number, invTypeCode?: string, startDate?: Date, endDate?: Date) => {
   try {
     const accessToken = Cookies.get('accessToken');
@@ -153,9 +172,14 @@ export const ratePlanServices = async (hotelCode: string, pageNo: number, invTyp
     }
     return await fetchRatePlans(hotelCode, accessToken, pageNo, invTypeCode, startDate, endDate)
   } catch (error) {
-
+    console.error('Error fetching rate plans:', error);
+    return {
+      success: false,
+      message: 'Failed to fetch rate plans'
+    };
   }
 }
+
 export const getAllRatePlanServices = async () => {
   try {
     const accessToken = Cookies.get('accessToken');
