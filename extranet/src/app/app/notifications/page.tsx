@@ -1,6 +1,7 @@
 "use client";
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { Triangle } from 'react-loader-spinner';
 import { Notification } from './types/notification';
 import { OfferCard } from './components/OfferCard';
 import { OfferModal } from './components/OfferModal';
@@ -158,9 +159,17 @@ function Offers() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading notifications...</p>
+          <div className="flex flex-col items-center justify-center py-24">
+            <Triangle
+              visible={true}
+              height={80}
+              width={80}
+              color="#076DB3"
+              ariaLabel="triangle-loading"
+            />
+            <p className="mt-4 text-gray-600 font-medium">
+              Loading notifications...
+            </p>
           </div>
         ) : offers.length > 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
