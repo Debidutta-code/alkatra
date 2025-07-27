@@ -1,5 +1,5 @@
 "use client";
-
+import axios from "axios";
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
@@ -50,22 +50,17 @@ export function Destination() {
     const fetchDestinations = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/unique-cities`, {
-          method: "GET",
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/unique-cities`, {
           headers: {
             "Content-Type": "application/json",
           },
         });
-
-        if (!response.ok) {
-          throw new Error(t("HomeSections.AllHotelLists.errorMessage", { defaultValue: "Failed to fetch destinations" }));
-        }
-
-        const data = await response.json();
+  
+        const data = response.data;
         if (data.status !== "success") {
           throw new Error(data.message || t("HomeSections.AllHotelLists.errorMessage", { defaultValue: "API error" }));
         }
-
+  
         // Map API response to Destination interface with localized descriptions
         const fetchedDestinations: Destination[] = data.data.map((city: string, index: number) => {
           // Check if a specific translation exists for the city (e.g., HomeSections.ExploreDestinations.destinations.<city>.name)
@@ -76,7 +71,7 @@ export function Destination() {
             defaultValue: `Explore hotels in ${translatedCityName}`,
             city: translatedCityName,
           });
-
+  
           return {
             id: `${index + 1}`,
             name: translatedCityName,
@@ -84,15 +79,17 @@ export function Destination() {
             image: `https://source.unsplash.com/random/300x200/?${encodeURIComponent(city)},city,landscape,tourism&sig=${index}`,
           };
         });
-
+  
         setDestinations(fetchedDestinations);
         setLoading(false);
       } catch (err: any) {
-        setError(err.message || t("HomeSections.AllHotelLists.errorMessage", { defaultValue: "An error occurred while fetching destinations" }));
+        // Handle both axios errors and custom errors
+        const errorMessage = err.response?.data?.message || err.message || t("HomeSections.AllHotelLists.errorMessage", { defaultValue: "An error occurred while fetching destinations" });
+        setError(errorMessage);
         setLoading(false);
       }
     };
-
+  
     fetchDestinations();
   }, [t]);
 

@@ -7,13 +7,13 @@ interface RoomAmenities {
   bed: BedType;
   bathroom: boolean;
   linensBedding: boolean;
-  linens: boolean; // Added
-  bidet: boolean; // Added
-  toiletPaper: boolean; // Added
-  towelsSheets: boolean; // Added (extra fee)
-  freeToiletries: boolean; // Added
-  shower: boolean; // Added
-  toilet: boolean; // Added
+  linens: boolean; 
+  bidet: boolean; 
+  toiletPaper: boolean; 
+  towelsSheets: boolean;
+  freeToiletries: boolean; 
+  shower: boolean; 
+  toilet: boolean; 
 }
 
 interface FurnitureAmenities {
@@ -21,21 +21,23 @@ interface FurnitureAmenities {
   desk: boolean;
   dresserWardrobe: boolean;
   sofaSeating: boolean;
-  sofa: boolean; // Added
-  diningTable: boolean; // Added
-  diningArea: boolean; // Added
-  sittingArea: boolean; // Added
-  readingChair: boolean; // Moved from WorkLeisure
-  balcony: boolean; // Added
+  diningTable: boolean;
+  readingChair: boolean;
+}
+
+interface SpaceLayoutAmenities {
+  diningArea: boolean;
+  sittingArea: boolean;
+  balcony: boolean;
 }
 
 interface TechnologyAmenities {
   television: boolean;
   telephone: boolean;
   wifiInternet: boolean;
-  flatScreenTV: boolean; // Added
-  satelliteChannels: boolean; // Added
-  cableChannels: boolean; // Added
+  flatScreenTV: boolean; 
+  satelliteChannels: boolean; 
+  cableChannels: boolean; 
 }
 
 interface ClimateControlAmenities {
@@ -46,12 +48,12 @@ interface ClimateControlAmenities {
 interface KitchenetteMiniBarAmenities {
   smallRefrigerator: boolean;
   microwave: boolean;
-  refrigerator: boolean; // Added (full size)
-  kitchenware: boolean; // Added
-  electricKettle: boolean; // Added
-  oven: boolean; // Added
-  stovetop: boolean; // Added
-  teaCoffeeMaker: boolean; // Added
+  refrigerator: boolean;
+  kitchenware: boolean; 
+  electricKettle: boolean; 
+  oven: boolean; 
+  stovetop: boolean; 
+  teaCoffeeMaker: boolean; 
 }
 
 interface SafetySecurityAmenities {
@@ -69,14 +71,14 @@ interface ToiletriesAmenities {
 interface WorkLeisureAmenities {
   workDesk: boolean;
   additionalLighting: boolean;
-  ironingFacilities: boolean; // Added
+  ironingFacilities: boolean; 
 }
 
 interface AccessibilityFeaturesAmenities {
   accessibleBathroom: boolean;
   wheelchairAccessibility: boolean;
-  upperFloorsAccessibleByElevator: boolean; // Added
-  entireUnitWheelchairAccessible: boolean; // Added
+  upperFloorsAccessibleByElevator: boolean; 
+  entireUnitWheelchairAccessible: boolean; 
 }
 
 interface RoomAminityType extends Document {
@@ -85,6 +87,7 @@ interface RoomAminityType extends Document {
   amenities: {
     basic: RoomAmenities;
     furniture: FurnitureAmenities;
+    spaceLayout: SpaceLayoutAmenities;
     technology: TechnologyAmenities;
     climateControl: ClimateControlAmenities;
     kitchenetteMiniBar: KitchenetteMiniBarAmenities;
@@ -128,11 +131,12 @@ const roomAminitySchema = new Schema({
       desk: { type: Boolean, default: false },
       dresserWardrobe: { type: Boolean, default: false },
       sofaSeating: { type: Boolean, default: false },
-      sofa: { type: Boolean, default: false },
       diningTable: { type: Boolean, default: false },
+      readingChair: { type: Boolean, default: false },
+    },
+    spaceLayout: {
       diningArea: { type: Boolean, default: false },
       sittingArea: { type: Boolean, default: false },
-      readingChair: { type: Boolean, default: false },
       balcony: { type: Boolean, default: false },
     },
     technology: {

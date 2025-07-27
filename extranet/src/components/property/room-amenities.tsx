@@ -50,11 +50,12 @@ const roomSchema = z.object({
   desk: z.boolean(),
   dresserWardrobe: z.boolean(),
   sofaSeating: z.boolean(),
-  sofa: z.boolean(),
   diningTable: z.boolean(),
+  readingChair: z.boolean(),
+
+  // Space Layout
   diningArea: z.boolean(),
   sittingArea: z.boolean(),
-  readingChair: z.boolean(),
   balcony: z.boolean(),
 
   // Technology Amenities
@@ -165,11 +166,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
       desk: false,
       dresserWardrobe: false,
       sofaSeating: false,
-      sofa: false,
       diningTable: false,
+      readingChair: false,
+
+      //Space Layout
       diningArea: false,
       sittingArea: false,
-      readingChair: false,
       balcony: false,
 
       // Technology Amenities
@@ -239,11 +241,12 @@ export default function Rooms({ onNext, onPrevious }: Props) {
         desk: !!data.desk,
         dresserWardrobe: !!data.dresserWardrobe,
         sofaSeating: !!data.sofaSeating,
-        sofa: !!data.sofa,
         diningTable: !!data.diningTable,
+        readingChair: !!data.readingChair,
+      },
+      spaceLayout: {
         diningArea: !!data.diningArea,
         sittingArea: !!data.sittingArea,
-        readingChair: !!data.readingChair,
         balcony: !!data.balcony,
       },
       technology: {
@@ -411,18 +414,25 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                       {createCheckbox("desk", "Desk", roomDetails?.desk)}
                       {createCheckbox("dresserWardrobe", "Dresser Wardrobe", roomDetails?.dresserWardrobe)}
                       {createCheckbox("sofaSeating", "Sofa Seating", roomDetails?.sofaSeating)}
-                      {createCheckbox("sofa", "Sofa", roomDetails?.sofa)}
                       {createCheckbox("diningTable", "Dining Table", roomDetails?.diningTable)}
+                      {createCheckbox("readingChair", "Reading Chair", roomDetails?.readingChair)}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="amenity-3"> {/* Unique value */}
+                  <AccordionTrigger>Space Layout</AccordionTrigger>
+                  <AccordionContent>
+                    <div>
                       {createCheckbox("diningArea", "Dining Area", roomDetails?.diningArea)}
                       {createCheckbox("sittingArea", "Sitting Area", roomDetails?.sittingArea)}
-                      {createCheckbox("readingChair", "Reading Chair", roomDetails?.readingChair)}
                       {createCheckbox("balcony", "Balcony", roomDetails?.balcony)}
                     </div>
                   </AccordionContent>
                 </AccordionItem>
 
                 {/* Technology Amenities */}
-                <AccordionItem value="amenity-3">
+                <AccordionItem value="amenity-4">
                   <AccordionTrigger>Technology Amenities</AccordionTrigger>
                   <AccordionContent>
                     <div>
@@ -437,7 +447,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                 </AccordionItem>
 
                 {/* Climate Control Amenities */}
-                <AccordionItem value="amenity-4">
+                <AccordionItem value="amenity-5">
                   <AccordionTrigger>Climate Control Amenities</AccordionTrigger>
                   <AccordionContent>
                     <div>
@@ -448,7 +458,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                 </AccordionItem>
 
                 {/* Kitchen/MiniBar Amenities */}
-                <AccordionItem value="amenity-5">
+                <AccordionItem value="amenity-6">
                   <AccordionTrigger>Kitchen/MiniBar Amenities</AccordionTrigger>
                   <AccordionContent>
                     <div>
@@ -465,7 +475,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                 </AccordionItem>
 
                 {/* Safety/Security Amenities */}
-                <AccordionItem value="amenity-6">
+                <AccordionItem value="amenity-7">
                   <AccordionTrigger>Safety/Security Amenities</AccordionTrigger>
                   <AccordionContent>
                     <div>
@@ -477,7 +487,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                 </AccordionItem>
 
                 {/* Toiletries Amenities */}
-                <AccordionItem value="amenity-7">
+                <AccordionItem value="amenity-8">
                   <AccordionTrigger>Toiletries Amenities</AccordionTrigger>
                   <AccordionContent>
                     <div>
@@ -489,7 +499,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                 </AccordionItem>
 
                 {/* Work/Leisure Amenities */}
-                <AccordionItem value="amenity-8">
+                <AccordionItem value="amenity-9">
                   <AccordionTrigger>Work/Leisure Amenities</AccordionTrigger>
                   <AccordionContent>
                     <div>
@@ -501,7 +511,7 @@ export default function Rooms({ onNext, onPrevious }: Props) {
                 </AccordionItem>
 
                 {/* Accessibility Features */}
-                <AccordionItem value="amenity-9">
+                <AccordionItem value="amenity-10">
                   <AccordionTrigger>Accessibility Features</AccordionTrigger>
                   <AccordionContent>
                     <div>

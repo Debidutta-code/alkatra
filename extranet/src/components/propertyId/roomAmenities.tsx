@@ -30,11 +30,13 @@ interface FurnitureAmenities {
   desk: boolean;
   dresserWardrobe: boolean;
   sofaSeating: boolean;
-  sofa: boolean;
   diningTable: boolean;
+  readingChair: boolean;
+}
+
+interface SpaceLayoutAmenities {
   diningArea: boolean;
   sittingArea: boolean;
-  readingChair: boolean;
   balcony: boolean;
 }
 
@@ -95,6 +97,7 @@ interface RoomAmenity {
   amenities: {
     basic: BasicAmenities;
     furniture: FurnitureAmenities;
+    spaceLayout: SpaceLayoutAmenities;
     technology: TechnologyAmenities;
     climateControl: ClimateControlAmenities;
     kitchenetteMiniBar: KitchenetteMiniBarAmenities;
@@ -126,8 +129,10 @@ const amenityCategories = {
     "toiletPaper", "towelsSheets", "freeToiletries", "shower", "toilet"
   ],
   furniture: [
-    "tableChairs", "desk", "dresserWardrobe", "sofaSeating", "sofa", "diningTable", "diningArea", "sittingArea",
-    "readingChair", "balcony"
+    "tableChairs", "desk", "dresserWardrobe", "sofaSeating", "diningTable", "readingChair"
+  ],
+  spaceLayout: [
+    "diningArea", "sittingArea", "balcony"
   ],
   technology: [
     "television", "telephone", "wifiInternet", "flatScreenTV",
@@ -233,11 +238,12 @@ const createEmptyAmenityStructure = (propertyInfoId: string, selectedRoomType: s
         desk: false,
         dresserWardrobe: false,
         sofaSeating: false,
-        sofa: false,
         diningTable: false,
+        readingChair: false,
+      },
+      spaceLayout: {
         diningArea: false,
         sittingArea: false,
-        readingChair: false,
         balcony: false
       },
       technology: {
@@ -467,7 +473,7 @@ export function RoomAmenities({
     <Card className="w-full shadow-sm hover:shadow-md transition-shadow duration-300">
       <CardHeader className="flex flex-row items-center justify-between border-b pb-1">
         <div>
-          <CardTitle className="text-primary text-xl font-semibold flex items-center">
+          <CardTitle className="text-primary font-semibold text-lg sm:text-xl flex items-center">
             Room Amenities
           </CardTitle>
           <CardDescription className="text-muted-foreground text-sm mt-0.5">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
@@ -155,6 +155,16 @@ export const RoomCard: React.FC<RoomCardProps> = ({
     }
   };
   const { i18n } = useTranslation();
+  useEffect(() => {
+    if (showPolicyModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showPolicyModal]);
   return (
     <>
       <Card className="w-full min-h-48 shadow-sm hover:shadow-md transition-shadow duration-300 bg-tripswift-off-white border border-gray-200 rounded-xl flex flex-col md:flex-row overflow-hidden font-noto-sans">
@@ -218,8 +228,8 @@ export const RoomCard: React.FC<RoomCardProps> = ({
                     setCurrentImageIndex(index);
                   }}
                   className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentImageIndex
-                      ? 'bg-white'
-                      : 'bg-white/50 hover:bg-white/75'
+                    ? 'bg-white'
+                    : 'bg-white/50 hover:bg-white/75'
                     }`}
                   aria-label={`View image ${index + 1}`}
                 />
@@ -267,7 +277,6 @@ export const RoomCard: React.FC<RoomCardProps> = ({
                   </svg>
                   Only {data.available_rooms} left on our site
                 </span> */}
-
               </div>
 
               {/* <div className="flex items-center text-yellow-400 gap-0.5 pt-1">
@@ -391,8 +400,14 @@ export const RoomCard: React.FC<RoomCardProps> = ({
 
       {/* Policy Modal */}
       {showPolicyModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-tripswift-off-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto"
+          onClick={() => setShowPolicyModal(false)} // Close on backdrop click
+        >
+          <div
+            className="bg-tripswift-off-white rounded-lg shadow-xl w-full max-w-md overflow-hidden my-8"
+            onClick={(e) => e.stopPropagation()} // Prevent modal close when clicking inside
+          >
             <div className="flex items-center justify-between bg-tripswift-blue text-tripswift-off-white px-4 py-3">
               <h3 className="text-lg font-tripswift-semibold">{t('RoomsPage.RoomCard.policies.title')}</h3>
               <button
@@ -404,7 +419,8 @@ export const RoomCard: React.FC<RoomCardProps> = ({
               </button>
             </div>
 
-            <div className="p-5">
+            <div className="p-5 max-h-[70vh] overflow-y-auto">
+              {/* Rest of your modal content remains the same */}
               <div className="mb-6">
                 <h4 className="text-section-heading flex items-center mb-3">
                   <span className={`inline-block w-3 h-3 rounded-full mr-2 ${policyType === "Flexible"

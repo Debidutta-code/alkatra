@@ -15,8 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button as NextUIButton } from "@nextui-org/react";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { RootState, useSelector, useDispatch, store } from "../../../../redux/store";
-
+import { RootState, useSelector, store } from "../../../../redux/store";
 import {
   Select,
   SelectContent,

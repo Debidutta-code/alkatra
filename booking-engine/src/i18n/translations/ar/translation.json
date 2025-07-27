@@ -237,7 +237,10 @@
         "pet_friendly": "صديق للحيوانات الأليفة",
         "business_facilities": "مرافق الأعمال",
         "laundry_services": "خدمات الغسيل",
-        "child_friendly_facilities": "مرافق صديقة للأطفال"
+        "child_friendly_facilities": "مرافق صديقة للأطفال",
+        "non_smoking_rooms": "غرف غير مدخنين",
+        "facilities_for_disabled_guests": "مرافق للضيوف ذوي الإعاقة",
+        "family_rooms": "غرف عائلية"
       }
     },
     "heroTitle": "ابحث عن إقامتك المثالية",
@@ -298,7 +301,10 @@
         "pet_friendly": "صديق للحيوانات الأليفة",
         "business_facilities": "مرافق الأعمال",
         "laundry_services": "خدمات الغسيل",
-        "child_friendly_facilities": "مرافق صديقة للأطفال"
+        "child_friendly_facilities": "مرافق صديقة للأطفال",
+        "non_smoking_rooms": "غرف غير مدخنين",
+        "facilities_for_disabled_guests": "مرافق للضيوف ذوي الإعاقة",
+        "family_rooms": "غرف عائلية"
       },
       "sortOptions": {
         "recommended": "موصى به",
@@ -383,7 +389,10 @@
       "pet_friendly": "صديق للحيوانات الأليفة",
       "business_facilities": "مرافق الأعمال",
       "laundry_services": "خدمات الغسيل",
-      "child_friendly_facilities": "مرافق صديقة للأطفال"
+      "child_friendly_facilities": "مرافق صديقة للأطفال",
+      "non_smoking_rooms": "غرف غير مدخنين",
+      "facilities_for_disabled_guests": "مرافق للضيوف ذوي الإعاقة",
+      "family_rooms": "غرف عائلية"
     },
     "noAmenitiesSpecified": "لم يتم تحديد أي مرافق لهذا العقار.",
     "contactInformation": "معلومات الاتصال",
@@ -406,9 +415,9 @@
       "qrCodeAlt": "رمز الخصم QR",
       "scanToApply": "امسح للتطبيق",
       "instructions": {
-        "scanAtCheckout": "امسح رمز QR عند الدفع",
-        "applyDiscount": "طبّق الخصم أثناء الدفع للحصول على عرضك الخاص",
-        "validityNote": "صالح فقط لهذه الجلسة الحجز"
+        "scanAtCheckout": "امسح رمز الاستجابة السريعة لفتح هذه الغرفة في تطبيق الحجز.",
+        "applyDiscount": "إذا لم يكن التطبيق مثبتاً، ستتم مطالبتك بتنزيله.",
+        "validityNote": "احجز من خلال التطبيق للحصول على خصم حصري لهذه الغرفة."
       }
     },
     "RoomCard": {
@@ -809,7 +818,7 @@
       "guestDetails": "تفاصيل الضيف",
       "guestName": "اسم الضيف",
       "contactNumber": "رقم الاتصال",
-      "email":"البريد الإلكتروني",
+      "email": "البريد الإلكتروني",
       "adults": "البالغين",
       "children": "الأطفال",
       "specialRequests": "طلبات خاصة",
