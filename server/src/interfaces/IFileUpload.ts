@@ -5,5 +5,6 @@ export interface IStorageProvider {
 
 
 export interface IFileUploader {
-    uploadAndGetPublicUrl(localPath: string, fileName: string): Promise<string>;
+    // uploadAndGetPublicUrl(localPath: string, fileName: string): Promise<string>;
+    uploadFiles(files: Express.Multer.File[], destinationFolder: string): Promise<string[]>;
 }

@@ -5,7 +5,7 @@ const upload = multer({
     destination: `public/uploads`,
     filename: (req, file, cb) => {
       // Define the filename for the uploaded file
-      cb(null, file.originalname + Date.now() + "-");
+      cb(null, file.originalname);
     },
   }),
   limits: {

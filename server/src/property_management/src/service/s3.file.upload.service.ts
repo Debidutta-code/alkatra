@@ -26,8 +26,8 @@ export class S3FileUploadService implements IStorageProvider {
             Bucket: this.bucketName,
             Key: key,
             Body: fileStream,
-            ACL: s3ACL,
-            ContentType: contentType
+            ContentType: contentType,
+            // ContentDisposition: "inline",
         });
 
         await s3Client.send(command);

@@ -12,6 +12,7 @@ export const config = {
         accessKeyId: env.AWS_ACCESS_KEY_ID as string,
         secretAccessKey: env.AWS_SECRET_ACCESS_KEY as string,
         s3ACL: env.AWS_S3_ALC as ObjectCannedACL,
+        bucketName: env.AWS_BUCKET_NAME as string
     }
 
 }

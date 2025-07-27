@@ -3,6 +3,8 @@ import { Request, catchAsync } from "../utils/catchAsync";
 import { cloudinary } from "../utils/cloudinary";
 import { AppError } from "../utils/appError";
 
+import { IFileUploader } from "../../../interfaces"
+
 export const uploadHandler = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const files = req.files;
@@ -51,3 +53,33 @@ export const uploadHandler = catchAsync(
     }
   }
 );
+
+
+
+export class UploadController {
+  constructor(private readonly uploader: IFileUploader) { }
+
+  uploadHandler = catchAsync(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const files = req.files as Express.Multer.File[];
+        const folder = "uploads";
+
+        if (!files?.length) {
+          return next(new AppError("Upload at least one file", 400));
+        }
+
+        const urls = await this.uploader.uploadFiles(files, folder);
+
+        res.status(201).json({
+          status: "success",
+          error: false,
+          message: "File uploaded successfully",
+          data: { urls },
+        });
+      } catch (err) {
+        next(err);
+      }
+    }
+  )
+}
