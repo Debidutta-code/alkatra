@@ -20,6 +20,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.850.0",
     "@clerk/clerk-sdk-node": "^5.0.53",
     "@elastic/elasticsearch": "^8.14.0",
     "@sendgrid/mail": "^8.1.5",
