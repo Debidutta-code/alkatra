@@ -124,7 +124,8 @@ const MapRatePlanPage: React.FC = () => {
   const handlePriceChange = (id: string, newPrice: number) => {
     // Update the data state with new price
     const updatedData = data.map(item => {
-      if (item.rates._id === id) {
+      // Add null check for item.rates before accessing _id
+      if (item.rates && item.rates._id === id) {
         return {
           ...item,
           rates: {
@@ -141,12 +142,9 @@ const MapRatePlanPage: React.FC = () => {
 
     setData(updatedData);
 
-    // Track modified values
     setModifiedValues(prev => {
-      // Remove existing entry for this rateAmountId if it exists
       const filtered = prev.filter(item => item.rateAmountId !== id);
 
-      // Add the new/updated entry
       return [
         ...filtered,
         {

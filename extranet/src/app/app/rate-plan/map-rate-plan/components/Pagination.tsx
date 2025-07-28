@@ -86,7 +86,7 @@ const Pagination: React.FC<PaginationProps> = ({
           ? 'border-gray-200 text-gray-300 cursor-not-allowed bg-gray-50'
           : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:text-gray-800 hover:bg-gray-50 active:bg-gray-100'}
         ${position === 'first' || position === 'last' ? 'flex' : ''}
-        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+        focus:outline-none focus:ring-2 focus:ring-tripswift-blue focus:ring-offset-2
       `}
       aria-label={label}
       title={label}
@@ -116,9 +116,9 @@ const Pagination: React.FC<PaginationProps> = ({
         onClick={onClick}
         className={`
           relative w-10 h-10 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out
-          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+          focus:outline-none focus:ring-2 focus:ring-tripswift-blue focus:ring-offset-2
           ${isActive
-            ? 'bg-blue-600 text-white shadow-md border border-blue-600 hover:bg-blue-700 hover:shadow-lg transform hover:-translate-y-0.5'
+            ? 'bg-blue-600 text-white shadow-md border border-tripswift-blue hover:bg-tripswift-dark-blue hover:shadow-lg transform hover:-translate-y-0.5'
             : 'text-gray-700 border border-gray-300 hover:border-gray-400 hover:bg-gray-50 hover:text-gray-900 active:bg-gray-100'}
         `}
       >

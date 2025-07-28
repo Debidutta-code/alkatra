@@ -1,6 +1,5 @@
 // RatePlanTable.tsx
 import React from 'react';
-import { Edit2, X, Check } from 'lucide-react';
 import { format } from '../utils/dateUtils';
 import { TABLE_HEADERS } from '../constants';
 import { RatePlanInterFace, modifiedRatePlanInterface } from '../types';
@@ -21,7 +20,7 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
   editButtonVal,
   modifiedValues
 }) => {
-  
+
   // Check if a specific item has been modified
   const isItemModified = (itemId: string) => {
     return modifiedValues.some(modified => modified.rateAmountId === itemId);
@@ -32,9 +31,9 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
     const price = getPrice(item);
     const availability = getAvailability(item);
     return (
-      price !== null && 
+      price !== null &&
       price !== undefined &&
-      availability !== null && 
+      availability !== null &&
       availability !== undefined &&
       item.rates?.ratePlanCode
     ); // Show rows only when both price and availability exist and are greater than 0
@@ -47,7 +46,7 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
           Rate Plan Data ({availableData.length} items)
         </h2>
         <div className="flex items-center space-x-4">
-          {modifiedValues.length&&modifiedValues.length > 0 && (
+          {modifiedValues.length > 0 && (
             <div className="flex items-center space-x-2">
               <span className="text-sm text-orange-600 font-medium">
                 {modifiedValues.length} unsaved changes
@@ -58,16 +57,15 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
           {editButtonVal && (
             <div className="flex items-center space-x-2">
               <span className="text-sm text-tripswift-blue font-medium">Edit Mode Active</span>
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+              <div className="w-2 h-2 bg-tripswift-dark-blue rounded-full animate-pulse"></div>
             </div>
           )}
           <button
             onClick={toggleEditButton}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-150 ${
-              editButtonVal
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-150 ${editButtonVal
                 ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-            }`}
+                : 'bg-blue-100 text-tripswift-dark-blue hover:bg-blue-200'
+              }`}
           >
             {editButtonVal ? 'Disable Edit' : 'Enable Edit'}
           </button>
@@ -97,17 +95,16 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
             <tbody className="divide-y divide-gray-100">
               {availableData.map((item, index) => {
                 const isModified = isItemModified(item?.rates?._id);
-                
+
                 return (
                   <tr
                     key={index}
-                    className={`transition-colors duration-150 ${
-                      isModified 
-                        ? 'bg-orange-50 hover:bg-orange-100 border-l-4 border-orange-400' 
+                    className={`transition-colors duration-150 ${isModified
+                        ? 'bg-orange-50 hover:bg-orange-100 border-l-4 border-orange-400'
                         : editButtonVal
-                        ? 'hover:bg-blue-50'
-                        : 'hover:bg-gray-50'
-                    }`}
+                          ? 'hover:bg-blue-50'
+                          : 'hover:bg-gray-50'
+                      }`}
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div>
@@ -119,30 +116,29 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
                         </div>
                       </div>
                     </td>
-                    
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className="text-sm font-medium text-gray-900">{item.rates?.ratePlanCode}</div>
                       </div>
                     </td>
-                    
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className="text-sm font-medium text-gray-900">{item.invTypeCode}</div>
                       </div>
                     </td>
-                    
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-1">
                         <input
                           type="number"
                           value={getPrice(item)}
                           onChange={(e) => handlePriceChange(item.rates._id, parseFloat(e.target.value) || 0)}
-                          className={`w-20 px-2 py-1 text-sm rounded transition-all duration-200 ${
-                            editButtonVal
+                          className={`w-20 px-2 py-1 text-sm rounded transition-all duration-200 ${editButtonVal
                               ? `border-2 ${isModified ? 'border-orange-400 bg-orange-50' : 'border-tripswift-blue bg-white'} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm`
                               : 'border-none bg-transparent focus:outline-none'
-                          }`}
+                            }`}
                           // step="0.01" 
                           min={0}
                           disabled={!editButtonVal}
@@ -154,7 +150,7 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
                         )}
                       </div>
                     </td>
-                    
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       <input
                         type="number"
