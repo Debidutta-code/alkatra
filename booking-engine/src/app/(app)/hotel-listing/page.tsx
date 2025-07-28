@@ -1,4 +1,4 @@
-import HotelList from "@/components/hotelListingComponents/HotelList";
+// import HotelList from "@/components/hotelListingComponents/HotelList";
 import React from "react";
 
 type Props = {};
@@ -6,7 +6,7 @@ type Props = {};
 const page = (props: Props) => {
   return (
     <div>
-      <HotelList />
+      {/* <HotelList /> */}
     </div>
   );
 };

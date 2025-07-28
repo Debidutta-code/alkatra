@@ -489,6 +489,16 @@ export default function Page({ params, searchParams }: Props) {
     }
   };
 
+  const handleRatePlanNavigation = () => {
+    if (property?.data?.property_code) {
+      router.push(`/app/rate-plan/map-rate-plan?propertyCode=${property.data.property_code}`);
+    } else if (propertyId) {
+      router.push(`/app/rate-plan/map-rate-plan?propertyCode=${propertyId}`);
+    } else {
+      toast.error('Property code not found');
+    }
+  };
+
   return (
     <main className="py-8 px-4 md:px-8 lg:px-16 xl:px-24">
       <header className="sticky top-0 backdrop-blur-sm">
@@ -544,7 +554,7 @@ export default function Page({ params, searchParams }: Props) {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <Button
                   variant="default"
-                  onClick={() => router.push(`/app/rate-plan/map-rate-plan`)}
+                  onClick={handleRatePlanNavigation}
                   className="bg-tripswift-blue hover:bg-tripswift-blue-600 text-white"
                 >
                   Rate and Inventory Allotment

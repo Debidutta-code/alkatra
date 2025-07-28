@@ -10,8 +10,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import Pagination from "./components/Pagination"
 import { useSidebar } from '@src/components/ui/sidebar';
 import { cn } from '@src/lib/utils';
-// Pagination Component
-
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const MapRatePlanPage: React.FC = () => {
   const [data, setData] = useState<RatePlanInterFace[]>([]);
@@ -23,7 +22,10 @@ const MapRatePlanPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [allRoomTypes, setAllRoomTypes] = useState<any[]>([]);
   const [roomTypesLoaded, setRoomTypesLoaded] = useState<boolean>(false);
-  const { state , isMobile } = useSidebar(); // state: "collapsed" | "expanded"
+  const { state, isMobile } = useSidebar();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [paginationResults, setPaginationResults] = useState<paginationTypes>({
     currentPage: 1,
     totalPage: 10,
@@ -35,6 +37,22 @@ const MapRatePlanPage: React.FC = () => {
   const [editButtonClicked, setEditButtonClicked] = useState<boolean>(false);
   const [modifiedValues, setModifiedValues] = useState<modifiedRatePlanInterface[]>([]);
   const [originalData, setOriginalData] = useState<RatePlanInterFace[]>([]);
+  const getHotelCode = (): string | null => {
+    const propertyCodeFromUrl = searchParams.get('propertyCode');
+    if (propertyCodeFromUrl) {
+      return propertyCodeFromUrl;
+    }
+    const propertyCodeFromSession = sessionStorage.getItem("propertyCode");
+    if (propertyCodeFromSession) {
+      return propertyCodeFromSession;
+    }
+    const propertyIdFromSession = sessionStorage.getItem("propertyId");
+    if (propertyIdFromSession) {
+      return propertyIdFromSession;
+    }
+
+    return null;
+  };
 
   useEffect(() => {
     const fetchRoomTypes = async () => {
@@ -56,9 +74,10 @@ const MapRatePlanPage: React.FC = () => {
   const fetchRatePlans = async () => {
     try {
       setIsLoading(true);
-      const hotelCode = sessionStorage.getItem("propertyCode") ;
+      const hotelCode = getHotelCode();
       if (!hotelCode) {
-        toast.error('Hotel code not found in session storage');
+        toast.error('Property code not found. Please navigate from the property page.');
+        router.push('/app/property');
         return;
       }
       const response = await ratePlanServices(hotelCode, currentPage, selectedRoomType, dateRange?.from, dateRange?.to);
@@ -105,7 +124,8 @@ const MapRatePlanPage: React.FC = () => {
   const handlePriceChange = (id: string, newPrice: number) => {
     // Update the data state with new price
     const updatedData = data.map(item => {
-      if (item.rates._id === id) {
+      // Add null check for item.rates before accessing _id
+      if (item.rates && item.rates._id === id) {
         return {
           ...item,
           rates: {
@@ -122,12 +142,9 @@ const MapRatePlanPage: React.FC = () => {
 
     setData(updatedData);
 
-    // Track modified values
     setModifiedValues(prev => {
-      // Remove existing entry for this rateAmountId if it exists
       const filtered = prev.filter(item => item.rateAmountId !== id);
 
-      // Add the new/updated entry
       return [
         ...filtered,
         {
@@ -168,18 +185,16 @@ const MapRatePlanPage: React.FC = () => {
   const hasUnsavedChanges = modifiedValues.length > 0;
 
   return (
- <div
-  className={cn(
-    "flex flex-col min-h-screen transition-all overflow-x-hidden  duration-300",
-    !isMobile && state === "collapsed" && "md:overflow-x-hidden ",
-    !isMobile && state === "expanded" && ""
-  )}
->
-
-
+    <div
+      className={cn(
+        "flex flex-col min-h-screen transition-all overflow-x-hidden  duration-300",
+        !isMobile && state === "collapsed" && "md:overflow-x-hidden ",
+        !isMobile && state === "expanded" && ""
+      )}
+    >
 
       <Toaster position="top-right" />
-<div className="w-full px-4 sm:px-6 md:px-8 ">
+      <div className="w-full px-4 sm:px-6 md:px-8 ">
         {roomTypesLoaded && (
           <>
             <Filters

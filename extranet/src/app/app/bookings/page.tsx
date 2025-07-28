@@ -1,31 +1,35 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getBookings } from "./api";
 import React from "react";
 import Link from "next/link";
 import { Label } from "../../../components/ui/label";
-import { Search, Building2, ChevronLeft, ChevronRight, Calendar, MapPin, ChevronDown, Home, ChevronRight as Chevron } from "lucide-react";
+import { Search, Building2, ChevronLeft, ChevronRight, Calendar, MapPin, ChevronDown, Eye, BookOpen, CreditCard, Clock, CheckCircle, AlertCircle, XCircle, Loader2 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@src/redux/store";
+import { getBookings, getAllHotelNames, type Booking, type GetBookingsResponse, getPaymentMethodDisplay } from "./api";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
+import { Badge } from "../../../components/ui/badge";
+import { Button } from "../../../components/ui/button";
 
-type Booking = {
-  id: string;
-  guestName: string;
-  checkIn: string;
-  checkOut: string;
-  status: "Confirmed" | "Pending";
-  property: {
-    id: string;
-    name: string;
-    city: string;
-  };
-};
+// Helper function to format date to DD/MM/YYYY
+const formatDateToDDMMYYYY = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
 
-type GetBookingsResponse = {
-  bookingDetails: Booking[];
-  currentPage: number;
-  totalPages: number;
-  totalBookings: number;
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return dateString; // Return original string if invalid
+    }
+
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth() is 0-indexed
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return dateString; // Return original string if error occurs
+  }
 };
 
 export default function ManageBookings() {
@@ -35,21 +39,81 @@ export default function ManageBookings() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const itemsPerPage = 5;
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const [itemsPerPage, setItemsPerPage] = useState<number>(5);
+  const [allHotelNames, setAllHotelNames] = useState<string[]>([]);
+  const [isLoadingHotels, setIsLoadingHotels] = useState<boolean>(false);
+  const [hotelNamesError, setHotelNamesError] = useState<string>("");
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
   useEffect(() => {
-    async function fetchData() {
-      const data: GetBookingsResponse = await getBookings(currentPage, itemsPerPage, accessToken);
-      console.log("**************************\n", data);
-      console.log(`@@@@@@@@@@@@@@@@@@\n ${data.bookingDetails}`);
-      setBookings(data.bookingDetails);
-      setFilteredBookings(data.bookingDetails);
-      setTotalPages(data.totalPages);
-    }
-    fetchData();
-  }, [currentPage]);
+    async function fetchHotelNames() {
+      if (!accessToken) {
+        console.log("No access token available for hotel names");
+        return;
+      }
 
+      try {
+        setIsLoadingHotels(true);
+        setHotelNamesError("");
+
+        console.log("Fetching hotel names...");
+        const hotelNames = await getAllHotelNames(accessToken);
+
+        console.log("Received hotel names:", hotelNames);
+        setAllHotelNames(hotelNames);
+
+        if (hotelNames.length === 0) {
+          setHotelNamesError("No hotel names found");
+        }
+      } catch (error: any) {
+        console.error("Failed to fetch hotel names:", error);
+        setHotelNamesError("Failed to load hotel names");
+      } finally {
+        setIsLoadingHotels(false);
+      }
+    }
+
+    fetchHotelNames();
+  }, [accessToken]);
+
+  // Fetch bookings data
+  useEffect(() => {
+    async function fetchData() {
+      if (!accessToken) {
+        setError("No access token found");
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        setError("");
+
+        const data: GetBookingsResponse = await getBookings(currentPage, itemsPerPage, accessToken);
+        console.log("API Response:", data);
+
+        if (data.bookingDetails) {
+          setBookings(data.bookingDetails);
+          setFilteredBookings(data.bookingDetails);
+          setTotalPages(data.totalPages);
+          setTotalCount(data.count || data.totalBookings);
+        } else {
+          setError("Failed to fetch bookings");
+        }
+      } catch (err: any) {
+        console.error("Error fetching bookings:", err);
+        setError(err.response?.data?.message || "Failed to fetch bookings");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchData();
+  }, [currentPage, itemsPerPage, accessToken]);
+
+  // Apply filters
   useEffect(() => {
     let updatedBookings = bookings;
 
@@ -61,246 +125,493 @@ export default function ManageBookings() {
 
     if (searchQuery.trim()) {
       updatedBookings = updatedBookings.filter((booking) =>
-        booking.guestName.toLowerCase().includes(searchQuery.toLowerCase())
+        booking.guestName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        booking.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        booking.reservationId.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
     setFilteredBookings(updatedBookings);
   }, [selectedProperty, searchQuery, bookings]);
 
-  const statusColors: Record<Booking["status"], { bg: string; text: string; icon: string }> = {
+  // Status configuration with icons
+  const statusConfig: Record<string, { bg: string; text: string; icon: React.ReactNode; variant: "default" | "secondary" | "destructive" | "outline" }> = {
     Confirmed: {
-      bg: "bg-emerald-500/10",
-      text: "text-emerald-500",
-      icon: "border-emerald-500",
+      bg: "bg-emerald-50 dark:bg-emerald-900/20",
+      text: "text-emerald-700 dark:text-emerald-400",
+      icon: <CheckCircle className="w-3 h-3" />,
+      variant: "secondary",
     },
     Pending: {
-      bg: "bg-amber-500/10",
-      text: "text-amber-500",
-      icon: "border-amber-500",
+      bg: "bg-amber-50 dark:bg-amber-900/20",
+      text: "text-amber-700 dark:text-amber-400",
+      icon: <Clock className="w-3 h-3" />,
+      variant: "outline",
+    },
+    Modified: {
+      bg: "bg-blue-50 dark:bg-blue-900/20",
+      text: "text-blue-700 dark:text-blue-400",
+      icon: <AlertCircle className="w-3 h-3" />,
+      variant: "default",
+    },
+    Cancelled: {
+      bg: "bg-red-50 dark:bg-red-900/20",
+      text: "text-red-700 dark:text-red-400",
+      icon: <XCircle className="w-3 h-3" />,
+      variant: "destructive",
     },
   };
 
-  const propertyNames = Array.from(
-    new Set(bookings.map((booking) => booking.property.name))
-  );
+  const getPropertyNames = (): string[] => {
+    if (allHotelNames.length > 0) {
+      console.log("Using hotel names from API:", allHotelNames);
+      return allHotelNames;
+    }
 
+    // Fallback: Use unique property names from bookings
+    const bookingPropertyNames = Array.from(
+      new Set(bookings.map((booking) => booking.property.name))
+    );
+
+    console.log("Using property names from bookings:", bookingPropertyNames);
+    return bookingPropertyNames;
+  };
+
+  const propertyNames = getPropertyNames();
+
+  // Pagination handler
   const goToPage = (page: number) => {
     if (page > 0 && page <= totalPages) {
       setCurrentPage(page);
     }
   };
 
-  return (
-    <div className="min-h-screen bg-white dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-gray-900 dark:via-gray-950 dark:to-black px-4 py-4 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto">
-        {/* Breadcrumb */}
-        <nav className="flex mb-2" aria-label="Breadcrumb">
-          <ol className="inline-flex items-center space-x-1 md:space-x-3">
-            <li className="inline-flex items-center">
-              <Link
-                href="/app"
-                className="inline-flex items-center text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
-              >
-                <Home className="w-4 h-4 mr-2" />
-                Home
-              </Link>
-            </li>
-            <li>
-              <div className="flex items-center">
-                <Chevron className="w-4 h-4 text-gray-500" />
-                <span className="ml-1 text-sm font-medium text-blue-600 dark:text-blue-400 md:ml-2">
-                  Bookings
-                </span>
-              </div>
-            </li>
-          </ol>
-        </nav>
+  // Handle items per page change
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
 
-        {/* Header Section */}
-        <div className="text-center mb-6 animate-[slideDown_0.5s_ease-out]">
-          <h3 className="pb-0 text-3xl font-medium bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 dark:from-blue-400 dark:via-purple-400 dark:to-blue-400 bg-clip-text text-transparent mb-1 animate-[gradient_3s_ease-in-out_infinite]">
-            Manage Bookings
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 text-xs">Manage and track all your property bookings in one place</p>
+  // Generate page numbers for pagination
+  const generatePageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+
+    if (totalPages <= maxVisiblePages) {
+      // Show all pages if total pages is less than max visible
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Always show first page
+      pages.push(1);
+
+      let startPage = Math.max(2, currentPage - 1);
+      let endPage = Math.min(totalPages - 1, currentPage + 1);
+
+      // Adjust range if we're near the beginning or end
+      if (currentPage <= 3) {
+        endPage = Math.min(4, totalPages - 1);
+      }
+      if (currentPage >= totalPages - 2) {
+        startPage = Math.max(2, totalPages - 3);
+      }
+
+      // Add ellipsis if there's a gap after first page
+      if (startPage > 2) {
+        pages.push('...');
+      }
+
+      // Add middle pages
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+
+      // Add ellipsis if there's a gap before last page
+      if (endPage < totalPages - 1) {
+        pages.push('...');
+      }
+
+      // Always show last page
+      if (totalPages > 1) {
+        pages.push(totalPages);
+      }
+    }
+
+    return pages;
+  };
+
+  // Calculate showing range
+  const startItem = (currentPage - 1) * itemsPerPage + 1;
+  const endItem = Math.min(currentPage * itemsPerPage, totalCount);
+  const showingText = `Showing ${startItem}-${endItem} of ${totalCount} bookings`;
+
+  if (error) {
+    return (
+      <div className="min-h-screen md:mx-8 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+        <div className="container px-4 py-6 mx-auto sm:px-6 lg:px-8 max-w-7xl">
+          <div className="text-center py-12">
+            <Card className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 shadow-lg max-w-md mx-auto">
+              <CardHeader>
+                <CardTitle className="text-red-600 dark:text-red-400 flex items-center gap-2 justify-center">
+                  <XCircle className="w-5 h-5" />
+                  Error Loading Bookings
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-red-500 dark:text-red-500 text-sm mb-4">{error}</p>
+                <Button
+                  onClick={() => window.location.reload()}
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                >
+                  Try Again
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen md:mx-8 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+      <div className="container px-4 py-6 mx-auto sm:px-6 lg:px-8 max-w-7xl">
+        {/* Back Button */}
+        <div className="mb-4">
+          <Link href="/app">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-slate-600 dark:text-slate-400 hover:text-tripswift-blue dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 p-2"
+            >
+              <ChevronLeft className="w-4 h-4 mr-2" />
+              Back to Dashboard
+            </Button>
+          </Link>
         </div>
 
-        {/* Filters Section */}
-        <div className="mb-6 flex flex-wrap items-center gap-4">
-          {/* Filter by Property */}
-          <div className="group relative w-full md:w-[30%]">
-            <Label htmlFor="propertyFilter" className="text-gray-600 dark:text-gray-400 mb-2 block">
-              <Building2 className="w-4 h-4 inline-block mr-2" />
-              Filter by Property
-            </Label>
-            <div className="relative">
-              <select
-                id="propertyFilter"
-                className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-800 dark:text-gray-200 
-               focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-500 focus:border-transparent transition-all duration-200
-               backdrop-blur-xl appearance-none hover:border-gray-400 dark:hover:border-gray-800 pr-10"
-                value={selectedProperty}
-                onChange={(e) => {
-                  setSelectedProperty(e.target.value);
-                  setCurrentPage(1); // Reset to first page when filter changes
-                }}
-              >
-                <option className="bg-white dark:bg-gray-900 text-gray-800 dark:text-white" value="">All Properties</option>
-                {propertyNames.map((name) => (
-                  <option key={name} className="bg-white dark:bg-gray-900 text-gray-800 dark:text-white" value={name}>
-                    {name}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600 dark:text-gray-400">
-                <ChevronDown className="w-4 h-4" />
+        {/* Header Section */}
+        <div className="mb-2 sm:mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+            <div className="space-y-1 sm:space-y-2">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="p-1.5 sm:p-2 bg-blue-100 dark:bg-blue-900/20 rounded-xl">
+                  <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-tripswift-blue dark:text-blue-400" />
+                </div>
+                <div className="flex flex-col">
+                  <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100">
+                    Manage Bookings
+                  </h1>
+                  {/* <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 font-medium mt-1">
+                    Manage and track all your property bookings in one place
+                  </p> */}
+                </div>
               </div>
             </div>
           </div>
-
-          {/* Search by Guest Name */}
-          <div className="group relative w-full md:w-[30%]">
-            <Label htmlFor="searchQuery" className="text-gray-600 dark:text-gray-400 mb-2 block">
-              <Search className="w-4 h-4 inline-block mr-2" />
-              Search by Guest Name
-            </Label>
-            <input
-              id="searchQuery"
-              type="text"
-              placeholder="Enter guest name..."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentPage(1); // Reset to first page when search query changes
-              }}
-              className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-800 dark:text-gray-200
-               focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200
-               backdrop-blur-xl placeholder-gray-500 hover:border-gray-400 dark:hover:border-gray-600"
-            />
-          </div>
         </div>
+
+        {/* Filters Section */}
+        <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200 dark:border-slate-700 shadow-sm mb-4">
+          <CardHeader className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-base font-medium text-slate-900 dark:text-slate-100">
+                  Filters & Search
+                </CardTitle>
+                {hotelNamesError && (
+                  <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+                    Using properties from bookings (Hotel names API failed)
+                  </p>
+                )}
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-4 pt-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {/* Filter by Property */}
+              <div className="space-y-1">
+                <Label htmlFor="propertyFilter" className="text-xs text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                  <Building2 className="w-3 h-3" />
+                  Property
+                  {isLoadingHotels && (
+                    <Loader2 className="w-3 h-3 animate-spin text-blue-500" />
+                  )}
+                </Label>
+                <div className="relative">
+                  <select
+                    id="propertyFilter"
+                    className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 
+                     focus:ring-1 focus:ring-tripswift-blue focus:border-transparent transition-all
+                     backdrop-blur-xl appearance-none hover:border-slate-300 dark:hover:border-slate-600 pr-8"
+                    value={selectedProperty}
+                    onChange={(e) => {
+                      setSelectedProperty(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    disabled={isLoadingHotels}
+                  >
+                    <option value="">
+                      {isLoadingHotels ? "Loading properties..." : "All Properties"}
+                    </option>
+                    {propertyNames.map((name) => (
+                      <option key={name} value={name}>
+                        {name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-500 pointer-events-none" />
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {propertyNames.length} properties available
+                  {allHotelNames.length > 0}
+                </p>
+              </div>
+
+              {/* Search by Guest Name */}
+              <div className="space-y-1">
+                <Label htmlFor="searchQuery" className="text-xs text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                  <Search className="w-3 h-3" />
+                  Search
+                </Label>
+                <input
+                  id="searchQuery"
+                  type="text"
+                  placeholder="Guest or email"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200
+                   focus:ring-1 focus:ring-tripswift-blue focus:border-transparent transition-all
+                   backdrop-blur-xl placeholder-slate-500 hover:border-slate-300 dark:hover:border-slate-600"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Bookings Table */}
-        <div className="bg-white dark:bg-gray-900/40 backdrop-blur-xl rounded-2xl border border-gray-300 dark:border-gray-800 overflow-hidden
-                      transition-all duration-300 hover:border-gray-400 dark:hover:border-gray-700 hover:shadow-md dark:hover:shadow-[0_0_15px_rgba(59,130,246,0.1)]">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-300 dark:border-gray-800">
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-gray-400">Guest</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-gray-400">Property</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-gray-400">Location</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-gray-400">Check-in</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-gray-400">Check-out</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-gray-400">Status</th>
-                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600 dark:text-gray-400">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredBookings.length > 0 ? (
-                  filteredBookings.map((booking, index) => (
-                    <tr
-                      key={booking.id}
-                      className="group border-b border-gray-300 dark:border-gray-800 last:border-0 hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors duration-200"
-                      style={{
-                        animationDelay: `${index * 50}ms`,
-                        animation: "slideDown 0.5s ease-out forwards",
-                      }}
-                    >
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-gray-800 dark:text-gray-200">{booking.guestName}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center text-gray-700 dark:text-gray-300">
-                          <Building2 className="w-4 h-4 mr-2 text-gray-600 dark:text-gray-400" />
-                          {booking.property.name}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center text-gray-700 dark:text-gray-300">
-                          <MapPin className="w-4 h-4 mr-2 text-gray-600 dark:text-gray-400" />
-                          {booking.property.city}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center text-gray-700 dark:text-gray-300">
-                          <Calendar className="w-4 h-4 mr-2 text-gray-600 dark:text-gray-400" />
-                          {booking.checkIn}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center text-gray-700 dark:text-gray-300">
-                          <Calendar className="w-4 h-4 mr-2 text-gray-600 dark:text-gray-400" />
-                          {booking.checkOut}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-                                     ${statusColors[booking.status].bg} ${statusColors[booking.status].text}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full mr-2 border ${statusColors[booking.status].icon}`}></span>
-                          {booking.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <Link href={`/app/bookings/${booking.id}`}>
-                          <button className="px-4 py-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-lg transition-all duration-200
-                                         hover:bg-blue-500 hover:text-white focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                                         focus:ring-offset-gray-100 dark:focus:ring-offset-gray-900">
-                            View Details
-                          </button>
-                        </Link>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={7} className="px-6 py-8 text-center text-gray-600 dark:text-gray-400">
-                      <div className="flex flex-col items-center">
-                        <Search className="w-12 h-12 mb-4 text-gray-500" />
-                        <p className="text-lg font-medium">No bookings found</p>
-                        <p className="text-sm text-gray-500">Try adjusting your search or filter criteria</p>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200 dark:border-slate-700 shadow-lg">
+          <CardHeader className="p-2 sm:p-4">
+            <CardTitle className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-slate-100">
+              All Bookings
+            </CardTitle>
+            <CardDescription className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+              Manage and view all property bookings
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-0 sm:p-2">
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8 sm:py-12">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 text-tripswift-blue animate-spin" />
+                  <span className="text-sm sm:text-base text-slate-600 dark:text-slate-400">Loading bookings...</span>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-lg border border-slate-200 dark:border-slate-700 overflow-x-auto">
+                <div className="min-w-[800px]">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
+                        <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                          Primary Guest
+                        </th>
+                        <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                          Property
+                        </th>
+                        <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                          Dates
+                        </th>
+                        <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                          Amount
+                        </th>
+                        <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                          Status
+                        </th>
+                        <th className="px-4 sm:px-6 py-3 sm:py-4 text-center text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredBookings.length > 0 ? (
+                        filteredBookings.map((booking, index) => (
+                          <tr
+                            key={booking.id}
+                            className="border-b border-slate-200 dark:border-slate-700 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-150"
+                          >
+                            <td className="px-2 sm:px-4 py-3 sm:py-4">
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-tripswift-blue to-purple-600 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-medium">
+                                  {booking.guestName.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                  <div className="text-sm sm:text-base font-medium text-slate-900 dark:text-slate-100">
+                                    {booking.guestName}
+                                  </div>
+                                  <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                                    {booking.email}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-4 sm:px-6 py-3 sm:py-4">
+                              <div className="flex items-center gap-1 sm:gap-2">
+                                <Building2 className="w-3 h-3 sm:w-4 sm:h-4 text-slate-400" />
+                                <span className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-medium">
+                                  {booking.property.name}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-4 sm:px-6 py-3 sm:py-4">
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-1 sm:gap-2">
+                                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
+                                  <span className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+                                    {formatDateToDDMMYYYY(booking.checkIn)}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1 sm:gap-2">
+                                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
+                                  <span className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+                                    {formatDateToDDMMYYYY(booking.checkOut)}
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-4 sm:px-6 py-3 sm:py-4">
+                              <div>
+                                <div className="text-xs sm:text-sm font-medium text-slate-900 dark:text-slate-100">
+                                  {booking.totalAmount.toFixed(2)} {booking.currency}
+                                </div>
+                                <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+                                  <CreditCard className="w-3 h-3" />
+                                  {getPaymentMethodDisplay(booking.paymentMethod)}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-4 sm:px-6 py-3 sm:py-4">
+                              <Badge
+                                variant={statusConfig[booking.status]?.variant || "outline"}
+                                className="flex items-center gap-1 w-fit text-xs sm:text-sm"
+                              >
+                                {statusConfig[booking.status]?.icon}
+                                <span className="capitalize">{booking.status}</span>
+                              </Badge>
+                            </td>
+                            <td className="px-4 sm:px-6 py-3 sm:py-4 text-center">
+                              <Link href={`/app/bookings/${booking.id}`}>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 px-3 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-tripswift-blue dark:hover:text-blue-400 transition-colors duration-150"
+                                >
+                                  <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                                  <span className="text-xs sm:text-sm">View</span>
+                                </Button>
+                              </Link>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={6} className="text-center py-8 sm:py-12"> {/* Changed colSpan from 7 to 6 */}
+                            <div className="flex flex-col items-center gap-2 sm:gap-3">
+                              <BookOpen className="w-8 h-8 sm:w-12 sm:h-12 text-slate-400 dark:text-slate-600" />
+                              <span className="text-base sm:text-lg font-medium text-slate-600 dark:text-slate-400">
+                                No bookings found
+                              </span>
+                              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-500">
+                                Try adjusting your search or filter criteria
+                              </p>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="mt-6 flex justify-center items-center space-x-2">
-            <button
-              onClick={() => goToPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="p-2 rounded-lg bg-gray-200 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-white
-                       disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
+        {/* Enhanced Pagination */}
+        {!isLoading && totalPages > 1 && (
+          <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4 px-4 py-3 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-lg">
+            {/* Left side - Items per page */}
+            <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+              <span>Show</span>
+              <div className="relative">
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                  className="px-3 py-1 text-sm bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-md text-slate-800 dark:text-slate-200 
+                   focus:ring-1 focus:ring-tripswift-blue focus:border-transparent transition-all appearance-none pr-8 min-w-[80px]"
+                >
+                  <option value={5}>5 <span>per page</span>
+                  </option>
+                  <option value={10}>10 <span>per page</span>
+                  </option>
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-500 pointer-events-none" />
+              </div>
+            </div>
 
-            {Array.from({ length: totalPages }, (_, i) => (
-              <button
-                key={i + 1}
-                onClick={() => goToPage(i + 1)}
-                className={`px-4 py-2 rounded-lg transition-all duration-200 ${currentPage === i + 1
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-white"
-                  }`}
+            {/* Center - Page navigation */}
+            <div className="flex items-center gap-1">
+              {/* Previous button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => goToPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-2 py-1 h-8 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {i + 1}
-              </button>
-            ))}
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
 
-            <button
-              onClick={() => goToPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="p-2 rounded-lg bg-gray-200 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-white
-                       disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+              {/* Page numbers */}
+              {generatePageNumbers().map((page, index) => (
+                <div key={index}>
+                  {page === '...' ? (
+                    <span className="px-2 py-1 text-slate-400 dark:text-slate-500">...</span>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => goToPage(page as number)}
+                      className={`px-3 py-1 h-8 text-sm transition-all ${currentPage === page
+                        ? "bg-tripswift-blue text-white hover:bg-tripswift-blue/90"
+                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                        }`}
+                    >
+                      {page}
+                    </Button>
+                  )}
+                </div>
+              ))}
+
+              {/* Next button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => goToPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-2 py-1 h-8 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+
+            {/* Right side - Showing text */}
+            <div className="text-sm text-slate-600 dark:text-slate-400">
+              {showingText}
+            </div>
           </div>
         )}
       </div>

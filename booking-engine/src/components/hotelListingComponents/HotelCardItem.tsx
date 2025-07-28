@@ -1,6 +1,6 @@
 // src/components/hotelListingComponents/HotelCardItem.tsx
 import React from "react";
-import { MapPin, Star, Coffee, Wifi, Car, Waves, Droplets, Briefcase, Utensils, BellRing, Dog, Bath } from "lucide-react";
+import { MapPin, Star, Coffee, Wifi, Car, Waves, Droplets, Briefcase, Utensils, BellRing, Dog, Bath, Accessibility, CigaretteOff, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export interface Hotel {
@@ -63,6 +63,12 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
                 return <Droplets className="h-4 w-4 text-tripswift-blue" />;
             case 'child_friendly_facilities':
                 return <Star className="h-4 w-4 text-tripswift-blue" />;
+            case 'non_smoking_rooms':
+                return <CigaretteOff className="h-4 w-4 text-tripswift-blue" />;
+            case 'facilities_for_disabled_guests':
+                return <Accessibility className="h-4 w-4 text-tripswift-blue" />;
+            case 'family_rooms':
+                return <Users className="h-4 w-4 text-tripswift-blue" />;
             default:
                 return null;
         }

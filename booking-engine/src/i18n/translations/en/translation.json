@@ -237,7 +237,10 @@
         "pet_friendly": "Pet Friendly",
         "business_facilities": "Business Facilities",
         "laundry_services": "Laundry Services",
-        "child_friendly_facilities": "Child Friendly Facilities"
+        "child_friendly_facilities": "Child Friendly Facilities",
+        "non_smoking_rooms": "Non Smoking Rooms",
+        "facilities_for_disabled_guests": "Facilities for disabled guests",
+        "family_rooms": "Family Rooms"
       }
     },
     "heroTitle": "Find Your Perfect Stay",
@@ -298,7 +301,10 @@
         "pet_friendly": "Pet Friendly",
         "business_facilities": "Business Facilities",
         "laundry_services": "Laundry Services",
-        "child_friendly_facilities": "Child Friendly Facilities"
+        "child_friendly_facilities": "Child Friendly Facilities",
+        "non_smoking_rooms": "Non Smoking Rooms",
+        "facilities_for_disabled_guests": "Facilities for disabled guests",
+        "family_rooms": "Family Rooms"
       },
       "sortOptions": {
         "recommended": "Recommended",
@@ -383,7 +389,10 @@
       "pet_friendly": "Pet Friendly",
       "business_facilities": "Business Facilities",
       "laundry_services": "Laundry Services",
-      "child_friendly_facilities": "Child Friendly Facilities"
+      "child_friendly_facilities": "Child Friendly Facilities",
+      "non_smoking_rooms": "Non Smoking Rooms",
+      "facilities_for_disabled_guests": "Facilities for disabled guests",
+      "family_rooms": "Family Rooms"
     },
     "noAmenitiesSpecified": "No amenities specified for this property.",
     "contactInformation": "Contact Information",
@@ -403,9 +412,9 @@
       "qrCodeAlt": "Discount QR Code",
       "scanToApply": "Scan to apply",
       "instructions": {
-        "scanAtCheckout": "Scan the QR code at checkout",
-        "applyDiscount": "Apply the discount during checkout to get your special offer",
-        "validityNote": "Valid for this booking session only"
+        "scanAtCheckout": "Scan the QR code to open this room in the Alhajz app.",
+        "applyDiscount": "If the app isn’t installed, you’ll be prompted to download it.",
+        "validityNote": "Book through the app to get an exclusive discount for this room."
       }
     },
     "RoomCard": {
@@ -808,7 +817,7 @@
       "guestDetails": "Guest Details",
       "guestName": "Guest Name",
       "contactNumber": "Contact Number",
-      "email":"Email",
+      "email": "Email",
       "adults": "Adults",
       "children": "Children",
       "specialRequests": "Special Requests",

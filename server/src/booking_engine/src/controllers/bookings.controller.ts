@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import mongoose, { isValidObjectId, Types } from "mongoose";
 import { CatchAsyncError } from "../middleware/catchAsyncError";
 import ErrorHandler from "../utils/errorHandler";
 import { ThirdPartyReservationService } from '../../../wincloud/src/controller/reservationController';
@@ -15,6 +16,7 @@ import { Inventory } from "../../../wincloud/src/model/inventoryModel";
 import { CustomRequest } from "../../../user_authentication/src/Utils/types";
 import Auth from "../../../user_authentication/src/Model/auth.model";
 import { PropertyInfo } from "../../../property_management/src/model/property.info.model";
+import UserModel from "../../../user_authentication/src/Model/auth.model";
 
 const calculateAgeCategory = (dob: string) => {
   const birthDate = new Date(dob);
@@ -2496,3 +2498,67 @@ export const getBookingDetailsForExtranet = CatchAsyncError(async (req: CustomRe
     return next(new ErrorHandler(error.message, 400));
   }
 });
+
+export const getAllHotelsByRole = CatchAsyncError(
+  async (req: CustomRequest, res: Response, next: NextFunction) => {
+    try {
+      console.log(`The user details ${JSON.stringify(req.user)}`);
+      const ownerId = req.user?.id;
+      const ownerRole = req.role;
+      console.log(`The owner id is ${ownerId} and owner role is ${ownerRole}`);
+      if (!ownerId || !ownerRole) {
+        return next(new ErrorHandler("Owner ID and ROLE not available", 400));
+      }
+      console.log("Owner ID:", ownerId);
+      const convertedOwnerId = new Types.ObjectId(ownerId);
+      const ownerDetails = await UserModel.findById(convertedOwnerId);
+      if (!ownerDetails) {
+        return next(new ErrorHandler("Owner not found in database", 404));
+      }
+      console.log("Owner Details:", ownerDetails);
+      const allowedRoles = ["superAdmin", "groupManager", "hotelManager"];
+      if (!allowedRoles.includes(ownerDetails.role)) {
+        return next(new ErrorHandler("Unauthorized access", 403));
+      }
+
+      let query = {};
+
+      switch (ownerDetails.role) {
+        case "superAdmin":
+          break;
+
+        case "groupManager":
+          const managedUsers = await UserModel.find({
+            createdBy: ownerDetails.email
+          }).select('_id');
+
+          query = {
+            user_id: { $in: managedUsers.map(user => user._id) }
+          };
+          break;
+
+        case "hotelManager":
+          // Fix: Convert ownerId to ObjectId for consistency
+          query = { user_id: convertedOwnerId };
+          break;
+      }
+
+      const properties = await PropertyInfo.find(query).select('property_name');
+      const propertyNames = [...new Set(properties.map(prop => prop.property_name))].sort();
+
+      return res.json({
+        success: true,
+        message: "Hotel names fetched successfully",
+        hotelNames: propertyNames,
+        count: propertyNames.length,
+      });
+
+    } catch (error: any) {
+      console.error("Error fetching hotel names:", error);
+      return next(new ErrorHandler(
+        error.message || "Failed to fetch hotel names",
+        error.statusCode || 500
+      ));
+    }
+  }
+);

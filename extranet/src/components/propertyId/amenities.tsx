@@ -449,7 +449,7 @@ export function Amenities({
   return (
     <Card className="w-full shadow-sm hover:shadow-md transition-shadow duration-300">
       <CardHeader className="flex flex-row items-center justify-between border-b pb-3">
-        <CardTitle className="text-primary font-semibold">
+        <CardTitle className="text-primary font-semibold text-lg sm:text-xl">
           Property Amenities
         </CardTitle>
         <div className="flex gap-2">

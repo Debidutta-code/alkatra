@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../../../../components/ui/select";
+import { RootState, useSelector, store } from "../../../../../redux/store";
 
 interface PageProps {
   params: {
@@ -34,6 +35,13 @@ const EditMember = ({ params }: PageProps) => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const router = useRouter();
   const { userId } = params;
+  const { user } = useSelector((state: RootState) => state.auth);
+
+  const isDisabled = () => {
+    const state = store.getState();
+    const currentUser = state.auth.user;
+    return currentUser?.role === "superAdmin" ? true : false;
+  }
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -297,9 +305,8 @@ const EditMember = ({ params }: PageProps) => {
                       type="text"
                       value={formData.firstName}
                       onChange={handleChange}
-                      className={`h-10 pl-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${
-                        formSubmitted && errors.firstName ? 'border-red-500' : ''
-                      }`}
+                      className={`h-10 pl-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${formSubmitted && errors.firstName ? 'border-red-500' : ''
+                        }`}
                       placeholder="Enter first name"
                     />
                     <User size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" />
@@ -322,9 +329,8 @@ const EditMember = ({ params }: PageProps) => {
                       type="text"
                       value={formData.lastName}
                       onChange={handleChange}
-                      className={`h-10 pl-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${
-                        formSubmitted && errors.lastName ? 'border-red-500' : ''
-                      }`}
+                      className={`h-10 pl-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${formSubmitted && errors.lastName ? 'border-red-500' : ''
+                        }`}
                       placeholder="Enter last name"
                     />
                     <User size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" />
@@ -348,9 +354,8 @@ const EditMember = ({ params }: PageProps) => {
                     type="text"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`h-10 pl-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${
-                      formSubmitted && errors.email ? 'border-red-500' : ''
-                    }`}
+                    className={`h-10 pl-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${formSubmitted && errors.email ? 'border-red-500' : ''
+                      }`}
                     placeholder="Enter email address"
                   />
                   <AtSign size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" />
@@ -378,18 +383,19 @@ const EditMember = ({ params }: PageProps) => {
                   <div className="flex items-center">
                     <UserCog size={18} className="text-slate-500 absolute left-3 z-10" />
                     <Select value={formData.role} onValueChange={handleRoleChange}>
-                      <SelectTrigger className={`h-10 pl-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${
-                        formSubmitted && errors.role ? 'border-red-500' : ''
-                      }`}>
+                      <SelectTrigger className={`h-10 pl-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${formSubmitted && errors.role ? 'border-red-500' : ''
+                        }`}>
                         <SelectValue placeholder="Select a role" />
                       </SelectTrigger>
                       <SelectContent className="rounded-lg border-slate-300">
-                        <SelectItem value="groupManager" className="rounded-md">
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                            Group Manager
-                          </div>
-                        </SelectItem>
+                        {isDisabled() && (
+                          <SelectItem value="groupManager" className="rounded-md">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                              Group Manager
+                            </div>
+                          </SelectItem>
+                        )}
                         <SelectItem value="hotelManager" className="rounded-md">
                           <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -429,9 +435,8 @@ const EditMember = ({ params }: PageProps) => {
                     type={showPassword ? "text" : "password"}
                     value={formData.password}
                     onChange={handleChange}
-                    className={`h-10 pl-12 pr-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${
-                      formSubmitted && errors.password ? 'border-red-500' : ''
-                    }`}
+                    className={`h-10 pl-12 pr-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${formSubmitted && errors.password ? 'border-red-500' : ''
+                      }`}
                     placeholder="Leave blank to keep current password"
                   />
                   <Lock size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" />
@@ -470,9 +475,8 @@ const EditMember = ({ params }: PageProps) => {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     disabled={!formData.password}
-                    className={`h-10 pl-12 pr-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${
-                      formSubmitted && errors.confirmPassword ? 'border-red-500' : ''
-                    } ${!formData.password ? 'bg-slate-50' : ''}`}
+                    className={`h-10 pl-12 pr-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${formSubmitted && errors.confirmPassword ? 'border-red-500' : ''
+                      } ${!formData.password ? 'bg-slate-50' : ''}`}
                     placeholder="Confirm new password"
                   />
                   <Shield size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" />

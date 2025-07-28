@@ -237,7 +237,10 @@
         "pet_friendly": "पेट फ्रेंडली",
         "business_facilities": "व्यावसायिक सुविधाएँ",
         "laundry_services": "लॉन्ड्री सेवाएँ",
-        "child_friendly_facilities": "बच्चों के अनुकूल सुविधाएँ"
+        "child_friendly_facilities": "बच्चों के अनुकूल सुविधाएँ",
+        "non_smoking_rooms": "धूम्रपान निषेध कक्ष",
+        "facilities_for_disabled_guests": "विकलांग अतिथियों के लिए सुविधाएं",
+        "family_rooms": "पारिवारिक कक्ष"
       }
     },
     "heroTitle": "अपना सही ठहराव खोजें",
@@ -298,7 +301,10 @@
         "pet_friendly": "पेट फ्रेंडली",
         "business_facilities": "व्यावसायिक सुविधाएँ",
         "laundry_services": "लॉन्ड्री सेवाएँ",
-        "child_friendly_facilities": "बच्चों के अनुकूल सुविधाएँ"
+        "child_friendly_facilities": "बच्चों के अनुकूल सुविधाएँ",
+        "non_smoking_rooms": "धूम्रपान निषेध कक्ष",
+        "facilities_for_disabled_guests": "विकलांग अतिथियों के लिए सुविधाएं",
+        "family_rooms": "पारिवारिक कक्ष"
       },
       "sortOptions": {
         "recommended": "अनुशंसित",
@@ -383,7 +389,10 @@
       "pet_friendly": "पेट फ्रेंडली",
       "business_facilities": "व्यावसायिक सुविधाएँ",
       "laundry_services": "लॉन्ड्री सेवाएँ",
-      "child_friendly_facilities": "बच्चों के अनुकूल सुविधाएँ"
+      "child_friendly_facilities": "बच्चों के अनुकूल सुविधाएँ",
+      "non_smoking_rooms": "धूम्रपान निषेध कक्ष",
+      "facilities_for_disabled_guests": "विकलांग अतिथियों के लिए सुविधाएं",
+      "family_rooms": "पारिवारिक कक्ष"
     },
     "noAmenitiesSpecified": "इस संपत्ति के लिए कोई सुविधाएँ निर्दिष्ट नहीं हैं।",
     "contactInformation": "संपर्क जानकारी",
@@ -402,9 +411,9 @@
       "qrCodeAlt": "डिस्काउंट क्यूआर कोड",
       "scanToApply": "लागू करने के लिए स्कैन करें",
       "instructions": {
-        "scanAtCheckout": "चेकआउट के समय क्यूआर कोड स्कैन करें",
-        "applyDiscount": "विशेष ऑफर प्राप्त करने के लिए चेकआउट के दौरान डिस्काउंट लागू करें",
-        "validityNote": "केवल इस बुकिंग सत्र के लिए मान्य"
+        "scanAtCheckout": "अलहज्ज़ ऐप में इस कमरे को खोलने के लिए QR कोड स्कैन करें।",
+        "applyDiscount": "यदि ऐप इंस्टॉल नहीं है, तो आपको इसे डाउनलोड करने के लिए कहा जाएगा।",
+        "validityNote": "इस कमरे के लिए विशेष छूट पाने हेतु ऐप के माध्यम से बुकिंग करें।"
       }
     },
     "RoomCard": {

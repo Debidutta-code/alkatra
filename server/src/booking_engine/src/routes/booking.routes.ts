@@ -16,7 +16,8 @@ import {
   getBookingDetailsOfUser,
   createReservationWithStoredCard,
   cancelThirdPartyReservation,
-  updateThirdPartyReservation
+  updateThirdPartyReservation,
+  getAllHotelsByRole
 } from "../controllers/bookings.controller";
 
 
@@ -46,6 +47,6 @@ router.route("/count/:id").get(protect as any, getBookingDetailsForExtranet);
 // router.route("/owner/revenue/:id").get(authenticateCustomer as any, getRevenueByOwner);
 // router.route("/property/revenue/:id").get(authenticateCustomer as any, getRevenueByProperty);
 router.route("/customers/booking/details/:id").get(authenticateCustomer as any, getBookingDetailsOfUser);
-
+router.route("/hotelname").get(protect as any, getAllHotelsByRole);
 
 export default router;

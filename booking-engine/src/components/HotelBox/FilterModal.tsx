@@ -31,6 +31,9 @@ export const AMENITIES = [
   { key: "business_facilities", labelKey: "business_facilities" },
   { key: "laundry_services", labelKey: "laundry_services" },
   { key: "child_friendly_facilities", labelKey: "child_friendly_facilities" },
+  { key: "non_smoking_rooms", labelKey: "non_smoking_rooms" },
+  { key: "facilities_for_disabled_guests", labelKey: "facilities_for_disabled_guests" },
+  { key: "family_rooms", labelKey: "family_rooms" },
 ] as const;
 
 export const FilterModal: React.FC<FilterModalProps> = ({
