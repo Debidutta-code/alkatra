@@ -7,7 +7,7 @@
     "clean": "rimraf ./dist",
     "dev": "nodemon src/index.ts",
     "build": "rimraf ./dist && tsc",
-    "start": "node --max-old-space-size=2048 node_modules/.bin/tsc && pm2 start dist/index.js --node-args='--max-old-space-size=2048' --name=Extranet_Server",
+    "start": "node --max-old-space-size=1024 node_modules/.bin/tsc && pm2 start dist/index.js --node-args='--max-old-space-size=1024' --name=Extranet_Server",
     "pm2:stop": "pm2 stop TwipSwift",
     "pm2:restart": "pm2 restart TwipSwift",
     "pm2:delete": "pm2 delete TwipSwift",
