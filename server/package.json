@@ -8,7 +8,7 @@
     "dev": "nodemon src/index.ts",
     "build": "rimraf ./dist && tsc -b",
     "start": "node dist/src/index.js",
-    "start:pm2": "pm2 start dist/src/index.js --name online-booking-engine",
+    "start:pm2": "pm2 start dist/src/index.js --name al-hajz-server",
     "pm2:stop": "pm2 stop TwipSwift",
     "pm2:restart": "pm2 restart TwipSwift",
     "pm2:delete": "pm2 delete TwipSwift",
