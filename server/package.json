@@ -6,8 +6,9 @@
   "scripts": {
     "clean": "rimraf ./dist",
     "dev": "nodemon src/index.ts",
-    "build": "rimraf ./dist && tsc",
-    "start": "node --max-old-space-size=1024 node_modules/.bin/tsc && pm2 start dist/index.js --node-args='--max-old-space-size=1024' --name=Extranet_Server",
+    "build": "rimraf ./dist && tsc -b",
+    "start": "node dist/src/index.js",
+    "start:pm2": "pm2 start dist/src/index.js --name online-booking-engine",
     "pm2:stop": "pm2 stop TwipSwift",
     "pm2:restart": "pm2 restart TwipSwift",
     "pm2:delete": "pm2 delete TwipSwift",
