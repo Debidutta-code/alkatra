@@ -760,6 +760,7 @@
       "errors": {
         "selectValidDates": "Please select valid check-in and check-out dates.",
         "unableToAmend": "Unable to update booking. Please try again or contact support.",
+        "unableToFetchPrice": "Unable to fetch updated pricing. Please try again or contact support.",
         "invalidFirstName": "First Name is required ",
         "invalidLastName": "Last Name is required ",
         "dobRequired": "Date of Birth is required.",

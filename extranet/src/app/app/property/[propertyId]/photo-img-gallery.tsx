@@ -4,12 +4,11 @@ import Image from "next/image";
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "../../../../components/ui/button";
 import { Card, CardContent } from "../../../../components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../../../..//components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../../../../components/ui/dialog";
 import { Plus, Trash2, Upload, Loader2, Edit3, Eye, ImageIcon, ChevronRight, ChevronLeft, } from "lucide-react";
 import { useDropzone, FileRejection } from "react-dropzone";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { updateProperty } from '../[propertyId]/api';
 
 interface IFileWithPreview extends File {
   preview: string;
@@ -22,7 +21,23 @@ interface PropertyImageGalleryProps {
   loading?: boolean;
   propertyId: string;
   accessToken: string;
+  uploadEndpoint?: string;
+  updatePropertyEndpoint?: string;
 }
+
+const updateProperty = async (propertyId: string, accessToken: string, data: any) => {
+  const response = await axios.patch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`,
+    data,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      }
+    }
+  );
+  return response.data;
+};
 
 export function PropertyImageGallery({
   image = [],
@@ -30,7 +45,9 @@ export function PropertyImageGallery({
   editable = false,
   loading = false,
   propertyId,
-  accessToken
+  accessToken,
+  uploadEndpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/upload`,
+  updatePropertyEndpoint
 }: PropertyImageGalleryProps) {
   const [currentImage, setCurrentImage] = useState(0);
   const [editMode, setEditMode] = useState(false);
@@ -41,12 +58,17 @@ export function PropertyImageGallery({
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [imageToDelete, setImageToDelete] = useState<{ url: string; index: number } | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Clean up object URLs when component unmounts
+  // Clean up object URLs when component unmounts or files change
   useEffect(() => {
     return () => {
-      files.forEach(file => URL.revokeObjectURL(file.preview));
+      files.forEach(file => {
+        if (file.preview) {
+          URL.revokeObjectURL(file.preview);
+        }
+      });
     };
   }, [files]);
 
@@ -57,28 +79,78 @@ export function PropertyImageGallery({
     }
   }, [image.length, currentImage]);
 
+  // File validation function
+  const validateFiles = (files: File[]) => {
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxFiles = 10;
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+
+    const validFiles = files.filter(file => {
+      if (file.size > maxSize) {
+        toast.error(`${file.name} is too large (max 10MB)`);
+        return false;
+      }
+      if (!allowedTypes.includes(file.type)) {
+        toast.error(`${file.name} is not a supported image type`);
+        return false;
+      }
+      return true;
+    });
+
+    if (image.length + validFiles.length > maxFiles) {
+      toast.error(`Maximum ${maxFiles} images allowed`);
+      return validFiles.slice(0, maxFiles - image.length);
+    }
+
+    return validFiles;
+  };
+
   const handleImageUpload = async () => {
     if (!files.length) return;
 
+    const validFiles = validateFiles(files);
+    if (!validFiles.length) return;
+
     setUploading(true);
+    setUploadError(null);
+    const originalImages = [...image];
+
     try {
       const formData = new FormData();
-      files.forEach((file) => {
+      validFiles.forEach((file) => {
         formData.append('file', file);
       });
 
-      const uploadResponse = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/upload`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          }
+      const uploadResponse = await axios.post(uploadEndpoint, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          ...(accessToken && { Authorization: `Bearer ${accessToken}` })
         }
-      );
+      });
 
-      // Extract just the URLs from the Cloudinary response
-      const newImageUrls = uploadResponse.data.data.urls.map((img: any) => img.url);
+      // Handle different response formats - adjust based on your API
+      let newImageUrls: string[] = [];
+
+      if (uploadResponse.data?.data?.urls) {
+        // If response has urls array with objects containing url property
+        newImageUrls = uploadResponse.data.data.urls.map((item: any) =>
+          typeof item === 'string' ? item : item.url || item.secure_url || item
+        );
+      } else if (uploadResponse.data?.urls) {
+        // If response has direct urls array
+        newImageUrls = uploadResponse.data.urls.map((item: any) =>
+          typeof item === 'string' ? item : item.url || item.secure_url || item
+        );
+      } else if (uploadResponse.data?.data) {
+        // If response data is array of URLs or objects
+        const data = uploadResponse.data.data;
+        newImageUrls = Array.isArray(data)
+          ? data.map((item: any) => typeof item === 'string' ? item : item.url || item.secure_url || item)
+          : [typeof data === 'string' ? data : data.url || data.secure_url || data];
+      } else {
+        throw new Error('Invalid response format from upload endpoint');
+      }
+
       const updatedImages = [...image, ...newImageUrls];
 
       // Update the UI immediately
@@ -86,26 +158,45 @@ export function PropertyImageGallery({
         onImagesUpdate(updatedImages);
       }
 
-      // Update the property record with just the URLs
+      // Update the property record
       await updateProperty(propertyId, accessToken, { image: updatedImages });
 
+      // Clean up files and close dialog only on success
+      files.forEach(file => {
+        if (file.preview) {
+          URL.revokeObjectURL(file.preview);
+        }
+      });
       setFiles([]);
       setUploadDialogOpen(false);
       toast.success("Property images uploaded successfully!");
-    } catch (error) {
+
+    } catch (error: any) {
       console.error('Upload failed:', error);
-      toast.error("Failed to upload images");
+
+      // Revert UI changes on error
+      if (onImagesUpdate) {
+        onImagesUpdate(originalImages);
+      }
+
+      const errorMessage = error?.response?.data?.message || error?.message || "Failed to upload images";
+      setUploadError(errorMessage);
+      toast.error(errorMessage);
+
+      // Don't clear files on error - let user retry
     } finally {
       setUploading(false);
     }
   };
 
   const handleDeleteImage = async (imageUrl: string, index: number) => {
+    const originalImages = [...image];
     setDeleting(imageUrl);
+
     try {
       const updatedImages = image.filter((_, i) => i !== index);
 
-      // Update the UI immediately
+      // Optimistic update
       if (onImagesUpdate) {
         onImagesUpdate(updatedImages);
       }
@@ -116,13 +207,18 @@ export function PropertyImageGallery({
       toast.success("Image deleted successfully!");
       setDeleteConfirmOpen(false);
       setImageToDelete(null);
-    } catch (error) {
+
+    } catch (error: any) {
       console.error('Delete failed:', error);
-      toast.error("Failed to delete image");
+
       // Revert the UI update on error
       if (onImagesUpdate) {
-        onImagesUpdate(image);
+        onImagesUpdate(originalImages);
       }
+
+      const errorMessage = error?.response?.data?.message || error?.message || "Failed to delete image";
+      toast.error(errorMessage);
+
     } finally {
       setDeleting(null);
     }
@@ -133,26 +229,34 @@ export function PropertyImageGallery({
     setDeleteConfirmOpen(true);
   };
 
-  // Drag and drop handlers for reordering
+  // Drag and drop handlers with validation
   const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
     if (acceptedFiles?.length) {
-      setFiles(previousFiles => [
-        ...previousFiles,
-        ...acceptedFiles.map(file =>
-          Object.assign(file, { preview: URL.createObjectURL(file) })
-        ),
-      ]);
+      const validFiles = validateFiles(acceptedFiles);
+      if (validFiles.length) {
+        setFiles(previousFiles => [
+          ...previousFiles,
+          ...validFiles.map(file =>
+            Object.assign(file, { preview: URL.createObjectURL(file) })
+          ),
+        ]);
+      }
     }
 
     if (rejectedFiles?.length) {
       setRejected(previousFiles => [...previousFiles, ...rejectedFiles]);
+      rejectedFiles.forEach(rejection => {
+        const errors = rejection.errors.map(e => e.message).join(', ');
+        toast.error(`${rejection.file.name}: ${errors}`);
+      });
     }
-  }, []);
+  }, [image.length]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
       'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp']
     },
+    maxSize: 10 * 1024 * 1024, // 10MB
     onDrop,
     noClick: true,
     disabled: !editMode
@@ -161,15 +265,24 @@ export function PropertyImageGallery({
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
     if (selectedFiles.length) {
-      const filesWithPreview = selectedFiles.map(file =>
-        Object.assign(file, { preview: URL.createObjectURL(file) })
-      );
-      setFiles(prev => [...prev, ...filesWithPreview]);
+      const validFiles = validateFiles(selectedFiles);
+      if (validFiles.length) {
+        const filesWithPreview = validFiles.map(file =>
+          Object.assign(file, { preview: URL.createObjectURL(file) })
+        );
+        setFiles(prev => [...prev, ...filesWithPreview]);
+      }
     }
   };
 
   const removeFile = (name: string) => {
-    setFiles(files => files.filter(file => file.name !== name));
+    setFiles(files => {
+      const fileToRemove = files.find(f => f.name === name);
+      if (fileToRemove?.preview) {
+        URL.revokeObjectURL(fileToRemove.preview);
+      }
+      return files.filter(file => file.name !== name);
+    });
   };
 
   // If no images, show placeholder
@@ -178,7 +291,7 @@ export function PropertyImageGallery({
       <div className="relative group">
         <div className="border-2 border-dashed border-gray-200 rounded-xl p-12 text-center bg-gradient-to-br from-gray-50/50 to-gray-100/30 backdrop-blur-sm transition-all duration-300 hover:border-gray-300 hover:shadow-lg">
           <div className="space-y-6">
-            <div className="mx-auto w-20 h-20 bg-gradient-to-br from-tripswift-blue to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+            <div className="mx-auto w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
               <ImageIcon className="w-10 h-10 text-white" />
             </div>
             <div>
@@ -187,7 +300,7 @@ export function PropertyImageGallery({
             </div>
             <Button
               onClick={() => setUploadDialogOpen(true)}
-              className="bg-gradient-to-r from-tripswift-blue to-purple-600 hover:from-tripswift-dark-blue hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 px-6 py-3"
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 px-6 py-3"
             >
               <Plus className="w-5 h-5 mr-2" />
               Add Images
@@ -203,6 +316,7 @@ export function PropertyImageGallery({
             rejected={rejected}
             setRejected={setRejected}
             uploading={uploading}
+            uploadError={uploadError}
             onUpload={handleImageUpload}
             fileInputRef={fileInputRef}
             removeFile={removeFile}
@@ -224,9 +338,9 @@ export function PropertyImageGallery({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="relative">
-                <div className={`w-2.5 h-2.5 rounded-full ${editMode ? 'bg-tripswift-blue' : 'bg-gray-400'} transition-colors duration-300`}></div>
+                <div className={`w-2.5 h-2.5 rounded-full ${editMode ? 'bg-blue-500' : 'bg-gray-400'} transition-colors duration-300`}></div>
                 {editMode && (
-                  <div className="absolute inset-0 w-2.5 h-2.5 bg-tripswift-blue rounded-full animate-ping opacity-75"></div>
+                  <div className="absolute inset-0 w-2.5 h-2.5 bg-blue-500 rounded-full animate-ping opacity-75"></div>
                 )}
               </div>
               <div className="flex flex-col">
@@ -244,7 +358,7 @@ export function PropertyImageGallery({
                 onClick={() => setEditMode(!editMode)}
                 className={`h-9 px-4 font-medium transition-all duration-200 rounded-md flex items-center gap-2 ${editMode
                   ? "text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200"
-                  : "bg-gradient-to-r from-tripswift-blue to-purple-600 hover:from-tripswift-dark-blue hover:to-purple-700 text-white shadow-sm hover:shadow-md"
+                  : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-sm hover:shadow-md"
                   }`}
               >
                 {editMode ? (
@@ -263,7 +377,7 @@ export function PropertyImageGallery({
               {editMode && (
                 <Button
                   onClick={() => setUploadDialogOpen(true)}
-                  className="h-9 px-4 bg-gradient-to-r from-tripswift-blue to-purple-600 hover:from-tripswift-dark-blue hover:to-purple-700 text-white font-medium shadow-sm hover:shadow-md transition-all duration-200"
+                  className="h-9 px-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium shadow-sm hover:shadow-md transition-all duration-200"
                   size="sm"
                 >
                   <Upload className="w-4 h-4 mr-2" />
@@ -278,7 +392,7 @@ export function PropertyImageGallery({
       <div
         {...(editMode ? getRootProps() : {})}
         className={`relative rounded-xl overflow-hidden transition-all duration-500 ${editMode && isDragActive
-          ? 'ring-4 ring-tripswift-blue/30 shadow-2xl transform scale-[1.01]'
+          ? 'ring-4 ring-blue-500/30 shadow-2xl transform scale-[1.01]'
           : editMode
             ? 'ring-2 ring-blue-200/60 shadow-lg'
             : 'shadow-xl hover:shadow-2xl'
@@ -287,7 +401,7 @@ export function PropertyImageGallery({
         {editMode && <input {...getInputProps()} />}
 
         {editMode && isDragActive && (
-          <div className="absolute inset-0 bg-gradient-to-br from-tripswift-blue to-purple-600/95 backdrop-blur-md flex items-center justify-center z-20 rounded-xl">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-600/95 backdrop-blur-md flex items-center justify-center z-20 rounded-xl">
             <div className="text-center text-white px-8 py-6">
               <div className="relative mb-6">
                 <Upload className="w-16 h-16 mx-auto animate-bounce" />
@@ -312,24 +426,6 @@ export function PropertyImageGallery({
 
             {/* Enhanced gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-            {/* Delete button for current image in edit mode */}
-            {/* {editMode && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  confirmDelete(image[currentImage], currentImage);
-                }}
-                disabled={deleting === image[currentImage]}
-                className="absolute top-6 right-6 w-10 h-10 bg-red-500/80 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-600/90 transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {deleting === image[currentImage] ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <Trash2 className="w-5 h-5" />
-                )}
-              </button>
-            )} */}
 
             {/* Modern image counter */}
             <div className="absolute top-6 left-6">
@@ -386,7 +482,7 @@ export function PropertyImageGallery({
               >
                 <button
                   className={`relative block w-20 h-20 rounded-xl overflow-hidden transition-all duration-300 ${currentImage === i
-                    ? "ring-3 ring-tripswift-blue ring-offset-2 transform scale-105 shadow-xl"
+                    ? "ring-3 ring-blue-500 ring-offset-2 transform scale-105 shadow-xl"
                     : "hover:ring-2 hover:ring-gray-300 hover:ring-offset-1 hover:transform hover:scale-102 shadow-md hover:shadow-lg"
                     }`}
                   onClick={() => setCurrentImage(i)}
@@ -401,7 +497,7 @@ export function PropertyImageGallery({
 
                   {/* Active state overlay */}
                   {currentImage === i && (
-                    <div className="absolute inset-0 bg-tripswift-blue/20 backdrop-blur-[1px] flex items-center justify-center">
+                    <div className="absolute inset-0 bg-blue-500/20 backdrop-blur-[1px] flex items-center justify-center">
                       <div className="w-3 h-3 bg-white rounded-full shadow-lg animate-pulse"></div>
                     </div>
                   )}
@@ -456,9 +552,9 @@ export function PropertyImageGallery({
                     <div
                       key={i}
                       className={`h-1.5 rounded-full transition-all duration-300 ${i === 0
-                        ? 'w-8 bg-gradient-to-r from-tripswift-blue to-purple-600'
+                        ? 'w-8 bg-gradient-to-r from-blue-500 to-purple-600'
                         : i === 1
-                          ? 'w-4 bg-tripswift-blue/60'
+                          ? 'w-4 bg-blue-500/60'
                           : 'w-2 bg-gray-300'
                         }`}
                     />
@@ -482,6 +578,7 @@ export function PropertyImageGallery({
         rejected={rejected}
         setRejected={setRejected}
         uploading={uploading}
+        uploadError={uploadError}
         onUpload={handleImageUpload}
         fileInputRef={fileInputRef}
         removeFile={removeFile}
@@ -535,7 +632,7 @@ export function PropertyImageGallery({
   );
 }
 
-// Enhanced Upload Dialog Component (unchanged from original)
+// Enhanced Upload Dialog Component
 function UploadDialog({
   open,
   setOpen,
@@ -544,6 +641,7 @@ function UploadDialog({
   rejected,
   setRejected,
   uploading,
+  uploadError,
   onUpload,
   fileInputRef,
   removeFile
@@ -555,6 +653,7 @@ function UploadDialog({
   rejected: FileRejection[];
   setRejected: React.Dispatch<React.SetStateAction<FileRejection[]>>;
   uploading: boolean;
+  uploadError: string | null;
   onUpload: () => void;
   fileInputRef: React.RefObject<HTMLInputElement>;
   removeFile?: (name: string) => void;
@@ -578,39 +677,26 @@ function UploadDialog({
     accept: {
       'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp']
     },
+    maxSize: 10 * 1024 * 1024, // 10MB
     onDrop,
   });
-
-  const handleFileInputClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = Array.from(e.target.files || []);
-    if (selectedFiles.length) {
-      const filesWithPreview = selectedFiles.map(file =>
-        Object.assign(file, { preview: URL.createObjectURL(file) })
-      );
-      setFiles(prev => [...prev, ...filesWithPreview]);
-    }
-  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-3xl max-w-[95vw] rounded-lg border-0 shadow-xl mx-2 sm:mx-0">
         <DialogHeader className="space-y-1 pb-3 sm:pb-4">
-          <DialogTitle className="text-lg sm:text-xl font-bold bg-gradient-to-r from-tripswift-blue to-purple-600 bg-clip-text text-transparent">
+          <DialogTitle className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
             Upload Property Images
           </DialogTitle>
           <DialogDescription className="text-gray-600 text-xs sm:text-sm">
-            Upload high-quality images to showcase your property (max 10 images)
+            Upload high-quality images to showcase your property (max 10 images, 10MB each)
           </DialogDescription>
         </DialogHeader>
 
         {uploading && (
           <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg">
             <div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 sm:px-4 sm:py-3 shadow-lg mx-2">
-              <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin text-tripswift-blue" />
+              <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin text-blue-500" />
               <div>
                 <div className="font-semibold text-gray-800 text-xs sm:text-sm">Uploading images...</div>
                 <div className="text-[10px] sm:text-xs text-gray-500">Processing your images</div>
@@ -620,6 +706,13 @@ function UploadDialog({
         )}
 
         <div className="space-y-3 sm:space-y-4">
+          {/* Show upload error if exists */}
+          {uploadError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <p className="text-sm text-red-600">{uploadError}</p>
+            </div>
+          )}
+
           {/* Compact Dropzone */}
           <div
             {...getRootProps()}

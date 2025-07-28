@@ -5,13 +5,13 @@ import { CheckCircle, Plus, ArrowLeft } from 'lucide-react';
 
 interface DeleteSuccessModalProps {
   isOpen: boolean;
-  onCreateProperty: () => void;
+  // onCreateProperty: () => void;
   onGoBack: () => void;
 }
 
 export const DeleteSuccessModal: React.FC<DeleteSuccessModalProps> = ({
   isOpen,
-  onCreateProperty,
+  // onCreateProperty,
   onGoBack,
 }) => {
   // Prevent background scrolling when modal is open
@@ -58,14 +58,14 @@ export const DeleteSuccessModal: React.FC<DeleteSuccessModalProps> = ({
           </CardHeader>
           <CardContent className="pt-0">
             <div className="flex flex-col sm:flex-row gap-3">
-              <Button
+              {/* <Button
                 variant="default"
                 onClick={onCreateProperty}
                 className="bg-tripswift-blue hover:bg-tripswift-dark-blue text-white flex-1"
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Create Property
-              </Button>
+              </Button> */}
               <Button
                 variant="outline"
                 onClick={onGoBack}

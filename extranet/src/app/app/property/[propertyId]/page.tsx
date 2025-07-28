@@ -683,7 +683,7 @@ export default function Page({ params, searchParams }: Props) {
       </Card>
       <DeleteSuccessModal
         isOpen={showDeleteSuccessModal}
-        onCreateProperty={handleCreateProperty}
+        // onCreateProperty={handleCreateProperty}
         onGoBack={handleGoBack}
       />
     </main>

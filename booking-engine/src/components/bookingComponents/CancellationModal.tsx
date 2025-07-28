@@ -266,7 +266,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
                       {t('BookingTabs.CancellationModal.totalAmount')}
                     </p>
                     <p className="text-sm sm:text-base text-tripswift-black font-tripswift-medium">
-                      ₹{booking.totalAmount != null ? Number(booking.totalAmount).toFixed(2) : '0.00'}
+                      {booking.currencyCode} {booking.totalAmount != null ? Number(booking.totalAmount).toFixed(2) : '0.00'}
                     </p>
                   </div>
                 </div>
@@ -345,7 +345,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
                     <span className="text-xs sm:text-sm text-tripswift-black/70">
                       {t('BookingTabs.CancellationModal.originalPayment')}
                     </span>
-                    <span className="text-sm sm:text-base font-tripswift-bold text-tripswift-black"> ₹{booking.totalAmount != null ? Number(booking.totalAmount).toFixed(2) : '0.00'}
+                    <span className="text-sm sm:text-base font-tripswift-bold text-tripswift-black"> {booking.currencyCode} {booking.totalAmount != null ? Number(booking.totalAmount).toFixed(2) : '0.00'}
                     </span>
                   </div>
 
@@ -354,7 +354,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
                       {t('BookingTabs.CancellationModal.cancellationFee')}
                     </span>
                     <span className={`text-sm sm:text-base font-tripswift-bold ${cancellationFee && cancellationFee > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                      ₹{booking.totalAmount != null ? Number(booking.totalAmount).toFixed(2) : '0.00'}
+                    {booking.currencyCode} {booking.totalAmount != null ? Number(booking.totalAmount).toFixed(2) : '0.00'}
                     </span>
                   </div>
 

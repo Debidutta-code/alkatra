@@ -313,8 +313,8 @@ export default function ManageBookings() {
         </div>
 
         {/* Filters Section */}
-        <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200 dark:border-slate-700 shadow-sm mb-4">
-          <CardHeader className="p-4">
+        {/* <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200 dark:border-slate-700 shadow-sm mb-4"> */}
+          {/* <CardHeader className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-base font-medium text-slate-900 dark:text-slate-100">
@@ -327,11 +327,11 @@ export default function ManageBookings() {
                 )}
               </div>
             </div>
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          </CardHeader> */}
+          {/* <CardContent className="p-4 pt-0"> */}
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-3"> */}
               {/* Filter by Property */}
-              <div className="space-y-1">
+              {/* <div className="space-y-1">
                 <Label htmlFor="propertyFilter" className="text-xs text-slate-700 dark:text-slate-300 flex items-center gap-1">
                   <Building2 className="w-3 h-3" />
                   Property
@@ -367,10 +367,10 @@ export default function ManageBookings() {
                   {propertyNames.length} properties available
                   {allHotelNames.length > 0}
                 </p>
-              </div>
+              </div> */}
 
               {/* Search by Guest Name */}
-              <div className="space-y-1">
+              {/* <div className="space-y-1">
                 <Label htmlFor="searchQuery" className="text-xs text-slate-700 dark:text-slate-300 flex items-center gap-1">
                   <Search className="w-3 h-3" />
                   Search
@@ -388,10 +388,10 @@ export default function ManageBookings() {
                    focus:ring-1 focus:ring-tripswift-blue focus:border-transparent transition-all
                    backdrop-blur-xl placeholder-slate-500 hover:border-slate-300 dark:hover:border-slate-600"
                 />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              </div> */}
+            {/* </div> */}
+          {/* </CardContent> */}
+        {/* </Card> */}
 
         {/* Bookings Table */}
         <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200 dark:border-slate-700 shadow-lg">

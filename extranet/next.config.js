@@ -4,7 +4,10 @@ const nextConfig = {
         remotePatterns: [
             {
                 hostname: "alhajz.s3.me-south-1.amazonaws.com"
-            }
+            },
+            {
+                hostname: "res.cloudinary.com"
+            },
         ]
     },
     async redirects() {
