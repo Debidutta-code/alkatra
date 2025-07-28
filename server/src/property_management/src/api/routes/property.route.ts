@@ -3,8 +3,8 @@
 // import { createPaymentMethod } from "../../controller/property/paymentmethod.controller";
 // import { getAllBrand, getBrandDetailsByID, updateExistingBrand } from "../../controller/brand.controller";
 // import { getAllPropertiesOfCategory } from "../../controller/propertyByCategory.controller";
-// import { createPropertyType, getPropertyTypes } from "../../controller/propertytype.controller";
 
+import { createPropertyType, getPropertyTypes } from "../../controller";
 import { createPropertyCategory, getAllPropertyCategories, getPropertyCategory, } from "../../controller/propertycategory.controller";
 import { updatePropertyAmenity, createPropertyAminity } from "../../controller/propertyamenity.controller";
 import { Router } from "express";
@@ -45,11 +45,11 @@ export default (app: Router) => {
     // .post(protect as any, createPaymentMethod as any);
   // router.route("/property-category").get(getAllPropertiesOfCategory as any);
   // property type
-  // router
-  //   .route("/type")
-  //   .post(protect as any, createPropertyType as any)
-  //   .get(getPropertyTypes as any);
-  // router.route("/category/:propertyCategoryID").get(getPropertyCategory as any);
+  router
+    .route("/type")
+    .post(protect as any, createPropertyType as any)
+    .get(getPropertyTypes as any);
+  router.route("/category/:propertyCategoryID").get(getPropertyCategory as any);
 
   
   router.route("/getAdminProperties").get(protect as any,getAdminProperties as any);

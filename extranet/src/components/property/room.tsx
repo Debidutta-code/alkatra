@@ -27,7 +27,7 @@ import Image from "next/image";
 import { FileRejection, useDropzone } from "react-dropzone";
 import Dropzone from "../dropzone";
 import { Checkbox } from "./../ui/checkbox";
-import axios, {  } from "axios";
+import axios, { } from "axios";
 import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -139,9 +139,11 @@ export default function XRooms({ onNext, onPrevious }: Props) {
   const [roomDetails, setRoomDetails] = useState<RoomDetails | null>(null);
   const [newRoomDetails, setNewRoomDetails] = useState<boolean>(true);
 
-  const [propertyImageUrls, setPropertyImageUrls] = useState<
-    { public_id: string; url: string; secure_url: string }[]
-  >([]);
+  // const [propertyImageUrls, setPropertyImageUrls] = useState<
+  //   { public_id: string; url: string; secure_url: string }[]
+  // >([]);
+  const [propertyImageUrls, setPropertyImageUrls] = useState<Array<any>>([]);
+
   const [propertyImagePreviewDialog, setPropertyImagePreviewDialog] =
     useState(false);
   const [files, setFiles] = useState<IFileWithPreview[]>([]);
@@ -208,11 +210,12 @@ export default function XRooms({ onNext, onPrevious }: Props) {
   }, [formState.errors]);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    console.log(data);
     try {
-      const imageUrls = propertyImageUrls.map(
-        (propertyImage) => propertyImage.url
-      );
+      // const imageUrls = propertyImageUrls.map(
+      //   (propertyImage) => propertyImage.url
+      // );
+      const imageUrls = propertyImageUrls;
+
       const roomBody = {
         ...data,
         propertyInfo_id: property_id,

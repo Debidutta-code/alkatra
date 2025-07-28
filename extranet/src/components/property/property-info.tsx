@@ -27,6 +27,7 @@ import { Textarea } from "./../ui/textarea";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@src/redux/store";
+import { AnyCnameRecord } from "dns";
 
 const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
 const createPropertySchema = z.object({
@@ -102,13 +103,14 @@ export default function PropertyInfo({ onNext }: Props) {
   const [propertyDetails, setPropertyDetails] = useState<any>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [currenStep, setCurrentStep] = useState(0);
-  const [propertyImageUrls, setPropertyImageUrls] = useState<
-    {
-      public_id: string;
-      url: string;
-      secure_url: string;
-    }[]
-  >([]);
+  // const [propertyImageUrls, setPropertyImageUrls] = useState<
+  //   {
+  //     public_id: string;
+  //     url: string;
+  //     secure_url: string;
+  //   }[]
+  // >([]);
+  const [propertyImageUrls, setPropertyImageUrls] = useState<Array<any>>([]);
   const [editMode, setEditMode] = useState(false);
   const [propertyCategories, setPropertyCategories] = useState<
     PropertyCategory[]
@@ -247,9 +249,12 @@ export default function PropertyInfo({ onNext }: Props) {
 
   // In the onSubmit function where you create a new property
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    const imageUrls = propertyImageUrls.map(
-      (propertyImage) => propertyImage.url
-    );
+    // const imageUrls = propertyImageUrls.map(
+    //   (propertyImage) => propertyImage.url
+    // );
+
+    console.log("Property image URLs:", propertyImageUrls);
+    const imageUrls = propertyImageUrls;
 
     const propertyCreateBody = {
       ...data,
@@ -318,7 +323,7 @@ export default function PropertyInfo({ onNext }: Props) {
           }
         );
 
-        console.log("Upload response:", response.data);
+        console.log("Upload response:", response.data.data.urls);
         const urls = response.data.data.urls;
         setOpenDialog(false);
         setPropertyImageUrls(urls);
