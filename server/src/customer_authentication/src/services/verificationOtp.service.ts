@@ -2,9 +2,11 @@ import OTPDao from '../repositories/verificationOtp.dao';
 import { OTPType, OTPStatus } from '../models/verification.model';
 import emailService from './email.service';
 import { TwilioService } from './sms.service';
+import { MailFactory } from "./mailFactory";
+import { OTPTemplate } from "../constant/otp.template";
 
 const twilioService = new TwilioService();
-
+const mailer = MailFactory.getMailer();
 
 class OTPService {
   private generateOTP(): string {
@@ -26,12 +28,19 @@ class OTPService {
         const html = `<p>Your OTP is: <strong>${otp}</strong></p><p>This code will expire in 5 minutes.</p>`;
 
         if (process.env.MODE === 'production') {
-          await emailService.sendEmail({
+          // await emailService.sendEmail({
+          //   to: identifier,
+          //   subject,
+          //   html,
+          //   text: `Your OTP is ${otp}`,
+          // });
+          mailer.sendMail({
             to: identifier,
             subject,
-            html,
+            html: OTPTemplate(otp),
             text: `Your OTP is ${otp}`,
-          });
+          })
+
         } else {
           console.log('📧 [DEV MODE] Email not sent. OTP:', otp);
         }
