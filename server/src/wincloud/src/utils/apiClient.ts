@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { parseStringPromise } from 'xml2js';
 import { stringify } from 'flatted';
 
 export class ApiClient {
