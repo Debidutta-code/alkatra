@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Button } from "../../../../../components/ui/button";
-import { CardTitle } from "../../../../../components/ui/card";
-import { Input } from "../../../../../components/ui/input";
-import { Label } from "../../../../../components/ui/label";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Button } from "../../../../components/ui/button";
+import { CardTitle } from "../../../../components/ui/card";
+import { Input } from "../../../../components/ui/input";
+import { Label } from "../../../../components/ui/label";
 import { ReloadIcon } from "@radix-ui/react-icons/";
-import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { AtSign, Eye, EyeOff, Lock, User, UserCog, ArrowLeft, UserCheck, Shield } from "lucide-react";
 import { Button as NextUIButton } from "@nextui-org/react";
@@ -18,30 +18,34 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../../../../components/ui/select";
-import { RootState, useSelector, store } from "../../../../../redux/store";
+} from "../../../../components/ui/select";
+import { RootState, useSelector, store } from "../../../../redux/store";
 
-interface PageProps {
-  params: {
-    userId: string;
-  };
+interface UserData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
 }
 
-const EditMember = ({ params }: PageProps) => {
+const EditMemberClient = () => {
+  const searchParams = useSearchParams();
+  const userId = searchParams.get('userId');
+  const router = useRouter();
+  const { user } = useSelector((state: RootState) => state.auth);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
-  const router = useRouter();
-  const { userId } = params;
-  const { user } = useSelector((state: RootState) => state.auth);
+  const [error, setError] = useState<string>("");
 
   const isDisabled = () => {
     const state = store.getState();
     const currentUser = state.auth.user;
     return currentUser?.role === "superAdmin" ? true : false;
-  }
+  };
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -61,11 +65,19 @@ const EditMember = ({ params }: PageProps) => {
     confirmPassword: "",
   });
 
-  // Fetch user data
+  // CHANGE 2: Update useEffect to handle query parameter validation
   useEffect(() => {
     const fetchUserData = async () => {
+      // CHANGE 3: Validate userId from query params
+      if (!userId) {
+        setError("No user ID provided in URL parameters.");
+        setIsLoading(false);
+        return;
+      }
+
       try {
         setIsLoading(true);
+        setError("");
         const accessToken = Cookies.get("accessToken");
 
         if (!accessToken) {
@@ -91,18 +103,20 @@ const EditMember = ({ params }: PageProps) => {
             password: "",
             confirmPassword: "",
           });
+        } else {
+          setError("User not found or does not exist.");
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
+        setError("Failed to fetch user data.");
         toast.error("Failed to fetch user data");
-        router.push("/app/manageMembers");
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchUserData();
-  }, [userId, router]);
+  }, [userId, router]); // CHANGE 4: Dependencies updated
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -111,7 +125,6 @@ const EditMember = ({ params }: PageProps) => {
       [name]: value,
     }));
 
-    // Clear error when user starts typing
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({
         ...prev,
@@ -126,7 +139,6 @@ const EditMember = ({ params }: PageProps) => {
       role: value,
     }));
 
-    // Clear role error when user selects a role
     if (errors.role) {
       setErrors((prev) => ({
         ...prev,
@@ -147,7 +159,6 @@ const EditMember = ({ params }: PageProps) => {
 
     let isValid = true;
 
-    // Required field validation
     if (!formData.firstName.trim()) {
       newErrors.firstName = "First name is required";
       isValid = false;
@@ -162,7 +173,6 @@ const EditMember = ({ params }: PageProps) => {
       newErrors.email = "Email is required";
       isValid = false;
     } else {
-      // Email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(formData.email)) {
         newErrors.email = "Please enter a valid email address";
@@ -175,7 +185,6 @@ const EditMember = ({ params }: PageProps) => {
       isValid = false;
     }
 
-    // Password validation - only if password is provided
     if (formData.password) {
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$/;
       if (!passwordRegex.test(formData.password)) {
@@ -211,7 +220,6 @@ const EditMember = ({ params }: PageProps) => {
         return;
       }
 
-      // Prepare data to send - only include password if it's provided
       const updateData = {
         firstName: formData.firstName,
         lastName: formData.lastName,
@@ -220,7 +228,6 @@ const EditMember = ({ params }: PageProps) => {
         ...(formData.password && { password: formData.password }),
       };
 
-      // Call the API to update a user
       await axios.put(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/update/${userId}`,
         updateData,
@@ -254,10 +261,42 @@ const EditMember = ({ params }: PageProps) => {
     );
   }
 
+  if (error) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-6 px-4 md:px-8 lg:px-16">
+        <div className="max-w-2xl mx-auto">
+          <div className="mb-6">
+            <Button
+              variant="ghost"
+              className="mb-4 p-2 hover:bg-slate-200 rounded-lg transition-colors group"
+              onClick={() => router.push("/app/manageMembers")}
+            >
+              <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+              Back to Members
+            </Button>
+          </div>
+          
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-8 shadow-lg">
+            <div className="text-center">
+              <UserCheck className="h-12 w-12 text-red-500 mx-auto mb-4" />
+              <h2 className="text-xl font-bold text-red-800 mb-2">Member Not Found</h2>
+              <p className="text-red-600 mb-4">{error}</p>
+              <Button
+                onClick={() => router.push("/app/manageMembers")}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                Back to Members
+              </Button>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-6 px-4 md:px-8 lg:px-16">
       <div className="max-w-2xl mx-auto">
-        {/* Header Section */}
         <div className="mb-6">
           <Button
             variant="ghost"
@@ -283,10 +322,8 @@ const EditMember = ({ params }: PageProps) => {
           </div>
         </div>
 
-        {/* Form Section */}
         <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Personal Information Section */}
             <div className="space-y-4">
               <div className="border-b border-slate-200 pb-2">
                 <h3 className="text-lg font-semibold text-slate-800">Personal Information</h3>
@@ -305,8 +342,7 @@ const EditMember = ({ params }: PageProps) => {
                       type="text"
                       value={formData.firstName}
                       onChange={handleChange}
-                      className={`h-10 pl-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${formSubmitted && errors.firstName ? 'border-red-500' : ''
-                        }`}
+                      className={`h-10 pl-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${formSubmitted && errors.firstName ? 'border-red-500' : ''}`}
                       placeholder="Enter first name"
                     />
                     <User size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" />
@@ -329,8 +365,7 @@ const EditMember = ({ params }: PageProps) => {
                       type="text"
                       value={formData.lastName}
                       onChange={handleChange}
-                      className={`h-10 pl-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${formSubmitted && errors.lastName ? 'border-red-500' : ''
-                        }`}
+                      className={`h-10 pl-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${formSubmitted && errors.lastName ? 'border-red-500' : ''}`}
                       placeholder="Enter last name"
                     />
                     <User size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" />
@@ -354,8 +389,7 @@ const EditMember = ({ params }: PageProps) => {
                     type="text"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`h-10 pl-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${formSubmitted && errors.email ? 'border-red-500' : ''
-                      }`}
+                    className={`h-10 pl-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${formSubmitted && errors.email ? 'border-red-500' : ''}`}
                     placeholder="Enter email address"
                   />
                   <AtSign size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" />
@@ -368,7 +402,6 @@ const EditMember = ({ params }: PageProps) => {
               </div>
             </div>
 
-            {/* Role & Permissions Section */}
             <div className="space-y-4">
               <div className="border-b border-slate-200 pb-2">
                 <h3 className="text-lg font-semibold text-slate-800">Role & Permissions</h3>
@@ -383,8 +416,7 @@ const EditMember = ({ params }: PageProps) => {
                   <div className="flex items-center">
                     <UserCog size={18} className="text-slate-500 absolute left-3 z-10" />
                     <Select value={formData.role} onValueChange={handleRoleChange}>
-                      <SelectTrigger className={`h-10 pl-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${formSubmitted && errors.role ? 'border-red-500' : ''
-                        }`}>
+                      <SelectTrigger className={`h-10 pl-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${formSubmitted && errors.role ? 'border-red-500' : ''}`}>
                         <SelectValue placeholder="Select a role" />
                       </SelectTrigger>
                       <SelectContent className="rounded-lg border-slate-300">
@@ -417,7 +449,6 @@ const EditMember = ({ params }: PageProps) => {
               </div>
             </div>
 
-            {/* Password Update Section */}
             <div className="space-y-4">
               <div className="border-b border-slate-200 pb-2">
                 <h3 className="text-lg font-semibold text-slate-800">Password Update</h3>
@@ -435,8 +466,7 @@ const EditMember = ({ params }: PageProps) => {
                     type={showPassword ? "text" : "password"}
                     value={formData.password}
                     onChange={handleChange}
-                    className={`h-10 pl-12 pr-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${formSubmitted && errors.password ? 'border-red-500' : ''
-                      }`}
+                    className={`h-10 pl-12 pr-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${formSubmitted && errors.password ? 'border-red-500' : ''}`}
                     placeholder="Leave blank to keep current password"
                   />
                   <Lock size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" />
@@ -475,8 +505,7 @@ const EditMember = ({ params }: PageProps) => {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     disabled={!formData.password}
-                    className={`h-10 pl-12 pr-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${formSubmitted && errors.confirmPassword ? 'border-red-500' : ''
-                      } ${!formData.password ? 'bg-slate-50' : ''}`}
+                    className={`h-10 pl-12 pr-12 border-slate-300 focus:border-primary focus:ring-primary/20 rounded-lg transition-all ${formSubmitted && errors.confirmPassword ? 'border-red-500' : ''} ${!formData.password ? 'bg-slate-50' : ''}`}
                     placeholder="Confirm new password"
                   />
                   <Shield size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" />
@@ -502,7 +531,6 @@ const EditMember = ({ params }: PageProps) => {
               </div>
             </div>
 
-            {/* Submit Button */}
             <div className="pt-4 border-t border-slate-200">
               <NextUIButton
                 size="lg"
@@ -531,4 +559,4 @@ const EditMember = ({ params }: PageProps) => {
   );
 };
 
-export default EditMember;
+export default EditMemberClient;

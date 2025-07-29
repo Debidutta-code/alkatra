@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    output: 'export', // 👈 Important line for static export
+    reactStrictMode: true,
     images: {
+        unoptimized: true,
         remotePatterns: [
             {
                 hostname: "alhajz.s3.me-south-1.amazonaws.com"
