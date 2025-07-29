@@ -7,7 +7,7 @@ export const app = express();
 
 app.use(
     cors({
-      origin: ["http://alhajz.ai"], 
+      origin: ["https://alhajz.ai"], 
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"], 
       allowedHeaders: ["Content-Type", "Authorization", "Cache-Control", "Pragma", "Expires"],
       credentials: true,
