@@ -92,6 +92,7 @@ const HotelCard = () => {
           height={500}
           priority
           quality={95}
+          unoptimized
         />
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-tripswift-black/50 via-tripswift-black/30 to-tripswift-black/60" />

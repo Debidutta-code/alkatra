@@ -29,6 +29,7 @@ const Footer = (props: Props) => {
                 height={20}
                 alt="TripSwift - Redefines Hospitality Technology"
                 className="object-contain"
+                unoptimized
               />
             </div>
 
