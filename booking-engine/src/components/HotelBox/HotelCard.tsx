@@ -85,9 +85,11 @@ const HotelCard = () => {
         style={{ transform: `translateY(${isScrolled ? "5%" : "0"})` }}
       >
         <Image
-          src={Home}
+          src="/assets/popular/Home.jpg"
           alt="Luxury Accommodation - TripSwift"
           className="object-cover w-full h-full"
+          width={800}
+          height={500}
           priority
           quality={95}
         />
