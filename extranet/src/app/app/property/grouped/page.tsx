@@ -149,7 +149,7 @@ const Page = () => {
             </Badge>
           </div>
 
-          <Link href={`/app/property/${hotel._id}`}>
+          <Link href={`/app/property/propertyDetails?propertyId=${hotel._id}`}>
             <Button
               size="sm"
               className="bg-tripswift-blue hover:bg-blue-700 text-white shadow-sm transition-all duration-200 hover:shadow-md"

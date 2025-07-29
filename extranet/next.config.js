@@ -2,6 +2,7 @@
 const nextConfig = {
     output: 'export', // 👈 Important line for static export
     reactStrictMode: true,
+    trailingSlash: true, // Add this for better static export compatibility
     images: {
         unoptimized: true,
         remotePatterns: [
@@ -13,20 +14,12 @@ const nextConfig = {
             },
         ]
     },
-    async redirects() {
-        return [
-            {
-                source: '/',
-                destination: '/app',
-                permanent: true,
-            },
-        ]
-    },
-        experimental: {
-          serverActions: {
+    // Remove the redirects section - doesn't work with static exports
+    experimental: {
+        serverActions: {
             bodySizeLimit: '2mb',
-          },
         },
+    },
 }
 
 module.exports = nextConfig
