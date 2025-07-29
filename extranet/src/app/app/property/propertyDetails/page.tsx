@@ -1,3 +1,5 @@
+//property/propertyDetails/page.tsx
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -18,7 +20,7 @@ import {
   updateRatePlan,
   addRatePlan
 } from './api';
-import { useRouter } from 'next/navigation';
+import { useSearchParams, useRouter } from "next/navigation";
 import { DeleteSuccessModal } from '../../../../components/propertyId/DeleteSuccessModal';
 import { PropertyDetails } from '../../../../components/propertyId/property-details';
 import { Amenities } from '../../../../components/propertyId/amenities';
@@ -103,18 +105,22 @@ interface AddressData {
   zip_code: string;
 }
 
-type Props = {
-  params: {
-    propertyId: string;
-  };
-  searchParams: {
-    token: string;
-  };
-};
+// type Props = {
+//   params: {
+//     propertyId: string;
+//   };
+//   searchParams: {
+//     token: string;
+//   };
+// };
 
-export default function Page({ params, searchParams }: Props) {
+export default function Page() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const propertyId = searchParams.get("propertyId");
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const [property, setProperty] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [editedProperty, setEditedProperty] = useState<any>(null);
   const [ratePlan, setRatePlan] = useState<RatePlanType | []>([]);
@@ -132,16 +138,17 @@ export default function Page({ params, searchParams }: Props) {
   const [roomType, setRoomType] = useState<string | null>(null);
   const [availableRoomTypes, setAvailableRoomTypes] = useState<string[]>([]);
   const [showDeleteSuccessModal, setShowDeleteSuccessModal] = useState<boolean>(false);
-  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
-  const propertyId = params.propertyId;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (!accessToken) {
-          console.error('Access token is undefined or not set');
+        if (!accessToken || !propertyId) {
+          console.error("Access token or property ID is missing");
+          toast.error("Invalid property ID or access token");
+          router.push("/app");
           return;
         }
+        setIsLoading(true);
         const propertyData = await fetchProperty(accessToken, propertyId);
         setProperty(propertyData);
         setRatePlanList(propertyData.data.rate_plan);
@@ -157,18 +164,20 @@ export default function Page({ params, searchParams }: Props) {
           setRoomAmenity(propertyData.data.room_Aminity);
           setEditedRoomAmenity({ ...propertyData.data.room_Aminity });
         }
-      }
-      catch (error: any) {
-        if (error.code === 'ECONNRESET') {
+      } catch (error: any) {
+        if (error.code === "ECONNRESET") {
           fetchData();
         } else {
-          console.error('Error fetching property data:', error);
+          console.error("Error fetching property data:", error);
+          toast.error("Failed to load property data");
         }
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [propertyId, accessToken]);
+  }, [propertyId, accessToken, router]);
 
   // Handlers for address
   const handleAddressEditClick = () => setEditAddressMode(!editAddressMode);
@@ -180,53 +189,58 @@ export default function Page({ params, searchParams }: Props) {
 
   const handleAddressSaveClick = async () => {
     try {
-      if (!accessToken || !editedAddress) {
-        console.error('Access token is undefined or not set, or editedAddress is null');
+      if (!accessToken || !editedAddress || !propertyId) {
+        console.error("Access token, property ID, or editedAddress is missing");
+        toast.error("Missing required data");
         return;
       }
-      const updateAmenityResponse = await updatePropertyAddress(params.propertyId, accessToken, editedAddress);
+      const updateAmenityResponse = await updatePropertyAddress(propertyId, accessToken, editedAddress);
       setEditAddressMode(false);
       setAddress({ ...editedAddress });
+      toast.success("Address updated successfully!");
     } catch (error) {
-      console.error('Error updating address data:', error);
+      console.error("Error updating address data:", error);
+      toast.error("Failed to update address");
     }
   };
 
-  const handleAddressAddClick = async (e: any) => {
+  const handleAddressAddClick = async () => {
     try {
-      if (!accessToken || !editedAddress) {
-        console.error('Access token is undefined or not set, or editedAddress is null');
+      if (!accessToken || !editedAddress || !propertyId) {
+        console.error("Access token, property ID, or editedAddress is missing");
+        toast.error("Missing required data");
         return;
       }
-
       const newPropertyAddress = {
         ...editedAddress,
-        property_id: params.propertyId
-      }
+        property_id: propertyId,
+      };
       const newAddress = await addPropertyAddress(accessToken, newPropertyAddress);
-
       setEditAddressMode(false);
       setAddress(newAddress);
+      toast.success("Address added successfully!");
     } catch (error) {
-      console.error('Error updating address data:', error);
+      console.error("Error adding address data:", error);
+      toast.error("Failed to add address");
     }
   };
 
   const handleDeleteClick = async () => {
     try {
-      if (!accessToken) {
-        console.error('Access token is undefined or not set');
+      if (!accessToken || !propertyId) {
+        console.error("Access token or property ID is missing");
+        toast.error("Missing required data");
         return;
       }
-      const propertyId = params.propertyId;
       await deleteProperty(propertyId, accessToken);
-      toast.success('Property deleted successfully!');
+      toast.success("Property deleted successfully!");
       setShowDeleteSuccessModal(true);
     } catch (error) {
-      console.error('Error deleting property:', error);
-      toast.error('Failed to delete property. Please try again.');
+      console.error("Error deleting property:", error);
+      toast.error("Failed to delete property. Please try again.");
     }
   };
+
   const handleCreateProperty = () => {
     setShowDeleteSuccessModal(false);
     router.push('/app/property/create');
@@ -238,18 +252,18 @@ export default function Page({ params, searchParams }: Props) {
   const handleEditClick = () => setEditMode(!editMode);
   const handleSaveClick = async () => {
     try {
-      if (!accessToken) {
-        console.error('Access token is undefined or not set');
+      if (!accessToken || !propertyId) {
+        console.error("Access token or property ID is missing");
+        toast.error("Missing required data");
         return;
       }
-      const response = await updateProperty(params.propertyId, accessToken, editedProperty);
+      const response = await updateProperty(propertyId, accessToken, editedProperty);
       setEditMode(false);
-      setProperty({ data: { ...editedProperty } });
-      if (response.data) {
-        toast.success('Property updated successfully!');
-      }
+      setProperty({ data: { ...editedProperty } } as { data: Property });
+      toast.success("Property updated successfully!");
     } catch (error) {
-      console.error('Error updating property data:', error);
+      console.error("Error updating property data:", error);
+      toast.error("Failed to update property");
     }
   };
 
@@ -268,44 +282,45 @@ export default function Page({ params, searchParams }: Props) {
 
   const handleAmenitySaveClick = async (data: EditedAmenity) => {
     try {
-      if (!accessToken) {
-        console.error('Access token is undefined or not set');
+      if (!accessToken || !propertyId) {
+        console.error("Access token or property ID is missing");
+        toast.error("Missing required data");
         return;
       }
-      const updateAmenityResponse = await updatePropertyAmenity(params.propertyId, accessToken, data);
+      const updateAmenityResponse = await updatePropertyAmenity(propertyId, accessToken, data);
       setEditAmenityMode(false);
       setAmenity(updateAmenityResponse.data);
       setProperty((prev: any) => ({
         ...prev,
-        property_amenities: updateAmenityResponse.data
+        property_amenities: updateAmenityResponse.data,
       }));
+      toast.success("Amenities updated successfully!");
     } catch (error) {
-      console.error('Error updating amenity data:', error);
+      console.error("Error updating amenity data:", error);
+      toast.error("Failed to update amenities");
     }
   };
 
-  // Handler for creating new amenities
   const handleCreateAmenity = async (data: EditedAmenity) => {
     try {
-      if (!accessToken) {
-        console.error('Access token is undefined or not set');
+      if (!accessToken || !propertyId) {
+        console.error("Access token or property ID is missing");
+        toast.error("Missing required data");
         return;
       }
-
       const amenityCreateBody = {
         ...data,
-        propertyInfo_id: params.propertyId,
+        propertyInfo_id: propertyId,
       };
-
-      const createdAmenity = await createPropertyAmenity(params.propertyId, accessToken, amenityCreateBody);
-
+      const createdAmenity = await createPropertyAmenity(propertyId, accessToken, amenityCreateBody);
       setAmenity(createdAmenity);
       setEditedAmenity(createdAmenity);
-      const updatedProperty = await fetchProperty(accessToken, params.propertyId);
+      const updatedProperty = await fetchProperty(accessToken, propertyId);
       setProperty(updatedProperty);
+      toast.success("Amenity created successfully!");
     } catch (error) {
-      console.error('Error creating amenity:', error);
-      throw error;
+      console.error("Error creating amenity:", error);
+      toast.error("Failed to create amenity");
     }
   };
 
@@ -314,12 +329,13 @@ export default function Page({ params, searchParams }: Props) {
   }, [rooms]);
 
   const fetchRooms = async () => {
-    if (!accessToken) return;
+    if (!accessToken || !propertyId) return;
     try {
-      const roomsFromApi = await fetchProperty(params.propertyId, accessToken);
-      setRooms(roomsFromApi);
+      const roomsFromApi = await fetchProperty(propertyId, accessToken);
+      setRooms(roomsFromApi.data.property_room ? [roomsFromApi.data.property_room] : []);
     } catch (err) {
-      console.error('Failed to fetch rooms:', err);
+      console.error("Failed to fetch rooms:", err);
+      toast.error("Failed to fetch rooms");
     }
   };
 
@@ -334,11 +350,12 @@ export default function Page({ params, searchParams }: Props) {
 
   const handleAddRoom = async (newRoom: RoomType) => {
     try {
-      if (!accessToken) {
-        console.error('Access token is undefined or not set');
+      if (!accessToken || !propertyId) {
+        console.error("Access token or property ID is missing");
+        toast.error("Missing required data");
         return;
       }
-      const addedRoom = await addPropertyRoom(params.propertyId, accessToken, newRoom);
+      const addedRoom = await addPropertyRoom(propertyId, accessToken, newRoom);
       setRooms((prevRooms) => {
         const roomContainer = prevRooms[0] || {};
         const newKey = Object.keys(roomContainer).length;
@@ -346,46 +363,40 @@ export default function Page({ params, searchParams }: Props) {
       });
       setRoomType(addedRoom.new_room.room_type);
       setEditRoomAmenityMode(true);
+      toast.success("Room added successfully!");
     } catch (error) {
-      console.error('Error adding new room:', error);
+      console.error("Error adding new room:", error);
+      toast.error("Failed to add room");
     }
   };
 
   const handleEditRoom = async (updatedRoom: RoomType) => {
     try {
-      if (!accessToken) {
-        console.error('Access token is undefined or not set');
+      if (!accessToken || !propertyId) {
+        console.error("Access token or property ID is missing");
+        toast.error("Missing required data");
         return;
       }
-
-      const updatedRoomData = await updatePropertyRoom(params.propertyId, accessToken, updatedRoom);
-
-      if (
-        !updatedRoomData ||
-        !updatedRoomData.updated_room ||
-        !updatedRoomData.updated_room._id
-      ) {
-        throw new Error('Invalid response from updatePropertyRoom');
+      const updatedRoomData = await updatePropertyRoom(propertyId, accessToken, updatedRoom);
+      if (!updatedRoomData || !updatedRoomData.updated_room || !updatedRoomData.updated_room._id) {
+        throw new Error("Invalid response from updatePropertyRoom");
       }
-
       setRooms((prevRooms) => {
         const container = { ...prevRooms[0] };
         const updatedRoom = updatedRoomData.updated_room;
-
         for (const key in container) {
           const room = (container as any)[key] as RoomType;
-
           if (room._id === updatedRoom._id) {
             (container as any)[key] = updatedRoom;
             break;
           }
         }
-
-
         return [container];
       });
+      toast.success("Room updated successfully!");
     } catch (error) {
-      console.error('Error updating room:', error);
+      console.error("Error updating room:", error);
+      toast.error("Failed to update room");
     }
   };
   const handleBack = () => {
@@ -430,62 +441,70 @@ export default function Page({ params, searchParams }: Props) {
   };
   const handleRoomAmenitySaveClick = async () => {
     try {
-      if (!accessToken) {
-        console.error('Access token is undefined or not set');
+      if (!accessToken || !propertyId) {
+        console.error("Access token or property ID is missing");
+        toast.error("Missing required data");
         return;
       }
-      await updatePropertyRoomAmenity(params.propertyId, accessToken, editedRoomAmenity);
+      await updatePropertyRoomAmenity(propertyId, accessToken, editedRoomAmenity);
       setEditRoomAmenityMode(false);
       setRoomAmenity({ ...editedRoomAmenity });
+      toast.success("Room amenities updated successfully!");
     } catch (error) {
-      console.error('Error updating room amenity data:', error);
+      console.error("Error updating room amenity data:", error);
+      toast.error("Failed to update room amenities");
     }
   };
 
   const handleCreateRoomAmenity = async (newRoomAmenity: any) => {
     try {
-      if (!accessToken) {
-        console.error('Access token is undefined or not set');
+      if (!accessToken || !propertyId) {
+        console.error("Access token or property ID is missing");
+        toast.error("Missing required data");
         return;
       }
-      const createdRoomAmenity = await createPropertyRoomAmenity(params.propertyId, accessToken, newRoomAmenity,);
+      const createdRoomAmenity = await createPropertyRoomAmenity(propertyId, accessToken, newRoomAmenity);
       setRoomAmenity(createdRoomAmenity);
       setEditedRoomAmenity(createdRoomAmenity);
-      const updatedProperty = await fetchProperty(accessToken, params.propertyId);
+      const updatedProperty = await fetchProperty(accessToken, propertyId);
       setProperty(updatedProperty);
+      toast.success("Room amenity created successfully!");
     } catch (error) {
-      console.error('Error creating room amenity:', error);
-      throw error;
+      console.error("Error creating room amenity:", error);
+      toast.error("Failed to create room amenity");
     }
   };
 
   // Update rate plan 
   const HandleUpdateRatePlan = async (newRatePlan: any) => {
     try {
-      if (!accessToken) {
-        console.error('Access token is undefined or not set');
+      if (!accessToken || !propertyId) {
+        console.error("Access token or property ID is missing");
+        toast.error("Missing required data");
         return;
       }
-      const updatedRatePlan = await updateRatePlan(params.propertyId, accessToken, newRatePlan);
-      setRatePlan(updatedRatePlan.newList)
+      const updatedRatePlan = await updateRatePlan(propertyId, accessToken, newRatePlan);
+      setRatePlan(updatedRatePlan.newList);
+      toast.success("Rate plan updated successfully!");
     } catch (error) {
-      console.error('Error creating room amenity:', error);
-      throw error;
+      console.error("Error updating rate plan:", error);
+      toast.error("Failed to update rate plan");
     }
   };
 
-  // Add rate plan 
   const HandleAddRatePlan = async (newRatePlan: any) => {
     try {
-      if (!accessToken) {
-        console.error('Access token is undefined or not set');
+      if (!accessToken || !propertyId) {
+        console.error("Access token or property ID is missing");
+        toast.error("Missing required data");
         return;
       }
-      const addedRatePlan = await addRatePlan(params.propertyId, accessToken, newRatePlan);
-
+      const addedRatePlan = await addRatePlan(propertyId, accessToken, newRatePlan);
+      setRatePlanList((prev) => [...prev, addedRatePlan]);
+      toast.success("Rate plan added successfully!");
     } catch (error) {
-      console.error('Error creating room amenity:', error);
-      throw error;
+      console.error("Error adding rate plan:", error);
+      toast.error("Failed to add rate plan");
     }
   };
 
@@ -522,23 +541,23 @@ export default function Page({ params, searchParams }: Props) {
 
       <div className="grid grid-cols-1 gap-4">
         <div className="relative">
-          <PropertyImageGallery
+        <PropertyImageGallery
             image={property?.data?.image || []}
             onImagesUpdate={(updatedImages) => {
-              setEditedProperty((prev: Property) => ({
+              setEditedProperty((prev: Partial<Property> | null) => ({
                 ...prev,
-                image: updatedImages
+                image: updatedImages,
               }));
-              setProperty((prev: { data: Property }) => ({
+              setProperty((prev: { data: Property } | null) => ({
                 ...prev,
                 data: {
-                  ...prev.data,
-                  image: updatedImages
-                }
+                  ...prev!.data,
+                  image: updatedImages,
+                },
               }));
             }}
             editable={true}
-            propertyId={params.propertyId}
+            propertyId={propertyId}
             accessToken={accessToken}
           />
         </div>

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchProperty, fetchAllRatePlanOfOwner, updateProperty } from "../app/app/property/[propertyId]/api";
+import { fetchProperty, fetchAllRatePlanOfOwner, updateProperty } from "../app/app/property/propertyDetails/api";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { useSelector } from "react-redux";

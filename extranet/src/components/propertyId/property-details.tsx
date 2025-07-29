@@ -4,7 +4,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Save, PenTool } from "lucide-react";
 import { PropertyDetailsProps } from '../../types/property_type';
-import { updateProperty } from '../../app/app/property/[propertyId]/api';
+import { updateProperty } from '../../app/app/property/propertyDetails/api';
 import toast from 'react-hot-toast';
 
 export function PropertyDetails({
@@ -66,15 +66,16 @@ export function PropertyDetails({
     if (!validateFields()) {
       return;
     }
-
+  
     try {
-      if (!accessToken) {
-        console.error('Access token is undefined or not set');
+      if (!accessToken || !propertyId) {
+        console.error('Access token or property ID is missing');
+        toast.error('Missing authentication or property ID');
         return;
       }
       const response = await updateProperty(propertyId, accessToken, editedProperty);
-      console.log(response.data)
-
+      console.log(response.data);
+  
       if (response.data) {
         setProperty({ data: { ...editedProperty } });
         setEditMode(false);

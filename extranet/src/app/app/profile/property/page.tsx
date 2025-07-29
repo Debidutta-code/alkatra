@@ -1,39 +1,33 @@
-import React from "react";
+'use client'
 
-// type Props = {};
-
-// export default function ProfileProperty({}: Props) {
-//   return <div>ProfileProperty</div>;
-// }
-
+import React, { useEffect, useState } from "react";
 import PropertySlide from "../../../../components/property/property-slide";
-
+import Cookies from "js-cookie";
 import axios from "axios";
-import { cookies } from "next/headers";
 
-async function fetchProperties(accessToken: string) {
-  const { data } = await axios.get("http://localhost:8040/api/v1/property/me", {
-    headers: {
-      Authorization: "Bearer " + accessToken,
-    },
-  });
+export default function Property() {
+  const [properties, setProperties] = useState([]);
+  const [draftProperties, setDraftProperties] = useState([]);
 
-  const { properties, draftProperties } = data.data;
-  // console.log("data: ", data,draftProperties)
-  // console.log("properties: ", properties)
-  // console.log("draftProperties: ", draftProperties, )
-  return { properties, draftProperties };
-}
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const accessToken = Cookies.get("accessToken");
+        const { data } = await axios.get("http://localhost:8040/api/v1/property/me", {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
 
-export default async function Property() {
-  const cookieStore = cookies();
-  const themetoken = cookieStore.get("accessToken");
+        setProperties(data.data.properties);
+        setDraftProperties(data.data.draftProperties);
+      } catch (error) {
+        console.error("Failed to fetch properties", error);
+      }
+    };
 
-  console.log("theameToken ", themetoken);
-
-  const { properties, draftProperties } = await fetchProperties(
-    themetoken?.value || ""
-  );
+    fetchData();
+  }, []);
 
   return (
     <main className="py-8 px-56">

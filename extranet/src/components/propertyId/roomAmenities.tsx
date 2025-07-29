@@ -114,7 +114,7 @@ interface RoomAmenitiesProps {
   editedRoomAmenity: RoomAmenity | null;
   editRoomAmenityMode: boolean;
   handleRoomAmenityEditClick: () => void;
-  propertyInfoId: string;
+  propertyInfoId: string | null;
   accessToken: string;
   availableRoomTypes: string[];
   onRoomTypeAdded?: (newRoomType: string) => void;
@@ -215,10 +215,10 @@ const getCategoryDisplayName = (category: string): string => {
     category.slice(1).replace(/([A-Z])/g, ' $1').replace("And", " & ");
 };
 
-const createEmptyAmenityStructure = (propertyInfoId: string, selectedRoomType: string): RoomAmenity => {
+const createEmptyAmenityStructure = (propertyInfoId: string | null, selectedRoomType: string): RoomAmenity => {
   const emptyAmenities: RoomAmenity = {
     _id: "",
-    propertyInfo_id: propertyInfoId,
+    propertyInfo_id: propertyInfoId || "",
     room_type: selectedRoomType,
     amenities: {
       basic: {
@@ -231,7 +231,7 @@ const createEmptyAmenityStructure = (propertyInfoId: string, selectedRoomType: s
         towelsSheets: false,
         freeToiletries: false,
         shower: false,
-        toilet: false
+        toilet: false,
       },
       furniture: {
         tableChairs: false,
@@ -244,7 +244,7 @@ const createEmptyAmenityStructure = (propertyInfoId: string, selectedRoomType: s
       spaceLayout: {
         diningArea: false,
         sittingArea: false,
-        balcony: false
+        balcony: false,
       },
       technology: {
         television: false,
@@ -252,11 +252,11 @@ const createEmptyAmenityStructure = (propertyInfoId: string, selectedRoomType: s
         wifiInternet: false,
         flatScreenTV: false,
         satelliteChannels: false,
-        cableChannels: false
+        cableChannels: false,
       },
       climateControl: {
         airConditioning: false,
-        heating: false
+        heating: false,
       },
       kitchenetteMiniBar: {
         smallRefrigerator: false,
@@ -271,12 +271,12 @@ const createEmptyAmenityStructure = (propertyInfoId: string, selectedRoomType: s
       safetySecurity: {
         safe: false,
         smokeDetectors: false,
-        fireExtinguisher: false
+        fireExtinguisher: false,
       },
       toiletries: {
         shampooConditioner: false,
         soap: false,
-        hairDryer: false
+        hairDryer: false,
       },
       workLeisure: {
         workDesk: false,
@@ -287,9 +287,9 @@ const createEmptyAmenityStructure = (propertyInfoId: string, selectedRoomType: s
         accessibleBathroom: false,
         wheelchairAccessibility: false,
         upperFloorsAccessibleByElevator: false,
-        entireUnitWheelchairAccessible: false
-      }
-    }
+        entireUnitWheelchairAccessible: false,
+      },
+    },
   };
 
   return emptyAmenities;
@@ -340,6 +340,11 @@ export function RoomAmenities({
   });
 
   const fetchRoomAmenities = async () => {
+    if (!propertyInfoId || !accessToken) {
+      toast.error("Missing property ID or authentication");
+      setIsLoading(false);
+      return;
+    }
     setIsLoading(true);
     try {
       const response = await axios.get(
@@ -349,20 +354,19 @@ export function RoomAmenities({
             Authorization: `Bearer ${accessToken}`,
             'Cache-Control': 'no-cache, no-store, must-revalidate',
             'Pragma': 'no-cache',
-            'Expires': '0'
-          }
+            'Expires': '0',
+          },
         }
       );
-
+  
       if (response.status === 200 && response.data.data) {
         const amenitiesArray = response.data.data;
-
+  
         if (amenitiesArray.length > 0) {
-          // Find amenities for selected room type
           const roomAmenityData = amenitiesArray.find((item: RoomAmenity) =>
             item.room_type === selectedRoomType
           );
-
+  
           if (roomAmenityData) {
             const structuredData = initializeAmenityStructure(roomAmenityData);
             setCurrentRoomAmenity(structuredData);
@@ -381,6 +385,7 @@ export function RoomAmenities({
       console.error('Error fetching room amenities:', error);
       setCurrentRoomAmenity(null);
       reset(createEmptyAmenityStructure(propertyInfoId, selectedRoomType));
+      toast.error("Failed to fetch room amenities");
     } finally {
       setIsLoading(false);
     }
@@ -393,18 +398,22 @@ export function RoomAmenities({
   }, [propertyInfoId, accessToken, selectedRoomType]);
 
   const onSubmit = async (data: RoomAmenity) => {
+    if (!propertyInfoId || !accessToken) {
+      toast.error("Missing property ID or authentication");
+      return;
+    }
     setIsSubmitting(true);
     try {
       const formData = {
         propertyInfo_id: propertyInfoId,
         room_type: selectedRoomType,
-        amenities: data.amenities
+        amenities: data.amenities,
       };
       const isUpdate = currentRoomAmenity !== null;
       const endpoint = isUpdate
         ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/amenite/update-room-amenity`
         : `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/amenite/roomaminity`;
-
+  
       const method = isUpdate ? "patch" : "post";
       const response = await axios({
         method,
@@ -415,7 +424,7 @@ export function RoomAmenities({
           "Content-Type": "application/json",
         },
       });
-
+  
       if (response.status === 200 || response.status === 201) {
         toast.success(
           isUpdate
