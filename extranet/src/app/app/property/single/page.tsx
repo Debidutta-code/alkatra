@@ -126,7 +126,7 @@ const Page = () => {
                 <div className="flex items-center justify-between">
 
 
-                    <Link href={`/app/property/${hotel._id}`}>
+                    <Link href={`/app/property/propertyDetails?propertyId=${hotel._id}`}>
                         <Button
                             className="bg-blue-500 hover:bg-indigo-600 text-white shadow-sm transition-all duration-200 hover:shadow-lg "
                         >
@@ -169,7 +169,7 @@ const Page = () => {
                     </div>
 
                     <div className="flex items-center space-x-3">
-                        <Link href={`/app/property/${hotel._id}`}>
+                        <Link href={`/app/property/propertyDetails?propertyId=${hotel._id}`}>
                             <Button className="bg-tripswift-blue hover:bg-tripswift-blue-600 text-white">
                                 <Eye className="w-4 h-4 mr-1" />
                                 View

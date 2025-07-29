@@ -1,4 +1,3 @@
-import { RootState } from "@src/redux/store";
 import Cookies from "js-cookie";
 import axios from "axios";
 
@@ -167,7 +166,6 @@ export async function getBookings(page: number = 1, itemsPerPage: number = 10, a
 
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-    // Using axios for better error handling
     const response = await axios.get(
       `${backendUrl}/booking/count/${ownerId}?page=${page}&limit=${itemsPerPage}`,
       {
@@ -214,9 +212,6 @@ export async function getBookings(page: number = 1, itemsPerPage: number = 10, a
     };
   }
 }
-
-// Store for raw booking data to avoid multiple API calls
-let rawBookingsCache: ApiBooking[] = [];
 
 export async function getBookingById(bookingId: string) {
   try {
