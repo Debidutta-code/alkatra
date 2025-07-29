@@ -1,11 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { getBookingById } from "../api";
-import { useParams } from "next/navigation";
-import { Calendar, MapPin, Mail, Phone, Hotel, BedDouble, ChevronLeft, CreditCard, CheckCircle, Clock, AlertCircle, XCircle, Loader2, BookOpen, Building2, Users, Baby, User, UserCheck } from "lucide-react";
+import { Calendar, MapPin, Mail, Phone, BedDouble, ChevronLeft, CreditCard, CheckCircle, Clock, AlertCircle, XCircle, BookOpen, Building2, Users, Baby, User, UserCheck } from "lucide-react";
 import React from "react";
-import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card";
 import { Badge } from "../../../../components/ui/badge";
 import { Button } from "../../../../components/ui/button";
 import { Triangle } from "react-loader-spinner";
@@ -62,11 +61,21 @@ const LoadingState = () => (
     </p>
   </div>
 );
-export default function BookingDetails() {
-  const { bookingId } = useParams();
+
+interface BookingDetailsClientProps {
+  bookingId: string;
+}
+
+export default function BookingDetailsClient({ bookingId }: BookingDetailsClientProps) {
+  const router = useRouter();
   const [booking, setBooking] = useState<BookingDetailsType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
+
+  // Navigation handler
+  const handleBackToList = () => {
+    router.push('/app/bookings');
+  };
 
   // Helper function to calculate age from date of birth
   const calculateAge = (dob: string): number => {
@@ -97,26 +106,26 @@ export default function BookingDetails() {
   };
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        if (typeof bookingId === "string") {
-          setError("");
-          const data = await getBookingById(bookingId);
-          console.log("^^^^^^^^^^^^^^^^^^^^^^^^\n", bookingId);
-          console.log("Booking data received:", data);
+    async function fetchBookingDetails() {
+      if (!bookingId) {
+        setError("No booking ID provided.");
+        setLoading(false);
+        return;
+      }
 
-          if (data) {
-            // If guests data is not available, we need to fetch it from raw booking data
-            // This assumes your getBookingById function will be updated to include guest details
-            setBooking(data as BookingDetailsType);
-          } else {
-            console.error("Booking not found!");
-            setError("Booking not found or does not exist.");
-            setBooking(null);
-          }
+      try {
+        setError("");
+        setLoading(true);
+        
+        const data = await getBookingById(bookingId);
+        console.log("^^^^^^^^^^^^^^^^^^^^^^^^\n", bookingId);
+        console.log("Booking data received:", data);
+
+        if (data) {
+          setBooking(data as BookingDetailsType);
         } else {
-          console.error("Invalid bookingId!");
-          setError("Invalid booking ID provided.");
+          console.error("Booking not found!");
+          setError("Booking not found or does not exist.");
           setBooking(null);
         }
       } catch (error) {
@@ -128,7 +137,7 @@ export default function BookingDetails() {
       }
     }
 
-    fetchData();
+    fetchBookingDetails();
   }, [bookingId]);
 
   // Status configuration with icons
@@ -171,32 +180,30 @@ export default function BookingDetails() {
     }
   };
 
-if (loading) {
-  return (
-    <div className="min-h-screen md:mx-8 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-      <div className="container px-4 py-4 mx-auto sm:px-6 lg:px-8 max-w-6xl">
-        <LoadingState />
+  if (loading) {
+    return (
+      <div className="min-h-screen md:mx-8 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+        <div className="container px-4 py-4 mx-auto sm:px-6 lg:px-8 max-w-6xl">
+          <LoadingState />
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   if (error || !booking) {
     return (
       <div className="min-h-screen md:mx-8 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
         <div className="container px-4 py-4 mx-auto sm:px-6 lg:px-8 max-w-6xl">
-          {/* Back Button */}
           <div className="mb-4">
-            <Link href="/app/bookings">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-slate-600 dark:text-slate-400 hover:text-tripswift-blue dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 p-2"
-              >
-                <ChevronLeft className="w-4 h-4 mr-2" />
-                Back to Bookings
-              </Button>
-            </Link>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleBackToList}
+              className="text-slate-600 dark:text-slate-400 hover:text-tripswift-blue dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 p-2"
+            >
+              <ChevronLeft className="w-4 h-4 mr-2" />
+              Back to Bookings
+            </Button>
           </div>
 
           <div className="flex justify-center items-center min-h-[50vh]">
@@ -212,11 +219,12 @@ if (loading) {
                   {error || "The booking you're looking for is either invalid or does not exist."}
                 </p>
                 <div className="text-center">
-                  <Link href="/app/bookings">
-                    <Button className="bg-tripswift-blue hover:bg-tripswift-dark-blue text-white">
-                      Back to Bookings
-                    </Button>
-                  </Link>
+                  <Button 
+                    onClick={handleBackToList}
+                    className="bg-tripswift-blue hover:bg-tripswift-dark-blue text-white"
+                  >
+                    Back to Bookings
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -229,21 +237,18 @@ if (loading) {
   return (
     <div className="min-h-screen md:mx-8 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       <div className="container px-4 py-4 mx-auto sm:px-6 lg:px-8 max-w-6xl">
-        {/* Back Button */}
         <div className="mb-4">
-          <Link href="/app/bookings">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-slate-600 dark:text-slate-400 hover:text-tripswift-blue dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 p-2"
-            >
-              <ChevronLeft className="w-4 h-4 mr-2" />
-              Back to Bookings
-            </Button>
-          </Link>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleBackToList}
+            className="text-slate-600 dark:text-slate-400 hover:text-tripswift-blue dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 p-2"
+          >
+            <ChevronLeft className="w-4 h-4 mr-2" />
+            Back to Bookings
+          </Button>
         </div>
 
-        {/* Header Section */}
         <div className="mb-5">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
             <div className="space-y-1">
@@ -272,7 +277,6 @@ if (loading) {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Guest Information - Enhanced for Multiple Guests */}
           <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl transition-all duration-300 lg:col-span-2">
             <CardHeader className="p-4">
               <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
@@ -289,7 +293,6 @@ if (loading) {
             </CardHeader>
             <CardContent className="p-4 pt-0">
               <div className="space-y-4">
-                {/* Check-in/Check-out dates */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                   <div className="flex items-center gap-2 p-2.5 bg-slate-50 dark:bg-slate-900/50 rounded-lg">
                     <Calendar className="w-4 h-4 text-slate-500" />
@@ -307,19 +310,16 @@ if (loading) {
                   </div>
                 </div>
 
-                {/* Guest List */}
                 <div className="space-y-3">
                   <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
                     <User className="w-4 h-4" />
                     Guest Details
                   </h3>
-                  
                   {booking.guests && booking.guests.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {booking.guests.map((guest, index) => {
                         const age = calculateAge(guest.dob);
                         const isPrimary = index === 0;
-                        
                         return (
                           <div 
                             key={guest._id} 
@@ -356,7 +356,6 @@ if (loading) {
                                 </div>
                               </div>
                             </div>
-                            
                             <div className="text-xs text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 p-2 rounded">
                               <span className="font-medium">Date of Birth:</span> {new Date(guest.dob).toLocaleDateString('en-US', {
                                 year: 'numeric',
@@ -369,7 +368,6 @@ if (loading) {
                       })}
                     </div>
                   ) : (
-                    // Fallback for when guest details are not available in new format
                     <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border-2 border-slate-200 dark:border-slate-700">
                       <div className="flex items-center gap-2.5">
                         <div className="w-9 h-9 bg-gradient-to-br from-tripswift-blue to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
@@ -391,7 +389,6 @@ if (loading) {
             </CardContent>
           </Card>
 
-          {/* Property Details */}
           <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader className="p-4">
               <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
@@ -412,7 +409,6 @@ if (loading) {
                     <span>Code: {booking.property.code}</span>
                   </div>
                 </div>
-                
                 <div className="p-2.5 bg-slate-50 dark:bg-slate-900/50 rounded-lg">
                   <div className="flex items-center gap-2 mb-1.5">
                     <BedDouble className="w-4 h-4 text-slate-500" />
@@ -427,7 +423,6 @@ if (loading) {
             </CardContent>
           </Card>
 
-          {/* Contact Information */}
           <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader className="p-4">
               <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
@@ -461,7 +456,6 @@ if (loading) {
             </CardContent>
           </Card>
 
-          {/* Payment Information */}
           <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl transition-all duration-300 lg:col-span-2">
             <CardHeader className="p-4">
               <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">

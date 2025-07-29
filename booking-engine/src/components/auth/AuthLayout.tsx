@@ -99,6 +99,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
             className="object-center filter saturate-110"
             priority
             quality={95}
+            unoptimized
           />
         </div>
         <div className="absolute inset-0 flex flex-col justify-center items-start z-30 p-16">
@@ -109,6 +110,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
               height={80}
               alt="TripSwift"
               className="filter brightness-105"
+              unoptimized
             />
           </div>
           <h1 className="text-5xl font-tripswift-extrabold text-tripswift-off-white mb-5 tracking-tight drop-shadow-lg">
@@ -143,6 +145,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
               height={70}
               alt="TripSwift"
               className="drop-shadow-lg"
+              unoptimized
             />
           </div>
           <div className="bg-tripswift-off-white items-center rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] overflow-hidden transition-all duration-300 hover:shadow-[0_20px_80px_rgba(7,109,179,0.07)]">

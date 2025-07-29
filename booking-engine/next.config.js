@@ -3,6 +3,7 @@ const nextConfig = {
   output: 'export', // 👈 Important line for static export
   reactStrictMode: true,
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',

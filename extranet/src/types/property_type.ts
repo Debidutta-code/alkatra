@@ -56,7 +56,7 @@ export interface PropertyDetailsProps {
     editedProperty: EditedProperty;
     editMode?: boolean;
     accessToken: string;
-    propertyId: string;
+    propertyId: string | null;
     setProperty: any;
     handleInputChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
     handleSaveClick?: () => void;

@@ -19,7 +19,7 @@ interface PropertyImageGalleryProps {
   onImagesUpdate?: (images: string[]) => void;
   editable?: boolean;
   loading?: boolean;
-  propertyId: string;
+  propertyId: string | null;
   accessToken: string;
   uploadEndpoint?: string;
   updatePropertyEndpoint?: string;
@@ -33,7 +33,7 @@ const updateProperty = async (propertyId: string, accessToken: string, data: any
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
-      }
+      },
     }
   );
   return response.data;
@@ -106,43 +106,42 @@ export function PropertyImageGallery({
   };
 
   const handleImageUpload = async () => {
+    if (!accessToken || !propertyId) {
+      toast.error("Missing authentication or property ID");
+      return;
+    }
     if (!files.length) return;
-
+  
     const validFiles = validateFiles(files);
     if (!validFiles.length) return;
-
+  
     setUploading(true);
     setUploadError(null);
     const originalImages = [...image];
-
+  
     try {
       const formData = new FormData();
       validFiles.forEach((file) => {
         formData.append('file', file);
       });
-
+  
       const uploadResponse = await axios.post(uploadEndpoint, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          ...(accessToken && { Authorization: `Bearer ${accessToken}` })
-        }
+          ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+        },
       });
-
-      // Handle different response formats - adjust based on your API
+  
       let newImageUrls: string[] = [];
-
       if (uploadResponse.data?.data?.urls) {
-        // If response has urls array with objects containing url property
         newImageUrls = uploadResponse.data.data.urls.map((item: any) =>
           typeof item === 'string' ? item : item.url || item.secure_url || item
         );
       } else if (uploadResponse.data?.urls) {
-        // If response has direct urls array
         newImageUrls = uploadResponse.data.urls.map((item: any) =>
           typeof item === 'string' ? item : item.url || item.secure_url || item
         );
       } else if (uploadResponse.data?.data) {
-        // If response data is array of URLs or objects
         const data = uploadResponse.data.data;
         newImageUrls = Array.isArray(data)
           ? data.map((item: any) => typeof item === 'string' ? item : item.url || item.secure_url || item)
@@ -150,18 +149,14 @@ export function PropertyImageGallery({
       } else {
         throw new Error('Invalid response format from upload endpoint');
       }
-
+  
       const updatedImages = [...image, ...newImageUrls];
-
-      // Update the UI immediately
       if (onImagesUpdate) {
         onImagesUpdate(updatedImages);
       }
-
-      // Update the property record
+  
       await updateProperty(propertyId, accessToken, { image: updatedImages });
-
-      // Clean up files and close dialog only on success
+  
       files.forEach(file => {
         if (file.preview) {
           URL.revokeObjectURL(file.preview);
@@ -170,55 +165,43 @@ export function PropertyImageGallery({
       setFiles([]);
       setUploadDialogOpen(false);
       toast.success("Property images uploaded successfully!");
-
     } catch (error: any) {
       console.error('Upload failed:', error);
-
-      // Revert UI changes on error
       if (onImagesUpdate) {
         onImagesUpdate(originalImages);
       }
-
       const errorMessage = error?.response?.data?.message || error?.message || "Failed to upload images";
       setUploadError(errorMessage);
       toast.error(errorMessage);
-
-      // Don't clear files on error - let user retry
     } finally {
       setUploading(false);
     }
   };
 
   const handleDeleteImage = async (imageUrl: string, index: number) => {
+    if (!accessToken || !propertyId) {
+      toast.error("Missing authentication or property ID");
+      return;
+    }
     const originalImages = [...image];
     setDeleting(imageUrl);
-
+  
     try {
       const updatedImages = image.filter((_, i) => i !== index);
-
-      // Optimistic update
       if (onImagesUpdate) {
         onImagesUpdate(updatedImages);
       }
-
-      // Update the property record
       await updateProperty(propertyId, accessToken, { image: updatedImages });
-
       toast.success("Image deleted successfully!");
       setDeleteConfirmOpen(false);
       setImageToDelete(null);
-
     } catch (error: any) {
       console.error('Delete failed:', error);
-
-      // Revert the UI update on error
       if (onImagesUpdate) {
         onImagesUpdate(originalImages);
       }
-
       const errorMessage = error?.response?.data?.message || error?.message || "Failed to delete image";
       toast.error(errorMessage);
-
     } finally {
       setDeleting(null);
     }

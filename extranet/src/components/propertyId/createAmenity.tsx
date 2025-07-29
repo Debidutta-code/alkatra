@@ -7,7 +7,7 @@ import { Badge } from "../ui/badge";
 import { Edit, Save } from "lucide-react";
 import { Checkbox } from "../ui/checkbox";
 import { useForm } from "react-hook-form";
-import { EditedAmenity } from '../../app/app/property/[propertyId]/page';
+import { EditedAmenity } from '../../app/app/property/propertyDetails/page';
 
 const AmenityData = [
     "wifi", "swimming_pool", "fitness_center", "spa_and_wellness",
