@@ -3,9 +3,10 @@ import React, { Suspense } from 'react'
 
 const page = () => {
   return (
-    <Suspense>
-      <RoomsPage/>
+    <Suspense fallback={<div>Loading rooms...</div>}>
+      <RoomsPage />
     </Suspense>
+
   )
 }
 
