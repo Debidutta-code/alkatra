@@ -69,12 +69,6 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
     setSearchQuery("");
   };
 
-  // Handler for when guest details change
-  const handleGuestDetailsChange = (details: any) => {
-    if (onGuestChange) {
-      onGuestChange(details);
-    }
-  };
 
   const handleSearchButtonClick = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -92,13 +86,12 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
       return;
     }
   
-    // Add this validation to prevent same check-in and check-out dates
     if (dates[0] === dates[1]) {
       toast.error(t("HotelListing.CompactSearchBar.errorSameDates"));
       return;
     }
   
-    console.log("guest details", guestDetails);
+    console.log("guest details", guestDetails); // This will now only show applied guest details
     setLoading(true);
     try {
       await getHotelsByCity(searchQuery);
@@ -112,7 +105,7 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
         // Build guest details query parameters
         const guestParams = guestDetails
           ? `&rooms=${guestDetails.rooms || 1}&adults=${guestDetails.guests || 1}&children=${guestDetails.children || 0}&infant=${guestDetails.infants || 0}`
-          : 1;
+          : "&rooms=1&adults=1&children=0&infant=0";
   
         router.push(`/destination?location=${encodeURIComponent(searchQuery)}&checkin=${checkinDate}&checkout=${checkoutDate}${guestParams}`);
       }
@@ -182,9 +175,8 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
           </div>
         </div>
 
-        {/* Guest Selection */}
-        <div className="w-[262px]  sm:flex-1">
-          <GuestBox onChange={handleGuestDetailsChange} />
+        <div className="w-[262px] sm:flex-1">
+          <GuestBox />
         </div>
 
         {/* Search Button */}

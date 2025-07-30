@@ -628,7 +628,7 @@ export default function PaymentSuccess() {
                             {t("Payment.PaymentSuccess.phoneLabel")}
                           </p>
                           <p className="text-sm sm:text-base font-tripswift-medium" dir="ltr">
-                            {reduxPhone}
+                            {reduxPhone ? (reduxPhone.startsWith('+') ? reduxPhone : `+${reduxPhone}`) : ''}
                           </p>
                         </div>
                       </div>

@@ -35,33 +35,28 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
   const [error, setError] = useState<string | null>(null);
   const { t, i18n } = useTranslation();
 
-  // Function to update display text in OTA style with translations
   const updateDisplayText = () => {
-    const roomsToUse = guestDetails?.rooms || rooms || 1;
-    const guestsToUse = guestDetails?.guests || guests || 1;
-    const childrenToUse = guestDetails?.children || children || 0;
-    const infantsToUse = guestDetails?.infants || infants || 0;
+    const roomsToUse = guestDetails?.rooms || 1;
+    const guestsToUse = guestDetails?.guests || 1;
+    const childrenToUse = guestDetails?.children || 0;
+    const infantsToUse = guestDetails?.infants || 0;
 
-    // Build the display text using translation keys
     let text = `${roomsToUse} ${roomsToUse === 1 ? t("GuestBox.roomSingular") : t("GuestBox.roomsPlural")} · ${guestsToUse} ${guestsToUse === 1 ? t("GuestBox.adultSingular") : t("GuestBox.adultsPlural")}`;
-
+  
     if (childrenToUse > 0) {
       text += ` · ${childrenToUse} ${childrenToUse === 1 ? t("GuestBox.childSingular") : t("GuestBox.childrenPlural")}`;
     }
-
+    
     if (infantsToUse > 0) {
       text += ` · ${infantsToUse} ${infantsToUse === 1 ? t("GuestBox.infantSingular") : t("GuestBox.infantsPlural")}`;
     }
-
+  
     setDisplayText(text);
   };
-
-  // Update display text when component mounts or guestDetails changes
   useEffect(() => {
     updateDisplayText();
-  }, [guestDetails, t]); // Add 't' as dependency to re-render when language changes
+  }, [guestDetails, t]);
 
-  // Sync state with Redux when guestDetails changes
   useEffect(() => {
     if (guestDetails) {
       setRooms(guestDetails.rooms || 1);
@@ -70,14 +65,12 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
       setChildAges(guestDetails.childAges || []);
       setInfants(guestDetails.infants || 0);
       setInfantAges(guestDetails.infantAges || []);
-      updateDisplayText();
     }
-  }, [guestDetails, t]); // Add 't' as dependency
-
-  // Update display text when local state changes
+  }, [guestDetails, t]);
+  
   useEffect(() => {
     updateDisplayText();
-  }, [rooms, guests, children, infants, t]); // Add 't' as dependency
+  }, []);
 
   useEffect(() => {
     if (modalOpen) {
@@ -100,29 +93,26 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
   };
 
   const incDecHandler = (
-  setter: React.Dispatch<React.SetStateAction<number>>,
-  delta: number,
-  minValue: number = 1,
-  maxValue?: number
-) => {
-  setter((prevValue) => {
-    const updatedValue = prevValue + delta;
-    if (updatedValue < minValue) return minValue;
-    if (maxValue !== undefined && updatedValue > maxValue) return maxValue;
-    return updatedValue;
-  });
-};
-
+    setter: React.Dispatch<React.SetStateAction<number>>,
+    delta: number,
+    minValue: number = 1,
+    maxValue?: number
+  ) => {
+    setter((prevValue) => {
+      const updatedValue = prevValue + delta;
+      if (updatedValue < minValue) return minValue;
+      if (maxValue !== undefined && updatedValue > maxValue) return maxValue;
+      return updatedValue;
+    });
+  };
 
   const handleChildrenChange = (value: number) => {
     setChildren(() => {
       const newValue = Math.max(value, 0);
       setChildAges((prevAges: number[]) => {
         if (newValue > prevAges.length) {
-          // Adding children - preserve existing ages and add 0 for new ones
           return [...prevAges, ...Array.from({ length: newValue - prevAges.length }, () => 0)];
         } else {
-          // Removing children - keep only the first 'newValue' ages
           return prevAges.slice(0, newValue);
         }
       });
@@ -141,10 +131,8 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
       const newValue = Math.max(value, 0);
       setInfantAges((prevAges: number[]) => {
         if (newValue > prevAges.length) {
-          // Adding infants - preserve existing ages and add undefined for new ones
           return [...prevAges, ...Array.from({ length: newValue - prevAges.length }, () => undefined)];
         } else {
-          // Removing infants - keep only the first 'newValue' ages
           return prevAges.slice(0, newValue);
         }
       });
@@ -167,20 +155,13 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
   };
 
   const validateGuestCount = () => {
-    // Typical max guests per room - 4 is standard for most hotels
     const maxGuestsPerRoom = 4;
-
-    // Total guests including children and infants
     const totalGuests = guests + children + infants;
-
-    // Maximum allowed guests based on room count
     const maxAllowedGuests = rooms * maxGuestsPerRoom;
-
     if (totalGuests > maxAllowedGuests) {
       setError(t("GuestBox.maxGuestsError", { maxGuests: maxGuestsPerRoom }));
       return false;
     }
-
     return true;
   };
 
@@ -188,9 +169,7 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
     if (!validateGuestCount()) {
       return;
     }
-
     if ((children === 0 || isChildAgeValid()) && (infants === 0 || isInfantAgeValid())) {
-      // Create guest data object with calculated DOBs
       const guestData = {
         rooms,
         guests,
@@ -201,15 +180,10 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
         childDOBs: childAges.map((age: number) => dayjs().subtract(age, 'year').format('YYYY-MM-DD')),
         infantDOBs: infantAges.map((age: number) => dayjs().subtract(age, 'year').format('YYYY-MM-DD'))
       };
-
-      // Dispatch to Redux
       dispatch(setGuestDetails(guestData));
-
-      // Call onChange callback if provided
       if (onChange) {
         onChange(guestData);
       }
-
       closeModal();
     } else {
       setError(t("GuestBox.selectAgeError"));
@@ -247,7 +221,7 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
                   {rooms}
                 </span>
                 <button
-                  className="w-9 h-9 rounded-full border border-tripswift-black/20 text-tripswift-black/60 flex items-center justify-center transition-colors hover:bg-tripswift-blue/10"
+                  className="w-9 h-9 rounded-full border border-tripswift-black/20 text-tripswift-black/60 flex items-center justify-center transition-colors hover:bg-tripswift-blue/10 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => incDecHandler(setRooms, 1, 1, 4)}
                   disabled={rooms >= 4}
                 >
@@ -272,8 +246,9 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
                   {guests}
                 </span>
                 <button
-                  className="w-9 h-9 rounded-full border border-tripswift-black/20 text-tripswift-black/60 flex items-center justify-center transition-colors hover:bg-tripswift-blue/10"
+                  className="w-9 h-9 rounded-full border border-tripswift-black/20 text-tripswift-black/60 flex items-center justify-center transition-colors hover:bg-tripswift-blue/10 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => incDecHandler(setGuests, 1)}
+                  disabled={(guests + children + infants) >= (rooms * 4)}
                 >
                   <span className="text-lg">+</span>
                 </button>
@@ -303,8 +278,9 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
                     {children}
                   </span>
                   <button
-                    className="w-9 h-9 rounded-full border border-tripswift-black/20 text-tripswift-black/60 flex items-center justify-center transition-colors hover:bg-tripswift-blue/10"
+                    className="w-9 h-9 rounded-full border border-tripswift-black/20 text-tripswift-black/60 flex items-center justify-center transition-colors hover:bg-tripswift-blue/10 disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={() => handleChildrenChange(children + 1)}
+                    disabled={(guests + children + infants) >= (rooms * 4)}
                   >
                     <span className="text-lg">+</span>
                   </button>
@@ -366,8 +342,9 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
                     {infants}
                   </span>
                   <button
-                    className="w-9 h-9 rounded-full border border-tripswift-black/20 text-tripswift-black/60 flex items-center justify-center transition-colors hover:bg-tripswift-blue/10"
+                    className="w-9 h-9 rounded-full border border-tripswift-black/20 text-tripswift-black/60 flex items-center justify-center transition-colors hover:bg-tripswift-blue/10 disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={() => handleInfantsChange(infants + 1)}
+                    disabled={(guests + children + infants) >= (rooms * 4)}
                   >
                     <span className="text-lg">+</span>
                   </button>
