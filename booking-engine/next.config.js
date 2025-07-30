@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
+  trailingSlash: true,
   reactStrictMode: true,
   images: {
     unoptimized: true,
@@ -33,10 +35,10 @@ const nextConfig = {
     ],
     formats: ['image/avif', 'image/webp'],
   },
-  i18n: {
-    locales: ['en', 'es', 'fr'],
-    defaultLocale: 'en',
-  },
+  // i18n: {
+  //   locales: ['en', 'es', 'fr'],
+  //   defaultLocale: 'en',
+  // },
   webpack(config, { isServer }) {
     if (!isServer) {
       config.module.rules.push({

@@ -216,7 +216,8 @@ const HotelListing: React.FC = () => {
       }`
       : "";
 
-    window.location.href = `/hotel?id=${hotelId}&checkin=${checkinDate}&checkout=${checkoutDate}${guestParams}`;
+    // Use Next.js router instead of window.location.href
+    router.push(`/hotel?id=${hotelId}&checkin=${checkinDate}&checkout=${checkoutDate}${guestParams}`);
   };
 
   // Apply filters to hotel data
