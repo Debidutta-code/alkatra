@@ -44,7 +44,7 @@ const reduceRoomsAfterBookingConfirmed = async (
 
   const requiredFields = { hotelCode, roomTypeCode, numberOfRooms, dates };
   const missingFields = Object.entries(requiredFields)
-    .filter(([key, value]) => value === undefined || value === null || value === "" || (key === 'startDate' && (!Array.isArray(value) || value.length !== 2)))
+    .filter(([key, value]) => value === undefined || value === null || value === "" || (key === 'dates' && (!Array.isArray(value) || value.length !== 2)))
     .map(([key]) => key);
 
   if (missingFields.length > 0) {
@@ -55,19 +55,27 @@ const reduceRoomsAfterBookingConfirmed = async (
 
   const [checkInDate, checkOutDate] = dates;
 
-  if (checkInDate > checkOutDate) {
+  if (checkInDate >= checkOutDate) {
     return {
-      message: "Check-in date must be before or equal to check-out date",
+      message: "Check-in date must be before check-out date",
     };
   }
 
   try {
+    // Calculate the date range excluding the checkout date
+    const dateRange = [];
+    let currentDate = new Date(checkInDate);
+    const endDate = new Date(checkOutDate);
+    while (currentDate < endDate) {
+      dateRange.push(new Date(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
     const inventoryRecords = await Inventory.find({
       hotelCode,
       invTypeCode: roomTypeCode,
       'availability.startDate': {
-        $gte: new Date(checkInDate),
-        $lte: new Date(checkOutDate),
+        $in: dateRange,
       },
     });
 
@@ -141,12 +149,19 @@ const reduceRoomsAfterBookingConfirmedCrypto = async (
     throw new Error("Check-in date must be before or equal to check-out date");
   }
 
+  const dateRange = [];
+  let currentDate = new Date(checkInDate);
+  const endDate = new Date(checkOutDate);
+  while (currentDate < endDate) {
+    dateRange.push(new Date(currentDate));
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
   const inventoryRecords = await Inventory.find({
     hotelCode,
     invTypeCode: roomTypeCode,
     'availability.startDate': {
-      $gte: new Date(checkInDate),
-      $lte: new Date(checkOutDate),
+      $in: dateRange,
     },
   });
 
@@ -215,12 +230,19 @@ const increaseRoomsAfterBookingCancelled = async (
   }
 
   try {
+    const dateRange = [];
+    let currentDate = new Date(checkInDate);
+    const endDate = new Date(checkOutDate);
+    while (currentDate < endDate) {
+      dateRange.push(new Date(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
     const inventoryRecords = await Inventory.find({
       hotelCode,
       invTypeCode: roomTypeCode,
       'availability.startDate': {
-        $gte: new Date(checkInDate),
-        $lte: new Date(checkOutDate),
+        $in: dateRange,
       },
     });
 
