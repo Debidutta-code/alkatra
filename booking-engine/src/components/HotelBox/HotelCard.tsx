@@ -145,7 +145,7 @@ const HotelCard = () => {
         <div className="w-[290px] md:w-full max-w-6xl animate-in slide-in-from-bottom duration-700 delay-200">
           {/* Search Box */}
           <CompactSearchBar
-            initialLocation="Dubai"
+            initialLocation="Manama"
             initialCheckin={tomorrow}
             initialCheckout={dayAfterTomorrow}
             onSearch={handleSearch}

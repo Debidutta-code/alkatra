@@ -21,7 +21,7 @@ interface CompactSearchBarProps {
 }
 
 const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
-  initialLocation = "Dubai",
+  initialLocation = "Manama",
   initialCheckin = "",
   initialCheckout = "",
   onSearch,
@@ -43,7 +43,7 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
     initialLocation ||
     searchParams.get("location") ||
     searchParams.get("destination") ||
-    "Dubai";
+    "Manama";
   const checkinDate = initialCheckin || searchParams.get("checkin") || tomorrow;
   const checkoutDate =
     initialCheckout || searchParams.get("checkout") || dayAfterTomorrow;
