@@ -4,7 +4,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import { RoomCard } from "@/components/AppComponent/RoomCard";
-import GuestInformationModal, {Guest} from "@/components/bookingComponents/GuestInformationModal";
+import GuestInformationModal, { Guest } from "@/components/bookingComponents/GuestInformationModal";
 import { useDispatch, useSelector } from "@/Redux/store";
 import { setAmount, setRoomId } from "@/Redux/slices/pmsHotelCard.slice";
 import { setGuestDetails } from "@/Redux/slices/hotelcard.slice";
@@ -122,6 +122,9 @@ const RoomsPage: React.FC = () => {
   const [showPropertyDetails, setShowPropertyDetails] = useState<boolean>(true);
   const [selectedImage, setSelectedImage] = useState<number>(0);
   const [propertyCode, setPropertyCode] = useState<string>("");
+  const [roomTypeCode, setRoomTypeCode] = useState<string>("");
+  const [roomAmenities, setRoomAmenities] = useState([]);
+
 
   // New state for handling 400 error
   const [showRoomNotAvailable, setShowRoomNotAvailable] = useState<boolean>(false);
@@ -178,15 +181,15 @@ const RoomsPage: React.FC = () => {
   useEffect(() => {
     const fetchProperty = async () => {
       if (!propertyId) return;
+
       try {
         const propertyResponse = await axios.get(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`
         );
-        const propDetails = propertyResponse.data.property || propertyResponse.data.data || propertyResponse.data;
-        if (!propDetails?.property_code) {
-          console.error("Property code missing from API response");
-          return;
-        }
+        const propDetails = propertyResponse.data.property ||
+          propertyResponse.data.data ||
+          propertyResponse.data;
+        console.log("Property Details:", propDetails);
         setPropertyDetails(propDetails);
         setPropertyCode(propDetails.property_code);
         sessionStorage.setItem("propertyCode", propDetails.property_code);
@@ -195,8 +198,25 @@ const RoomsPage: React.FC = () => {
       }
     };
 
+    const fetchAminities = async () => {
+      if (!propertyId) return;
+
+      try {
+        const propertyResponse = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/amenite/${propertyId}?room_type=${roomTypeCode}`
+        );
+        const amenitiesDetails = propertyResponse.data
+        console.log("Aminites Details:", amenitiesDetails);
+        setRoomAmenities(amenitiesDetails);
+      } catch (error) {
+        console.error("Error fetching property:", error);
+      }
+    };
+
     fetchProperty();
+    fetchAminities();
   }, [propertyId]);
+
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -217,7 +237,15 @@ const RoomsPage: React.FC = () => {
             hotelCode: propertyCode,
           }
         );
+        const roomData = response.data.data;
         setRooms(response.data);
+        if (roomData && roomData.length > 0) {
+          const roomTypeCode = roomData[0].room_type;
+          setRoomTypeCode(roomTypeCode);
+          console.log("Room Type Code:", roomTypeCode);
+        }
+
+        console.log("The room details", response.data);
         if (response.data.qrCode) {
           setQrCodeData({
             qrCode: response.data.qrCode,
@@ -877,13 +905,10 @@ const RoomsPage: React.FC = () => {
                       {t("RoomsPage.propertyAmenities")}
                     </h3>
 
-                    {propertyDetails?.property_amenities?.amenities &&
-                      Object.keys(propertyDetails.property_amenities.amenities)
-                        .length > 0 ? (
+                    {roomAmenities &&
+                      Object.keys(roomAmenities).length > 0 ? (
                       <div className="flex flex-wrap gap-2">
-                        {Object.entries(
-                          propertyDetails.property_amenities.amenities
-                        )
+                        {Object.entries(roomAmenities)
                           .filter(([_, hasAmenity]) => hasAmenity)
                           .map(([amenity]) => (
                             <div
@@ -902,6 +927,7 @@ const RoomsPage: React.FC = () => {
                         {t("RoomsPage.noAmenitiesSpecified")}
                       </p>
                     )}
+
                   </div>
                 </div>
 
