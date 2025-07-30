@@ -405,46 +405,54 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     }
   };
 
-  const handleVerifyPhone = async () => {
-    setIsPhoneVerifying(true);
-    try {
-      const response = await verifyApi.sendPhoneOtp(phone);
-      setUpdateMessage(
-        response.message || t("BookingComponents.GuestInformationModal.otpSent")
-      );
-      setPhoneOtpSent(true);
-      setPhoneCountdown(300);
-      setPhoneVerified(false);
-      setErrors(prev => ({ ...prev, phone: '' }));
-    } catch (err: any) {
-      setErrorMessage(
-        err.message || t("BookingComponents.GuestInformationModal.otpSendFailed")
-      );
-    } finally {
-      setIsPhoneVerifying(false);
-    }
+  const validatePhoneNumber = () => {
+    if (!phone) return false;
+    // Remove all non-digit characters and check length
+    const phoneDigits = phone.replace(/\D/g, '');
+    // For international numbers, ensure we have at least 10 digits (excluding country code if needed)
+    return phoneDigits.length >= 10;
   };
 
-  const handleVerifyPhoneOtp = async () => {
-    if (!phoneOtp.trim()) {
-      setErrorMessage(t("BookingComponents.GuestInformationModal.otpEmptyError"));
-      return;
-    }
+  // const handleVerifyPhone = async () => {
+  //   setIsPhoneVerifying(true);
+  //   try {
+  //     const response = await verifyApi.sendPhoneOtp(phone);
+  //     setUpdateMessage(
+  //       response.message || t("BookingComponents.GuestInformationModal.otpSent")
+  //     );
+  //     setPhoneOtpSent(true);
+  //     setPhoneCountdown(300);
+  //     setPhoneVerified(false);
+  //     setErrors(prev => ({ ...prev, phone: '' }));
+  //   } catch (err: any) {
+  //     setErrorMessage(
+  //       err.message || t("BookingComponents.GuestInformationModal.otpSendFailed")
+  //     );
+  //   } finally {
+  //     setIsPhoneVerifying(false);
+  //   }
+  // };
 
-    try {
-      const response = await verifyApi.verifyPhoneOtp(phone || "", phoneOtp);
-      setUpdateMessage(t("BookingComponents.GuestInformationModal.phoneVerified"));
-      setPhoneVerified(true);
-      setPhoneOtpSent(false);
-      setPhoneCountdown(0);
-      setPhoneOtp("");
-      setErrorMessage(null);
-    } catch (err: any) {
-      setErrorMessage(
-        err.message || t("BookingComponents.GuestInformationModal.otpInvalidError")
-      );
-    }
-  };
+  // const handleVerifyPhoneOtp = async () => {
+  //   if (!phoneOtp.trim()) {
+  //     setErrorMessage(t("BookingComponents.GuestInformationModal.otpEmptyError"));
+  //     return;
+  //   }
+
+  //   try {
+  //     const response = await verifyApi.verifyPhoneOtp(phone || "", phoneOtp);
+  //     setUpdateMessage(t("BookingComponents.GuestInformationModal.phoneVerified"));
+  //     setPhoneVerified(true);
+  //     setPhoneOtpSent(false);
+  //     setPhoneCountdown(0);
+  //     setPhoneOtp("");
+  //     setErrorMessage(null);
+  //   } catch (err: any) {
+  //     setErrorMessage(
+  //       err.message || t("BookingComponents.GuestInformationModal.otpInvalidError")
+  //     );
+  //   }
+  // };
 
   const handleUpdate = async () => {
     let valid = true;
@@ -491,12 +499,12 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       valid = false;
     }
 
-    if (!phoneVerified) {
-      newErrors["phone"] = t(
-        "BookingComponents.GuestInformationModal.phoneNotVerified"
-      );
-      valid = false;
-    }
+    // if (!phoneVerified) {
+    //   newErrors["phone"] = t(
+    //     "BookingComponents.GuestInformationModal.phoneNotVerified"
+    //   );
+    //   valid = false;
+    // }
     setErrors(newErrors);
     if (!valid) return;
 
@@ -1076,73 +1084,58 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                           enableSearch={true}
                           disableSearchIcon={true}
                         />
-                        {!phoneVerified && (
-                          <button
-                            onClick={() => {
-                              if (phone && phone.replace(/\D/g, '').replace(/^91/, '').length >= 10) {
-                                setErrors(prev => ({ ...prev, phone: '' }));
-                              }
-                              handleVerifyPhone();
-                            }}
-                            type="button"
-                            disabled={isPhoneVerifying || !phone || phone.replace(/\D/g, '').replace(/^91/, '').length < 10}
-                            className={`px-4 py-2 rounded-lg text-sm transition whitespace-nowrap ${isPhoneVerifying || !phone || phone.replace(/\D/g, '').replace(/^91/, '').length < 10
-                              ? 'bg-gray-300 text-black cursor-not-allowed'
-                              : 'bg-tripswift-blue text-tripswift-off-white hover:bg-tripswift-blue/90'
-                              }`}
-                          >
-                            {isPhoneVerifying ? (
-                              <>
-                                {/* <Loader2 className="w-4 h-4 animate-spin text-tripswift-off-white" /> */}
-                                <span>{t("BookingComponents.GuestInformationModal.verifying")}</span>
-                              </>
-                            ) : (
-                              t("BookingComponents.GuestInformationModal.verifyPhone")
-                            )}
-                          </button>
-                        )}
                       </div>
-                      {phoneOtpSent && phoneCountdown > 0 && !phoneVerified && (
-                        <div className="mt-3 flex flex-col md:flex-row md:items-center gap-2">
-                          <input
-                            type="text"
-                            placeholder={t("BookingComponents.GuestInformationModal.otpPlaceholder")}
-                            value={phoneOtp}
-                            maxLength={6}
-                            onChange={(e) => {
-                              setPhoneOtp(e.target.value);
-                              // Clear error when user starts typing
-                              if (errorMessage && errorMessage.includes("OTP")) {
-                                setErrorMessage(null);
-                              }
-                            }}
-                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 text-sm transition-all duration-200 ${errorMessage && errorMessage.includes("OTP") ? "border-red-600" : "border-tripswift-black/20"
-                              }`}
-                          />
-                          <button
-                            onClick={async () => {
-                              try {
-                                await handleVerifyPhoneOtp();
-                                // Error will be cleared in handleVerifyPhoneOtp on success
-                              } catch (error) {
-                                // Error is already handled in handleVerifyPhoneOtp
-                              }
-                            }}
-                            className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition whitespace-nowrap"
-                          >
-                            {t("BookingComponents.GuestInformationModal.verifyOtp")}
-                          </button>
-                          <p className="text-xs text-tripswift-black/60 sm:ml-2 mt-1 sm:mt-0">
-                            {t("BookingComponents.GuestInformationModal.otpExpiresIn")}{" "}
-                            {Math.floor(phoneCountdown / 60)}:{String(phoneCountdown % 60).padStart(2, "0")}
-                          </p>
-                        </div>
-                      )}
-                      {phoneVerified && (
+{/* {!phoneVerified && (
+  <button
+    onClick={() => {
+      if (phone && phone.replace(/\D/g, '').replace(/^91/, '').length >= 10) {
+        setErrors(prev => ({ ...prev, phone: '' }));
+      }
+      handleVerifyPhone();
+    }}
+    type="button"
+    disabled={isPhoneVerifying || !phone || phone.replace(/\D/g, '').replace(/^91/, '').length < 10}
+    className={`px-4 py-2 rounded-lg text-sm transition whitespace-nowrap ${isPhoneVerifying || !phone || phone.replace(/\D/g, '').replace(/^91/, '').length < 10
+      ? 'bg-gray-300 text-black cursor-not-allowed'
+      : 'bg-tripswift-blue text-tripswift-off-white hover:bg-tripswift-blue/90'
+      }`}
+  >
+    {isPhoneVerifying ? (
+      <>
+        <span>{t("BookingComponents.GuestInformationModal.verifying")}</span>
+      </>
+    ) : (
+      t("BookingComponents.GuestInformationModal.verifyPhone")
+    )}
+  </button>
+)} */}
+
+{/* {phoneOtpSent && phoneCountdown > 0 && !phoneVerified && (
+  <div className="mt-3 flex flex-col md:flex-row md:items-center gap-2">
+    <input
+      type="text"
+      placeholder={t("BookingComponents.GuestInformationModal.otpPlaceholder")}
+      value={phoneOtp}
+      maxLength={6}
+      onChange={(e) => {
+        setPhoneOtp(e.target.value);
+        if (errorMessage && errorMessage.includes("OTP")) {
+          setErrorMessage(null);
+        }
+      }}
+      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 text-sm transition-all duration-200 ${errorMessage && errorMessage.includes("OTP") ? "border-red-600" : "border-tripswift-black/20"
+        }`}
+    />
+    <p className="text-xs text-tripswift-black/60 sm:ml-2 mt-1 sm:mt-0">
+      {t("BookingComponents.GuestInformationModal.otpExpiresIn")} {Math.floor(phoneCountdown / 60)}:{String(phoneCountdown % 60).padStart(2, "0")}
+    </p>
+  </div>
+)} */}
+                      {/* {phoneVerified && (
                         <p className="text-xs text-green-600 mt-1">
                           ✅ {t("BookingComponents.GuestInformationModal.phoneVerified")}
                         </p>
-                      )}
+                      )} */}
                       {errors.phone && (
                         <p className="text-xs text-red-600 mt-1">{errors.phone}</p>
                       )}
@@ -1426,12 +1419,16 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
               }}
               disabled={
                 (activeSection === "details" &&
-                  (!emailVerified || !phoneVerified || !validateGuestNames())) ||
+                  (!emailVerified || 
+                   !validateGuestNames() || 
+                   !phone || // Check if phone exists
+                   !validatePhoneNumber() // Check if phone is valid
+                  )) ||
                 (activeSection === "review" && !isFormUpdated) ||
                 isLoading
               }
               className={`px-6 py-2.5 rounded-lg text-sm font-tripswift-medium transition-all duration-200 flex items-center justify-center gap-2 ${(activeSection === "details" &&
-                (!emailVerified || !phoneVerified || !validateGuestNames())) ||
+                (!emailVerified || !validateGuestNames() || !phone || !validatePhoneNumber())) ||
                 (activeSection === "review" && !isFormUpdated) ||
                 isLoading
                 ? "bg-gray-300 text-black cursor-not-allowed"
