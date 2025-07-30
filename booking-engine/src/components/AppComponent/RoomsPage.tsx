@@ -178,15 +178,15 @@ const RoomsPage: React.FC = () => {
   useEffect(() => {
     const fetchProperty = async () => {
       if (!propertyId) return;
-
       try {
         const propertyResponse = await axios.get(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`
         );
-        const propDetails = propertyResponse.data.property ||
-          propertyResponse.data.data ||
-          propertyResponse.data;
-        console.log("Property Details:", propDetails);
+        const propDetails = propertyResponse.data.property || propertyResponse.data.data || propertyResponse.data;
+        if (!propDetails?.property_code) {
+          console.error("Property code missing from API response");
+          return;
+        }
         setPropertyDetails(propDetails);
         setPropertyCode(propDetails.property_code);
         sessionStorage.setItem("propertyCode", propDetails.property_code);
