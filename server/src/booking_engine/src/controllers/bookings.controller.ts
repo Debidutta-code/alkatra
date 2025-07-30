@@ -17,6 +17,9 @@ import { CustomRequest } from "../../../user_authentication/src/Utils/types";
 import Auth from "../../../user_authentication/src/Model/auth.model";
 import { PropertyInfo } from "../../../property_management/src/model/property.info.model";
 import UserModel from "../../../user_authentication/src/Model/auth.model";
+import { MailFactory } from "../../../customer_authentication/src/services/mailFactory";
+
+const mailer = MailFactory.getMailer();
 
 const calculateAgeCategory = (dob: string) => {
   const birthDate = new Date(dob);
@@ -625,12 +628,16 @@ export const createReservationWithStoredCard = CatchAsyncError(
         // Generate the final HTML by replacing placeholders with actual data
         const finalHtml = template(templateData);
 
-        await EmailService.sendEmail({
+        await mailer.sendMail({
           to: email,
-          text: `Your booking has been confirmed`,
           subject: `Booking Confirmation - ${hotelName}`,
           html: finalHtml,
+          text: `Your booking has been confirmed`,
         });
+
+         
+
+        
       }
       catch (error: any) {
         return res.status(500).json({ message: "❌ Failed to send confirmation email" });
