@@ -38,15 +38,15 @@ const cryptoPaymentSchema = new mongoose.Schema({
   },
   initiatedTime: {
     type: Date,
-    default: convertToLocalTime(),
+    default: new Date(),
   },
   createdAt: {
     type: Date,
-    default: convertToLocalTime(),
+    default: new Date(),
   },
   updatedAt: {
     type: Date,
-    default: convertToLocalTime(),    
+    default: new Date(),    
   }
 });
 
@@ -73,15 +73,15 @@ const cryptoPaymentLogSchema = new mongoose.Schema({
   },
   initiatedTime: {
     type: Date,
-    default: convertToLocalTime,
+    default: new Date(),
   },
   createdAt: {
     type: Date,
-    default: convertToLocalTime,
+    default: new Date(),
   },
   updatedAt: {
     type: Date,
-    default: convertToLocalTime,    
+    default: new Date(),    
   }
 }, {
   timestamps: false,

@@ -83,35 +83,35 @@ exports.updateRoomAmenity = updateRoomAmenity;
 const getRoomAminity = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const propertyInfo_id = req.params.id;
-        const room_type = req.params.room_type;
-        console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$-property_id", propertyInfo_id);
-        console.log("Room Type:", room_type);
+        const room_type = req.query.room_type;
+        console.log('Property ID:', propertyInfo_id);
+        console.log('Room Type:', room_type);
         if (!propertyInfo_id) {
-            return next(new appError_1.AppError("Please provide propertyInfo_id", 400));
+            return next(new appError_1.AppError('Please provide propertyInfo_id', 400));
         }
-        let roomAminity;
+        let roomAminities;
         if (room_type) {
-            roomAminity = yield room_amenite_model_1.RoomAminity.findOne({ propertyInfo_id, room_type }).lean();
-            if (!roomAminity) {
+            roomAminities = yield room_amenite_model_1.RoomAminity.findOne({ propertyInfo_id, room_type }).lean();
+            if (!roomAminities) {
                 return next(new appError_1.AppError(`No amenities found for room type "${room_type}" in property ${propertyInfo_id}`, 404));
             }
         }
         else {
-            roomAminity = yield room_amenite_model_1.RoomAminity.find({ propertyInfo_id }).lean();
-            if (!roomAminity || roomAminity.length === 0) {
+            roomAminities = yield room_amenite_model_1.RoomAminity.find({ propertyInfo_id }).lean();
+            if (!roomAminities || roomAminities.length === 0) {
                 return next(new appError_1.AppError(`No amenities found for property ${propertyInfo_id}`, 404));
             }
         }
         res.status(200).json({
             success: true,
-            data: roomAminity
+            data: roomAminities,
         });
     }
     catch (error) {
-        console.log(error.message);
-        return res.status(500).json({
+        console.error(error.message);
+        res.status(500).json({
             success: false,
-            message: "Internal server error",
+            message: 'Internal server error',
         });
     }
 });

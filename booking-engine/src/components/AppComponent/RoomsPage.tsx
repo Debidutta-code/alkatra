@@ -38,7 +38,7 @@ import {
 import LoadingSkeleton from "../hotelListingComponents/LoadingSkeleton";
 import { formatDate, calculateNights } from "@/utils/dateUtils";
 import { useTranslation } from "react-i18next";
-import QRCodeDisplay from "./QRCodeDisplay";
+// import QRCodeDisplay from "./QRCodeDisplay";
 
 interface Room {
   _id: string;
@@ -124,6 +124,7 @@ const RoomsPage: React.FC = () => {
   const [propertyCode, setPropertyCode] = useState<string>("");
   const [roomTypeCode, setRoomTypeCode] = useState<string[]>([]);
   const [roomAmenities, setRoomAmenities] = useState<{ [key: string]: any }>({});
+  const [unavailableRoomTypes, setUnavailableRoomTypes] = useState<{ roomType: string; dates: string[] }[]>([]);
 
 
   // New state for handling 400 error
@@ -190,6 +191,10 @@ const RoomsPage: React.FC = () => {
           propertyResponse.data.data ||
           propertyResponse.data;
         console.log("Property Details:", propDetails);
+        console.log("Property Amenities:", propDetails?.property_amenities?.amenities);
+        if (!propDetails?.property_amenities?.amenities) {
+          console.warn("Property amenities are missing or empty in the API response");
+        }
         setPropertyDetails(propDetails);
         setPropertyCode(propDetails.property_code);
         sessionStorage.setItem("propertyCode", propDetails.property_code);
@@ -221,12 +226,7 @@ const RoomsPage: React.FC = () => {
         const roomData = response.data.data;
         console.log("The room data:", roomData);
         setRooms(response.data);
-
-        if (roomData && roomData.length > 0) {
-          const roomTypes = roomData.map((room: Room) => room.room_type);
-          setRoomTypeCode(roomTypes);
-          console.log("Room Types:", roomTypes);
-        }
+        setUnavailableRoomTypes(response.data.unavailableRoomTypes || []); // Set unavailable room types
 
         if (response.data.qrCode) {
           setQrCodeData({
@@ -245,7 +245,6 @@ const RoomsPage: React.FC = () => {
         setIsLoading(false);
       }
     };
-
     const fetchAminities = async () => {
       if (!propertyId) return;
 
@@ -359,12 +358,12 @@ const RoomsPage: React.FC = () => {
         if (amenityLower.includes("ironing")) return "ironing";
         if (amenityLower.includes("dining area") || amenityLower.includes("sitting area")) return "sofaSeating";
         if (amenityLower.includes("balcony")) return "balcony";
-        return "check-circle"; // Fallback for unmapped amenities
+        return "check-circle";
       };
 
       return {
         icon: getIconName(amenity),
-        name: amenity,
+        name: t(`RoomsPage.amenitiesList.${amenity.toLowerCase()}`, { defaultValue: amenity }),
       };
     });
 
@@ -468,7 +467,8 @@ const RoomsPage: React.FC = () => {
   };
 
   const getAmenityIcon = (amenity: string) => {
-    switch (amenity) {
+    const normalizedAmenity = amenity.toLowerCase();
+    switch (normalizedAmenity) {
       case "wifi":
         return <Wifi className="h-4 w-4 text-tripswift-blue" />;
       case "swimming_pool":
@@ -505,6 +505,7 @@ const RoomsPage: React.FC = () => {
         return <CheckCircle className="h-4 w-4 text-tripswift-blue" />;
     }
   };
+
   return (
     <div className="bg-[#F5F7FA] min-h-screen font-noto-sans relative">
       {/* Room Not Available Overlay */}
@@ -919,11 +920,10 @@ const RoomsPage: React.FC = () => {
                     <h3 className="text-section-heading mb-3">
                       {t("RoomsPage.propertyAmenities")}
                     </h3>
-
-                    {roomAmenities &&
-                      Object.keys(roomAmenities).length > 0 ? (
+                    {propertyDetails?.property_amenities?.amenities &&
+                      Object.keys(propertyDetails.property_amenities.amenities).length > 0 ? (
                       <div className="flex flex-wrap gap-2">
-                        {Object.entries(roomAmenities)
+                        {Object.entries(propertyDetails.property_amenities.amenities)
                           .filter(([_, hasAmenity]) => hasAmenity)
                           .map(([amenity]) => (
                             <div
@@ -942,18 +942,28 @@ const RoomsPage: React.FC = () => {
                         {t("RoomsPage.noAmenitiesSpecified")}
                       </p>
                     )}
-
                   </div>
                 </div>
 
                 {/* Property amenities and contact info */}
                 <div className="lg:col-span-1">
                   {/* Property amenities */}
-                  <div className="bg-tripswift-blue/5 p-4 rounded-xl mb-2">
+                  {/* <div className="bg-tripswift-blue/5 p-4 rounded-xl mb-2">
                     {qrCodeData.qrCode && qrCodeData.couponCode && (
                       <QRCodeDisplay qrCode={qrCodeData.qrCode} />
                     )}
-                  </div>
+                  </div> */}
+
+
+                  {/* Property description */}
+                  {propertyDetails?.description && (
+                    <div className="mt-4 p-4">
+                      <h3 className="text-section-heading mb-2">{t('RoomsPage.aboutThisProperty')}</h3>
+                      <p className="text-description">
+                        {propertyDetails.description}
+                      </p>
+                    </div>
+                  )}
 
                   {/* Contact information */}
                   <div className="bg-tripswift-off-white p-4 rounded-xl border border-gray-100">
@@ -1115,18 +1125,32 @@ const RoomsPage: React.FC = () => {
                 const guestCount = guestDetails?.guests || 1;
                 const matchingRate =
                   room.baseByGuestAmts.find((rate) => rate.numberOfGuests === guestCount) ||
-                  room.baseByGuestAmts[0]; // Fallback to first rate
+                  room.baseByGuestAmts[0];
                 displayPrice = `${room.currency_code} ${matchingRate.amountBeforeTax.toFixed(2)}`;
               }
 
+              // Check if the room type is unavailable
+              const isUnavailable = unavailableRoomTypes.some(
+                (unavailable) => unavailable.roomType === room.room_type
+              );
+
               return (
-                <RoomCard
+                <div
                   key={room._id}
-                  data={convertAmenities(room)}
-                  price={displayPrice}
-                  onBookNow={() => handleBookNow(room)}
-                  isPriceAvailable={room.has_valid_rate}
-                />
+                  className={`relative ${isUnavailable ? "blur-sm opacity-60" : ""}`}
+                >
+                  <RoomCard
+                    data={convertAmenities(room)}
+                    price={displayPrice}
+                    onBookNow={() => handleBookNow(room)}
+                    isPriceAvailable={room.has_valid_rate && !isUnavailable} // Disable booking for unavailable rooms
+                  />
+                  {isUnavailable && (
+                    <div className="absolute top-4 left-4 z-20 bg-gray-600 text-tripswift-off-white text-xs font-tripswift-semibold py-1 px-2.5 rounded-full flex items-center shadow-md">
+                      {t("RoomsPage.RoomCard.notAvailable")}
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>

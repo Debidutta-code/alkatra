@@ -10,6 +10,7 @@ import { formatDate, calculateNights } from "@/utils/dateUtils";
 import { useTranslation } from "react-i18next";
 import { verifyApi } from "@/api/verify";
 import axios from "axios";
+import toast, { Toaster } from 'react-hot-toast';
 
 // Interfaces remain unchanged
 export interface Guest {
@@ -241,10 +242,12 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       if (finalPriceResponse.data.success) {
         setFinalPrice(finalPriceResponse.data.data);
       } else {
-        setErrorMessage(finalPriceResponse.data.message);
+        // setErrorMessage(finalPriceResponse.data.message);
+        toast.error(finalPriceResponse.data.message);
       }
     } catch (error: any) {
-      setErrorMessage(error.message);
+      // setErrorMessage(error.message);
+      toast.error(error.message);
     }
   };
 
@@ -369,14 +372,20 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     setIsEmailVerifying(true);
     try {
       const response = await verifyApi.sendEmailOtp(email);
-      setUpdateMessage(
+      // setUpdateMessage(
+      //   response.message || t("BookingComponents.GuestInformationModal.otpSent")
+      // );
+      toast.success(
         response.message || t("BookingComponents.GuestInformationModal.otpSent")
       );
       setEmailOtpSent(true);
       setEmailCountdown(300);
       setEmailVerified(false);
     } catch (err: any) {
-      setErrorMessage(
+      // setErrorMessage(
+      //   err.message || t("BookingComponents.GuestInformationModal.otpSendFailed")
+      // );
+      toast.error(
         err.message || t("BookingComponents.GuestInformationModal.otpSendFailed")
       );
     } finally {
@@ -386,20 +395,25 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
 
   const handleVerifyEmailOtp = async () => {
     if (!emailOtp.trim()) {
-      setErrorMessage(t("BookingComponents.GuestInformationModal.otpEmptyError"));
+      // setErrorMessage(t("BookingComponents.GuestInformationModal.otpEmptyError"));
+      toast.error(t("BookingComponents.GuestInformationModal.otpEmptyError"));
       return;
     }
 
     try {
       const response = await verifyApi.verifyEmailOtp(email, emailOtp);
-      setUpdateMessage(t("BookingComponents.GuestInformationModal.emailVerified"));
+      // setUpdateMessage(t("BookingComponents.GuestInformationModal.emailVerified"));
+      toast.success(t("BookingComponents.GuestInformationModal.emailVerified"));
       setEmailVerified(true);
       setEmailOtpSent(false);
       setEmailCountdown(0);
       setEmailOtp("");
       setErrorMessage(null);
     } catch (err: any) {
-      setErrorMessage(
+      // setErrorMessage(
+      //   err.message || t("BookingComponents.GuestInformationModal.otpInvalidError")
+      // );
+      toast.error(
         err.message || t("BookingComponents.GuestInformationModal.otpInvalidError")
       );
     }
@@ -510,7 +524,10 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
 
     setIsLoading(true); // Set loading state to show loader
     try {
-      setUpdateMessage(
+      // setUpdateMessage(
+      //   t("BookingComponents.GuestInformationModal.informationVerified")
+      // );
+      toast.success(
         t("BookingComponents.GuestInformationModal.informationVerified")
       );
       dispatch(
@@ -529,7 +546,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       await getFinalPrice(selectedRoom, checkInDate, checkOutDate, guestData); // Await async call
       setActiveSection("review");
     } catch (error) {
-      setErrorMessage(t("BookingComponents.GuestInformationModal.updateError"));
+      // setErrorMessage(t("BookingComponents.GuestInformationModal.updateError"));\
+      toast.error(t("BookingComponents.GuestInformationModal.updateError"));
     } finally {
       setIsLoading(false); // Reset loading state
     }
@@ -543,14 +561,20 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         "";
       if (!propertyId) {
         console.log("Missing propertyId");
-        setErrorMessage(
+        // setErrorMessage(
+        //   t("BookingComponents.GuestInformationModal.propertyInfoMissing")
+        // );
+        toast.error(
           t("BookingComponents.GuestInformationModal.propertyInfoMissing")
         );
         return;
       }
       if (!finalPrice || !finalPrice.totalAmount) {
         console.log("Missing finalPrice or totalAmount");
-        setErrorMessage(
+        // setErrorMessage(
+        //   t("BookingComponents.GuestInformationModal.priceFetchError")
+        // );
+        toast.error(
           t("BookingComponents.GuestInformationModal.priceFetchError")
         );
         return;
@@ -609,7 +633,10 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         console.log("onConfirmBooking completed successfully");
       } catch (error) {
         console.error("Error in handleConfirmBooking:", error);
-        setErrorMessage(
+        // setErrorMessage(
+        //   t("BookingComponents.GuestInformationModal.bookingError")
+        // );
+        toast.error(
           t("BookingComponents.GuestInformationModal.bookingError")
         );
       } finally {
@@ -1011,18 +1038,30 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         <div className="mt-3 flex flex-col md:flex-row md:items-center gap-2">
                           <input
                             type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
                             placeholder={t("BookingComponents.GuestInformationModal.otpPlaceholder")}
                             value={emailOtp}
                             maxLength={6}
                             onChange={(e) => {
-                              setEmailOtp(e.target.value);
+                              const value = e.target.value.replace(/\D/g, '');
+                              setEmailOtp(value);
                               setErrorMessage(null);
+                            }}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab') {
+                                e.preventDefault();
+                              }
                             }}
                             className="w-full px-3 py-2 border border-tripswift-black/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue/30 text-sm transition-all duration-200"
                           />
                           <button
                             onClick={handleVerifyEmailOtp}
-                            className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition whitespace-nowrap"
+                            disabled={emailOtp.trim().length !== 6}
+                            className={`px-4 py-2 rounded-lg text-sm transition whitespace-nowrap ${emailOtp.trim().length !== 6
+                              ? 'bg-gray-300 text-black cursor-not-allowed'
+                              : 'bg-green-600 text-white hover:bg-green-700'
+                              }`}
                           >
                             {t("BookingComponents.GuestInformationModal.verifyOtp")}
                           </button>
@@ -1085,7 +1124,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                           disableSearchIcon={true}
                         />
                       </div>
-{/* {!phoneVerified && (
+                      {/* {!phoneVerified && (
   <button
     onClick={() => {
       if (phone && phone.replace(/\D/g, '').replace(/^91/, '').length >= 10) {
@@ -1110,7 +1149,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   </button>
 )} */}
 
-{/* {phoneOtpSent && phoneCountdown > 0 && !phoneVerified && (
+                      {/* {phoneOtpSent && phoneCountdown > 0 && !phoneVerified && (
   <div className="mt-3 flex flex-col md:flex-row md:items-center gap-2">
     <input
       type="text"
@@ -1256,15 +1295,13 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         </div>
                         <div>
                           <p className="text-xs text-tripswift-black/60">
-                            {t(
-                              "BookingComponents.GuestInformationModal.phone"
-                            )}
+                            {t("BookingComponents.GuestInformationModal.phone")}
                           </p>
                           <p
                             className={`text-sm font-tripswift-medium  ${i18n.language === "ar" ? "text-right" : ""}`}
                             dir="ltr"
                           >
-                            {"\u200E" + phone}
+                            {phone ? (phone.startsWith('+') ? phone : `+${phone}`) : ''}
                           </p>
                         </div>
                       </div>
@@ -1419,10 +1456,10 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
               }}
               disabled={
                 (activeSection === "details" &&
-                  (!emailVerified || 
-                   !validateGuestNames() || 
-                   !phone || // Check if phone exists
-                   !validatePhoneNumber() // Check if phone is valid
+                  (!emailVerified ||
+                    !validateGuestNames() ||
+                    !phone || // Check if phone exists
+                    !validatePhoneNumber() // Check if phone is valid
                   )) ||
                 (activeSection === "review" && !isFormUpdated) ||
                 isLoading

@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CryptoPaymentLog = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
-const timezone_convert_1 = __importDefault(require("../../../utils/timezone_convert"));
 const cryptoPaymentSchema = new mongoose_1.default.Schema({
     customer_id: {
         type: mongoose_1.default.Schema.Types.ObjectId,
@@ -43,15 +42,15 @@ const cryptoPaymentSchema = new mongoose_1.default.Schema({
     },
     initiatedTime: {
         type: Date,
-        default: (0, timezone_convert_1.default)(),
+        default: new Date(),
     },
     createdAt: {
         type: Date,
-        default: (0, timezone_convert_1.default)(),
+        default: new Date(),
     },
     updatedAt: {
         type: Date,
-        default: (0, timezone_convert_1.default)(),
+        default: new Date(),
     }
 });
 const cryptoPaymentLogSchema = new mongoose_1.default.Schema({
@@ -77,15 +76,15 @@ const cryptoPaymentLogSchema = new mongoose_1.default.Schema({
     },
     initiatedTime: {
         type: Date,
-        default: timezone_convert_1.default,
+        default: new Date(),
     },
     createdAt: {
         type: Date,
-        default: timezone_convert_1.default,
+        default: new Date(),
     },
     updatedAt: {
         type: Date,
-        default: timezone_convert_1.default,
+        default: new Date(),
     }
 }, {
     timestamps: false,

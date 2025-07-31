@@ -23,12 +23,13 @@ const reservationModel_1 = require("../../../wincloud/src/model/reservationModel
 const stripe_service_1 = __importDefault(require("../services/stripe.service"));
 const cancelReservationService_1 = require("../../../wincloud/src/service/cancelReservationService");
 const cryptoUserPaymentInitialStage_model_1 = require("../models/cryptoUserPaymentInitialStage.model");
-const email_service_1 = __importDefault(require("../../../customer_authentication/src/services/email.service"));
 const handlebars_1 = __importDefault(require("handlebars"));
 const inventoryModel_1 = require("../../../wincloud/src/model/inventoryModel");
 const auth_model_1 = __importDefault(require("../../../user_authentication/src/Model/auth.model"));
 const property_info_model_1 = require("../../../property_management/src/model/property.info.model");
 const auth_model_2 = __importDefault(require("../../../user_authentication/src/Model/auth.model"));
+const mailFactory_1 = require("../../../customer_authentication/src/services/mailFactory");
+const mailer = mailFactory_1.MailFactory.getMailer();
 const calculateAgeCategory = (dob) => {
     const birthDate = new Date(dob);
     const today = new Date();
@@ -48,7 +49,7 @@ const reduceRoomsAfterBookingConfirmed = (res, hotelCode, roomTypeCode, numberOf
     console.log(`Get data for reduce rooms ${hotelCode} | ${roomTypeCode} | ${numberOfRooms} | ${dates}`);
     const requiredFields = { hotelCode, roomTypeCode, numberOfRooms, dates };
     const missingFields = Object.entries(requiredFields)
-        .filter(([key, value]) => value === undefined || value === null || value === "" || (key === 'startDate' && (!Array.isArray(value) || value.length !== 2)))
+        .filter(([key, value]) => value === undefined || value === null || value === "" || (key === 'dates' && (!Array.isArray(value) || value.length !== 2)))
         .map(([key]) => key);
     if (missingFields.length > 0) {
         return {
@@ -56,18 +57,25 @@ const reduceRoomsAfterBookingConfirmed = (res, hotelCode, roomTypeCode, numberOf
         };
     }
     const [checkInDate, checkOutDate] = dates;
-    if (checkInDate > checkOutDate) {
+    if (checkInDate >= checkOutDate) {
         return {
-            message: "Check-in date must be before or equal to check-out date",
+            message: "Check-in date must be before check-out date",
         };
     }
     try {
+        // Calculate the date range excluding the checkout date
+        const dateRange = [];
+        let currentDate = new Date(checkInDate);
+        const endDate = new Date(checkOutDate);
+        while (currentDate < endDate) {
+            dateRange.push(new Date(currentDate));
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
         const inventoryRecords = yield inventoryModel_1.Inventory.find({
             hotelCode,
             invTypeCode: roomTypeCode,
             'availability.startDate': {
-                $gte: new Date(checkInDate),
-                $lte: new Date(checkOutDate),
+                $in: dateRange,
             },
         });
         if (!inventoryRecords || inventoryRecords.length === 0) {
@@ -122,12 +130,18 @@ const reduceRoomsAfterBookingConfirmedCrypto = (hotelCode, roomTypeCode, numberO
     if (checkInDate > checkOutDate) {
         throw new Error("Check-in date must be before or equal to check-out date");
     }
+    const dateRange = [];
+    let currentDate = new Date(checkInDate);
+    const endDate = new Date(checkOutDate);
+    while (currentDate < endDate) {
+        dateRange.push(new Date(currentDate));
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
     const inventoryRecords = yield inventoryModel_1.Inventory.find({
         hotelCode,
         invTypeCode: roomTypeCode,
         'availability.startDate': {
-            $gte: new Date(checkInDate),
-            $lte: new Date(checkOutDate),
+            $in: dateRange,
         },
     });
     if (!inventoryRecords || inventoryRecords.length === 0) {
@@ -177,12 +191,18 @@ const increaseRoomsAfterBookingCancelled = (res, hotelCode, roomTypeCode, number
         };
     }
     try {
+        const dateRange = [];
+        let currentDate = new Date(checkInDate);
+        const endDate = new Date(checkOutDate);
+        while (currentDate < endDate) {
+            dateRange.push(new Date(currentDate));
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
         const inventoryRecords = yield inventoryModel_1.Inventory.find({
             hotelCode,
             invTypeCode: roomTypeCode,
             'availability.startDate': {
-                $gte: new Date(checkInDate),
-                $lte: new Date(checkOutDate),
+                $in: dateRange,
             },
         });
         if (!inventoryRecords || inventoryRecords.length === 0) {
@@ -507,7 +527,7 @@ exports.createReservationWithStoredCard = (0, catchAsyncError_1.CatchAsyncError)
                 guests: categorizedGuests,
                 supportEmail: 'support@alhajz.com',
                 supportPhone: '+1-800-123-4567',
-                websiteUrl: 'https://book.trip-swift.ai',
+                websiteUrl: 'https://alhajz.ai',
                 currentYear: new Date().getFullYear(),
                 companyName: 'Al-Hajz',
                 companyAddress: '1234 Example St, City, Country',
@@ -516,11 +536,11 @@ exports.createReservationWithStoredCard = (0, catchAsyncError_1.CatchAsyncError)
             const template = handlebars_1.default.compile(htmlContent);
             // Generate the final HTML by replacing placeholders with actual data
             const finalHtml = template(templateData);
-            yield email_service_1.default.sendEmail({
+            yield mailer.sendMail({
                 to: email,
-                text: `Your booking has been confirmed`,
                 subject: `Booking Confirmation - ${hotelName}`,
                 html: finalHtml,
+                text: `Your booking has been confirmed`,
             });
         }
         catch (error) {
@@ -776,18 +796,18 @@ function createReservationWithCryptoPayment(input) {
                 guests: categorizedGuests,
                 supportEmail: 'support@alhajz.com',
                 supportPhone: '+1-800-123-4567',
-                websiteUrl: 'https://book.trip-swift.ai',
+                websiteUrl: 'https://alhajz.ai',
                 currentYear: new Date().getFullYear(),
                 companyName: 'Al-Hajz',
                 companyAddress: '1234 Example St, City, Country',
             };
             const template = handlebars_1.default.compile(htmlContent);
             const finalHtml = template(templateData);
-            yield email_service_1.default.sendEmail({
+            yield mailer.sendMail({
                 to: email,
-                text: `Your reservation has been confirmed`,
-                subject: `Reservation Confirmation - ${hotelName}`,
+                subject: `Booking Confirmation - ${hotelName}`,
                 html: finalHtml,
+                text: `Your booking has been confirmed`,
             });
             return {
                 message: "Reservation with crypto confirmed",
@@ -1083,19 +1103,25 @@ exports.updateThirdPartyReservation = (0, catchAsyncError_1.CatchAsyncError)((re
                 guests: categorizedGuests,
                 supportEmail: 'support@alhajz.com',
                 supportPhone: '+1-800-123-4567',
-                websiteUrl: 'https://book.trip-swift.ai',
+                websiteUrl: 'https://alhajz.ai',
                 currentYear: new Date().getFullYear(),
                 companyName: 'Al-Hajz',
                 companyAddress: '1234 Example St, City, Country',
             };
             const template = handlebars_1.default.compile(htmlContent);
             const finalHtml = template(templateData);
-            yield email_service_1.default.sendEmail({
+            yield mailer.sendMail({
                 to: email,
-                text: `Your reservation update has been confirmed`,
-                subject: `Reservation Confirmation - ${hotelName}`,
+                subject: `Booking Confirmation - ${hotelName}`,
                 html: finalHtml,
+                text: `Your reservation update has been confirmed`,
             });
+            // await EmailService.sendEmail({
+            //   to: email,
+            //   text: `Your reservation update has been confirmed`,
+            //   subject: `Reservation Confirmation - ${hotelName}`,
+            //   html: finalHtml,
+            // });
         }
         catch (error) {
             return res.status(500).json({ message: error.message || "Failed to update reservation" });
@@ -1292,18 +1318,24 @@ exports.cancelThirdPartyReservation = (0, catchAsyncError_1.CatchAsyncError)((re
                 checkOutDate: new Date(checkOutDate).toLocaleDateString(),
                 supportEmail: 'support@alhajz.com',
                 supportPhone: '+1-800-123-4567',
-                websiteUrl: 'https://book.trip-swift.ai',
+                websiteUrl: 'https://alhajz.ai',
                 currentYear: new Date().getFullYear(),
                 companyName: 'Al-Hajz',
                 companyAddress: '1234 Example St, City, Country',
             };
             const template = handlebars_1.default.compile(htmlContent);
             const finalHtml = template(templateData);
-            yield email_service_1.default.sendEmail({
+            yield mailer.sendMail({
                 to: email,
                 subject: `Booking Cancellation Confirmation - ${hotelName}`,
                 html: finalHtml,
+                text: `Your reservation update has been confirmed`,
             });
+            // await EmailService.sendEmail({
+            //   to: email,
+            //   subject: `Booking Cancellation Confirmation - ${hotelName}`,
+            //   html: finalHtml,
+            // });
             console.log(`✅ Cancellation confirmation email sent to ${email}`);
             res.status(200).json({
                 message: "Reservation cancellation processed successfully",
