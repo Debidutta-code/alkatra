@@ -136,11 +136,11 @@ export default function Navbar() {
                       Manage Bookings
                     </Button>
                   </Link>
-                  <Link href="/app/revenue">
+                  {/* <Link href="/app/revenue">
                     <Button variant="ghost" className="w-full justify-start">
                       Revenue
                     </Button>
-                  </Link>
+                  </Link> */}
                   {user && (user.role === "superAdmin" || user.role === "groupManager") && (
                     <Link href="/app/manageMembers">
                       <Button variant="ghost" className="w-full justify-start">
