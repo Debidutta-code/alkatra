@@ -78,9 +78,12 @@ export const RoomCard: React.FC<RoomCardProps> = ({
     if (!text) return "";
     const words = text.trim().split(/\s+/);
     if (words.length <= wordLimit) return text;
-    return words.slice(0, wordLimit).join(" ") + "...";
+    return words.slice(0, wordLimit).join(" ");
   };
   const truncatedDescription = truncateDescription(data.description || "");
+  const hasLongDescription = data.description && data.description.trim().split(/\s+/).length > 8;
+
+  const [showFullDescription, setShowFullDescription] = useState(false);
   const handleBookNow = () => {
     if (!isPriceAvailable) return;
     const accessToken = Cookies.get("accessToken");
@@ -291,9 +294,38 @@ export const RoomCard: React.FC<RoomCardProps> = ({
                 ))}
               </div> */}
             </div>
-            <p className="text-description line-clamp-2 mt-1">
-              {truncatedDescription}
-            </p>
+            <div className="mt-1">
+              <p className="text-description">
+                {showFullDescription ? (
+                  <>
+                    {data.description}
+                    {hasLongDescription && (
+                      <button
+                        onClick={() => setShowFullDescription(false)}
+                        className="text-xs text-tripswift-blue hover:text-[#054B8F] font-tripswift-medium ml-1 transition-colors duration-200 inline-flex items-center"
+                      >
+                        ({t('RoomsPage.RoomCard.showLess')})
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {truncatedDescription}
+                    {hasLongDescription && (
+                      <>
+                        <span className="text-tripswift-black/40">... </span>
+                        <button
+                          onClick={() => setShowFullDescription(true)}
+                          className="text-xs text-tripswift-blue hover:text-[#054B8F] font-tripswift-medium transition-colors duration-200 inline-flex items-center"
+                        >
+                          ({t('RoomsPage.RoomCard.seeMore')})
+                        </button>
+                      </>
+                    )}
+                  </>
+                )}
+              </p>
+            </div>
           </CardHeader>
 
           {/* Content */}

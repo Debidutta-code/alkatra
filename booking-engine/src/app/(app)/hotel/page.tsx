@@ -3,7 +3,7 @@ import React, { Suspense } from 'react'
 
 const page = () => {
   return (
-    <Suspense fallback={<div>Loading rooms...</div>}>
+    <Suspense>
       <RoomsPage />
     </Suspense>
 

@@ -101,7 +101,7 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
             onClick={() => onViewRoom(hotel._id)}
         >            <div className="flex flex-col md:flex-row">
                 {/* Hotel image */}
-                <div className="md:w-1/3 h-52 md:h-auto relative overflow-hidden">
+                <div className="md:w-1/3 h-72 md:h-80 relative overflow-hidden">
                     <img
                         src={hotel.image && hotel.image.length > 0 ? hotel.image[0] : defaultHotelImage}
                         alt={hotel.property_name}
