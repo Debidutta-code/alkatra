@@ -124,6 +124,7 @@ const RoomsPage: React.FC = () => {
   const [propertyCode, setPropertyCode] = useState<string>("");
   const [roomTypeCode, setRoomTypeCode] = useState<string[]>([]);
   const [roomAmenities, setRoomAmenities] = useState<{ [key: string]: any }>({});
+  const [unavailableRoomTypes, setUnavailableRoomTypes] = useState<{ roomType: string; dates: string[] }[]>([]);
 
 
   // New state for handling 400 error
@@ -206,72 +207,72 @@ const RoomsPage: React.FC = () => {
 
 
   useEffect(() => {
-  const fetchRooms = async () => {
-    if (!propertyId || !propertyCode) return;
+    const fetchRooms = async () => {
+      if (!propertyId || !propertyCode) return;
 
-    setIsLoading(true);
-    setShowRoomNotAvailable(false);
-    console.log("Fetching rooms for property:", propertyId, "with code:", propertyCode);
+      setIsLoading(true);
+      setShowRoomNotAvailable(false);
+      console.log("Fetching rooms for property:", propertyId, "with code:", propertyCode);
 
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}?numberOfRooms=${guestDetails?.rooms || 1}`,
-        {
-          startDate: checkInDate,
-          endDate: checkOutDate,
-          hotelCode: propertyCode,
+      try {
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}?numberOfRooms=${guestDetails?.rooms || 1}`,
+          {
+            startDate: checkInDate,
+            endDate: checkOutDate,
+            hotelCode: propertyCode,
+          }
+        );
+        const roomData = response.data.data;
+        console.log("The room data:", roomData);
+        setRooms(response.data);
+        setUnavailableRoomTypes(response.data.unavailableRoomTypes || []); // Set unavailable room types
+
+        if (response.data.qrCode) {
+          setQrCodeData({
+            qrCode: response.data.qrCode,
+            couponCode: response.data.couponCode || "",
+          });
         }
-      );
-      const roomData = response.data.data;
-      console.log("The room data:", roomData);
-      setRooms(response.data);
-
-      if (response.data.qrCode) {
-        setQrCodeData({
-          qrCode: response.data.qrCode,
-          couponCode: response.data.couponCode || "",
-        });
+      } catch (error) {
+        console.error("Error fetching rooms:", error);
+        if (axios.isAxiosError(error)) {
+          setShowRoomNotAvailable(true);
+        } else {
+          setRooms({ success: true, data: [] });
+        }
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching rooms:", error);
-      if (axios.isAxiosError(error)) {
-        setShowRoomNotAvailable(true);
-      } else {
-        setRooms({ success: true, data: [] });
+    };
+    const fetchAminities = async () => {
+      if (!propertyId) return;
+
+      try {
+        const amenitiesResponse = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/amenite/${propertyId}`
+        );
+        const amenitiesData = amenitiesResponse.data.data;
+        console.log("Amenities Data:", amenitiesData);
+        const amenitiesMap = amenitiesData.reduce((acc: { [key: string]: any }, item: any) => {
+          const roomType = item.room_type || "default";
+          acc[roomType] = item.amenities;
+          return acc;
+        }, {});
+        console.log("Amenities Map:", amenitiesMap);
+        setRoomAmenities(amenitiesMap);
+      } catch (error) {
+        console.error("Error fetching amenities:", error);
       }
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
 
-  const fetchAminities = async () => {
-    if (!propertyId) return;
+    const fetchData = async () => {
+      await fetchRooms();
+      await fetchAminities();
+    };
 
-    try {
-      const amenitiesResponse = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/amenite/${propertyId}`
-      );
-      const amenitiesData = amenitiesResponse.data.data;
-      console.log("Amenities Data:", amenitiesData);
-      const amenitiesMap = amenitiesData.reduce((acc: { [key: string]: any }, item: any) => {
-        const roomType = item.room_type || "default";
-        acc[roomType] = item.amenities;
-        return acc;
-      }, {});
-      console.log("Amenities Map:", amenitiesMap);
-      setRoomAmenities(amenitiesMap);
-    } catch (error) {
-      console.error("Error fetching amenities:", error);
-    }
-  };
-
-  const fetchData = async () => {
-    await fetchRooms();
-    await fetchAminities();
-  };
-
-  fetchData();
-}, [propertyId, checkInDate, checkOutDate, propertyCode, guestDetails?.rooms]);
+    fetchData();
+  }, [propertyId, checkInDate, checkOutDate, propertyCode, guestDetails?.rooms]);
 
 
   useEffect(() => {
@@ -1113,18 +1114,32 @@ const RoomsPage: React.FC = () => {
                 const guestCount = guestDetails?.guests || 1;
                 const matchingRate =
                   room.baseByGuestAmts.find((rate) => rate.numberOfGuests === guestCount) ||
-                  room.baseByGuestAmts[0]; // Fallback to first rate
+                  room.baseByGuestAmts[0];
                 displayPrice = `${room.currency_code} ${matchingRate.amountBeforeTax.toFixed(2)}`;
               }
 
+              // Check if the room type is unavailable
+              const isUnavailable = unavailableRoomTypes.some(
+                (unavailable) => unavailable.roomType === room.room_type
+              );
+
               return (
-                <RoomCard
+                <div
                   key={room._id}
-                  data={convertAmenities(room)}
-                  price={displayPrice}
-                  onBookNow={() => handleBookNow(room)}
-                  isPriceAvailable={room.has_valid_rate}
-                />
+                  className={`relative ${isUnavailable ? "blur-sm opacity-60" : ""}`}
+                >
+                  <RoomCard
+                    data={convertAmenities(room)}
+                    price={displayPrice}
+                    onBookNow={() => handleBookNow(room)}
+                    isPriceAvailable={room.has_valid_rate && !isUnavailable} // Disable booking for unavailable rooms
+                  />
+                  {isUnavailable && (
+                    <div className="absolute top-4 left-4 z-20 bg-gray-600 text-tripswift-off-white text-xs font-tripswift-semibold py-1 px-2.5 rounded-full flex items-center shadow-md">
+                      {t("RoomsPage.RoomCard.notAvailable")}
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>
