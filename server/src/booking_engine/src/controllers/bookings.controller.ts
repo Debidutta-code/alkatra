@@ -945,12 +945,12 @@ export async function createReservationWithCryptoPayment(input: {
     const template = Handlebars.compile(htmlContent);
     const finalHtml = template(templateData);
 
-    await EmailService.sendEmail({
-      to: email,
-      text: `Your reservation has been confirmed`,
-      subject: `Reservation Confirmation - ${hotelName}`,
-      html: finalHtml,
-    });
+    await mailer.sendMail({
+          to: email,
+          subject: `Booking Confirmation - ${hotelName}`,
+          html: finalHtml,
+          text: `Your booking has been confirmed`,
+        });
 
     return {
       message: "Reservation with crypto confirmed",
@@ -1281,13 +1281,20 @@ export const updateThirdPartyReservation = CatchAsyncError(
         const template = Handlebars.compile(htmlContent);
         const finalHtml = template(templateData);
 
-
-        await EmailService.sendEmail({
+        await mailer.sendMail({
           to: email,
-          text: `Your reservation update has been confirmed`,
-          subject: `Reservation Confirmation - ${hotelName}`,
+          subject: `Booking Confirmation - ${hotelName}`,
           html: finalHtml,
+          text: `Your reservation update has been confirmed`,
         });
+
+
+        // await EmailService.sendEmail({
+        //   to: email,
+        //   text: `Your reservation update has been confirmed`,
+        //   subject: `Reservation Confirmation - ${hotelName}`,
+        //   html: finalHtml,
+        // });
       } catch (error: any) {
         return res.status(500).json({ message: error.message || "Failed to update reservation" });
       }
@@ -1500,11 +1507,18 @@ export const cancelThirdPartyReservation = CatchAsyncError(
         const template = Handlebars.compile(htmlContent);
         const finalHtml = template(templateData);
 
-        await EmailService.sendEmail({
+         await mailer.sendMail({
           to: email,
           subject: `Booking Cancellation Confirmation - ${hotelName}`,
           html: finalHtml,
+          text: `Your reservation update has been confirmed`,
         });
+
+        // await EmailService.sendEmail({
+        //   to: email,
+        //   subject: `Booking Cancellation Confirmation - ${hotelName}`,
+        //   html: finalHtml,
+        // });
         console.log(`✅ Cancellation confirmation email sent to ${email}`);
 
         res.status(200).json({
