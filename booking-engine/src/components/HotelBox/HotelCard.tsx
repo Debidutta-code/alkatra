@@ -85,11 +85,14 @@ const HotelCard = () => {
         style={{ transform: `translateY(${isScrolled ? "5%" : "0"})` }}
       >
         <Image
-          src={Home}
+          src="/assets/popular/Home.jpg"
           alt="Luxury Accommodation - TripSwift"
           className="object-cover w-full h-full"
+          width={800}
+          height={500}
           priority
           quality={95}
+          unoptimized
         />
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-tripswift-black/50 via-tripswift-black/30 to-tripswift-black/60" />

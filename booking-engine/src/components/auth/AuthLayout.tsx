@@ -3,12 +3,8 @@ import Image from "next/image";
 import { CheckCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { usePathname } from "next/navigation";
-import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
-import LoginImg from "@/components/assets/login.jpg";
-import LoginIcon from "@/components/assets/TRIP-1.png";
-import LoginIconMob from "@/components/assets/TRIP-1.png";
+import { useGoogleLogin } from "@react-oauth/google";
 import { useRouter } from "next/navigation";
-import Cookies from 'js-cookie';
 import { useDispatch } from "react-redux";
 import { googleLogin } from "@/Redux/slices/auth.slice";
 import toast from "react-hot-toast"
@@ -94,23 +90,27 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         <div className="absolute inset-0 bg-[url('/patterns/dot-pattern.png')] opacity-10 z-20"></div>
         <div className="absolute inset-0 transition-transform duration-3000 hover:scale-105">
           <Image
-            src={LoginImg}
+            src="/assets/login.jpg"
             alt={t('Auth.Layout.travelDestinationAlt')}
-            layout="fill"
-            objectFit="cover"
+            // layout="fill"
+            // objectFit="cover"
+            width={1200}
+            height={600}
             className="object-center filter saturate-110"
             priority
             quality={95}
+            unoptimized
           />
         </div>
         <div className="absolute inset-0 flex flex-col justify-center items-start z-30 p-16">
           <div className="mb-6 drop-shadow-2xl transform hover:scale-105 transition-transform duration-300">
             <Image
-              src={LoginIcon}
+              src="/assets/TRIP-1.png"
               width={160}
               height={80}
               alt="TripSwift"
               className="filter brightness-105"
+              unoptimized
             />
           </div>
           <h1 className="text-5xl font-tripswift-extrabold text-tripswift-off-white mb-5 tracking-tight drop-shadow-lg">
@@ -140,11 +140,12 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         <div className="w-full max-w-[410px]">
           <div className="flex justify-center mb-6 lg:hidden">
             <Image
-              src={LoginIconMob}
+              src="/assets/TRIP-1.png"
               width={140}
               height={70}
               alt="TripSwift"
               className="drop-shadow-lg"
+              unoptimized
             />
           </div>
           <div className="bg-tripswift-off-white items-center rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] overflow-hidden transition-all duration-300 hover:shadow-[0_20px_80px_rgba(7,109,179,0.07)]">

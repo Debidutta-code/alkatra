@@ -7,7 +7,7 @@ export const app = express();
 
 app.use(
     cors({
-      origin: ["http://localhost:3000", "https://dashboard.trip-swift.ai", "http://localhost:3004", "http://localhost:3001", "https://app.trip-swift.ai"], 
+      origin: ["https://alhajz.ai",'https://extranet.alhajz.ai', 'http://localhost:3004'], 
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"], 
       allowedHeaders: ["Content-Type", "Authorization", "Cache-Control", "Pragma", "Expires"],
       credentials: true,

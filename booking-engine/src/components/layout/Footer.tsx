@@ -24,11 +24,12 @@ const Footer = (props: Props) => {
             {/* Logo Section */}
             <div className="flex items-start">
               <Image
-                src={img}
+                src="/assets/TRIP-1.png"
                 width={170}
                 height={20}
                 alt="TripSwift - Redefines Hospitality Technology"
                 className="object-contain"
+                unoptimized
               />
             </div>
 

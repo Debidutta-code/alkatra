@@ -157,7 +157,7 @@ const Navbar: React.FC = () => {
         >
           <div className="overflow-hidden">
             <Image
-              src={Logo}
+              src="/assets/TRIP-1.png"
               width={280}
               height={70}
               alt="TripSwift - Redefines Hospitality Technology"
@@ -209,7 +209,7 @@ const Navbar: React.FC = () => {
             onClick={handleMyTripClick}
             className="flex items-center cursor-pointer px-3 py-2 rounded-full text-tripswift-black hover:text-tripswift-blue hover:bg-tripswift-blue/5 text-[15px] leading-[20px] tracking-tight font-tripswift-medium transition-all duration-300"
           >
-            <Image src={MTrip} width={16} height={16} alt={t('Navbar.myTrip')} className={` text-tripswift-blue ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
+            <Image src="/assets/traveling.png" width={16} height={16} alt={t('Navbar.myTrip')} className={` text-tripswift-blue ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} unoptimized />
             <span>{t('Navbar.myTrip')}</span>
           </div>
 
@@ -334,7 +334,7 @@ const Navbar: React.FC = () => {
               onClick={handleMyTripClick}
               className="flex items-center gap-2 py-2 px-1 hover:bg-tripswift-blue hover:bg-opacity-10 rounded cursor-pointer"
             >
-              <Image src={MTrip} width={18} height={18} alt={t('Navbar.myTrip')} />
+              <Image src="/assets/traveling.png" width={18} height={18} alt={t('Navbar.myTrip')} unoptimized />
               <span className="text-tripswift-black font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]">
                 {t('Navbar.myTrip')}
               </span>
