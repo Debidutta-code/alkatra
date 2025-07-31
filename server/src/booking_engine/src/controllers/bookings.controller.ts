@@ -510,6 +510,7 @@ export const createReservationWithStoredCard = CatchAsyncError(
               text-decoration: none;
               border-radius: 5px;
               font-weight: bold;
+              text-color
             }
 
             @media only screen and (max-width: 600px) {
@@ -589,13 +590,12 @@ export const createReservationWithStoredCard = CatchAsyncError(
               </table>
 
               <p>For any questions or to modify your reservation, please contact us at <a
-                  href="mailto:{{supportEmail}}">{{supportEmail}}</a> or call {{supportPhone}}.</p>
+                  href="mailto:{{supportEmail}}">{{supportEmail}}</a>.</p>
 
               <a href="{{websiteUrl}}" class="button">View Your Booking</a>
             </div>
             <div class="footer">
               <p>&copy; {{currentYear}} {{companyName}}. All rights reserved.</p>
-              <p>{{companyAddress}}</p>
             </div>
           </div>
         </body>
@@ -614,12 +614,11 @@ export const createReservationWithStoredCard = CatchAsyncError(
           email: email,
           phone: phone,
           guests: categorizedGuests,
-          supportEmail: 'support@alhajz.com',
-          supportPhone: '+1-800-123-4567',
+          supportEmail: 'business.alhajz@gmail.com',
+          // supportPhone: '+1-800-123-4567',
           websiteUrl: 'https://alhajz.ai',
           currentYear: new Date().getFullYear(),
           companyName: 'Al-Hajz',
-          companyAddress: '1234 Example St, City, Country',
         };
 
         // Compile the Handlebars template
@@ -910,13 +909,12 @@ export async function createReservationWithCryptoPayment(input: {
               </table>
 
               <p>For any questions or to modify your reservation, please contact us at <a
-                  href="mailto:{{supportEmail}}">{{supportEmail}}</a> or call {{supportPhone}}.</p>
+                  href="mailto:{{supportEmail}}">{{supportEmail}}</a>.</p>
 
               <a href="{{websiteUrl}}" class="button">View Your Booking</a>
             </div>
             <div class="footer">
               <p>&copy; {{currentYear}} {{companyName}}. All rights reserved.</p>
-              <p>{{companyAddress}}</p>
             </div>
           </div>
         </body>
@@ -934,12 +932,11 @@ export async function createReservationWithCryptoPayment(input: {
       email,
       phone,
       guests: categorizedGuests,
-      supportEmail: 'support@alhajz.com',
-      supportPhone: '+1-800-123-4567',
-      websiteUrl: 'https://alhajz.ai',
+      supportEmail: 'https://alhajz.ai',
+      // supportPhone: '+1-800-123-4567',
+      websiteUrl: 'business.alhajz@gmail.com',
       currentYear: new Date().getFullYear(),
       companyName: 'Al-Hajz',
-      companyAddress: '1234 Example St, City, Country',
     };
 
     const template = Handlebars.compile(htmlContent);
@@ -1075,188 +1072,183 @@ export const updateThirdPartyReservation = CatchAsyncError(
         await thirdPartyService.processAmendReservation(amendReservationInput);
         await reduceRoomsAfterBookingConfirmed(res, hotelCode, roomTypeCode, numberOfRooms, [checkIn, checkOutDate]);
         const htmlContent = `<!DOCTYPE html>
-<html lang="en">
+          <html lang="en">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 0;
-    }
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+              body {
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 0;
+              }
 
-    .container {
-      max-width: 600px;
-      margin: 20px auto;
-      background-color: #ffffff;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+              .container {
+                max-width: 600px;
+                margin: 20px auto;
+                background-color: #ffffff;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+              }
 
-    .header {
-      background-color: #1a73e8;
-      color: #ffffff;
-      padding: 20px;
-      text-align: center;
-    }
+              .header {
+                background-color: #1a73e8;
+                color: #ffffff;
+                padding: 20px;
+                text-align: center;
+              }
 
-    .header h1 {
-      margin: 0;
-      font-size: 24px;
-    }
+              .header h1 {
+                margin: 0;
+                font-size: 24px;
+              }
 
-    .content {
-      padding: 20px;
-    }
+              .content {
+                padding: 20px;
+              }
 
-    .content h2 {
-      color: #333333;
-      font-size: 20px;
-      margin-top: 0;
-    }
+              .content h2 {
+                color: #333333;
+                font-size: 20px;
+                margin-top: 0;
+              }
 
-    .content p {
-      color: #666666;
-      line-height: 1.6;
-      margin: 10px 0;
-    }
+              .content p {
+                color: #666666;
+                line-height: 1.6;
+                margin: 10px 0;
+              }
 
-    .details-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 20px 0;
-    }
+              .details-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+              }
 
-    .details-table th,
-    .details-table td {
-      padding: 10px;
-      text-align: left;
-      border-bottom: 1px solid #dddddd;
-    }
+              .details-table th,
+              .details-table td {
+                padding: 10px;
+                text-align: left;
+                border-bottom: 1px solid #dddddd;
+              }
 
-    .details-table th {
-      background-color: #f8f8f8;
-      color: #333333;
-      font-weight: bold;
-    }
+              .details-table th {
+                background-color: #f8f8f8;
+                color: #333333;
+                font-weight: bold;
+              }
 
-    .footer {
-      background-color: #f4f4f4;
-      padding: 15px;
-      text-align: center;
-      color: #888888;
-      font-size: 12px;
-    }
+              .footer {
+                background-color: #f4f4f4;
+                padding: 15px;
+                text-align: center;
+                color: #888888;
+                font-size: 12px;
+              }
 
-    .button {
-      display: inline-block;
-      padding: 10px 20px;
-      margin: 20px 0;
-      background-color: #1a73e8;
-      color: #ffffff;
-      text-decoration: none;
-      border-radius: 5px;
-      font-weight: bold;
-    }
+              .button {
+                display: inline-block;
+                padding: 10px 20px;
+                margin: 20px 0;
+                background-color: #1a73e8;
+                color: #ffffff;
+                text-decoration: none;
+                border-radius: 5px;
+                font-weight: bold;
+              }
 
-    @media only screen and (max-width: 600px) {
-      .container {
-        width: 100%;
-        margin: 10px;
-      }
+              @media only screen and (max-width: 600px) {
+                .container {
+                  width: 100%;
+                  margin: 10px;
+                }
 
-      .header h1 {
-        font-size: 20px;
-      }
+                .header h1 {
+                  font-size: 20px;
+                }
 
-      .content h2 {
-        font-size: 18px;
-      }
-    }
-  </style>
-</head>
+                .content h2 {
+                  font-size: 18px;
+                }
+              }
+            </style>
+          </head>
 
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>Booking Update Confirmation</h1>
-    </div>
-    <div class="content">
-      <h2>Dear {{guestName}},</h2>
-      <p>Your reservation with {{hotelName}} has been successfully updated. Below are the updated details for your
-        booking.</p>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1>Booking Update Confirmation</h1>
+              </div>
+              <div class="content">
+                <h2>Dear {{guestName}},</h2>
+                <p>Your reservation with {{hotelName}} has been successfully updated. Below are the updated details for your
+                  booking.</p>
 
-      <h2>Updated Reservation Details</h2>
-      <table class="details-table">
-        <tr>
-          <th>Hotel Name</th>
-          <td>{{hotelName}}</td>
-        </tr>
-        <!-- <tr>
-          <th>Hotel Code</th>
-          <td>{{hotelCode}}</td>
-        </tr> -->
-        <tr>
-          <th>Check-In Date</th>
-          <td>{{checkInDate}}</td>
-        </tr>
-        <tr>
-          <th>Check-Out Date</th>
-          <td>{{checkOutDate}}</td>
-        </tr>
-        <tr>
-          <th>Room Type</th>
-          <td>{{roomTypeCode}}</td>
-        </tr>
-        <tr>
-          <th>Number of Rooms</th>
-          <td>{{numberOfRooms}}</td>
-        </tr>
-        <tr>
-          <th>Total Price</th>
-          <td>{{roomTotalPrice}} {{currencyCode}}</td>
-        </tr>
-        <tr>
-          <th>Contact Email</th>
-          <td>{{email}}</td>
-        </tr>
-        <tr>
-          <th>Contact Phone</th>
-          <td>{{phone}}</td>
-        </tr>
-      </table>
+                <h2>Updated Reservation Details</h2>
+                <table class="details-table">
+                  <tr>
+                    <th>Hotel Name</th>
+                    <td>{{hotelName}}</td>
+                  </tr>
+                  <!-- <tr>
+                    <th>Hotel Code</th>
+                    <td>{{hotelCode}}</td>
+                  </tr> -->
+                  <tr>
+                    <th>Check-In Date</th>
+                    <td>{{checkInDate}}</td>
+                  </tr>
+                  <tr>
+                    <th>Check-Out Date</th>
+                    <td>{{checkOutDate}}</td>
+                  </tr>
+                  <tr>
+                    <th>Room Type</th>
+                    <td>{{roomTypeCode}}</td>
+                  </tr>
+                  <tr>
+                    <th>Number of Rooms</th>
+                    <td>{{numberOfRooms}}</td>
+                  </tr>
+                  <tr>
+                    <th>Total Price</th>
+                    <td>{{roomTotalPrice}} {{currencyCode}}</td>
+                  </tr>
+                  <tr>
+                    <th>Contact Email</th>
+                    <td>{{email}}</td>
+                  </tr>
+                </table>
 
-      <h2>Guest Details</h2>
-      <table class="details-table">
-        <tr>
-          <th>Name</th>
-          <th>Age Category</th>
-        </tr>
-        {{#each guests}}
-        <tr>
-          <td>{{firstName}} {{lastName}}</td>
-          <td>{{category}} (Age {{age}})</td>
-        </tr>
-        {{/each}}
-      </table>
+                <h2>Guest Details</h2>
+                <table class="details-table">
+                  <tr>
+                    <th>Name</th>
+                    <th>Age Category</th>
+                  </tr>
+                  {{#each guests}}
+                  <tr>
+                    <td>{{firstName}} {{lastName}}</td>
+                    <td>{{category}} (Age {{age}})</td>
+                  </tr>
+                  {{/each}}
+                </table>
 
-      <p>If you have any questions or need further modifications to your reservation, please contact us at <a
-          href="mailto:{{supportEmail}}">{{supportEmail}}</a> or call {{supportPhone}}.</p>
+                <p>If you have any questions or need further modifications to your reservation, please contact us at <a
+                    href="mailto:{{supportEmail}}">{{supportEmail}}</a>.</p>
 
-      <a href="{{websiteUrl}}" class="button">View Your Updated Reservation</a>
-    </div>
-    <div class="footer">
-      <p>© {{currentYear}} {{companyName}}. All rights reserved.</p>
-      <p>{{companyAddress}}</p>
-    </div>
-  </div>
-</body>
+                <a href="{{websiteUrl}}" class="button">View Your Updated Reservation</a>
+              </div>
+              <div class="footer">
+                <p>© {{currentYear}} {{companyName}}. All rights reserved.</p>
+              </div>
+            </div>
+          </body>
 
-</html>`;
+          </html>`;
 
         const templateData = {
           guestName: `${guests[0].firstName} ${guests[0].lastName}`,
@@ -1270,12 +1262,11 @@ export const updateThirdPartyReservation = CatchAsyncError(
           email,
           phone,
           guests: categorizedGuests,
-          supportEmail: 'support@alhajz.com',
-          supportPhone: '+1-800-123-4567',
-          websiteUrl: 'https://alhajz.ai',
+          supportEmail: 'business.alhajz@gmail.com',
+          // supportPhone: '+1-800-123-4567',
+          websiteUrl: 'business.alhajz@gmail.com',
           currentYear: new Date().getFullYear(),
           companyName: 'Al-Hajz',
-          companyAddress: '1234 Example St, City, Country',
         };
 
         const template = Handlebars.compile(htmlContent);
@@ -1479,12 +1470,11 @@ export const cancelThirdPartyReservation = CatchAsyncError(
                             <td>{{amount}}</td>
                         </tr>
                     </table>
-                    <p>If you have any questions or need assistance, please contact us at <a href="mailto:{{supportEmail}}">{{supportEmail}}</a> or call {{supportPhone}}.</p>
+                    <p>If you have any questions or need assistance, please contact us at <a href="mailto:{{supportEmail}}">{{supportEmail}}</a>.</p>
                     <a href="{{websiteUrl}}" class="button">Visit Our Website</a>
                 </div>
                 <div class="footer">
                     <p>© {{currentYear}} {{companyName}}. All rights reserved.</p>
-                    <p>{{companyAddress}}</p>
                 </div>
             </div>
         </body>
@@ -1496,12 +1486,10 @@ export const cancelThirdPartyReservation = CatchAsyncError(
           amount: `${existingReservation.totalAmount} ${existingReservation.currencyCode}`,
           checkInDate: new Date(checkInDate).toLocaleDateString(),
           checkOutDate: new Date(checkOutDate).toLocaleDateString(),
-          supportEmail: 'support@alhajz.com',
-          supportPhone: '+1-800-123-4567',
+          supportEmail: 'business.alhajz@gmail.com',
           websiteUrl: 'https://alhajz.ai',
           currentYear: new Date().getFullYear(),
           companyName: 'Al-Hajz',
-          companyAddress: '1234 Example St, City, Country',
         };
 
         const template = Handlebars.compile(htmlContent);
