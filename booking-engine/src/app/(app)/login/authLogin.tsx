@@ -169,8 +169,8 @@ const Login: React.FC = () => {
         />
 
         {/* Remember Me */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
+        <div className="flex items-center justify-end">
+          {/* <div className="flex items-center">
             <input
               type="checkbox"
               id="remember"
@@ -181,7 +181,7 @@ const Login: React.FC = () => {
             <label htmlFor="remember" className={` text-sm text-tripswift-black/70 font-tripswift-medium ${i18n.language === "ar" ? "mr-2" : "ml-2"} `}>
               {t('Auth.Login.rememberMe')}
             </label>
-          </div>
+          </div> */}
 
           {/* Forgot Password Link */}
           <button
