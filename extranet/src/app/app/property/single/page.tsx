@@ -213,11 +213,11 @@ const Page = () => {
                                     className="pl-10 w-64 bg-white/70 dark:bg-gray-800/70 border-gray-200 dark:border-gray-700 focus:border-tripswift-blue focus:ring-tripswift-blue backdrop-blur-sm"
                                 />
                             </div>
-
+{/* 
                             <Button variant="outline" size="sm" className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm">
                                 <Filter className="w-4 h-4 mr-1" />
                                 Filter
-                            </Button>
+                            </Button> */}
 
                             <div className="flex items-center bg-gray-100/70 dark:bg-gray-800/70 rounded-lg p-1 backdrop-blur-sm">
                                 <Button

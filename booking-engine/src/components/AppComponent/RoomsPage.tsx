@@ -38,7 +38,7 @@ import {
 import LoadingSkeleton from "../hotelListingComponents/LoadingSkeleton";
 import { formatDate, calculateNights } from "@/utils/dateUtils";
 import { useTranslation } from "react-i18next";
-import QRCodeDisplay from "./QRCodeDisplay";
+// import QRCodeDisplay from "./QRCodeDisplay";
 
 interface Room {
   _id: string;
@@ -948,11 +948,22 @@ const RoomsPage: React.FC = () => {
                 {/* Property amenities and contact info */}
                 <div className="lg:col-span-1">
                   {/* Property amenities */}
-                  <div className="bg-tripswift-blue/5 p-4 rounded-xl mb-2">
+                  {/* <div className="bg-tripswift-blue/5 p-4 rounded-xl mb-2">
                     {qrCodeData.qrCode && qrCodeData.couponCode && (
                       <QRCodeDisplay qrCode={qrCodeData.qrCode} />
                     )}
-                  </div>
+                  </div> */}
+
+
+                  {/* Property description */}
+                  {propertyDetails?.description && (
+                    <div className="mt-4 p-4">
+                      <h3 className="text-section-heading mb-2">{t('RoomsPage.aboutThisProperty')}</h3>
+                      <p className="text-description">
+                        {propertyDetails.description}
+                      </p>
+                    </div>
+                  )}
 
                   {/* Contact information */}
                   <div className="bg-tripswift-off-white p-4 rounded-xl border border-gray-100">
