@@ -10,7 +10,7 @@ const createRoomAminity = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { propertyInfo_id, room_type, amenities } = req.body;
-      console.log("###################\nIncoming creating amenities",req.body);
+      console.log("###################\nIncoming creating amenities", req.body);
 
       if (!req.body) {
         next(new AppError("Please fill all the required fields", 400));
@@ -19,7 +19,7 @@ const createRoomAminity = catchAsync(
       const roomTypeDetails = await Room.find({
         propertyInfo_id,
         room_type,
-      });      
+      });
       if (roomTypeDetails.length === 0) {
         return next(new AppError(`No room found with ${propertyInfo_id} type ${room_type} for this property`, 404));
       }
@@ -79,10 +79,10 @@ const updateRoomAmenity = async (req: Request, res: Response, next: NextFunction
       success: true,
       updatedRoomAminity
     })
-  } 
+  }
   catch (error: any) {
     console.log(error.message);
-    return res.status(500).json({ 
+    return res.status(500).json({
       success: false,
       message: "Internal server error",
     });
@@ -91,43 +91,44 @@ const updateRoomAmenity = async (req: Request, res: Response, next: NextFunction
 
 const getRoomAminity = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const propertyInfo_id = req.params.id; 
-    const room_type = req.params.room_type; 
+    const propertyInfo_id = req.params.id;
+    const room_type = req.query.room_type as string | undefined;
 
-    console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$-property_id", propertyInfo_id);
-    console.log("Room Type:", room_type);
+    console.log('Property ID:', propertyInfo_id);
+    console.log('Room Type:', room_type);
 
     if (!propertyInfo_id) {
-      return next(new AppError("Please provide propertyInfo_id", 400));
+      return next(new AppError('Please provide propertyInfo_id', 400));
     }
 
-    let roomAminity;
-
+    let roomAminities;
     if (room_type) {
-      roomAminity = await RoomAminity.findOne({ propertyInfo_id, room_type }).lean();
-      if (!roomAminity) {
-        return next(new AppError(`No amenities found for room type "${room_type}" in property ${propertyInfo_id}`, 404));
+      roomAminities = await RoomAminity.findOne({ propertyInfo_id, room_type }).lean();
+      if (!roomAminities) {
+        return next(
+          new AppError(`No amenities found for room type "${room_type}" in property ${propertyInfo_id}`, 404)
+        );
       }
     } else {
-      roomAminity = await RoomAminity.find({ propertyInfo_id }).lean();
-      if (!roomAminity || roomAminity.length === 0) {
+      roomAminities = await RoomAminity.find({ propertyInfo_id }).lean();
+      if (!roomAminities || roomAminities.length === 0) {
         return next(new AppError(`No amenities found for property ${propertyInfo_id}`, 404));
       }
     }
 
     res.status(200).json({
       success: true,
-      data: roomAminity
+      data: roomAminities,
     });
-    
   } catch (error: any) {
-    console.log(error.message);
-    return res.status(500).json({ 
+    console.error(error.message);
+    res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: 'Internal server error',
     });
   }
 };
+
 
 const deleteRoomAmenity = async (req: Request, res: Response, next: NextFunction) => {
   const { propertyInfo_id, room_type } = req.body;
@@ -135,7 +136,7 @@ const deleteRoomAmenity = async (req: Request, res: Response, next: NextFunction
     return next(new AppError("Please provide propertyInfo_id and room_type", 400));
   }
   const roomAminityDetails = await RoomAminity.findOne({ propertyInfo_id, room_type });
-  if (!roomAminityDetails){
+  if (!roomAminityDetails) {
     return next(new AppError(`No room amenity found for property ${propertyInfo_id} and room type ${room_type}`, 404));
   }
   // const roomAminityDetails = await RoomAminity.findOneAndDelete({ propertyInfo_id, room_type });
