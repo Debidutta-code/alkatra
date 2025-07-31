@@ -30,6 +30,14 @@ initializeExpressRoutes({ app }).then(async () => {
 cron.schedule("*/1 * * * *", async () => {
   try {
     const fortyMinutesAgo = new Date(Date.now() - 40 * 60 * 1000);
+
+    console.log("--------***--fortyMinutesAgo---------", fortyMinutesAgo);
+    const matches = await CryptoPaymentDetails.find({
+  status: "Pending",
+  createdAt: { $lte: fortyMinutesAgo }
+});
+
+console.log("Matching documents:", matches);
     const cryptoPaymentDetails = await CryptoPaymentDetails.updateMany(
       {
         status: "Pending",
@@ -48,7 +56,7 @@ cron.schedule("*/1 * * * *", async () => {
         $set: { status: "Cancelled" }
       }
     );
-    console.log("--------***-----------");
+    console.log("--------***-----------",cryptoGuestDetails);
     if (cryptoPaymentDetails.modifiedCount > 0) {
       console.log(`[AUTO-CANCEL] ${cryptoPaymentDetails.modifiedCount} pending payments marked as Cancelled.`);
     }

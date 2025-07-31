@@ -38,6 +38,12 @@ app_1.app.use(passport_1.default.initialize());
 node_cron_1.default.schedule("*/1 * * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const fortyMinutesAgo = new Date(Date.now() - 40 * 60 * 1000);
+        console.log("--------***--fortyMinutesAgo---------", fortyMinutesAgo);
+        const matches = yield cryptoPayment_model_1.default.find({
+            status: "Pending",
+            createdAt: { $lte: fortyMinutesAgo }
+        });
+        console.log("Matching documents:", matches);
         const cryptoPaymentDetails = yield cryptoPayment_model_1.default.updateMany({
             status: "Pending",
             createdAt: { $lte: fortyMinutesAgo }
@@ -50,7 +56,7 @@ node_cron_1.default.schedule("*/1 * * * *", () => __awaiter(void 0, void 0, void
         }, {
             $set: { status: "Cancelled" }
         });
-        console.log("--------***-----------");
+        console.log("--------***-----------", cryptoGuestDetails);
         if (cryptoPaymentDetails.modifiedCount > 0) {
             console.log(`[AUTO-CANCEL] ${cryptoPaymentDetails.modifiedCount} pending payments marked as Cancelled.`);
         }

@@ -17,6 +17,9 @@ import { CustomRequest } from "../../../user_authentication/src/Utils/types";
 import Auth from "../../../user_authentication/src/Model/auth.model";
 import { PropertyInfo } from "../../../property_management/src/model/property.info.model";
 import UserModel from "../../../user_authentication/src/Model/auth.model";
+import { MailFactory } from "../../../customer_authentication/src/services/mailFactory";
+
+const mailer = MailFactory.getMailer();
 
 const calculateAgeCategory = (dob: string) => {
   const birthDate = new Date(dob);
@@ -613,7 +616,7 @@ export const createReservationWithStoredCard = CatchAsyncError(
           guests: categorizedGuests,
           supportEmail: 'support@alhajz.com',
           supportPhone: '+1-800-123-4567',
-          websiteUrl: 'https://book.trip-swift.ai',
+          websiteUrl: 'https://alhajz.ai',
           currentYear: new Date().getFullYear(),
           companyName: 'Al-Hajz',
           companyAddress: '1234 Example St, City, Country',
@@ -625,12 +628,16 @@ export const createReservationWithStoredCard = CatchAsyncError(
         // Generate the final HTML by replacing placeholders with actual data
         const finalHtml = template(templateData);
 
-        await EmailService.sendEmail({
+        await mailer.sendMail({
           to: email,
-          text: `Your booking has been confirmed`,
           subject: `Booking Confirmation - ${hotelName}`,
           html: finalHtml,
+          text: `Your booking has been confirmed`,
         });
+
+         
+
+        
       }
       catch (error: any) {
         return res.status(500).json({ message: "❌ Failed to send confirmation email" });
@@ -929,7 +936,7 @@ export async function createReservationWithCryptoPayment(input: {
       guests: categorizedGuests,
       supportEmail: 'support@alhajz.com',
       supportPhone: '+1-800-123-4567',
-      websiteUrl: 'https://book.trip-swift.ai',
+      websiteUrl: 'https://alhajz.ai',
       currentYear: new Date().getFullYear(),
       companyName: 'Al-Hajz',
       companyAddress: '1234 Example St, City, Country',
@@ -938,12 +945,12 @@ export async function createReservationWithCryptoPayment(input: {
     const template = Handlebars.compile(htmlContent);
     const finalHtml = template(templateData);
 
-    await EmailService.sendEmail({
-      to: email,
-      text: `Your reservation has been confirmed`,
-      subject: `Reservation Confirmation - ${hotelName}`,
-      html: finalHtml,
-    });
+    await mailer.sendMail({
+          to: email,
+          subject: `Booking Confirmation - ${hotelName}`,
+          html: finalHtml,
+          text: `Your booking has been confirmed`,
+        });
 
     return {
       message: "Reservation with crypto confirmed",
@@ -1265,7 +1272,7 @@ export const updateThirdPartyReservation = CatchAsyncError(
           guests: categorizedGuests,
           supportEmail: 'support@alhajz.com',
           supportPhone: '+1-800-123-4567',
-          websiteUrl: 'https://book.trip-swift.ai',
+          websiteUrl: 'https://alhajz.ai',
           currentYear: new Date().getFullYear(),
           companyName: 'Al-Hajz',
           companyAddress: '1234 Example St, City, Country',
@@ -1274,13 +1281,20 @@ export const updateThirdPartyReservation = CatchAsyncError(
         const template = Handlebars.compile(htmlContent);
         const finalHtml = template(templateData);
 
-
-        await EmailService.sendEmail({
+        await mailer.sendMail({
           to: email,
-          text: `Your reservation update has been confirmed`,
-          subject: `Reservation Confirmation - ${hotelName}`,
+          subject: `Booking Confirmation - ${hotelName}`,
           html: finalHtml,
+          text: `Your reservation update has been confirmed`,
         });
+
+
+        // await EmailService.sendEmail({
+        //   to: email,
+        //   text: `Your reservation update has been confirmed`,
+        //   subject: `Reservation Confirmation - ${hotelName}`,
+        //   html: finalHtml,
+        // });
       } catch (error: any) {
         return res.status(500).json({ message: error.message || "Failed to update reservation" });
       }
@@ -1484,7 +1498,7 @@ export const cancelThirdPartyReservation = CatchAsyncError(
           checkOutDate: new Date(checkOutDate).toLocaleDateString(),
           supportEmail: 'support@alhajz.com',
           supportPhone: '+1-800-123-4567',
-          websiteUrl: 'https://book.trip-swift.ai',
+          websiteUrl: 'https://alhajz.ai',
           currentYear: new Date().getFullYear(),
           companyName: 'Al-Hajz',
           companyAddress: '1234 Example St, City, Country',
@@ -1493,11 +1507,18 @@ export const cancelThirdPartyReservation = CatchAsyncError(
         const template = Handlebars.compile(htmlContent);
         const finalHtml = template(templateData);
 
-        await EmailService.sendEmail({
+         await mailer.sendMail({
           to: email,
           subject: `Booking Cancellation Confirmation - ${hotelName}`,
           html: finalHtml,
+          text: `Your reservation update has been confirmed`,
         });
+
+        // await EmailService.sendEmail({
+        //   to: email,
+        //   subject: `Booking Cancellation Confirmation - ${hotelName}`,
+        //   html: finalHtml,
+        // });
         console.log(`✅ Cancellation confirmation email sent to ${email}`);
 
         res.status(200).json({
