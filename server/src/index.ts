@@ -33,11 +33,11 @@ cron.schedule("*/1 * * * *", async () => {
 
     console.log("--------***--fortyMinutesAgo---------", fortyMinutesAgo);
     const matches = await CryptoPaymentDetails.find({
-  status: "Pending",
-  createdAt: { $lte: fortyMinutesAgo }
-});
+      status: "Pending",
+      createdAt: { $lte: fortyMinutesAgo }
+    });
 
-console.log("Matching documents:", matches);
+    console.log("Matching documents:", matches);
     const cryptoPaymentDetails = await CryptoPaymentDetails.updateMany(
       {
         status: "Pending",
@@ -56,7 +56,7 @@ console.log("Matching documents:", matches);
         $set: { status: "Cancelled" }
       }
     );
-    console.log("--------***-----------",cryptoGuestDetails);
+    console.log("--------***-----------", cryptoGuestDetails);
     if (cryptoPaymentDetails.modifiedCount > 0) {
       console.log(`[AUTO-CANCEL] ${cryptoPaymentDetails.modifiedCount} pending payments marked as Cancelled.`);
     }
