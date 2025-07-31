@@ -127,9 +127,8 @@ export const RoomCard: React.FC<RoomCardProps> = ({
     }
 
     const defaultAmenities = [
-      { icon: <FaWifi className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.wifi') },
-      { icon: <FaSnowflake className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.airConditioning') },
       { icon: <FaBed className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.kingBed') },
+      { icon: <FaBath className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.bathroom') },
     ];
     return defaultAmenities;
   };
