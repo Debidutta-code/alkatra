@@ -190,6 +190,10 @@ const RoomsPage: React.FC = () => {
           propertyResponse.data.data ||
           propertyResponse.data;
         console.log("Property Details:", propDetails);
+        console.log("Property Amenities:", propDetails?.property_amenities?.amenities);
+        if (!propDetails?.property_amenities?.amenities) {
+          console.warn("Property amenities are missing or empty in the API response");
+        }
         setPropertyDetails(propDetails);
         setPropertyCode(propDetails.property_code);
         sessionStorage.setItem("propertyCode", propDetails.property_code);
@@ -202,78 +206,72 @@ const RoomsPage: React.FC = () => {
 
 
   useEffect(() => {
-    const fetchRooms = async () => {
-      if (!propertyId || !propertyCode) return;
+  const fetchRooms = async () => {
+    if (!propertyId || !propertyCode) return;
 
-      setIsLoading(true);
-      setShowRoomNotAvailable(false);
-      console.log("Fetching rooms for property:", propertyId, "with code:", propertyCode);
+    setIsLoading(true);
+    setShowRoomNotAvailable(false);
+    console.log("Fetching rooms for property:", propertyId, "with code:", propertyCode);
 
-      try {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}?numberOfRooms=${guestDetails?.rooms || 1}`,
-          {
-            startDate: checkInDate,
-            endDate: checkOutDate,
-            hotelCode: propertyCode,
-          }
-        );
-        const roomData = response.data.data;
-        console.log("The room data:", roomData);
-        setRooms(response.data);
-
-        if (roomData && roomData.length > 0) {
-          const roomTypes = roomData.map((room: Room) => room.room_type);
-          setRoomTypeCode(roomTypes);
-          console.log("Room Types:", roomTypes);
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}?numberOfRooms=${guestDetails?.rooms || 1}`,
+        {
+          startDate: checkInDate,
+          endDate: checkOutDate,
+          hotelCode: propertyCode,
         }
+      );
+      const roomData = response.data.data;
+      console.log("The room data:", roomData);
+      setRooms(response.data);
 
-        if (response.data.qrCode) {
-          setQrCodeData({
-            qrCode: response.data.qrCode,
-            couponCode: response.data.couponCode || "",
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching rooms:", error);
-        if (axios.isAxiosError(error)) {
-          setShowRoomNotAvailable(true);
-        } else {
-          setRooms({ success: true, data: [] });
-        }
-      } finally {
-        setIsLoading(false);
+      if (response.data.qrCode) {
+        setQrCodeData({
+          qrCode: response.data.qrCode,
+          couponCode: response.data.couponCode || "",
+        });
       }
-    };
-
-    const fetchAminities = async () => {
-      if (!propertyId) return;
-
-      try {
-        const amenitiesResponse = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/amenite/${propertyId}`
-        );
-        const amenitiesData = amenitiesResponse.data.data;
-        console.log("Amenities Data:", amenitiesData);
-        const amenitiesMap = amenitiesData.reduce((acc: { [key: string]: any }, item: any) => {
-          const roomType = item.room_type || "default";
-          acc[roomType] = item.amenities;
-          return acc;
-        }, {});
-        console.log("Amenities Map:", amenitiesMap);
-        setRoomAmenities(amenitiesMap);
-      } catch (error) {
-        console.error("Error fetching amenities:", error);
+    } catch (error) {
+      console.error("Error fetching rooms:", error);
+      if (axios.isAxiosError(error)) {
+        setShowRoomNotAvailable(true);
+      } else {
+        setRooms({ success: true, data: [] });
       }
-    };
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    const fetchData = async () => {
-      await fetchRooms();
-      await fetchAminities();
-    };
+  const fetchAminities = async () => {
+    if (!propertyId) return;
 
-    fetchData();
-  }, [propertyId, checkInDate, checkOutDate, propertyCode, guestDetails?.rooms]);
+    try {
+      const amenitiesResponse = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/amenite/${propertyId}`
+      );
+      const amenitiesData = amenitiesResponse.data.data;
+      console.log("Amenities Data:", amenitiesData);
+      const amenitiesMap = amenitiesData.reduce((acc: { [key: string]: any }, item: any) => {
+        const roomType = item.room_type || "default";
+        acc[roomType] = item.amenities;
+        return acc;
+      }, {});
+      console.log("Amenities Map:", amenitiesMap);
+      setRoomAmenities(amenitiesMap);
+    } catch (error) {
+      console.error("Error fetching amenities:", error);
+    }
+  };
+
+  const fetchData = async () => {
+    await fetchRooms();
+    await fetchAminities();
+  };
+
+  fetchData();
+}, [propertyId, checkInDate, checkOutDate, propertyCode, guestDetails?.rooms]);
 
 
   useEffect(() => {
@@ -359,12 +357,12 @@ const RoomsPage: React.FC = () => {
         if (amenityLower.includes("ironing")) return "ironing";
         if (amenityLower.includes("dining area") || amenityLower.includes("sitting area")) return "sofaSeating";
         if (amenityLower.includes("balcony")) return "balcony";
-        return "check-circle"; // Fallback for unmapped amenities
+        return "check-circle";
       };
 
       return {
         icon: getIconName(amenity),
-        name: amenity,
+        name: t(`RoomsPage.amenitiesList.${amenity.toLowerCase()}`, { defaultValue: amenity }),
       };
     });
 
@@ -468,7 +466,8 @@ const RoomsPage: React.FC = () => {
   };
 
   const getAmenityIcon = (amenity: string) => {
-    switch (amenity) {
+    const normalizedAmenity = amenity.toLowerCase();
+    switch (normalizedAmenity) {
       case "wifi":
         return <Wifi className="h-4 w-4 text-tripswift-blue" />;
       case "swimming_pool":
@@ -505,6 +504,7 @@ const RoomsPage: React.FC = () => {
         return <CheckCircle className="h-4 w-4 text-tripswift-blue" />;
     }
   };
+
   return (
     <div className="bg-[#F5F7FA] min-h-screen font-noto-sans relative">
       {/* Room Not Available Overlay */}
@@ -919,11 +919,10 @@ const RoomsPage: React.FC = () => {
                     <h3 className="text-section-heading mb-3">
                       {t("RoomsPage.propertyAmenities")}
                     </h3>
-
-                    {roomAmenities &&
-                      Object.keys(roomAmenities).length > 0 ? (
+                    {propertyDetails?.property_amenities?.amenities &&
+                      Object.keys(propertyDetails.property_amenities.amenities).length > 0 ? (
                       <div className="flex flex-wrap gap-2">
-                        {Object.entries(roomAmenities)
+                        {Object.entries(propertyDetails.property_amenities.amenities)
                           .filter(([_, hasAmenity]) => hasAmenity)
                           .map(([amenity]) => (
                             <div
@@ -942,7 +941,6 @@ const RoomsPage: React.FC = () => {
                         {t("RoomsPage.noAmenitiesSpecified")}
                       </p>
                     )}
-
                   </div>
                 </div>
 
