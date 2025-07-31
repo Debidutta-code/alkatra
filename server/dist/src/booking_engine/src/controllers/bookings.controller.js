@@ -23,7 +23,6 @@ const reservationModel_1 = require("../../../wincloud/src/model/reservationModel
 const stripe_service_1 = __importDefault(require("../services/stripe.service"));
 const cancelReservationService_1 = require("../../../wincloud/src/service/cancelReservationService");
 const cryptoUserPaymentInitialStage_model_1 = require("../models/cryptoUserPaymentInitialStage.model");
-const email_service_1 = __importDefault(require("../../../customer_authentication/src/services/email.service"));
 const handlebars_1 = __importDefault(require("handlebars"));
 const inventoryModel_1 = require("../../../wincloud/src/model/inventoryModel");
 const auth_model_1 = __importDefault(require("../../../user_authentication/src/Model/auth.model"));
@@ -528,7 +527,7 @@ exports.createReservationWithStoredCard = (0, catchAsyncError_1.CatchAsyncError)
                 guests: categorizedGuests,
                 supportEmail: 'support@alhajz.com',
                 supportPhone: '+1-800-123-4567',
-                websiteUrl: 'https://book.trip-swift.ai',
+                websiteUrl: 'https://alhajz.ai',
                 currentYear: new Date().getFullYear(),
                 companyName: 'Al-Hajz',
                 companyAddress: '1234 Example St, City, Country',
@@ -797,18 +796,18 @@ function createReservationWithCryptoPayment(input) {
                 guests: categorizedGuests,
                 supportEmail: 'support@alhajz.com',
                 supportPhone: '+1-800-123-4567',
-                websiteUrl: 'https://book.trip-swift.ai',
+                websiteUrl: 'https://alhajz.ai',
                 currentYear: new Date().getFullYear(),
                 companyName: 'Al-Hajz',
                 companyAddress: '1234 Example St, City, Country',
             };
             const template = handlebars_1.default.compile(htmlContent);
             const finalHtml = template(templateData);
-            yield email_service_1.default.sendEmail({
+            yield mailer.sendMail({
                 to: email,
-                text: `Your reservation has been confirmed`,
-                subject: `Reservation Confirmation - ${hotelName}`,
+                subject: `Booking Confirmation - ${hotelName}`,
                 html: finalHtml,
+                text: `Your booking has been confirmed`,
             });
             return {
                 message: "Reservation with crypto confirmed",
@@ -1104,19 +1103,25 @@ exports.updateThirdPartyReservation = (0, catchAsyncError_1.CatchAsyncError)((re
                 guests: categorizedGuests,
                 supportEmail: 'support@alhajz.com',
                 supportPhone: '+1-800-123-4567',
-                websiteUrl: 'https://book.trip-swift.ai',
+                websiteUrl: 'https://alhajz.ai',
                 currentYear: new Date().getFullYear(),
                 companyName: 'Al-Hajz',
                 companyAddress: '1234 Example St, City, Country',
             };
             const template = handlebars_1.default.compile(htmlContent);
             const finalHtml = template(templateData);
-            yield email_service_1.default.sendEmail({
+            yield mailer.sendMail({
                 to: email,
-                text: `Your reservation update has been confirmed`,
-                subject: `Reservation Confirmation - ${hotelName}`,
+                subject: `Booking Confirmation - ${hotelName}`,
                 html: finalHtml,
+                text: `Your reservation update has been confirmed`,
             });
+            // await EmailService.sendEmail({
+            //   to: email,
+            //   text: `Your reservation update has been confirmed`,
+            //   subject: `Reservation Confirmation - ${hotelName}`,
+            //   html: finalHtml,
+            // });
         }
         catch (error) {
             return res.status(500).json({ message: error.message || "Failed to update reservation" });
@@ -1313,18 +1318,24 @@ exports.cancelThirdPartyReservation = (0, catchAsyncError_1.CatchAsyncError)((re
                 checkOutDate: new Date(checkOutDate).toLocaleDateString(),
                 supportEmail: 'support@alhajz.com',
                 supportPhone: '+1-800-123-4567',
-                websiteUrl: 'https://book.trip-swift.ai',
+                websiteUrl: 'https://alhajz.ai',
                 currentYear: new Date().getFullYear(),
                 companyName: 'Al-Hajz',
                 companyAddress: '1234 Example St, City, Country',
             };
             const template = handlebars_1.default.compile(htmlContent);
             const finalHtml = template(templateData);
-            yield email_service_1.default.sendEmail({
+            yield mailer.sendMail({
                 to: email,
                 subject: `Booking Cancellation Confirmation - ${hotelName}`,
                 html: finalHtml,
+                text: `Your reservation update has been confirmed`,
             });
+            // await EmailService.sendEmail({
+            //   to: email,
+            //   subject: `Booking Cancellation Confirmation - ${hotelName}`,
+            //   html: finalHtml,
+            // });
             console.log(`✅ Cancellation confirmation email sent to ${email}`);
             res.status(200).json({
                 message: "Reservation cancellation processed successfully",
