@@ -1,6 +1,6 @@
 "use client";
 
-import CheckAuthentication from "@/components/check_authentication/CheckAuth";
+import CheckAuthentication from "@/components/checkAuthentication/CheckAuth";
 import CheckoutPage from "@/components/Stripe/checkoutPage";
 import PayAtHotelFunction from "@/components/paymentComponents/PayAtHotelFunction";
 import PaymentOptionSelector from "@/components/paymentComponents/PaymentOptionSelector";

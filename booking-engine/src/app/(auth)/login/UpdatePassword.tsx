@@ -12,9 +12,10 @@ import AuthButton from "@/components/auth/AuthButton";
 interface UpdatePasswordProps {
   email: string;
   onBack: () => void;
+  onSuccess?: () => void;
 }
 
-const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack }) => {
+const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack, onSuccess }) => {
   const { t } = useTranslation();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -115,15 +116,13 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack }) => {
         setNewPassword("");
         setConfirmPassword("");
         setTimeout(() => {
-          window.location.href = "/login?fromReset=true";
-        }, 1500);
-      }
-      // if (response.status == 200) {
-      //   setMessage(t("Auth.UpdatePassword.successMessage"));
-      //   setNewPassword("");
-      //   setConfirmPassword("");
-      //     router.push("/login?fromReset=true");
-      // } 
+          if (onSuccess) {
+            onSuccess();
+          } else {
+            onBack();
+          }
+        }, 2000);
+      } 
       else {
         setError(response.data.message || t("Auth.UpdatePassword.errors.generic"));
       }
