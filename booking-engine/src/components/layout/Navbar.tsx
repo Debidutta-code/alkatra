@@ -257,7 +257,7 @@ const Navbar: React.FC = () => {
                     </p>
                   </div>
                 </DropdownItem>
-                <DropdownItem key="separator" className="h-px bg-tripswift-black/10 my-1" />
+                {/* <DropdownItem key="separator" className="h-px bg-tripswift-black/10 my-1" /> */}
                 <DropdownItem
                   key="profile-settings"
                   onClick={() => router.push('/profile')}
@@ -266,13 +266,13 @@ const Navbar: React.FC = () => {
                 >
                   {t('Navbar.profileSettings')}
                 </DropdownItem>
-                <DropdownItem
+                {/* <DropdownItem
                   key="help-feedback"
                   startContent={<HelpCircle size={16} className="text-tripswift-blue" />}
                   className="py-2.5 text-[14px] font-tripswift-medium"
                 >
                   {t('Navbar.helpFeedback')}
-                </DropdownItem>
+                </DropdownItem> */}
                 <DropdownItem
                   key="logout"
                   onClick={handleLogout}
@@ -390,11 +390,11 @@ const Navbar: React.FC = () => {
                 >
                   {t('Navbar.profileSettings')}
                 </div>
-                <div
+                {/* <div
                   className="cursor-pointer py-2 px-1 text-tripswift-black hover:bg-tripswift-blue hover:bg-opacity-10 rounded font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]"
                 >
                   {t('Navbar.helpFeedback')}
-                </div>
+                </div> */}
                 <div
                   onClick={handleLogout}
                   className="cursor-pointer py-2 px-1 text-[#EF4444] hover:bg-tripswift-blue hover:bg-opacity-10 rounded font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]"
