@@ -3,22 +3,75 @@ import { Request, Response } from "express";
 import customerService from "../services/customerService";
 import { AuthenticatedRequest } from "../types/custom";
 
+// Referral Service
+import { CustomerReferralService } from "../services";
+import { ValidateService } from "../../../referral_system/services/validate.service";
+
 class CustomerController {
 
+
+  /**
+   * @params - registration request body, optional referrerId and referralCode
+   * Step 1: If referrerId and referralCode are provided
+   *         - then check if the referrer exists and if the referral code matches with referrer referral code
+   *         - then apply the referral code to the customer
+   * 
+   * Step 2: If referrerId and referralCode are not provided
+   *         then register the customer and return the customer details
+   */
+
   // Register a new customer
-  async registerCustomer(req: Request, res: Response): Promise<void> {
+  async registerCustomer(req: Request, res: Response): Promise<Response | void> {
     try {
-      const customer = await customerService.registerCustomer(req.body);
-      res.status(201).json({ message: "Customer registered successfully", data: customer });
-    } catch (error: any) {
-      try {
-        const parsedError = JSON.parse(error.message);
-        res.status(400).json(parsedError);
-      } catch (e) {
-        res.status(error.message === "Customer already registered" ? 400 : 500).json({
-          message: error.message,
-        });
+      const { referrerId, referralCode } = req.query as { referrerId: string; referralCode: string };
+      const userBody = req.body;
+
+      /**
+       * Register the customer if referrerId and referralCode are not provided
+       */
+      if (!referrerId && !referralCode) {
+        const customer = await customerService.registerCustomer(userBody);
+        return res.status(201).json({ message: "Customer registered successfully", data: customer });
       }
+
+
+      /**
+       * Validate the referrerId and referralCode
+       */
+      ValidateService.validateReferralCodeAndReferrerId(referrerId, referralCode);
+
+      /**
+       * Check if the referrer exists and if the referral code matches with referrer referral code
+       */
+      const validatedReferrer = await CustomerReferralService.validateReferrerForReferral(referrerId);
+
+      /**
+       * Match referral code with referrer referral code
+       */
+      CustomerReferralService.matchReferralCode(validatedReferrer.referralCode, referralCode);
+
+      /**
+       * Now all check's are passed to register the referee
+       */
+      const referee = await customerService.registerCustomer(userBody);
+      if (!referee._id) throw new Error("Unable to register, please again later.");
+
+      /**
+       * Apply the referral code to the customer
+       */
+      const referralResult = await CustomerReferralService.applyReferral({ 
+        referrerId: referrerId, 
+        refereeId: referee._id as string, 
+        referralCode: referralCode,
+        referralLink: validatedReferrer.referralLink,
+        referralQRCode: validatedReferrer.referralQRCode 
+      });
+
+      return res.status(201).json(referralResult);
+    } 
+    catch (error: any) {
+      const statusCode = error.message === "Customer already registered" ? 400 : 500;
+      return res.status(statusCode).json({ message: error.message });
     }
   }
 

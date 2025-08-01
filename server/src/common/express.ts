@@ -17,6 +17,9 @@ import couponManagement from "../coupon_management/routes/couponRoutes";
 import notification from "../notification/src/route/notification.route";
 import googleAuth from "../customer_authentication/src/api/routes/googleAuthRoute";
 
+// Referral system routes
+import { ReferralRouter } from "../referral_system/routes";
+
 export async function initializeExpressRoutes({ app }: { app: Express }) {
   app.head("/status", (_, res: Response) => res.status(200).end());
 
@@ -34,7 +37,7 @@ export async function initializeExpressRoutes({ app }: { app: Express }) {
 
   app.use("/api/v1/booking", bookingRouter);
   app.use("/api/v1/payment", paymentRouter);
-  
+
   // crypto payment routes
   app.use("/api/v1/crypto", cryptoRouter);
 
@@ -44,6 +47,9 @@ export async function initializeExpressRoutes({ app }: { app: Express }) {
   app.use("/api/v1/coupon", couponManagement);
   app.use("/api/v1/admin", roleBased)
   app.use("/api/v1/notification", notification);
+
+  // Referral system routes
+  app.use("/api/v1/referrals", ReferralRouter);
 
 
   app.all("*", (req: Request, _res: Response, next: NextFunction) => {

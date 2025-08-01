@@ -29,7 +29,7 @@ class CustomerService {
             throw new Error("Customer already registered");
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newCustomer = await customerRepository.create({
+        const newCustomer: any = await customerRepository.create({
             firstName,
             lastName,
             email,
@@ -39,7 +39,11 @@ class CustomerService {
             createdAt: new Date(),
             updatedAt: new Date(),
         });
-        return newCustomer;
+
+        const sanitizedCustomer = newCustomer.toObject();
+        delete sanitizedCustomer.password;
+
+        return sanitizedCustomer;
     }
 
     // Login customer
@@ -171,6 +175,15 @@ class CustomerService {
             throw new Error("Failed to update password");
         }
     }
+
+
+    /**
+     * Find user by it's ID
+     */
+    async findById(id: string): Promise<ICustomer | null> {
+        return await customerRepository.findById(id);
+    }
+
 }
 
 export default new CustomerService();

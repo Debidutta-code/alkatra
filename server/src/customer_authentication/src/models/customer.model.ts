@@ -6,9 +6,12 @@ export interface ICustomer extends Document {
     email: string;
     phone: string;
     password: string;
+    address?: string;
     role: string;
     permissions: Types.ObjectId[];
-    address?: string;
+    referralCode?: string;
+    referralLink?: string;
+    referralQRCode?: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -22,6 +25,9 @@ const CustomerSchema: Schema = new Schema<ICustomer>({
     address: { type: String },
     role: { type: String, required: true, enum: ["customer"], default: "customer" },
     permissions: [{ type: Schema.Types.ObjectId, ref: "Permission" }],
+    referralCode: { type: String, unique: true, sparse: true },
+    referralLink: { type: String, unique: true, sparse: true },
+    referralQRCode: { type: String, unique: true, sparse: true },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 });
@@ -38,5 +44,4 @@ CustomerSchema.pre<ICustomer>("findOneAndUpdate", function (next) {
     next();
 });
 
-const customerModel = mongoose.model<ICustomer>("CustomerModel", CustomerSchema);
-export default customerModel;
+export default mongoose.model<ICustomer>("CustomerModel", CustomerSchema);
