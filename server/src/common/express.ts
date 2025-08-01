@@ -16,6 +16,7 @@ import ratePlaneRoute from "../rate_plan/src/routes/ratePlan.route";
 import couponManagement from "../coupon_management/routes/couponRoutes";
 import notification from "../notification/src/route/notification.route";
 import googleAuth from "../customer_authentication/src/api/routes/googleAuthRoute";
+import analytics from "../role_based/src/routes/analytics.route";
 
 export async function initializeExpressRoutes({ app }: { app: Express }) {
   app.head("/status", (_, res: Response) => res.status(200).end());
@@ -44,6 +45,7 @@ export async function initializeExpressRoutes({ app }: { app: Express }) {
   app.use("/api/v1/coupon", couponManagement);
   app.use("/api/v1/admin", roleBased)
   app.use("/api/v1/notification", notification);
+  app.use("/api/v1/analytics", analytics);
 
 
   app.all("*", (req: Request, _res: Response, next: NextFunction) => {

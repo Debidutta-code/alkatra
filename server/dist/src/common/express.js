@@ -29,6 +29,7 @@ const ratePlan_route_1 = __importDefault(require("../rate_plan/src/routes/ratePl
 const couponRoutes_1 = __importDefault(require("../coupon_management/routes/couponRoutes"));
 const notification_route_1 = __importDefault(require("../notification/src/route/notification.route"));
 const googleAuthRoute_1 = __importDefault(require("../customer_authentication/src/api/routes/googleAuthRoute"));
+const analytics_route_1 = __importDefault(require("../role_based/src/routes/analytics.route"));
 function initializeExpressRoutes(_a) {
     return __awaiter(this, arguments, void 0, function* ({ app }) {
         app.head("/status", (_, res) => res.status(200).end());
@@ -51,6 +52,7 @@ function initializeExpressRoutes(_a) {
         app.use("/api/v1/coupon", couponRoutes_1.default);
         app.use("/api/v1/admin", rolebased_route_1.default);
         app.use("/api/v1/notification", notification_route_1.default);
+        app.use("/api/v1/analytics", analytics_route_1.default);
         app.all("*", (req, _res, next) => {
             next(new appError_1.AppError(`Can't find ${req.originalUrl} path on the server`, 404));
         });

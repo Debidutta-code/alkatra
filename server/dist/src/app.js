@@ -10,7 +10,7 @@ const morgan_1 = __importDefault(require("morgan"));
 const bodyParser = require('body-parser');
 exports.app = (0, express_1.default)();
 exports.app.use((0, cors_1.default)({
-    origin: ["https://alhajz.ai", 'https://extranet.alhajz.ai',],
+    origin: ["https://alhajz.ai", 'https://extranet.alhajz.ai', 'http://localhost:3004', 'http://localhost:3000'],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "Cache-Control", "Pragma", "Expires"],
     credentials: true,
