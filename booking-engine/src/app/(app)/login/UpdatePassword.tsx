@@ -115,9 +115,8 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ email, onBack }) => {
         setNewPassword("");
         setConfirmPassword("");
         setTimeout(() => {
-          if (typeof window !== 'undefined') {
-            window.location.replace("/login?fromReset=true");
-          }
+            router.replace("/login");
+          
         }, 2000);
       }
       else {

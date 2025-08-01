@@ -952,7 +952,7 @@ const RoomsPage: React.FC = () => {
                     {qrCodeData.qrCode && qrCodeData.couponCode && (
                       <QRCodeDisplay qrCode={qrCodeData.qrCode} />
                     )}
-                  </div> */}
+                  </div>  */}
 
 
                   {/* Property description */}
@@ -962,7 +962,7 @@ const RoomsPage: React.FC = () => {
                       <p className="text-description">
                         {propertyDetails.description}
                       </p>
-                    </div>
+                  </div>
                   )}
 
                   {/* Contact information */}

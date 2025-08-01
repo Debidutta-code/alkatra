@@ -42,15 +42,15 @@ const cryptoPaymentSchema = new mongoose_1.default.Schema({
     },
     initiatedTime: {
         type: Date,
-        default: new Date(),
+        default: () => new Date(),
     },
     createdAt: {
         type: Date,
-        default: new Date(),
+        default: () => new Date(),
     },
     updatedAt: {
         type: Date,
-        default: new Date(),
+        default: () => new Date(),
     }
 });
 const cryptoPaymentLogSchema = new mongoose_1.default.Schema({
