@@ -2,7 +2,7 @@
 
 import React, { Suspense } from "react";
 import Login from "./authLogin";
-import RedirectIfAuthenticated from "@/components/check_authentication/RedirectIfAuthenticated";
+import RedirectIfAuthenticated from "@/components/checkAuthentication/RedirectIfAuthenticated";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const LoginPage = () => {

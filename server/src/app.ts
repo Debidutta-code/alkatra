@@ -7,7 +7,7 @@ export const app = express();
 
 app.use(
     cors({
-      origin: ["https://alhajz.ai",'https://extranet.alhajz.ai', 'http://localhost:3004'], 
+      origin: ["https://alhajz.ai",'https://extranet.alhajz.ai', 'http://localhost:3004', 'http://0.0.0.0:3000'], 
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"], 
       allowedHeaders: ["Content-Type", "Authorization", "Cache-Control", "Pragma", "Expires"],
       credentials: true,

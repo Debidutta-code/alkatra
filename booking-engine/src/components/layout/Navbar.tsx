@@ -46,7 +46,7 @@ type AppDispatch = ThunkDispatch<RootState, unknown, AnyAction>;
 
 import MTrip from '@/components/assets/traveling.png';
 import Logo from '../assets/TRIP-1.png';
-import LanguageSwitcher from '../Language-Switcher/LanguageSwitcher';
+import LanguageSwitcher from '../languageSwitcher/LanguageSwitcher';
 import i18next from 'i18next';
 
 const Navbar: React.FC = () => {

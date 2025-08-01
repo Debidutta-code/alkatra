@@ -3,8 +3,8 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
-import { RoomCard } from "@/components/AppComponent/RoomCard";
-import GuestInformationModal, { Guest } from "@/components/bookingComponents/GuestInformationModal";
+import { RoomCard } from "@/components/appComponent/RoomCard";
+import GuestInformationModal, {Guest} from "@/components/bookingComponents/GuestInformationModal";
 import { useDispatch, useSelector } from "@/Redux/store";
 import { setAmount, setRoomId } from "@/Redux/slices/pmsHotelCard.slice";
 import { setGuestDetails } from "@/Redux/slices/hotelcard.slice";
@@ -38,7 +38,7 @@ import {
 import LoadingSkeleton from "../hotelListingComponents/LoadingSkeleton";
 import { formatDate, calculateNights } from "@/utils/dateUtils";
 import { useTranslation } from "react-i18next";
-// import QRCodeDisplay from "./QRCodeDisplay";
+import QRCodeDisplay from "./QRCodeDisplay";
 
 interface Room {
   _id: string;
@@ -122,10 +122,6 @@ const RoomsPage: React.FC = () => {
   const [showPropertyDetails, setShowPropertyDetails] = useState<boolean>(true);
   const [selectedImage, setSelectedImage] = useState<number>(0);
   const [propertyCode, setPropertyCode] = useState<string>("");
-  const [roomTypeCode, setRoomTypeCode] = useState<string[]>([]);
-  const [roomAmenities, setRoomAmenities] = useState<{ [key: string]: any }>({});
-  const [unavailableRoomTypes, setUnavailableRoomTypes] = useState<{ roomType: string; dates: string[] }[]>([]);
-
 
   // New state for handling 400 error
   const [showRoomNotAvailable, setShowRoomNotAvailable] = useState<boolean>(false);
@@ -182,18 +178,14 @@ const RoomsPage: React.FC = () => {
   useEffect(() => {
     const fetchProperty = async () => {
       if (!propertyId) return;
-
       try {
         const propertyResponse = await axios.get(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`
         );
-        const propDetails = propertyResponse.data.property ||
-          propertyResponse.data.data ||
-          propertyResponse.data;
-        console.log("Property Details:", propDetails);
-        console.log("Property Amenities:", propDetails?.property_amenities?.amenities);
-        if (!propDetails?.property_amenities?.amenities) {
-          console.warn("Property amenities are missing or empty in the API response");
+        const propDetails = propertyResponse.data.property || propertyResponse.data.data || propertyResponse.data;
+        if (!propDetails?.property_code) {
+          console.error("Property code missing from API response");
+          return;
         }
         setPropertyDetails(propDetails);
         setPropertyCode(propDetails.property_code);
@@ -202,18 +194,20 @@ const RoomsPage: React.FC = () => {
         console.error("Error fetching property:", error);
       }
     };
+
     fetchProperty();
   }, [propertyId]);
 
-
   useEffect(() => {
     const fetchRooms = async () => {
-      if (!propertyId || !propertyCode) return;
+      if (!propertyId) return;
 
       setIsLoading(true);
-      setShowRoomNotAvailable(false);
+      setShowRoomNotAvailable(false); // Reset error state
       console.log("Fetching rooms for property:", propertyId, "with code:", propertyCode);
-
+      if (!propertyCode) {
+        return;
+      }
       try {
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}?numberOfRooms=${guestDetails?.rooms || 1}`,
@@ -223,11 +217,7 @@ const RoomsPage: React.FC = () => {
             hotelCode: propertyCode,
           }
         );
-        const roomData = response.data.data;
-        console.log("The room data:", roomData);
         setRooms(response.data);
-        setUnavailableRoomTypes(response.data.unavailableRoomTypes || []); // Set unavailable room types
-
         if (response.data.qrCode) {
           setQrCodeData({
             qrCode: response.data.qrCode,
@@ -236,45 +226,21 @@ const RoomsPage: React.FC = () => {
         }
       } catch (error) {
         console.error("Error fetching rooms:", error);
+
+        // Check if the error is an AxiosError and has a response with status 400
         if (axios.isAxiosError(error)) {
           setShowRoomNotAvailable(true);
         } else {
+          // For other errors, show empty rooms as before
           setRooms({ success: true, data: [] });
         }
       } finally {
         setIsLoading(false);
       }
     };
-    const fetchAminities = async () => {
-      if (!propertyId) return;
 
-      try {
-        const amenitiesResponse = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/amenite/${propertyId}`
-        );
-        const amenitiesData = amenitiesResponse.data.data;
-        console.log("Amenities Data:", amenitiesData);
-        const amenitiesMap = amenitiesData.reduce((acc: { [key: string]: any }, item: any) => {
-          const roomType = item.room_type || "default";
-          acc[roomType] = item.amenities;
-          return acc;
-        }, {});
-        console.log("Amenities Map:", amenitiesMap);
-        setRoomAmenities(amenitiesMap);
-      } catch (error) {
-        console.error("Error fetching amenities:", error);
-      }
-    };
-
-    const fetchData = async () => {
-      await fetchRooms();
-      await fetchAminities();
-    };
-
-    fetchData();
-  }, [propertyId, checkInDate, checkOutDate, propertyCode, guestDetails?.rooms]);
-
-
+    fetchRooms();
+  }, [propertyId, checkInDate, checkOutDate, propertyCode]);
   useEffect(() => {
     console.log("The property code we get from api: ", propertyCode);
   }, [propertyCode]);
@@ -291,79 +257,71 @@ const RoomsPage: React.FC = () => {
 
   // Helper function to convert amenities to the expected format
   const convertAmenities = (room: Room) => {
-    let roomAmenitiesList: string[] = [];
-
-    // Normalize room_type for case-insensitive matching
-    const roomTypeLower = room.room_type.toLowerCase();
-    const amenitiesKeys = Object.keys(roomAmenities).reduce((acc, key) => {
-      acc[key.toLowerCase()] = roomAmenities[key];
-      return acc;
-    }, {} as { [key: string]: any });
-
-    // Get amenities for the specific room type, fallback to default
-    const amenitiesForRoomType = amenitiesKeys[roomTypeLower] || amenitiesKeys["default"] || {};
-
-    // Log for debugging mismatches
-    if (!amenitiesKeys[roomTypeLower] && !amenitiesKeys["default"]) {
-      console.warn(`No amenities found for room type "${room.room_type}" and no default amenities available`);
-    } else if (!amenitiesKeys[roomTypeLower]) {
-      console.log(`Using default amenities for room type "${room.room_type}"`);
-    } else {
-      console.log(`Found amenities for room type "${room.room_type}"`);
-    }
-
-    // Extract amenities from all categories
-    Object.values(amenitiesForRoomType).forEach((category: any) => {
-      Object.entries(category).forEach(([key, value]) => {
-        if (value === true || (typeof value === "string" && value !== "")) {
-          // Handle special case for 'bed' which has string values like "double" or "single"
-          const readableName = key === "bed" ? `Bed: ${value}` : key
-            .replace(/([A-Z])/g, " $1")
-            .replace(/^./, (str) => str.toUpperCase())
-            .trim();
-          roomAmenitiesList.push(readableName);
-        }
+    // Map room amenities from propertyDetails.room_Aminity
+    let roomAmenities: string[] = [];
+    if (propertyDetails?.room_Aminity?.amenities) {
+      const amenities = propertyDetails.room_Aminity.amenities;
+      // Flatten all amenities into a single array of names
+      Object.values(amenities).forEach((category: any) => {
+        Object.entries(category).forEach(([key, value]) => {
+          if (value === true) {
+            // Convert camelCase keys to readable names (e.g., airConditioning -> Air Conditioning)
+            const readableName = key
+              .replace(/([A-Z])/g, " $1")
+              .replace(/^./, (str) => str.toUpperCase())
+              .trim();
+            roomAmenities.push(readableName);
+          }
+        });
       });
-    });
+    }
+    // const amenityTranslationMap: { [key: string]: string } = {
+    //   wifi: "RoomsPage.RoomCard.amenities.wifi",
+    //   internet: "RoomsPage.RoomCard.amenities.wifi",
+    //   airconditioning: "RoomsPage.RoomCard.amenities.airConditioning",
+    //   ac: "RoomsPage.RoomCard.amenities.airConditioning",
+    //   kingbed: "RoomsPage.RoomCard.amenities.kingBed",
+    //   smoking: "RoomsPage.RoomCard.amenities.smokingBan",
+    //   bed: "RoomsPage.RoomCard.amenities.kingBed",
+    //   view: "RoomsPage.RoomCard.amenities.view",
+    //   bathroom: "RoomsPage.RoomCard.amenities.bathroom",
+    //   towels: "RoomsPage.RoomCard.amenities.towels",
+    //   linens: "RoomsPage.RoomCard.amenities.linens",
+    //   tablechairs: "RoomsPage.RoomCard.amenities.tableChairs",
+    //   desk: "RoomsPage.RoomCard.amenities.desk",
+    //   dresserwardrobe: "RoomsPage.RoomCard.amenities.dresserWardrobe",
+    //   sofaseating: "RoomsPage.RoomCard.amenities.sofaSeating",
+    //   television: "RoomsPage.RoomCard.amenities.television",
+    //   telephone: "RoomsPage.RoomCard.amenities.telephone",
+    //   heating: "RoomsPage.RoomCard.amenities.heating",
+    // };
 
-    // Remove duplicates (e.g., combine similar amenities)
-    roomAmenitiesList = Array.from(new Set(roomAmenitiesList));
+    // Inside convertAmenities function
 
-    const convertedAmenities = roomAmenitiesList.map((amenity) => {
+    const convertedAmenities = roomAmenities.map((amenity) => {
       const getIconName = (amenityName: string) => {
         const amenityLower = amenityName.toLowerCase();
-        // Comprehensive icon mappings based on Postman data
         if (amenityLower.includes("wifi") || amenityLower.includes("internet")) return "wifi";
         if (amenityLower.includes("air") || amenityLower.includes("ac")) return "snowflake";
         if (amenityLower.includes("smoking")) return "smoking-ban";
         if (amenityLower.includes("bed")) return "bed";
-        if (amenityLower.includes("bathroom") || amenityLower.includes("bidet") || amenityLower.includes("toilet") || amenityLower.includes("shower")) return "bathroom";
-        if (amenityLower.includes("towels") || amenityLower.includes("towels sheets")) return "towels";
-        if (amenityLower.includes("linens") || amenityLower.includes("linens bedding")) return "linens";
-        if (amenityLower.includes("toiletries") || amenityLower.includes("shampoo") || amenityLower.includes("conditioner") || amenityLower.includes("soap")) return "toiletries";
-        if (amenityLower.includes("hairdryer") || amenityLower.includes("hair dryer")) return "hairDryer";
-        if (amenityLower.includes("table") || amenityLower.includes("chairs") || amenityLower.includes("dining table")) return "tableChairs";
-        if (amenityLower.includes("desk") || amenityLower.includes("work desk")) return "desk";
+        if (amenityLower.includes("view")) return "tree";
+        if (amenityLower.includes("bathroom")) return "bathroom";
+        if (amenityLower.includes("towels")) return "towels";
+        if (amenityLower.includes("linens")) return "linens";
+        if (amenityLower.includes("table") || amenityLower.includes("chairs")) return "tableChairs";
+        if (amenityLower.includes("desk")) return "desk";
         if (amenityLower.includes("dresser") || amenityLower.includes("wardrobe")) return "dresserWardrobe";
-        if (amenityLower.includes("seating") || amenityLower.includes("sofa") || amenityLower.includes("reading chair")) return "sofaSeating";
-        if (amenityLower.includes("television") || amenityLower.includes("flat screen tv") || amenityLower.includes("satellite") || amenityLower.includes("cable")) return "television";
+        if (amenityLower.includes("seating")) return "sofaSeating";
+        if (amenityLower.includes("television")) return "television";
         if (amenityLower.includes("telephone")) return "telephone";
         if (amenityLower.includes("heating")) return "heating";
-        if (amenityLower.includes("refrigerator") || amenityLower.includes("microwave") || amenityLower.includes("kitchenware") || amenityLower.includes("oven") || amenityLower.includes("stovetop")) return "kitchenette";
-        if (amenityLower.includes("coffee") || amenityLower.includes("tea") || amenityLower.includes("coffee maker") || amenityLower.includes("electric kettle")) return "coffeeMaker";
-        if (amenityLower.includes("smoke detectors")) return "smokeDetectors";
-        if (amenityLower.includes("fire extinguisher")) return "fireExtinguisher";
-        if (amenityLower.includes("safe")) return "safe";
-        if (amenityLower.includes("accessible") || amenityLower.includes("wheelchair") || amenityLower.includes("elevator")) return "accessibility";
-        if (amenityLower.includes("ironing")) return "ironing";
-        if (amenityLower.includes("dining area") || amenityLower.includes("sitting area")) return "sofaSeating";
-        if (amenityLower.includes("balcony")) return "balcony";
         return "check-circle";
       };
 
       return {
         icon: getIconName(amenity),
-        name: t(`RoomsPage.amenitiesList.${amenity.toLowerCase()}`, { defaultValue: amenity }),
+        name: amenity,
       };
     });
 
@@ -371,7 +329,7 @@ const RoomsPage: React.FC = () => {
       ...room,
       amenities: convertedAmenities,
       default_image_url: room.image?.[0] || "",
-    };
+    } as any;
   };
 
   const handleBookNow = (room: Room) => {
@@ -467,8 +425,7 @@ const RoomsPage: React.FC = () => {
   };
 
   const getAmenityIcon = (amenity: string) => {
-    const normalizedAmenity = amenity.toLowerCase();
-    switch (normalizedAmenity) {
+    switch (amenity) {
       case "wifi":
         return <Wifi className="h-4 w-4 text-tripswift-blue" />;
       case "swimming_pool":
@@ -505,7 +462,6 @@ const RoomsPage: React.FC = () => {
         return <CheckCircle className="h-4 w-4 text-tripswift-blue" />;
     }
   };
-
   return (
     <div className="bg-[#F5F7FA] min-h-screen font-noto-sans relative">
       {/* Room Not Available Overlay */}
@@ -920,10 +876,14 @@ const RoomsPage: React.FC = () => {
                     <h3 className="text-section-heading mb-3">
                       {t("RoomsPage.propertyAmenities")}
                     </h3>
+
                     {propertyDetails?.property_amenities?.amenities &&
-                      Object.keys(propertyDetails.property_amenities.amenities).length > 0 ? (
+                      Object.keys(propertyDetails.property_amenities.amenities)
+                        .length > 0 ? (
                       <div className="flex flex-wrap gap-2">
-                        {Object.entries(propertyDetails.property_amenities.amenities)
+                        {Object.entries(
+                          propertyDetails.property_amenities.amenities
+                        )
                           .filter(([_, hasAmenity]) => hasAmenity)
                           .map(([amenity]) => (
                             <div
@@ -948,22 +908,11 @@ const RoomsPage: React.FC = () => {
                 {/* Property amenities and contact info */}
                 <div className="lg:col-span-1">
                   {/* Property amenities */}
-                  {/* <div className="bg-tripswift-blue/5 p-4 rounded-xl mb-2">
+                  <div className="bg-tripswift-blue/5 p-4 rounded-xl mb-2">
                     {qrCodeData.qrCode && qrCodeData.couponCode && (
                       <QRCodeDisplay qrCode={qrCodeData.qrCode} />
                     )}
-                  </div> */}
-
-
-                  {/* Property description */}
-                  {propertyDetails?.description && (
-                    <div className="mt-4 p-4">
-                      <h3 className="text-section-heading mb-2">{t('RoomsPage.aboutThisProperty')}</h3>
-                      <p className="text-description">
-                        {propertyDetails.description}
-                      </p>
-                    </div>
-                  )}
+                  </div>
 
                   {/* Contact information */}
                   <div className="bg-tripswift-off-white p-4 rounded-xl border border-gray-100">
@@ -1125,32 +1074,18 @@ const RoomsPage: React.FC = () => {
                 const guestCount = guestDetails?.guests || 1;
                 const matchingRate =
                   room.baseByGuestAmts.find((rate) => rate.numberOfGuests === guestCount) ||
-                  room.baseByGuestAmts[0];
+                  room.baseByGuestAmts[0]; // Fallback to first rate
                 displayPrice = `${room.currency_code} ${matchingRate.amountBeforeTax.toFixed(2)}`;
               }
 
-              // Check if the room type is unavailable
-              const isUnavailable = unavailableRoomTypes.some(
-                (unavailable) => unavailable.roomType === room.room_type
-              );
-
               return (
-                <div
+                <RoomCard
                   key={room._id}
-                  className={`relative ${isUnavailable ? "blur-sm opacity-60" : ""}`}
-                >
-                  <RoomCard
-                    data={convertAmenities(room)}
-                    price={displayPrice}
-                    onBookNow={() => handleBookNow(room)}
-                    isPriceAvailable={room.has_valid_rate && !isUnavailable} // Disable booking for unavailable rooms
-                  />
-                  {isUnavailable && (
-                    <div className="absolute top-4 left-4 z-20 bg-gray-600 text-tripswift-off-white text-xs font-tripswift-semibold py-1 px-2.5 rounded-full flex items-center shadow-md">
-                      {t("RoomsPage.RoomCard.notAvailable")}
-                    </div>
-                  )}
-                </div>
+                  data={convertAmenities(room)}
+                  price={displayPrice}
+                  onBookNow={() => handleBookNow(room)}
+                  isPriceAvailable={room.has_valid_rate}
+                />
               );
             })}
           </div>

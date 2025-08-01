@@ -2,7 +2,7 @@
 
 import React from "react";
 import Register from "./authRegister";
-import RedirectIfAuthenticated from "@/components/check_authentication/RedirectIfAuthenticated";
+import RedirectIfAuthenticated from "@/components/checkAuthentication/RedirectIfAuthenticated";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const RegisterPage = () => {
