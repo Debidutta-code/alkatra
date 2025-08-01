@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getHotelsByCity } from "@/api/hotel";
-import { FilterState } from "@/components/HotelBox/FilterModal";
+import { FilterState } from "@/components/hotelBox/FilterModal";
 import {
   setPropertyId,
   setCheckInDate,
@@ -24,7 +24,7 @@ import { useSelector } from "@/Redux/store";
 import { formatDate, calculateNights } from "@/utils/dateUtils";
 import { useTranslation } from "react-i18next";
 
-import CompactSearchBar from "@/components/HotelBox/CompactSearchBar";
+import CompactSearchBar from "@/components/hotelBox/CompactSearchBar";
 import HotelCardItem from "@/components/hotelListingComponents/HotelCardItem";
 import ActiveFilters from "@/components/hotelListingComponents/ActiveFilters";
 import FilterSidebar from "@/components/hotelListingComponents/FilterSidebar";

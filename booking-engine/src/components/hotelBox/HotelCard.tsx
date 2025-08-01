@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import i18next from "../../i18n/Index";
 import Home from "@/components/assets/popular/Home.jpg";
-import CompactSearchBar from "../HotelBox/CompactSearchBar";
+import CompactSearchBar from "../hotelBox/CompactSearchBar";
 import { format, addDays } from "date-fns";
 import QRCodeForAPP from "../ui/qrcode";
 

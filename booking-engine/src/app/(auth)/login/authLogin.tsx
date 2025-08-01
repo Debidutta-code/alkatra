@@ -109,6 +109,11 @@ const Login: React.FC = () => {
       <UpdatePassword
         email={verifiedEmail}
         onBack={() => setIsUpdatePassword(false)}
+        onSuccess={() => {
+          setIsUpdatePassword(false);
+          setIsForgotPassword(false);
+          setVerifiedEmail("");
+        }}
       />
     );
   }

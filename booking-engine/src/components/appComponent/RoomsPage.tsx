@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
-import { RoomCard } from "@/components/AppComponent/RoomCard";
+import { RoomCard } from "@/components/appComponent/RoomCard";
 import GuestInformationModal, { Guest } from "@/components/bookingComponents/GuestInformationModal";
 import { useDispatch, useSelector } from "@/Redux/store";
 import { setAmount, setRoomId } from "@/Redux/slices/pmsHotelCard.slice";

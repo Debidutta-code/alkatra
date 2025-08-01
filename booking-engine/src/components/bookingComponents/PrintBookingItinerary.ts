@@ -1,5 +1,5 @@
-import { Booking, GuestDetails } from "./BookingTabs/types";
-import { formatDateString } from "./BookingTabs/utils";
+import { Booking, GuestDetails } from "./bookingTabs/types";
+import { formatDateString } from "./bookingTabs/utils";
 import { TFunction } from "i18next";
 
 export const generatePrintContent = (

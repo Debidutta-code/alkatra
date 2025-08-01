@@ -25,7 +25,7 @@ import {
   getRoomTypeStyle,
   getRoomTypeIcon,
 } from "./utils";
-import { printBookingItinerary } from '../printBookingItinerary';
+import { printBookingItinerary } from '../PrintBookingItinerary';
 
 interface BookingDetailsModalProps {
   booking: Booking;
