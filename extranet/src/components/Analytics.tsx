@@ -658,7 +658,7 @@ const Analytics = () => {
                 </div>
               </ChartCard>
             )}
-            {!selectedHotel && (
+            {(isSuperAdmin || isGroupManager) && !selectedHotel && (
               <ChartCard
                 title="Top Performing Properties"
                 subtitle="Highest performing hotels by revenue and reservations"
