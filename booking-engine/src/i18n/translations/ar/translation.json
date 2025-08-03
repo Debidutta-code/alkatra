@@ -465,7 +465,9 @@
           "reducingStay": "تقليل مدة الإقامة يخضع لسياسة الإلغاء"
         },
         "gotIt": "فهمت"
-      }
+      },
+      "seeMore": "عرض المزيد",
+      "showLess": "عرض أقل"
     }
   },
   "CancellationPolicies": {
@@ -592,11 +594,13 @@
       "phoneNotVerified": "رقم الهاتف غير مُتحقق",
       "phoneInvalidError": "يرجى إدخال رقم هاتف صالح",
       "processing": "جارٍ المعالجة...",
-      "verifying": "جارٍ التحقق"
+      "verifying": "جارٍ التحقق",
+      "priceFetchError": "تعذر جلب السعر المحدث. يرجى المحاولة مرة أخرى لاحقًا."
     }
   },
   "BookingTabs": {
     "userNotLoggedIn": "المستخدم غير مسجل الدخول",
+    "backToHome": "العودة إلى الصفحة الرئيسية",
     "noBooking": "لا يوجد حجز",
     "BookingHeader": {
       "yourBookings": "حجوزاتك",

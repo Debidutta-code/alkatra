@@ -61,7 +61,7 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
-
+  const [isCardComplete, setIsCardComplete] = useState(false);
   const auth = useSelector((state: any) => state.auth);
   const token = auth?.token || auth?.accessToken;
 
@@ -93,6 +93,15 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
     });
   }, [bookingDetails, stripe, elements, token]);
 
+  // Handle card element changes
+  const handleCardChange = (event: any) => {
+    setIsCardComplete(event.complete);
+    if (event.error) {
+      setErrorMessage(event.error.message);
+    } else {
+      setErrorMessage(null);
+    }
+  };
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -276,6 +285,7 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
         <div className="p-4 border border-gray-300 rounded-lg bg-tripswift-off-white min-h-[48px]">
           <CardElement
             id="card-element"
+            onChange={handleCardChange}
             options={{
               style: {
                 base: {
@@ -317,10 +327,10 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
 
       <button
         type="submit"
-        disabled={!stripe || isLoading || !!validationError}
-        className={`w-full py-3 px-4 rounded-lg transition-all duration-300 ${isLoading || !stripe || validationError
-          ? 'bg-gray-300 cursor-not-allowed text-tripswift-black/50'
-          : 'bg-tripswift-blue hover:bg-[#054B8F] text-tripswift-off-white'
+        disabled={!stripe || isLoading || !!validationError || !isCardComplete}
+        className={`w-full py-3 px-4 rounded-lg transition-all duration-300 ${isLoading || !stripe || validationError || !isCardComplete
+            ? 'bg-gray-300 cursor-not-allowed text-tripswift-black/50'
+            : 'bg-tripswift-blue hover:bg-[#054B8F] text-tripswift-off-white'
           } font-tripswift-semibold`}
       >
         {isLoading ? (

@@ -12,7 +12,6 @@ import { jwtDecode } from "jwt-decode";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -25,8 +24,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-  DialogClose,
 } from "../../../components/ui/dialog";
 import { toast } from "react-hot-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
