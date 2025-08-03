@@ -1,30 +1,33 @@
 import express from "express";
 import cors from "cors"
 import morgan from "morgan"
-const bodyParser = require('body-parser');
+import { config } from "./config";
+
+const {
+  expressJsonLimit,
+  expressUrlencodedLimit,
+  expressStaticPathFolder,
+  expressUrlencodedExtended,
+  morganMode
+} = config.server;
+
+const {
+  origins,
+  methods,
+  allowedHeaders,
+  credentials
+} = config.server.cors;
 
 export const app = express();
 
-app.use(
-    cors({
-      origin: ["https://alhajz.ai",'https://extranet.alhajz.ai', 'http://localhost:3004'], 
-      methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"], 
-      allowedHeaders: ["Content-Type", "Authorization", "Cache-Control", "Pragma", "Expires"],
-      credentials: true,
-    })
-  );
-
-// Increase the payload size limit
-app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.urlencoded({ 
-    limit: '50mb', 
-    extended: true 
+app.use(cors({
+  origin: origins,
+  methods: methods,
+  allowedHeaders: allowedHeaders,
+  credentials: credentials,
 }));
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"));
-app.use(morgan("dev"));
-app.use(express.json({ limit: '50mb' }));
-app.options("*", cors());
+app.use(express.json({ limit: expressJsonLimit }));
+app.use(express.urlencoded({ extended: expressUrlencodedExtended, limit: expressUrlencodedLimit }));
+app.use(express.static(expressStaticPathFolder));
+app.use(morgan(morganMode));
 

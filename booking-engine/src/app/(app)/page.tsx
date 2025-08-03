@@ -1,7 +1,7 @@
 "use client"
 import 'regenerator-runtime/runtime';
 
-import HotelCard from "@/components/HotelBox/HotelCard";
+import HotelCard from "@/components/hotelBox/HotelCard";
 import DestinationCarousel from '@/components/homeComponents/HomeSection';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
