@@ -27,36 +27,44 @@ initializeExpressRoutes({ app }).then(async () => {
 
 
 // CORN job implemented to auto cancel
-cron.schedule("*/1 * * * *", async () => {
-  try {
-    const fortyMinutesAgo = new Date(Date.now() - 40 * 60 * 1000);
-    const cryptoPaymentDetails = await CryptoPaymentDetails.updateMany(
-      {
-        status: "Pending",
-        createdAt: { $lte: fortyMinutesAgo }
-      },
-      {
-        $set: { status: "Cancelled" }
-      }
-    );
-    const cryptoGuestDetails = await CryptoGuestDetails.updateMany(
-      {
-        status: "Processing",
-        createdAt: { $lte: fortyMinutesAgo }
-      },
-      {
-        $set: { status: "Cancelled" }
-      }
-    );
-    console.log("--------***-----------");
-    if (cryptoPaymentDetails.modifiedCount > 0) {
-      console.log(`[AUTO-CANCEL] ${cryptoPaymentDetails.modifiedCount} pending payments marked as Cancelled.`);
-    }
-    if (cryptoGuestDetails.modifiedCount > 0) {
-      console.log(`[AUTO-CANCEL] ${cryptoGuestDetails.modifiedCount} processing guest details initiated payments marked as Cancelled.`);
-    }
-    console.log("--------***-----------");
-  } catch (error) {
-    console.error("[AUTO-CANCEL ERROR]", error);
-  }
-});
+// cron.schedule("*/1 * * * *", async () => {
+//   try {
+//     const fortyMinutesAgo = new Date(Date.now() - 40 * 60 * 1000);
+
+//     console.log("--------***--fortyMinutesAgo---------", fortyMinutesAgo);
+//     const matches = await CryptoPaymentDetails.find({
+//       status: "Pending",
+//       createdAt: { $lte: fortyMinutesAgo }
+//     });
+
+//     console.log("Matching documents:", matches);
+//     const cryptoPaymentDetails = await CryptoPaymentDetails.updateMany(
+//       {
+//         status: "Pending",
+//         createdAt: { $lte: fortyMinutesAgo }
+//       },
+//       {
+//         $set: { status: "Cancelled" }
+//       }
+//     );
+//     const cryptoGuestDetails = await CryptoGuestDetails.updateMany(
+//       {
+//         status: "Processing",
+//         createdAt: { $lte: fortyMinutesAgo }
+//       },
+//       {
+//         $set: { status: "Cancelled" }
+//       }
+//     );
+//     console.log("--------***-----------", cryptoGuestDetails);
+//     if (cryptoPaymentDetails.modifiedCount > 0) {
+//       console.log(`[AUTO-CANCEL] ${cryptoPaymentDetails.modifiedCount} pending payments marked as Cancelled.`);
+//     }
+//     if (cryptoGuestDetails.modifiedCount > 0) {
+//       console.log(`[AUTO-CANCEL] ${cryptoGuestDetails.modifiedCount} processing guest details initiated payments marked as Cancelled.`);
+//     }
+//     console.log("--------***-----------");
+//   } catch (error) {
+//     console.error("[AUTO-CANCEL ERROR]", error);
+//   }
+// });

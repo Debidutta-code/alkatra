@@ -101,11 +101,11 @@ export default function AppSidebar({ role }: { role?: string }) {
       href: "/app/notifications",
       icon: Crown,
     },
-    {
-      title: "Logs",
-      href: "/app/logs",
-      icon: Shield,
-    },
+    // {
+    //   title: "Logs",
+    //   href: "/app/logs",
+    //   icon: Shield,
+    // },
   ];
 
   const visibleItems = navigationItems.filter(item => !item.restricted);

@@ -12,7 +12,7 @@ export const config = {
         mode: env.MODE as string,
         expressJsonLimit: env.EXPRESS_JSON_LIMIT as string,
         expressUrlencodedLimit: env.EXPRESS_URLENCODED_LIMIT as string,
-        expressStaticFolderPath: env.EXPRESS_STATIC_FOLDER_PATH as string,
+        expressStaticPathFolder: env.EXPRESS_STATIC_FOLDER_PATH as string,
         expressUrlencodedExtended: Boolean(env.EXPRESS_URLENCODED_EXTENDED),
         morganMode: env.MORGAN_MODE as string,
         appName: env.APP_NAME as string,
@@ -23,13 +23,13 @@ export const config = {
             origins: env.CORS_ORIGINS.split(",") as string[],
             methods: env.CORS_METHODS.split(",") as string[],
             allowedHeaders: env.CORS_HEADERS.split(",") as string[],
-            credentials: Boolean(env.CORS_CREDENTIALS)
+            credentials: Boolean(env.CORS_CREDENTIALS),
         },
         jwt: {
             secretKey: env.JWT_SECRET_KEY as string,
             expiresIn: env.JWT_EXPIRES_IN as string,
-            devSecretKey: env.JWT_SECRET_KEY_DEV as string,
-            devExpiresIn: env.JWT_EXPIRES_IN_DEV as string
+            secretKeyDev: env.JWT_SECRET_KEY_DEV as string,
+            expiresInDev: env.JWT_EXPIRES_IN_DEV as string
         },
     },
 

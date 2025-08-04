@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { format, parseISO, differenceInDays, differenceInHours } from "date-fns";
-import { Booking } from '../bookingComponents/BookingTabs/types';
+import { Booking } from './bookingTabs/types';
 import Cookies from "js-cookie";
 import {
   AlertTriangle,

@@ -461,7 +461,9 @@
           "reducingStay": "प्रवास की अवधि को कम करने पर मूल बुकिंग की रद्दीकरण नीति लागू हो सकती है"
         },
         "gotIt": "समझ गया"
-      }
+      },
+      "seeMore": "और देखें",
+      "showLess": "कम दिखाएं"
     }
   },
   "CancellationPolicies": {
@@ -588,11 +590,13 @@
       "phoneNotVerified": "फोन नंबर सत्यापित नहीं है",
       "phoneInvalidError": "कृपया एक वैध फोन नंबर दर्ज करें",
       "processing": "प्रसंस्करण कर रहा है...",
-      "verifying": "सत्यापन हो रहा है"
+      "verifying": "सत्यापन हो रहा है",
+      "priceFetchError": "अपडेट की गई कीमत प्राप्त नहीं की जा सकी। कृपया बाद में पुनः प्रयास करें।"
     }
   },
   "BookingTabs": {
     "userNotLoggedIn": "उपयोगकर्ता लॉग इन नहीं है",
+    "backToHome": "मुखपृष्ठ पर वापस जाएं",
     "noBooking": "कोई बुकिंग नहीं है",
     "BookingHeader": {
       "yourBookings": "आपकी बुकिंग",
