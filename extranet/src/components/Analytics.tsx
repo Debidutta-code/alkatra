@@ -716,7 +716,7 @@ const Analytics = () => {
                       label={({ name, value }) => {
                         const totalRevenue = paymentMethodData.reduce((sum, item) => sum + item.totalRevenue, 0);
                         const percentage = (value / totalRevenue * 100).toFixed(1);
-                        return `${name} ${percentage}%`;
+                        return `${name} ${percentage === '100.0' ? '100' : percentage}%`;
                       }}
                     >
                       {paymentMethodData.map((entry, index) => (
