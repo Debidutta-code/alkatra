@@ -1,3 +1,5 @@
+export { IDatabase } from "./IDatabase";
+
 export {
     IStorageProvider,
     IFileUploader
