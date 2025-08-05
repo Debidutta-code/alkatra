@@ -136,7 +136,8 @@
     "helpFeedback": "Help & Feedback",
     "logout": "Log Out",
     "signUp": "Sign Up",
-    "login": "Log In"
+    "login": "Log In",
+    "referral": "Referral"
   },
   "Footer": {
     "companyTitle": "Company",
@@ -204,6 +205,32 @@
     "freeCancellation": "Free Cancellation",
     "bestPriceGuarantee": "Best Price Guarantee",
     "downloadourapp": "Download Our App"
+  },
+  "Referral": {
+    "heroTitle": "Refer a Friend",
+    "heroSubtitle": "Invite your friends and enjoy exclusive rewards when they join",
+    "howItWorks": "How It Works",
+    "howItWorksSubTitle": "Invite people to win rewards",
+    "step1Title": "Send invitation",
+    "step1Desc": "Share invitation link to friends and win rewards",
+    "step2Title": "Sign Up",
+    "step2Desc": "Let them register to our service using your referral link",
+    "step3Title": "Earn",
+    "step3Desc": "Get rewards",
+    "stepLabel": "Step {{number}}",
+    "shareYourLink": "Share Your Referral Link",
+    "shareDescription": "You can also share your referral link by copying and sending it to your friends or sharing it to social media.",
+    "copy": "Copy referral link",
+    "copied": "Copied!",
+    "shareVia": "Share via:",
+    "generateQr": "Generate QR Code",
+    "scanToShare": "Scan to Share",
+    "scanDescription": "Scan this QR code or save it to share with friends.",
+
+    "hideReferrals": "Hide Referrals",
+    "viewYourReferrals": "View Your Referrals",
+    "total": "Total:",
+    "referrals": "referrals"
   },
   "HotelListing": {
     "CompactSearchBar": {
