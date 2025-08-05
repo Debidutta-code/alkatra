@@ -932,9 +932,9 @@ export async function createReservationWithCryptoPayment(input: {
       email,
       phone,
       guests: categorizedGuests,
-      supportEmail: 'https://alhajz.ai',
+      supportEmail: 'business.alhajz@gmail.com',
       // supportPhone: '+1-800-123-4567',
-      websiteUrl: 'business.alhajz@gmail.com',
+      websiteUrl: 'https://alhajz.ai',
       currentYear: new Date().getFullYear(),
       companyName: 'Al-Hajz',
     };
@@ -1264,7 +1264,7 @@ export const updateThirdPartyReservation = CatchAsyncError(
           guests: categorizedGuests,
           supportEmail: 'business.alhajz@gmail.com',
           // supportPhone: '+1-800-123-4567',
-          websiteUrl: 'business.alhajz@gmail.com',
+          websiteUrl: 'https://alhajz.ai',
           currentYear: new Date().getFullYear(),
           companyName: 'Al-Hajz',
         };
