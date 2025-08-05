@@ -72,7 +72,11 @@ export default function PaymentSuccess() {
   } = useSelector((state: any) => state.pmsHotelCard);
 
   // Combine data sources with priority order: Booking API > URL params > Redux > Default
-  const amount = amountParam ? parseFloat(amountParam) : reduxAmount;
+  const amount = amountParam 
+  ? parseFloat((parseFloat(amountParam).toFixed(2))) 
+  : reduxAmount != null 
+    ? parseFloat(parseFloat(reduxAmount).toFixed(2)) 
+    : 0;
   const handleDownloadConfirmation = () => {
     if (!amount) {
       toast.error(t("Payment.PaymentSuccess.noAmountForDownload"));
@@ -112,7 +116,7 @@ export default function PaymentSuccess() {
       `Nights: ${getBookingNights()}`,
       `Guests: ${getGuestCountDisplay()}`,
       `Payment Method: Pay at Hotel`,
-      `Total Amount: ₹${amount.toLocaleString()}`
+      `Total Amount: ₹{(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
     ];
 
     details.forEach(detail => {
@@ -676,7 +680,7 @@ export default function PaymentSuccess() {
                         {t("Payment.PaymentSuccess.total")}
                       </span>
                       <span className="font-tripswift-bold text-base sm:text-lg text-tripswift-blue">
-                        ${amount.toLocaleString()}
+                        {(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="text-[10px] sm:text-xs text-tripswift-black/50 text-right mt-1">

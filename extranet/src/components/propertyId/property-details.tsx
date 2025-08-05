@@ -66,7 +66,7 @@ export function PropertyDetails({
     if (!validateFields()) {
       return;
     }
-  
+
     try {
       if (!accessToken || !propertyId) {
         console.error('Access token or property ID is missing');
@@ -75,7 +75,7 @@ export function PropertyDetails({
       }
       const response = await updateProperty(propertyId, accessToken, editedProperty);
       console.log(response.data);
-  
+
       if (response.data) {
         setProperty({ data: { ...editedProperty } });
         setEditMode(false);
@@ -101,13 +101,16 @@ export function PropertyDetails({
   return (
     <Card className="w-full shadow-sm hover:shadow-md transition-shadow duration-300">
       <CardHeader className="flex flex-row items-center justify-between border-b pb-3">
-        <CardTitle className="text-primary font-semibold text-lg sm:text-xl">Property Details</CardTitle>
-        <div className="flex gap-2">
+        <CardTitle className="text-primary font-semibold text-lg sm:text-xl">
+          Property Details
+        </CardTitle>
+        <div className="flex gap-2 mt-2 sm:mt-0">
           {editMode && (
             <Button
               variant="outline"
               size="sm"
               onClick={() => setEditMode(false)}
+              className="w-full sm:w-auto"
             >
               Cancel
             </Button>
@@ -117,6 +120,7 @@ export function PropertyDetails({
               variant="outline"
               size="sm"
               onClick={editMode ? handleSaveClick : () => setEditMode(true)}
+              className="w-full sm:w-auto"
             >
               {editMode ? <Save className="mr-2 h-4 w-4" /> : <PenTool className="mr-2 h-4 w-4" />}
               {editMode ? 'Update' : 'Edit'}
@@ -128,17 +132,18 @@ export function PropertyDetails({
       <CardContent className="pt-0">
         {editMode ? (
           <div className="pt-4 space-y-6">
-            <div className="grid grid-cols-[120px_1fr] items-center gap-4">
-              <label className="text-sm text-gray-500">
+            {/* Responsive field layout: stacked on small screens, side-by-side on md+ */}
+            <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-2 sm:gap-4 items-center">
+              <label className="text-sm text-gray-500 sm:self-start">
                 Property Name <span className="text-red-500">*</span>
               </label>
-              <div>
+              <div className="space-y-1">
                 <Input
                   name="property_name"
                   value={editedProperty.property_name || ""}
                   onChange={handleInputChange}
                   placeholder="Property Name"
-                  className={`w-full ${errors.property_name ? 'border-red-500' : ''}`}
+                  className={errors.property_name ? 'border-red-500' : ''}
                 />
                 {errors.property_name && (
                   <p className="text-red-500 text-xs mt-1">Property Name is required</p>
@@ -146,17 +151,17 @@ export function PropertyDetails({
               </div>
             </div>
 
-            <div className="grid grid-cols-[120px_1fr] items-center gap-4">
-              <label className="text-sm text-gray-500">
+            <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-2 sm:gap-4 items-center">
+              <label className="text-sm text-gray-500 sm:self-start">
                 Property Email <span className="text-red-500">*</span>
               </label>
-              <div>
+              <div className="space-y-1">
                 <Input
                   name="property_email"
                   value={editedProperty.property_email || ""}
                   onChange={handleInputChange}
                   placeholder="Property Email"
-                  className={`w-full ${errors.property_email ? 'border-red-500' : ''}`}
+                  className={errors.property_email ? 'border-red-500' : ''}
                 />
                 {errors.property_email && (
                   <p className="text-red-500 text-xs mt-1">{emailErrorMessage}</p>
@@ -164,11 +169,11 @@ export function PropertyDetails({
               </div>
             </div>
 
-            <div className="grid grid-cols-[120px_1fr] items-center gap-4">
-              <label className="text-sm text-gray-500">
-                Property Contact<span className="text-red-500">*</span>
+            <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-2 sm:gap-4 items-center">
+              <label className="text-sm text-gray-500 sm:self-start">
+                Property Contact <span className="text-red-500">*</span>
               </label>
-              <div>
+              <div className="space-y-1">
                 <Input
                   name="property_contact"
                   value={editedProperty.property_contact || ""}
@@ -178,8 +183,8 @@ export function PropertyDetails({
                     const syntheticEvent = {
                       target: {
                         name: 'property_contact',
-                        value: digitsOnly
-                      }
+                        value: digitsOnly,
+                      },
                     } as React.ChangeEvent<HTMLInputElement>;
                     handleInputChange?.(syntheticEvent);
                   }}
@@ -188,7 +193,7 @@ export function PropertyDetails({
                     target.value = target.value.replace(/\D/g, '');
                   }}
                   placeholder="Property Contact"
-                  className={`w-full ${errors.property_contact ? 'border-red-500' : ''}`}
+                  className={errors.property_contact ? 'border-red-500' : ''}
                 />
                 {errors.property_contact && (
                   <p className="text-red-500 text-xs mt-1">Contact must be a valid 10-digit number</p>
@@ -196,8 +201,8 @@ export function PropertyDetails({
               </div>
             </div>
 
-            <div className="grid grid-cols-[120px_1fr] items-center gap-4">
-              <label className="text-sm text-gray-500">
+            <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-2 sm:gap-4 items-start">
+              <label className="text-sm text-gray-500 pt-2">
                 Description
               </label>
               <div>
@@ -213,36 +218,36 @@ export function PropertyDetails({
             </div>
           </div>
         ) : (
-          <div className="space-y-0">
+          <div className="space-y-0 divide-gray-100">
             {property && property.data ? (
-              <div>
-                <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">Name</div>
-                  <div className="w-3/4 text-sm font-medium break-words overflow-hidden">
+              <>
+                <div className="py-2 flex flex-col sm:flex-row">
+                  <div className="w-full sm:w-1/4 text-sm text-gray-500 mb-1 sm:mb-0">Name</div>
+                  <div className="w-full sm:w-3/4 text-sm font-medium break-words">
                     {property.data.property_name || 'N/A'}
                   </div>
                 </div>
-                <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">Email</div>
-                  <div className="w-3/4 text-sm font-medium break-words overflow-hidden">
+                <div className="py-2 flex flex-col sm:flex-row">
+                  <div className="w-full sm:w-1/4 text-sm text-gray-500 mb-1 sm:mb-0">Email</div>
+                  <div className="w-full sm:w-3/4 text-sm font-medium break-words">
                     {property.data.property_email || 'N/A'}
                   </div>
                 </div>
-                <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">Contact</div>
-                  <div className="w-3/4 text-sm font-medium break-words overflow-hidden">
+                <div className="py-2 flex flex-col sm:flex-row">
+                  <div className="w-full sm:w-1/4 text-sm text-gray-500 mb-1 sm:mb-0">Contact</div>
+                  <div className="w-full sm:w-3/4 text-sm font-medium break-words">
                     {property.data.property_contact || 'N/A'}
                   </div>
                 </div>
-                <div className="py-2 flex items-start">
-                  <div className="w-1/4 text-sm text-gray-500">Description</div>
-                  <div className="w-3/4 text-sm font-medium break-words overflow-hidden">
+                <div className="py-2 flex flex-col sm:flex-row">
+                  <div className="w-full sm:w-1/4 text-sm text-gray-500 mb-1 sm:mb-0">Description</div>
+                  <div className="w-full sm:w-3/4 text-sm font-medium break-words">
                     {property.data.description || 'N/A'}
                   </div>
                 </div>
-              </div>
+              </>
             ) : (
-              <div className="bg-muted/50 rounded-lg p-6 text-center">
+              <div className="bg-muted/50 rounded-lg p-6 text-center mt-4">
                 <p className="text-muted-foreground">No property details found</p>
               </div>
             )}
