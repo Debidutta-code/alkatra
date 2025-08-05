@@ -418,57 +418,55 @@
   },
   "RoomsPage": {
     "backToSearch": "العودة إلى البحث",
-    "starHotelRating": "فندق نجوم",
+    "starHotelRating": "تصنيف الفندق حسب النجوم",
     "viewPropertyDetails": "عرض تفاصيل العقار",
     "aboutThisProperty": "عن هذا العقار",
     "noImagesAvailable": "لا توجد صور متاحة",
     "propertyAmenities": "مرافق العقار",
     "nights": "ليلة",
-    "nightsPlural": "ليالي",
+    "nightsPlural": "ليالٍ",
     "stay": "إقامة",
-    "filter": "فلتر",
+    "filter": "تصفية",
+    "viewAllPhotos": "عرض جميع الصور",
     "amenitiesList": {
       "wifi": "واي فاي مجاني",
-      "swimming_pool": "حمام سباحة",
-      "fitness_center": "مركز لياقة بدنية",
-      "spa_and_wellness": "سبا وصحة",
+      "swimming_pool": "مسبح",
+      "fitness_center": "مركز للياقة البدنية",
+      "spa_and_wellness": "سبا وعناية بالصحة",
       "restaurant": "مطعم",
       "room_service": "خدمة الغرف",
       "bar_and_lounge": "بار وصالة",
       "parking": "موقف سيارات",
       "concierge_services": "خدمات الكونسيرج",
-      "pet_friendly": "صديق للحيوانات الأليفة",
+      "pet_friendly": "مسموح بالحيوانات الأليفة",
       "business_facilities": "مرافق الأعمال",
       "laundry_services": "خدمات الغسيل",
-      "child_friendly_facilities": "مرافق صديقة للأطفال",
-      "non_smoking_rooms": "غرف غير مدخنين",
-      "facilities_for_disabled_guests": "مرافق للضيوف ذوي الإعاقة",
+      "child_friendly_facilities": "مرافق مناسبة للأطفال",
+      "non_smoking_rooms": "غرف لغير المدخنين",
+      "facilities_for_disabled_guests": "مرافق للضيوف ذوي الإعاقات",
       "family_rooms": "غرف عائلية"
     },
     "noAmenitiesSpecified": "لم يتم تحديد أي مرافق لهذا العقار.",
     "contactInformation": "معلومات الاتصال",
     "allRooms": "جميع الغرف",
-    "searchRoomName": "ابحث عن الغرفة بالاسم",
+    "searchRoomName": "البحث عن غرفة حسب الاسم",
     "availableRooms": "الغرف المتاحة",
-    "showingRooms_zero": "لا توجد غرف",
     "showingRooms_one": "عرض {{count}} غرفة",
-    "showingRooms_two": "عرض {{count}} غرفتين",
-    "showingRooms_few": "عرض {{count}} غرف",
-    "showingRooms_many": "عرض {{count}} غرفة",
     "showingRooms_other": "عرض {{count}} غرف",
     "noRoomsAvailableTitle": "لا توجد غرف متاحة",
-    "noRoomsAvailableMessage": "لم نتمكن من العثور على أي غرف مطابقة لمعايير البحث الخاصة بك. حاول تعديل فلاتر البحث أو التواريخ.",
-    "goBack": "العودة إلى البحث",
+    "noRoomsAvailableMessage": "تعذر علينا العثور على غرف تطابق معاييرك. حاول تعديل عوامل التصفية أو التواريخ.",
+    "goBack": "العودة",
     "clearFilters": "مسح الفلاتر",
-    "loadingRoomsMessage": "جارٍ تحميل الغرف المتاحة...",
+    "loadingRoomsMessage": "جاري تحميل الغرف المتاحة...",
+    "priceNotAvailable": "",
     "qrCode": {
       "discountTitle": "استخدم خصمك",
-      "qrCodeAlt": "رمز الخصم QR",
-      "scanToApply": "امسح للتطبيق",
+      "qrCodeAlt": "رمز الاستجابة السريعة للخصم",
+      "scanToApply": "امسح لتطبيق الخصم",
       "instructions": {
-        "scanAtCheckout": "امسح رمز الاستجابة السريعة لفتح هذه الغرفة في تطبيق الحجز.",
-        "applyDiscount": "إذا لم يكن التطبيق مثبتاً، ستتم مطالبتك بتنزيله.",
-        "validityNote": "احجز من خلال التطبيق للحصول على خصم حصري لهذه الغرفة."
+        "scanAtCheckout": "امسح رمز الاستجابة السريعة لفتح هذه الغرفة في تطبيق Alhajz.",
+        "applyDiscount": "إذا لم يكن التطبيق مثبتًا، فسيُطلب منك تنزيله.",
+        "validityNote": "احجز عبر التطبيق للحصول على خصم حصري لهذه الغرفة."
       }
     },
     "RoomCard": {
@@ -479,41 +477,105 @@
       "night": "ليلة",
       "bookNow": "احجز الآن",
       "viewBookingPolicies": "عرض سياسات الحجز",
+      "notAvailable": "غير متاح",
       "securePayment": "دفع آمن",
-      "amenities": {
-        "wifi": "واي فاي مجاني",
-        "airConditioning": "تكييف",
-        "kingBed": "سرير كبير",
-        "smokingBan": "ممنوع التدخين",
-        "view": "إطلالة خلابة",
-        "bathroom": "حمام خاص",
-        "towels": "مناشف مقدمة",
-        "linens": "بياضات السرير",
-        "tableChairs": "طاولة وكراسي",
-        "desk": "مكتب عمل",
-        "dresserWardrobe": "خزانة/دولاب",
-        "sofaSeating": "أريكة للجلوس",
-        "television": "تلفزيون",
-        "telephone": "هاتف",
-        "heating": "تدفئة",
-        "default": "ميزة"
+      "defaultamenities": {
+        "kingBed": "سرير كينج",
+        "bathroom": "حمام خاص"
+      },
+      "roomAmenities": {
+        "basic": {
+          "bed": "سرير",
+          "bedTypes": {
+            "single": "مفرد",
+            "double": "مزدوج",
+            "king": "كينج",
+            "twin": "توأم",
+            "queen": "كوين"
+          },
+          "bathroom": "حمام خاص",
+          "linensBedding": "مفارش وأغطية",
+          "linens": "مفارش نظيفة",
+          "bidet": "_bidet_",
+          "toiletPaper": "ورق حمام",
+          "towelsSheets": "مناشف وشراشف",
+          "freeToiletries": "مستلزمات حمام مجانية",
+          "shower": "دُش",
+          "toilet": "مرحاض"
+        },
+        "furniture": {
+          "tableChairs": "طاولة وكراسي",
+          "desk": "مكتب عمل",
+          "dresserWardrobe": "دولاب ومرآة",
+          "sofaSeating": "مقاعد أريكة",
+          "diningTable": "طاولة طعام",
+          "readingChair": "كرسي قراءة"
+        },
+        "spaceLayout": {
+          "diningArea": "منطقة طعام",
+          "sittingArea": "منطقة جلوس",
+          "balcony": "شرفة"
+        },
+        "technology": {
+          "television": "تلفزيون",
+          "telephone": "هاتف",
+          "wifiInternet": "اتصال واي فاي",
+          "flatScreenTV": "تلفزيون شاشة مسطحة",
+          "satelliteChannels": "قنوات فضائية",
+          "cableChannels": "قنوات كابل"
+        },
+        "climateControl": {
+          "airConditioning": "تكييف هواء",
+          "heating": "تدفئة"
+        },
+        "kitchenetteMiniBar": {
+          "smallRefrigerator": "ثلاجة صغيرة",
+          "microwave": "ميكروويف",
+          "refrigerator": "ثلاجة",
+          "kitchenware": "أدوات مطبخ",
+          "electricKettle": "غلاية كهربائية",
+          "oven": "فرن",
+          "stovetop": "موقد",
+          "teaCoffeeMaker": "ماكينة صنع الشاي/القهوة"
+        },
+        "safetySecurity": {
+          "safe": "خزنة داخل الغرفة",
+          "smokeDetectors": "كاشفات الدخان",
+          "fireExtinguisher": "طفاية حريق"
+        },
+        "toiletries": {
+          "shampooConditioner": "شامبو وبلسم",
+          "soap": "صابون",
+          "hairDryer": "مجفف شعر"
+        },
+        "workLeisure": {
+          "workDesk": "مكتب عمل",
+          "additionalLighting": "إضاءة إضافية",
+          "ironingFacilities": "مرافق كي الملابس"
+        },
+        "accessibilityFeatures": {
+          "accessibleBathroom": "حمام يمكن الوصول إليه",
+          "wheelchairAccessibility": "إمكانية الوصول بكرسي متحرك",
+          "upperFloorsAccessibleByElevator": "الطوابق العليا متاحة عبر المصعد",
+          "entireUnitWheelchairAccessible": "الوحدة بأكملها يمكن الوصول إليها بكرسي متحرك"
+        }
       },
       "policies": {
         "title": "سياسات الحجز",
         "closeModal": "إغلاق النافذة",
         "cancellationPolicy": "سياسة الإلغاء",
         "policyTypes": {
-          "flexible": "مرن",
-          "moderate": "معتدل",
-          "strict": "صارم",
-          "nonrefundable": "غير قابل للاسترداد"
+          "flexible": "مرنة",
+          "moderate": "متوسطة",
+          "strict": "صارمة",
+          "nonrefundable": "غير قابلة للاسترداد"
         },
         "amendmentPolicy": "سياسة التعديل",
         "amendmentPoints": {
-          "dateChanges": "تغييرات التاريخ تخضع للتوافر",
-          "changes72Hours": "التغييرات خلال 72 ساعة من تسجيل الوصول قد تتكبد رسوم إضافية",
-          "roomUpgrades": "ترقيات الغرف تخضع للتوافر والرسوم الإضافية",
-          "reducingStay": "تقليل مدة الإقامة يخضع لسياسة الإلغاء"
+          "dateChanges": "التغييرات في التواريخ تخضع للتوافر",
+          "changes72Hours": "قد تترتب رسوم إضافية على التغييرات خلال 72 ساعة من وقت تسجيل الوصول",
+          "roomUpgrades": "تحديثات الغرفة تخضع للتوافر والرسوم الإضافية",
+          "reducingStay": "تقصير مدة الإقامة يخضع لسياسة الإلغاء"
         },
         "gotIt": "فهمت"
       },

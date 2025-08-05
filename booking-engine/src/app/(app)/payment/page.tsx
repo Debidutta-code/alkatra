@@ -75,10 +75,12 @@ function PaymentPageContent() {
   const infants = parseInt(searchParams.get('infants') || '0', 10);
   const amountFromRedux = useSelector((state: any) => state.pmsHotelCard.amount);
   console.log(`>>>>>>>>>>>>>>>>>###################The amount we get from Redux is: ${amountFromRedux}`);
+
   const { i18n } = useTranslation();
+
   // Use amount from Redux only
-  const amount = amountFromRedux || '0';
-  console.log(`<><><><><><><><><><><><>The amount we are Getting from amountFromRedux is: ${amount}`);
+  const amount = amountFromRedux || '0'; // Still a string
+  console.log(`<><><><><><><><><><><><>The amount we are Getting from amountFromRedux is: ${parseFloat(amount).toFixed(2)}`); // Clean log
   // Parse guests from query parameters
   const guests: Guest[] = (() => {
     try {
@@ -106,7 +108,8 @@ function PaymentPageContent() {
 
   const nights = calculateNights(checkIn, checkOut);
 
-  const ratePerNight = amount / (nights || 1);
+  const numericAmount = parseFloat(amount) || 0;
+  const ratePerNight = nights > 0 ? (numericAmount / nights) : 0;
 
   const bookingDetails = {
     roomId,
@@ -391,7 +394,9 @@ function PaymentPageContent() {
                           <div className="font-tripswift-bold text-xl text-tripswift-blue">
                             {(paymentOption === "payWithCrypto-payWithQR" || paymentOption === "payWithCrypto-payWithWallet") && convertedAmount !== null
                               ? `USD ${convertedAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 })}`
-                              : `${currency.toUpperCase()} ${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 })}`}                          </div>
+                              : `${currency.toUpperCase()} ${numericAmount.toFixed(2)}`
+                            }
+                          </div>
                         </div>
 
                         {paymentOption === 'payAtHotel' && (

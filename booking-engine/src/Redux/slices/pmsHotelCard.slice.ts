@@ -11,9 +11,9 @@ interface PmsHotelCardState {
   checkInDate: string | null;
   checkOutDate: string | null;
   guestDetails: Record<string, any>;
-  baseRatePerNight: string | null; // Added
-  additionalGuestCharges: string | null; // Added
-  requestedRooms: string | null; // Added
+  baseRatePerNight: string | null; 
+  additionalGuestCharges: string | null; 
+  requestedRooms: string | null; 
 }
 
 const initialState: PmsHotelCardState = {
@@ -24,9 +24,9 @@ const initialState: PmsHotelCardState = {
   checkInDate: null,
   checkOutDate: null,
   guestDetails: {},
-  baseRatePerNight: null, // Added
-  additionalGuestCharges: null, // Added
-  requestedRooms: null, // Added
+  baseRatePerNight: null, 
+  additionalGuestCharges: null, 
+  requestedRooms: null, 
 };
 
 const pmsHotelCardSlice = createSlice({
@@ -54,13 +54,13 @@ const pmsHotelCardSlice = createSlice({
     setGuestDetails: (state, action: PayloadAction<Record<string, any>>) => {
       state.guestDetails = action.payload;
     },
-    setBaseRatePerNight: (state, action: PayloadAction<string>) => { // Added
+    setBaseRatePerNight: (state, action: PayloadAction<string>) => { 
       state.baseRatePerNight = action.payload;
     },
-    setAdditionalGuestCharges: (state, action: PayloadAction<string>) => { // Added
+    setAdditionalGuestCharges: (state, action: PayloadAction<string>) => { 
       state.additionalGuestCharges = action.payload;
     },
-    setRequestedRooms: (state, action: PayloadAction<string>) => { // Added
+    setRequestedRooms: (state, action: PayloadAction<string>) => { 
       state.requestedRooms = action.payload;
     },
   },
@@ -74,9 +74,9 @@ export const {
   setCheckOutDate,
   setAmount,
   setGuestDetails,
-  setBaseRatePerNight, // Added
-  setAdditionalGuestCharges, // Added
-  setRequestedRooms, // Added
+  setBaseRatePerNight, 
+  setAdditionalGuestCharges, 
+  setRequestedRooms, 
 } = pmsHotelCardSlice.actions;
 
 export const getUser =
