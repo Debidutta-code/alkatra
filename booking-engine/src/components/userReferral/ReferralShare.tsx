@@ -156,13 +156,12 @@ export default function ReferralShare() {
                   <button
                     onClick={handleCopyLink}
                     disabled={!referralLink}
-                    className={`flex-shrink-0 ml-3 p-2.5 rounded-lg transition-all duration-200 ${
-                      copied
-                        ? "text-green-600 bg-green-50"
-                        : referralLink
+                    className={`flex-shrink-0 ml-3 p-2.5 rounded-lg transition-all duration-200 ${copied
+                      ? "text-green-600 bg-green-50"
+                      : referralLink
                         ? "bg-tripswift-blue text-white hover:bg-blue-600 hover:scale-105 active:scale-95"
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
+                      }`}
                     aria-label={
                       copied ? t("Referral.copied") : t("Referral.copy")
                     }
@@ -219,14 +218,13 @@ export default function ReferralShare() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => !referralLink && e.preventDefault()}
-                    className={`flex items-center justify-center p-3 rounded-xl ${bg} transition-colors duration-200 ${
-                      !referralLink
-                        ? "cursor-not-allowed opacity-50"
-                        : "hover:scale-105"
-                    }`}
+                    className={`flex items-center justify-center p-3 rounded-xl ${bg} transition-colors duration-200 ${!referralLink
+                      ? "cursor-not-allowed opacity-50"
+                      : "hover:scale-105"
+                      }`}
                     title={`Share on ${name}`}
                   >
-                    <Icon className={`w-5 h-5 ${iconColor}`} />
+                    <Icon className={`w-5 h-5 ${iconColor}`} aria-hidden="true" />
                   </a>
                 ))}
               </div>
@@ -245,8 +243,8 @@ export default function ReferralShare() {
                 <img
                   src={qrCodeData}
                   alt="Referral QR Code"
-                  className="w-45 h-45 object-contain"
                   style={{ width: "180px", height: "180px" }}
+                  className="object-contain"
                 />
               ) : referralLink ? (
                 <QRCodeCanvas

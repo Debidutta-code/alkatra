@@ -190,7 +190,9 @@
     "contentComingSoon": "Content for {{tab}} coming soon...",
     "newPasswordOptional": "New Password (optional)",
     "confirmNewPassword": "Confirm New Password",
-    "joined": "Joined {{date}}"
+    "joined": "Joined {{date}}",
+    "notificationsDesc": "Manage your notification preferences and view recent notifications.",
+    "recentNotifications": "Recent Notifications"
   },
   "HotelCard": {
     "heroTitle": "Find the Perfect Stay for Your Journey",
@@ -226,11 +228,24 @@
     "generateQr": "Generate QR Code",
     "scanToShare": "Scan to Share",
     "scanDescription": "Scan this QR code or save it to share with friends.",
-
     "hideReferrals": "Hide Referrals",
     "viewYourReferrals": "View Your Referrals",
     "total": "Total:",
-    "referrals": "referrals"
+    "referrals": "referrals",
+    "wallet": "Wallet",
+    "currentBalance": "Current Balance",
+    "totalEarned": "Total Earned",
+    "totalRedeemed": "Total Redeemed",
+    "redeemEarnings": "Redeem Your Earnings",
+    "enterAmount": "Enter Amount",
+    "availableBalance": "Available Balance",
+    "redeem": "Redeem",
+    "lastUpdated": "Last Updated",
+    "redeemSuccess": "Redeem successful! Your earnings have been added to your wallet.",
+    "tableName": "Name",
+    "tableEmail": "Email",
+    "tableReferralDate": "Referral Date",
+    "tableId": "ID"
   },
   "HotelListing": {
     "CompactSearchBar": {

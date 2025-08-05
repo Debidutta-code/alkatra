@@ -1,26 +1,14 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import Cookies from "js-cookie";
 import ReferralHowItWorks from "./ReferralHowItWorks";
 import ReferralShare from "./ReferralShare";
 import ReferralTable from "./ReferralTable";
+import ReferralWallet from "./ReferralWallet";
 
 export default function Referral() {
   const { t } = useTranslation();
-  // const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  // if (loading) {
-  //   return (
-  //     <div className="min-h-screen bg-tripswift-off-white flex justify-center items-center">
-  //       <div className="flex flex-col items-center">
-  //         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tripswift-blue"></div>
-  //         <p className="mt-4 text-gray-600">Loading referral data...</p>
-  //       </div>
-  //     </div>
-  //   );
-  // }
 
   if (error) {
     return (
@@ -60,20 +48,21 @@ export default function Referral() {
     <div className="min-h-screen bg-tripswift-off-white flex justify-center w-screen">
       <div className="w-screen overflow-hidden">
         {/* Header Section */}
-        <div className="flex flex-col justify-center bg-tripswift-blue p-6 text-center h-[30vh] relative overflow-hidden">
+        <div className="flex flex-col justify-center bg-tripswift-blue p-4 text-center h-[30vh] relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-blue-600/10 to-blue-700/30"></div>
           <h1 className="text-4xl font-bold text-white relative z-10">
             {t("Referral.heroTitle")}
           </h1>
-          <p className="mt-5 text-blue-100 text-sm relative z-10 max-w-md mx-auto">
+          <p className="mt-4 text-blue-100 text-sm relative z-10 max-w-md mx-auto">
             {t("Referral.heroSubtitle")}
           </p>
         </div>
 
         {/* Main Content */}
-        <div className="p-6 md:p-10 space-y-[10vh] -mt-8 relative z-20 w-full">
+        <div className="p-4 md:p-6 space-y-[10vh] mt-2 relative z-20 w-full">
           <ReferralHowItWorks />
           <ReferralShare />
+          <ReferralWallet />
           <ReferralTable />
         </div>
       </div>
