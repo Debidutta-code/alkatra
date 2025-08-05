@@ -143,9 +143,9 @@ class RoomPriceService {
     }
   }
 
-  public static async getAllRoomTypeService() {
+  public static async getAllRoomTypeService(hotelCode: string) {
     try {
-      const responses = await RatePlanDao.getAllRoomType()
+      const responses = await RatePlanDao.getAllRoomType(hotelCode)
       return {
         success: true,
         roomTypes: responses

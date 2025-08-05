@@ -258,9 +258,9 @@ class RatePlanDao {
       }
     };
   }
-  public static async getAllRoomType() {
+  public static async getAllRoomType(hotelCode: string) {
     try {
-      const response = await Inventory.distinct("invTypeCode");
+      const response = await Inventory.distinct("invTypeCode", {hotelCode});
       return response;
     } catch (error) {
       throw new Error(error.message)

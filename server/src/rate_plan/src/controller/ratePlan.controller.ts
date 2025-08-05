@@ -154,8 +154,12 @@ class RoomPrice {
         return response
     }
 
-    public static async getAllRoomTypeController() {
-        const response = await RoomPriceService.getAllRoomTypeService()
+    public static async getAllRoomTypeController(req: Request) {
+        const hotelCode = req.query.hotelCode as string;
+        if (!hotelCode) {
+            throw new Error("Hotel code is required");
+        }
+        const response = await RoomPriceService.getAllRoomTypeService(hotelCode)
         console.log(response)
         return response
     }
