@@ -182,7 +182,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ type: 'spring', damping: 25, stiffness: 400 }}
-              className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-3 w-96 bg-white rounded-xl shadow-xl border border-tripswift-black/5 z-50 max-h-[32rem] overflow-hidden flex flex-col`}
+              className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-3 w-full sm:w-96 max-w-[95vw] bg-white rounded-xl shadow-xl border border-tripswift-black/5 z-50 max-h-[32rem] overflow-hidden flex flex-col`}
               dir={isRTL ? 'rtl' : 'ltr'}
             >
               <div className="bg-gradient-to-r from-tripswift-blue/10 to-tripswift-blue/5 p-4 border-b border-tripswift-black/10">
