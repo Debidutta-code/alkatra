@@ -97,10 +97,19 @@ class RatePlanController {
 
     public static async getRatePlanByHotel(req: Request, res: Response, next: NextFunction) {
         try {
-            const { hotelCode, invTypeCode, startDate, endDate } = req.body;
-            console.log(hotelCode, invTypeCode, startDate, endDate)
+            // const { hotelCode, invTypeCode, startDate, endDate } = req.body;
+            const { hotelCode, invTypeCode } = req.body;
+            // console.log(hotelCode, invTypeCode, startDate, endDate)
+            console.log(hotelCode, invTypeCode)
+
             const page = req.query?.page.toString()
-            const response = await RatePlanService.getRatePlanByHotel(hotelCode, invTypeCode && invTypeCode, startDate && new Date(startDate), endDate && new Date(endDate), page && parseInt(page));
+            const response = await RatePlanService.getRatePlanByHotel(
+                hotelCode, 
+                invTypeCode && invTypeCode, 
+                // startDate && new Date(startDate), 
+                // endDate && new Date(endDate), 
+                page && parseInt(page)
+            );
 
             return response;
         } catch (error) {

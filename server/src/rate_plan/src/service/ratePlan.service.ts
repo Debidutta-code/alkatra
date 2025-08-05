@@ -98,9 +98,11 @@ class RatePlanService {
     };
   }
 
-  public static async getRatePlanByHotel(hotelCode: string, invTypeCode?: string, startDate?: Date, endDate?: Date, page?: number) {
-    const ratePlans = await RatePlanDao.getRatePlanByHotel(hotelCode, invTypeCode && invTypeCode, startDate && startDate, endDate && endDate, page && page);
-    // console.log(ratePlans)
+  public static async getRatePlanByHotelCode(hotelCode: string) {
+    const ratePlans = await RatePlanDao.getRatePlanByHotelCode(hotelCode);
+
+    if (ratePlans.length === 0) throw new Error("No rate plans found for this hotel code");
+
     return {
       success: true,
       message: "Rate plans retrieved successfully",
@@ -108,11 +110,11 @@ class RatePlanService {
     };
   }
 
-  public static async getRatePlanByHotelCode(hotelCode: string) {
-    const ratePlans = await RatePlanDao.getRatePlanByHotelCode(hotelCode);
-
-    if (ratePlans.length === 0) throw new Error("No rate plans found for this hotel code");
-
+  // public static async getRatePlanByHotel(hotelCode: string, invTypeCode?: string, startDate?: Date, endDate?: Date, page?: number) {
+  public static async getRatePlanByHotel(hotelCode: string, invTypeCode?: string, page?: number) {
+    // const ratePlans = await RatePlanDao.getRatePlanByHotel(hotelCode, invTypeCode && invTypeCode, startDate && startDate, endDate && endDate, page && page);
+    const ratePlans = await RatePlanDao.getRatePlanByHotel(hotelCode, invTypeCode && invTypeCode, page && page);
+    // console.log(ratePlans)
     return {
       success: true,
       message: "Rate plans retrieved successfully",
