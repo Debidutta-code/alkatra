@@ -18,9 +18,10 @@ export const fetchRatePlans = async (hotelCode: string, accessToken: string, pag
 
 }
 
-export const getAllRatePlans = async (accessToken: string) => {
+export const getAllRatePlans = async (accessToken: string, hotelCode: string) => {
+    console.log(`The access token is ${accessToken}\nThe hotel code is ${hotelCode}`)
     try {
-        const ratePlans =  await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomType/all`, {
+        const ratePlans =  await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomType/all?hotelCode=${hotelCode}`, {
         headers: {
             "Authorization": `Bearer ${accessToken}`
         }
