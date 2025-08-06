@@ -27,13 +27,15 @@ export class TaxGroupSanitizer {
 
     /**
      * Sanitizes the payload for update operation
-     * Ensures code and createdBy cannot be overridden
+     * Ensures code cannot be overridden
      */
     public static sanitizeUpdatePayload(raw: any): Partial<ITaxGroup> {
         const {
             name,
             rules,
             isActive,
+            hotelId,
+            createdBy
         } = raw;
 
         const sanitized: Partial<ITaxGroup> = {};
@@ -41,6 +43,8 @@ export class TaxGroupSanitizer {
         if (name !== undefined) sanitized.name = String(name).trim();
         if (rules !== undefined) sanitized.rules = rules;
         if (isActive !== undefined) sanitized.isActive = isActive;
+        if (hotelId !== undefined) sanitized.hotelId = hotelId;
+        if (createdBy !== undefined) sanitized.createdBy = createdBy;
 
         return sanitized;
     }

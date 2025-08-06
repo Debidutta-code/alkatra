@@ -37,6 +37,7 @@ export class TaxGroupController implements ITaxGroupController {
             console.error("Failed to create tax group at Controller Layer:", error);
             if (
                 error.message === "No tax rules found for this hotel." ||
+                error.message === "You are not the owner of this hotel." ||
                 error.message === "One or more tax rules do not belong to the specified hotel." ||
                 error.message === "Tax group already exists with this name."
             ) {
@@ -102,9 +103,10 @@ export class TaxGroupController implements ITaxGroupController {
      * Update tax group
      * @returns The updated tax group
      */
-    async update(req: Request, res: Response): Promise<Response<ITaxGroup>> {
+    async update(req: AuthenticatedRequest, res: Response): Promise<Response<ITaxGroup>> {
         try {
             const { id } = req.params;
+            const createdBy = req.user?.id;
 
             /**
              * Validate tax group ID
@@ -114,7 +116,7 @@ export class TaxGroupController implements ITaxGroupController {
             /**
              * Sanitize and validate tax group data
              */
-            const sanitizedData = TaxGroupSanitizer.sanitizeUpdatePayload(req.body);
+            const sanitizedData = TaxGroupSanitizer.sanitizeUpdatePayload({ ...req.body, createdBy });
 
             /**
              * Update tax group after validation's and sanitization
@@ -127,6 +129,7 @@ export class TaxGroupController implements ITaxGroupController {
             console.error("Failed to update tax group at Controller Layer:", error);
             if (
                 error.message === "Tax group not found" ||
+                error.message === "You are not the owner of this hotel." ||
                 error.message === "One or more tax rules do not belong to the specified hotel." ||
                 error.message === "Tax group name cannot be the same."
             ) {

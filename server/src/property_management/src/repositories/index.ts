@@ -1,0 +1,1 @@
+export { PropertyInfoRepository } from "./propertyInfo.repository";

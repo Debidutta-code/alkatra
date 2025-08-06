@@ -41,7 +41,6 @@ export class TaxRuleSanitizer {
 
     /**
      * Sanitizes the payload for update operation
-     * Ensures code and createdBy cannot be overridden
      */
     public static sanitizeUpdatePayload(raw: any): Partial<ITaxRule> {
         const {
@@ -55,7 +54,7 @@ export class TaxRuleSanitizer {
             isInclusive,
             priority,
             hotelId,
-            // createdBy,
+            createdBy,
         } = raw;
 
         const sanitized: Partial<ITaxRule> = {};
@@ -78,7 +77,7 @@ export class TaxRuleSanitizer {
         if (isInclusive !== undefined) sanitized.isInclusive = isInclusive;
         if (priority !== undefined) sanitized.priority = priority;
         if (hotelId !== undefined) sanitized.hotelId = hotelId;
-        // if (createdBy !== undefined) sanitized.createdBy = createdBy;
+        if (createdBy !== undefined) sanitized.createdBy = createdBy;
 
         return sanitized;
     }

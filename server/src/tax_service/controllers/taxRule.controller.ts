@@ -38,7 +38,12 @@ export class TaxRuleController implements ITaxRuleController {
         } 
         catch (error) {
             console.error("Failed to create tax rule at Controller Layer:", error);
-            if (error.message === "Tax rule already exists with this name.") {
+            if (
+                error.message === "No tax rules found for this hotel." ||
+                error.message === "You are not the owner of this hotel." ||
+                error.message === "One or more tax rules do not belong to the specified hotel." ||
+                error.message === "Tax rule already exists with this name."
+            ) {
                 return res.status(409).json({ success: false, message: error.message });
             }
             return res.status(500).json({ success: false, message: "Unable to create tax rule at this momment." });
@@ -103,9 +108,10 @@ export class TaxRuleController implements ITaxRuleController {
      * Update a tax rule
      * @returns The updated tax rule
      */
-    public update = async (req: Request, res: Response) => {
+    public update = async (req: AuthenticatedRequest, res: Response) => {
         try {
             const { id } = req.params;
+            const createdBy = req.user?.id;
 
             /**
              * Validate tax rule ID
@@ -115,7 +121,7 @@ export class TaxRuleController implements ITaxRuleController {
             /**
              * Sanitize and validate tax rule data
              */
-            const sanitizedPayload = TaxRuleSanitizer.sanitizeUpdatePayload(req.body);
+            const sanitizedPayload = TaxRuleSanitizer.sanitizeUpdatePayload({ ...req.body, createdBy });
 
             /**
              * Update tax rule after validation's and sanitization
@@ -126,7 +132,11 @@ export class TaxRuleController implements ITaxRuleController {
         } 
         catch (error) {
             console.error("Failed to update tax rule:", error);
-            if (error.message === "Tax rule name cannot be the same.") {
+            if (
+                error.message === "Tax rule not found" ||
+                error.message === "You are not the owner of this hotel." ||
+                error.message === "Tax rule name cannot be the same."
+            ) {
                 return res.status(409).json({ success: false, message: error.message });
             }
             return res.status(500).json({ success: false, message: "Unable to update tax rule at this moment." });

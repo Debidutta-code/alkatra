@@ -3,6 +3,7 @@ import { ITaxRule } from "../models";
 import { Generator } from "../utils";
 import { config } from "../../config";
 import { TaxRuleRepository } from "../repositories";
+import { CommonService } from "../../services";
 
 const { taxRulePrefix } = config.taxSystem;
 
@@ -10,14 +11,22 @@ const { taxRulePrefix } = config.taxSystem;
 export class TaxRuleService implements ITaxRuleService {
     private static instance: TaxRuleService;
     private taxRuleRepository: TaxRuleRepository;
+    private commonService: CommonService;
 
-    private constructor(taxRuleRepository: TaxRuleRepository) {
+    private constructor(
+        taxRuleRepository: TaxRuleRepository,
+        commonService: CommonService
+    ) {
         this.taxRuleRepository = taxRuleRepository;
+        this.commonService = commonService
     }
 
-    public static getInstance(taxRuleRepository: TaxRuleRepository): TaxRuleService {
+    public static getInstance(
+        taxRuleRepository: TaxRuleRepository,
+        commonService: CommonService
+    ): TaxRuleService {
         if (!TaxRuleService.instance) {
-            TaxRuleService.instance = new TaxRuleService(taxRuleRepository);
+            TaxRuleService.instance = new TaxRuleService(taxRuleRepository, commonService);
         }
         return TaxRuleService.instance;
     }
@@ -34,6 +43,12 @@ export class TaxRuleService implements ITaxRuleService {
      */
     async createTaxRule(data: Partial<ITaxRule>) {
         try {
+            /**
+             * Verify ownership of user for the hotel
+             */
+            const isOwner = await this.commonService.verifyOwnership(String(data.createdBy), String(data.hotelId));
+            if (!isOwner) throw new Error("You are not the owner of this hotel.");
+
             /**
              * Generate a unique tax code and assign it to the tax rule data
              */
@@ -80,6 +95,18 @@ export class TaxRuleService implements ITaxRuleService {
 
     async updateTaxRule(id: string, data: Partial<ITaxRule>) {
         try {
+            /**
+             * Verify ownership of user for the hotel
+             */
+            const isOwner = await this.commonService.verifyOwnership(String(data.createdBy), String(data.hotelId));
+            if (!isOwner) throw new Error("You are not the owner of this hotel.");
+
+            /**
+             * Remove fields that are not allowed to be updated
+             */
+            delete data.createdBy;
+            delete data.hotelId;
+
             const taxRule = await this.taxRuleRepository.findById(id);
             if (!taxRule?._id) throw new Error("Tax rule not found");
 

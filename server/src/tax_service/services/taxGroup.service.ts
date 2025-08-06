@@ -1,8 +1,9 @@
 import { ITaxGroupService } from "../interfaces";
-import { ITaxGroup, ITaxRule } from "../models";
+import { ITaxGroup } from "../models";
 import { TaxGroupRepository, TaxRuleRepository } from "../repositories";
 import { Generator } from "../utils";
 import { config } from "../../config";
+import { CommonService } from "../../services";
 
 const { taxGroupPrefix } = config.taxSystem;
 
@@ -11,21 +12,29 @@ export class TaxGroupService implements ITaxGroupService {
     private static instance: TaxGroupService;
     private taxGroupRepository: TaxGroupRepository;
     private taxRuleRepository: TaxRuleRepository;
+    private commonService: CommonService;
 
     private constructor(
         taxGroupRepository: TaxGroupRepository,
-        taxRuleRepository: TaxRuleRepository
+        taxRuleRepository: TaxRuleRepository,
+        commonService: CommonService
     ) {
         this.taxGroupRepository = taxGroupRepository
         this.taxRuleRepository = taxRuleRepository
+        this.commonService = commonService
     }
 
     public static getInstance(
         taxGroupRepository: TaxGroupRepository,
-        taxRuleRepository: TaxRuleRepository
+        taxRuleRepository: TaxRuleRepository,
+        commonService: CommonService
     ): TaxGroupService {
         if (!TaxGroupService.instance) {
-            TaxGroupService.instance = new TaxGroupService(taxGroupRepository, taxRuleRepository);
+            TaxGroupService.instance = new TaxGroupService(
+                taxGroupRepository, 
+                taxRuleRepository,
+                commonService
+            );
         }
         return TaxGroupService.instance;
     }
@@ -42,6 +51,12 @@ export class TaxGroupService implements ITaxGroupService {
      */
     async createTaxGroup(data: Partial<ITaxGroup>): Promise<ITaxGroup> {
         try {
+            /**
+             * Verify ownership of user for the hotel
+             */
+            const isOwner = await this.commonService.verifyOwnership(String(data.createdBy), String(data.hotelId));
+            if (!isOwner) throw new Error("You are not the owner of this hotel.");
+
             /**
              * Check if the hotel ID matches with all the tax rules
              * 
@@ -89,6 +104,18 @@ export class TaxGroupService implements ITaxGroupService {
 
     async updateTaxGroup(id: string, data: Partial<ITaxGroup>): Promise<ITaxGroup | null | void> {
         try {
+            /**
+             * Verify ownership of user for the hotel
+             */
+            const isOwner = await this.commonService.verifyOwnership(String(data.createdBy), String(data.hotelId));
+            if (!isOwner) throw new Error("You are not the owner of this hotel.");
+            
+            /**
+             * Remove fields that are not allowed to be updated
+             */
+            delete data.createdBy;
+            delete data.hotelId;
+
             const taxGroup = await this.taxGroupRepository.findById(id);
             if (!taxGroup?._id) throw new Error("Tax group not found");
 
