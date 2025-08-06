@@ -1,1 +1,0 @@
-{"version":3,"file":"s3.config.js","sourceRoot":"","sources":["../../../src/config/s3.config.ts"],"names":[],"mappings":";;;AAAA,kDAA8C;AAC9C,iDAAwC;AAExC,MAAM,EACF,MAAM,EACN,WAAW,EACX,eAAe,EAClB,GAAG,qBAAM,CAAC,GAAG,CAAC;AAEF,QAAA,QAAQ,GAAG,IAAI,oBAAQ,CAAC;IACjC,MAAM,EAAE,MAAM;IACd,WAAW,EAAE;QACT,WAAW,EAAE,WAAW;QACxB,eAAe,EAAE,eAAe;KACnC;CACJ,CAAC,CAAC"}

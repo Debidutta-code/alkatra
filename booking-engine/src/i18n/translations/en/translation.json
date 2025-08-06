@@ -463,7 +463,9 @@
           "reducingStay": "Reducing stay length is subject to the cancellation policy"
         },
         "gotIt": "Got it"
-      }
+      },
+      "seeMore": "See more",
+      "showLess": "Show less"
     }
   },
   "CancellationPolicies": {
@@ -590,13 +592,15 @@
       "phoneNotVerified": "Phone number not verified",
       "phoneInvalidError": "Please enter a valid phone number",
       "processing": "Processing...",
-      "verifying": "Verifying"
+      "verifying": "Verifying",
+      "priceFetchError": "Unable to fetch updated price. Please try again later."
     }
   },
   "BookingTabs": {
     "userNotLoggedIn": "User not logged in",
     "noBooking": "There is no booking",
     "BookingHeader": {
+      "backToHome": "Back to Home",
       "yourBookings": "Your Bookings",
       "viewManageTrack": "View, manage, and track all your hotel reservations in one place"
     },

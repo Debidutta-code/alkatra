@@ -1,9 +1,9 @@
-import RoomsPage from '@/components/AppComponent/RoomsPage'
+import RoomsPage from '@/components/appComponent/RoomsPage'
 import React, { Suspense } from 'react'
 
 const page = () => {
   return (
-    <Suspense fallback={<div>Loading rooms...</div>}>
+    <Suspense>
       <RoomsPage />
     </Suspense>
 

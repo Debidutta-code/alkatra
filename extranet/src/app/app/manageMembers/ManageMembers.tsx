@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Button } from "../../../components/ui/button";
-import { Plus, Pencil, Trash2, Users, Shield, Mail, User } from "lucide-react";
+import { Plus, Pencil, Trash2, Users, Shield, Mail, User, ChevronRight, ChevronDown, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -12,7 +12,6 @@ import { jwtDecode } from "jwt-decode";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -25,8 +24,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-  DialogClose,
 } from "../../../components/ui/dialog";
 import { toast } from "react-hot-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
@@ -47,10 +44,12 @@ const ManageMembers = () => {
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const router = useRouter();
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
   const currentUser = useSelector((state: RootState) => state.auth.user);
-
-  const fetchUsers = async () => {
+  const fetchUsers = async (page = 1, limit = itemsPerPage) => {
     try {
       setLoading(true);
       const accessToken = Cookies.get("accessToken");
@@ -69,21 +68,30 @@ const ManageMembers = () => {
         console.error("Error decoding token:", error);
       }
 
+      // Add pagination parameters to the API call
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/user`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/user?page=${page}&limit=${limit}`,
         {
           headers: { Authorization: `Bearer ${accessToken}` },
         }
       );
 
       if (response.data && response.data.data && response.data.data.users) {
-        if (currentUser?.role === "superAdmin") {
-          setUsers(response.data.data.users);
-        } else {
-          const filteredUsers = response.data.data.users.filter(
+        let filteredUsers = response.data.data.users;
+
+        if (currentUser?.role !== "superAdmin") {
+          filteredUsers = response.data.data.users.filter(
             (user: User) => user.createdBy === currentUserEmail
           );
-          setUsers(filteredUsers);
+        }
+
+        setUsers(filteredUsers);
+
+        // Update pagination state from backend response
+        if (response.data.pagination) {
+          setTotalPages(response.data.pagination.totalPages);
+          setTotalUsers(response.data.pagination.total);
+          setCurrentPage(response.data.pagination.page);
         }
       }
     } catch (error) {
@@ -93,6 +101,63 @@ const ManageMembers = () => {
       setLoading(false);
     }
   };
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      fetchUsers(page, itemsPerPage);
+    }
+  };
+
+  const handleItemsPerPageChange = (newLimit: number) => {
+    setItemsPerPage(newLimit);
+    setCurrentPage(1);
+    fetchUsers(1, newLimit);
+  };
+
+  const generatePageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+
+    return pages;
+  };
+
+  // 5. Calculate showing text
+  const startItem = (currentPage - 1) * itemsPerPage + 1;
+  const endItem = Math.min(currentPage * itemsPerPage, totalUsers);
+  const showingText = `Showing ${startItem}-${endItem} of ${totalUsers} members`;
+
+  // 6. Update useEffect to call fetchUsers without parameters initially
+  useEffect(() => {
+    fetchUsers(1, itemsPerPage);
+  }, []);
 
   const handleDeleteUser = async () => {
     if (!userToDelete) return;
@@ -313,7 +378,79 @@ const ManageMembers = () => {
             )}
           </CardContent>
         </Card>
+        {/* Pagination Controls */}
+        {!loading && users.length > 0 && (
+          <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4 px-4 py-3 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-lg">
+            {/* Left side - Items per page */}
+            <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+              <span>Show</span>
+              <div className="relative">
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                  className="px-3 py-1 text-sm bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-md text-slate-800 dark:text-slate-200 
+           focus:ring-1 focus:ring-tripswift-blue focus:border-transparent transition-all appearance-none pr-8 min-w-[80px]"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-500 pointer-events-none" />
+              </div>
+            </div>
 
+            {/* Center - Page navigation */}
+            <div className="flex items-center gap-1">
+              {/* Previous button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => goToPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-2 py-1 h-8 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+
+              {/* Page numbers */}
+              {generatePageNumbers().map((page, index) => (
+                <div key={index}>
+                  {page === '...' ? (
+                    <span className="px-2 py-1 text-slate-400 dark:text-slate-500">...</span>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => goToPage(page as number)}
+                      className={`px-3 py-1 h-8 text-sm transition-all ${currentPage === page
+                        ? "bg-tripswift-blue text-white hover:bg-tripswift-blue/90"
+                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                        }`}
+                    >
+                      {page}
+                    </Button>
+                  )}
+                </div>
+              ))}
+
+              {/* Next button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => goToPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-2 py-1 h-8 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+
+            {/* Right side - Showing text */}
+            <div className="text-sm text-slate-600 dark:text-slate-400">
+              {showingText}
+            </div>
+          </div>
+        )}
         {/* Delete Dialog */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogContent className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
