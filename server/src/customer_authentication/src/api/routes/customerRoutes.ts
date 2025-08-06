@@ -20,6 +20,6 @@ router.post('/verify-otp', verificationOtpController.verifyOTP);
 router.post('/send-sms',smsController.sendSMS );
 
 // Customer connect request API
-router.route("/connect").post(authenticateCustomer, CustomerController.connectUser);
+router.route("/connect").post(CustomerController.connectUser);
 
 export default router; 
