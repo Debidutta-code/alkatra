@@ -150,11 +150,11 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
     <div className={`relative ${className}`}>
       <button
         onClick={handleBellClick}
-        className="relative p-2.5 rounded-full hover:bg-tripswift-blue/10 transition-colors duration-300 group"
+        className="relative p-1 rounded-full hover:bg-tripswift-blue/10 transition-colors duration-300 group"
         aria-label={`${t('notifications.title')} ${unreadCount > 0 ? `(${unreadCount} ${t('notifications.unread')})` : ''}`}
         disabled={isLoading}
       >
-        <Bell size={22} className={`text-tripswift-black group-hover:text-tripswift-blue transition-colors ${isLoading ? 'animate-pulse' : ''}`} />
+        <Bell size={18} className={`text-tripswift-black group-hover:text-tripswift-blue transition-colors ${isLoading ? 'animate-pulse' : ''}`} />
         {unreadCount > 0 && (
           <motion.div
             initial={{ scale: 0 }}

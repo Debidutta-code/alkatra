@@ -8,7 +8,6 @@ import {
   X,
   Globe,
   ChevronDown,
-  HelpCircle,
   LogOut,
   User,
 } from "lucide-react";
@@ -26,11 +25,11 @@ import {
 import { logout, getUser } from "@/Redux/slices/auth.slice";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-
-// Define types
 import { ThunkDispatch } from "redux-thunk";
 import { AnyAction } from "redux";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
+import LanguageSwitcher from "../languageSwitcher/LanguageSwitcher";
+import i18next from "i18next";
 
 interface RootState {
   auth: {
@@ -51,11 +50,6 @@ interface UserType {
 }
 
 type AppDispatch = ThunkDispatch<RootState, unknown, AnyAction>;
-
-import MTrip from "@/components/assets/traveling.png";
-import Logo from "../assets/TRIP-1.png";
-import LanguageSwitcher from "../languageSwitcher/LanguageSwitcher";
-import i18next from "i18next";
 
 const Navbar: React.FC = () => {
   const { t } = useTranslation();
@@ -100,16 +94,20 @@ const Navbar: React.FC = () => {
   const handleMyTripClick = () => {
     if (accessToken) {
       router.push("/my-trip");
+      setIsMenuOpen(false);
     } else {
       toast.error(t("Navbar.pleaseLogin"));
+      setIsMenuOpen(false);
     }
   };
 
   const handleMyReferals = () => {
     if (accessToken) {
       router.push("/referral");
+      setIsMenuOpen(false);
     } else {
       toast.error(t("Navbar.pleaseLogin"));
+      setIsMenuOpen(false);
     }
   };
 
@@ -147,24 +145,26 @@ const Navbar: React.FC = () => {
     toast.success(t("Navbar.logoutSuccess"));
     dispatch(logout() as any);
     router.push("/");
+    setIsMenuOpen(false);
   };
 
   const handleSignup = () => {
     router.push("/register");
+    setIsMenuOpen(false);
   };
 
   const handleLogin = () => {
     Cookies.set("redirectAfterLogin", window.location.href);
     router.push("/login");
+    setIsMenuOpen(false);
   };
 
   return (
     <div
-      className={`sticky top-0 z-50 transition-all duration-300 font-noto-sans ${
-        scrolled
-          ? "bg-gray-100 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.06)]"
-          : "bg-gray-100 border-b border-tripswift-black/5"
-      } ${pathname === "/login" || pathname === "/register" ? "hidden" : ""}`}
+      className={`sticky top-0 z-50 transition-all duration-300 font-noto-sans ${scrolled
+        ? "bg-gray-100 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.06)]"
+        : "bg-gray-100 border-b border-tripswift-black/5"
+        } ${pathname === "/login" || pathname === "/register" ? "hidden" : ""}`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between h-20 px-4 sm:px-6 lg:px-8">
         {/* Logo */}
@@ -175,7 +175,7 @@ const Navbar: React.FC = () => {
               width={280}
               height={70}
               alt="TripSwift - Redefines Hospitality Technology"
-              className="h-16 w-auto transform transition-transform group-hover:scale-110 duration-300" // Increased h-16 (64px) and hover scale to 110%
+              className="h-16 w-auto transform transition-transform group-hover:scale-110 duration-300"
               priority
               style={{
                 maxHeight: "70px",
@@ -194,9 +194,8 @@ const Navbar: React.FC = () => {
           onClick={toggleMenu}
         >
           <div
-            className={`w-10 h-10 rounded-full flex items-center justify-center bg-tripswift-off-white ${
-              isMenuOpen ? "shadow-inner" : "shadow-sm"
-            } transition-all duration-300`}
+            className={`w-10 h-10 rounded-full flex items-center justify-center bg-tripswift-off-white ${isMenuOpen ? "shadow-inner" : "shadow-sm"
+              } transition-all duration-300`}
           >
             {isMenuOpen ? (
               <X size={20} className="text-tripswift-blue" />
@@ -216,16 +215,14 @@ const Navbar: React.FC = () => {
           {/* Become a Host */}
           <div
             onClick={() =>
-              (window.location.href =
-                process.env.NEXT_PUBLIC_EXTRANET_URL || "")
+            (window.location.href =
+              process.env.NEXT_PUBLIC_EXTRANET_URL || "")
             }
             className="flex items-center cursor-pointer px-3 py-2 rounded-full text-tripswift-black hover:text-tripswift-blue hover:bg-tripswift-blue/5 text-[15px] leading-[20px] tracking-tight font-tripswift-medium transition-all duration-300"
           >
             <Globe
               size={16}
-              className={` text-tripswift-blue ${
-                i18n.language === "ar" ? "ml-2" : "mr-2"
-              }`}
+              className={` text-tripswift-blue ${i18n.language === "ar" ? "ml-2" : "mr-2"}`}
             />
             <span>{t("Navbar.becomeHost")}</span>
           </div>
@@ -240,9 +237,7 @@ const Navbar: React.FC = () => {
               width={16}
               height={16}
               alt={t("Navbar.myTrip")}
-              className={` text-tripswift-blue ${
-                i18n.language === "ar" ? "ml-2" : "mr-2"
-              }`}
+              className={` text-tripswift-blue ${i18n.language === "ar" ? "ml-2" : "mr-2"}`}
               unoptimized
             />
             <span>{t("Navbar.myTrip")}</span>
@@ -296,7 +291,6 @@ const Navbar: React.FC = () => {
                     </p>
                   </div>
                 </DropdownItem>
-                {/* <DropdownItem key="separator" className="h-px bg-tripswift-black/10 my-1" /> */}
                 <DropdownItem
                   key="profile-settings"
                   onClick={() => router.push("/profile")}
@@ -320,13 +314,6 @@ const Navbar: React.FC = () => {
                   <span>{t("Navbar.referral")}</span>
                 </DropdownItem>
 
-                {/* <DropdownItem
-                  key="help-feedback"
-                  startContent={<HelpCircle size={16} className="text-tripswift-blue" />}
-                  className="py-2.5 text-[14px] font-tripswift-medium"
-                >
-                  {t('Navbar.helpFeedback')}
-                </DropdownItem> */}
                 <DropdownItem
                   key="logout"
                   onClick={handleLogout}
@@ -354,7 +341,7 @@ const Navbar: React.FC = () => {
               </button>
             </div>
           )}
-          {/* Notification Bell - Only show for logged-in users */}
+
           {user && (
             <div className="flex items-center py-2 rounded-full hover:bg-tripswift-blue/10 transition-all duration-300">
               <NotificationBell className="relative" userId={user._id} />
@@ -365,17 +352,17 @@ const Navbar: React.FC = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden bg-tripswift-off-white border-t border-tripswift-black/10 py-4 px-4 shadow-md absolute w-full left-0 top-20 z-10 transition-all duration-300 animate-in slide-in-from-top-5">
-          <div className="flex flex-col space-y-4">
+        <div className="lg:hidden bg-tripswift-off-white border-t border-tripswift-black/10 py-2 px-4 shadow-lg absolute w-full left-0 top-20 z-40 transition-all duration-300 animate-in slide-in-from-top-5">
+          <div className="flex flex-col space-y-2">
             {/* Language Switcher */}
-            <div className="py-2">
-              <LanguageSwitcher />
+            <div className="py-1">
+              <LanguageSwitcher onLanguageChange={() => setIsMenuOpen(false)} />
             </div>
 
             {/* Become a Host */}
             <Link
               href={process.env.NEXT_PUBLIC_EXTRANET_URL || ""}
-              className="flex items-center gap-2 py-2 px-1 hover:bg-tripswift-blue hover:bg-opacity-10 rounded"
+              className="flex items-center gap-2 py-1.5 px-1 hover:bg-tripswift-blue hover:bg-opacity-10 rounded"
             >
               <Globe size={18} className="text-tripswift-blue" />
               <span className="text-tripswift-black font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]">
@@ -386,7 +373,7 @@ const Navbar: React.FC = () => {
             {/* My Trip */}
             <div
               onClick={handleMyTripClick}
-              className="flex items-center gap-2 py-2 px-1 hover:bg-tripswift-blue hover:bg-opacity-10 rounded cursor-pointer"
+              className="flex items-center gap-2 py-1.5 px-1 hover:bg-tripswift-blue hover:bg-opacity-10 rounded cursor-pointer"
             >
               <Image
                 src="/assets/traveling.png"
@@ -399,36 +386,38 @@ const Navbar: React.FC = () => {
                 {t("Navbar.myTrip")}
               </span>
             </div>
-
             {/* Notification Bell - Mobile */}
             {user && (
-              <div className="py-2">
+              <div>
                 <NotificationBell
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-1"
                   userId={user._id}
                 />
+                {/* <span className="text-tripswift-black font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]">
+                  {t("Navbar.notifications")}
+                </span> */}
               </div>
             )}
 
             {/* Auth Options */}
             {!user ? (
-              <div className="pt-2 border-t border-tripswift-black/10 flex flex-col gap-3 mt-2">
+              <div className="pt-1.5 border-t border-tripswift-black/10 flex flex-col gap-2 mt-1">
                 <div
                   onClick={handleLogin}
-                  className="cursor-pointer py-2 text-tripswift-black hover:text-tripswift-blue font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]"
+                  className="cursor-pointer py-1.5 text-tripswift-black hover:text-tripswift-blue font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]"
                 >
                   {t("Navbar.login")}
                 </div>
                 <div
                   onClick={handleSignup}
-                  className="cursor-pointer btn-tripswift-primary text-[16px] leading-[20px] tracking-[0px] font-tripswift-medium px-4 py-2 rounded-full hover:shadow-md transition-all duration-300"
+                  className="cursor-pointer btn-tripswift-primary text-[16px] leading-[20px] tracking-[0px] font-tripswift-medium px-4 py-1.5 rounded-full hover:shadow-md transition-all duration-300"
                 >
                   {t("Navbar.signUp")}
                 </div>
               </div>
             ) : (
-              <div className="pt-2 border-t border-tripswift-black/10 flex flex-col gap-2 mt-2">
-                <div className="flex items-center gap-3 py-2">
+              <div className="pt-1.5 border-t border-tripswift-black/10 flex flex-col gap-1.5 mt-1">
+                <div className="flex items-center gap-3 py-1.5">
                   <Avatar
                     size="sm"
                     className="bg-tripswift-blue text-tripswift-off-white"
@@ -448,15 +437,18 @@ const Navbar: React.FC = () => {
                   </div>
                 </div>
                 <div
-                  onClick={() => router.push("/profile")}
-                  className="cursor-pointer py-2 px-1 text-tripswift-black hover:bg-tripswift-blue hover:bg-opacity-10 rounded font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]"
+                  onClick={() => {
+                    router.push("/profile");
+                    setIsMenuOpen(false);
+                  }}
+                  className="cursor-pointer py-1.5 px-1 text-tripswift-black hover:bg-tripswift-blue hover:bg-opacity-10 rounded font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]"
                 >
                   {t("Navbar.profileSettings")}
                 </div>
 
                 <div
                   onClick={handleMyReferals}
-                  className="cursor-pointer py-2 px-1 text-tripswift-black hover:bg-tripswift-blue hover:bg-opacity-10 rounded font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]"
+                  className="cursor-pointer py-1.5 px-1 text-tripswift-black hover:bg-tripswift-blue hover:bg-opacity-10 rounded font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]"
                 >
                   {t("Navbar.referral")}
                 </div>
@@ -468,7 +460,7 @@ const Navbar: React.FC = () => {
                 </div> */}
                 <div
                   onClick={handleLogout}
-                  className="cursor-pointer py-2 px-1 text-[#EF4444] hover:bg-tripswift-blue hover:bg-opacity-10 rounded font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]"
+                  className="cursor-pointer py-1.5 px-1 text-[#EF4444] hover:bg-tripswift-blue hover:bg-opacity-10 rounded font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]"
                 >
                   {t("Navbar.logout")}
                 </div>
