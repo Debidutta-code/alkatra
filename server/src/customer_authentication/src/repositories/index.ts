@@ -1,0 +1,1 @@
+export { UserMessageRepository } from "./userMessage.repository";

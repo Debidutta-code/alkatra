@@ -19,4 +19,7 @@ router.post('/send-otp', verificationOtpController.sendOTP);
 router.post('/verify-otp', verificationOtpController.verifyOTP);
 router.post('/send-sms',smsController.sendSMS );
 
+// Customer connect request API
+router.route("/connect").post(authenticateCustomer, CustomerController.connectUser);
+
 export default router; 
