@@ -246,7 +246,14 @@
     "tableName": "Name",
     "tableEmail": "Email",
     "tableReferralDate": "Referral Date",
-    "tableId": "ID"
+    "tableId": "ID",
+    "noWalletData": "No wallet data available.",
+    "startReferring": "Start Referring Now",
+    "refreshWallet": "Refresh Wallet",
+    "noToken": "Please try again later.",
+    "walletError": "Error fetching wallet data. Please try again later.",
+    "insufficientBalance": "Insufficient balance to redeem.",
+    "redeemError": "Error redeeming earnings. Please try again later."
   },
   "HotelListing": {
     "CompactSearchBar": {
