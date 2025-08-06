@@ -207,6 +207,24 @@ class CustomerController {
       res.status(400).json({ message: error.message });
     }
   }
+
+  async getReferrals(req: AuthenticatedRequest, res: Response): Promise<Response> {
+    try {
+      const userId = req.user?.id;
+      if (!userId) throw new Error("User ID is required");
+      const referrals = await CustomerReferralService.findUserWithReferral(userId);
+      return res.status(200).json({ message: "Referrals retrieved successfully", data: referrals });
+    } catch (error: any) {
+      console.log("Failed to get referral details of user: ", error);
+      if (
+        error.message === "User ID is required" ||
+        error.message === "User not found"
+      ) {
+        return res.status(404).json({ message: error.message });
+      }
+      return res.status(500).json({ message: "Failed to get referral details of user" });
+    }
+  }
 }
 
 export default new CustomerController();
