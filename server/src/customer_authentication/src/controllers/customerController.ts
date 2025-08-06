@@ -6,6 +6,7 @@ import { AuthenticatedRequest } from "../types/custom";
 // Referral Service
 import { CustomerReferralService } from "../services";
 import { ValidateService } from "../../../referral_system/services/validate.service";
+import { IUserMessage } from "../models";
 
 class CustomerController {
 
@@ -190,6 +191,20 @@ class CustomerController {
       };
       const status = statusMap[error.message] || 500;
       res.status(status).json({ message: error.message });
+    }
+  }
+
+  /**
+   * Handle customer connect request
+   * @request - name, email, reason
+   */
+  async connectUser(req: Request, res: Response): Promise<Response> {
+    try {
+      const data = req.body as IUserMessage;
+      await customerService.handleCustomerConnectRequest(data);
+      return res.status(200).json({ message: "Customer connect request sent successfully" });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
     }
   }
 }

@@ -5,8 +5,17 @@ import { isValidPassword } from "../utils/passwordValidator";
 import { ICustomer } from "../models/customer.model";
 import jwt from "jsonwebtoken";
 import { IUser } from "../models/googleUser.model";
+import { UserMessageRepository } from "../repositories";
+import { IUserMessage } from "../interfaces/userMessage.interface";
 
 class CustomerService {
+    private userMessageRepository: UserMessageRepository;
+
+    constructor() {
+        this.userMessageRepository = UserMessageRepository.getInstance();
+    }
+
+
     // new customer register
     async registerCustomer(customerData: Partial<ICustomer>): Promise<ICustomer> {
         const { firstName, lastName, email, password, phone } = customerData;
@@ -173,6 +182,28 @@ class CustomerService {
         const updatedCustomer = await customerRepository.updatePassword(customer.id, hashedPassword);
         if (!updatedCustomer) {
             throw new Error("Failed to update password");
+        }
+    }
+
+
+    /**
+     * Handle customer connect request
+     */
+    async handleCustomerConnectRequest(data: IUserMessage) {
+        try {
+            const payload: IUserMessage = {
+                name: data.name,
+                email: data.email,
+                reason: data.reason
+            }
+
+            const message = await this.userMessageRepository.create(payload);
+            if (!message) throw new Error("Failed to handle customer connect request");
+
+            // send email to user for successful connection
+        } catch (error: any) {
+            console.log("Failed to handle customer connect request", error);
+            throw error;
         }
     }
 

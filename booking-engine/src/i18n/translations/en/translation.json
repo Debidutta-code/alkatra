@@ -132,11 +132,13 @@
     "logoutSuccess": "Successfully logged out",
     "becomeHost": "Become a Host",
     "myTrip": "My Trip",
+    "notifications":"Notifications",
     "profileSettings": "Profile Settings",
     "helpFeedback": "Help & Feedback",
     "logout": "Log Out",
     "signUp": "Sign Up",
-    "login": "Log In"
+    "login": "Log In",
+    "referral": "Referral"
   },
   "Footer": {
     "companyTitle": "Company",
@@ -189,7 +191,9 @@
     "contentComingSoon": "Content for {{tab}} coming soon...",
     "newPasswordOptional": "New Password (optional)",
     "confirmNewPassword": "Confirm New Password",
-    "joined": "Joined {{date}}"
+    "joined": "Joined {{date}}",
+    "notificationsDesc": "Manage your notification preferences and view recent notifications.",
+    "recentNotifications": "Recent Notifications"
   },
   "HotelCard": {
     "heroTitle": "Find the Perfect Stay for Your Journey",
@@ -204,6 +208,52 @@
     "freeCancellation": "Free Cancellation",
     "bestPriceGuarantee": "Best Price Guarantee",
     "downloadourapp": "Download Our App"
+  },
+  "Referral": {
+    "heroTitle": "Refer a Friend",
+    "heroSubtitle": "Invite your friends and enjoy exclusive rewards when they join",
+    "howItWorks": "How It Works",
+    "howItWorksSubTitle": "Invite people to win rewards",
+    "step1Title": "Send invitation",
+    "step1Desc": "Share invitation link to friends and win rewards",
+    "step2Title": "Sign Up",
+    "step2Desc": "Let them register to our service using your referral link",
+    "step3Title": "Earn",
+    "step3Desc": "Get rewards",
+    "stepLabel": "Step {{number}}",
+    "shareYourLink": "Share Your Referral Link",
+    "shareDescription": "You can also share your referral link by copying and sending it to your friends or sharing it to social media.",
+    "copy": "Copy referral link",
+    "copied": "Copied!",
+    "shareVia": "Share via:",
+    "generateQr": "Generate QR Code",
+    "scanToShare": "Scan to Share",
+    "scanDescription": "Scan this QR code or save it to share with friends.",
+    "hideReferrals": "Hide Referrals",
+    "viewYourReferrals": "View Your Referrals",
+    "total": "Total:",
+    "referrals": "referrals",
+    "wallet": "Wallet",
+    "currentBalance": "Current Balance",
+    "totalEarned": "Total Earned",
+    "totalRedeemed": "Total Redeemed",
+    "redeemEarnings": "Redeem Your Earnings",
+    "enterAmount": "Enter Amount",
+    "availableBalance": "Available Balance",
+    "redeem": "Redeem",
+    "lastUpdated": "Last Updated",
+    "redeemSuccess": "Redeem successful! Your earnings have been added to your wallet.",
+    "tableName": "Name",
+    "tableEmail": "Email",
+    "tableReferralDate": "Referral Date",
+    "tableId": "ID",
+    "noWalletData": "No wallet data available.",
+    "startReferring": "Start Referring Now",
+    "refreshWallet": "Refresh Wallet",
+    "noToken": "Please try again later.",
+    "walletError": "Error fetching wallet data. Please try again later.",
+    "insufficientBalance": "Insufficient balance to redeem.",
+    "redeemError": "Error redeeming earnings. Please try again later."
   },
   "HotelListing": {
     "CompactSearchBar": {
@@ -376,6 +426,7 @@
     "nightsPlural": "Nights",
     "stay": "stay",
     "filter": "Filter",
+    "viewAllPhotos": "View All Photos",
     "amenitiesList": {
       "wifi": "Free Wifi",
       "swimming_pool": "Swimming Pool",
@@ -427,23 +478,86 @@
       "viewBookingPolicies": "View booking policies",
       "notAvailable": "Not Available",
       "securePayment": "Secure payment",
-      "amenities": {
-        "wifi": "Free WiFi",
-        "airConditioning": "Air Conditioning",
+      "defaultamenities": {
         "kingBed": "King Bed",
-        "smokingBan": "No Smoking",
-        "view": "Scenic View",
-        "bathroom": "Private Bathroom",
-        "towels": "Towels Provided",
-        "linens": "Bed Linens",
-        "tableChairs": "Table and Chairs",
-        "desk": "Work Desk",
-        "dresserWardrobe": "Dresser/Wardrobe",
-        "sofaSeating": "Sofa Seating",
-        "television": "Television",
-        "telephone": "Telephone",
-        "heating": "Heating",
-        "default": "Amenity"
+        "bathroom": "Private Bathroom"
+      },
+      "roomAmenities": {
+        "basic": {
+          "bed": "Bed",
+          "bedTypes": {
+            "single": "Single",
+            "double": "Double",
+            "king": "King",
+            "twin": "Twin",
+            "queen": "Queen"
+          },
+          "bathroom": "Private Bathroom",
+          "linensBedding": "Linens and Bedding",
+          "linens": "Fresh Linens",
+          "bidet": "Bidet",
+          "toiletPaper": "Toilet Paper",
+          "towelsSheets": "Towels and Sheets",
+          "freeToiletries": "Free Toiletries",
+          "shower": "Shower",
+          "toilet": "Toilet"
+        },
+        "furniture": {
+          "tableChairs": "Table and Chairs",
+          "desk": "Work Desk",
+          "dresserWardrobe": "Dresser and Wardrobe",
+          "sofaSeating": "Sofa Seating",
+          "diningTable": "Dining Table",
+          "readingChair": "Reading Chair"
+        },
+        "spaceLayout": {
+          "diningArea": "Dining Area",
+          "sittingArea": "Sitting Area",
+          "balcony": "Balcony"
+        },
+        "technology": {
+          "television": "Television",
+          "telephone": "Telephone",
+          "wifiInternet": "Wi-Fi Internet",
+          "flatScreenTV": "Flat-Screen TV",
+          "satelliteChannels": "Satellite Channels",
+          "cableChannels": "Cable Channels"
+        },
+        "climateControl": {
+          "airConditioning": "Air Conditioning",
+          "heating": "Heating"
+        },
+        "kitchenetteMiniBar": {
+          "smallRefrigerator": "Mini Refrigerator",
+          "microwave": "Microwave",
+          "refrigerator": "Refrigerator",
+          "kitchenware": "Kitchenware",
+          "electricKettle": "Electric Kettle",
+          "oven": "Oven",
+          "stovetop": "Stovetop",
+          "teaCoffeeMaker": "Tea/Coffee Maker"
+        },
+        "safetySecurity": {
+          "safe": "In-Room Safe",
+          "smokeDetectors": "Smoke Detectors",
+          "fireExtinguisher": "Fire Extinguisher"
+        },
+        "toiletries": {
+          "shampooConditioner": "Shampoo & Conditioner",
+          "soap": "Soap",
+          "hairDryer": "Hair Dryer"
+        },
+        "workLeisure": {
+          "workDesk": "Work Desk",
+          "additionalLighting": "Additional Lighting",
+          "ironingFacilities": "Ironing Facilities"
+        },
+        "accessibilityFeatures": {
+          "accessibleBathroom": "Accessible Bathroom",
+          "wheelchairAccessibility": "Wheelchair Accessible",
+          "upperFloorsAccessibleByElevator": "Upper Floors Accessible by Elevator",
+          "entireUnitWheelchairAccessible": "Entire Unit Wheelchair Accessible"
+        }
       },
       "policies": {
         "title": "Booking Policies",

@@ -1,28 +1,35 @@
-'use client';
+"use client";
 
-import React, { useCallback, useEffect, useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Menu, X, Globe, ChevronDown, HelpCircle, LogOut, User } from 'lucide-react';
-import { useDispatch, useSelector } from 'react-redux';
-import { usePathname, useRouter } from 'next/navigation';
-import Cookies from 'js-cookie';
+import React, { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import {
+  Menu,
+  X,
+  Globe,
+  ChevronDown,
+  LogOut,
+  User,
+} from "lucide-react";
+import { FiLink2 } from "react-icons/fi";
+import { useDispatch, useSelector } from "react-redux";
+import { usePathname, useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 import {
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
   Avatar,
-} from '@nextui-org/react';
-import { logout, getUser } from '@/Redux/slices/auth.slice';
-import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
-
-
-// Define types
-import { ThunkDispatch } from 'redux-thunk';
-import { AnyAction } from 'redux';
-import { NotificationBell } from '@/components/notifications/NotificationBell';
+} from "@nextui-org/react";
+import { logout, getUser } from "@/Redux/slices/auth.slice";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
+import { ThunkDispatch } from "redux-thunk";
+import { AnyAction } from "redux";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
+import LanguageSwitcher from "../languageSwitcher/LanguageSwitcher";
+import i18next from "i18next";
 
 interface RootState {
   auth: {
@@ -44,11 +51,6 @@ interface UserType {
 
 type AppDispatch = ThunkDispatch<RootState, unknown, AnyAction>;
 
-import MTrip from '@/components/assets/traveling.png';
-import Logo from '../assets/TRIP-1.png';
-import LanguageSwitcher from '../languageSwitcher/LanguageSwitcher';
-import i18next from 'i18next';
-
 const Navbar: React.FC = () => {
   const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -58,7 +60,7 @@ const Navbar: React.FC = () => {
   const router = useRouter();
 
   const user = useSelector((state: RootState) => state.auth.user);
-  const accessToken = Cookies.get('accessToken');
+  const accessToken = Cookies.get("accessToken");
   const { i18n } = useTranslation();
   // console.log("access token",accessToken);
 
@@ -73,33 +75,45 @@ const Navbar: React.FC = () => {
 
   // Handle scroll effect for shadow
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
   // RTL handling
   useEffect(() => {
-    document.documentElement.dir = i18next.language === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.dir = i18next.language === "ar" ? "rtl" : "ltr";
     const handleLanguageChange = () => {
-      document.documentElement.dir = i18next.language === 'ar' ? 'rtl' : 'ltr';
+      document.documentElement.dir = i18next.language === "ar" ? "rtl" : "ltr";
     };
-    i18next.on('languageChanged', handleLanguageChange);
+    i18next.on("languageChanged", handleLanguageChange);
     return () => {
-      i18next.off('languageChanged', handleLanguageChange);
+      i18next.off("languageChanged", handleLanguageChange);
     };
   }, []);
 
   const handleMyTripClick = () => {
     if (accessToken) {
-      router.push('/my-trip');
+      router.push("/my-trip");
+      setIsMenuOpen(false);
     } else {
-      toast.error(t('Navbar.pleaseLogin'));
+      toast.error(t("Navbar.pleaseLogin"));
+      setIsMenuOpen(false);
+    }
+  };
+
+  const handleMyReferals = () => {
+    if (accessToken) {
+      router.push("/referral");
+      setIsMenuOpen(false);
+    } else {
+      toast.error(t("Navbar.pleaseLogin"));
+      setIsMenuOpen(false);
     }
   };
 
   useEffect(() => {
-    const persistedAccessToken = localStorage.getItem('persist:root')
-      ? JSON.parse(localStorage.getItem('persist:root') || '{}').auth
+    const persistedAccessToken = localStorage.getItem("persist:root")
+      ? JSON.parse(localStorage.getItem("persist:root") || "{}").auth
       : null;
 
     let persistedToken = null;
@@ -128,45 +142,45 @@ const Navbar: React.FC = () => {
   };
 
   const handleLogout = () => {
-    toast.success(t('Navbar.logoutSuccess'));
+    toast.success(t("Navbar.logoutSuccess"));
     dispatch(logout() as any);
-    router.push('/');
+    router.push("/");
+    setIsMenuOpen(false);
   };
 
   const handleSignup = () => {
-    router.push('/register');
+    router.push("/register");
+    setIsMenuOpen(false);
   };
 
   const handleLogin = () => {
-    Cookies.set('redirectAfterLogin', window.location.href);
-    router.push('/login');
+    Cookies.set("redirectAfterLogin", window.location.href);
+    router.push("/login");
+    setIsMenuOpen(false);
   };
 
   return (
     <div
       className={`sticky top-0 z-50 transition-all duration-300 font-noto-sans ${scrolled
-        ? 'bg-gray-100 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.06)]'
-        : 'bg-gray-100 border-b border-tripswift-black/5'
-        } ${pathname === '/login' || pathname === '/register' ? 'hidden' : ''}`}
+        ? "bg-gray-100 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.06)]"
+        : "bg-gray-100 border-b border-tripswift-black/5"
+        } ${pathname === "/login" || pathname === "/register" ? "hidden" : ""}`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between h-20 px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <Link
-          href="/"
-          className="flex items-center relative z-10 group"
-        >
+        <Link href="/" className="flex items-center relative z-10 group">
           <div className="overflow-hidden">
             <Image
               src="/assets/TRIP-1.png"
               width={280}
               height={70}
               alt="TripSwift - Redefines Hospitality Technology"
-              className="h-16 w-auto transform transition-transform group-hover:scale-110 duration-300" // Increased h-16 (64px) and hover scale to 110%
+              className="h-16 w-auto transform transition-transform group-hover:scale-110 duration-300"
               priority
               style={{
-                maxHeight: '70px',
-                objectFit: 'contain',
-                objectPosition: 'left center',
+                maxHeight: "70px",
+                objectFit: "contain",
+                objectPosition: "left center",
               }}
             />
           </div>
@@ -179,7 +193,10 @@ const Navbar: React.FC = () => {
           className="lg:hidden cursor-pointer z-50 relative"
           onClick={toggleMenu}
         >
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center bg-tripswift-off-white ${isMenuOpen ? 'shadow-inner' : 'shadow-sm'} transition-all duration-300`}>
+          <div
+            className={`w-10 h-10 rounded-full flex items-center justify-center bg-tripswift-off-white ${isMenuOpen ? "shadow-inner" : "shadow-sm"
+              } transition-all duration-300`}
+          >
             {isMenuOpen ? (
               <X size={20} className="text-tripswift-blue" />
             ) : (
@@ -197,11 +214,17 @@ const Navbar: React.FC = () => {
 
           {/* Become a Host */}
           <div
-            onClick={() => (window.location.href = process.env.NEXT_PUBLIC_EXTRANET_URL || '')}
+            onClick={() =>
+            (window.location.href =
+              process.env.NEXT_PUBLIC_EXTRANET_URL || "")
+            }
             className="flex items-center cursor-pointer px-3 py-2 rounded-full text-tripswift-black hover:text-tripswift-blue hover:bg-tripswift-blue/5 text-[15px] leading-[20px] tracking-tight font-tripswift-medium transition-all duration-300"
           >
-            <Globe size={16} className={` text-tripswift-blue ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
-            <span>{t('Navbar.becomeHost')}</span>
+            <Globe
+              size={16}
+              className={` text-tripswift-blue ${i18n.language === "ar" ? "ml-2" : "mr-2"}`}
+            />
+            <span>{t("Navbar.becomeHost")}</span>
           </div>
 
           {/* My Trip */}
@@ -209,15 +232,26 @@ const Navbar: React.FC = () => {
             onClick={handleMyTripClick}
             className="flex items-center cursor-pointer px-3 py-2 rounded-full text-tripswift-black hover:text-tripswift-blue hover:bg-tripswift-blue/5 text-[15px] leading-[20px] tracking-tight font-tripswift-medium transition-all duration-300"
           >
-            <Image src="/assets/traveling.png" width={16} height={16} alt={t('Navbar.myTrip')} className={` text-tripswift-blue ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} unoptimized />
-            <span>{t('Navbar.myTrip')}</span>
+            <Image
+              src="/assets/traveling.png"
+              width={16}
+              height={16}
+              alt={t("Navbar.myTrip")}
+              className={` text-tripswift-blue ${i18n.language === "ar" ? "ml-2" : "mr-2"}`}
+              unoptimized
+            />
+            <span>{t("Navbar.myTrip")}</span>
           </div>
 
           {/* User Profile */}
           {user ? (
-            <Dropdown placement="bottom-end" classNames={{
-              content: "p-0 shadow-xl border border-tripswift-black/5 rounded-xl overflow-hidden",
-            }}>
+            <Dropdown
+              placement="bottom-end"
+              classNames={{
+                content:
+                  "p-0 shadow-xl border border-tripswift-black/5 rounded-xl overflow-hidden",
+              }}
+            >
               <DropdownTrigger>
                 <div className="flex items-center gap-2 cursor-pointer bg-tripswift-black/5 hover:bg-tripswift-blue/10 transition-colors duration-300 px-2 py-1.5 rounded-full">
                   <Avatar
@@ -257,29 +291,36 @@ const Navbar: React.FC = () => {
                     </p>
                   </div>
                 </DropdownItem>
-                {/* <DropdownItem key="separator" className="h-px bg-tripswift-black/10 my-1" /> */}
                 <DropdownItem
                   key="profile-settings"
-                  onClick={() => router.push('/profile')}
-                  startContent={<User size={16} className="text-tripswift-blue" />}
+                  onClick={() => router.push("/profile")}
+                  startContent={
+                    <User size={16} className="text-tripswift-blue" />
+                  }
                   className="py-2.5 text-[14px] font-tripswift-medium"
                 >
-                  {t('Navbar.profileSettings')}
+                  {t("Navbar.profileSettings")}
                 </DropdownItem>
-                {/* <DropdownItem
-                  key="help-feedback"
-                  startContent={<HelpCircle size={16} className="text-tripswift-blue" />}
+
+                {/* Referral */}
+                <DropdownItem
+                  onClick={handleMyReferals}
+                  key="referral"
+                  startContent={
+                    <FiLink2 size={16} className="text-tripswift-blue" />
+                  }
                   className="py-2.5 text-[14px] font-tripswift-medium"
                 >
-                  {t('Navbar.helpFeedback')}
-                </DropdownItem> */}
+                  <span>{t("Navbar.referral")}</span>
+                </DropdownItem>
+
                 <DropdownItem
                   key="logout"
                   onClick={handleLogout}
                   startContent={<LogOut size={16} className="text-red-500" />}
                   className="py-2.5 text-[14px] font-tripswift-medium text-red-600"
                 >
-                  {t('Navbar.logout')}
+                  {t("Navbar.logout")}
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
@@ -289,18 +330,18 @@ const Navbar: React.FC = () => {
                 onClick={handleLogin}
                 className="cursor-pointer text-tripswift-black hover:text-tripswift-blue text-[15px] leading-[20px] tracking-tight font-tripswift-medium px-4 py-2 rounded-full hover:bg-tripswift-blue/5 transition-all duration-300"
               >
-                {t('Navbar.login')}
+                {t("Navbar.login")}
               </button>
               <button
                 onClick={handleSignup}
                 className="cursor-pointer relative overflow-hidden group text-[15px] leading-[20px] tracking-tight font-tripswift-medium px-5 py-2.5 rounded-full text-tripswift-off-white shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-r from-tripswift-blue to-[#054B8F]"
               >
-                <span className="relative z-10">{t('Navbar.signUp')}</span>
+                <span className="relative z-10">{t("Navbar.signUp")}</span>
                 <span className="absolute inset-0 bg-gradient-to-r from-[#054B8F] to-tripswift-blue opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
               </button>
             </div>
           )}
-          {/* Notification Bell - Only show for logged-in users */}
+
           {user && (
             <div className="flex items-center py-2 rounded-full hover:bg-tripswift-blue/10 transition-all duration-300">
               <NotificationBell className="relative" userId={user._id} />
@@ -311,61 +352,72 @@ const Navbar: React.FC = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden bg-tripswift-off-white border-t border-tripswift-black/10 py-4 px-4 shadow-md absolute w-full left-0 top-20 z-10 transition-all duration-300 animate-in slide-in-from-top-5">
-          <div className="flex flex-col space-y-4">
+        <div className="lg:hidden bg-tripswift-off-white border-t border-tripswift-black/10 py-2 px-4 shadow-lg absolute w-full left-0 top-20 z-40 transition-all duration-300 animate-in slide-in-from-top-5">
+          <div className="flex flex-col space-y-2">
             {/* Language Switcher */}
-            <div className="py-2">
-              <LanguageSwitcher />
+            <div className="py-1">
+              <LanguageSwitcher onLanguageChange={() => setIsMenuOpen(false)} />
             </div>
 
             {/* Become a Host */}
             <Link
-              href={process.env.NEXT_PUBLIC_EXTRANET_URL || ''}
-              className="flex items-center gap-2 py-2 px-1 hover:bg-tripswift-blue hover:bg-opacity-10 rounded"
+              href={process.env.NEXT_PUBLIC_EXTRANET_URL || ""}
+              className="flex items-center gap-2 py-1.5 px-1 hover:bg-tripswift-blue hover:bg-opacity-10 rounded"
             >
               <Globe size={18} className="text-tripswift-blue" />
               <span className="text-tripswift-black font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]">
-                {t('Navbar.becomeHost')}
+                {t("Navbar.becomeHost")}
               </span>
             </Link>
 
             {/* My Trip */}
             <div
               onClick={handleMyTripClick}
-              className="flex items-center gap-2 py-2 px-1 hover:bg-tripswift-blue hover:bg-opacity-10 rounded cursor-pointer"
+              className="flex items-center gap-2 py-1.5 px-1 hover:bg-tripswift-blue hover:bg-opacity-10 rounded cursor-pointer"
             >
-              <Image src="/assets/traveling.png" width={18} height={18} alt={t('Navbar.myTrip')} unoptimized />
+              <Image
+                src="/assets/traveling.png"
+                width={18}
+                height={18}
+                alt={t("Navbar.myTrip")}
+                unoptimized
+              />
               <span className="text-tripswift-black font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]">
-                {t('Navbar.myTrip')}
+                {t("Navbar.myTrip")}
               </span>
             </div>
-
             {/* Notification Bell - Mobile */}
             {user && (
-              <div className="py-2">
-                <NotificationBell className="flex items-center gap-2" userId={user._id} />
+              <div>
+                <NotificationBell
+                  className="flex items-center gap-1"
+                  userId={user._id}
+                />
+                {/* <span className="text-tripswift-black font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]">
+                  {t("Navbar.notifications")}
+                </span> */}
               </div>
             )}
 
             {/* Auth Options */}
             {!user ? (
-              <div className="pt-2 border-t border-tripswift-black/10 flex flex-col gap-3 mt-2">
+              <div className="pt-1.5 border-t border-tripswift-black/10 flex flex-col gap-2 mt-1">
                 <div
                   onClick={handleLogin}
-                  className="cursor-pointer py-2 text-tripswift-black hover:text-tripswift-blue font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]"
+                  className="cursor-pointer py-1.5 text-tripswift-black hover:text-tripswift-blue font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]"
                 >
-                  {t('Navbar.login')}
+                  {t("Navbar.login")}
                 </div>
                 <div
                   onClick={handleSignup}
-                  className="cursor-pointer btn-tripswift-primary text-[16px] leading-[20px] tracking-[0px] font-tripswift-medium px-4 py-2 rounded-full hover:shadow-md transition-all duration-300"
+                  className="cursor-pointer btn-tripswift-primary text-[16px] leading-[20px] tracking-[0px] font-tripswift-medium px-4 py-1.5 rounded-full hover:shadow-md transition-all duration-300"
                 >
-                  {t('Navbar.signUp')}
+                  {t("Navbar.signUp")}
                 </div>
               </div>
             ) : (
-              <div className="pt-2 border-t border-tripswift-black/10 flex flex-col gap-2 mt-2">
-                <div className="flex items-center gap-3 py-2">
+              <div className="pt-1.5 border-t border-tripswift-black/10 flex flex-col gap-1.5 mt-1">
+                <div className="flex items-center gap-3 py-1.5">
                   <Avatar
                     size="sm"
                     className="bg-tripswift-blue text-tripswift-off-white"
@@ -385,11 +437,22 @@ const Navbar: React.FC = () => {
                   </div>
                 </div>
                 <div
-                  onClick={() => router.push('/profile')}
-                  className="cursor-pointer py-2 px-1 text-tripswift-black hover:bg-tripswift-blue hover:bg-opacity-10 rounded font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]"
+                  onClick={() => {
+                    router.push("/profile");
+                    setIsMenuOpen(false);
+                  }}
+                  className="cursor-pointer py-1.5 px-1 text-tripswift-black hover:bg-tripswift-blue hover:bg-opacity-10 rounded font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]"
                 >
-                  {t('Navbar.profileSettings')}
+                  {t("Navbar.profileSettings")}
                 </div>
+
+                <div
+                  onClick={handleMyReferals}
+                  className="cursor-pointer py-1.5 px-1 text-tripswift-black hover:bg-tripswift-blue hover:bg-opacity-10 rounded font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]"
+                >
+                  {t("Navbar.referral")}
+                </div>
+
                 {/* <div
                   className="cursor-pointer py-2 px-1 text-tripswift-black hover:bg-tripswift-blue hover:bg-opacity-10 rounded font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]"
                 >
@@ -397,9 +460,9 @@ const Navbar: React.FC = () => {
                 </div> */}
                 <div
                   onClick={handleLogout}
-                  className="cursor-pointer py-2 px-1 text-[#EF4444] hover:bg-tripswift-blue hover:bg-opacity-10 rounded font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]"
+                  className="cursor-pointer py-1.5 px-1 text-[#EF4444] hover:bg-tripswift-blue hover:bg-opacity-10 rounded font-tripswift-medium text-[14px] leading-[18px] tracking-[0px]"
                 >
-                  {t('Navbar.logout')}
+                  {t("Navbar.logout")}
                 </div>
               </div>
             )}

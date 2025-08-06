@@ -79,7 +79,6 @@ const HotelListing: React.FC = () => {
   // const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const sidebarRef = useRef<HTMLDivElement>(null);
   const { guestDetails } = useSelector((state) => state.hotel);
-
   const destination = searchParams.get("destination");
   const location = searchParams.get("location");
   const checkinDate = searchParams.get("checkin");

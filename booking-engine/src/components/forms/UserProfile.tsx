@@ -545,7 +545,7 @@ const UserProfile: React.FC = () => {
 
   const menuItems = [
     { id: 'overview' as const, label: t("Profile.overview", { defaultValue: "Overview" }), icon: User },
-    { id: 'bookings' as const, label: t("Profile.myTrips", { defaultValue: "My Trips" }), icon: Calendar },
+    // { id: 'bookings' as const, label: t("Profile.myTrips", { defaultValue: "My Trips" }), icon: Calendar },
     { id: 'preferences' as const, label: t("Profile.preferences", { defaultValue: "Preferences" }), icon: Heart },
     { id: 'security' as const, label: t("Profile.security", { defaultValue: "Security" }), icon: Shield },
     { id: 'notifications' as const, label: t("Profile.notifications", { defaultValue: "Notifications" }), icon: Bell },
