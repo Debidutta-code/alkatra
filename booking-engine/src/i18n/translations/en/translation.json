@@ -260,7 +260,8 @@
     "shareLink": "Share Link",
     "generateReferral": "Generate Referral Link",
     "generateOnce": "Generate your referral link once and share it with your friends to start earning rewards.",
-    "generated": "Referral link generated successfully!"
+    "generated": "Referral link generated successfully!",
+    "copiedToClipboard": "Copied to clipboard!"
   },
   "HotelListing": {
     "CompactSearchBar": {

@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "@/Redux/store";
 import { setAmount, setRoomId } from "@/Redux/slices/pmsHotelCard.slice";
 import { setGuestDetails } from "@/Redux/slices/hotelcard.slice";
 import FullscreenGallery from './FullscreenGallery';
+import QRCodeDisplay from "./QRCodeDisplay";
 import {
   Calendar,
   Search,
@@ -958,7 +959,15 @@ const RoomsPage: React.FC = () => {
                         ))}
                       </div>
                     )}
-
+                  {/* Property description */}
+                  {/* {propertyDetails?.description && (
+                    <div className="mt-4">
+                      <h3 className="text-section-heading mb-2">{t('RoomsPage.aboutThisProperty')}</h3>
+                      <p className="text-description">
+                        {propertyDetails.description}
+                      </p>
+                    </div>
+                  )} */}
                   {/* Property amenities section */}
                   <div className="mt-4">
                     <h3 className="text-section-heading mb-3">
@@ -991,6 +1000,14 @@ const RoomsPage: React.FC = () => {
 
                 {/* Property amenities and contact info */}
                 <div className="lg:col-span-1">
+
+                  {/* Property amenities */}
+                  <div className="bg-tripswift-blue/5 p-4 rounded-xl mb-2">
+                    {qrCodeData.qrCode && qrCodeData.couponCode && (
+                      <QRCodeDisplay qrCode={qrCodeData.qrCode} />
+                    )}
+                  </div> 
+
                   {/* Property description */}
                   {propertyDetails?.description && (
                     <div className="mt-4 p-4">

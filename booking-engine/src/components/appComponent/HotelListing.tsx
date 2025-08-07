@@ -341,11 +341,11 @@ const HotelListing: React.FC = () => {
               </h1>
             </div>
 
-            <div className="flex flex-wrap items-center  text-sm font-tripswift-regular text-tripswift-black/70 mt-2 ">
-              <div className={`flex items-center `}>
+            <div className="flex flex-wrap items-center text-sm font-tripswift-regular text-tripswift-black/70 mt-2 gap-2">
+              {/* Date Range */}
+              <div className="flex items-center whitespace-nowrap">
                 <Calendar
-                  className={`h-5 w-5  text-tripswift-blue ${i18n.language === "ar" ? "ml-3" : "mr-3"
-                    }`}
+                  className={`h-5 w-5 text-tripswift-blue ${i18n.language === "ar" ? "ml-3" : "mr-3"}`}
                 />
                 {checkinDate && checkoutDate ? (
                   <span>
@@ -354,26 +354,30 @@ const HotelListing: React.FC = () => {
                       : `${formatDate(checkinDate, { month: "short", day: "numeric" })} - ${formatDate(checkoutDate, { month: "short", day: "numeric" })}`}
                   </span>
                 ) : (
-                  <span>
-                    {t("HotelListing.selectDates", {
-                      defaultValue: "Select dates",
-                    })}
-                  </span>
+                  <span>{t("HotelListing.selectDates", { defaultValue: "Select dates" })}</span>
                 )}
               </div>
-              <span className={` text-tripswift-black/40 mx-4`}>•</span>
-              {checkinDate && checkoutDate ? (
-                <span>{calculateNights(checkinDate, checkoutDate)} {t("HotelListing.nights", { defaultValue: "nights" })}</span>
-              ) : (
-                <span>Select dates</span>
+
+              {/* Nights Count - only show if dates are selected */}
+              {checkinDate && checkoutDate && (
+                <>
+                  <span className="text-tripswift-black/40 hidden sm:inline">•</span>
+                  <div className="flex items-center whitespace-nowrap">
+                    <span className="sm:hidden text-tripswift-black/40 mx-1">|</span>
+                    <span>{calculateNights(checkinDate, checkoutDate)} {t("HotelListing.nights", { defaultValue: "nights" })}</span>
+                  </div>
+                </>
               )}
-              <span className="mx-4 text-tripswift-black/40">•</span>
-              <span>
-                {filteredHotels.length}{" "}
-                {t("HotelListing.propertiesFound", {
-                  defaultValue: "properties found",
-                })}
-              </span>
+
+              {/* Property Count */}
+              <span className="text-tripswift-black/40 hidden sm:inline">•</span>
+              <div className="flex items-center whitespace-nowrap">
+                <span className="sm:hidden text-tripswift-black/40 mx-1">|</span>
+                <span>
+                  {filteredHotels.length}{" "}
+                  {t("HotelListing.propertiesFound", { defaultValue: "properties found" })}
+                </span>
+              </div>
             </div>
           </div>
         </div>
