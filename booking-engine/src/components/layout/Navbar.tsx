@@ -11,7 +11,7 @@ import {
   LogOut,
   User,
 } from "lucide-react";
-import { FiLink2 } from "react-icons/fi";
+import { FiDollarSign, FiLink2, FiTarget } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
@@ -307,8 +307,7 @@ const Navbar: React.FC = () => {
                   onClick={handleMyReferals}
                   key="referral"
                   startContent={
-                    <FiLink2 size={16} className="text-tripswift-blue" />
-                  }
+                    <FiTarget size={16} className="text-tripswift-blue" />}
                   className="py-2.5 text-[14px] font-tripswift-medium"
                 >
                   <span>{t("Navbar.referral")}</span>
