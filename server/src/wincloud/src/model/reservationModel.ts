@@ -77,7 +77,7 @@ const thirdPartyBookingSchema = new Schema<IThirdPartyBooking>({
     currencyCode: { type: String, required: true },
     userId: { type: String, required: true },
     status: { type: String, required: false, enum: ['Confirmed', 'Pending', 'Cancelled'] },
-    createdAt: { type: Date, default: Date.now },
+    createdAt: { type: Date, default: () => new Date() },
 });
 
 const reservationLogSchema = new Schema<IReservationLog>({
@@ -99,7 +99,7 @@ const reservationLogSchema = new Schema<IReservationLog>({
     status: { type: String, required: true },
     process: { type: String, required: true, enum: ['Reservation', 'Amend Reservation', 'Cancellation'] },
     errorMessage: { type: String, required: false },
-    timestamp: { type: Date, default: Date.now },
+    timestamp: { type: Date, default: () => new Date()},
 });
 
 export const ThirdPartyBooking = model<IThirdPartyBooking>('WincloudReservation', thirdPartyBookingSchema);
