@@ -132,11 +132,13 @@
     "logoutSuccess": "सफलतापूर्वक लॉग आउट हो गया",
     "becomeHost": "होस्ट बनें",
     "myTrip": "मेरी यात्रा",
+    "notifications": "सूचनाएँ",
     "profileSettings": "प्रोफाइल सेटिंग्स",
     "helpFeedback": "सहायता और प्रतिक्रिया",
     "logout": "लॉग आउट",
     "signUp": "साइन अप करें",
-    "login": "लॉग इन करें"
+    "login": "लॉग इन करें",
+    "referral": "रेफ़र करें और कमाएँ"
   },
   "Footer": {
     "companyTitle": "कंपनी",
@@ -189,7 +191,9 @@
     "contentComingSoon": "{{tab}} के लिए सामग्री जल्द ही उपलब्ध होगी...",
     "newPasswordOptional": "नया पासवर्ड (वैकल्पिक)",
     "confirmNewPassword": "नए पासवर्ड की पुष्टि करें",
-    "joined": "{{date}} को शामिल हुए"
+    "joined": "{{date}} को शामिल हुए",
+    "notificationsDesc": "अपनी सूचना प्राथमिकताओं को प्रबंधित करें और हाल की सूचनाएं देखें।",
+    "recentNotifications": "हाल की सूचनाएं"
   },
   "HotelCard": {
     "heroTitle": "अपनी यात्रा के लिए सही ठहरने की जगह खोजें",
@@ -204,6 +208,60 @@
     "freeCancellation": "मुफ्त रद्दीकरण",
     "bestPriceGuarantee": "सर्वोत्तम मूल्य की गारंटी",
     "downloadourapp": " हमारा ऐप डाउनलोड करें"
+  },
+  "Referral": {
+    "heroTitle": "एक दोस्त को रेफर करें",
+    "heroSubtitle": "अपने दोस्तों को आमंत्रित करें और जब वे शामिल हों तो विशेष पुरस्कारों का आनंद लें",
+    "howItWorks": "यह कैसे काम करता है",
+    "howItWorksSubTitle": "पुरस्कार जीतने के लिए लोगों को आमंत्रित करें",
+    "step1Title": "निमंत्रण भेजें",
+    "step1Desc": "दोस्तों को निमंत्रण लिंक साझा करें और पुरस्कार जीतें",
+    "step2Title": "साइन अप करें",
+    "step2Desc": "उन्हें आपके रेफरल लिंक का उपयोग करके हमारी सेवा में पंजीकरण करने दें",
+    "step3Title": "कमाएं",
+    "step3Desc": "पुरस्कार प्राप्त करें",
+    "stepLabel": "चरण {{number}}",
+    "shareYourLink": "अपना रेफरल लिंक साझा करें",
+    "shareDescription": "आप अपने रेफरल लिंक को कॉपी करके और अपने दोस्तों को भेजकर या सोशल मीडिया पर साझा करके भी साझा कर सकते हैं।",
+    "copy": "रेफरल लिंक कॉपी करें",
+    "copied": "कॉपी हो गया!",
+    "shareVia": "के माध्यम से साझा करें",
+    "generateQr": "QR कोड जेनरेट करें",
+    "scanToShare": "साझा करने के लिए स्कैन करें",
+    "scanDescription": "इस QR कोड को स्कैन करें या दोस्तों के साथ साझा करने के लिए इसे सेव करें।",
+    "hideReferrals": "रेफरल छुपाएं",
+    "viewYourReferrals": "अपने रेफरल देखें",
+    "total": "कुल:",
+    "referrals": "रेफरल",
+    "wallet": "वॉलेट",
+    "currentBalance": "वर्तमान बैलेंस",
+    "totalEarned": "कुल कमाई",
+    "totalRedeemed": "कुल रिडीम किया गया",
+    "redeemEarnings": "अपनी कमाई रिडीम करें",
+    "enterAmount": "राशि दर्ज करें",
+    "availableBalance": "उपलब्ध बैलेंस",
+    "redeem": "रिडीम करें",
+    "lastUpdated": "अंतिम बार अपडेट किया गया",
+    "redeemSuccess": "रिडीम सफल! आपकी कमाई आपके वॉलेट में जोड़ दी गई है।",
+    "tableName": "नाम",
+    "tableEmail": "ईमेल",
+    "tableReferralDate": "रेफरल तिथि",
+    "tableId": "आईडी",
+    "noWalletData": "कोई वॉलेट डेटा उपलब्ध नहीं है।",
+    "startReferring": "अभी रेफर करना शुरू करें",
+    "refreshWallet": "वॉलेट रिफ्रेश करें",
+    "noToken": "कृपया बाद में पुनः प्रयास करें।",
+    "walletError": "वॉलेट डेटा लाने में त्रुटि। कृपया बाद में पुनः प्रयास करें।",
+    "insufficientBalance": "रिडीम करने के लिए अपर्याप्त बैलेंस।",
+    "redeemError": "कमाई रिडीम करने में त्रुटि। कृपया बाद में पुनः प्रयास करें।",
+    "yourReferralLink": "आपका रेफरल लिंक",
+    "noReferrals": "आपके पास अभी तक कोई रेफरल नहीं है।",
+    "shareToEarn": "जब आपके दोस्त साइन अप करते हैं तो पुरस्कार अर्जित करने के लिए अपना रेफरल लिंक साझा करें।",
+    "shareLink": "लिंक साझा करें",
+    "generateReferral": "रेफरल लिंक जेनरेट करें",
+    "generateOnce": "एक बार अपना रेफरल लिंक जेनरेट करें और पुरस्कार कमाना शुरू करने के लिए इसे अपने दोस्तों के साथ साझा करें।",
+    "generated": "रेफ़रल लिंक सफलतापूर्वक जनरेट हो गया!",
+    "copiedToClipboard": "क्लिपबोर्ड पर कॉपी हो गया!"
   },
   "HotelListing": {
     "CompactSearchBar": {
@@ -367,53 +425,55 @@
   },
   "RoomsPage": {
     "backToSearch": "खोज पर वापस जाएं",
-    "starHotelRating": "सितारा होटल रेटिंग",
-    "viewPropertyDetails": "संपत्ति विवरण देखें",
+    "starHotelRating": "स्टार होटल रेटिंग",
+    "viewPropertyDetails": "संपत्ति के विवरण देखें",
     "aboutThisProperty": "इस संपत्ति के बारे में",
-    "noImagesAvailable": "कोई छवि उपलब्ध नहीं है",
-    "propertyAmenities": "संपत्ति की सुविधाएँ",
+    "noImagesAvailable": "कोई छवियाँ उपलब्ध नहीं हैं",
+    "propertyAmenities": "संपत्ति सुविधाएँ",
     "nights": "रात",
     "nightsPlural": "रातें",
-    "stay": "प्रवास",
+    "stay": "रुकना",
     "filter": "फ़िल्टर",
+    "viewAllPhotos": "सभी फोटो देखें",
     "amenitiesList": {
       "wifi": "मुफ्त वाईफाई",
       "swimming_pool": "स्विमिंग पूल",
       "fitness_center": "फिटनेस सेंटर",
-      "spa_and_wellness": "स्पा और वेलनेस",
+      "spa_and_wellness": "स्पा और स्वास्थ्य",
       "restaurant": "रेस्तरां",
       "room_service": "रूम सर्विस",
       "bar_and_lounge": "बार और लाउंज",
       "parking": "पार्किंग",
-      "concierge_services": "कंसीयज सेवाएँ",
-      "pet_friendly": "पेट फ्रेंडली",
-      "business_facilities": "व्यावसायिक सुविधाएँ",
-      "laundry_services": "लॉन्ड्री सेवाएँ",
-      "child_friendly_facilities": "बच्चों के अनुकूल सुविधाएँ",
-      "non_smoking_rooms": "धूम्रपान निषेध कक्ष",
-      "facilities_for_disabled_guests": "विकलांग अतिथियों के लिए सुविधाएं",
-      "family_rooms": "पारिवारिक कक्ष"
+      "concierge_services": "कंसीर्ज सेवाएं",
+      "pet_friendly": "पालतू अनुकूल",
+      "business_facilities": "व्यापार सुविधाएं",
+      "laundry_services": "लॉन्ड्री सेवाएं",
+      "child_friendly_facilities": "बच्चों के अनुकूल सुविधाएं",
+      "non_smoking_rooms": "नॉन स्मोकिंग कमरे",
+      "facilities_for_disabled_guests": "विकलांग मेहमानों के लिए सुविधाएं",
+      "family_rooms": "परिवार कमरे"
     },
-    "noAmenitiesSpecified": "इस संपत्ति के लिए कोई सुविधाएँ निर्दिष्ट नहीं हैं।",
+    "noAmenitiesSpecified": "इस संपत्ति के लिए कोई सुविधाएं निर्दिष्ट नहीं की गईं।",
     "contactInformation": "संपर्क जानकारी",
     "allRooms": "सभी कमरे",
-    "searchRoomName": "कमरे का नाम खोजें",
+    "searchRoomName": "नाम से कमरा खोजें",
     "availableRooms": "उपलब्ध कमरे",
     "showingRooms_one": "{{count}} कमरा दिखाया जा रहा है",
     "showingRooms_other": "{{count}} कमरे दिखाए जा रहे हैं",
     "noRoomsAvailableTitle": "कोई कमरा उपलब्ध नहीं है",
-    "noRoomsAvailableMessage": "हमें आपके मानदंडों से मेल खाने वाले कोई कमरे नहीं मिले। कृपया अपने खोज फ़िल्टर या तारीखें समायोजित करने का प्रयास करें।",
+    "noRoomsAvailableMessage": "हम आपके मापदंडों से मेल खाते कोई कमरे नहीं ढूंढ सके। कृपया अपने खोज फ़िल्टर या तिथियां समायोजित करें।",
     "goBack": "वापस जाएं",
     "clearFilters": "फ़िल्टर साफ़ करें",
-    "loadingRoomsMessage": "उपलब्ध कमरों को लोड हो रहा है...",
+    "loadingRoomsMessage": "उपलब्ध कमरे लोड हो रहे हैं...",
+    "priceNotAvailable": "",
     "qrCode": {
-      "discountTitle": "अपना डिस्काउंट उपयोग करें",
-      "qrCodeAlt": "डिस्काउंट क्यूआर कोड",
+      "discountTitle": "अपनी छूट का उपयोग करें",
+      "qrCodeAlt": "छूट क्यूआर कोड",
       "scanToApply": "लागू करने के लिए स्कैन करें",
       "instructions": {
-        "scanAtCheckout": "अलहज्ज़ ऐप में इस कमरे को खोलने के लिए QR कोड स्कैन करें।",
-        "applyDiscount": "यदि ऐप इंस्टॉल नहीं है, तो आपको इसे डाउनलोड करने के लिए कहा जाएगा।",
-        "validityNote": "इस कमरे के लिए विशेष छूट पाने हेतु ऐप के माध्यम से बुकिंग करें।"
+        "scanAtCheckout": "Alhajz ऐप में इस कमरे को खोलने के लिए क्यूआर कोड स्कैन करें।",
+        "applyDiscount": "यदि ऐप स्थापित नहीं है, तो आपको इसे डाउनलोड करने के लिए कहा जाएगा।",
+        "validityNote": "इस कमरे के लिए एक विशेष छूट प्राप्त करने के लिए ऐप के माध्यम से बुक करें।"
       }
     },
     "RoomCard": {
@@ -424,41 +484,105 @@
       "night": "रात",
       "bookNow": "अभी बुक करें",
       "viewBookingPolicies": "बुकिंग नीतियां देखें",
+      "notAvailable": "अनुपलब्ध",
       "securePayment": "सुरक्षित भुगतान",
-      "amenities": {
-        "wifi": "मुफ्त वाईफाई",
-        "airConditioning": "एयर कंडीशनिंग",
+      "defaultamenities": {
         "kingBed": "किंग बेड",
-        "smokingBan": "धूम्रपान निषिद्ध",
-        "view": "मनोरम दृश्य",
-        "bathroom": "निजी बाथरूम",
-        "towels": "तौलिए प्रदान किए गए",
-        "linens": "बिस्तर लिनन",
-        "tableChairs": "टेबल और कुर्सियाँ",
-        "desk": "कार्य डेस्क",
-        "dresserWardrobe": "ड्रेसर/अलमारी",
-        "sofaSeating": "सोफा बैठने की व्यवस्था",
-        "television": "टेलीविजन",
-        "telephone": "टेलीफोन",
-        "heating": "हीटिंग",
-        "default": "सुविधा"
+        "bathroom": "निजी बाथरूम"
+      },
+      "roomAmenities": {
+        "basic": {
+          "bed": "बेड",
+          "bedTypes": {
+            "single": "सिंगल",
+            "double": "डबल",
+            "king": "किंग",
+            "twin": "ट्विन",
+            "queen": "क्वीन"
+          },
+          "bathroom": "निजी बाथरूम",
+          "linensBedding": "लिनन और बिस्तर",
+          "linens": "ताजा लिनन",
+          "bidet": "बिडेट",
+          "toiletPaper": "टॉयलेट पेपर",
+          "towelsSheets": "तौलिए और चादर",
+          "freeToiletries": "मुफ्त टॉयलेट्रीज",
+          "shower": "शावर",
+          "toilet": "शौचालय"
+        },
+        "furniture": {
+          "tableChairs": "मेज और कुर्सियाँ",
+          "desk": "डेस्क",
+          "dresserWardrobe": "ड्रेसर और अलमारी",
+          "sofaSeating": "सोफा सीटिंग",
+          "diningTable": "डाइनिंग टेबल",
+          "readingChair": "पढ़ने की कुर्सी"
+        },
+        "spaceLayout": {
+          "diningArea": "डाइनिंग एरिया",
+          "sittingArea": "बैठने का स्थान",
+          "balcony": "बालकनी"
+        },
+        "technology": {
+          "television": "टेलीविजन",
+          "telephone": "टेलीफोन",
+          "wifiInternet": "वाईफाई इंटरनेट",
+          "flatScreenTV": "फ्लैट-स्क्रीन टीवी",
+          "satelliteChannels": "सैटेलाइट चैनल",
+          "cableChannels": "केबल चैनल"
+        },
+        "climateControl": {
+          "airConditioning": "एयर कंडीशनिंग",
+          "heating": "हीटिंग"
+        },
+        "kitchenetteMiniBar": {
+          "smallRefrigerator": "मिनी रेफ्रिजरेटर",
+          "microwave": "माइक्रोवेव",
+          "refrigerator": "रेफ्रिजरेटर",
+          "kitchenware": "किचनवेयर",
+          "electricKettle": "इलेक्ट्रिक केटल",
+          "oven": "ओवन",
+          "stovetop": "स्टोवटॉप",
+          "teaCoffeeMaker": "चाय/कॉफी मेकर"
+        },
+        "safetySecurity": {
+          "safe": "कमरे में सेफ",
+          "smokeDetectors": "धुआं संसूचक",
+          "fireExtinguisher": "अग्निशामक"
+        },
+        "toiletries": {
+          "shampooConditioner": "शैम्पू और कंडीशनर",
+          "soap": "साबुन",
+          "hairDryer": "हेयर ड्रायर"
+        },
+        "workLeisure": {
+          "workDesk": "डेस्क",
+          "additionalLighting": "अतिरिक्त प्रकाश",
+          "ironingFacilities": "इस्त्री सुविधाएं"
+        },
+        "accessibilityFeatures": {
+          "accessibleBathroom": "पहुंच योग्य बाथरूम",
+          "wheelchairAccessibility": "व्हीलचेयर एक्सेसिबल",
+          "upperFloorsAccessibleByElevator": "ऊपरी मंजिल लिफ्ट द्वारा पहुंच योग्य",
+          "entireUnitWheelchairAccessible": "पूरी इकाई व्हीलचेयर एक्सेसिबल"
+        }
       },
       "policies": {
         "title": "बुकिंग नीतियां",
-        "closeModal": "मॉडल बंद करें",
+        "closeModal": "मोडल बंद करें",
         "cancellationPolicy": "रद्दीकरण नीति",
         "policyTypes": {
           "flexible": "लचीला",
           "moderate": "मध्यम",
-          "strict": "सख्त",
-          "nonrefundable": "अप्रतिदेय"
+          "strict": "कठोर",
+          "nonrefundable": "गैर-धनवापसी योग्य"
         },
         "amendmentPolicy": "संशोधन नीति",
         "amendmentPoints": {
-          "dateChanges": "तिथि परिवर्तन उपलब्धता के अधीन हैं",
-          "changes72Hours": "चेक-इन से 72 घंटे के भीतर परिवर्तन पर अतिरिक्त शुल्क लग सकता है",
-          "roomUpgrades": "कमरे के अपग्रेड उपलब्धता और अतिरिक्त शुल्क के अधीन हैं",
-          "reducingStay": "प्रवास की अवधि को कम करने पर मूल बुकिंग की रद्दीकरण नीति लागू हो सकती है"
+          "dateChanges": "तिथि परिवर्तन उपलब्धता पर निर्भर करते हैं",
+          "changes72Hours": "चेक-इन के 72 घंटे के भीतर परिवर्तन में अतिरिक्त शुल्क लग सकता है",
+          "roomUpgrades": "कमरे के अपग्रेड उपलब्धता और अतिरिक्त शुल्क पर निर्भर करते हैं",
+          "reducingStay": "रुकने की अवधि कम करना रद्दीकरण नीति पर निर्भर करता है"
         },
         "gotIt": "समझ गया"
       },
@@ -599,6 +723,7 @@
     "backToHome": "मुखपृष्ठ पर वापस जाएं",
     "noBooking": "कोई बुकिंग नहीं है",
     "BookingHeader": {
+      "backToHome": "होम पर वापस जाएं",
       "yourBookings": "आपकी बुकिंग",
       "viewManageTrack": "अपने सभी होटल आरक्षण एक ही स्थान पर देखें, प्रबंधित करें और ट्रैक करें"
     },

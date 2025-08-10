@@ -42,15 +42,15 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
     const infantsToUse = guestDetails?.infants || 0;
 
     let text = `${roomsToUse} ${roomsToUse === 1 ? t("GuestBox.roomSingular") : t("GuestBox.roomsPlural")} · ${guestsToUse} ${guestsToUse === 1 ? t("GuestBox.adultSingular") : t("GuestBox.adultsPlural")}`;
-  
+
     if (childrenToUse > 0) {
       text += ` · ${childrenToUse} ${childrenToUse === 1 ? t("GuestBox.childSingular") : t("GuestBox.childrenPlural")}`;
     }
-    
+
     if (infantsToUse > 0) {
       text += ` · ${infantsToUse} ${infantsToUse === 1 ? t("GuestBox.infantSingular") : t("GuestBox.infantsPlural")}`;
     }
-  
+
     setDisplayText(text);
   };
   useEffect(() => {
@@ -67,7 +67,7 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
       setInfantAges(guestDetails.infantAges || []);
     }
   }, [guestDetails, t]);
-  
+
   useEffect(() => {
     updateDisplayText();
   }, []);
@@ -420,7 +420,7 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
                 <Users className="h-4 w-4 text-tripswift-black/40 group-hover:text-tripswift-blue transition-colors duration-200" />
               </div>
             </div>
-            <div className={`bg-white border border-tripswift-black/10 hover:border-tripswift-blue/20 rounded-md shadow-sm transition-all duration-200 h-11 ${i18n.language === "ar" ? "pr-12" : "pl-12"} flex items-center`}>
+            <div className="bg-white border border-tripswift-black/10 hover:border-tripswift-blue/20 rounded-md shadow-sm transition-all duration-200 h-11 pl-12 flex items-center">
               <span className="text-tripswift-black/70 ml-3 mr-3 text-sm font-tripswift-medium">
                 {displayText || t("GuestBox.defaultText")}
               </span>

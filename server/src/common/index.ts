@@ -1,20 +1,28 @@
 import dotenv from "dotenv";
 dotenv.config()
 
-process.env.NODE_ENV = process.env.NODE_ENV || "development";
+const { env } = process;
+
+env.NODE_ENV = env.NODE_ENV || "development";
 
 export default {
-  port: parseInt(process.env.PORT || "8040", 10),
-  isDev: process.env.IS_DEV == "true",
-  mongoURI: process.env.EXTRANET_MONGO_URI_TESTING,
-  jwtSecretKeyDev: process.env.JWT_SECRET_KEY_DEV,
-  jwtSecretKey: process.env.JWT_SECRET_KEY,
-  jwtExpiresInDev: process.env.JWT_SECRET_KEY_DEV,
-  jwtExpiresIn: process.env.JWT_EXPIRES_IN,
-  kafkaBootstrapServers: process.env.KAFKA_BOOTSTRAP_SERVERS,
-  kafkaAuthTopic: process.env.KAFKA_AUTH_TOPIC,
-  googleClientId: process.env.GOOGLE_CLIENT_ID,
-  googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  googleFrontendCallbackUrl: process.env.GOOGLE_FRONTEND_CALLBACK_URL,
+  port: parseInt(env.PORT || "8040", 10),
+  isDev: env.IS_DEV == "true",
+  mongoURI: env.EXTRANET_MONGO_URI_TESTING,
+  jwtSecretKeyDev: env.JWT_SECRET_KEY_DEV,
+  jwtSecretKey: env.JWT_SECRET_KEY,
+  jwtExpiresInDev: env.JWT_SECRET_KEY_DEV,
+  jwtExpiresIn: env.JWT_EXPIRES_IN,
+  kafkaBootstrapServers: env.KAFKA_BOOTSTRAP_SERVERS,
+  kafkaAuthTopic: env.KAFKA_AUTH_TOPIC,
+  googleClientId: env.GOOGLE_CLIENT_ID,
+  googleClientSecret: env.GOOGLE_CLIENT_SECRET,
+  googleFrontendCallbackUrl: env.GOOGLE_FRONTEND_CALLBACK_URL,
+
+  // Referral System
+  referralSystem: {
+    referralLinkBaseUrl: env.REFERRAL_LINK_BASE_URL,
+    referRewardAmount: parseInt(env.REFER_REWARD_AMOUNT, 10),
+  }
 };
 

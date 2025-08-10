@@ -1,0 +1,1 @@
+export { IUserMessage, UserMessageModel } from "./userMessage.model";

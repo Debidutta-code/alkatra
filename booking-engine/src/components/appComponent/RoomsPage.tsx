@@ -8,6 +8,8 @@ import GuestInformationModal, { Guest } from "@/components/bookingComponents/Gue
 import { useDispatch, useSelector } from "@/Redux/store";
 import { setAmount, setRoomId } from "@/Redux/slices/pmsHotelCard.slice";
 import { setGuestDetails } from "@/Redux/slices/hotelcard.slice";
+import FullscreenGallery from './FullscreenGallery';
+import QRCodeDisplay from "./QRCodeDisplay";
 import {
   Calendar,
   Search,
@@ -125,6 +127,8 @@ const RoomsPage: React.FC = () => {
   const [roomTypeCode, setRoomTypeCode] = useState<string[]>([]);
   const [roomAmenities, setRoomAmenities] = useState<{ [key: string]: any }>({});
   const [unavailableRoomTypes, setUnavailableRoomTypes] = useState<{ roomType: string; dates: string[] }[]>([]);
+  const [isGalleryOpen, setIsGalleryOpen] = useState<boolean>(false);
+  const [galleryInitialIndex, setGalleryInitialIndex] = useState<number>(0);
 
 
   // New state for handling 400 error
@@ -659,12 +663,19 @@ const RoomsPage: React.FC = () => {
                         {/* Different layouts based on image count */}
                         {propertyDetails.image.length === 1 ? (
                           /* Single image layout with 4-sided curve */
-                          <div className="h-[280px] rounded-xl overflow-hidden">
+                          <div
+                            className="h-[280px] rounded-xl overflow-hidden cursor-pointer group"
+                            onClick={() => {
+                              setGalleryInitialIndex(0);
+                              setIsGalleryOpen(true);
+                            }}
+                          >
                             <img
                               src={propertyDetails.image[0]}
                               alt={propertyDetails.property_name || "Property"}
-                              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                             />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
                           </div>
                         ) : propertyDetails.image.length === 2 ? (
                           /* Two images layout - EACH with 4-sided curve */
@@ -672,16 +683,20 @@ const RoomsPage: React.FC = () => {
                             {propertyDetails.image.map((img, index) => (
                               <div
                                 key={index}
-                                className="relative h-full rounded-xl overflow-hidden"
+                                className="relative h-full rounded-xl overflow-hidden cursor-pointer group"
+                                onClick={() => {
+                                  setGalleryInitialIndex(index);
+                                  setIsGalleryOpen(true);
+                                }}
                               >
                                 <img
                                   src={img}
-                                  alt={`${propertyDetails.property_name || "Property"
-                                    } view ${index + 1}`}
-                                  className="w-full h-full object-cover"
+                                  alt={`${propertyDetails.property_name || "Property"} view ${index + 1}`}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                 />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
                                 {index === selectedImage && (
-                                  <div className="absolute inset-0 shadow-inner"></div>
+                                  <div className="absolute inset-0 shadow-inner ring-2 ring-tripswift-blue/30"></div>
                                 )}
                               </div>
                             ))}
@@ -690,14 +705,19 @@ const RoomsPage: React.FC = () => {
                           /* 3-4 images layout - EACH with 4-sided curve */
                           <div className="grid grid-cols-2 gap-2 h-[280px]">
                             {/* Main selected image - larger with 4-sided curve */}
-                            <div className="col-span-2 md:col-span-1 row-span-2 relative h-full rounded-xl overflow-hidden">
+                            <div
+                              className="col-span-2 md:col-span-1 row-span-2 relative h-full rounded-xl overflow-hidden cursor-pointer group"
+                              onClick={() => {
+                                setGalleryInitialIndex(selectedImage);
+                                setIsGalleryOpen(true);
+                              }}
+                            >
                               <img
                                 src={propertyDetails.image[selectedImage]}
-                                alt={
-                                  propertyDetails.property_name || "Property"
-                                }
-                                className="w-full h-full object-cover"
+                                alt={propertyDetails.property_name || "Property"}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                               />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
                             </div>
 
                             {/* Grid of other images - each with 4-sided curve */}
@@ -707,55 +727,69 @@ const RoomsPage: React.FC = () => {
                                 .slice(0, 2)
                                 .map((img, index) => {
                                   const images = propertyDetails?.image;
+                                  const originalIndex = images?.findIndex((i) => i === img);
                                   return (
                                     <div
                                       key={index}
-                                      className="relative cursor-pointer h-[138px] rounded-xl overflow-hidden"
+                                      className="relative cursor-pointer h-[138px] rounded-xl overflow-hidden group"
                                       onClick={() => {
                                         if (images && Array.isArray(images)) {
-                                          const newIndex = images.findIndex(
-                                            (i) => i === img
-                                          );
-                                          if (newIndex !== -1)
+                                          const newIndex = images.findIndex((i) => i === img);
+                                          if (newIndex !== -1) {
                                             setSelectedImage(newIndex);
+                                          }
+                                        }
+                                      }}
+                                      onDoubleClick={() => {
+                                        if (originalIndex !== undefined && originalIndex !== -1) {
+                                          setGalleryInitialIndex(originalIndex);
+                                          setIsGalleryOpen(true);
                                         }
                                       }}
                                     >
                                       <img
                                         src={img}
                                         alt={`Property view ${index + 1}`}
-                                        className="w-full h-full object-cover hover:opacity-90 transition-opacity"
+                                        className="w-full h-full object-cover group-hover:opacity-90 group-hover:scale-105 transition-all duration-300"
                                       />
                                     </div>
                                   );
                                 })}
-                              {propertyDetails.image.length > 3 &&
-                                selectedImage !== 3 && (
-                                  <div
-                                    className="relative cursor-pointer h-[138px] rounded-xl overflow-hidden"
-                                    onClick={() => setSelectedImage(3)}
-                                  >
-                                    <img
-                                      src={propertyDetails.image[3]}
-                                      alt={`Property view 4`}
-                                      className="w-full h-full object-cover hover:opacity-90 transition-opacity"
-                                    />
-                                  </div>
-                                )}
+                              {propertyDetails.image.length > 3 && selectedImage !== 3 && (
+                                <div
+                                  className="relative cursor-pointer h-[138px] rounded-xl overflow-hidden group"
+                                  onClick={() => setSelectedImage(3)}
+                                  onDoubleClick={() => {
+                                    setGalleryInitialIndex(3);
+                                    setIsGalleryOpen(true);
+                                  }}
+                                >
+                                  <img
+                                    src={propertyDetails.image[3]}
+                                    alt={`Property view 4`}
+                                    className="w-full h-full object-cover group-hover:opacity-90 group-hover:scale-105 transition-all duration-300"
+                                  />
+                                </div>
+                              )}
                             </div>
                           </div>
                         ) : (
                           /* 5+ images layout - EACH with 4-sided curve */
                           <div className="grid grid-cols-4 gap-2 h-[280px]">
                             {/* Main selected image with 4-sided curve */}
-                            <div className="col-span-4 md:col-span-2 md:row-span-2 relative h-full rounded-xl overflow-hidden">
+                            <div
+                              className="col-span-4 md:col-span-2 md:row-span-2 relative h-full rounded-xl overflow-hidden cursor-pointer group"
+                              onClick={() => {
+                                setGalleryInitialIndex(selectedImage);
+                                setIsGalleryOpen(true);
+                              }}
+                            >
                               <img
                                 src={propertyDetails.image[selectedImage]}
-                                alt={
-                                  propertyDetails.property_name || "Property"
-                                }
-                                className="w-full h-full object-cover"
+                                alt={propertyDetails.property_name || "Property"}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                               />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
                             </div>
 
                             {/* Grid of other images - each with 4-sided curve */}
@@ -765,35 +799,47 @@ const RoomsPage: React.FC = () => {
                                 .slice(0, 3)
                                 .map((img, index) => {
                                   const images = propertyDetails?.image;
+                                  const originalIndex = images?.findIndex((i) => i === img);
                                   return (
                                     <div
                                       key={index}
-                                      className="relative cursor-pointer rounded-xl overflow-hidden"
+                                      className="relative cursor-pointer rounded-xl overflow-hidden group"
                                       onClick={() => {
                                         if (images && Array.isArray(images)) {
-                                          const newIndex = images.findIndex(
-                                            (i) => i === img
-                                          );
-                                          if (newIndex !== -1)
+                                          const newIndex = images.findIndex((i) => i === img);
+                                          if (newIndex !== -1) {
                                             setSelectedImage(newIndex);
+                                          }
+                                        }
+                                      }}
+                                      onDoubleClick={() => {
+                                        if (originalIndex !== undefined && originalIndex !== -1) {
+                                          setGalleryInitialIndex(originalIndex);
+                                          setIsGalleryOpen(true);
                                         }
                                       }}
                                     >
                                       <img
                                         src={img}
                                         alt={`Property view ${index + 1}`}
-                                        className="w-full h-full object-cover hover:opacity-90 transition-opacity"
+                                        className="w-full h-full object-cover group-hover:opacity-90 group-hover:scale-105 transition-all duration-300"
                                       />
                                     </div>
                                   );
                                 })}
 
                               {/* Last image with overlay showing more images - with 4-sided curve */}
-                              <div className="relative cursor-pointer rounded-xl overflow-hidden">
+                              <div
+                                className="relative cursor-pointer rounded-xl overflow-hidden group"
+                                onClick={() => {
+                                  setGalleryInitialIndex(4);
+                                  setIsGalleryOpen(true);
+                                }}
+                              >
                                 <img
                                   src={propertyDetails.image[4]}
                                   alt="More property images"
-                                  className="w-full h-full object-cover brightness-75"
+                                  className="w-full h-full object-cover brightness-75 group-hover:brightness-50 transition-all duration-300"
                                 />
                                 <div className="absolute inset-0 flex items-center justify-center text-tripswift-off-white">
                                   <div className="text-center">
@@ -815,43 +861,34 @@ const RoomsPage: React.FC = () => {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 const images = propertyDetails.image;
-                                if (
-                                  images &&
-                                  Array.isArray(images) &&
-                                  images.length > 0
-                                ) {
+                                if (images && Array.isArray(images) && images.length > 0) {
                                   setSelectedImage((prev) =>
                                     prev <= 0 ? images.length - 1 : prev - 1
                                   );
                                 }
                               }}
-                              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-tripswift-off-white/70 backdrop-blur-sm text-tripswift-black rounded-full p-2.5 shadow-sm hover:bg-tripswift-off-white transition-colors duration-300"
+                              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-tripswift-off-white/70 backdrop-blur-sm rounded-full p-2.5 shadow-sm hover:bg-tripswift-off-white transition-colors duration-300 z-10 group"
                             >
-                              <ChevronLeft className="h-5 w-5" />
+                              <ChevronLeft className="h-5 w-5 text-white group-hover:text-black transition-colors duration-300" />
                             </button>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 const images = propertyDetails.image;
-                                if (
-                                  images &&
-                                  Array.isArray(images) &&
-                                  images.length > 0
-                                ) {
+                                if (images && Array.isArray(images) && images.length > 0) {
                                   setSelectedImage((prev) =>
                                     prev >= images.length - 1 ? 0 : prev + 1
                                   );
                                 }
                               }}
-                              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-tripswift-off-white/70 backdrop-blur-sm text-tripswift-black rounded-full p-2.5 shadow-sm hover:bg-tripswift-off-white transition-colors duration-300"
+                              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-tripswift-off-white/70 backdrop-blur-sm rounded-full p-2.5 shadow-sm hover:bg-tripswift-off-white transition-colors duration-300 z-10 group"
                             >
-                              <ChevronRight className="h-5 w-5" />
+                              <ChevronRight className="h-5 w-5 text-white group-hover:text-black transition-colors duration-300" />
                             </button>
 
                             {/* Counter */}
-                            <div className="absolute bottom-4 right-4 bg-tripswift-off-white/70 backdrop-blur-sm text-tripswift-black text-xs py-1.5 px-4 rounded-full font-tripswift-medium shadow-sm">
-                              {selectedImage + 1} /{" "}
-                              {propertyDetails.image.length}
+                            <div className="absolute text-white bottom-4 right-4 bg-tripswift-off-white/70 backdrop-blur-sm text-xs py-1.5 px-4 rounded-full font-tripswift-medium shadow-sm z-10">
+                              {selectedImage + 1} / {propertyDetails.image.length}
                             </div>
                           </>
                         )}
@@ -859,16 +896,23 @@ const RoomsPage: React.FC = () => {
                         {/* View all photos button */}
                         {propertyDetails.image.length >= 3 && (
                           <button
-                            className="absolute top-4 right-4 bg-tripswift-off-white/70 backdrop-blur-sm text-tripswift-black text-xs font-tripswift-medium px-3.5 py-2 rounded-full shadow-sm flex items-center hover:bg-tripswift-off-white transition-colors duration-300"
+                            className="absolute top-4 right-4 bg-tripswift-off-white/70 backdrop-blur-sm text-tripswift-black text-xs font-tripswift-medium px-3.5 py-2 rounded-full shadow-sm flex items-center bg-tripswift-off-white transition-colors duration-300 z-10"
                             onClick={(e) => {
                               e.stopPropagation();
-                              // Implement fullscreen gallery view
+                              setGalleryInitialIndex(selectedImage);
+                              setIsGalleryOpen(true);
                             }}
                           >
-                            <ImageIcon className="h-3.5 w-3.5 mr-1.5" /> View
-                            all photos
+                            <ImageIcon className="h-3.5 w-3.5 mr-1.5" />
+                            {t("RoomsPage.viewAllPhotos", { defaultValue: "View all photos" })}
                           </button>
                         )}
+
+                        {/* Click to view overlay hint */}
+                        <div className="absolute top-4 left-4 bg-black/20 backdrop-blur-sm text-white text-xs font-tripswift-medium px-2.5 py-1.5 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
+                          Click to view
+                        </div>
+
                       </>
                     ) : (
                       <div className="w-full h-[280px] rounded-xl flex items-center justify-center">
@@ -889,24 +933,32 @@ const RoomsPage: React.FC = () => {
                           <div
                             key={index}
                             onClick={() => setSelectedImage(index)}
-                            className={`w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-xl overflow-hidden cursor-pointer relative transition-all duration-300 ${selectedImage === index
+                            onDoubleClick={() => {
+                              setGalleryInitialIndex(index);
+                              setIsGalleryOpen(true);
+                            }}
+                            className={`w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-xl overflow-hidden cursor-pointer relative transition-all duration-300 group ${selectedImage === index
                               ? "shadow-md scale-105"
                               : "opacity-70 hover:opacity-90"
                               }`}
+                            title="Click to select, double-click to view fullscreen"
                           >
                             <img
                               src={img}
                               alt={`Thumbnail ${index + 1}`}
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             />
                             {selectedImage === index && (
                               <div className="absolute bottom-0 left-0 right-0 h-1 bg-tripswift-blue"></div>
                             )}
+                            {/* Fullscreen icon on hover */}
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                              <ImageIcon className="h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                            </div>
                           </div>
                         ))}
                       </div>
                     )}
-
                   {/* Property description */}
                   {/* {propertyDetails?.description && (
                     <div className="mt-4">
@@ -916,6 +968,7 @@ const RoomsPage: React.FC = () => {
                       </p>
                     </div>
                   )} */}
+                  {/* Property amenities section */}
                   <div className="mt-4">
                     <h3 className="text-section-heading mb-3">
                       {t("RoomsPage.propertyAmenities")}
@@ -947,13 +1000,13 @@ const RoomsPage: React.FC = () => {
 
                 {/* Property amenities and contact info */}
                 <div className="lg:col-span-1">
+
                   {/* Property amenities */}
-                  {/* <div className="bg-tripswift-blue/5 p-4 rounded-xl mb-2">
+                  <div className="bg-tripswift-blue/5 p-4 rounded-xl mb-2">
                     {qrCodeData.qrCode && qrCodeData.couponCode && (
                       <QRCodeDisplay qrCode={qrCodeData.qrCode} />
                     )}
-                  </div>  */}
-
+                  </div> 
 
                   {/* Property description */}
                   {propertyDetails?.description && (
@@ -962,7 +1015,7 @@ const RoomsPage: React.FC = () => {
                       <p className="text-description">
                         {propertyDetails.description}
                       </p>
-                  </div>
+                    </div>
                   )}
 
                   {/* Contact information */}
@@ -1011,10 +1064,8 @@ const RoomsPage: React.FC = () => {
                       )}
                       {propertyDetails?.property_address && (
                         <div className="flex items-center text-description">
-                          <MapPin className={`h-4 w-4 text-tripswift-blue  flex-shrink-0 mb-0.5 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
-                          {getFormattedAddress(
-                            propertyDetails.property_address
-                          )}
+                          <MapPin className={`h-4 w-4 text-tripswift-blue flex-shrink-0 mb-0.5 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
+                          {getFormattedAddress(propertyDetails.property_address)}
                         </div>
                       )}
                     </div>
@@ -1156,6 +1207,14 @@ const RoomsPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      <FullscreenGallery
+        images={propertyDetails?.image || []}
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        initialIndex={galleryInitialIndex}
+        propertyName={propertyDetails?.property_name}
+      />
 
       {/* Guest Information Modal */}
       <GuestInformationModal

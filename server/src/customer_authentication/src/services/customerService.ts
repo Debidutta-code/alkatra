@@ -5,8 +5,17 @@ import { isValidPassword } from "../utils/passwordValidator";
 import { ICustomer } from "../models/customer.model";
 import jwt from "jsonwebtoken";
 import { IUser } from "../models/googleUser.model";
+import { UserMessageRepository } from "../repositories";
+import { IUserMessage } from "../interfaces/userMessage.interface";
 
 class CustomerService {
+    private userMessageRepository: UserMessageRepository;
+
+    constructor() {
+        this.userMessageRepository = UserMessageRepository.getInstance();
+    }
+
+
     // new customer register
     async registerCustomer(customerData: Partial<ICustomer>): Promise<ICustomer> {
         const { firstName, lastName, email, password, phone } = customerData;
@@ -29,7 +38,7 @@ class CustomerService {
             throw new Error("Customer already registered");
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newCustomer = await customerRepository.create({
+        const newCustomer: any = await customerRepository.create({
             firstName,
             lastName,
             email,
@@ -39,7 +48,11 @@ class CustomerService {
             createdAt: new Date(),
             updatedAt: new Date(),
         });
-        return newCustomer;
+
+        const sanitizedCustomer = newCustomer.toObject();
+        delete sanitizedCustomer.password;
+
+        return sanitizedCustomer;
     }
 
     // Login customer
@@ -171,6 +184,37 @@ class CustomerService {
             throw new Error("Failed to update password");
         }
     }
+
+
+    /**
+     * Handle customer connect request
+     */
+    async handleCustomerConnectRequest(data: IUserMessage) {
+        try {
+            const payload: IUserMessage = {
+                name: data.name,
+                email: data.email,
+                reason: data.reason
+            }
+
+            const message = await this.userMessageRepository.create(payload);
+            if (!message) throw new Error("Failed to handle customer connect request");
+
+            // send email to user for successful connection
+        } catch (error: any) {
+            console.log("Failed to handle customer connect request", error);
+            throw error;
+        }
+    }
+
+
+    /**
+     * Find user by it's ID
+     */
+    async findById(id: string): Promise<ICustomer | null> {
+        return await customerRepository.findById(id);
+    }
+
 }
 
 export default new CustomerService();

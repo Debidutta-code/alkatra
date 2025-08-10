@@ -76,6 +76,7 @@ interface UpdateProfileData {
 
 // Fetch a specific property by ID
 export async function fetchProperty(accessToken: string, propertyId: string) {
+  console.log("Property fetch api called with id:", propertyId);
   try {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`,
@@ -85,6 +86,8 @@ export async function fetchProperty(accessToken: string, propertyId: string) {
         },
       }
     );
+    const hotelCode = response.data.data.property_code;
+    sessionStorage.setItem('hotelCode', hotelCode);
     return response.data;
   } catch (error: any) {
     throw new Error(`Error fetching property: ${error.message}`);
@@ -183,7 +186,7 @@ export async function updateProfile(accessToken: string, updatedData: UpdateProf
 // Add a new room to a property
 export async function addPropertyRoom(propertyId: string, accessToken: string, newRoomData: any) {
   try {
-    console.log("new Room Data",newRoomData);
+    console.log("new Room Data", newRoomData);
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/${propertyId}`,
       newRoomData,
@@ -203,7 +206,7 @@ export async function addPropertyRoom(propertyId: string, accessToken: string, n
 // Update a room in a property
 export async function updatePropertyRoom(propertyId: string, accessToken: string, updatedData: any) {
   try {
-    console.log("updated data we get",updatedData)
+    console.log("updated data we get", updatedData)
     const response = await axios.patch(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/${propertyId}?roomId=${updatedData._id}`,
       updatedData,
@@ -243,7 +246,7 @@ export async function createPropertyAmenity(propertyId: string, accessToken: str
 // Update property room amenities
 export async function updatePropertyRoomAmenity(propertyId: string, accessToken: string, updatedData: RoomAmenityData) {
   try {
-    const newAmenity = {...updatedData, propertyInfo_id: propertyId, }
+    const newAmenity = { ...updatedData, propertyInfo_id: propertyId, }
     const response = await axios.patch(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/amenite/roomaminity`,
       newAmenity,
@@ -262,7 +265,7 @@ export async function updatePropertyRoomAmenity(propertyId: string, accessToken:
 // Create property room amenities
 export async function createPropertyRoomAmenity(propertyId: string, accessToken: string, newRoomAmenity: RoomAmenityData) {
   try {
-    const newAmenity = {...newRoomAmenity, propertyInfo_id: propertyId}
+    const newAmenity = { ...newRoomAmenity, propertyInfo_id: propertyId }
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/amenite/roomaminity`,
       newAmenity,

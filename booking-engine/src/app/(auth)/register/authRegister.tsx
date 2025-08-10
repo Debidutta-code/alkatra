@@ -1,7 +1,6 @@
-//src/app/(app)/register/authRegister.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -15,11 +14,27 @@ import FormInput from "@/components/auth/FormInput";
 import PasswordInput from "@/components/auth/PasswordInput";
 import AuthButton from "@/components/auth/AuthButton";
 import { useFormValidation } from "@/components/auth/hooks/useFormValidation";
+import { useSearchParams } from "next/navigation";
 
 const Register: React.FC = () => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [referralCode, setReferralCode] = useState<string | null>("");
+  const [referralId, setReferralId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const referrerId = searchParams.get("referrerId");
+    const referralCode = searchParams.get("referralCode");
+    // if (referralCode && referrerId) {
+    //   console.log(">>>>>>>>>>>>>", referralCode, referrerId);
+    // } else {
+    //   console.log(">>>>>>>>>>>>>not found", referralCode);
+    // }
+    setReferralCode(referralCode);
+    setReferralId(referrerId);
+  }, []);
 
   const {
     values,
@@ -28,19 +43,19 @@ const Register: React.FC = () => {
     handleChange,
     handleFocus,
     handleBlur,
-    validateForm
+    validateForm,
   } = useFormValidation(
     {
       firstName: "",
       lastName: "",
       email: "",
-      password: ""
+      password: "",
     },
     {
       firstName: { required: true },
       lastName: { required: true },
       email: { required: true, email: true },
-      password: { required: true, passwordStrength: true }
+      password: { required: true, passwordStrength: true },
     }
   );
 
@@ -51,46 +66,62 @@ const Register: React.FC = () => {
     }
     setLoading(true);
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/register`,
-        {
-          ...values,
-          bookings: []
-        }
-      );
+      let apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/register`;
+
+      if (referralCode && referralId) {
+        const params = new URLSearchParams({
+          referrerId: referralId,
+          referralCode: referralCode,
+        });
+        apiUrl += `?${params.toString()}`;
+      }
+
+      const response = await axios.post(apiUrl, {
+        ...values,
+      });
+
       if (response.status === 201) {
         setLoading(false);
-        toast.success(t('Auth.Register.successMessage'));
+        toast.success(t("Auth.Register.successMessage"));
         router.push("/login");
       } else {
-        toast.error(t('Auth.Register.genericError'));
+        toast.error(t("Auth.Register.genericError"));
         setLoading(false);
       }
     } catch (error: any) {
       setLoading(false);
-      toast.error(error.response?.data?.message || t('Auth.Register.registrationFailed'));
+      toast.error(
+        error.response?.data?.message || t("Auth.Register.registrationFailed")
+      );
     }
   };
 
   return (
     <AuthLayout
-      title={t('Auth.Register.title')}
-      subtitle={t('Auth.Register.subtitle')}
-      heroTitle={<>{t('Auth.Register.heroTitle.join')} <span className="text-blue-200">{t('Auth.Register.heroTitle.now')}</span></>}
-      heroSubtitle={t('Auth.Register.heroSubtitle')}
+      title={t("Auth.Register.title")}
+      subtitle={t("Auth.Register.subtitle")}
+      heroTitle={
+        <>
+          {t("Auth.Register.heroTitle.join")}{" "}
+          <span className="text-blue-200">
+            {t("Auth.Register.heroTitle.now")}
+          </span>
+        </>
+      }
+      heroSubtitle={t("Auth.Register.heroSubtitle")}
       benefits={[
-        t('Auth.Register.benefits.memberPricing'),
-        t('Auth.Register.benefits.personalizedRecommendations'),
-        t('Auth.Register.benefits.manageBookings')
+        t("Auth.Register.benefits.memberPricing"),
+        t("Auth.Register.benefits.personalizedRecommendations"),
+        t("Auth.Register.benefits.manageBookings"),
       ]}
       footerContent={
         <p className="text-center text-gray-600">
-          {t('Auth.Register.alreadyHaveAccount')}{" "}
+          {t("Auth.Register.alreadyHaveAccount")}{" "}
           <Link
             href="/login"
             className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
           >
-            {t('Auth.Register.signIn')}
+            {t("Auth.Register.signIn")}
           </Link>
         </p>
       }
@@ -100,66 +131,69 @@ const Register: React.FC = () => {
         <FormInput
           id="firstName"
           name="firstName"
-          label={t('Auth.Register.firstNameLabel')}
+          label={t("Auth.Register.firstNameLabel")}
           type="text"
           value={values.firstName}
           onChange={handleChange}
-          placeholder={t('Auth.Register.firstNamePlaceholder')}
+          placeholder={t("Auth.Register.firstNamePlaceholder")}
           error={errors.firstName}
           icon={<User />}
-          isFocused={formFocus === 'firstName'}
-          onFocus={() => handleFocus('firstName')}
-          onBlur={() => handleBlur('firstName')}
+          isFocused={formFocus === "firstName"}
+          onFocus={() => handleFocus("firstName")}
+          onBlur={() => handleBlur("firstName")}
         />
 
         {/* Last Name Field */}
         <FormInput
           id="lastName"
           name="lastName"
-          label={t('Auth.Register.lastNameLabel')}
+          label={t("Auth.Register.lastNameLabel")}
           type="text"
           value={values.lastName}
           onChange={handleChange}
-          placeholder={t('Auth.Register.lastNamePlaceholder')}
+          placeholder={t("Auth.Register.lastNamePlaceholder")}
           error={errors.lastName}
           icon={<User />}
-          isFocused={formFocus === 'lastName'}
-          onFocus={() => handleFocus('lastName')}
-          onBlur={() => handleBlur('lastName')}
+          isFocused={formFocus === "lastName"}
+          onFocus={() => handleFocus("lastName")}
+          onBlur={() => handleBlur("lastName")}
         />
 
         {/* Email Field */}
         <FormInput
           id="email"
           name="email"
-          label={t('Auth.Register.emailLabel')}
+          label={t("Auth.Register.emailLabel")}
           type="email"
           value={values.email}
           onChange={handleChange}
-          placeholder={t('Auth.Register.emailPlaceholder')}
+          placeholder={t("Auth.Register.emailPlaceholder")}
           error={errors.email}
           icon={<Mail />}
-          isFocused={formFocus === 'email'}
-          onFocus={() => handleFocus('email')}
-          onBlur={() => handleBlur('email')}
+          isFocused={formFocus === "email"}
+          onFocus={() => handleFocus("email")}
+          onBlur={() => handleBlur("email")}
         />
 
         {/* Password Field */}
         <PasswordInput
           id="password"
           name="password"
-          label={t('Auth.Register.passwordLabel')}
+          label={t("Auth.Register.passwordLabel")}
           value={values.password}
           onChange={handleChange}
           error={errors.password}
-          isFocused={formFocus === 'password'}
-          onFocus={() => handleFocus('password')}
-          onBlur={() => handleBlur('password')}
-          helpText={t('Auth.Register.passwordHelp')}
+          isFocused={formFocus === "password"}
+          onFocus={() => handleFocus("password")}
+          onBlur={() => handleBlur("password")}
+          helpText={t("Auth.Register.passwordHelp")}
         />
 
         {/* Submit Button */}
-        <AuthButton loading={loading} text={t('Auth.Register.createAccountButton')} />
+        <AuthButton
+          loading={loading}
+          text={t("Auth.Register.createAccountButton")}
+        />
       </form>
     </AuthLayout>
   );

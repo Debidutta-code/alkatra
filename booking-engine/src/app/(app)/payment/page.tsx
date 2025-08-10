@@ -75,10 +75,12 @@ function PaymentPageContent() {
   const infants = parseInt(searchParams.get('infants') || '0', 10);
   const amountFromRedux = useSelector((state: any) => state.pmsHotelCard.amount);
   console.log(`>>>>>>>>>>>>>>>>>###################The amount we get from Redux is: ${amountFromRedux}`);
+
   const { i18n } = useTranslation();
+
   // Use amount from Redux only
-  const amount = amountFromRedux || '0';
-  console.log(`<><><><><><><><><><><><>The amount we are Getting from amountFromRedux is: ${amount}`);
+  const amount = amountFromRedux || '0'; // Still a string
+  console.log(`<><><><><><><><><><><><>The amount we are Getting from amountFromRedux is: ${parseFloat(amount).toFixed(2)}`); // Clean log
   // Parse guests from query parameters
   const guests: Guest[] = (() => {
     try {
@@ -106,7 +108,8 @@ function PaymentPageContent() {
 
   const nights = calculateNights(checkIn, checkOut);
 
-  const ratePerNight = amount / (nights || 1);
+  const numericAmount = parseFloat(amount) || 0;
+  const ratePerNight = nights > 0 ? (numericAmount / nights) : 0;
 
   const bookingDetails = {
     roomId,
@@ -225,21 +228,32 @@ function PaymentPageContent() {
                         </div>
                       </div>
 
-                      <div className="flex items-start ">
+                      <div className="flex items-start">
                         <Users className="text-tripswift-blue flex-shrink-0" size={20} />
-                        <div className={` ${i18n.language === "ar" ? "mr-3" : "ml-3"}`}>
+                        <div className={`${i18n.language === "ar" ? "mr-3" : "ml-3"} flex-1 min-w-0`}>
                           <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentPageContent.bookingSummary.guests')}</p>
-                          <div className="text-sm text-tripswift-black/60">
-                            <div>
-                              · {rooms} {rooms === 1 ? t('Payment.PaymentPageContent.bookingSummary.room') : t('Payment.PaymentPageContent.bookingSummary.rooms')} · {adults} {adults === 1 ? t('Payment.PaymentPageContent.bookingSummary.adult') : t('Payment.PaymentPageContent.bookingSummary.adults')}
-                              {children > 0 ? ` · ${children} ${children === 1 ? t('Payment.PaymentPageContent.bookingSummary.child') : t('Payment.PaymentPageContent.bookingSummary.children')}` : ''}
-                            </div>
-                            {infants > 0 && (
-                              <div>
-                                · {infants} {infants === 1 ? t('Payment.PaymentPageContent.bookingSummary.infant') : t('Payment.PaymentPageContent.bookingSummary.infants')}
-                              </div>
-                            )}
+
+                          {/* Line 1: Rooms and Adults */}
+                          <div className="text-sm text-tripswift-black/60 flex flex-wrap gap-x-1 gap-y-1">
+                            <span>· {rooms} {rooms === 1 ? t('Payment.PaymentPageContent.bookingSummary.room') : t('Payment.PaymentPageContent.bookingSummary.rooms')}</span>
+                            <span>· {adults} {adults === 1 ? t('Payment.PaymentPageContent.bookingSummary.adult') : t('Payment.PaymentPageContent.bookingSummary.adults')}</span>
                           </div>
+
+                          {/* Line 2: Children and Infants */}
+                          {(children > 0 || infants > 0) && (
+                            <div className="text-sm text-tripswift-black/60 flex flex-wrap gap-x-1 gap-y-1 mt-1">
+                              {children > 0 && (
+                                <span>
+                                  · {children} {children === 1 ? t('Payment.PaymentPageContent.bookingSummary.child') : t('Payment.PaymentPageContent.bookingSummary.children')}
+                                </span>
+                              )}
+                              {infants > 0 && (
+                                <span>
+                                  · {infants} {infants === 1 ? t('Payment.PaymentPageContent.bookingSummary.infant') : t('Payment.PaymentPageContent.bookingSummary.infants')}
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -391,7 +405,9 @@ function PaymentPageContent() {
                           <div className="font-tripswift-bold text-xl text-tripswift-blue">
                             {(paymentOption === "payWithCrypto-payWithQR" || paymentOption === "payWithCrypto-payWithWallet") && convertedAmount !== null
                               ? `USD ${convertedAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 })}`
-                              : `${currency.toUpperCase()} ${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 })}`}                          </div>
+                              : `${currency.toUpperCase()} ${numericAmount.toFixed(2)}`
+                            }
+                          </div>
                         </div>
 
                         {paymentOption === 'payAtHotel' && (

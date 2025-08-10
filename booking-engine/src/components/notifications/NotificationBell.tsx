@@ -150,11 +150,11 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
     <div className={`relative ${className}`}>
       <button
         onClick={handleBellClick}
-        className="relative p-2.5 rounded-full hover:bg-tripswift-blue/10 transition-colors duration-300 group"
+        className="relative p-1 rounded-full hover:bg-tripswift-blue/10 transition-colors duration-300 group"
         aria-label={`${t('notifications.title')} ${unreadCount > 0 ? `(${unreadCount} ${t('notifications.unread')})` : ''}`}
         disabled={isLoading}
       >
-        <Bell size={22} className={`text-tripswift-black group-hover:text-tripswift-blue transition-colors ${isLoading ? 'animate-pulse' : ''}`} />
+        <Bell size={18} className={`text-tripswift-black group-hover:text-tripswift-blue transition-colors ${isLoading ? 'animate-pulse' : ''}`} />
         {unreadCount > 0 && (
           <motion.div
             initial={{ scale: 0 }}
@@ -182,7 +182,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ type: 'spring', damping: 25, stiffness: 400 }}
-              className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-3 w-96 bg-white rounded-xl shadow-xl border border-tripswift-black/5 z-50 max-h-[32rem] overflow-hidden flex flex-col`}
+              className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-3 w-full sm:w-96 max-w-[95vw] bg-white rounded-xl shadow-xl border border-tripswift-black/5 z-50 max-h-[32rem] overflow-hidden flex flex-col`}
               dir={isRTL ? 'rtl' : 'ltr'}
             >
               <div className="bg-gradient-to-r from-tripswift-blue/10 to-tripswift-blue/5 p-4 border-b border-tripswift-black/10">

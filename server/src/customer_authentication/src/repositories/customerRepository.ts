@@ -51,12 +51,28 @@ class CustomerRepository {
         await customer.save();
         return customer;
     }
-    
+
     // Update customer password
     async updatePassword(id: string, hashedPassword: string): Promise<ICustomer | null> {
         return await Customer.findByIdAndUpdate(
             id,
             { password: hashedPassword, updatedAt: new Date() },
+            { new: true } // Return the updated document
+        );
+    }
+
+    /**
+     * Update customer information for referrals
+     */
+    async updateReferralInfo(customerId: string, referralCode: string, referralLink: string, referralQRCode: string): Promise<ICustomer | null> {
+        return await Customer.findByIdAndUpdate(
+            customerId,
+            {
+                referralCode: referralCode,
+                referralLink: referralLink,
+                referralQRCode: referralQRCode,
+                updatedAt: new Date()
+            },
             { new: true } // Return the updated document
         );
     }
