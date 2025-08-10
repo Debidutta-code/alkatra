@@ -35,6 +35,10 @@ export const config = {
 
     companyName: env.COMPANY_NAME as string,
 
+    database: {
+        mongoURI: env.EXTRANET_MONGO_URI_TESTING as string
+    },
+
     // AWS config
     aws: {
         region: env.AWS_REGION as string,
@@ -49,6 +53,12 @@ export const config = {
         user: env.EMAIL_USER as string,
         pass: env.EMAIL_PASS as string,
         sendGridApiKey: env.SENDGRID_API_KEY as string,
-    }
+    },
 
+    // Referral System
+    referralSystem: {
+        referralLinkBaseUrl: env.REFERRAL_LINK_BASE_URL,
+        referRewardAmount: parseInt(env.REFER_REWARD_AMOUNT, 10),
+    },
+    
 }

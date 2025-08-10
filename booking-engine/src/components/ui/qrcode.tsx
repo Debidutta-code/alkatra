@@ -2,7 +2,7 @@
 import QRCode from 'react-qr-code';
 
 export default function QRCodeForAPP() {
-  const staticLink = `${process.env.NEXT_PUBLIC_BASE_URL}/download/app-release.apk`;
+  const staticLink = `${process.env.NEXT_PUBLIC_MOBILE_APPLICATION_URL}`;
 
   return (
     <div className=" bg-tripswift-off-white px-4 py-2 flex flex-col items-center justify-center  lg:py-4  rounded-2xl shadow-lg max-w-xs">

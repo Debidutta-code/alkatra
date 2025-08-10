@@ -1,14 +1,16 @@
-import { DateRange, RatePlanInterFace ,modifiedRatePlanInterface} from '../types';
+import { DateRange, RatePlanInterFace, modifiedRatePlanInterface } from '../types';
 import { format, isWithinInterval, parseISO } from '../utils/dateUtils';
 import Cookies from 'js-cookie';
-import { fetchRatePlans, getAllRatePlans,modifyRatePlans } from "../API"
+import { fetchRatePlans, getAllRatePlans, modifyRatePlans } from "../API"
+
+
 
 export const filterData = (
   data: RatePlanInterFace[],
   dateRange: DateRange | undefined,
   selectedRoomType: string,
   selectedRatePlan: string,
-  allRoomTypes:any[]
+  allRoomTypes: any[]
 ): RatePlanInterFace[] => {
   // Handle case where data is undefined, null, or not an array
   if (!data || !Array.isArray(data) || data.length === 0) {
@@ -150,17 +152,17 @@ export const saveData = async (data: modifiedRatePlanInterface[]): Promise<void>
     if (!accessToken) {
       throw new Error('No access token found. Please log in.');
     }
-    console.log("From save Data",data)
+    console.log("From save Data", data)
     let modifiedRatePlans = data.map((mp) => {
       const rateAmountId = mp.rateAmountId
       const price = mp.price
-      return {rateAmountId, price };
+      return { rateAmountId, price };
     });
-    return await modifyRatePlans(modifiedRatePlans,accessToken)
+    return await modifyRatePlans(modifiedRatePlans, accessToken)
   } catch (error: any) {
     console.error(error.message);
   }
-  
+
   await new Promise(resolve => setTimeout(resolve, 1000));
 };
 
@@ -186,7 +188,11 @@ export const getAllRatePlanServices = async () => {
     if (!accessToken) {
       throw new Error('No access token found. Please log in.');
     }
-    return await getAllRatePlans(accessToken.toString())
+    const storedHotelCode = sessionStorage.getItem('hotelCode');
+    if (!storedHotelCode) {
+      throw new Error('No hotel code found in session storage.');
+    }
+    return await getAllRatePlans(accessToken.toString(), storedHotelCode);
   } catch (error: any) {
     return {
       success: false,

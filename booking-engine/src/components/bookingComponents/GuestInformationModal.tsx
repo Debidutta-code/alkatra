@@ -376,7 +376,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       //   response.message || t("BookingComponents.GuestInformationModal.otpSent")
       // );
       toast.success(
-        response.message || t("BookingComponents.GuestInformationModal.otpSent")
+        t("BookingComponents.GuestInformationModal.otpSent")
       );
       setEmailOtpSent(true);
       setEmailCountdown(300);
@@ -386,7 +386,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       //   err.message || t("BookingComponents.GuestInformationModal.otpSendFailed")
       // );
       toast.error(
-        err.message || t("BookingComponents.GuestInformationModal.otpSendFailed")
+        t("BookingComponents.GuestInformationModal.otpSendFailed")
       );
     } finally {
       setIsEmailVerifying(false);
@@ -414,7 +414,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       //   err.message || t("BookingComponents.GuestInformationModal.otpInvalidError")
       // );
       toast.error(
-        err.message || t("BookingComponents.GuestInformationModal.otpInvalidError")
+        t("BookingComponents.GuestInformationModal.otpInvalidError")
       );
     }
   };
@@ -1188,108 +1188,81 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
             ) : (
               <div className="space-y-3">
                 {/* Booking Summary Card */}
-                <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-tripswift-black/10">
+                <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-tripswift-black/10 overflow-hidden">
                   <div className="bg-tripswift-blue/10 px-4 py-2 rounded-t-xl">
                     <h3 className="text-lg font-tripswift-bold text-tripswift-black">
-                      {t(
-                        "BookingComponents.GuestInformationModal.bookingSummary"
-                      )}
+                      {t("BookingComponents.GuestInformationModal.bookingSummary")}
                     </h3>
                   </div>
-                  <div className="px-4 pb-3 grid grid-cols-1 md:grid-cols-2">
+                  <div className="px-4 pb-3 grid grid-cols-1 md:grid-cols-2 gap-y-4 md:gap-x-6 text-sm">
+                    {/* Stay Details */}
                     <div>
                       <h4 className="text-base font-tripswift-medium text-tripswift-black mb-1 flex items-center">
                         <Calendar
                           size={16}
-                          className={`text-tripswift-blue  ${i18n.language === "ar" ? "ml-2" : "mr-2"
-                            }`}
+                          className={`text-tripswift-blue ${i18n.language === "ar" ? "ml-2" : "mr-2"}`}
                         />
-                        {t(
-                          "BookingComponents.GuestInformationModal.stayDetails"
-                        )}
+                        {t("BookingComponents.GuestInformationModal.stayDetails")}
                       </h4>
-                      <div className="space-y-3 ml-6">
+                      <div className="space-y-2 ml-6 mt-1">
                         <div>
                           <p className="text-xs text-tripswift-black/60">
-                            {t(
-                              "BookingComponents.GuestInformationModal.roomType"
-                            )}
+                            {t("BookingComponents.GuestInformationModal.roomType")}
                           </p>
-                          <p className="text-sm font-tripswift-medium">
+                          <p className="text-sm font-tripswift-medium break-words max-w-[280px]">
                             {selectedRoom.room_name} ({selectedRoom.room_type})
                           </p>
                         </div>
                         <div>
                           <p className="text-xs text-tripswift-black/60">
-                            {t(
-                              "BookingComponents.GuestInformationModal.checkIn"
-                            )}
+                            {t("BookingComponents.GuestInformationModal.checkIn")}
                           </p>
-                          <p className="text-sm font-tripswift-medium">
-                            {formatDate(checkInDate)}
-                          </p>
+                          <p className="text-sm font-tripswift-medium">{formatDate(checkInDate)}</p>
                         </div>
                         <div>
                           <p className="text-xs text-tripswift-black/60">
-                            {t(
-                              "BookingComponents.GuestInformationModal.checkOut"
-                            )}
+                            {t("BookingComponents.GuestInformationModal.checkOut")}
                           </p>
-                          <p className="text-sm font-tripswift-medium">
-                            {formatDate(checkOutDate)}
-                          </p>
+                          <p className="text-sm font-tripswift-medium">{formatDate(checkOutDate)}</p>
                         </div>
                         <div>
                           <p className="text-xs text-tripswift-black/60">
-                            {t(
-                              "BookingComponents.GuestInformationModal.nightsPlural"
-                            )}
+                            {t("BookingComponents.GuestInformationModal.nightsPlural")}
                           </p>
-                          <p className="text-sm font-tripswift-medium">
-                            {nightsCount} {nightsText}
-                          </p>
+                          <p className="text-sm font-tripswift-medium">{nightsCount} {nightsText}</p>
                         </div>
                         <div>
                           <p className="text-xs text-tripswift-black/60">
-                            {t(
-                              "BookingComponents.GuestInformationModal.guests"
-                            )}
+                            {t("BookingComponents.GuestInformationModal.guests")}
                           </p>
-                          <p className="text-sm font-tripswift-medium">
-                            {getGuestCountDisplay()}
-                          </p>
+                          <p className="text-sm font-tripswift-medium">{getGuestCountDisplay()}</p>
                         </div>
                       </div>
                     </div>
+
+                    {/* Guest Information */}
                     <div>
                       <h4 className="text-base font-tripswift-medium text-tripswift-black mb-1 flex items-center">
                         <User
                           size={16}
-                          className={`text-tripswift-blue  ${i18n.language === "ar" ? "ml-2" : "mr-2"
-                            }`}
+                          className={`text-tripswift-blue ${i18n.language === "ar" ? "ml-2" : "mr-2"}`}
                         />
-                        {t(
-                          "BookingComponents.GuestInformationModal.guestInformation"
-                        )}
+                        {t("BookingComponents.GuestInformationModal.guestInformation")}
                       </h4>
-                      <div className="space-y-3 ml-6">
+                      <div className="space-y-2 ml-6 mt-1">
                         <div>
                           <p className="text-xs text-tripswift-black/60">
-                            {t(
-                              "BookingComponents.GuestInformationModal.primaryGuest"
-                            )}
+                            {t("BookingComponents.GuestInformationModal.primaryGuest")}
                           </p>
-                          <p className="text-sm font-tripswift-medium">
+                          <p className="text-sm font-tripswift-medium break-words max-w-[280px]">
                             {guests[0]?.firstName} {guests[0]?.lastName}
                           </p>
                         </div>
                         <div>
                           <p className="text-xs text-tripswift-black/60">
-                            {t(
-                              "BookingComponents.GuestInformationModal.email"
-                            )}
+                            {t("BookingComponents.GuestInformationModal.email")}
                           </p>
-                          <p className="text-sm font-tripswift-medium">
+                          <p className="text-sm font-tripswift-medium break-words max-w-[280px]">
                             {email}
                           </p>
                         </div>
@@ -1298,7 +1271,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                             {t("BookingComponents.GuestInformationModal.phone")}
                           </p>
                           <p
-                            className={`text-sm font-tripswift-medium  ${i18n.language === "ar" ? "text-right" : ""}`}
+                            className={`text-sm font-tripswift-medium ${i18n.language === "ar" ? "text-right" : ""}`}
                             dir="ltr"
                           >
                             {phone ? (phone.startsWith('+') ? phone : `+${phone}`) : ''}
@@ -1311,53 +1284,54 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
 
                 {/* Price Summary Card */}
                 {finalPrice && finalPrice.totalAmount ? (
-                  <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-tripswift-black/10">
+                  <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-tripswift-black/10 overflow-hidden">
                     <div className="bg-tripswift-blue/10 px-4 py-2 rounded-t-xl">
                       <h3 className="text-lg font-tripswift-bold text-tripswift-black">
                         {t("BookingComponents.GuestInformationModal.priceDetails")}
                       </h3>
                     </div>
-                    <div className="px-4 pb-2 space-y-1">
-                      {/* Total Base Amount */}
+                    <div className="px-4 pb-3 space-y-2 text-sm">
+                      {/* Base Rate */}
                       <div className="flex justify-between items-center py-1">
                         <span className="text-sm text-tripswift-black/70">
                           {t("BookingComponents.GuestInformationModal.baseRatePerRoomPerNight")}:
                         </span>
-                        <span className="text-sm font-tripswift-medium">
-                          {finalPrice.dailyBreakdown?.[0]?.currencyCode} {finalPrice.breakdown.totalBaseAmount.toLocaleString()}
+                        <span className="text-sm font-tripswift-medium tabular-nums">
+                          {finalPrice.dailyBreakdown?.[0]?.currencyCode}{" "}
+                          {finalPrice.breakdown.totalBaseAmount.toLocaleString()}
                         </span>
                       </div>
 
-                      {/* Total Additional Charges */}
+                      {/* Additional Charges */}
                       <div className="flex justify-between items-center py-1">
                         <span className="text-sm text-tripswift-black/70">
                           {t("BookingComponents.GuestInformationModal.additionalGuestCharges")}:
                         </span>
-                        <span className="text-sm font-tripswift-medium">
-                          {finalPrice.dailyBreakdown?.[0]?.currencyCode} {finalPrice.breakdown.totalAdditionalCharges.toLocaleString()}
+                        <span className="text-sm font-tripswift-medium tabular-nums">
+                          {finalPrice.dailyBreakdown?.[0]?.currencyCode}{" "}
+                          {finalPrice.breakdown.totalAdditionalCharges.toLocaleString()}
                         </span>
                       </div>
 
                       {/* Total Amount */}
-                      <div className="flex justify-between items-center py-1">
-                        <span className="text-sm font-tripswift-bold text-tripswift-black">
+                      <div className="flex justify-between items-center py-1 font-tripswift-bold text-tripswift-black">
+                        <span className="text-sm">
                           {t("BookingComponents.GuestInformationModal.totalAmount")}:
                         </span>
-                        <span className="text-sm font-tripswift-bold">
-                          {finalPrice.dailyBreakdown?.[0]?.currencyCode} {finalPrice.breakdown.totalAmount.toLocaleString()}
+                        <span className="text-sm tabular-nums">
+                          {finalPrice.dailyBreakdown?.[0]?.currencyCode}{" "}
+                          {finalPrice.breakdown.totalAmount.toLocaleString()}
                         </span>
                       </div>
 
                       {/* Number of Nights */}
                       <div className="flex justify-between items-center py-1">
                         <span className="text-sm text-tripswift-black/70">
-                          {t("BookingComponents.GuestInformationModal.nights",
-                            { count: finalPrice.numberOfNights }
-                          )}:
+                          {t("BookingComponents.GuestInformationModal.nights", {
+                            count: finalPrice.numberOfNights,
+                          })}:
                         </span>
-                        <span className="text-sm font-tripswift-medium">
-                          {finalPrice.numberOfNights}
-                        </span>
+                        <span className="text-sm font-tripswift-medium">{finalPrice.numberOfNights}</span>
                       </div>
 
                       {/* Daily Breakdown */}
@@ -1366,13 +1340,16 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                           <div className="text-sm font-tripswift-medium text-tripswift-black mb-1">
                             {t("BookingComponents.GuestInformationModal.roomRate")}:
                           </div>
-                          <div className="space-y-0.5">
+                          <div className="space-y-1 max-h-32 overflow-y-auto">
                             {finalPrice.dailyBreakdown.map((day, index) => (
-                              <div key={index} className="flex justify-between items-center py-0.5">
-                                <span className="text-sm text-tripswift-black/70">
+                              <div
+                                key={index}
+                                className="flex justify-between items-center py-0.5 text-sm"
+                              >
+                                <span className="text-tripswift-black/70 truncate max-w-[120px]">
                                   {day.date}
                                 </span>
-                                <span className="text-sm font-tripswift-medium">
+                                <span className="font-tripswift-medium tabular-nums">
                                   {day.currencyCode} {day.totalForAllRooms.toLocaleString()}
                                 </span>
                               </div>
@@ -1381,23 +1358,27 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         </div>
                       )}
 
-                      {/* Final Total Amount - Highlighted */}
+                      {/* Final Total - Highlighted */}
                       <div className="border-t border-tripswift-black/10 pt-2 mt-2">
                         <div className="flex justify-between items-center">
                           <span className="text-base font-tripswift-bold text-tripswift-black">
                             {t("BookingComponents.GuestInformationModal.totalAmount")}
                           </span>
-                          <span className="text-xl font-tripswift-bold text-tripswift-blue">
-                            {finalPrice.dailyBreakdown?.[0]?.currencyCode} {finalPrice.totalAmount.toLocaleString()}
+                          <span className="text-xl font-tripswift-bold text-tripswift-blue tabular-nums">
+                            {finalPrice.dailyBreakdown?.[0]?.currencyCode}{" "}
+                            {finalPrice.totalAmount.toLocaleString()}
                           </span>
                         </div>
                       </div>
 
                       {/* Additional Info */}
-                      <p className="text-xs text-tripswift-black/60 mt-1">
+                      <p className="text-xs text-tripswift-black/60 mt-1 leading-relaxed">
                         {t("BookingComponents.GuestInformationModal.priceIncludes", {
                           rooms: finalPrice.requestedRooms || guestData?.rooms || 1,
-                          guests: (guestData?.guests || 1) + (guestData?.children || 0) + (guestData?.infants || 0),
+                          guests:
+                            (guestData?.guests || 1) +
+                            (guestData?.children || 0) +
+                            (guestData?.infants || 0),
                         })}
                       </p>
                     </div>
@@ -1413,20 +1394,13 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                 {/* Payment Notice */}
                 <div className="bg-tripswift-blue/5 rounded-xl px-4 py-3 border border-tripswift-blue/20">
                   <div className="flex items-start gap-3">
-                    <CreditCard
-                      className="text-tripswift-blue flex-shrink-0 mt-1"
-                      size={18}
-                    />
+                    <CreditCard className="text-tripswift-blue flex-shrink-0 mt-1" size={18} />
                     <div>
                       <p className="text-sm font-tripswift-medium text-tripswift-black/80">
-                        {t(
-                          "BookingComponents.GuestInformationModal.paymentNoticeTitle"
-                        )}
+                        {t("BookingComponents.GuestInformationModal.paymentNoticeTitle")}
                       </p>
-                      <p className="text-xs text-tripswift-black/60 mt-1">
-                        {t(
-                          "BookingComponents.GuestInformationModal.paymentNoticeDescription"
-                        )}
+                      <p className="text-xs text-tripswift-black/60 mt-1 leading-relaxed">
+                        {t("BookingComponents.GuestInformationModal.paymentNoticeDescription")}
                       </p>
                     </div>
                   </div>

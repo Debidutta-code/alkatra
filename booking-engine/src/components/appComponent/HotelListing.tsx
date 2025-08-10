@@ -79,7 +79,6 @@ const HotelListing: React.FC = () => {
   // const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const sidebarRef = useRef<HTMLDivElement>(null);
   const { guestDetails } = useSelector((state) => state.hotel);
-
   const destination = searchParams.get("destination");
   const location = searchParams.get("location");
   const checkinDate = searchParams.get("checkin");
@@ -342,39 +341,46 @@ const HotelListing: React.FC = () => {
               </h1>
             </div>
 
-            <div className="flex flex-wrap items-center  text-sm font-tripswift-regular text-tripswift-black/70 mt-2 ">
-              <div className={`flex items-center `}>
+            <div className="flex flex-col md:flex-row md:flex-wrap md:items-center text-xs sm:text-sm font-tripswift-regular text-tripswift-black/70 mt-2 gap-2 md:gap-2">
+              {/* Date Range with Calendar Icon */}
+              <div className="flex items-start md:items-center pl-0.5">
                 <Calendar
-                  className={`h-5 w-5  text-tripswift-blue ${i18n.language === "ar" ? "ml-3" : "mr-3"
-                    }`}
+                  className={`h-4 w-4 text-tripswift-blue flex-shrink-0 mt-0.5 md:mt-0 ${i18n.language === "ar" ? "ml-3 md:ml-3" : "mr-4 md:mr-3"}`}
                 />
-                {checkinDate && checkoutDate ? (
-                  <span>
-                    {i18n.language === "ar"
-                      ? `${formatDate(checkoutDate, { month: "short", day: "numeric" })} - ${formatDate(checkinDate, { month: "short", day: "numeric" })}`
-                      : `${formatDate(checkinDate, { month: "short", day: "numeric" })} - ${formatDate(checkoutDate, { month: "short", day: "numeric" })}`}
-                  </span>
-                ) : (
-                  <span>
-                    {t("HotelListing.selectDates", {
-                      defaultValue: "Select dates",
-                    })}
-                  </span>
-                )}
+                <div className="flex flex-col md:flex-row md:items-center md:gap-2 min-w-0 flex-1">
+                  {/* Date Range Value */}
+                  <div className="leading-tight min-w-0">
+                    {checkinDate && checkoutDate ? (
+                      <span className="text-sm md:text-sm font-medium whitespace-nowrap">
+                        {i18n.language === "ar"
+                          ? `${formatDate(checkoutDate, { month: "short", day: "numeric" })} - ${formatDate(checkinDate, { month: "short", day: "numeric" })}`
+                          : `${formatDate(checkinDate, { month: "short", day: "numeric" })} - ${formatDate(checkoutDate, { month: "short", day: "numeric" })}`}
+                      </span>
+                    ) : (
+                      <span className="text-sm md:text-sm whitespace-nowrap">{t("HotelListing.selectDates", { defaultValue: "Select dates" })}</span>
+                    )}
+                  </div>
+
+                  {/* Nights Count - only show if dates are selected */}
+                  {checkinDate && checkoutDate && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-tripswift-black/40 text-sm hidden md:inline">•</span>
+                      <span className="text-sm md:text-sm font-medium leading-tight whitespace-nowrap">
+                        {calculateNights(checkinDate, checkoutDate)} {t("HotelListing.nights", { defaultValue: "nights" })}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Property Count */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-tripswift-black/40 text-sm hidden md:inline">•</span>
+                    <span className="text-sm md:text-sm font-medium leading-tight whitespace-nowrap">
+                      {filteredHotels.length}{" "}
+                      {t("HotelListing.propertiesFound", { defaultValue: "properties found" })}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <span className={` text-tripswift-black/40 mx-4`}>•</span>
-              {checkinDate && checkoutDate ? (
-                <span>{calculateNights(checkinDate, checkoutDate)} {t("HotelListing.nights", { defaultValue: "nights" })}</span>
-              ) : (
-                <span>Select dates</span>
-              )}
-              <span className="mx-4 text-tripswift-black/40">•</span>
-              <span>
-                {filteredHotels.length}{" "}
-                {t("HotelListing.propertiesFound", {
-                  defaultValue: "properties found",
-                })}
-              </span>
             </div>
           </div>
         </div>

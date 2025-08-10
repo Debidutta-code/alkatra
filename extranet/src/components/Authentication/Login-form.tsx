@@ -113,10 +113,10 @@ const LoginForm = () => {
         </div>
       </div>
       <div className="mb-6 text-center">
-        <h1 className="text-2xl font-bold tracking-tight text-gray-800">
+        <h1 className="sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-800 whitespace-nowrap">
           Welcome Back to <span className="text-primary">Al HaJz</span>
         </h1>
-        <p className="text-sm sm:text-base text-muted-foreground mt-2">
+        <p className="text-xs sm:text-sm text-muted-foreground mt-1">
           Sign in to manage your properties
         </p>
       </div>

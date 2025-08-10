@@ -9,8 +9,16 @@ import { useDispatch } from "react-redux";
 import { logout } from "@/Redux/slices/auth.slice";
 import { useTranslation } from "react-i18next";
 import {
-  FaShower, FaThermometerHalf, FaPhone, FaTv, FaCouch, FaChair, FaDoorClosed, FaDesktop, FaWifi, FaSnowflake, FaSmokingBan, FaBed, FaChild, FaUser, FaTree,
-  FaCheckCircle, FaPercent, FaTimes, FaInfoCircle, FaRulerCombined, FaBath, FaShieldAlt, FaChevronLeft, FaChevronRight
+  FaThermometerHalf, FaPhone, FaTv, FaCouch, FaChair, FaDoorClosed, FaDesktop, FaWifi, FaSnowflake, FaBed, FaChild, FaUser, FaTree,
+  FaCheckCircle, FaPercent, FaTimes, FaInfoCircle, FaRulerCombined, FaBath, FaShieldAlt, FaChevronLeft, FaChevronRight,
+  FaUtensils,
+  FaMugHot,
+  FaFireExtinguisher,
+  FaFan,
+  FaLightbulb,
+  FaSoap,
+  FaWheelchair,
+  FaPlug
 } from "react-icons/fa";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { getPolicyType, getPolicyStyling, getPolicyBulletPoints } from "@/utils/cancellationPolicies";
@@ -82,7 +90,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
   };
   const truncatedDescription = truncateDescription(data.description || "");
   const hasLongDescription = data.description && data.description.trim().split(/\s+/).length > 8;
-
+  const [showAllAmenities, setShowAllAmenities] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const handleBookNow = () => {
     if (!isPriceAvailable) return;
@@ -118,42 +126,271 @@ export const RoomCard: React.FC<RoomCardProps> = ({
     }
   };
 
+  // Create a mapping from display names to translation keys
+  const normalizeString = (str: string): string => {
+    return str
+      .toLowerCase()
+      .replace(/[:\-/]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .replace(/\b(t v|tv)\b/g, 'tv')
+      .trim();
+  };
+
+  const getAmenityTranslationKey = (displayName: string): string | null => {
+    const normalizedDisplayName = normalizeString(displayName);
+    if (displayName.startsWith('Bed:')) {
+      const bedType = displayName.split(':')[1]?.trim().toLowerCase();
+      if (bedType) {
+        return `RoomsPage.RoomCard.roomAmenities.basic.bedTypes.${bedType}`;
+      }
+      return 'RoomsPage.RoomCard.roomAmenities.basic.bed';
+    }
+    const normalizedMap: Record<string, string> = {
+      'bed': 'RoomsPage.RoomCard.roomAmenities.basic.bed',
+      'private bathroom': 'RoomsPage.RoomCard.roomAmenities.basic.bathroom',
+      'bathroom': 'RoomsPage.RoomCard.roomAmenities.basic.bathroom',
+      'linens bedding': 'RoomsPage.RoomCard.roomAmenities.basic.linensBedding',
+      'fresh linens': 'RoomsPage.RoomCard.roomAmenities.basic.linens',
+      'linens': 'RoomsPage.RoomCard.roomAmenities.basic.linens',
+      'bidet': 'RoomsPage.RoomCard.roomAmenities.basic.bidet',
+      'toilet paper': 'RoomsPage.RoomCard.roomAmenities.basic.toiletPaper',
+      'towels sheets': 'RoomsPage.RoomCard.roomAmenities.basic.towelsSheets',
+      'free toiletries': 'RoomsPage.RoomCard.roomAmenities.basic.freeToiletries',
+      'shower': 'RoomsPage.RoomCard.roomAmenities.basic.shower',
+      'toilet': 'RoomsPage.RoomCard.roomAmenities.basic.toilet',
+      'table and chairs': 'RoomsPage.RoomCard.roomAmenities.furniture.tableChairs',
+      'table chairs': 'RoomsPage.RoomCard.roomAmenities.furniture.tableChairs',
+      'work desk': 'RoomsPage.RoomCard.roomAmenities.furniture.desk',
+      'desk': 'RoomsPage.RoomCard.roomAmenities.furniture.desk',
+      'dresser and wardrobe': 'RoomsPage.RoomCard.roomAmenities.furniture.dresserWardrobe',
+      'dresser wardrobe': 'RoomsPage.RoomCard.roomAmenities.furniture.dresserWardrobe',
+      'sofa seating': 'RoomsPage.RoomCard.roomAmenities.furniture.sofaSeating',
+      'dining table': 'RoomsPage.RoomCard.roomAmenities.furniture.diningTable',
+      'reading chair': 'RoomsPage.RoomCard.roomAmenities.furniture.readingChair',
+      'dining area': 'RoomsPage.RoomCard.roomAmenities.spaceLayout.diningArea',
+      'sitting area': 'RoomsPage.RoomCard.roomAmenities.spaceLayout.sittingArea',
+      'balcony': 'RoomsPage.RoomCard.roomAmenities.spaceLayout.balcony',
+      'television': 'RoomsPage.RoomCard.roomAmenities.technology.television',
+      'telephone': 'RoomsPage.RoomCard.roomAmenities.technology.telephone',
+      'wifi internet': 'RoomsPage.RoomCard.roomAmenities.technology.wifiInternet',
+      'flat screen tv': 'RoomsPage.RoomCard.roomAmenities.technology.flatScreenTV',
+      'satellite channels': 'RoomsPage.RoomCard.roomAmenities.technology.satelliteChannels',
+      'cable channels': 'RoomsPage.RoomCard.roomAmenities.technology.cableChannels',
+      'air conditioning': 'RoomsPage.RoomCard.roomAmenities.climateControl.airConditioning',
+      'heating': 'RoomsPage.RoomCard.roomAmenities.climateControl.heating',
+      'mini refrigerator': 'RoomsPage.RoomCard.roomAmenities.kitchenetteMiniBar.smallRefrigerator',
+      'small refrigerator': 'RoomsPage.RoomCard.roomAmenities.kitchenetteMiniBar.smallRefrigerator',
+      'refrigerator': 'RoomsPage.RoomCard.roomAmenities.kitchenetteMiniBar.refrigerator',
+      'microwave': 'RoomsPage.RoomCard.roomAmenities.kitchenetteMiniBar.microwave',
+      'kitchenware': 'RoomsPage.RoomCard.roomAmenities.kitchenetteMiniBar.kitchenware',
+      'electric kettle': 'RoomsPage.RoomCard.roomAmenities.kitchenetteMiniBar.electricKettle',
+      'oven': 'RoomsPage.RoomCard.roomAmenities.kitchenetteMiniBar.oven',
+      'stovetop': 'RoomsPage.RoomCard.roomAmenities.kitchenetteMiniBar.stovetop',
+      'tea coffee maker': 'RoomsPage.RoomCard.roomAmenities.kitchenetteMiniBar.teaCoffeeMaker',
+      'in room safe': 'RoomsPage.RoomCard.roomAmenities.safetySecurity.safe',
+      'safe': 'RoomsPage.RoomCard.roomAmenities.safetySecurity.safe',
+      'smoke detectors': 'RoomsPage.RoomCard.roomAmenities.safetySecurity.smokeDetectors',
+      'fire extinguisher': 'RoomsPage.RoomCard.roomAmenities.safetySecurity.fireExtinguisher',
+      'shampoo conditioner': 'RoomsPage.RoomCard.roomAmenities.toiletries.shampooConditioner',
+      'soap': 'RoomsPage.RoomCard.roomAmenities.toiletries.soap',
+      'hair dryer': 'RoomsPage.RoomCard.roomAmenities.toiletries.hairDryer',
+      'additional lighting': 'RoomsPage.RoomCard.roomAmenities.workLeisure.additionalLighting',
+      'ironing facilities': 'RoomsPage.RoomCard.roomAmenities.workLeisure.ironingFacilities',
+      'accessible bathroom': 'RoomsPage.RoomCard.roomAmenities.accessibilityFeatures.accessibleBathroom',
+      'wheelchair accessibility': 'RoomsPage.RoomCard.roomAmenities.accessibilityFeatures.wheelchairAccessibility',
+      'upper floors accessible by elevator': 'RoomsPage.RoomCard.roomAmenities.accessibilityFeatures.upperFloorsAccessibleByElevator',
+      'entire unit wheelchair accessible': 'RoomsPage.RoomCard.roomAmenities.accessibilityFeatures.entireUnitWheelchairAccessible'
+    };
+    return normalizedDisplayName in normalizedMap ? normalizedMap[normalizedDisplayName] : null;
+  };
+
   const getRoomAmenities = () => {
     if (data.amenities && data.amenities.length > 0) {
-      return data.amenities.map((amenity) => ({
-        icon: getIconComponent(amenity.icon),
-        name: amenity.name,
-      }));
+      return data.amenities.map((amenity) => {
+        const category = amenity.icon;
+        const displayName = amenity.name;
+  
+        let translatedName;
+        
+        // Special handling for bed types
+        if (displayName.startsWith('Bed:')) {
+          const bedType = displayName.split(':')[1]?.trim().toLowerCase();
+          const bedLabel = t('RoomsPage.RoomCard.roomAmenities.basic.bed');
+          
+          if (bedType) {
+            const translationKey = `RoomsPage.RoomCard.roomAmenities.basic.bedTypes.${bedType}`;
+            const bedTypeTranslation = t(translationKey);
+            
+            // If translation exists, combine bed label with bed type
+            if (bedTypeTranslation !== translationKey) {
+              translatedName = `${bedLabel}: ${bedTypeTranslation}`;
+            } else {
+              // Fallback: use original display name if bed type translation doesn't exist
+              translatedName = displayName;
+            }
+          } else {
+            translatedName = bedLabel;
+          }
+        } else {
+          // Handle other amenities as before
+          const translationKey = getAmenityTranslationKey(displayName);
+          
+          if (translationKey) {
+            translatedName = t(translationKey);
+            if (translatedName === translationKey) {
+              translatedName = displayName;
+            }
+          } else {
+            translatedName = displayName;
+          }
+        }
+  
+        return {
+          icon: getIconComponent(category, displayName),
+          name: translatedName,
+        };
+      });
     }
 
+    // Default amenities (these work fine as you mentioned)
     const defaultAmenities = [
-      { icon: <FaBed className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.kingBed') },
-      { icon: <FaBath className="text-tripswift-blue" />, name: t('RoomsPage.RoomCard.amenities.bathroom') },
+      {
+        icon: <FaBed className="text-tripswift-blue" />,
+        name: t('RoomsPage.RoomCard.defaultamenities.kingBed')
+      },
+      {
+        icon: <FaBath className="text-tripswift-blue" />,
+        name: t('RoomsPage.RoomCard.defaultamenities.bathroom')
+      },
     ];
     return defaultAmenities;
   };
 
-  const getIconComponent = (iconName: string) => {
-    const iconClass = "text-tripswift-blue";
-    switch (iconName) {
-      case 'wifi': return <FaWifi className={iconClass} />;
-      case 'snowflake': return <FaSnowflake className={iconClass} />;
-      case 'smoking-ban': return <FaSmokingBan className={iconClass} />;
-      case 'bed': return <FaBed className={iconClass} />;
-      case 'tree': return <FaTree className={iconClass} />;
-      case 'user': return <FaUser className={iconClass} />;
-      case 'child': return <FaChild className={iconClass} />;
-      case 'bathroom': return <FaBath className={iconClass} />;
-      case 'towels': return <FaShower className={iconClass} />;
-      case 'linens': return <FaBed className={iconClass} />;
-      case 'tableChairs': return <FaChair className={iconClass} />;
-      case 'desk': return <FaDesktop className={iconClass} />;
-      case 'dresserWardrobe': return <FaDoorClosed className={iconClass} />;
-      case 'sofaSeating': return <FaCouch className={iconClass} />;
-      case 'television': return <FaTv className={iconClass} />;
-      case 'telephone': return <FaPhone className={iconClass} />;
-      case 'heating': return <FaThermometerHalf className={iconClass} />;
-      default: return <FaCheckCircle className={iconClass} />;
+  const getIconComponent = (category: string, displayName: string) => {
+    const iconClass = "h-3 w-3 text-tripswift-blue";
+
+    // Map display names to appropriate icons
+    switch (displayName) {
+      // Basic amenities
+      case "Bed":
+        return <FaBed className={iconClass} />;
+
+      case "Private Bathroom":
+      case "Bathroom":
+      case "Shower":
+      case "Toilet":
+      case "Towels and Sheets":
+      case "Fresh Linens":
+      case "Linens":
+      case "Linens and Bedding":
+      case "Bidet":
+      case "Toilet Paper":
+      case "Free Toiletries":
+        return <FaBath className={iconClass} />;
+
+      // Furniture
+      case "Table and Chairs":
+      case "Table Chairs":
+      case "Dining Table":
+        return <FaChair className={iconClass} />;
+
+      case "Work Desk":
+      case "Desk":
+        return <FaDesktop className={iconClass} />;
+
+      case "Dresser and Wardrobe":
+      case "Dresser Wardrobe":
+        return <FaDoorClosed className={iconClass} />;
+
+      case "Sofa Seating":
+      case "Reading Chair":
+        return <FaCouch className={iconClass} />;
+
+      // Space Layout
+      case "Dining Area":
+      case "Sitting Area":
+        return <FaCouch className={iconClass} />;
+
+      case "Balcony":
+        return <FaTree className={iconClass} />;
+
+      // Technology
+      case "Television":
+      case "Flat-Screen TV":
+      case "Flat Screen TV":
+      case "Satellite Channels":
+      case "Cable Channels":
+        return <FaTv className={iconClass} />;
+
+      case "Telephone":
+        return <FaPhone className={iconClass} />;
+
+      case "Wi-Fi Internet":
+      case "Wifi Internet":
+      case "WiFi Internet":
+        return <FaWifi className={iconClass} />;
+
+      // Climate Control
+      case "Air Conditioning":
+        return <FaSnowflake className={iconClass} />;
+
+      case "Heating":
+        return <FaThermometerHalf className={iconClass} />;
+
+      // Kitchen/Mini Bar
+      case "Mini Refrigerator":
+      case "Small Refrigerator":
+      case "Refrigerator":
+        return <FaSnowflake className={iconClass} />;
+
+      case "Microwave":
+      case "Oven":
+      case "Stovetop":
+        return <FaUtensils className={iconClass} />;
+
+      case "Kitchenware":
+      case "Electric Kettle":
+      case "Tea/Coffee Maker":
+      case "Tea Coffee Maker":
+        return <FaMugHot className={iconClass} />;
+
+      // Safety & Security
+      case "In-Room Safe":
+      case "Safe":
+        return <FaShieldAlt className={iconClass} />;
+
+      case "Smoke Detectors":
+      case "Fire Extinguisher":
+        return <FaFireExtinguisher className={iconClass} />;
+
+      // Toiletries
+      case "Shampoo & Conditioner":
+      case "Shampoo Conditioner":
+      case "Soap":
+        return <FaSoap className={iconClass} />;
+
+      case "Hair Dryer":
+        return <FaFan className={iconClass} />;
+
+      // Work & Leisure
+      case "Additional Lighting":
+        return <FaLightbulb className={iconClass} />;
+
+      case "Ironing Facilities":
+        return <FaPlug className={iconClass} />;
+
+      // Accessibility Features
+      case "Accessible Bathroom":
+      case "Wheelchair Accessible":
+      case "Wheelchair Accessibility":
+      case "Upper Floors Accessible by Elevator":
+      case "Upper Floors Accessible By Elevator":
+      case "Entire Unit Wheelchair Accessible":
+        return <FaWheelchair className={iconClass} />;
+
+      // Default fallback
+      default:
+        return <FaCheckCircle className={iconClass} />;
     }
   };
   const { i18n } = useTranslation();
@@ -364,12 +601,25 @@ export const RoomCard: React.FC<RoomCardProps> = ({
 
             {/* Enhanced Amenities Display */}
             <div className="flex flex-wrap gap-x-2 gap-y-1.5">
-              {getRoomAmenities().map((amenity, index) => (
-                <div key={index} className="flex items-center text-xs bg-blue-50 text-tripswift-blue/80 font-tripswift-medium px-2 py-1 rounded-full">
-                  {React.cloneElement(amenity.icon, { className: ` h-3 w-3  ${i18n.language === "ar" ? "ml-2" : "mr-2"}` })}
-                  <span className="truncate">{amenity.name}</span>
-                </div>
-              ))}
+              {getRoomAmenities()
+                .slice(0, showAllAmenities ? undefined : 10)
+                .map((amenity, index) => (
+                  <div key={index} className="flex items-center text-xs bg-blue-50 text-tripswift-blue/80 font-tripswift-medium px-2 py-1 rounded-full">
+                    {React.cloneElement(amenity.icon, {
+                      className: `h-3 w-3 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`
+                    })}
+                    <span className="truncate">{amenity.name}</span>
+                  </div>
+                ))}
+              {getRoomAmenities().length > 10 && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllAmenities(prev => !prev)}
+                  className="text-xs text-tripswift-blue hover:text-[#054B8F] font-tripswift-medium"
+                >
+                  ({t(`RoomsPage.RoomCard.${showAllAmenities ? 'showLess' : 'seeMore'}`)})
+                </button>
+              )}
             </div>
 
             {/* Price and Button */}

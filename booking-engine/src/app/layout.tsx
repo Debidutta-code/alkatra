@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
-import 'react-phone-number-input/style.css'; // must come first
+import 'react-phone-number-input/style.css';
 import "./globals.css";
-import Navbar from "@/components/layout/Navbar";
 import { Toaster } from "react-hot-toast";
 import { Providers } from "./provider";
-import Footer from "../components/layout/Footer";
 import Script from "next/script";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import FCMInitializer from "@/components/fcmInitializer/FCMInitializer";

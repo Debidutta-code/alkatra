@@ -1,70 +1,56 @@
-import { connect } from "mongoose";
-import config from "./common/index";
 import { app } from "./app";
+import { mongoClient, config } from "./config";
 import { initializeExpressRoutes } from "./common/express";
-import cron from "node-cron";
-import CryptoPaymentDetails from './booking_engine/src/models/cryptoPayment.model';
-import passport from 'passport';
-import { CryptoGuestDetails } from "./booking_engine/src/models/cryptoUserPaymentInitialStage.model";
+import { autoCancelCron } from "./services";
 
+const { port, host, baseUrl } = config.server;
 
-// Middleware
-app.use(passport.initialize());
-
-initializeExpressRoutes({ app }).then(async () => {
-  try {
-    const connection = await connect(process.env.EXTRANET_MONGO_URI_TESTING! as string);
-    console.log(`🏡 Database successfully running on ${connection.connection.host}`);
-
-    app.listen(config.port, () => {
-      console.log(`🏡 Server is running on port ${config.port}`);
-    });
-  }
-  catch (err) {
-    console.log(`Error: ${err}`);
-  }
-});
-
-
-// CORN job implemented to auto cancel
-cron.schedule("*/1 * * * *", async () => {
-  try {
-    const fortyMinutesAgo = new Date(Date.now() - 40 * 60 * 1000);
-
-    console.log("--------***--fortyMinutesAgo---------", fortyMinutesAgo);
-    const matches = await CryptoPaymentDetails.find({
-      status: "Pending",
-      createdAt: { $lte: fortyMinutesAgo }
-    });
-
-    console.log("Matching documents:", matches);
-    const cryptoPaymentDetails = await CryptoPaymentDetails.updateMany(
-      {
-        status: "Pending",
-        createdAt: { $lte: fortyMinutesAgo }
-      },
-      {
-        $set: { status: "Cancelled" }
-      }
-    );
-    const cryptoGuestDetails = await CryptoGuestDetails.updateMany(
-      {
-        status: "Processing",
-        createdAt: { $lte: fortyMinutesAgo }
-      },
-      {
-        $set: { status: "Cancelled" }
-      }
-    );
-    console.log("--------***-----------", cryptoGuestDetails);
-    if (cryptoPaymentDetails.modifiedCount > 0) {
-      console.log(`[AUTO-CANCEL] ${cryptoPaymentDetails.modifiedCount} pending payments marked as Cancelled.`);
+async function shutdown(signal: string): Promise<void> {
+    try {
+        console.log(`Received ${signal}, shutting down...`);
+        await mongoClient.disconnect();
+        autoCancelCron.stop();
+        console.log("Successfully shut down the application.");
+    } catch (error) {
+        console.error("[SHUTDOWN ERROR]", error);
+    } finally {
+        process.exit(0); // Ensure the process exits regardless of errors
     }
-    if (cryptoGuestDetails.modifiedCount > 0) {
-      console.log(`[AUTO-CANCEL] ${cryptoGuestDetails.modifiedCount} processing guest details initiated payments marked as Cancelled.`);
+}
+
+(async () => {
+    try {
+        /**
+         * Connect to database
+         */
+        await mongoClient.connect();
+
+        /**
+         * Initialize express routes
+         */
+        await initializeExpressRoutes({ app });
+
+        /**
+         * Start server
+         */
+        app.listen(port, host, () => {
+            console.log(`🏡 Server is running on port ${baseUrl}`);
+        });
+
+        /**
+         * Start auto cancel cron job for cryto-payment
+         */
+        autoCancelCron.start();
+
+        /**
+         * Graceful shutdown
+         * Exit the process
+         */
+        process.on("SIGINT", () => shutdown("SIGINT"));
+        process.on("SIGTERM", () => shutdown("SIGTERM"));
+
+    } catch (error) {
+        console.log("Application initialization failed:", error);
+        process.exit(1);
     }
-    console.log("--------***-----------");
-  } catch (error) {
-    console.error("[AUTO-CANCEL ERROR]", error);
-  }
-});
+})();
