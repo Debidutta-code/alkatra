@@ -132,13 +132,13 @@
     "logoutSuccess": "Successfully logged out",
     "becomeHost": "Become a Host",
     "myTrip": "My Trip",
-    "notifications":"Notifications",
+    "notifications": "Notifications",
     "profileSettings": "Profile Settings",
     "helpFeedback": "Help & Feedback",
     "logout": "Log Out",
     "signUp": "Sign Up",
     "login": "Log In",
-    "referral": "Referral"
+    "referral": "Refer and Earn"
   },
   "Footer": {
     "companyTitle": "Company",
@@ -225,7 +225,7 @@
     "shareDescription": "You can also share your referral link by copying and sending it to your friends or sharing it to social media.",
     "copy": "Copy referral link",
     "copied": "Copied!",
-    "shareVia": "Share via:",
+    "shareVia": "Share via",
     "generateQr": "Generate QR Code",
     "scanToShare": "Scan to Share",
     "scanDescription": "Scan this QR code or save it to share with friends.",
@@ -251,9 +251,17 @@
     "startReferring": "Start Referring Now",
     "refreshWallet": "Refresh Wallet",
     "noToken": "Please try again later.",
-    "walletError": "Error fetching wallet data. Please try again later.",
+    "walletError": "No wallet data available.",
     "insufficientBalance": "Insufficient balance to redeem.",
-    "redeemError": "Error redeeming earnings. Please try again later."
+    "redeemError": "Error redeeming earnings. Please try again later.",
+    "yourReferralLink": "Your Referral Link",
+    "noReferrals": "You have no referrals yet.",
+    "shareToEarn": "Share your referral link to earn rewards when your friends sign up.",
+    "shareLink": "Share Link",
+    "generateReferral": "Generate Referral Link",
+    "generateOnce": "Generate your referral link once and share it with your friends to start earning rewards.",
+    "generated": "Referral link generated successfully!",
+    "copiedToClipboard": "Copied to clipboard!"
   },
   "HotelListing": {
     "CompactSearchBar": {

@@ -24,43 +24,46 @@ export function useFormValidation(
 
   const validateField = (name: string, value: string): string => {
     const rules = fieldConfig[name] || {};
-    
+
     if (rules.required && !value.trim()) {
-      // Try to get a specific validation message for this field
-      const specificKey = `Auth.Validation.${name}Required`;
-      const specificMessage = t(specificKey);
-      
-      // If the translation key doesn't exist, fall back to a generic message with field name
-      if (specificMessage === specificKey) {
+      try {
+        const specificKey = `Auth.Validation.${name}Required`;
+        const specificMessage = t(specificKey);
+
+        if (specificMessage === specificKey) {
+          const fieldLabel = name.charAt(0).toUpperCase() + name.slice(1).replace(/([A-Z])/g, ' $1').trim();
+          return t('Auth.Validation.fieldRequired', { field: fieldLabel });
+        }
+
+        return specificMessage;
+      } catch (error) {
         const fieldLabel = name.charAt(0).toUpperCase() + name.slice(1).replace(/([A-Z])/g, ' $1').trim();
-        return t('Auth.Validation.fieldRequired', { field: fieldLabel });
+        return `${fieldLabel} is required`;
       }
-      
-      return specificMessage;
     }
-    
+
     if (rules.email && value && !/\S+@\S+\.\S+/.test(value)) {
       return t('Auth.Validation.emailInvalid');
     }
-    
+
     if (rules.minLength && value.length < rules.minLength) {
       return t('Auth.Validation.minLength', { count: rules.minLength });
     }
-    
+
     if (rules.passwordStrength && value) {
-      if (!/^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*\d.*\d.*\d).{8,}$/.test(value)) {
+      if (!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/.test(value)) {
         return t('Auth.Validation.passwordComplexity');
       }
     }
-    
+
     return "";
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
+
     setValues(prev => ({ ...prev, [name]: value }));
-    
+
     // Clear error when user types
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: "" }));
@@ -68,19 +71,19 @@ export function useFormValidation(
   };
 
   const handleFocus = (field: string) => setFormFocus(field);
-  
+
   const handleBlur = (field: string) => {
     setFormFocus(null);
-    
+
     // Validate on blur
     const error = validateField(field, values[field]);
     setErrors(prev => ({ ...prev, [field]: error }));
   };
-  
+
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
     let isValid = true;
-    
+
     // Validate all fields
     Object.keys(fieldConfig).forEach((field) => {
       const error = validateField(field, values[field]);
@@ -89,7 +92,7 @@ export function useFormValidation(
         isValid = false;
       }
     });
-    
+
     setErrors(newErrors);
     return isValid;
   };

@@ -56,7 +56,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
   const [policyLoading, setPolicyLoading] = useState(true);
   const [policyType, setPolicyType] = useState<PolicyType>("Moderate");
   const [refundPercentage, setRefundPercentage] = useState(0);
-  const {i18n}=useTranslation();
+  const { i18n } = useTranslation();
   useEffect(() => {
     checkCancellationPolicy();
   }, []);
@@ -124,13 +124,13 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
   const confirmCancelBooking = async () => {
     setCancellationLoading(true);
     setCancellationMessage(null);
-  
+
     try {
       // Use the first guest in guestDetails for cancellation
       const firstGuest = booking.guestDetails && booking.guestDetails.length > 0
         ? booking.guestDetails[0]
         : { firstName: "", lastName: "" };
-  
+
       // Prepare the payload as per your backend spec
       const payload = {
         firstName: firstGuest.firstName,
@@ -155,12 +155,12 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
       );
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || t('BookingTabs.CancellationModal.cancellationFailed'));
-  
+
       setCancellationMessage({
         type: "success",
         text: data.message || t('BookingTabs.CancellationModal.cancellationProcessedSuccess'),
       });
-  
+
       setTimeout(() => {
         onCancellationComplete(booking._id);
       }, 2000);
@@ -198,7 +198,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
         <div className="bg-tripswift-off-white border border-gray-200 shadow-sm rounded-xl overflow-hidden mb-4 ">
           <div className="bg-tripswift-blue/10 p-3  sm:px-4 border-b border-gray-200">
             <div className="flex items-center">
-              <Info className={`h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue  ${i18n.language==="ar"?"ml-1.5 sm:ml-2":"mr-1.5 sm:mr-2"}`} />
+              <Info className={`h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue  ${i18n.language === "ar" ? "ml-1.5 sm:ml-2" : "mr-1.5 sm:mr-2"}`} />
               <h4 className="text-sm sm:text-base font-tripswift-bold text-tripswift-black/80">
                 {t('BookingTabs.CancellationModal.bookingDetails')}
               </h4>
@@ -247,7 +247,10 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
                       {t('BookingTabs.CancellationModal.stayDates')}
                     </p>
                     <p className="text-sm sm:text-base text-tripswift-black font-tripswift-medium">
-                      {formatDateString(booking.checkInDate)} - {formatDateString(booking.checkOutDate)}
+                      {i18n.language === 'ar'
+                        ? `${formatDateString(booking.checkOutDate)} - ${formatDateString(booking.checkInDate)}`
+                        : `${formatDateString(booking.checkInDate)} - ${formatDateString(booking.checkOutDate)}`
+                      }
                     </p>
                     <p className="text-[10px] sm:text-xs text-tripswift-black/50 mt-0.5">
                       {t('BookingTabs.CancellationModal.nightStay', {
@@ -287,7 +290,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
           <div className="bg-tripswift-off-white border border-gray-200 shadow-sm rounded-xl overflow-hidden mb-4 ">
             <div className={`${policyStyling.headerBgColor} p-3 sm:px-4 flex items-center justify-between`}>
               <div className="flex items-center">
-                <Shield className={`h-4 w-4 sm:h-5 sm:w-5 ${policyStyling.textColor}  ${i18n.language==="ar"?"ml-1.5 sm:ml-2":"mr-1.5 sm:mr-2"}`} />
+                <Shield className={`h-4 w-4 sm:h-5 sm:w-5 ${policyStyling.textColor}  ${i18n.language === "ar" ? "ml-1.5 sm:ml-2" : "mr-1.5 sm:mr-2"}`} />
                 <h4 className={`text-sm sm:text-base font-tripswift-bold ${policyStyling.textColor}`}>
                   {t(`BookingTabs.CancellationModal.policyTypes.${policyType.toLowerCase()}`)}
                 </h4>
@@ -305,7 +308,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
                 <ul className="space-y-2 ">
                   {policyBulletPoints.map((point, index) => (
                     <li key={index} className="flex items-start">
-                      <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0 bg-gray-100   ${i18n.language==="ar"?"ml-1.5 sm:ml-2":"mr-1.5 sm:mr-2"}`}>
+                      <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0 bg-gray-100   ${i18n.language === "ar" ? "ml-1.5 sm:ml-2" : "mr-1.5 sm:mr-2"}`}>
                         <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-tripswift-blue"></div>
                       </div>
                       <span className="text-xs sm:text-sm text-tripswift-black/70">
@@ -354,7 +357,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
                       {t('BookingTabs.CancellationModal.cancellationFee')}
                     </span>
                     <span className={`text-sm sm:text-base font-tripswift-bold ${cancellationFee && cancellationFee > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                    {booking.currencyCode} {booking.totalAmount != null ? Number(booking.totalAmount).toFixed(2) : '0.00'}
+                      {booking.currencyCode} {booking.totalAmount != null ? Number(booking.totalAmount).toFixed(2) : '0.00'}
                     </span>
                   </div>
 
@@ -378,7 +381,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
         <div className="bg-tripswift-off-white border border-gray-200 shadow-sm rounded-xl overflow-hidden mb-4 ">
           <div className="bg-gray-50 p-3 sm:px-4 border-b border-gray-200">
             <div className="flex items-center">
-              <FileQuestion className={`h-4 w-4 sm:h-5 sm:w-5 text-tripswift-black/60  ${i18n.language==="ar"?"ml-1.5 sm:ml-2":"mr-1.5 sm:mr-2"}`} />
+              <FileQuestion className={`h-4 w-4 sm:h-5 sm:w-5 text-tripswift-black/60  ${i18n.language === "ar" ? "ml-1.5 sm:ml-2" : "mr-1.5 sm:mr-2"}`} />
               <h4 className="text-sm sm:text-base font-tripswift-bold text-tripswift-black/80">
                 {t('BookingTabs.CancellationModal.reasonForCancellation')}
               </h4>
@@ -391,7 +394,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
               placeholder={t('BookingTabs.CancellationModal.reasonPlaceholder')}
               value={cancellationReason}
               onChange={(e) => setCancellationReason(e.target.value)}
-              style={{ resize:"none"}}
+              style={{ resize: "none" }}
             ></textarea>
             <p className="text-[10px] sm:text-xs text-tripswift-black/50 mt-1">
               {t('BookingTabs.CancellationModal.feedbackHelpsImprove')}
@@ -407,9 +410,9 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
               }`}>
               <div className="flex items-center">
                 {cancellationMessage.type === 'success' ? (
-                  <CheckCircle className={`h-4 w-4 sm:h-5 sm:w-5 text-white ${i18n.language==="ar"?"ml-1.5 sm:ml-2":"mr-1.5 sm:mr-2"}`} />
+                  <CheckCircle className={`h-4 w-4 sm:h-5 sm:w-5 text-white ${i18n.language === "ar" ? "ml-1.5 sm:ml-2" : "mr-1.5 sm:mr-2"}`} />
                 ) : (
-                  <XCircle className={`h-4 w-4 sm:h-5 sm:w-5 text-white ${i18n.language==="ar"?"ml-1.5 sm:ml-2":"mr-1.5 sm:mr-2"}`}  />
+                  <XCircle className={`h-4 w-4 sm:h-5 sm:w-5 text-white ${i18n.language === "ar" ? "ml-1.5 sm:ml-2" : "mr-1.5 sm:mr-2"}`} />
                 )}
                 <h4 className="text-sm sm:text-base font-tripswift-bold text-white">
                   {cancellationMessage.type === 'success'
@@ -431,7 +434,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
 
         {/* Final Warning */}
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 sm:px-4 mb-4  flex items-start">
-          <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0   ${i18n.language==="ar"?"ml-2 sm:ml-3":"mr-2 sm:mr-3"}`}>
+          <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0   ${i18n.language === "ar" ? "ml-2 sm:ml-3" : "mr-2 sm:mr-3"}`}>
             <AlertCircle className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-amber-600" />
           </div>
           <div>

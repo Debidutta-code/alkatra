@@ -376,7 +376,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       //   response.message || t("BookingComponents.GuestInformationModal.otpSent")
       // );
       toast.success(
-        response.message || t("BookingComponents.GuestInformationModal.otpSent")
+        t("BookingComponents.GuestInformationModal.otpSent")
       );
       setEmailOtpSent(true);
       setEmailCountdown(300);
@@ -386,7 +386,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       //   err.message || t("BookingComponents.GuestInformationModal.otpSendFailed")
       // );
       toast.error(
-        err.message || t("BookingComponents.GuestInformationModal.otpSendFailed")
+        t("BookingComponents.GuestInformationModal.otpSendFailed")
       );
     } finally {
       setIsEmailVerifying(false);
@@ -414,7 +414,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
       //   err.message || t("BookingComponents.GuestInformationModal.otpInvalidError")
       // );
       toast.error(
-        err.message || t("BookingComponents.GuestInformationModal.otpInvalidError")
+        t("BookingComponents.GuestInformationModal.otpInvalidError")
       );
     }
   };

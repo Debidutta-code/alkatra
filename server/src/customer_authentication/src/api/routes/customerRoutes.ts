@@ -19,6 +19,9 @@ router.post('/send-otp', verificationOtpController.sendOTP);
 router.post('/verify-otp', verificationOtpController.verifyOTP);
 router.post('/send-sms',smsController.sendSMS );
 
+// get referral's details of user
+router.get("/referrals", authenticateCustomer, CustomerController.getReferrals);
+
 // Customer connect request API
 router.route("/connect").post(CustomerController.connectUser);
 

@@ -16,12 +16,106 @@ import Cookies from "js-cookie";
 export default function ReferralShare() {
   const [copied, setCopied] = useState(false);
   const [referralLink, setReferralLink] = useState("");
+  const [referralCode, setReferralCode] = useState("");
   const [qrCodeData, setQrCodeData] = useState("");
   const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false); // Separate state for generation
+  const [isGenerated, setIsGenerated] = useState(false);
   const { t } = useTranslation();
-
   const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
   const accessToken = Cookies.get("accessToken");
+
+  // Fetch existing referral data (GET)
+  const fetchReferralData = async () => {
+    if (!accessToken) {
+      setLoading(false);
+      return;
+    }
+    
+    try {
+      const response = await axios.get(`${API_BASE_URL}/customers/referrals`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      
+      const data = response.data?.data;
+      if (data?.referralLink) {
+        setReferralLink(data.referralLink);
+        setReferralCode(data.referralCode);
+        setQrCodeData(data.referralQRCode);
+        setIsGenerated(true);
+        return true; // Return success
+      }
+      return false; // No data found
+    } catch (error) {
+      console.error("Failed to fetch referral data:", error);
+      return false; // Return failure
+    }
+  };
+
+  const handleGenerate = async () => {
+    if (!accessToken) {
+      toast.error(t("Referral.noToken") || "Please log in first.");
+      return;
+    }
+
+    if (isGenerated) {
+      toast(t("Referral.alreadyGenerated") || "You have already generated your referral.");
+      return;
+    }
+
+    try {
+      setGenerating(true); // Set generating state
+      
+      // Step 1: Generate referral
+      const response = await axios.post(
+        `${API_BASE_URL}/referrals/generate`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (response.data?.message || response.status === 200 || response.status === 201) {
+        toast.success(t("Referral.generated") || "Referral generated successfully!");
+        
+        // Step 2: Immediately fetch the generated referral data
+        const fetchSuccess = await fetchReferralData();
+        
+        if (fetchSuccess) {
+          console.log("Referral data fetched successfully after generation");
+        } else {
+          // If fetch fails, try one more time after a short delay
+          setTimeout(async () => {
+            const retrySuccess = await fetchReferralData();
+            if (!retrySuccess) {
+              toast.error("Generated successfully, but failed to load data. Please refresh the page.");
+            }
+          }, 1000);
+        }
+      }
+    } catch (error) {
+      let errorMessage = "Failed to generate referral. You may have already generated one.";
+      if (axios.isAxiosError(error)) {
+        errorMessage =
+          error.response?.data?.message || 
+          error.response?.data?.error || 
+          errorMessage;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      console.error("Failed to generate referral:", errorMessage);
+      toast.error(t("Referral.generateError") || errorMessage);
+    } finally {
+      setGenerating(false); // Reset generating state
+    }
+  };
 
   // Generate share message with URL
   const shareMessage = `Join me on this awesome app! Use my referral link: ${referralLink}`;
@@ -68,63 +162,31 @@ export default function ReferralShare() {
 
   const handleCopyLink = () => {
     if (!referralLink) {
-      toast.error("Referral link not available");
+      toast.error(t("Referral.linkNotAvailable") || "Referral link not available");
       return;
     }
     navigator.clipboard.writeText(referralLink);
     setCopied(true);
-    toast.success("Link copied to clipboard!");
+    toast.success(t("Referral.copiedToClipboard") || "Link copied to clipboard!");
     setTimeout(() => setCopied(false), 2000);
   };
 
-  async function fetchReferralLink() {
-    const endpoint = `${API_BASE_URL}/referrals/generate`;
-
-    try {
-      setLoading(true);
-      const response = await axios.post(
-        endpoint,
-        {}, // Empty body for POST request
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-
-      const data = response.data;
-      console.log("Referral link data:", data);
-
-      if (data?.referral_result?.referral_link) {
-        setReferralLink(data.referral_result.referral_link);
-
-        // Set QR code data if available from API
-        if (data.referral_result.referral_qr_code) {
-          setQrCodeData(data.referral_result.referral_qr_code);
-        }
-
-        console.log(
-          data.referral_result.message || "Referral link loaded successfully!"
-        );
-      } else {
-        throw new Error("Referral link not found in the response.");
-      }
-    } catch (error) {
-      console.error("Failed to fetch referral link:", error);
-      toast.error("Failed to load referral link. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
   useEffect(() => {
-    if (accessToken) {
-      fetchReferralLink();
-    }
+    const initializeReferralData = async () => {
+      if (accessToken) {
+        setLoading(true);
+        await fetchReferralData();
+        setLoading(false);
+      } else {
+        setLoading(false);
+      }
+    };
+    
+    initializeReferralData();
   }, [accessToken]);
 
-  if (loading) {
+  // Show loading spinner only during initial load
+  if (loading && !referralLink) {
     return (
       <div className="flex justify-center items-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tripswift-blue"></div>
@@ -133,84 +195,125 @@ export default function ReferralShare() {
   }
 
   return (
-    <div className="space-y-6 w-full max-w-6xl mx-auto">
-      <h2 className="text-xl font-semibold text-gray-800 text-center">
+    <div className="space-y-6 w-full max-w-3xl mx-auto px-4">
+      <h2 className="text-2xl font-bold text-gray-800 text-center">
         {t("Referral.shareYourLink")}
       </h2>
+      <p className="text-gray-600 text-center max-w-md mx-auto">
+        {t("Referral.shareDescription")}
+      </p>
 
-      <div className="flex flex-col lg:flex-row gap-6 w-full">
-        {/* Referral Link Card */}
-        <div className="bg-white p-6 rounded-xl w-full lg:w-2/3">
-          <p className="text-gray-600 text-center mb-6">
-            {t("Referral.shareDescription")}
-          </p>
+      {/* Main Card */}
+      <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-6">
+        {/* Generate Button (Only if not generated) */}
+        {!isGenerated && !referralLink && (
+          <div className="text-center">
+            <button
+              onClick={handleGenerate}
+              disabled={generating}
+              className="bg-tripswift-blue text-white px-8 py-3 rounded-xl font-medium hover:bg-blue-600 transition-colors shadow-md hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {generating ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-white"></div>
+                  {t("Referral.generating") || "Generating..."}
+                </span>
+              ) : (
+                t("Referral.generateReferral") || "Generate Referral"
+              )}
+            </button>
+            <p className="text-gray-500 text-sm mt-3">
+              {t("Referral.generateOnce") || "You can generate your referral link only once."}
+            </p>
+          </div>
+        )}
 
-          <div className="flex flex-col gap-6">
-            {/* Referral Link Input */}
-            <div className="w-full">
-              <div className="relative">
-                <div className="flex items-center justify-between bg-blue-50 p-2 rounded-xl transition-all duration-300 group hover:ring-2 hover:ring-blue-100">
-                  <code className="text-sm text-gray-800 font-mono flex-grow px-4 py-3 truncate bg-white rounded-lg">
-                    {referralLink || "Loading..."}
-                  </code>
-                  <button
-                    onClick={handleCopyLink}
-                    disabled={!referralLink}
-                    className={`flex-shrink-0 ml-3 p-2.5 rounded-lg transition-all duration-200 ${copied
-                      ? "text-green-600 bg-green-50"
+        {/* Show content only if generated */}
+        {(isGenerated || referralLink) && (
+          <>
+            {/* 1. Referral URL */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t("Referral.yourReferralLink")}
+              </label>
+              <div className="flex items-center gap-3 bg-blue-50 p-3 rounded-xl group hover:ring-2 hover:ring-blue-200 transition-all">
+                <code className="flex-grow text-sm font-mono text-gray-800 truncate bg-white px-4 py-2.5 rounded-lg">
+                  {referralLink || "Loading..."}
+                </code>
+                <button
+                  onClick={handleCopyLink}
+                  disabled={!referralLink}
+                  className={`p-2.5 rounded-lg transition-all flex-shrink-0 ${
+                    copied
+                      ? "bg-green-100 text-green-600"
                       : referralLink
-                        ? "bg-tripswift-blue text-white hover:bg-blue-600 hover:scale-105 active:scale-95"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      }`}
-                    aria-label={
-                      copied ? t("Referral.copied") : t("Referral.copy")
-                    }
-                  >
-                    {copied ? (
-                      <div className="flex items-center gap-1.5">
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2.5"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                        <span className="text-xs font-medium">
-                          {t("Referral.copied")}
-                        </span>
-                      </div>
-                    ) : (
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                        />
-                      </svg>
-                    )}
-                  </button>
-                </div>
+                      ? "bg-tripswift-blue text-white hover:bg-blue-600 active:scale-95 hover:scale-105"
+                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  }`}
+                  aria-label={copied ? t("Referral.copied") : t("Referral.copy")}
+                >
+                  {copied ? (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                      />
+                    </svg>
+                  )}
+                </button>
               </div>
+              {copied && (
+                <p className="text-green-600 text-xs mt-1.5 ml-1">
+                  {t("Referral.copied")}
+                </p>
+              )}
             </div>
 
-            {/* Social Sharing */}
-            <div className="flex flex-col items-center">
-              <p className="text-gray-500 text-sm mb-3">
+            {/* 2. QR Code */}
+            <div className="flex flex-col items-center py-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                {t("Referral.scanToShare")}
+              </h3>
+              <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+                {qrCodeData ? (
+                  <img
+                    src={qrCodeData}
+                    alt="Referral QR Code"
+                    className="rounded-md object-contain"
+                    style={{ width: "160px", height: "160px" }}
+                  />
+                ) : referralLink ? (
+                  <QRCodeCanvas
+                    value={referralLink}
+                    size={160}
+                    level="H"
+                    bgColor="#FFFFFF"
+                    fgColor="#111827"
+                    includeMargin={true}
+                  />
+                ) : (
+                  <div className="w-40 h-40 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-tripswift-blue"></div>
+                  </div>
+                )}
+              </div>
+              <p className="text-gray-500 text-sm mt-3 text-center">
+                {t("Referral.scanDescription")}
+              </p>
+            </div>
+
+            {/* 3. Social Sharing */}
+            <div className="pt-4 border-t border-gray-100">
+              <p className="text-gray-700 font-medium text-center mb-4">
                 {t("Referral.shareVia")}
               </p>
-              <div className="flex flex-wrap items-center justify-center gap-3">
+              <div className="flex flex-wrap justify-center gap-4">
                 {sharePlatforms.map(({ name, url, bg, iconColor, Icon }) => (
                   <a
                     key={name}
@@ -218,57 +321,23 @@ export default function ReferralShare() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => !referralLink && e.preventDefault()}
-                    className={`flex items-center justify-center p-3 rounded-xl ${bg} transition-colors duration-200 ${!referralLink
-                      ? "cursor-not-allowed opacity-50"
-                      : "hover:scale-105"
-                      }`}
+                    className={`flex flex-col items-center justify-center p-3 rounded-xl min-w-[72px] transition-all ${
+                      !referralLink
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover:scale-110 active:scale-105"
+                    } ${bg}`}
                     title={`Share on ${name}`}
                   >
                     <Icon className={`w-5 h-5 ${iconColor}`} aria-hidden="true" />
+                    <span className="text-xs font-medium text-gray-700 mt-1.5">
+                      {name}
+                    </span>
                   </a>
                 ))}
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* QR Code Section */}
-        <div className="w-full lg:w-1/3 flex flex-col gap-6 items-center justify-center">
-          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm text-center w-full">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
-              {t("Referral.scanToShare")}
-            </h3>
-            <div className="flex justify-center p-4 bg-white rounded-lg">
-              {qrCodeData ? (
-                <img
-                  src={qrCodeData}
-                  alt="Referral QR Code"
-                  style={{ width: "180px", height: "180px" }}
-                  className="object-contain"
-                />
-              ) : referralLink ? (
-                <QRCodeCanvas
-                  value={referralLink}
-                  bgColor="#FFFFFF"
-                  fgColor="#111827"
-                  level="H"
-                  size={180}
-                  includeMargin={true}
-                />
-              ) : (
-                <div
-                  className="w-45 h-45 bg-gray-100 rounded-lg flex items-center justify-center"
-                  style={{ width: "180px", height: "180px" }}
-                >
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tripswift-blue"></div>
-                </div>
-              )}
-            </div>
-            <p className="mt-3 text-gray-500 text-sm">
-              {t("Referral.scanDescription")}
-            </p>
-          </div>
-        </div>
+          </>
+        )}
       </div>
     </div>
   );

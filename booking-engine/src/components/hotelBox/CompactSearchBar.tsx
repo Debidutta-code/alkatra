@@ -140,7 +140,7 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
               placeholder={t("HotelListing.CompactSearchBar.locationPlaceholder")}
-              className={`block w-[262px] md:w-full  h-11 sm:pl-12 pl-8 pr-4 sm:pr-8 py-2 rounded-md border ${isSearchFocused
+              className={`block w-[262px] md:w-full h-11 pl-10 pr-4 sm:pr-8 py-2 rounded-md border ${isSearchFocused
                 ? "border-tripswift-blue ring-2 ring-tripswift-blue/10"
                 : "border-tripswift-black/10 hover:border-tripswift-blue/30"
                 } outline-none text-tripswift-black transition duration-200 ease-in-out shadow-sm font-tripswift-medium text-[16px] px-2 tracking-normal`}

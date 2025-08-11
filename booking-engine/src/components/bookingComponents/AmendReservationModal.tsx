@@ -508,7 +508,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
             {/* Stay Dates */}
             <div className="space-y-3 sm:space-y-4">
               <div className="flex items-start">
-                <div className="w-8 sm:w-10  rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 ml-2 sm:mr-3 shadow-sm flex-shrink-0">
+                <div className="w-8 sm:w-10 rounded-full bg-tripswift-off-white flex items-center justify-center mr-2 ml-2 sm:mr-3 shadow-sm flex-shrink-0">
                   <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
                 </div>
                 <div>
@@ -516,7 +516,10 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                     {t('BookingTabs.AmendReservationModal.stayDates')}
                   </p>
                   <p className="text-sm sm:text-base text-tripswift-black font-tripswift-medium">
-                    {dayjs(booking.checkInDate).format('MMM D, YYYY')} - {dayjs(booking.checkOutDate).format('MMM D, YYYY')}
+                    {i18n.language === 'ar'
+                      ? `${dayjs(booking.checkOutDate).format('MMM D, YYYY')} - ${dayjs(booking.checkInDate).format('MMM D, YYYY')}`
+                      : `${dayjs(booking.checkInDate).format('MMM D, YYYY')} - ${dayjs(booking.checkOutDate).format('MMM D, YYYY')}`
+                    }
                   </p>
                   <p className="text-[10px] sm:text-xs text-tripswift-black/50 mt-0.5 sm:mt-1">
                     {t('BookingTabs.AmendReservationModal.nightsCount', {
