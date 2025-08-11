@@ -9,11 +9,11 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 // Import shared components
-import AuthLayout from "@/components/auth/AuthLayout";
-import FormInput from "@/components/auth/FormInput";
-import PasswordInput from "@/components/auth/PasswordInput";
-import AuthButton from "@/components/auth/AuthButton";
-import { useFormValidation } from "@/components/auth/hooks/useFormValidation";
+import AuthLayout from "../../../components/auth/AuthLayout";
+import FormInput from "../../../components/auth/FormInput";
+import PasswordInput from "../../../components/auth/PasswordInput";
+import AuthButton from "../../../components/auth/AuthButton";
+import { useFormValidation } from "../../../components/auth/hooks/useFormValidation";
 import { useSearchParams } from "next/navigation";
 
 const Register: React.FC = () => {

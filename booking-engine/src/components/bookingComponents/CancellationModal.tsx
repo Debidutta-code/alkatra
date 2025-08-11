@@ -27,7 +27,7 @@ import {
   getPolicyStyling,
   getPolicyBulletPoints,
   calculateRefund
-} from "@/utils/cancellationPolicies";
+} from "../../utils/cancellationPolicies";
 
 interface GuestDetails {
   firstName: string;

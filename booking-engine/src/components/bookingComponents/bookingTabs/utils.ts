@@ -45,7 +45,7 @@ export const getStatusClass = (status: string): string => {
   }
 };
 
-export const getStatusIcon = (status: string , lang : string ="eg"): JSX.Element => {
+export const getStatusIcon = (status: string , lang : string ="eg"): React.ReactElement => {
       const directionClass = lang === "ar" ? "ml-1.5" : "mr-1.5";
     switch (status) {
       case "Confirmed":
@@ -72,9 +72,8 @@ export const getRoomTypeStyle = (roomType: string = ""): string => {
     return "bg-tripswift-blue/5 text-tripswift-blue border border-tripswift-blue/20";
   }
 };
-
 // Added the missing getRoomTypeIcon function
-export const getRoomTypeIcon = (roomType: string = "", lang: string = "en"): JSX.Element => {
+export const getRoomTypeIcon = (roomType: string = "", lang: string = "en"): React.ReactElement => {
   const type = roomType?.toLowerCase() || "";
     const directionClass = lang === "ar" ? "ml-1.5" : "mr-1.5";
 

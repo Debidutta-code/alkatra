@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { NextUIProvider } from "@nextui-org/react";
-import ReduxProvider from "@/Redux/ReduxProvider";
+import ReduxProvider from "../Redux/ReduxProvider";
 import { PersistGate } from "redux-persist/integration/react";
-import { persistor } from "@/Redux/store";
-import '@/i18n/Index';
+import { persistor } from "../Redux/store";
+import '../../src/i18n/Index';
 // import '@rainbow-me/rainbowkit/styles.css';
 
 // import { WagmiProvider, createConfig, http } from 'wagmi';

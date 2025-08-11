@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "@/Redux/store";
+import { useDispatch, useSelector } from "../../Redux/store";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { getHotelsByCity } from "@/api/hotel";
+import { getHotelsByCity } from "../../api/hotel";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import i18next from "../../i18n/Index";
-import Home from "@/components/assets/popular/Home.jpg";
+import Home from "../../components/assets/popular/Home.jpg";
 import CompactSearchBar from "../hotelBox/CompactSearchBar";
 import { format, addDays } from "date-fns";
 import QRCodeForAPP from "../ui/qrcode";

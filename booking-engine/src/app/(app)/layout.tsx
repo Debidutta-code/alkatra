@@ -1,8 +1,8 @@
 'use client';
 import React from "react";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-import '@/i18n/Index';
+import Navbar from "../../components/layout/Navbar";
+import Footer from "../../components/layout/Footer";
+import '../../i18n/Index';
 
 export default function RootLayout({
   children,

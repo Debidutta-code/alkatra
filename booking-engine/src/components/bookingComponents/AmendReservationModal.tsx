@@ -7,11 +7,11 @@ import dayjs, { Dayjs } from "dayjs";
 import { Booking, GuestDetails } from './bookingTabs/types';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { setGuestDetails } from '@/Redux/slices/hotelcard.slice';
+import { setGuestDetails } from '../../Redux/slices/hotelcard.slice';
 import GuestBox from "../hotelBox/GuestBox";
 import Cookies from "js-cookie";
 import { getDefaultDOBByType, getGuestType } from '../../utils/guestDobHelpers';
-import { useSelector } from "@/Redux/store";
+import { useSelector } from "../../Redux/store";
 
 import {
   CalendarDays,

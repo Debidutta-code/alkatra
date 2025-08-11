@@ -1,13 +1,13 @@
 import React from 'react';
 import { X, Check, Star } from 'lucide-react';
-import { AMENITIES } from "@/components/hotelBox/FilterModal";
+import { AMENITIES } from "../../components/hotelBox/FilterModal";
 import { useTranslation } from 'react-i18next';
 import { t } from 'i18next';
 
 interface MobileFilterDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  sidebarRef: React.RefObject<HTMLDivElement>;
+  sidebarRef: React.RefObject<HTMLDivElement | null>;
   amenities: { [key: string]: boolean };
   sortOrder: string;
   ratingFilter: number | null;
@@ -23,10 +23,8 @@ const MobileFilterDrawer: React.FC<MobileFilterDrawerProps> = ({
   onClose,
   sidebarRef,
   amenities,
-  sortOrder,
   ratingFilter,
   toggleAmenityFilter,
-  handleSortChange,
   handleRatingChange,
   resetFilters,
   filteredHotelsCount

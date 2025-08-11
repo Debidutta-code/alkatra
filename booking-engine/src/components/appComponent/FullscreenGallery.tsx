@@ -27,11 +27,9 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
   const [showGridView, setShowGridView] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const timeoutRef = useRef<NodeJS.Timeout>();
-
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   // Reset state when gallery opens
   useEffect(() => {
     if (isOpen) {
@@ -60,10 +58,10 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
     };
 
     const handleMouseMove = () => resetTimeout();
-    
+
     resetTimeout();
     window.addEventListener('mousemove', handleMouseMove);
-    
+
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -74,7 +72,7 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isOpen) return;
-      
+
       switch (e.key) {
         case 'Escape':
           if (showGridView) {
@@ -244,15 +242,14 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className="fixed inset-0 z-50 bg-black select-none"
       onWheel={handleWheel}
     >
       {/* Header with controls */}
-      <div className={`absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-black/80 via-black/40 to-transparent transition-all duration-500 ${
-        showControls ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'
-      }`}>
+      <div className={`absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-black/80 via-black/40 to-transparent transition-all duration-500 ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'
+        }`}>
         <div className="flex items-center justify-between p-4 md:p-6">
           <div className="text-white">
             <h3 className="font-semibold text-lg md:text-xl leading-tight">{propertyName}</h3>
@@ -260,7 +257,7 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
               {currentIndex + 1} of {images.length} photos
             </p>
           </div>
-          
+
           <div className="flex items-center gap-2">
             {/* Zoom controls */}
             <div className="hidden md:flex items-center gap-1 bg-black/40 backdrop-blur-sm rounded-lg p-1">
@@ -294,7 +291,7 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
               >
                 <Grid3X3 className="h-4 w-4 text-white" />
               </button>
-              
+
               <button
                 onClick={toggleFullscreen}
                 className="p-2 hover:bg-white/20 rounded-md transition-colors duration-200"
@@ -302,7 +299,7 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
               >
                 <Maximize2 className="h-4 w-4 text-white" />
               </button>
-              
+
               <button
                 onClick={handleDownload}
                 className="p-2 hover:bg-white/20 rounded-md transition-colors duration-200"
@@ -310,7 +307,7 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
               >
                 <Download className="h-4 w-4 text-white" />
               </button>
-              
+
               <button
                 onClick={handleShare}
                 className="p-2 hover:bg-white/20 rounded-md transition-colors duration-200"
@@ -319,7 +316,7 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
                 <Share2 className="h-4 w-4 text-white" />
               </button>
             </div>
-            
+
             {/* Close button */}
             <button
               onClick={onClose}
@@ -341,11 +338,10 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
                 <button
                   key={index}
                   onClick={() => goToImage(index)}
-                  className={`relative aspect-square rounded-lg overflow-hidden group transition-all duration-200 ${
-                    currentIndex === index
+                  className={`relative aspect-square rounded-lg overflow-hidden group transition-all duration-200 ${currentIndex === index
                       ? 'ring-2 ring-blue-500 scale-105'
                       : 'hover:scale-105 hover:ring-1 hover:ring-white/50'
-                  }`}
+                    }`}
                 >
                   {!imageError[index] ? (
                     <img
@@ -360,12 +356,12 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
                       <X className="h-6 w-6 text-gray-500" />
                     </div>
                   )}
-                  
+
                   {/* Image number overlay */}
                   <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
                     {index + 1}
                   </div>
-                  
+
                   {/* Current image indicator */}
                   {currentIndex === index && (
                     <div className="absolute inset-0 bg-blue-500/20 flex items-center justify-center">
@@ -391,18 +387,16 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
                 <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
               </div>
             )}
-            
+
             {/* Main image */}
             {!imageError[currentIndex] ? (
               <img
                 ref={imageRef}
                 src={images[currentIndex]}
                 alt={`${propertyName} - Image ${currentIndex + 1}`}
-                className={`max-w-full max-h-full object-contain transition-all duration-300 ${
-                  zoom > 1 ? 'cursor-grab' : 'cursor-default'
-                } ${isDragging ? 'cursor-grabbing' : ''} ${
-                  isLoading ? 'opacity-50 scale-95' : 'opacity-100 scale-100'
-                }`}
+                className={`max-w-full max-h-full object-contain transition-all duration-300 ${zoom > 1 ? 'cursor-grab' : 'cursor-default'
+                  } ${isDragging ? 'cursor-grabbing' : ''} ${isLoading ? 'opacity-50 scale-95' : 'opacity-100 scale-100'
+                  }`}
                 style={{
                   transform: `scale(${zoom}) translate(${imagePosition.x / zoom}px, ${imagePosition.y / zoom}px)`,
                   transformOrigin: 'center'
@@ -426,25 +420,23 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
                 </p>
               </div>
             )}
-            
+
             {/* Navigation arrows */}
             {images.length > 1 && (
               <>
                 <button
                   onClick={goToPrevious}
-                  className={`absolute left-4 top-1/2 transform -translate-y-1/2 p-3 bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-full transition-all duration-300 ${
-                    showControls ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-full'
-                  }`}
+                  className={`absolute left-4 top-1/2 transform -translate-y-1/2 p-3 bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-full transition-all duration-300 ${showControls ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-full'
+                    }`}
                   title="Previous image (←)"
                 >
                   <ChevronLeft className="h-6 w-6 text-white" />
                 </button>
-                
+
                 <button
                   onClick={goToNext}
-                  className={`absolute right-4 top-1/2 transform -translate-y-1/2 p-3 bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-full transition-all duration-300 ${
-                    showControls ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
-                  }`}
+                  className={`absolute right-4 top-1/2 transform -translate-y-1/2 p-3 bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-full transition-all duration-300 ${showControls ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
+                    }`}
                   title="Next image (→)"
                 >
                   <ChevronRight className="h-6 w-6 text-white" />
@@ -456,9 +448,8 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
             {zoom !== 1 && (
               <button
                 onClick={resetZoom}
-                className={`absolute top-4 left-1/2 transform -translate-x-1/2 p-2 bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-lg text-white text-sm transition-all duration-300 ${
-                  showControls ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'
-                }`}
+                className={`absolute top-4 left-1/2 transform -translate-x-1/2 p-2 bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-lg text-white text-sm transition-all duration-300 ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'
+                  }`}
                 title="Reset zoom"
               >
                 <RotateCcw className="h-4 w-4" />
@@ -470,9 +461,8 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
 
       {/* Bottom thumbnails */}
       {!showGridView && images.length > 1 && showThumbnails && (
-        <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent transition-all duration-500 ${
-          showControls ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full'
-        }`}>
+        <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent transition-all duration-500 ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full'
+          }`}>
           <div className="p-4 md:p-6">
             <div className="flex justify-center">
               <div className="flex gap-2 overflow-x-auto max-w-full pb-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
@@ -480,11 +470,10 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
                   <button
                     key={index}
                     onClick={() => goToImage(index)}
-                    className={`relative flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden transition-all duration-200 ${
-                      currentIndex === index
+                    className={`relative flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden transition-all duration-200 ${currentIndex === index
                         ? 'ring-2 ring-white scale-105'
                         : 'opacity-60 hover:opacity-80 hover:scale-105'
-                    }`}
+                      }`}
                   >
                     {!imageError[index] ? (
                       <img
@@ -499,11 +488,11 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
                         <X className="h-4 w-4 text-gray-500" />
                       </div>
                     )}
-                    
+
                     {currentIndex === index && (
                       <div className="absolute inset-0 bg-white/10 border-2 border-white rounded-lg"></div>
                     )}
-                    
+
                     {/* Image number */}
                     <div className="absolute top-1 right-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded backdrop-blur-sm">
                       {index + 1}
@@ -517,9 +506,8 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
       )}
 
       {/* Keyboard shortcuts hint */}
-      <div className={`absolute bottom-4 left-4 text-white/60 text-xs transition-all duration-500 ${
-        showControls ? 'opacity-100' : 'opacity-0'
-      }`}>
+      <div className={`absolute bottom-4 left-4 text-white/60 text-xs transition-all duration-500 ${showControls ? 'opacity-100' : 'opacity-0'
+        }`}>
         <div className="bg-black/40 backdrop-blur-sm rounded-lg p-2 space-y-1">
           <div>Press <kbd className="bg-white/20 px-1 rounded">Esc</kbd> to close</div>
           <div>Press <kbd className="bg-white/20 px-1 rounded">G</kbd> for grid view</div>

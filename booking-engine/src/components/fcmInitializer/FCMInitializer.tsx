@@ -1,8 +1,8 @@
 // src/components/FCMInitializer.tsx
 'use client';
 
-import useFCM from '@/hooks/useFCM';
-import { useSelector } from '@/Redux/store';
+import useFCM from '../../hooks/useFCM';
+import { useSelector } from '../../Redux/store';
 
 
 const FCMInitializer = () => {

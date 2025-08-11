@@ -4,11 +4,11 @@ import React, { useState, useEffect } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { useDispatch, useSelector } from "react-redux";
-import { setGuestDetails, setAmount } from "@/Redux/slices/pmsHotelCard.slice";
+import { setGuestDetails, setAmount } from "../../Redux/slices/pmsHotelCard.slice";
 import { User, Mail, Phone, Calendar, CreditCard, X, Loader2 } from "lucide-react";
-import { formatDate, calculateNights } from "@/utils/dateUtils";
+import { formatDate, calculateNights } from "../../utils/dateUtils";
 import { useTranslation } from "react-i18next";
-import { verifyApi } from "@/api/verify";
+import { verifyApi } from "../../api/verify";
 import axios from "axios";
 import toast, { Toaster } from 'react-hot-toast';
 

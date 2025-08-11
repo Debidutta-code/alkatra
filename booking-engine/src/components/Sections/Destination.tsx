@@ -1,12 +1,12 @@
 "use client";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "../../components/ui/card";
 import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
-import { setCheckInDate, setCheckOutDate } from "@/Redux/slices/pmsHotelCard.slice";
+import { setCheckInDate, setCheckOutDate } from "../../Redux/slices/pmsHotelCard.slice";
 import { format, addDays } from "date-fns";
 
 interface Destination {

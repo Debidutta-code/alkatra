@@ -1,12 +1,12 @@
 "use client";
 
-import CheckAuthentication from "@/components/checkAuthentication/CheckAuth";
-import CheckoutPage from "@/components/Stripe/checkoutPage";
-import PayAtHotelFunction from "@/components/paymentComponents/PayAtHotelFunction";
-import PaymentOptionSelector from "@/components/paymentComponents/PaymentOptionSelector";
-import convertToSubcurrency from "@/lib/convertToSubcurrency";
-import PayWithCryptoQR from "@/components/paymentComponents/payWithCrypto/PayWithCryptoQR";
-import { formatDate, calculateNights } from "@/utils/dateUtils";
+import CheckAuthentication from "../../../components/checkAuthentication/CheckAuth";
+import CheckoutPage from "../../../components/Stripe/checkoutPage";
+import PayAtHotelFunction from "../../../components/paymentComponents/PayAtHotelFunction";
+import PaymentOptionSelector from "../../../components/paymentComponents/PaymentOptionSelector";
+import convertToSubcurrency from "../../../lib/convertToSubcurrency";
+import PayWithCryptoQR from "../../../components/paymentComponents/payWithCrypto/PayWithCryptoQR";
+import { formatDate, calculateNights } from "../../../utils/dateUtils";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { Suspense, useState } from "react";

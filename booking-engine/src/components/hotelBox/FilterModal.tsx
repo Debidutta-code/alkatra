@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { X, Star } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { Card } from "../../components/ui/card";
 import { useTranslation } from "react-i18next";
 
 export interface FilterState {

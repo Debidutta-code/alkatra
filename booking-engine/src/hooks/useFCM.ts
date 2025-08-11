@@ -5,9 +5,9 @@ import { useDispatch } from 'react-redux';
 import { getToken, onMessage } from 'firebase/messaging';
 import { messaging } from '../utils/firebase.config'; // Adjust the import path as needed
 import toast from 'react-hot-toast';
-import { AppDispatch } from '@/Redux/store';
-import { addNotification } from '@/Redux/slices/notification.slice';
-import type { Notification } from '@/components/notifications/types/notification';
+import { AppDispatch } from '../Redux/store';
+import { addNotification } from '../Redux/slices/notification.slice';
+import type { Notification } from '../components/notifications/types/notification';
 
 const vapidKey = process.env.NEXT_PUBLIC_VAPIDKEY as string; // from Firebase Console
 

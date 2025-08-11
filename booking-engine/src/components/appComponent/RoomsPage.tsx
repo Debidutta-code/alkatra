@@ -3,11 +3,11 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
-import { RoomCard } from "@/components/appComponent/RoomCard";
-import GuestInformationModal, { Guest } from "@/components/bookingComponents/GuestInformationModal";
-import { useDispatch, useSelector } from "@/Redux/store";
-import { setAmount, setRoomId } from "@/Redux/slices/pmsHotelCard.slice";
-import { setGuestDetails } from "@/Redux/slices/hotelcard.slice";
+import { RoomCard } from "../../components/appComponent/RoomCard";
+import GuestInformationModal, { Guest } from "../../components/bookingComponents/GuestInformationModal";
+import { useDispatch, useSelector } from "../../Redux/store";
+import { setAmount, setRoomId } from "../../Redux/slices/pmsHotelCard.slice";
+import { setGuestDetails } from "../../Redux/slices/hotelcard.slice";
 import FullscreenGallery from './FullscreenGallery';
 import QRCodeDisplay from "./QRCodeDisplay";
 import {
@@ -38,7 +38,7 @@ import {
   Accessibility
 } from "lucide-react";
 import LoadingSkeleton from "../hotelListingComponents/LoadingSkeleton";
-import { formatDate, calculateNights } from "@/utils/dateUtils";
+import { formatDate, calculateNights } from "../../utils/dateUtils";
 import { useTranslation } from "react-i18next";
 // import QRCodeDisplay from "./QRCodeDisplay";
 

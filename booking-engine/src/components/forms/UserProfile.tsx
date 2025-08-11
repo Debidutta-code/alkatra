@@ -4,15 +4,15 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { User, Heart, Lock, Bell, Calendar, ChevronDown, Edit3, Bookmark, CheckCircle, ChevronRight, Gift, Percent, Shield, Star, HelpCircle, Eye, EyeOff, LogOut, Check, X, AlertTriangle, Volume2, VolumeX, Smartphone, Mail } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
-import { logout, getUser, updateProfile } from "@/Redux/slices/auth.slice";
+import { logout, getUser, updateProfile } from "../../Redux/slices/auth.slice";
 import {
   fetchNotifications,
   markAsRead,
   markAllAsRead,
   updateNotificationReadStatus,
   clearNotifications
-} from "@/Redux/slices/notification.slice";
-import { AppDispatch, RootState } from "@/Redux/store";
+} from "../../Redux/slices/notification.slice";
+import { AppDispatch, RootState } from "../../Redux/store";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";

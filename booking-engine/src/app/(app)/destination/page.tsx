@@ -1,6 +1,6 @@
 
 import React, { Suspense } from 'react';
-import HotelList from '@/components/appComponent/HotelListing';
+import HotelList from '../../../components/appComponent/HotelListing';
 
 const HotelSearchPage: React.FC = () => {
   return (

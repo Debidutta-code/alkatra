@@ -6,7 +6,7 @@ import { Toaster } from "react-hot-toast";
 import { Providers } from "./provider";
 import Script from "next/script";
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import FCMInitializer from "@/components/fcmInitializer/FCMInitializer";
+import FCMInitializer from "../components/fcmInitializer/FCMInitializer";
 
 const nunito = Nunito({
   subsets: ["latin"],
