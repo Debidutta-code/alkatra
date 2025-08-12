@@ -17,6 +17,7 @@ import couponManagement from "../coupon_management/routes/couponRoutes";
 import notification from "../notification/src/route/notification.route";
 import googleAuth from "../customer_authentication/src/api/routes/googleAuthRoute";
 import analytics from "../role_based/src/routes/analytics.route";
+import customerReview from "../review_system/route/review.route";
 
 // Referral system routes
 import { ReferralRouter } from "../referral_system/routes";
@@ -52,6 +53,9 @@ export async function initializeExpressRoutes({ app }: { app: Express }) {
 
   // Referral system routes
   app.use("/api/v1/referrals", ReferralRouter);
+
+  // Customer Review System
+  app.use("/api/v1/review", customerReview);
 
 
   app.all("*", (req: Request, _res: Response, next: NextFunction) => {

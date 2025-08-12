@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
+import { RootState } from "./../../Redux/store";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import { RoomCard } from "@/components/appComponent/RoomCard";
@@ -136,6 +137,7 @@ const RoomsPage: React.FC = () => {
 
   // Get guest details from Redux
   const { guestDetails } = useSelector((state) => state.hotel);
+  console.log(`The guest details we get from redux: ${JSON.stringify(guestDetails)}`);
 
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
@@ -220,7 +222,7 @@ const RoomsPage: React.FC = () => {
 
       try {
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}?numberOfRooms=${guestDetails?.rooms || 1}`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}?numberOfRooms=${guestDetails?.rooms || 1}&guestDetails=${guestDetails}`,
           {
             startDate: checkInDate,
             endDate: checkOutDate,
