@@ -6,15 +6,17 @@ export interface IReview extends Document {
   userId: Types.ObjectId;
   userEmail: string;
   comment: string;
+  rating: number;
   createdAt: Date;
 }
 
 const ReviewSchema: Schema = new Schema({
   hotelId: { type: Schema.Types.ObjectId, ref: 'PropertyInfo' },
-  hotelCode: { type: String, required: true },
+  hotelCode: { type: String, required: false },
   userId: { type: Schema.Types.ObjectId, ref: "User" },
-  userEmail: { type: String, required: true },
-  comment: { type: String, required: true },
+  userEmail: { type: String, required: false },
+  comment: { type: String, required: false },
+  rating: { type: Number, required: false },
   createdAt: { type: Date, default: Date.now }
 });
 
