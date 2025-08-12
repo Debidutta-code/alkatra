@@ -14,7 +14,7 @@ import {
 } from "../../Redux/slices/notification.slice";
 import { AppDispatch, RootState } from "../../Redux/store";
 import Cookies from "js-cookie";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 import { useTranslation } from "react-i18next";
 import { formatDistanceToNow } from 'date-fns';
 
@@ -462,7 +462,7 @@ const EditProfileModal = ({
           </div>
           <div className="flex flex-col sm:flex-row gap-3 mt-6">
             <Button variant="primary" size="md" type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
-              {isSubmitting ? t("Auth.Button.processing", { defaultValue: "Processing..." }) : t("Auth.Register.createAccountButton", { defaultValue: "Save Changes" })}
+              {isSubmitting ? t("Auth.Button.processing", { defaultValue: "Processing..." }) : t("Auth.Register.updateAccountButton", { defaultValue: "Save Changes" })}
             </Button>
             <Button variant="outline" size="md" onClick={onClose} className="w-full sm:w-auto" disabled={isSubmitting}>
               {t("BookingComponents.GuestInformationModal.cancel", { defaultValue: "Cancel" })}

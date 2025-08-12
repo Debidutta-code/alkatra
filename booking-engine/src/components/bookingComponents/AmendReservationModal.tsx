@@ -255,15 +255,11 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
           children: guestBreakdown.children,
           infants: guestBreakdown.infants,
         };
-        const hotelCode = sessionStorage.getItem("propertyCode");
-        if (!hotelCode) {
-          return Error(t('Hotel code not found in Amend Reservation Modal'));
-        }
+
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomRentPrice`,
           {
-            // hotelCode: booking.hotelCode,
-            hotelCode: hotelCode,
+            hotelCode: booking.hotelCode,
             invTypeCode: roomTypeCode,
             startDate: dateRange[0].format('YYYY-MM-DD'),
             endDate: dateRange[1].format('YYYY-MM-DD'),
@@ -328,13 +324,10 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
     guestData: any
   ) => {
     try {
-      const hotelCode = sessionStorage.getItem("propertyCode");
-
       const finalPriceResponse = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomRentPrice`,
         {
-          // hotelCode: booking.hotelCode,
-          hotelCode: hotelCode,
+          hotelCode: booking.hotelCode,
           invTypeCode: selectedRoom?.room_type,
           startDate: checkInDate,
           endDate: checkOutDate,

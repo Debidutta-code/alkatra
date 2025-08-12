@@ -664,7 +664,7 @@ const RoomsPage: React.FC = () => {
                         {propertyDetails.image.length === 1 ? (
                           /* Single image layout with 4-sided curve */
                           <div
-                            className="h-[280px] rounded-xl overflow-hidden cursor-pointer group"
+                            className="h-[280px] rounded-xl overflow-hidden cursor-pointer group relative"
                             onClick={() => {
                               setGalleryInitialIndex(0);
                               setIsGalleryOpen(true);
@@ -673,7 +673,7 @@ const RoomsPage: React.FC = () => {
                             <img
                               src={propertyDetails.image[0]}
                               alt={propertyDetails.property_name || "Property"}
-                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                              className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                             />
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
                           </div>
@@ -692,7 +692,7 @@ const RoomsPage: React.FC = () => {
                                 <img
                                   src={img}
                                   alt={`${propertyDetails.property_name || "Property"} view ${index + 1}`}
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                                 />
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
                                 {index === selectedImage && (
@@ -706,7 +706,8 @@ const RoomsPage: React.FC = () => {
                           <div className="grid grid-cols-2 gap-2 h-[280px]">
                             {/* Main selected image - larger with 4-sided curve */}
                             <div
-                              className="col-span-2 md:col-span-1 row-span-2 relative h-full rounded-xl overflow-hidden cursor-pointer group"
+                              className="col-span-2 md:col-span-1 row-span-2 relative rounded-xl overflow-hidden cursor-pointer group"
+                              style={{ minHeight: '280px' }}
                               onClick={() => {
                                 setGalleryInitialIndex(selectedImage);
                                 setIsGalleryOpen(true);
@@ -715,13 +716,13 @@ const RoomsPage: React.FC = () => {
                               <img
                                 src={propertyDetails.image[selectedImage]}
                                 alt={propertyDetails.property_name || "Property"}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                               />
                               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
                             </div>
 
                             {/* Grid of other images - each with 4-sided curve */}
-                            <div className="hidden md:grid md:grid-cols-1 md:grid-rows-2 gap-2">
+                            <div className="hidden md:grid md:grid-cols-1 gap-2" style={{ height: '280px' }}>
                               {propertyDetails.image
                                 .filter((_, i) => i !== selectedImage)
                                 .slice(0, 2)
@@ -731,7 +732,8 @@ const RoomsPage: React.FC = () => {
                                   return (
                                     <div
                                       key={index}
-                                      className="relative cursor-pointer h-[138px] rounded-xl overflow-hidden group"
+                                      className="relative cursor-pointer rounded-xl overflow-hidden group flex-1"
+                                      style={{ minHeight: '136px' }}
                                       onClick={() => {
                                         if (images && Array.isArray(images)) {
                                           const newIndex = images.findIndex((i) => i === img);
@@ -750,14 +752,15 @@ const RoomsPage: React.FC = () => {
                                       <img
                                         src={img}
                                         alt={`Property view ${index + 1}`}
-                                        className="w-full h-full object-cover group-hover:opacity-90 group-hover:scale-105 transition-all duration-300"
+                                        className="w-full h-full object-cover object-center group-hover:opacity-90 group-hover:scale-105 transition-all duration-300"
                                       />
                                     </div>
                                   );
                                 })}
                               {propertyDetails.image.length > 3 && selectedImage !== 3 && (
                                 <div
-                                  className="relative cursor-pointer h-[138px] rounded-xl overflow-hidden group"
+                                  className="relative cursor-pointer rounded-xl overflow-hidden group flex-1"
+                                  style={{ minHeight: '136px' }}
                                   onClick={() => setSelectedImage(3)}
                                   onDoubleClick={() => {
                                     setGalleryInitialIndex(3);
@@ -767,7 +770,7 @@ const RoomsPage: React.FC = () => {
                                   <img
                                     src={propertyDetails.image[3]}
                                     alt={`Property view 4`}
-                                    className="w-full h-full object-cover group-hover:opacity-90 group-hover:scale-105 transition-all duration-300"
+                                    className="w-full h-full object-cover object-center group-hover:opacity-90 group-hover:scale-105 transition-all duration-300"
                                   />
                                 </div>
                               )}
@@ -778,7 +781,8 @@ const RoomsPage: React.FC = () => {
                           <div className="grid grid-cols-4 gap-2 h-[280px]">
                             {/* Main selected image with 4-sided curve */}
                             <div
-                              className="col-span-4 md:col-span-2 md:row-span-2 relative h-full rounded-xl overflow-hidden cursor-pointer group"
+                              className="col-span-4 md:col-span-2 md:row-span-2 relative rounded-xl overflow-hidden cursor-pointer group"
+                              style={{ minHeight: '280px' }}
                               onClick={() => {
                                 setGalleryInitialIndex(selectedImage);
                                 setIsGalleryOpen(true);
@@ -787,13 +791,13 @@ const RoomsPage: React.FC = () => {
                               <img
                                 src={propertyDetails.image[selectedImage]}
                                 alt={propertyDetails.property_name || "Property"}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                               />
                               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
                             </div>
 
                             {/* Grid of other images - each with 4-sided curve */}
-                            <div className="hidden md:grid md:col-span-2 md:grid-cols-2 md:grid-rows-2 gap-2">
+                            <div className="hidden md:grid md:col-span-2 md:grid-cols-2 md:grid-rows-2 gap-2" style={{ height: '280px' }}>
                               {propertyDetails.image
                                 .filter((_, i) => i !== selectedImage)
                                 .slice(0, 3)
@@ -804,6 +808,7 @@ const RoomsPage: React.FC = () => {
                                     <div
                                       key={index}
                                       className="relative cursor-pointer rounded-xl overflow-hidden group"
+                                      style={{ minHeight: '136px' }}
                                       onClick={() => {
                                         if (images && Array.isArray(images)) {
                                           const newIndex = images.findIndex((i) => i === img);
@@ -822,7 +827,7 @@ const RoomsPage: React.FC = () => {
                                       <img
                                         src={img}
                                         alt={`Property view ${index + 1}`}
-                                        className="w-full h-full object-cover group-hover:opacity-90 group-hover:scale-105 transition-all duration-300"
+                                        className="w-full h-full object-cover object-center group-hover:opacity-90 group-hover:scale-105 transition-all duration-300"
                                       />
                                     </div>
                                   );
@@ -831,6 +836,7 @@ const RoomsPage: React.FC = () => {
                               {/* Last image with overlay showing more images - with 4-sided curve */}
                               <div
                                 className="relative cursor-pointer rounded-xl overflow-hidden group"
+                                style={{ minHeight: '136px' }}
                                 onClick={() => {
                                   setGalleryInitialIndex(4);
                                   setIsGalleryOpen(true);
@@ -839,7 +845,7 @@ const RoomsPage: React.FC = () => {
                                 <img
                                   src={propertyDetails.image[4]}
                                   alt="More property images"
-                                  className="w-full h-full object-cover brightness-75 group-hover:brightness-50 transition-all duration-300"
+                                  className="w-full h-full object-cover object-center brightness-75 group-hover:brightness-50 transition-all duration-300"
                                 />
                                 <div className="absolute inset-0 flex items-center justify-center text-tripswift-off-white">
                                   <div className="text-center">
@@ -867,9 +873,9 @@ const RoomsPage: React.FC = () => {
                                   );
                                 }
                               }}
-                              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-tripswift-off-white/70 backdrop-blur-sm rounded-full p-2.5 shadow-sm hover:bg-tripswift-off-white transition-colors duration-300 z-10 group"
+                              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-tripswift-off-white/90 backdrop-blur-sm rounded-full p-2.5 shadow-lg hover:bg-tripswift-off-white transition-colors duration-300 z-10 group border border-white/20"
                             >
-                              <ChevronLeft className="h-5 w-5 text-white group-hover:text-black transition-colors duration-300" />
+                              <ChevronLeft className="h-5 w-5 text-gray-700 group-hover:text-black transition-colors duration-300" />
                             </button>
                             <button
                               onClick={(e) => {
@@ -881,13 +887,13 @@ const RoomsPage: React.FC = () => {
                                   );
                                 }
                               }}
-                              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-tripswift-off-white/70 backdrop-blur-sm rounded-full p-2.5 shadow-sm hover:bg-tripswift-off-white transition-colors duration-300 z-10 group"
+                              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-tripswift-off-white/90 backdrop-blur-sm rounded-full p-2.5 shadow-lg hover:bg-tripswift-off-white transition-colors duration-300 z-10 group border border-white/20"
                             >
-                              <ChevronRight className="h-5 w-5 text-white group-hover:text-black transition-colors duration-300" />
+                              <ChevronRight className="h-5 w-5 text-gray-700 group-hover:text-black transition-colors duration-300" />
                             </button>
 
                             {/* Counter */}
-                            <div className="absolute text-white bottom-4 right-4 bg-tripswift-off-white/70 backdrop-blur-sm text-xs py-1.5 px-4 rounded-full font-tripswift-medium shadow-sm z-10">
+                            <div className="absolute text-white bottom-4 right-4 bg-black/70 backdrop-blur-sm text-xs py-1.5 px-4 rounded-full font-tripswift-medium shadow-lg z-10 border border-white/20">
                               {selectedImage + 1} / {propertyDetails.image.length}
                             </div>
                           </>
@@ -896,7 +902,7 @@ const RoomsPage: React.FC = () => {
                         {/* View all photos button */}
                         {propertyDetails.image.length >= 3 && (
                           <button
-                            className="absolute top-4 right-4 bg-tripswift-off-white/70 backdrop-blur-sm text-tripswift-black text-xs font-tripswift-medium px-3.5 py-2 rounded-full shadow-sm flex items-center bg-tripswift-off-white transition-colors duration-300 z-10"
+                            className="absolute top-4 right-4 bg-tripswift-off-white backdrop-blur-sm text-tripswift-black text-xs font-tripswift-medium px-3.5 py-2 rounded-full shadow-lg flex items-center duration-300 z-10 border border-white/20"
                             onClick={(e) => {
                               e.stopPropagation();
                               setGalleryInitialIndex(selectedImage);
@@ -909,22 +915,24 @@ const RoomsPage: React.FC = () => {
                         )}
 
                         {/* Click to view overlay hint */}
-                        <div className="absolute top-4 left-4 bg-black/20 backdrop-blur-sm text-white text-xs font-tripswift-medium px-2.5 py-1.5 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
+                        <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-sm text-white text-xs font-tripswift-medium px-2.5 py-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10 border border-white/20">
                           Click to view
                         </div>
 
                       </>
                     ) : (
-                      <div className="w-full h-[280px] rounded-xl flex items-center justify-center">
-                        <ImageIcon className="h-12 w-12 text-gray-300" />
-                        <span className="ml-2 text-gray-400 font-tripswift-medium">
-                          {t("RoomsPage.noImagesAvailable")}
-                        </span>
+                      <div className="w-full h-[280px] rounded-xl flex items-center justify-center bg-gray-50">
+                        <div className="text-center">
+                          <ImageIcon className="h-12 w-12 text-gray-300 mx-auto mb-2" />
+                          <span className="text-gray-400 font-tripswift-medium">
+                            {t("RoomsPage.noImagesAvailable")}
+                          </span>
+                        </div>
                       </div>
                     )}
                   </div>
 
-                  {/* Image thumbnails with 4-sided curve */}
+                  {/* Image thumbnails with 4-sided curve - Enhanced */}
                   {propertyDetails?.image &&
                     Array.isArray(propertyDetails.image) &&
                     propertyDetails.image.length >= 3 && (
@@ -937,19 +945,21 @@ const RoomsPage: React.FC = () => {
                               setGalleryInitialIndex(index);
                               setIsGalleryOpen(true);
                             }}
-                            className={`w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-xl overflow-hidden cursor-pointer relative transition-all duration-300 group ${selectedImage === index
-                              ? "shadow-md scale-105"
-                              : "opacity-70 hover:opacity-90"
+                            className={`w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-xl overflow-hidden cursor-pointer relative transition-all duration-300 group border-2 ${selectedImage === index
+                                ? "shadow-lg scale-105 border-tripswift-blue"
+                                : "opacity-70 hover:opacity-90 border-transparent"
                               }`}
                             title="Click to select, double-click to view fullscreen"
                           >
                             <img
                               src={img}
                               alt={`Thumbnail ${index + 1}`}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                             />
                             {selectedImage === index && (
-                              <div className="absolute bottom-0 left-0 right-0 h-1 bg-tripswift-blue"></div>
+                              <div className="absolute inset-0 bg-tripswift-blue/20 flex items-center justify-center">
+                                <div className="w-3 h-3 bg-tripswift-blue rounded-full"></div>
+                              </div>
                             )}
                             {/* Fullscreen icon on hover */}
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
@@ -959,17 +969,9 @@ const RoomsPage: React.FC = () => {
                         ))}
                       </div>
                     )}
-                  {/* Property description */}
-                  {/* {propertyDetails?.description && (
-                    <div className="mt-4">
-                      <h3 className="text-section-heading mb-2">{t('RoomsPage.aboutThisProperty')}</h3>
-                      <p className="text-description">
-                        {propertyDetails.description}
-                      </p>
-                    </div>
-                  )} */}
+
                   {/* Property amenities section */}
-                  <div className="mt-4">
+                  <div className="mt-6">
                     <h3 className="text-section-heading mb-3">
                       {t("RoomsPage.propertyAmenities")}
                     </h3>
@@ -1000,19 +1002,18 @@ const RoomsPage: React.FC = () => {
 
                 {/* Property amenities and contact info */}
                 <div className="lg:col-span-1">
-
-                  {/* Property amenities */}
-                  <div className="bg-tripswift-blue/5 p-4 rounded-xl mb-2">
+                  {/* QR Code section */}
+                  <div className="bg-tripswift-blue/5 p-4 rounded-xl mb-4">
                     {qrCodeData.qrCode && qrCodeData.couponCode && (
                       <QRCodeDisplay qrCode={qrCodeData.qrCode} />
                     )}
-                  </div> 
+                  </div>
 
                   {/* Property description */}
                   {propertyDetails?.description && (
-                    <div className="mt-4 p-4">
+                    <div className="bg-tripswift-off-white p-4 rounded-xl border border-gray-100 mb-4">
                       <h3 className="text-section-heading mb-2">{t('RoomsPage.aboutThisProperty')}</h3>
-                      <p className="text-description">
+                      <p className="text-description leading-relaxed">
                         {propertyDetails.description}
                       </p>
                     </div>
@@ -1023,12 +1024,12 @@ const RoomsPage: React.FC = () => {
                     <h3 className="text-section-heading mb-3">
                       {t("RoomsPage.contactInformation")}
                     </h3>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {propertyDetails?.property_contact && (
                         <div className="flex items-center text-description">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className={`h-4 w-4 text-tripswift-blue ${i18n.language === "ar" ? "ml-2" : "mr-2"}`}
+                            className={`h-4 w-4 text-tripswift-blue flex-shrink-0 ${i18n.language === "ar" ? "ml-3" : "mr-3"}`}
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -1040,14 +1041,14 @@ const RoomsPage: React.FC = () => {
                               d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
                             />
                           </svg>
-                          {propertyDetails.property_contact}
+                          <span className="break-all">{propertyDetails.property_contact}</span>
                         </div>
                       )}
                       {propertyDetails?.property_email && (
                         <div className="flex items-center text-description">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className={`h-4 w-4 text-tripswift-blue ${i18n.language === "ar" ? "ml-2" : "mr-2"}`}
+                            className={`h-4 w-4 text-tripswift-blue flex-shrink-0 ${i18n.language === "ar" ? "ml-3" : "mr-3"}`}
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -1059,13 +1060,13 @@ const RoomsPage: React.FC = () => {
                               d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                             />
                           </svg>
-                          {propertyDetails.property_email}
+                          <span className="break-all">{propertyDetails.property_email}</span>
                         </div>
                       )}
                       {propertyDetails?.property_address && (
-                        <div className="flex items-center text-description">
-                          <MapPin className={`h-4 w-4 text-tripswift-blue flex-shrink-0 mb-0.5 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
-                          {getFormattedAddress(propertyDetails.property_address)}
+                        <div className="flex items-start text-description">
+                          <MapPin className={`h-4 w-4 text-tripswift-blue flex-shrink-0 mt-0.5 ${i18n.language === "ar" ? "ml-3" : "mr-3"}`} />
+                          <span className="leading-relaxed">{getFormattedAddress(propertyDetails.property_address)}</span>
                         </div>
                       )}
                     </div>

@@ -44,7 +44,7 @@
       "emailPlaceholder": "you@example.com",
       "passwordLabel": "كلمة المرور",
       "passwordHelp": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل بما في ذلك حرف كبير واحد، وحرف صغير واحد، ورقم واحد، وحرف خاص واحد.",
-      "createAccountButton": "إنشاء حساب",
+      "updateAccountButton": "إنشاء حساب",
       "alreadyHaveAccount": "هل لديك حساب بالفعل؟",
       "signIn": "تسجيل الدخول",
       "successMessage": "تم التسجيل بنجاح! يرجى تسجيل الدخول.",

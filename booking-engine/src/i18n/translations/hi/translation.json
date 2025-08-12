@@ -44,7 +44,7 @@
       "emailPlaceholder": "आप@example.com",
       "passwordLabel": "पासवर्ड",
       "passwordHelp": "पासवर्ड में कम से कम 8 कैरेक्टर होने चाहिए जिसमें एक अपरकेस लेटर, एक लोअरकेस लेटर, एक नंबर और एक स्पेशल कैरेक्टर शामिल हो।",
-      "createAccountButton": "खाता बनाएं",
+      "updateAccountButton": "खाता अपडेट करें",
       "alreadyHaveAccount": "क्या आपके पास पहले से ही खाता है?",
       "signIn": "साइन इन करें",
       "successMessage": "पंजीकरण सफल! कृपया साइन इन करें।",

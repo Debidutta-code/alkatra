@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, ChevronLeft, ChevronRight, Download, Share2, ZoomIn, ZoomOut, RotateCcw, Maximize2, Grid3X3 } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Download, Share2, ZoomIn, ZoomOut, RotateCcw, Maximize2, Grid3X3, Heart } from 'lucide-react';
 
 interface FullscreenGalleryProps {
   images: string[];
@@ -20,16 +20,16 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [imageError, setImageError] = useState<{ [key: number]: boolean }>({});
   const [showThumbnails, setShowThumbnails] = useState(true);
-  const [showControls, setShowControls] = useState(true);
   const [zoom, setZoom] = useState(1);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
   const [showGridView, setShowGridView] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Reset state when gallery opens
   useEffect(() => {
     if (isOpen) {
@@ -46,27 +46,6 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
       document.body.style.overflow = 'unset';
     };
   }, [isOpen, initialIndex]);
-
-  // Auto-hide controls
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const resetTimeout = () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      setShowControls(true);
-      timeoutRef.current = setTimeout(() => setShowControls(false), 3000);
-    };
-
-    const handleMouseMove = () => resetTimeout();
-
-    resetTimeout();
-    window.addEventListener('mousemove', handleMouseMove);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, [isOpen]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -244,86 +223,93 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-50 bg-black select-none"
+      className="fixed inset-0 z-50 bg-white select-none flex flex-col"
       onWheel={handleWheel}
     >
-      {/* Header with controls */}
-      <div className={`absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-black/80 via-black/40 to-transparent transition-all duration-500 ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'
-        }`}>
+      {/* Header with controls - Fixed height */}
+      <div className="flex-shrink-0 bg-white border-b border-gray-200 shadow-sm z-20">
         <div className="flex items-center justify-between p-4 md:p-6">
-          <div className="text-white">
-            <h3 className="font-semibold text-lg md:text-xl leading-tight">{propertyName}</h3>
-            <p className="text-white/70 text-sm mt-1">
-              {currentIndex + 1} of {images.length} photos
+          <div className="text-gray-900">
+            <h3 className="font-bold text-lg md:text-xl leading-tight text-gray-900">{propertyName}</h3>
+            <p className="text-gray-600 text-sm mt-1">
+              Photo {currentIndex + 1} of {images.length}
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {/* Zoom controls */}
-            <div className="hidden md:flex items-center gap-1 bg-black/40 backdrop-blur-sm rounded-lg p-1">
+            <div className="hidden md:flex items-center gap-1 bg-gray-100 rounded-lg p-1 border border-gray-200">
               <button
                 onClick={handleZoomOut}
-                className="p-2 hover:bg-white/20 rounded-md transition-colors duration-200"
+                className="p-2 hover:bg-white hover:shadow-sm rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Zoom out"
                 disabled={zoom <= 0.5}
               >
-                <ZoomOut className="h-4 w-4 text-white" />
+                <ZoomOut className="h-4 w-4 text-gray-700" />
               </button>
-              <span className="text-white text-xs px-2 min-w-[3rem] text-center">
+              <span className="text-gray-700 text-xs px-3 min-w-[3rem] text-center font-medium">
                 {Math.round(zoom * 100)}%
               </span>
               <button
                 onClick={handleZoomIn}
-                className="p-2 hover:bg-white/20 rounded-md transition-colors duration-200"
+                className="p-2 hover:bg-white hover:shadow-sm rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Zoom in"
                 disabled={zoom >= 5}
               >
-                <ZoomIn className="h-4 w-4 text-white" />
+                <ZoomIn className="h-4 w-4 text-gray-700" />
               </button>
             </div>
 
             {/* Action buttons */}
-            <div className="flex items-center gap-1 bg-black/40 backdrop-blur-sm rounded-lg p-1">
+            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1 border border-gray-200">
+              <button
+                onClick={() => setIsFavorited(!isFavorited)}
+                className="p-2 hover:bg-white hover:shadow-sm rounded-md transition-all duration-200"
+                title="Add to favorites"
+              >
+                <Heart className={`h-4 w-4 ${isFavorited ? 'text-red-500 fill-red-500' : 'text-gray-700'}`} />
+              </button>
+
               <button
                 onClick={() => setShowGridView(!showGridView)}
-                className="p-2 hover:bg-white/20 rounded-md transition-colors duration-200"
+                className="p-2 hover:bg-white hover:shadow-sm rounded-md transition-all duration-200"
                 title="Grid view"
               >
-                <Grid3X3 className="h-4 w-4 text-white" />
+                <Grid3X3 className="h-4 w-4 text-gray-700" />
               </button>
 
               <button
                 onClick={toggleFullscreen}
-                className="p-2 hover:bg-white/20 rounded-md transition-colors duration-200"
+                className="p-2 hover:bg-white hover:shadow-sm rounded-md transition-all duration-200"
                 title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
               >
-                <Maximize2 className="h-4 w-4 text-white" />
+                <Maximize2 className="h-4 w-4 text-gray-700" />
               </button>
 
               <button
                 onClick={handleDownload}
-                className="p-2 hover:bg-white/20 rounded-md transition-colors duration-200"
+                className="p-2 hover:bg-white hover:shadow-sm rounded-md transition-all duration-200"
                 title="Download image"
               >
-                <Download className="h-4 w-4 text-white" />
+                <Download className="h-4 w-4 text-gray-700" />
               </button>
 
               <button
                 onClick={handleShare}
-                className="p-2 hover:bg-white/20 rounded-md transition-colors duration-200"
+                className="p-2 hover:bg-white hover:shadow-sm rounded-md transition-all duration-200"
                 title="Share image"
               >
-                <Share2 className="h-4 w-4 text-white" />
+                <Share2 className="h-4 w-4 text-gray-700" />
               </button>
             </div>
 
             {/* Close button */}
             <button
               onClick={onClose}
-              className="p-2 bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-lg transition-colors duration-200 ml-2"
+              className="p-2 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg transition-all duration-200"
               title="Close gallery (Esc)"
             >
-              <X className="h-5 w-5 text-white" />
+              <X className="h-5 w-5 text-gray-700" />
             </button>
           </div>
         </div>
@@ -331,17 +317,22 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
 
       {/* Grid View */}
       {showGridView && (
-        <div className="absolute inset-0 z-10 bg-black/95 backdrop-blur-sm overflow-y-auto">
-          <div className="container mx-auto p-4 pt-20">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+        <div className="flex-1 bg-white overflow-y-auto">
+          <div className="container mx-auto p-4 pb-8">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">All Photos</h2>
+              <p className="text-gray-600">{images.length} photos available</p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
               {images.map((image, index) => (
                 <button
                   key={index}
                   onClick={() => goToImage(index)}
-                  className={`relative aspect-square rounded-lg overflow-hidden group transition-all duration-200 ${currentIndex === index
-                      ? 'ring-2 ring-blue-500 scale-105'
-                      : 'hover:scale-105 hover:ring-1 hover:ring-white/50'
-                    }`}
+                  className={`relative aspect-square rounded-xl overflow-hidden group transition-all duration-200 border-2 ${
+                    currentIndex === index
+                      ? 'border-blue-500 shadow-lg scale-105'
+                      : 'border-gray-200 hover:border-gray-300 hover:shadow-md hover:scale-102'
+                  }`}
                 >
                   {!imageError[index] ? (
                     <img
@@ -352,20 +343,20 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
                       onError={() => handleImageError(index)}
                     />
                   ) : (
-                    <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                      <X className="h-6 w-6 text-gray-500" />
+                    <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                      <X className="h-6 w-6 text-gray-400" />
                     </div>
                   )}
 
                   {/* Image number overlay */}
-                  <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
+                  <div className="absolute top-3 left-3 bg-white/90 text-gray-800 text-xs font-semibold px-2 py-1 rounded-lg shadow-sm">
                     {index + 1}
                   </div>
 
                   {/* Current image indicator */}
                   {currentIndex === index && (
-                    <div className="absolute inset-0 bg-blue-500/20 flex items-center justify-center">
-                      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <div className="absolute inset-0 bg-blue-500/10 flex items-center justify-center">
+                      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
                         <div className="w-3 h-3 bg-white rounded-full"></div>
                       </div>
                     </div>
@@ -377,103 +368,105 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
         </div>
       )}
 
-      {/* Main image container */}
+      {/* Main image container - Takes remaining space */}
       {!showGridView && (
-        <div className="flex items-center justify-center h-full p-4 pt-20 pb-20">
-          <div className="relative max-w-full max-h-full w-full h-full flex items-center justify-center">
-            {/* Loading spinner */}
-            {isLoading && (
-              <div className="absolute inset-0 flex items-center justify-center z-10">
-                <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
-              </div>
-            )}
+        <div className="flex-1 bg-gray-50 relative overflow-hidden">
+          {/* Loading spinner */}
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <div className="w-12 h-12 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin"></div>
+            </div>
+          )}
 
-            {/* Main image */}
+          {/* Main image - Centered without excessive padding */}
+          <div className="absolute inset-0 flex items-center justify-center p-4">
             {!imageError[currentIndex] ? (
-              <img
-                ref={imageRef}
-                src={images[currentIndex]}
-                alt={`${propertyName} - Image ${currentIndex + 1}`}
-                className={`max-w-full max-h-full object-contain transition-all duration-300 ${zoom > 1 ? 'cursor-grab' : 'cursor-default'
-                  } ${isDragging ? 'cursor-grabbing' : ''} ${isLoading ? 'opacity-50 scale-95' : 'opacity-100 scale-100'
+              <div className="relative w-full h-full flex items-center justify-center">
+                <img
+                  ref={imageRef}
+                  src={images[currentIndex]}
+                  alt={`${propertyName} - Image ${currentIndex + 1}`}
+                  className={`max-w-full max-h-full object-contain bg-white rounded-2xl shadow-2xl transition-all duration-300 ${
+                    zoom > 1 ? 'cursor-grab' : 'cursor-default'
+                  } ${isDragging ? 'cursor-grabbing' : ''} ${
+                    isLoading ? 'opacity-50 scale-95' : 'opacity-100 scale-100'
                   }`}
-                style={{
-                  transform: `scale(${zoom}) translate(${imagePosition.x / zoom}px, ${imagePosition.y / zoom}px)`,
-                  transformOrigin: 'center'
-                }}
-                onLoad={handleImageLoad}
-                onError={() => handleImageError(currentIndex)}
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
-                draggable={false}
-              />
+                  style={{
+                    transform: `scale(${zoom}) translate(${imagePosition.x / zoom}px, ${imagePosition.y / zoom}px)`,
+                    transformOrigin: 'center'
+                  }}
+                  onLoad={handleImageLoad}
+                  onError={() => handleImageError(currentIndex)}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
+                  draggable={false}
+                />
+              </div>
             ) : (
-              <div className="flex flex-col items-center justify-center text-white/60 p-8 max-w-md">
-                <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mb-6">
-                  <X className="h-10 w-10" />
+              <div className="flex flex-col items-center justify-center text-gray-500 p-12 max-w-md bg-white rounded-2xl shadow-lg border border-gray-200">
+                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+                  <X className="h-10 w-10 text-gray-400" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Image not available</h3>
-                <p className="text-white/40 text-center">
-                  Image {currentIndex + 1} of {images.length} could not be loaded
+                <h3 className="text-xl font-semibold mb-2 text-gray-700">Image not available</h3>
+                <p className="text-gray-500 text-center">
+                  Photo {currentIndex + 1} of {images.length} could not be loaded
                 </p>
               </div>
             )}
-
-            {/* Navigation arrows */}
-            {images.length > 1 && (
-              <>
-                <button
-                  onClick={goToPrevious}
-                  className={`absolute left-4 top-1/2 transform -translate-y-1/2 p-3 bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-full transition-all duration-300 ${showControls ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-full'
-                    }`}
-                  title="Previous image (←)"
-                >
-                  <ChevronLeft className="h-6 w-6 text-white" />
-                </button>
-
-                <button
-                  onClick={goToNext}
-                  className={`absolute right-4 top-1/2 transform -translate-y-1/2 p-3 bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-full transition-all duration-300 ${showControls ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
-                    }`}
-                  title="Next image (→)"
-                >
-                  <ChevronRight className="h-6 w-6 text-white" />
-                </button>
-              </>
-            )}
-
-            {/* Reset zoom button */}
-            {zoom !== 1 && (
-              <button
-                onClick={resetZoom}
-                className={`absolute top-4 left-1/2 transform -translate-x-1/2 p-2 bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-lg text-white text-sm transition-all duration-300 ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'
-                  }`}
-                title="Reset zoom"
-              >
-                <RotateCcw className="h-4 w-4" />
-              </button>
-            )}
           </div>
+
+          {/* Navigation arrows */}
+          {images.length > 1 && (
+            <>
+              <button
+                onClick={goToPrevious}
+                className="absolute left-6 top-1/2 transform -translate-y-1/2 p-3 bg-white hover:bg-gray-50 border border-gray-200 rounded-full shadow-lg transition-all duration-200 hover:shadow-xl z-10"
+                title="Previous image (←)"
+              >
+                <ChevronLeft className="h-6 w-6 text-gray-700" />
+              </button>
+
+              <button
+                onClick={goToNext}
+                className="absolute right-6 top-1/2 transform -translate-y-1/2 p-3 bg-white hover:bg-gray-50 border border-gray-200 rounded-full shadow-lg transition-all duration-200 hover:shadow-xl z-10"
+                title="Next image (→)"
+              >
+                <ChevronRight className="h-6 w-6 text-gray-700" />
+              </button>
+            </>
+          )}
+
+          {/* Reset zoom button */}
+          {zoom !== 1 && (
+            <button
+              onClick={resetZoom}
+              className="absolute top-6 left-1/2 transform -translate-x-1/2 px-4 py-2 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg text-gray-700 text-sm font-medium shadow-lg transition-all duration-200 flex items-center gap-2 z-10"
+              title="Reset zoom"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Reset Zoom
+            </button>
+          )}
         </div>
       )}
 
-      {/* Bottom thumbnails */}
+      {/* Bottom thumbnails - Fixed height when shown */}
       {!showGridView && images.length > 1 && showThumbnails && (
-        <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent transition-all duration-500 ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full'
-          }`}>
+        <div className="flex-shrink-0 bg-white border-t border-gray-200 shadow-sm">
           <div className="p-4 md:p-6">
             <div className="flex justify-center">
-              <div className="flex gap-2 overflow-x-auto max-w-full pb-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+              <div className="flex gap-3 overflow-x-auto max-w-full pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
                 {images.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => goToImage(index)}
-                    className={`relative flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden transition-all duration-200 ${currentIndex === index
-                        ? 'ring-2 ring-white scale-105'
-                        : 'opacity-60 hover:opacity-80 hover:scale-105'
-                      }`}
+                    className={`relative flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden transition-all duration-200 border-2 ${
+                      currentIndex === index
+                        ? 'border-blue-500 scale-105 shadow-md'
+                        : 'border-gray-200 opacity-70 hover:opacity-100 hover:scale-105 hover:border-gray-300'
+                    }`}
                   >
                     {!imageError[index] ? (
                       <img
@@ -484,17 +477,13 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
                         onError={() => handleImageError(index)}
                       />
                     ) : (
-                      <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                        <X className="h-4 w-4 text-gray-500" />
+                      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                        <X className="h-4 w-4 text-gray-400" />
                       </div>
                     )}
 
-                    {currentIndex === index && (
-                      <div className="absolute inset-0 bg-white/10 border-2 border-white rounded-lg"></div>
-                    )}
-
                     {/* Image number */}
-                    <div className="absolute top-1 right-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded backdrop-blur-sm">
+                    <div className="absolute top-1 right-1 bg-white/90 text-gray-800 text-xs font-semibold px-1.5 py-0.5 rounded shadow-sm">
                       {index + 1}
                     </div>
                   </button>
@@ -506,20 +495,13 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
       )}
 
       {/* Keyboard shortcuts hint */}
-      <div className={`absolute bottom-4 left-4 text-white/60 text-xs transition-all duration-500 ${showControls ? 'opacity-100' : 'opacity-0'
-        }`}>
-        <div className="bg-black/40 backdrop-blur-sm rounded-lg p-2 space-y-1">
-          <div>Press <kbd className="bg-white/20 px-1 rounded">Esc</kbd> to close</div>
-          <div>Press <kbd className="bg-white/20 px-1 rounded">G</kbd> for grid view</div>
-          <div>Press <kbd className="bg-white/20 px-1 rounded">Space</kbd> to toggle thumbnails</div>
+      <div className="absolute bottom-4 left-4 text-gray-600 text-xs z-10">
+        <div className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg p-3 space-y-1 shadow-sm">
+          <div>Press <kbd className="bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded text-xs font-mono">Esc</kbd> to close</div>
+          <div>Press <kbd className="bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded text-xs font-mono">G</kbd> for grid view</div>
+          <div>Use <kbd className="bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded text-xs font-mono">←</kbd> <kbd className="bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded text-xs font-mono">→</kbd> to navigate</div>
         </div>
       </div>
-
-      {/* Click outside to close */}
-      <div
-        className="absolute inset-0 -z-10"
-        onClick={onClose}
-      ></div>
     </div>
   );
 };

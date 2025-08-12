@@ -44,7 +44,7 @@
       "emailPlaceholder": "you@example.com",
       "passwordLabel": "Password",
       "passwordHelp": "Password must contain at least 8 characters including one uppercase letter, one lowercase letter, one number and one special character.",
-      "createAccountButton": "Create Account",
+      "updateAccountButton": "Update Account",
       "alreadyHaveAccount": "Already have an account?",
       "signIn": "Sign in",
       "successMessage": "Registration successful! Please sign in.",
