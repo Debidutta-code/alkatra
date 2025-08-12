@@ -1,6 +1,6 @@
 import { ITaxRuleService } from "../interfaces";
 import { ITaxRule } from "../models";
-import { Generator } from "../utils";
+import { Generator, Validator } from "../utils";
 import { config } from "../../config";
 import { TaxRuleRepository } from "../repositories";
 import { CommonService } from "../../services";

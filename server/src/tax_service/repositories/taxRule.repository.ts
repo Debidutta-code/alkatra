@@ -94,4 +94,33 @@ export class TaxRuleRepository implements ITaxRuleRepository {
             hotelId: hotelId
         });
     }
+
+
+    /**
+     * Find all tax rules by their IDs and return only
+     * type, value, and applicableOn fields.
+     * 
+     * @param ruleIds Array of TaxRule ObjectIds
+     * @returns Array of TaxRule objects with limited fields
+     */
+    async findTaxRulesByIds(ruleIds: Types.ObjectId[] | string[]) {
+        try {
+            const taxRules = await TaxRuleModel.find(
+                { _id: { $in: ruleIds } },
+                { 
+                    type: 1, 
+                    value: 1, 
+                    applicableOn: 1, 
+                    name: 1,
+                    _id: 0 
+                }
+            ).lean();
+
+            return taxRules;
+        } catch (error) {
+            console.error("Error fetching tax rules:", error);
+            throw error;
+        }
+    }
+
 }

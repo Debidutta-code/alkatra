@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { Types } from "mongoose";
 
 
 export class Generator {
@@ -12,6 +13,10 @@ export class Generator {
         const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, "").slice(0, 14); // YYYYMMDDHHMMSS
         const randomStr = crypto.randomBytes(2).toString("hex").toUpperCase(); // 4-char hex string
         return `${prefix}-${timestamp}-${randomStr}`;
+    }
+
+    static toObjectID(id: string) {
+        return new Types.ObjectId(id);
     }
 
 }

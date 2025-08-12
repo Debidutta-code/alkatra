@@ -1,7 +1,7 @@
 import { ITaxGroupService } from "../interfaces";
-import { ITaxGroup } from "../models";
+import { ITaxGroup, ITaxRule } from "../models";
 import { TaxGroupRepository, TaxRuleRepository } from "../repositories";
-import { Generator } from "../utils";
+import { Generator, Validator } from "../utils";
 import { config } from "../../config";
 import { CommonService } from "../../services";
 
@@ -31,7 +31,7 @@ export class TaxGroupService implements ITaxGroupService {
     ): TaxGroupService {
         if (!TaxGroupService.instance) {
             TaxGroupService.instance = new TaxGroupService(
-                taxGroupRepository, 
+                taxGroupRepository,
                 taxRuleRepository,
                 commonService
             );
@@ -39,10 +39,37 @@ export class TaxGroupService implements ITaxGroupService {
         return TaxGroupService.instance;
     }
 
+
     private isDuplicateTaxGroup(newName: string, existingGroups: ITaxGroup[]): boolean {
         const normalized = newName.trim().toLowerCase();
         return existingGroups.some(group => group.name.trim().toLowerCase() === normalized);
     }
+
+
+
+    /**
+     * Calculate tax for a reservation
+     */
+    private calculateTaxForReservation(taxRules: Partial<ITaxRule>[], basePrice: number, totalPrice: number) {
+        return taxRules.map(rule => {
+            const applicableAmount = rule.applicableOn === "ROOM_RATE" ? basePrice : totalPrice;
+
+            if (rule.type === "PERCENTAGE") {
+                const taxAmount = (applicableAmount * rule.value) / 100;
+                return {
+                    name: rule.name,
+                    percentage: rule.value,
+                    amount: Number(taxAmount.toFixed(2))
+                };
+            } else if (rule.type === "FIXED") {
+                return {
+                    name: rule.name,
+                    fixed: rule.value
+                };
+            }
+        });
+    }
+
 
 
     /**
@@ -92,6 +119,12 @@ export class TaxGroupService implements ITaxGroupService {
     }
 
 
+
+    /**
+     * Get all tax groups
+     * @param hotelId
+     * @returns array of tax groups
+     */
     async getAllTaxGroups(hotelId: string): Promise<ITaxGroup[]> {
         try {
             return await this.taxGroupRepository.findAll(hotelId);
@@ -102,6 +135,12 @@ export class TaxGroupService implements ITaxGroupService {
     }
 
 
+    /**
+     * Updates a tax group
+     * @param id - tax group id
+     * @param data - tax group data
+     * @returns updated tax group
+     */
     async updateTaxGroup(id: string, data: Partial<ITaxGroup>): Promise<ITaxGroup | null | void> {
         try {
             /**
@@ -109,7 +148,7 @@ export class TaxGroupService implements ITaxGroupService {
              */
             const isOwner = await this.commonService.verifyOwnership(String(data.createdBy), String(data.hotelId));
             if (!isOwner) throw new Error("You are not the owner of this hotel.");
-            
+
             /**
              * Remove fields that are not allowed to be updated
              */
@@ -121,7 +160,7 @@ export class TaxGroupService implements ITaxGroupService {
 
             if (data.rules.length > 0) {
                 const taxRules = await this.taxRuleRepository.findByHotelAndIds(taxGroup.hotelId, data.rules);
-    
+
                 if (taxRules.length !== data.rules.length) {
                     throw new Error("One or more tax rules do not belong to the specified hotel.");
                 }
@@ -137,6 +176,11 @@ export class TaxGroupService implements ITaxGroupService {
     }
 
 
+
+    /**
+     * Deletes a tax group
+     * @param id - tax group id
+     */
     async deleteTaxGroup(id: string): Promise<void> {
         try {
             const taxGroup = await this.taxGroupRepository.findById(id);
@@ -151,6 +195,12 @@ export class TaxGroupService implements ITaxGroupService {
     }
 
 
+
+    /**
+     * Get a tax group by ID
+     * @param id - tax group id
+     * @returns tax group
+     */
     async getTaxGroupById(id: string): Promise<ITaxGroup | null> {
         try {
             const taxGroup = await this.taxGroupRepository.findById(id);
@@ -159,6 +209,73 @@ export class TaxGroupService implements ITaxGroupService {
             return taxGroup;
         } catch (error: any) {
             console.error("Failed to get tax group by ID at Service Layer:", error);
+            throw error;
+        }
+    }
+
+
+    /**
+     * Get tax rules for a reservation
+     * @param amount - total amount for the reservation
+     * @param hotelId - hotel id of the hotel for the reservation
+     * 
+     * @format - 
+     * {
+     *        "taxRules": [
+     *          {
+     *              "name": "Tax Rule 1",
+     *              "percentage": 10
+     *              "amount": 10.0,
+     *              "applicable_on": "ROOM_RATE"
+     *          },
+     *          {
+     *              "name": "Tax Rule 2",
+     *              "percentage": 10
+     *              "amount": 5.0,
+     *              "applicable_on": "ROOM_RATE"
+     *          }
+     *          },
+     *          {
+     *              "name": "Tax Rule 3",
+     *              "fixed": 100,
+     *              "applicable_on": "TOTAL_AMOUNT"
+     *          }
+     *      ]
+     * }
+     */
+    async calculateTaxRulesForReservation(basePrice: number, totalPrice: number, taxGroupID: string): Promise<any> {
+        try {
+            /**
+             * Check amount and hotel ID are provided
+             */
+            if (!basePrice || !totalPrice || !taxGroupID) throw new Error("Missing basePrice, totalPrice or taxGroupID.");
+
+            Validator.validateAmount(basePrice);
+            Validator.validateAmount(totalPrice);
+            Validator.validateID(taxGroupID);
+
+            /**
+             * Get all tax rules for the hotel
+             */
+            const taxGroupData = await this.getTaxGroupById(taxGroupID);
+            if (!taxGroupData) throw new Error("This tax group doesn't exists.");
+            if (!taxGroupData.rules || taxGroupData.rules.length === 0) {
+                throw new Error("No tax rules found for this tax group.");
+            }
+
+            /**
+             * Fetch tax rules for the reservation
+             */
+            const taxRules = await this.taxRuleRepository.findTaxRulesByIds(taxGroupData.rules);
+
+            /**
+             * Calculate Taxes based on applicableOn
+             */
+            const taxRulesForReservation = this.calculateTaxForReservation(taxRules, basePrice, totalPrice);
+
+            return taxRulesForReservation;
+        } catch (error: any) {
+            console.error("Failed to get tax rules for reservation at Get Service Layer:", error);
             throw error;
         }
     }

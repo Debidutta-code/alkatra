@@ -126,6 +126,11 @@ export class TaxRuleController implements ITaxRuleController {
             if (Object.keys(updatePayload).length === 0) throw new Error("Update payload cannot be empty.");
 
             /**
+             * Check if the hotel ID present in the payload
+             */
+            if (!updatePayload.hotelId) throw new Error("Hotel ID is required.");
+
+            /**
              * Validate tax rule ID
              */
             Validator.validateID(id);
@@ -146,6 +151,7 @@ export class TaxRuleController implements ITaxRuleController {
             console.error("Failed to update tax rule:", error);
             if (
                 error.message === "Update payload cannot be empty." ||
+                error.message === "Hotel ID is required." ||
                 error.message === "Tax rule not found" ||
                 error.message === "You are not the owner of this hotel." ||
                 error.message === "Tax rule name cannot be the same."
