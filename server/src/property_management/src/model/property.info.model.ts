@@ -42,7 +42,7 @@ const propertyInfoSchema = new Schema<PropertyInfoType>({
   description: { type: String },
   isDraft: { type: Boolean, default: true, },
   rate_plan: [{ type: Schema.Types.ObjectId }],
-  tax_group: { type: Schema.Types.ObjectId, ref: "TaxGroup" },
+  tax_group: { type: Schema.Types.ObjectId, ref: "TaxGroup", sparse: true },
 });
 
 const PropertyInfo = mongoose.model<PropertyInfoType>("PropertyInfo", propertyInfoSchema);
