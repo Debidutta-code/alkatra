@@ -1,9 +1,54 @@
+import { ObjectId } from "mongoose";
 import { CustomerReviewModel } from "../model";
+import { ThirdPartyBooking } from "../../wincloud/src/model/reservationModel";
 
 export class CustomerReviewRepository {
 
-    async newReviewCreate(data: any) {
-        const createReviewData = await CustomerReviewModel.create(data);
+    async newReviewCreate(
+        reservationId: string,
+        hotelCode: string,
+        hotelName: string,
+        userId: ObjectId,
+        guestEmail: string,
+        comment: string,
+        rating: number
+    ) {
+        const requiredFields = {
+            reservationId, hotelCode, hotelName, userId, guestEmail, comment, rating
+        };
+
+        const missingFields = Object.entries(requiredFields)
+            .filter(([_, value]) => value === undefined || value === null || value === "")
+            .map(([key]) => key);
+
+        if (missingFields.length > 0) {
+            throw new Error(`Missing required fields: ${missingFields.join(", ")}`);
+        }
+
+        const reservationData = await ThirdPartyBooking.findOne({ reservationId: reservationId });
+
+        if (!reservationData) {
+            throw new Error ("Reservation data not found");
+        }
+
+        if (
+            hotelCode !== reservationData.hotelCode
+            || hotelName !== reservationData.hotelName
+            || userId.toString() !== reservationData.userId.toString()
+            || guestEmail !== reservationData.email
+        ) {
+            throw new Error("Data do not match with existing data");
+        }
+
+        const createReviewData = await CustomerReviewModel.create({
+            reservationId,
+            hotelCode,
+            hotelName,
+            userId,
+            guestEmail,
+            comment,
+            rating
+        });
         if (!createReviewData) {
             throw new Error("Error at create review data")
         }
@@ -11,16 +56,24 @@ export class CustomerReviewRepository {
 
     async getReviews(filters: any) {
         const reviewDetails = await CustomerReviewModel.find(filters).sort({ createdAt: -1 });
-        console.log(`The review details we get ${JSON.stringify(reviewDetails)}`)
+        
         if (!reviewDetails.length || !reviewDetails) {
             throw new Error("No review data found. Please check your provided details.");
         }
         return reviewDetails;
     };
 
-    async updateReview(reviewId: string, customerId, updatedData: any) {
-        const updatedReview = await CustomerReviewModel.findByIdAndUpdate(
-            { _id: reviewId, customerId: customerId },
+    async updateReview(reviewId: string, userId, updatedData: any) {
+
+        const restrictedFields = ["reviewId", "hotelCode", "userId", "userEmail"];
+
+        /**
+         * This deletes each field which are in RestrictedFields
+         */
+        restrictedFields.forEach(field => delete updatedData[field]);
+        
+        const updatedReview = await CustomerReviewModel.findOneAndUpdate(
+            { _id: reviewId, userId: userId },
             { $set: updatedData },
             { new: true }
         );
@@ -35,7 +88,7 @@ export class CustomerReviewRepository {
             _id: reviewId,
             customerId: customerId
         });
-
+        
         if (!deletedReview) {
             throw new Error("Review not found or delete failed");
         }
