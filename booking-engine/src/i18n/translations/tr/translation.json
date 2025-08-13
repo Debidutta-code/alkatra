@@ -1310,6 +1310,18 @@
                 "description": "İndirim kuponları ve promosyon teklifleri"
             }
         },
+        "contactForm": {
+            "title": "Bize Mesaj Gönderin",
+            "subject": "Konu",
+            "message": "Mesajınız",
+            "messagePlaceholder": "Sorununuzu açıklayın...",
+            "cancel": "İptal",
+            "send": "Mesaj Gönder",
+            "sending": "Gönderiliyor...",
+            "sent": "Mesaj Gönderildi!",
+            "thankYou": "Teşekkürler! Ekibimiz yakında sizinle iletişime geçecek."
+        },
+        "contactFooterNoPhone": "Acil yardım için lütfen e-posta desteğini kullanın.",
         "faq": {
             "howToPayQuestion": "Kullanıcı nasıl ödeme yapabilir?",
             "howToPayAnswer": "Platform, geniş bir kullanıcı tercih yelpazesine hitap etmek için birden fazla uygun ödeme seçeneği sunar. Kullanıcılar \"Otelde Öde\" yöntemini seçebilirler, burada rezervasyon sırasında sadece rezervasyon onayı için kart bilgilerini sağlarlar. Anında herhangi bir ücret alınmaz ve ödeme doğrudan otelde - mülkün özel politikasına bağlı olarak check-in sırasında veya check-out'ta - yapılır.\n\nAyrıca, dijital para birimi tercih eden kullanıcılar için platform USDC, USDT (Polygon ağı), Ethereum, BNB ve Polygon Mainnet ile kripto para ödemelerini destekler. Bu, uluslararası seyahat edenler, teknoloji meraklısı kullanıcılar ve blockchain tabanlı işlemleri tercih edenler için daha fazla esneklik sağlar. Her iki ödeme yöntemi de güvenlik, şeffaflık ve kolaylık sağlamak için tasarlanmıştır.",
@@ -1324,10 +1336,10 @@
             "accountRequiredQuestion": "Kullanıcıların rezervasyon öncesi hesap oluşturması gerekiyor mu?",
             "accountRequiredAnswer": "Hesap oluşturma yalnızca kullanıcının rezervasyon yapmak istediği anda gereklidir. Bu, herkesin giriş yapmadan otelleri keşfedebileceği, oda müsaitliğini görüntüleyebileceği, fiyatları karşılaştırabileceği, olanakları kontrol edebileceği ve misafir yorumlarını okuyabileceği anlamına gelir.\n\nAncak, bir oda rezervasyonuna geçerken, sistem kullanıcıdan bir hesap oluşturmasını veya giriş yapmasını isteyecektir. Bu adım, rezervasyon detayları, ödeme onayları ve gelecekteki rezervasyonların güvenli bir şekilde saklanmasını ve \"Seyahatlerim\" bölümünde kolayca erişilebilir olmasını sağlar.",
             "contactSupportQuestion": "Kullanıcılar müşteri desteği ile nasıl iletişim kurabilir?",
-            "contactSupportAnswer": "Platform, kullanıcılara rezervasyon sorguları, ödeme sorunları veya teknik endişeler konusunda yardımcı olmak için birden fazla destek kanalı sağlar. Kullanıcılar e-posta desteği, uygulama içi yardım masası veya anlık yardım için 7/24 canlı sohbet seçeneği aracılığıyla ulaşabilirler. Yanıt süreleri kanala göre değişir, ancak öncelik her zaman acil rezervasyon veya ödeme ile ilgili sorunlara verilir.",
+            "contactSupportAnswer": "Platform, kullanıcıların rezervasyon sorguları, ödeme sorunları veya teknik endişeleri konusunda yardım almak için birden fazla destek kanalı sunmaktadır. Kullanıcılar e-posta desteği ve uygulama içi yardım masası aracılığıyla iletişime geçebilirler. Yanıt süreleri kanala bağlı olarak değişiklik gösterse de, acil rezervasyon veya ödeme ile ilgili sorunlara her zaman öncelik verilmektedir.",
             "additionalChargesQuestion": "Rezervasyon sırasında herhangi bir ek ücret var mı?",
             "additionalChargesAnswer": "Rezervasyon özetinde aksi belirtilmedikçe, görüntülenen tüm fiyatlar geçerli vergiler ve ücretler dahildir. Bazı oteller, ekstra yatak, yemek veya geç check-out gibi isteğe bağlı hizmetler için check-in sırasında ek miktarlar talep edebilir. Bunlar rezervasyonu sonuçlandırmadan önce açıkça belirtilir ve tam şeffaflık ile gizli sürpriz olmadığını garanti eder.",
-            "discountCouponQuestion": "Rezervasyon yaparken nasıl indirim alabilirim veya kupon kullanabilirim?",
+            "discountCouponQuestion": "Kullanıcı rezervasyon yaparken nasıl indirim alabilir veya kupon kullanabilir?",
             "discountCouponAnswer": "Teklifler ve indirimlerden yararlanmak için kullanıcıların basit bir süreci takip etmeleri gerekir. Özel promosyon kuponları, seçili otel odalarına veya diğer promosyon malzemelerine yerleştirilen QR kodlarına bağlıdır. Bu QR kodunu mobil cihaz kullanarak tarayarak, kullanıcılar platformun mobil uygulamasına yönlendirilir. Oradan standart rezervasyon süreci ile devam edebilirler. Ödeme aşamasında bir \"Kupon Uygula\" seçeneği görünür - buna dokunmak kullanıcının kodu girmesine ve uygun indirimi toplam rezervasyon tutarına anında uygulamasına olanak tanır."
         }
     }
