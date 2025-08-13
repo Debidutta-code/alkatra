@@ -9,6 +9,10 @@ import QRCode from 'qrcode';
 import { generateCouponCode } from "../../../coupon_management/services/couponService";
 import RoomType from "../model/RoomTypes.model";
 import { Inventory } from "../../../wincloud/src/model/inventoryModel";
+import { PropertyDetails } from "../service";
+
+
+const propertyDetailsService = new PropertyDetails();
 
 interface UpdateFields {
   room_name?: string;
@@ -384,7 +388,7 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
 
   if (availableRoomTypes.length === 0) {
     const errorMessage = unavailableRoomTypes
-      .map(({ roomType, dates }) => 
+      .map(({ roomType, dates }) =>
         `Room type ${roomType} is unavailable on ${dates.join(', ')} for ${numberOfRooms} rooms`
       )
       .join('; ');
@@ -540,17 +544,26 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
   // Generate coupon and QR
   const couponCode = await generateCouponCode();
   const guestDetails = req.query.guestDetails;
-  console.log(`Room Controller: The guest details we get from UI: ${JSON.stringify(guestDetails)} `);
-  const deepLinkUrl = `${process.env.DEEP_LINK}/property/${propertyInfoId}?coupon=${couponCode.code}&startDate=${startDate}&endDate=${endDate}&hotelCode=${hotelCode}&guestDetails=${guestDetails}`;
+  const getPropertyDetails = await propertyDetailsService.getRoomsByPropertyIdService(propertyInfoId);
+
+  const deepLinkUrl = `${process.env.DEEP_LINK}/property/${propertyInfoId}
+    ?coupon=${couponCode.code}
+    &startDate=${startDate}
+    &endDate=${endDate}
+    &hotelCode=${hotelCode}
+    &guestDetails=${guestDetails}
+    &hotelDetails=${getPropertyDetails}
+  `;
+
   const qrCodeData = await QRCode.toDataURL(deepLinkUrl);
 
   res.status(200).json({
     status: "success",
     error: false,
-    message: unavailableRoomTypes.length > 0 
+    message: unavailableRoomTypes.length > 0
       ? `Rooms fetched successfully. Some room types unavailable: ${unavailableRoomTypes
-          .map(({ roomType, dates }) => `${roomType} on ${dates.join(', ')}`)
-          .join('; ')}`
+        .map(({ roomType, dates }) => `${roomType} on ${dates.join(', ')}`)
+        .join('; ')}`
       : "Rooms fetched successfully",
     data: roomsWithRates,
     qrCode: qrCodeData,
