@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ITaxGroup } from "../models";
 import { ITaxGroupController, ITaxGroupService, AuthenticatedRequest } from "../interfaces";
 import { TaxGroupSanitizer, Validator } from "../utils";
-
+import { propertyInfoService } from "../../property_management/src/container";
 
 export class TaxGroupController implements ITaxGroupController {
     private taxGroupService: ITaxGroupService;
@@ -15,6 +15,11 @@ export class TaxGroupController implements ITaxGroupController {
         try {
             const taxGroupData = req.body;
             const createdBy = req.user?.id;
+
+            /**
+             * Check if payload is empty
+             */
+            if (Object.keys(taxGroupData).length === 0) throw new Error("Update payload cannot be empty.");
 
             /**
              * Validate createdBy user ID
@@ -31,15 +36,25 @@ export class TaxGroupController implements ITaxGroupController {
              */
             const taxGroup = await this.taxGroupService.createTaxGroup(sanitizedData);
 
+            /**
+             * Asign the tax group to the property, so that it can be used at reservation
+             */
+            const updatedPropertyInfo = await propertyInfoService.assignTaxGroupToProperty(String(taxGroup.hotelId), taxGroup.id);
+            if (!updatedPropertyInfo) {
+                throw new Error("Failed to assign tax group to property");
+            }
+
             return res.status(201).json({ success: true, data: taxGroup });
         } 
         catch (error: any) {
             console.error("Failed to create tax group at Controller Layer:", error);
             if (
+                error.message === "Update payload cannot be empty." ||
                 error.message === "No tax rules found for this hotel." ||
                 error.message === "You are not the owner of this hotel." ||
                 error.message === "One or more tax rules do not belong to the specified hotel." ||
-                error.message === "Tax group already exists with this name."
+                error.message === "Tax group already exists with this name." ||
+                error.message === "Failed to assign tax group to property"
             ) {
                 return res.status(409).json({ error: error.message });
             }
@@ -107,6 +122,17 @@ export class TaxGroupController implements ITaxGroupController {
         try {
             const { id } = req.params;
             const createdBy = req.user?.id;
+            const taxGroupPayload = req.body;
+
+            /**
+             * Check if payload is empty
+             */
+            if (Object.keys(taxGroupPayload).length === 0) throw new Error("Update payload cannot be empty.");
+
+            /**
+             * Check is hotel ID is present in the payload
+             */
+            if (!taxGroupPayload.hotelId) throw new Error("Hotel ID is required.");
 
             /**
              * Validate tax group ID
@@ -116,7 +142,7 @@ export class TaxGroupController implements ITaxGroupController {
             /**
              * Sanitize and validate tax group data
              */
-            const sanitizedData = TaxGroupSanitizer.sanitizeUpdatePayload({ ...req.body, createdBy });
+            const sanitizedData = TaxGroupSanitizer.sanitizeUpdatePayload({ ...taxGroupPayload, createdBy });
 
             /**
              * Update tax group after validation's and sanitization
@@ -128,6 +154,8 @@ export class TaxGroupController implements ITaxGroupController {
         catch (error: any) {
             console.error("Failed to update tax group at Controller Layer:", error);
             if (
+                error.message === "Update payload cannot be empty." ||
+                error.message === "Hotel ID is required." ||
                 error.message === "Tax group not found" ||
                 error.message === "You are not the owner of this hotel." ||
                 error.message === "One or more tax rules do not belong to the specified hotel." ||

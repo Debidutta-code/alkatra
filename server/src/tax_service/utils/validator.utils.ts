@@ -11,4 +11,9 @@ export class Validator {
         return this.validateMongoId(id);
     }
 
+    public static validateAmount(amount: number): boolean {
+        if (isNaN(amount) || amount <= 0) throw new Error("Invalid amount");
+        return true;
+    }
+
 }

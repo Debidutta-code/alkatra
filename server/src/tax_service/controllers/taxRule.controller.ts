@@ -20,6 +20,11 @@ export class TaxRuleController implements ITaxRuleController {
             const createdBy = req.user?.id;
 
             /**
+             * Check if payload is empty
+             */
+            if (Object.keys(taxRuleData).length === 0) throw new Error("Update payload cannot be empty."); 
+
+            /**
              * Validate createdBy user ID
              */
             Validator.validateID(createdBy);
@@ -39,6 +44,7 @@ export class TaxRuleController implements ITaxRuleController {
         catch (error) {
             console.error("Failed to create tax rule at Controller Layer:", error);
             if (
+                error.message === "Update payload cannot be empty." ||
                 error.message === "No tax rules found for this hotel." ||
                 error.message === "You are not the owner of this hotel." ||
                 error.message === "One or more tax rules do not belong to the specified hotel." ||
@@ -48,7 +54,7 @@ export class TaxRuleController implements ITaxRuleController {
             }
             return res.status(500).json({ success: false, message: "Unable to create tax rule at this momment." });
         }
-    };
+    };  
 
 
     /**
@@ -111,7 +117,18 @@ export class TaxRuleController implements ITaxRuleController {
     public update = async (req: AuthenticatedRequest, res: Response) => {
         try {
             const { id } = req.params;
+            const updatePayload = req.body;
             const createdBy = req.user?.id;
+
+            /**
+             * Check if update payload is empty
+             */
+            if (Object.keys(updatePayload).length === 0) throw new Error("Update payload cannot be empty.");
+
+            /**
+             * Check if the hotel ID present in the payload
+             */
+            if (!updatePayload.hotelId) throw new Error("Hotel ID is required.");
 
             /**
              * Validate tax rule ID
@@ -121,7 +138,7 @@ export class TaxRuleController implements ITaxRuleController {
             /**
              * Sanitize and validate tax rule data
              */
-            const sanitizedPayload = TaxRuleSanitizer.sanitizeUpdatePayload({ ...req.body, createdBy });
+            const sanitizedPayload = TaxRuleSanitizer.sanitizeUpdatePayload({ ...updatePayload, createdBy });
 
             /**
              * Update tax rule after validation's and sanitization
@@ -133,6 +150,8 @@ export class TaxRuleController implements ITaxRuleController {
         catch (error) {
             console.error("Failed to update tax rule:", error);
             if (
+                error.message === "Update payload cannot be empty." ||
+                error.message === "Hotel ID is required." ||
                 error.message === "Tax rule not found" ||
                 error.message === "You are not the owner of this hotel." ||
                 error.message === "Tax rule name cannot be the same."

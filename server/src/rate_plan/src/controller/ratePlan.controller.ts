@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { RatePlanService, RoomPriceService, RoomRentCalculationService } from "../service/ratePlan.service";
+import { propertyInfoService } from "../../../property_management/src/container";
+import { container } from "../../../tax_service/container";
 
 class RatePlanController {
 
@@ -104,8 +106,8 @@ class RatePlanController {
 
             const page = req.query?.page.toString()
             const response = await RatePlanService.getRatePlanByHotel(
-                hotelCode, 
-                invTypeCode && invTypeCode, 
+                hotelCode,
+                invTypeCode && invTypeCode,
                 // startDate && new Date(startDate), 
                 // endDate && new Date(endDate), 
                 page && parseInt(page)
@@ -133,12 +135,15 @@ class RoomPrice {
         const {
             hotelCode,
             invTypeCode,
-            startDate,  
+            startDate,
             endDate,
             noOfChildrens,
             noOfAdults,
-            noOfRooms } = req.body
-        const response = await RoomRentCalculationService.getRoomRentService(hotelCode,
+            noOfRooms
+        } = req.body
+
+        const response: any = await RoomRentCalculationService.getRoomRentService(
+            hotelCode,
             invTypeCode,
             startDate,
             endDate,
@@ -150,7 +155,36 @@ class RoomPrice {
             console.error("Error in getRoomRentController:", response.message)
             return;
         }
-        console.log(`The response we get from Get-Room-Rent-Controller${JSON.stringify(response)}`)
+
+
+        /**
+         * Total Price and Base Price for caculating tax
+         */
+        const totalPrice = response.data.totalAmount;
+        const basePrice = response.data.breakdown.totalBaseAmount;
+
+        /**
+         * Get the property info for getting property ID
+         */
+        const propertyInfo: any = await propertyInfoService.getPropertyByHotelCode(hotelCode);
+
+        /**
+         * Calculating tax
+         */
+        const taxCalculation = await container.taxGroupService.calculateTaxRulesForReservation(basePrice, totalPrice, String(propertyInfo.tax_group));
+
+        /**
+         * Cummilative total amount
+         */
+        let totalAmount = 0;
+        for (let i = 0, len = taxCalculation.length; i < len; i++) {
+            totalAmount += taxCalculation[i].amount;
+        }
+
+        response.data.tax = taxCalculation;
+        response.data.totalTax = totalAmount;
+        response.data.priceAfterTax = response.data.totalAmount + totalAmount;
+
         return response
     }
 
