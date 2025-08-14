@@ -3,6 +3,7 @@ import { RoomRepository } from "../repository";
 import { AppError } from "../utils/appError";
 import { generateCouponCode } from "../../../coupon_management/services/couponService";
 import { PropertyDetails } from "./get.property.details.service";
+import { ObjectId } from "mongoose";
 
 const roomRepository = new RoomRepository();
 const propertyDetailsService = new PropertyDetails();
@@ -12,7 +13,7 @@ export class RoomService {
 
     private roomRepository = new RoomRepository();
 
-    async storeDeepLinkData ( couponCode: String, startDate: String, endDate: String, hotelCode: String, guestDetails , getPropertyDetails ) {
+    async storeDeepLinkData ( couponCode: string, startDate: string, endDate: string, hotelCode: string, guestDetails , getPropertyDetails ) {
         console.log(`Get data to store in deep link ${couponCode}, 
             ${startDate}, 
             ${endDate}, 
@@ -24,6 +25,14 @@ export class RoomService {
             throw new Error ("Required details are not found for storing in Deep link model");
         }
         return await roomRepository.storeDeepLinkData( couponCode, startDate, endDate, hotelCode, guestDetails, getPropertyDetails );
+    }
+    
+    async getDeepLinkData ( deepLinkId: string ) {
+        console.log(`The getting deep link data in service ${deepLinkId}`);
+        if (!deepLinkId) {
+            throw new Error ("Deep link id not found in service");
+        }
+        return await roomRepository.getDeepLinkData(deepLinkId);
     }
 
     async getRoomsByPropertyId(params: {
@@ -126,5 +135,5 @@ export class RoomService {
 
     
 
-    async getDeepLinkData () {}
+    
 }

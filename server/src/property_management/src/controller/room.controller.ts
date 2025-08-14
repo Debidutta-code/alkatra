@@ -300,44 +300,64 @@ const getRoomsByPropertyId = catchAsync(async (req: Request, res: Response, next
 });
 
 const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const { startDate, endDate, hotelCode } = req.body;
-    const propertyInfoId = req.params.id;
-    const numberOfRooms = parseInt(req.query.numberOfRooms as string);
+  const { startDate, endDate, hotelCode } = req.body;
+  const propertyInfoId = req.params.id;
+  const numberOfRooms = parseInt(req.query.numberOfRooms as string);
 
-    let guestDetails: any = {};
-    if (typeof req.query.guestDetails === "string") {
-        guestDetails = JSON.parse(decodeURIComponent(req.query.guestDetails));
-    } else if (Array.isArray(req.query.guestDetails) && typeof req.query.guestDetails[0] === "string") {
-        guestDetails = JSON.parse(decodeURIComponent(req.query.guestDetails[0]));
-    } else {
-        return next(new Error("Invalid guestDetails parameter"));
-    }
+  let guestDetails: any = {};
+  if (typeof req.query.guestDetails === "string") {
+    guestDetails = JSON.parse(decodeURIComponent(req.query.guestDetails));
+  } else if (Array.isArray(req.query.guestDetails) && typeof req.query.guestDetails[0] === "string") {
+    guestDetails = JSON.parse(decodeURIComponent(req.query.guestDetails[0]));
+  } else {
+    return next(new Error("Invalid guestDetails parameter"));
+  }
 
-    if (!startDate || !endDate || !hotelCode || !propertyInfoId || !numberOfRooms) {
-        return next(new Error("Required fields are missing"));
-    }
+  if (!startDate || !endDate || !hotelCode || !propertyInfoId || !numberOfRooms) {
+    return next(new Error("Required fields are missing"));
+  }
 
-    const result = await roomService.getRoomsByPropertyId({
-        propertyInfoId,
-        numberOfRooms,
-        startDate,
-        endDate,
-        hotelCode,
-        guestDetails
-    });
-    
-    res.status(200).json({
-        status: "success",
-        error: false,
-        message: result.unavailableRoomTypes.length
-            ? `Rooms fetched successfully. Some unavailable: ${result.unavailableRoomTypes.map(u => `${u.roomType} on ${u.dates.join(", ")}`).join("; ")}`
-            : "Rooms fetched successfully",
-        data: result.roomsWithRates,
-        couponCode: result.couponCode,
-        deepLink: result.deepLink,
-        qrCode: result.qrCode,
-        unavailableRoomTypes: result.unavailableRoomTypes
-    });
+  const result = await roomService.getRoomsByPropertyId({
+    propertyInfoId,
+    numberOfRooms,
+    startDate,
+    endDate,
+    hotelCode,
+    guestDetails
+  });
+
+  res.status(200).json({
+    status: "success",
+    error: false,
+    message: result.unavailableRoomTypes.length
+      ? `Rooms fetched successfully. Some unavailable: ${result.unavailableRoomTypes.map(u => `${u.roomType} on ${u.dates.join(", ")}`).join("; ")}`
+      : "Rooms fetched successfully",
+    data: result.roomsWithRates,
+    couponCode: result.couponCode,
+    deepLink: result.deepLink,
+    qrCode: result.qrCode,
+    unavailableRoomTypes: result.unavailableRoomTypes
+  });
+});
+
+const getDeepLinkData = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const deepLinkId = req.params.id;
+  console.log(`The deep link id ${deepLinkId}`);
+  if (!deepLinkId) {
+    throw new Error("No deep link id found");
+  }
+
+  const deepLinkData = await roomService.getDeepLinkData(deepLinkId);
+
+  if (!deepLinkData) {
+    throw new Error("Deep link data not found");
+  }
+
+  return res.status(200).json({
+    status: "success",
+    error: false,
+    deepLinkData
+  });;
 });
 
 const getRoomsForBooking = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -404,4 +424,4 @@ const getAllRoomTypes = catchAsync(async (req: Request, res: Response, next: Nex
   }
 });
 
-export { createRoom, getAllRoomTypes, updateRoom, deleteRoom, getRoomById, getRooms, getRoomsByPropertyId, getRoomsByPropertyId2, getRoomsForBooking };
+export { getDeepLinkData, createRoom, getAllRoomTypes, updateRoom, deleteRoom, getRoomById, getRooms, getRoomsByPropertyId, getRoomsByPropertyId2, getRoomsForBooking };

@@ -4,7 +4,7 @@ import { Room } from "../model/room.model";
 import { Inventory } from "../../../wincloud/src/model/inventoryModel";
 import RateAmountDateWise from "../../../wincloud/src/model/ratePlanDateWise.model";
 import { DeepLinkModel } from "../model/deepLink.model";
-
+import { ObjectId } from "mongoose";
 
 export class RoomRepository {
 
@@ -121,6 +121,13 @@ export class RoomRepository {
         guestDetails , 
         getPropertyDetails ) {
         
+        console.log(`Get data to store in deep link ${couponCode}, 
+            ${startDate}, 
+            ${endDate}, 
+            ${hotelCode}, 
+            ${JSON.stringify(guestDetails)}, 
+            ${JSON.stringify(getPropertyDetails)}
+        `)
         if (!couponCode || !startDate || !endDate || !hotelCode || !guestDetails || !getPropertyDetails) {
             throw new Error ("Required details are not found for storing in Deep link model");
         }
@@ -130,7 +137,7 @@ export class RoomRepository {
             endDate,
             hotelCode,
             guestDetails,
-            getPropertyDetails,
+            hotelDetails: getPropertyDetails,
         })
         if (!deepLinkDataStore) {
             throw new Error ("Data stored in deep link model unsuccessful");
@@ -140,5 +147,18 @@ export class RoomRepository {
 
     }
 
-    async getDeepLinkData () {}
+    async getDeepLinkData ( deepLinkId: string ) {
+        if (!deepLinkId) {
+            throw new Error ("Deep link id not found in service");
+        }
+        console.log(`The deep link data we get from service ${deepLinkId}`);
+        const ObjectConvertedDeepLinkData = new mongoose.Types.ObjectId(deepLinkId);
+
+        const deepLinkData = await DeepLinkModel.findOne({ _id: ObjectConvertedDeepLinkData });
+
+        if (!deepLinkData) {
+            throw new Error (`Deep link data not found with this ${deepLinkId}`);
+        }
+        return deepLinkData;
+    }
 }
