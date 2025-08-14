@@ -717,7 +717,13 @@
       "phoneInvalidError": "कृपया एक वैध फोन नंबर दर्ज करें",
       "processing": "प्रसंस्करण कर रहा है...",
       "verifying": "सत्यापन हो रहा है",
-      "priceFetchError": "अपडेट की गई कीमत प्राप्त नहीं की जा सकी। कृपया बाद में पुनः प्रयास करें।"
+      "priceFetchError": "अपडेट की गई कीमत प्राप्त नहीं की जा सकी। कृपया बाद में पुनः प्रयास करें।",
+      "subtotalBeforeTax": "कुल योग (कर से पहले)",
+      "totalTax": "कुल कर",
+      "finalAmountIncludingTax": "अंतिम राशि (कर सहित)",
+      "includesTaxes": "कर और शुल्क शामिल हैं",
+      "taxBreakdown": "कर विवरण",
+      "includesTaxAmount": "{{currency}} {{amount}} कर शामिल है"
     }
   },
   "BookingTabs": {
@@ -923,7 +929,16 @@
         "changedRoomType": "कमरे का प्रकार {{roomType}} में बदला गया",
         "changedGuestCount": "मेहमानों की संख्या बदली गई",
         "changedRatePlan": "दर योजना {{ratePlanName}} में बदली गई"
-      }
+      },
+      "priceBreakdown": "मूल्य विवरण",
+      "baseAmount": "आधार मूल्य",
+      "additionalCharges": "अतिरिक्त शुल्क",
+      "subtotal": "उप-योग",
+      "taxes": "कर और शुल्क",
+      "totalTax": "कुल कर",
+      "grandTotal": "कुल योग",
+      "averagePerNight": "प्रति रात औसत",
+      "taxInclusiveNote": "सभी कीमतें लागू करों और शुल्कों सहित हैं। पारदर्शिता के लिए कर विवरण दिखाया गया है।"
     },
     "BookingDetailsModal": {
       "bookingNumber": "बुकिंग #{{id}}",

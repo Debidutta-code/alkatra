@@ -717,7 +717,13 @@
       "phoneInvalidError": "يرجى إدخال رقم هاتف صالح",
       "processing": "جارٍ المعالجة...",
       "verifying": "جارٍ التحقق",
-      "priceFetchError": "تعذر جلب السعر المحدث. يرجى المحاولة مرة أخرى لاحقًا."
+      "priceFetchError": "تعذر جلب السعر المحدث. يرجى المحاولة مرة أخرى لاحقًا.",
+      "subtotalBeforeTax": "المبلغ الجزئي (قبل الضريبة)",
+      "totalTax": "إجمالي الضريبة",
+      "finalAmountIncludingTax": "المبلغ النهائي (شامل الضريبة)",
+      "includesTaxes": "يشمل الضرائب والرسوم",
+      "taxBreakdown": "تفصيل الضريبة",
+      "includesTaxAmount": "يتضمن {{amount}} {{currency}} كضرائب"
     }
   },
   "BookingTabs": {
@@ -923,7 +929,16 @@
         "changedRoomType": "تم تغيير نوع الغرفة إلى {{roomType}}",
         "changedGuestCount": "تم تغيير عدد الضيوف",
         "changedRatePlan": "تم تغيير خطة السعر إلى {{ratePlanName}}"
-      }
+      },
+      "priceBreakdown": "تفصيل السعر",
+      "baseAmount": "المبلغ الأساسي",
+      "additionalCharges": "الرسوم الإضافية",
+      "subtotal": "المجموع الجزئي",
+      "taxes": "الضرائب والرسوم",
+      "totalTax": "إجمالي الضريبة",
+      "grandTotal": "الإجمالي الكلي",
+      "averagePerNight": "متوسط السعر لليلة",
+      "taxInclusiveNote": "جميع الأسعار تشمل الضرائب والرسوم المعمول بها. ويتم عرض تفصيل الضريبة لأغراض الشفافية."
     },
     "BookingDetailsModal": {
       "bookingNumber": "الحجز #{{id}}",

@@ -53,7 +53,20 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
   const [specialRequests, setSpecialRequests] = useState("");
   const [ratePlanCode, setRatePlanCode] = useState(booking.ratePlanCode || "BAR");
   const [guests, setGuests] = useState<GuestDetails[]>([]);
-  const [finalPrice, setFinalPrice] = useState<{ totalAmount: number; currencyCode: string } | null>(null);
+  const [finalPrice, setFinalPrice] = useState<{
+    totalAmount: number;
+    currencyCode: string;
+    tax?: Array<{ name: string; percentage: number; amount: number }>;
+    totalTax?: number;
+    priceAfterTax?: number;
+    breakdown?: {
+      totalBaseAmount: number;
+      totalAdditionalCharges: number;
+      totalAmount: number;
+      numberOfNights: number;
+      averagePerNight: number;
+    };
+  } | null>(null);
   const { guestDetails } = useSelector((state) => state.hotel);
   // UI control states
   const [amendmentType, setAmendmentType] = useState<"dates" | "room" | "guests" | "requests">("dates");
@@ -274,6 +287,10 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
           setFinalPrice({
             totalAmount: response.data.data.totalAmount,
             currencyCode: response.data.data.dailyBreakdown[0]?.currencyCode || "INR",
+            tax: response.data.data.tax || [],
+            totalTax: response.data.data.totalTax || 0,
+            priceAfterTax: response.data.data.priceAfterTax || response.data.data.totalAmount,
+            breakdown: response.data.data.breakdown
           });
         } else {
           setFinalPrice(null);
@@ -843,20 +860,112 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
 
           {/* Display Final Price */}
           {finalPrice && (
-            <div className="mt-2 p-1.5 sm:p-2 bg-tripswift-blue/10 rounded-lg border border-tripswift-blue/20 flex items-start gap-1 sm:gap-1.5">
-              <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-tripswift-off-white flex items-center justify-center mr-1 sm:mr-1.5 shadow-sm flex-shrink-0">
-                <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
+            <div className="mt-4 space-y-3">
+              {/* Price Breakdown Section */}
+              <div className="bg-gradient-to-r from-tripswift-blue/5 to-tripswift-blue/10 rounded-xl border border-tripswift-blue/20 overflow-hidden">
+                <div className="px-4 py-3 bg-tripswift-blue/10 border-b border-tripswift-blue/20">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="h-5 w-5 text-tripswift-blue" />
+                    <h4 className="font-tripswift-bold text-base text-tripswift-black">
+                      {t('BookingTabs.AmendReservationModal.priceBreakdown')}
+                    </h4>
+                  </div>
+                </div>
+
+                <div className="p-4 space-y-3">
+                  {/* Base Amount */}
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-tripswift-black/70 font-tripswift-medium">
+                      {t('BookingTabs.AmendReservationModal.baseAmount')}
+                    </span>
+                    <span className="font-tripswift-medium text-tripswift-black">
+                      {finalPrice.currencyCode} {(finalPrice.breakdown?.totalBaseAmount || finalPrice.totalAmount).toFixed(2)}
+                    </span>
+                  </div>
+
+                  {/* Additional Charges (if any) */}
+                  {(finalPrice.breakdown?.totalAdditionalCharges ?? 0) > 0 && (
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-tripswift-black/70 font-tripswift-medium">
+                        {t('BookingTabs.AmendReservationModal.additionalCharges')}
+                      </span>
+                      <span className="font-tripswift-medium text-tripswift-black">
+                        {finalPrice.currencyCode} {finalPrice.breakdown?.totalAdditionalCharges?.toFixed(2) || "0.00"}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Subtotal */}
+                  <div className="flex justify-between items-center text-sm pt-2 border-t border-gray-200">
+                    <span className="text-tripswift-black/80 font-tripswift-medium">
+                      {t('BookingTabs.AmendReservationModal.subtotal')}
+                    </span>
+                    <span className="font-tripswift-bold text-tripswift-black">
+                      {finalPrice.currencyCode} {finalPrice.totalAmount.toFixed(2)}
+                    </span>
+                  </div>
+
+                  {/* Tax Breakdown */}
+                  {finalPrice.tax && finalPrice.tax.length > 0 && (
+                    <div className="space-y-2">
+                      <h5 className="text-sm font-tripswift-bold text-tripswift-black/80 flex items-center gap-1.5">
+                        <Info className="h-4 w-4" />
+                        {t('BookingTabs.AmendReservationModal.taxes')}
+                      </h5>
+                      {finalPrice.tax.map((taxItem, index) => (
+                        <div key={index} className="flex justify-between items-center text-sm pl-4">
+                          <span className="text-tripswift-black/70 font-tripswift-medium">
+                            {taxItem.name} ({taxItem.percentage}%)
+                          </span>
+                          <span className="font-tripswift-medium text-tripswift-black">
+                            {finalPrice.currencyCode} {taxItem.amount.toFixed(2)}
+                          </span>
+                        </div>
+                      ))}
+
+                      {/* Total Tax */}
+                      <div className="flex justify-between items-center text-sm pl-4 pt-1 border-t border-gray-100">
+                        <span className="text-tripswift-black/80 font-tripswift-bold">
+                          {t('BookingTabs.AmendReservationModal.totalTax')}
+                        </span>
+                        <span className="font-tripswift-bold text-tripswift-black">
+                          {finalPrice.currencyCode} {(finalPrice.totalTax || 0).toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Final Total */}
+                  <div className="flex justify-between items-center pt-2 border-t-2 border-tripswift-blue/30">
+                    <span className="text-md font-tripswift-bold text-tripswift-black">
+                      {t('BookingTabs.AmendReservationModal.grandTotal')}
+                    </span>
+                    <span className="text-md font-tripswift-bold text-tripswift-blue">
+                      {finalPrice.currencyCode} {(finalPrice.priceAfterTax || finalPrice.totalAmount).toFixed(2)}
+                    </span>
+                  </div>
+
+                  {/* Per Night Average */}
+                  {finalPrice.breakdown?.averagePerNight && (
+                    <div className="text-center pt-2">
+                      <p className="text-xs text-tripswift-black/60">
+                        {t('BookingTabs.AmendReservationModal.averagePerNight')}: {finalPrice.currencyCode} {finalPrice.breakdown.averagePerNight.toFixed(2)}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="flex-col space-y-0.5">
-                <p className="text-xs sm:text-sm text-tripswift-black/70 font-tripswift-medium">
-                  {t('BookingTabs.AmendReservationModal.estimatedTotal')}
-                </p>
-                <p className="text-base sm:text-lg font-tripswift-bold text-tripswift-black">
-                  {finalPrice.currencyCode} {finalPrice.totalAmount.toFixed(2)}
-                </p>
+
+              {/* Tax Information Notice */}
+              <div className="px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800 flex items-start gap-2">
+                <Info className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                <span className="font-tripswift-medium">
+                  {t('BookingTabs.AmendReservationModal.taxInclusiveNote')}
+                </span>
               </div>
             </div>
           )}
+
         </div>
 
         {/* Amendment policies */}

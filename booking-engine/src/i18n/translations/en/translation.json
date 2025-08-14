@@ -717,7 +717,13 @@
       "phoneInvalidError": "Please enter a valid phone number",
       "processing": "Processing...",
       "verifying": "Verifying",
-      "priceFetchError": "Unable to fetch updated price. Please try again later."
+      "priceFetchError": "Unable to fetch updated price. Please try again later.",
+      "subtotalBeforeTax": "Subtotal (before tax)",
+      "totalTax": "Total Tax",
+      "finalAmountIncludingTax": "Final Amount (including tax)",
+      "includesTaxes": "Includes taxes and fees",
+      "taxBreakdown": "Tax Breakdown",
+      "includesTaxAmount": "Includes {{currency}} {{amount}} in taxes"
     }
   },
   "BookingTabs": {
@@ -922,7 +928,16 @@
         "changedRoomType": "Changed room type to {{roomType}}",
         "changedGuestCount": "Changed guest count",
         "changedRatePlan": "Changed rate plan to {{ratePlanName}}"
-      }
+      },
+      "priceBreakdown": "Price Breakdown",
+      "baseAmount": "Base Amount",
+      "additionalCharges": "Additional Charges",
+      "subtotal": "Subtotal",
+      "taxes": "Taxes & Fees",
+      "totalTax": "Total Tax",
+      "grandTotal": "Grand Total",
+      "averagePerNight": "Average per night",
+      "taxInclusiveNote": "All prices are inclusive of applicable taxes and fees. Tax breakdown is shown for transparency."
     },
     "BookingDetailsModal": {
       "bookingId": "Booking ID",

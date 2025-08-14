@@ -717,7 +717,13 @@
             "phoneInvalidError": "Lütfen geçerli bir telefon numarası girin",
             "processing": "İşleniyor...",
             "verifying": "Doğrulanıyor",
-            "priceFetchError": "Güncellenmiş fiyat alınamadı. Lütfen daha sonra tekrar deneyin."
+            "priceFetchError": "Güncellenmiş fiyat alınamadı. Lütfen daha sonra tekrar deneyin.",
+            "subtotalBeforeTax": "Ara Toplam (vergi öncesi)",
+            "totalTax": "Toplam Vergi",
+            "finalAmountIncludingTax": "Son Tutar (vergi dahil)",
+            "includesTaxes": "Vergi ve ücretler dahildir",
+            "taxBreakdown": "Vergi Ayrımı",
+            "includesTaxAmount": "{{currency}} {{amount}} vergi dahil"
         }
     },
     "BookingTabs": {
@@ -922,7 +928,16 @@
                 "changedRoomType": "Oda tipi {{roomType}} olarak değiştirildi",
                 "changedGuestCount": "Misafir sayısı değiştirildi",
                 "changedRatePlan": "Tarife planı {{ratePlanName}} olarak değiştirildi"
-            }
+            },
+            "priceBreakdown": "Fiyat Ayrımı",
+            "baseAmount": "Temel Tutar",
+            "additionalCharges": "Ek Ücretler",
+            "subtotal": "Ara Toplam",
+            "taxes": "Vergiler ve Ücretler",
+            "totalTax": "Toplam Vergi",
+            "grandTotal": "Genel Toplam",
+            "averagePerNight": "Gece başı ortalama",
+            "taxInclusiveNote": "Tüm fiyatlar uygulanabilir vergi ve ücretleri içermektedir. Şeffaflık için vergi ayrımı gösterilmiştir."
         },
         "BookingDetailsModal": {
             "bookingId": "Rezervasyon ID",

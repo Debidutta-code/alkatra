@@ -112,6 +112,12 @@ interface DailyBreakDown {
   childrenChargesBreakdown: number[];
 }
 
+interface TaxInfo {
+  name: string;
+  percentage: number;
+  amount: number;
+}
+
 interface FinalPrice {
   totalAmount: number;
   numberOfNights: number;
@@ -127,6 +133,10 @@ interface FinalPrice {
   dailyBreakdown: DailyBreakDown[] | null;
   availableRooms: number;
   requestedRooms: number;
+  // Add these new tax-related fields
+  tax?: TaxInfo[];
+  totalTax?: number;
+  priceAfterTax?: number;
 }
 
 const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
@@ -579,8 +589,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         );
         return;
       }
-      const totalPrice = finalPrice?.totalAmount ?? 0;
-      console.log("@@@@@@@@@@@@@>>>>>>>>>>>Total Price:", totalPrice);
+      const totalPrice = finalPrice?.priceAfterTax ?? finalPrice?.totalAmount ?? 0;
+      console.log("@@@@@@@@@@@@@>>>>>>>>>>>Total Price (including tax):", totalPrice);
       console.log("@@@@@@@@@@@@@>>>>>>>>>>>Total Price with String:", totalPrice.toString());
       dispatch(setAmount(totalPrice.toString()));
       console.log("Booking Payload:", {
@@ -1283,6 +1293,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                 </div>
 
                 {/* Price Summary Card */}
+                {/* Price Summary Card - Fixed with Null Checks */}
                 {finalPrice && finalPrice.totalAmount ? (
                   <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-tripswift-black/10 overflow-hidden">
                     <div className="bg-tripswift-blue/10 px-4 py-2 rounded-t-xl">
@@ -1297,8 +1308,8 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                           {t("BookingComponents.GuestInformationModal.baseRatePerRoomPerNight")}:
                         </span>
                         <span className="text-sm font-tripswift-medium tabular-nums">
-                          {finalPrice.dailyBreakdown?.[0]?.currencyCode}{" "}
-                          {finalPrice.breakdown.totalBaseAmount.toLocaleString()}
+                          {finalPrice.dailyBreakdown?.[0]?.currencyCode || "USD"}{" "}
+                          {(finalPrice.breakdown?.totalBaseAmount || 0).toLocaleString()}
                         </span>
                       </div>
 
@@ -1308,34 +1319,59 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                           {t("BookingComponents.GuestInformationModal.additionalGuestCharges")}:
                         </span>
                         <span className="text-sm font-tripswift-medium tabular-nums">
-                          {finalPrice.dailyBreakdown?.[0]?.currencyCode}{" "}
-                          {finalPrice.breakdown.totalAdditionalCharges.toLocaleString()}
+                          {finalPrice.dailyBreakdown?.[0]?.currencyCode || "USD"}{" "}
+                          {(finalPrice.breakdown?.totalAdditionalCharges || 0).toLocaleString()}
                         </span>
                       </div>
 
-                      {/* Total Amount */}
-                      <div className="flex justify-between items-center py-1 font-tripswift-bold text-tripswift-black">
-                        <span className="text-sm">
-                          {t("BookingComponents.GuestInformationModal.totalAmount")}:
+                      {/* Subtotal (before tax) */}
+                      <div className="flex justify-between items-center py-1 border-t border-tripswift-black/10 pt-2">
+                        <span className="text-sm font-tripswift-medium text-tripswift-black">
+                          {t("BookingComponents.GuestInformationModal.subtotalBeforeTax")}:
                         </span>
-                        <span className="text-sm tabular-nums">
-                          {finalPrice.dailyBreakdown?.[0]?.currencyCode}{" "}
-                          {finalPrice.breakdown.totalAmount.toLocaleString()}
+                        <span className="text-sm font-tripswift-bold tabular-nums">
+                          {finalPrice.dailyBreakdown?.[0]?.currencyCode || "USD"}{" "}
+                          {(finalPrice.breakdown?.totalAmount || finalPrice.totalAmount || 0).toLocaleString()}
                         </span>
                       </div>
 
-                      {/* Number of Nights */}
-                      <div className="flex justify-between items-center py-1">
-                        <span className="text-sm text-tripswift-black/70">
-                          {t("BookingComponents.GuestInformationModal.nights", {
-                            count: finalPrice.numberOfNights,
-                          })}:
-                        </span>
-                        <span className="text-sm font-tripswift-medium">{finalPrice.numberOfNights}</span>
-                      </div>
+                      {/* Tax Details - Only show if tax data exists */}
+                      {finalPrice.tax && Array.isArray(finalPrice.tax) && finalPrice.tax.length > 0 && (
+                        <div className="space-y-1">
+                          <div className="text-sm font-tripswift-medium text-tripswift-black/80 mt-2 mb-1">
+                            {t("BookingComponents.GuestInformationModal.taxBreakdown")}:
+                          </div>
+                          {finalPrice.tax
+                            .filter(taxItem => taxItem && typeof taxItem.amount === 'number' && !isNaN(taxItem.amount))
+                            .map((taxItem, index) => (
+                              <div key={index} className="flex justify-between items-center py-1">
+                                <span className="text-sm text-tripswift-black/70">
+                                  {taxItem.name || 'Tax'} ({taxItem.percentage || 0}%):
+                                </span>
+                                <span className="text-sm font-tripswift-medium tabular-nums">
+                                  {finalPrice.dailyBreakdown?.[0]?.currencyCode || "USD"}{" "}
+                                  {taxItem.amount.toLocaleString()}
+                                </span>
+                              </div>
+                            ))}
+
+                          {/* Total Tax - Only show if totalTax exists */}
+                          {finalPrice.totalTax && typeof finalPrice.totalTax === 'number' && !isNaN(finalPrice.totalTax) && (
+                            <div className="flex justify-between items-center py-1 border-t border-tripswift-black/5 pt-1">
+                              <span className="text-sm font-tripswift-medium text-tripswift-black">
+                                {t("BookingComponents.GuestInformationModal.totalTax")}:
+                              </span>
+                              <span className="text-sm font-tripswift-bold tabular-nums">
+                                {finalPrice.dailyBreakdown?.[0]?.currencyCode || "USD"}{" "}
+                                {finalPrice.totalTax.toLocaleString()}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      )}
 
                       {/* Daily Breakdown */}
-                      {finalPrice.dailyBreakdown && finalPrice.dailyBreakdown.length > 0 && (
+                      {finalPrice.dailyBreakdown && Array.isArray(finalPrice.dailyBreakdown) && finalPrice.dailyBreakdown.length > 0 && (
                         <div className="mt-2">
                           <div className="text-sm font-tripswift-medium text-tripswift-black mb-1">
                             {t("BookingComponents.GuestInformationModal.roomRate")}:
@@ -1347,10 +1383,10 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                                 className="flex justify-between items-center py-0.5 text-sm"
                               >
                                 <span className="text-tripswift-black/70 truncate max-w-[120px]">
-                                  {day.date}
+                                  {day.date || `Day ${index + 1}`}
                                 </span>
                                 <span className="font-tripswift-medium tabular-nums">
-                                  {day.currencyCode} {day.totalForAllRooms.toLocaleString()}
+                                  {day.currencyCode || "USD"} {(day.totalForAllRooms || 0).toLocaleString()}
                                 </span>
                               </div>
                             ))}
@@ -1358,21 +1394,39 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         </div>
                       )}
 
-                      {/* Final Total - Highlighted */}
-                      <div className="border-t border-tripswift-black/10 pt-2 mt-2">
+                      {/* Final Total - Show with or without tax */}
+                      <div className="border-t border-tripswift-blue/20 pt-2 mt-2 bg-tripswift-blue/5 -mx-4 px-4 py-2 rounded-b-xl">
                         <div className="flex justify-between items-center">
                           <span className="text-base font-tripswift-bold text-tripswift-black">
-                            {t("BookingComponents.GuestInformationModal.totalAmount")}
+                            {finalPrice.priceAfterTax && finalPrice.priceAfterTax !== finalPrice.totalAmount
+                              ? t("BookingComponents.GuestInformationModal.finalAmountIncludingTax")
+                              : t("BookingComponents.GuestInformationModal.totalAmount")}
                           </span>
                           <span className="text-xl font-tripswift-bold text-tripswift-blue tabular-nums">
-                            {finalPrice.dailyBreakdown?.[0]?.currencyCode}{" "}
-                            {finalPrice.totalAmount.toLocaleString()}
+                            {finalPrice.dailyBreakdown?.[0]?.currencyCode || "USD"}{" "}
+                            {finalPrice.priceAfterTax && typeof finalPrice.priceAfterTax === 'number' && !isNaN(finalPrice.priceAfterTax)
+                              ? finalPrice.priceAfterTax.toLocaleString()
+                              : (finalPrice.totalAmount || 0).toLocaleString()}
                           </span>
                         </div>
+
+                        {/* Show tax info if available */}
+                        {finalPrice.priceAfterTax &&
+                          finalPrice.totalTax &&
+                          typeof finalPrice.totalTax === 'number' &&
+                          !isNaN(finalPrice.totalTax) &&
+                          finalPrice.totalTax > 0 && (
+                            <div className="text-xs text-tripswift-black/60 mt-1">
+                              {t("BookingComponents.GuestInformationModal.includesTaxAmount", {
+                                currency: finalPrice.dailyBreakdown?.[0]?.currencyCode || "USD",
+                                amount: finalPrice.totalTax.toLocaleString()
+                              })}
+                            </div>
+                          )}
                       </div>
 
                       {/* Additional Info */}
-                      <p className="text-xs text-tripswift-black/60 mt-1 leading-relaxed">
+                      <div className="text-xs text-tripswift-black/60 mt-2 leading-relaxed">
                         {t("BookingComponents.GuestInformationModal.priceIncludes", {
                           rooms: finalPrice.requestedRooms || guestData?.rooms || 1,
                           guests:
@@ -1380,7 +1434,14 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                             (guestData?.children || 0) +
                             (guestData?.infants || 0),
                         })}
-                      </p>
+                        {finalPrice.priceAfterTax &&
+                          finalPrice.totalTax &&
+                          finalPrice.totalTax > 0 && (
+                            <div className="text-xs text-tripswift-black/60 mt-1">
+                              {t("BookingComponents.GuestInformationModal.includesTaxes")}
+                            </div>
+                          )}
+                      </div>
                     </div>
                   </div>
                 ) : (
