@@ -358,11 +358,11 @@ const HelpCenterTab: React.FC = () => {
                     {t("Help.email", "Email Support")}
                   </h3>
                   <p className="text-xs text-gray-600 mb-1 leading-tight">
-                    {t("Help.emailResponseTime", "We'll respond within 4 hours")}
+                    {t("Help.emailDesc", "We'll respond within 4 hours")}
                   </p>
                   <div className="flex items-center text-xs text-gray-500 font-medium">
                     <Clock className="h-3 w-3 text-gray-400 mr-1" />
-                    <span>{t("Help.responseTime", "< 4 hours")}</span>
+                    <span>{t("Help.supportOptions.email.responseTime", "< 4 hours")}</span>
                   </div>
                 </div>
               </div>
