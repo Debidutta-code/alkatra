@@ -12,6 +12,20 @@ export class RoomService {
 
     private roomRepository = new RoomRepository();
 
+    async storeDeepLinkData ( couponCode: String, startDate: String, endDate: String, hotelCode: String, guestDetails , getPropertyDetails ) {
+        console.log(`Get data to store in deep link ${couponCode}, 
+            ${startDate}, 
+            ${endDate}, 
+            ${hotelCode}, 
+            ${JSON.stringify(guestDetails)}, 
+            ${JSON.stringify(getPropertyDetails)}
+        `)
+        if (!couponCode || !startDate || !endDate || !hotelCode || !guestDetails || !getPropertyDetails) {
+            throw new Error ("Required details are not found for storing in Deep link model");
+        }
+        return await roomRepository.storeDeepLinkData( couponCode, startDate, endDate, hotelCode, guestDetails, getPropertyDetails );
+    }
+
     async getRoomsByPropertyId(params: {
         propertyInfoId: string;
         numberOfRooms: number;
@@ -87,17 +101,17 @@ export class RoomService {
         }
 
         // 6. Generate coupon & QR
-        const couponCode = await generateCouponCode();
-        console.log(`===========********===========The guest details ${JSON.stringify(guestDetails)}`);
+        const couponCode = await generateCouponCode();        
         const getPropertyDetails = await propertyDetailsService.getRoomsByPropertyIdService(propertyInfoId);
-        console.log(`===========********===========The data we get from SERVICE ${JSON.stringify(getPropertyDetails)}`);
+
+        const storedDeepLinkData = await this.storeDeepLinkData( couponCode.code, startDate, endDate, hotelCode, guestDetails, getPropertyDetails );
+
+        if (!storedDeepLinkData) {
+            throw new Error ("Data can't store in DB");
+        }
+        
         const deepLinkUrl = `${process.env.DEEP_LINK}/property/${propertyInfoId}
-            ?coupon=${couponCode.code}
-            &startDate=${startDate}
-            &endDate=${endDate}
-            &hotelCode=${hotelCode}
-            &guestDetails=${guestDetails}
-            &hotelDetails=${getPropertyDetails}`;
+            ?deepLinkCode=${storedDeepLinkData}`;
 
         const qrCodeData = await QRCode.toDataURL(deepLinkUrl);
 
@@ -109,4 +123,8 @@ export class RoomService {
             unavailableRoomTypes
         };
     }
+
+    
+
+    async getDeepLinkData () {}
 }

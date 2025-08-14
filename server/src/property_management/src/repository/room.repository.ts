@@ -3,6 +3,8 @@ import { PropertyInfo } from "../model/property.info.model";
 import { Room } from "../model/room.model";
 import { Inventory } from "../../../wincloud/src/model/inventoryModel";
 import RateAmountDateWise from "../../../wincloud/src/model/ratePlanDateWise.model";
+import { DeepLinkModel } from "../model/deepLink.model";
+
 
 export class RoomRepository {
 
@@ -110,4 +112,33 @@ export class RoomRepository {
             }
         ]);
     }
+
+    async storeDeepLinkData ( 
+        couponCode: String, 
+        startDate: String, 
+        endDate: String, 
+        hotelCode: String, 
+        guestDetails , 
+        getPropertyDetails ) {
+        
+        if (!couponCode || !startDate || !endDate || !hotelCode || !guestDetails || !getPropertyDetails) {
+            throw new Error ("Required details are not found for storing in Deep link model");
+        }
+        const deepLinkDataStore = await DeepLinkModel.create({
+            couponCode,
+            startDate,
+            endDate,
+            hotelCode,
+            guestDetails,
+            getPropertyDetails,
+        })
+        if (!deepLinkDataStore) {
+            throw new Error ("Data stored in deep link model unsuccessful");
+        }
+        const newDeepLinkDataId = deepLinkDataStore._id;
+        return newDeepLinkDataId;
+
+    }
+
+    async getDeepLinkData () {}
 }

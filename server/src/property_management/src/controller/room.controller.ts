@@ -325,7 +325,7 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
         hotelCode,
         guestDetails
     });
-    console.log(`<<<<<<<<<<<<<<<<<<<<<The guest details we get from UI ${JSON.stringify(guestDetails)}`);
+    
     res.status(200).json({
         status: "success",
         error: false,
