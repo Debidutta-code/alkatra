@@ -91,7 +91,7 @@ export default function AppSidebar({ role }: { role?: string }) {
     },
     {
       title: `${propertyId.status ? `${propertyId?.name}` : "Create Property"}`,
-      href: propertyId.status ? `/app/property/${propertyId?.id}` : "/app/property/create",
+      href: propertyId.status ? `/app/property/propertyDetails?propertyId=${propertyId?.id}` : "/app/property/create",
       icon: Hotel,
       restricted: role !== "hotelManager",
       description: `${!propertyId?.status ? "Create Your Property First" : ""}`

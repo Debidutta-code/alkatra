@@ -144,8 +144,7 @@ export default function Page() {
       try {
         if (!accessToken || !propertyId) {
           console.error("Access token or property ID is missing");
-          toast.error("Invalid property ID or access token");
-          router.push("/app");
+          router.push("/login");
           return;
         }
         setIsLoading(true);
@@ -541,7 +540,7 @@ export default function Page() {
 
       <div className="grid grid-cols-1 gap-4">
         <div className="relative">
-        <PropertyImageGallery
+          <PropertyImageGallery
             image={property?.data?.image || []}
             onImagesUpdate={(updatedImages) => {
               setEditedProperty((prev: Partial<Property> | null) => ({
@@ -562,11 +561,12 @@ export default function Page() {
           />
         </div>
         <div className="mb-8">
+          {/* Quick Actions */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Quick Actions</CardTitle>
               <CardDescription>
-                Manage your property's rate and inventory allotment
+                Manage your property's rate, inventory, and tax settings
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -577,6 +577,15 @@ export default function Page() {
                   className="bg-tripswift-blue hover:bg-tripswift-blue-600 text-white"
                 >
                   Rate and Inventory Allotment
+                </Button>
+                <Button
+                  variant="default"
+                  onClick={() =>
+                    router.push(`/app/tax-service?propertyId=${propertyId}`)
+                  }
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  Tax Configuration
                 </Button>
               </div>
             </CardContent>
