@@ -5,8 +5,13 @@ import { Label } from "../../../../components/ui/label";
 import { toast } from "react-hot-toast";
 import { TaxDeleteModal } from "./TaxDeleteModal";
 import type { TaxRule } from "../../../../types/taxTypes";
+import { CustomDropdown } from "../../../../components/ui/custom-dropdown";
 
 const TAX_API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+type InputEvent =
+    | React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    | { target: { name: string; value: string; type?: string } };
 
 // Define props interface
 type TaxRulesProps = {
@@ -21,6 +26,24 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [filterStatus, setFilterStatus] = useState<"all" | "active" | "inactive">("all");
+    // Dropdown options
+    const taxTypeOptions = [
+        { value: "PERCENTAGE", label: "Percentage (%)" },
+        // { value: "FIXED", label: "Fixed Amount" }
+    ];
+
+    const applicableOnOptions = [
+        {
+            value: "ROOM_RATE",
+            label: "Room Rate Only",
+            description: "Applies only to room charges"
+        }
+        // {
+        //     value: "TOTAL_AMOUNT",
+        //     label: "Total Amount",
+        //     description: "Applies to the entire booking total"
+        // },
+    ];
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [deleteModal, setDeleteModal] = useState<{
         isOpen: boolean;
@@ -68,8 +91,8 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
         priority: 1,
     });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const target = e.target;
+    const handleChange = (e: InputEvent) => {
+        const target = 'target' in e ? e.target : e;
         const { name, value } = target;
 
         let checkedValue: boolean | undefined;
@@ -83,8 +106,8 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
         }));
     };
 
-    const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const target = e.target;
+    const handleEditChange = (e: InputEvent) => {
+        const target = 'target' in e ? e.target : e;
         const { name, value } = target;
 
         let checkedValue: boolean | undefined;
@@ -120,30 +143,45 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
     const saveEdit = async () => {
         if (!editingRule) return;
 
+        // Convert and validate 'value' as number
         const numValue = Number(editForm.value);
         if (isNaN(numValue) || numValue < 0) {
             toast.error("Valid numeric value is required");
             return;
         }
 
+        // Convert and validate 'priority' as number
+        const numPriority = Number(editForm.priority);
+        if (isNaN(numPriority) || numPriority < 1) {
+            toast.error("Priority must be a positive number");
+            return;
+        }
+
+        // Required fields check
         if (!editForm.name.trim() || !editForm.country.trim()) {
             toast.error("Name and Country are required");
             return;
         }
 
-        await handleUpdate(editingRule, {
-            name: editForm.name.trim(),
-            type: editForm.type as "PERCENTAGE" | "FIXED",
-            value: numValue,
-            applicableOn: editForm.applicableOn as "TOTAL_AMOUNT" | "ROOM_RATE",
-            region: { country: editForm.country.trim() },
-            description: editForm.description || undefined,
-            validFrom: editForm.validFrom ? convertDateToUTC(editForm.validFrom) : undefined,
-            isInclusive: editForm.isInclusive,
-            priority: editForm.priority,
-        });
+        try {
+            await handleUpdate(editingRule, {
+                name: editForm.name.trim(),
+                type: editForm.type as "PERCENTAGE" | "FIXED",
+                value: numValue,
+                applicableOn: editForm.applicableOn as "TOTAL_AMOUNT" | "ROOM_RATE",
+                region: { country: editForm.country.trim() },
+                description: editForm.description || undefined,
+                validFrom: editForm.validFrom ? convertDateToUTC(editForm.validFrom) : undefined,
+                isInclusive: editForm.isInclusive,
+                priority: numPriority,
+            });
 
-        setEditingRule(null);
+            setEditingRule(null);
+            toast.success("Tax rule updated successfully!");
+        } catch (error) {
+            console.error("Error saving tax rule:", error);
+            toast.error("Failed to update tax rule. Please try again.");
+        }
     };
 
     const cancelEdit = () => {
@@ -168,8 +206,15 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
         }
 
         const numValue = Number(form.value);
+        const numPriority = Number(form.priority);
+
         if (isNaN(numValue) || numValue < 0) {
             toast.error("Valid numeric value is required");
+            return;
+        }
+
+        if (isNaN(numPriority) || numPriority < 1) {
+            toast.error("Priority must be a positive number");
             return;
         }
 
@@ -182,7 +227,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
             description: form.description || undefined,
             validFrom: form.validFrom ? convertDateToUTC(form.validFrom) : undefined,
             isInclusive: form.isInclusive,
-            priority: form.priority,
+            priority: numPriority,
             hotelId: propertyId,
         };
 
@@ -204,11 +249,11 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                 setShowCreateForm(false);
             } else {
                 const errorData = await res.json().catch(() => ({}));
-                toast.error(`Failed to create tax rule: ${errorData.message || "Unknown error"}`);
+                toast.error(`Failed: ${errorData.message || "Unknown error"}`);
             }
         } catch (err) {
             console.error("Error creating tax rule:", err);
-            toast.error("Network error: Could not connect to server");
+            toast.error("Network error");
         } finally {
             setLoading(false);
         }
@@ -410,9 +455,9 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                 onClick={() => setShowCreateForm(!showCreateForm)}
                                 className="bg-gradient-to-r from-tripswift-blue to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105"
                             >
-                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {/* <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
+                                </svg> */}
                                 {showCreateForm ? "Cancel" : "Create New Rule"}
                             </Button>
                         </div>
@@ -454,16 +499,15 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
 
                                 <div className="space-y-2">
                                     <Label className="text-sm font-semibold text-slate-700">Tax Type</Label>
-                                    <select
+                                    <CustomDropdown
                                         name="type"
                                         value={form.type}
                                         onChange={handleChange}
+                                        options={taxTypeOptions}
+                                        placeholder="Select tax type..."
                                         disabled={loading}
-                                        className="w-full p-3 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
-                                    >
-                                        <option value="PERCENTAGE">Percentage (%)</option>
-                                        <option value="FIXED">Fixed Amount</option>
-                                    </select>
+                                        className="w-full"
+                                    />
                                 </div>
 
                                 <div className="space-y-2">
@@ -501,16 +545,15 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
 
                                 <div className="space-y-2">
                                     <Label className="text-sm font-semibold text-slate-700">Applicable On</Label>
-                                    <select
+                                    <CustomDropdown
                                         name="applicableOn"
                                         value={form.applicableOn}
                                         onChange={handleChange}
+                                        options={applicableOnOptions}
+                                        placeholder="Select where tax applies..."
                                         disabled={loading}
-                                        className="w-full p-3 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
-                                    >
-                                        <option value="TOTAL_AMOUNT">Total Amount</option>
-                                        <option value="ROOM_RATE">Room Rate Only</option>
-                                    </select>
+                                        className="w-full"
+                                    />
                                 </div>
 
                                 <div className="space-y-2">
@@ -662,16 +705,14 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
 
                                                     <div className="space-y-2">
                                                         <Label className="text-sm font-semibold text-slate-700">Type</Label>
-                                                        <select
+                                                        <CustomDropdown
                                                             name="type"
                                                             value={editForm.type}
                                                             onChange={handleEditChange}
+                                                            options={taxTypeOptions}
                                                             disabled={loading}
-                                                            className="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200"
-                                                        >
-                                                            <option value="PERCENTAGE">Percentage (%)</option>
-                                                            <option value="FIXED">Fixed Amount</option>
-                                                        </select>
+                                                            className="w-full"
+                                                        />
                                                     </div>
 
                                                     <div className="space-y-2">
@@ -703,16 +744,14 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
 
                                                     <div className="space-y-2">
                                                         <Label className="text-sm font-semibold text-slate-700">Applicable On</Label>
-                                                        <select
+                                                        <CustomDropdown
                                                             name="applicableOn"
                                                             value={editForm.applicableOn}
                                                             onChange={handleEditChange}
+                                                            options={applicableOnOptions}
                                                             disabled={loading}
-                                                            className="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200"
-                                                        >
-                                                            <option value="TOTAL_AMOUNT">Total Amount</option>
-                                                            <option value="ROOM_RATE">Room Rate Only</option>
-                                                        </select>
+                                                            className="w-full"
+                                                        />
                                                     </div>
 
                                                     <div className="space-y-2">

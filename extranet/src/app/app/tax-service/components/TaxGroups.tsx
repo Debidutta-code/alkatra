@@ -481,7 +481,7 @@ export const TaxGroups = ({
 
                           <div className="mt-2 flex items-center text-sm text-gray-500 space-x-4">
                             <span>{group.rules.length} tax rule{group.rules.length !== 1 ? 's' : ''}</span>
-                            <button
+                            {/* <button
                               onClick={() => toggleGroupExpansion(group._id)}
                               className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
                             >
@@ -490,7 +490,7 @@ export const TaxGroups = ({
                                 }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                               </svg>
-                            </button>
+                            </button> */}
                           </div>
                         </div>
 
@@ -530,7 +530,7 @@ export const TaxGroups = ({
                     </div>
 
                     {/* Expandable Rules Details */}
-                    {expandedGroups.has(group._id) && (
+                    {/* {expandedGroups.has(group._id) && (
                       <div className="border-t border-gray-100 bg-gray-50 px-6 py-4">
                         <h6 className="text-sm font-medium text-gray-900 mb-3">Associated Tax Rules</h6>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -584,7 +584,7 @@ export const TaxGroups = ({
                           })}
                         </div>
                       </div>
-                    )}
+                    )} */}
                   </div>
                 )}
               </div>
