@@ -300,9 +300,18 @@ const getRoomsByPropertyId = catchAsync(async (req: Request, res: Response, next
 });
 
 const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const { startDate, endDate, hotelCode, guestDetails } = req.body;
+    const { startDate, endDate, hotelCode } = req.body;
     const propertyInfoId = req.params.id;
     const numberOfRooms = parseInt(req.query.numberOfRooms as string);
+
+    let guestDetails: any = {};
+    if (typeof req.query.guestDetails === "string") {
+        guestDetails = JSON.parse(decodeURIComponent(req.query.guestDetails));
+    } else if (Array.isArray(req.query.guestDetails) && typeof req.query.guestDetails[0] === "string") {
+        guestDetails = JSON.parse(decodeURIComponent(req.query.guestDetails[0]));
+    } else {
+        return next(new Error("Invalid guestDetails parameter"));
+    }
 
     if (!startDate || !endDate || !hotelCode || !propertyInfoId || !numberOfRooms) {
         return next(new Error("Required fields are missing"));
@@ -316,7 +325,7 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
         hotelCode,
         guestDetails
     });
-
+    console.log(`<<<<<<<<<<<<<<<<<<<<<The guest details we get from UI ${JSON.stringify(guestDetails)}`);
     res.status(200).json({
         status: "success",
         error: false,

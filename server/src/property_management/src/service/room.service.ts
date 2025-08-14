@@ -88,8 +88,9 @@ export class RoomService {
 
         // 6. Generate coupon & QR
         const couponCode = await generateCouponCode();
+        console.log(`===========********===========The guest details ${JSON.stringify(guestDetails)}`);
         const getPropertyDetails = await propertyDetailsService.getRoomsByPropertyIdService(propertyInfoId);
-        console.log(`The data we get from SERVICE ${getPropertyDetails}`);
+        console.log(`===========********===========The data we get from SERVICE ${JSON.stringify(getPropertyDetails)}`);
         const deepLinkUrl = `${process.env.DEEP_LINK}/property/${propertyInfoId}
             ?coupon=${couponCode.code}
             &startDate=${startDate}

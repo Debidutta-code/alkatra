@@ -221,8 +221,10 @@ const RoomsPage: React.FC = () => {
       console.log("Fetching rooms for property:", propertyId, "with code:", propertyCode);
 
       try {
+        const encodedGuestDetails = encodeURIComponent(JSON.stringify(guestDetails));
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}?numberOfRooms=${guestDetails?.rooms || 1}&guestDetails=${guestDetails}`,
+          // `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}?numberOfRooms=${guestDetails?.rooms || 1}&guestDetails=${encodeURIComponent(JSON.stringify(guestDetails))}`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}?numberOfRooms=${guestDetails?.rooms}&guestDetails=${encodedGuestDetails}`,
           {
             startDate: checkInDate,
             endDate: checkOutDate,
