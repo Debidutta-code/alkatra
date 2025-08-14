@@ -17,6 +17,7 @@ import Cookies from "js-cookie";
 import toast from 'react-hot-toast';
 import { useTranslation } from "react-i18next";
 import { formatDistanceToNow } from 'date-fns';
+import HelpCenterTab from "@/components/helpCenter/HelpCenterTab";
 
 // Types
 interface UserProfile {
@@ -692,105 +693,8 @@ const UserProfile: React.FC = () => {
                     {t("notifications.markAllRead", { defaultValue: "Mark all read" })}
                   </Button>
                 )}
-                {/* <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleClearAllNotifications}
-                  className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-                >
-                  <X className="h-4 w-4" />
-                  {t("Profile.clearAll", { defaultValue: "Clear all" })}
-                </Button> */}
               </div>
             </div>
-
-            {/* Notification Settings */}
-            {/* <Card className="p-4 sm:p-6">
-              <h3 className="text-base sm:text-lg font-semibold text-[var(--color-secondary-black)] mb-4">
-                {t("Profile.notificationSettings", { defaultValue: "Notification Settings" })}
-              </h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Mail className="h-5 w-5 text-[var(--color-primary-blue)]" />
-                    <div>
-                      <p className="text-sm font-medium text-[var(--color-secondary-black)]">
-                        {t("Profile.emailNotifications", { defaultValue: "Email Notifications" })}
-                      </p>
-                      <p className="text-xs text-[var(--color-secondary-black)]/60">
-                        {t("Profile.emailNotificationsDesc", { defaultValue: "Receive notifications via email" })}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setNotificationSettings(prev => ({ ...prev, email: !prev.email }))}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${notificationSettings.email ? 'bg-[var(--color-primary-blue)]' : 'bg-gray-200'}`}
-                  >
-                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${notificationSettings.email ? 'translate-x-6' : 'translate-x-1'}`} />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Smartphone className="h-5 w-5 text-[var(--color-primary-blue)]" />
-                    <div>
-                      <p className="text-sm font-medium text-[var(--color-secondary-black)]">
-                        {t("Profile.pushNotifications", { defaultValue: "Push Notifications" })}
-                      </p>
-                      <p className="text-xs text-[var(--color-secondary-black)]/60">
-                        {t("Profile.pushNotificationsDesc", { defaultValue: "Receive push notifications on your device" })}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setNotificationSettings(prev => ({ ...prev, push: !prev.push }))}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${notificationSettings.push ? 'bg-[var(--color-primary-blue)]' : 'bg-gray-200'}`}
-                  >
-                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${notificationSettings.push ? 'translate-x-6' : 'translate-x-1'}`} />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Volume2 className="h-5 w-5 text-[var(--color-primary-blue)]" />
-                    <div>
-                      <p className="text-sm font-medium text-[var(--color-secondary-black)]">
-                        {t("Profile.bookingUpdates", { defaultValue: "Booking Updates" })}
-                      </p>
-                      <p className="text-xs text-[var(--color-secondary-black)]/60">
-                        {t("Profile.bookingUpdatesDesc", { defaultValue: "Get notified about booking confirmations and changes" })}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setNotificationSettings(prev => ({ ...prev, bookingUpdates: !prev.bookingUpdates }))}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${notificationSettings.bookingUpdates ? 'bg-[var(--color-primary-blue)]' : 'bg-gray-200'}`}
-                  >
-                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${notificationSettings.bookingUpdates ? 'translate-x-6' : 'translate-x-1'}`} />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Gift className="h-5 w-5 text-[var(--color-primary-blue)]" />
-                    <div>
-                      <p className="text-sm font-medium text-[var(--color-secondary-black)]">
-                        {t("Profile.promotionsDeals", { defaultValue: "Promotions & Deals" })}
-                      </p>
-                      <p className="text-xs text-[var(--color-secondary-black)]/60">
-                        {t("Profile.promotionsDealsDesc", { defaultValue: "Receive notifications about special offers and promotions" })}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setNotificationSettings(prev => ({ ...prev, promotions: !prev.promotions }))}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${notificationSettings.promotions ? 'bg-[var(--color-primary-blue)]' : 'bg-gray-200'}`}
-                  >
-                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${notificationSettings.promotions ? 'translate-x-6' : 'translate-x-1'}`} />
-                  </button>
-                </div>
-              </div>
-            </Card> */}
 
             {/* Recent Notifications */}
             <Card className="overflow-hidden">
@@ -873,6 +777,8 @@ const UserProfile: React.FC = () => {
             </Card>
           </div>
         );
+      case 'help':
+        return <HelpCenterTab />;
       default:
         return (
           <div className="text-center py-12">
@@ -921,15 +827,6 @@ const UserProfile: React.FC = () => {
                 <span className="hidden sm:inline">{t("Profile.editProfile", { defaultValue: "Edit Profile" })}</span>
                 <Edit3 className="w-4 h-4 sm:ml-2" />
               </Button>
-              {/* <Button
-                variant="outline"
-                size="sm"
-                className="flex items-center border-[var(--color-primary-blue)]/30 bg-[var(--color-primary-blue)]/5 text-[var(--color-primary-blue)]"
-                onClick={handleLogout}
-              >
-                <span className="hidden sm:inline">{t("Profile.signOut", { defaultValue: "Sign Out" })}</span>
-                <LogOut className="h-4 w-4 sm:ml-2" />
-              </Button> */}
               <Button
                 variant="outline"
                 size="sm"
@@ -942,7 +839,7 @@ const UserProfile: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="w-full mb-4">
           <div className="bg-white rounded-lg border border-gray-200 p-1">
             <div className="flex overflow-x-auto space-x-1 rtl:space-x-reverse">

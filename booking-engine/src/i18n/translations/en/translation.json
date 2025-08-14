@@ -428,6 +428,8 @@
     "starHotelRating": "Star Hotel Rating",
     "viewPropertyDetails": "View Property Details",
     "aboutThisProperty": "About this property",
+    "showMore": "Show more",
+    "showLess": "Show less",
     "noImagesAvailable": "No images available",
     "propertyAmenities": "Property Amenities",
     "nights": "Night",
@@ -1257,6 +1259,88 @@
       "markAllReadFailed": "Failed to mark all notifications as read",
       "markReadFailed": "Failed to mark notification as read",
       "loadingError": "Error loading notifications"
+    }
+  },
+  "Help": {
+    "helpCenter": "Help Center",
+    "helpCenterDesc": "Find answers to common questions about booking, payments, and more.",
+    "searchPlaceholder": "Search help articles...",
+    "searchAriaLabel": "Search FAQs",
+    "noResults": "No results found. Try a different search term.",
+    "allCategories": "All Categories",
+    "popularTopics": "Popular Topics",
+    "searchResults": "Search Results",
+    "clearFilters": "Clear filters",
+    "stillNeedHelp": "Still need help?",
+    "contactDesc": "Our support team is here to help you 24/7",
+    "contactFooter": "Response times may vary during peak hours. For urgent matters, please call us at <phoneLink>the phone number</phoneLink>.",
+    "contactPhone": "+1-800-555-1234",
+    "contactPhoneFormatted": "(800) 555-1234",
+    "email": "Email Support",
+    "emailDesc": "We'll respond within 4 hours",
+    "phone": "Phone Support",
+    "phoneDesc": "Call us for urgent matters",
+    "supportOptions": {
+      "email": {
+        "responseTime": "< 4 hours"
+      },
+      "phone": {
+        "responseTime": "24/7"
+      }
+    },
+    "categories": {
+      "booking": {
+        "title": "Booking & Reservations",
+        "description": "Questions about making and managing bookings"
+      },
+      "payment": {
+        "title": "Payment & Billing",
+        "description": "Payment methods, crypto, billing, and refunds"
+      },
+      "security": {
+        "title": "Security & Privacy",
+        "description": "Account security and data protection"
+      },
+      "account": {
+        "title": "Account & Profile",
+        "description": "Managing your account and profile settings"
+      },
+      "promotions": {
+        "title": "Offers & Promotions",
+        "description": "Discount coupons and promotional offers"
+      }
+    },
+    "contactForm": {
+      "title": "Send Us a Message",
+      "subject": "Subject",
+      "message": "Your Message",
+      "messagePlaceholder": "Describe your issue...",
+      "cancel": "Cancel",
+      "send": "Send Message",
+      "sending": "Sending...",
+      "sent": "Message Sent!",
+      "thankYou": "Thank you! Our team will get back to you soon."
+    },
+    "contactFooterNoPhone": "For immediate help, please use email support.",
+    "faq": {
+      "howToPayQuestion": "How can a user make a payment?",
+      "howToPayAnswer": "The platform offers multiple convenient payment options to cater to a wide range of user preferences. Users can choose the \"Pay at Hotel\" method, where they provide their card details during the booking process purely for reservation confirmation. No immediate charge is made, and the payment is settled directly at the hotel—either during check-in or at checkout—depending on the property’s specific policy.\n\nAdditionally, for users who prefer digital currency, the platform supports cryptocurrency payments in USDC, USDT (Polygon network), Ethereum, BNB, and Polygon Mainnet. This ensures greater flexibility for international travelers, tech-savvy users, and those who prefer blockchain-based transactions. Both payment methods are designed to provide security, transparency, and convenience.",
+      "cancelReservationQuestion": "Is it possible to cancel a reservation after it is confirmed?",
+      "cancelReservationAnswer": "Yes. Users can cancel confirmed reservations, provided they do so at least 24 hours before the scheduled check-in time. The cancellation feature is easily accessible in the “My Trips” section of the user dashboard.\n\nIt is important to note that while most hotels allow free cancellations within the stated period, some properties may have stricter terms—such as non-refundable bookings or special promotional rates. Therefore, users are strongly advised to review the hotel’s cancellation policy at the time of booking to avoid any potential charges.",
+      "paymentSecurityQuestion": "Is user payment information handled securely?",
+      "paymentSecurityAnswer": "Absolutely. The platform prioritizes user payment security by partnering with Stripe, a globally recognized and PCI DSS-compliant payment gateway known for its advanced encryption technology. No sensitive payment data is stored on the platform’s servers. All transactions, whether for card payments or cryptocurrency transfers, are processed through secure, encrypted channels, ensuring maximum data protection and user trust.",
+      "internationalCardsQuestion": "Can users pay using international credit or debit cards?",
+      "internationalCardsAnswer": "Yes. The payment system fully supports international transactions, allowing users from around the world to book hotels without restriction. Supported card types include major global providers such as Visa, Mastercard, and American Express. Currency conversions are automatically handled by the payment gateway, providing a smooth and hassle-free booking experience for international travelers.",
+      "receiptQuestion": "Will a receipt be provided after the payment is completed?",
+      "receiptAnswer": "Yes. Whether a user chooses to pay at the hotel, via card, or through cryptocurrency, a digital payment receipt is automatically generated and sent to the registered email address once the transaction is completed. This receipt includes the booking reference number, hotel name, room rate, tax details, and a clear payment breakdown, serving as an official record for the transaction.",
+      "accountRequiredQuestion": "Do users need to create an account before booking?",
+      "accountRequiredAnswer": "Account creation is only required at the time a user wishes to make a booking. This means anyone can freely explore hotels, view room availability, compare prices, check amenities, and read guest reviews without logging in.\n\nHowever, when proceeding to book a room, the system will prompt the user to create an account or log in. This step ensures that booking details, payment confirmations, and future reservations are securely stored and easily accessible in the “My Trips” section.",
+      "contactSupportQuestion": "How can users contact customer support?",
+      "contactSupportAnswer": "The platform provides multiple support channels to assist users with booking queries, payment issues, or technical concerns. Users can reach out via email support, the in-app help desk. Response times vary depending on the channel, but priority is always given to urgent booking or payment-related issues.",
+      "additionalChargesQuestion": "Are there any additional charges during booking?",
+      "additionalChargesAnswer": "All displayed prices are inclusive of applicable taxes and fees, unless otherwise specified in the booking summary. Some hotels may charge additional amounts at check-in for optional services such as extra beds, meals, or late check-out. These will be clearly indicated before finalizing the booking, ensuring full transparency and no hidden surprises.",
+      "discountCouponQuestion": "How can user get a discount or use a coupon while booking?",
+      "discountCouponAnswer": "To avail of offers and discounts, users need to follow a simple process. Special promotional coupons are linked to QR codes placed in select hotel rooms or other promotional materials. By scanning this QR code using a mobile device, users are redirected to the platform’s mobile application. From there, they can proceed with the standard booking process. At the payment stage, an “Apply Coupon” option will be visible—tapping on this will allow the user to enter the code and instantly apply the eligible discount to their total booking amount."
     }
   }
 }

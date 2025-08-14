@@ -135,7 +135,7 @@ const HotelCard = () => {
               {t("HotelCard.exclusiveOffers")}
             </span>
           </div>
-          <h1 className="text-2xl md-text-4xl lg:w-[90%] xl:w-[100%] mt-4 md:mt-10 lg:text-5xl xl:text-6xl font-tripswift-extrabold text-tripswift-off-white mb-5 leading-tight tracking-tight drop-shadow-lg">
+          <h1 className="text-xl md-text-2xl lg:w-[90%] xl:w-[100%] mt-4 md:mt-10 lg:text-4xl xl:text-6xl font-tripswift-extrabold text-tripswift-off-white mb-5 leading-tight tracking-tight drop-shadow-lg">
             {t("HotelCard.heroTitle")}
           </h1>
 

@@ -13,5 +13,10 @@
     "name": "Hindi",
     "code": "hi",
     "flag": "https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg"
-  }
+  },
+  "tr": {
+  "name": "Turkish",
+  "code": "tr",
+  "flag": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Flag_of_Turkey.svg"
+}
 }

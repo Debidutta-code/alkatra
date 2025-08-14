@@ -129,7 +129,7 @@ const RoomsPage: React.FC = () => {
   const [unavailableRoomTypes, setUnavailableRoomTypes] = useState<{ roomType: string; dates: string[] }[]>([]);
   const [isGalleryOpen, setIsGalleryOpen] = useState<boolean>(false);
   const [galleryInitialIndex, setGalleryInitialIndex] = useState<number>(0);
-
+  const [showFullDescription, setShowFullDescription] = useState<boolean>(false);
 
   // New state for handling 400 error
   const [showRoomNotAvailable, setShowRoomNotAvailable] = useState<boolean>(false);
@@ -946,8 +946,8 @@ const RoomsPage: React.FC = () => {
                               setIsGalleryOpen(true);
                             }}
                             className={`w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-xl overflow-hidden cursor-pointer relative transition-all duration-300 group border-2 ${selectedImage === index
-                                ? "shadow-lg scale-105 border-tripswift-blue"
-                                : "opacity-70 hover:opacity-90 border-transparent"
+                              ? "shadow-lg scale-105 border-tripswift-blue"
+                              : "opacity-70 hover:opacity-90 border-transparent"
                               }`}
                             title="Click to select, double-click to view fullscreen"
                           >
@@ -969,9 +969,17 @@ const RoomsPage: React.FC = () => {
                         ))}
                       </div>
                     )}
-
+                  {/* Property description */}
+                  {/* {propertyDetails?.description && (
+                    <div className="mt-4">
+                      <h3 className="text-section-heading mb-2">{t('RoomsPage.aboutThisProperty')}</h3>
+                      <p className="text-description">
+                        {propertyDetails.description}
+                      </p>
+                    </div>
+                  )} */}
                   {/* Property amenities section */}
-                  <div className="mt-6">
+                  <div className="mt-4">
                     <h3 className="text-section-heading mb-3">
                       {t("RoomsPage.propertyAmenities")}
                     </h3>
@@ -1003,18 +1011,32 @@ const RoomsPage: React.FC = () => {
                 {/* Property amenities and contact info */}
                 <div className="lg:col-span-1">
                   {/* QR Code section */}
-                  <div className="bg-tripswift-blue/5 p-4 rounded-xl mb-4">
+                  <div className="bg-tripswift-blue/5 p-4 rounded-xl">
                     {qrCodeData.qrCode && qrCodeData.couponCode && (
                       <QRCodeDisplay qrCode={qrCodeData.qrCode} />
                     )}
                   </div>
-
                   {/* Property description */}
                   {propertyDetails?.description && (
                     <div className="bg-tripswift-off-white p-4 rounded-xl border border-gray-100 mb-4">
                       <h3 className="text-section-heading mb-2">{t('RoomsPage.aboutThisProperty')}</h3>
                       <p className="text-description leading-relaxed">
-                        {propertyDetails.description}
+                        {propertyDetails.description.split(' ').length > 10 ? (
+                          <>
+                            {showFullDescription
+                              ? propertyDetails.description
+                              : propertyDetails.description.split(' ').slice(0, 10).join(' ') + '...'}
+                            <button
+                              type="button"
+                              className="text-tripswift-blue font-tripswift-medium text-sm ml-1"
+                              onClick={() => setShowFullDescription(!showFullDescription)}
+                            >
+                              {showFullDescription ? t('RoomsPage.showLess') : t('RoomsPage.showMore')}
+                            </button>
+                          </>
+                        ) : (
+                          propertyDetails.description
+                        )}
                       </p>
                     </div>
                   )}
@@ -1024,7 +1046,7 @@ const RoomsPage: React.FC = () => {
                     <h3 className="text-section-heading mb-3">
                       {t("RoomsPage.contactInformation")}
                     </h3>
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {propertyDetails?.property_contact && (
                         <div className="flex items-center text-description">
                           <svg

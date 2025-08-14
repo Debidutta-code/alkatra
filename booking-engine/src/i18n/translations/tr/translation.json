@@ -1,0 +1,1346 @@
+{
+    "Auth": {
+        "Login": {
+            "title": "Hesabınıza giriş yapın",
+            "subtitle": "Tekrar hoş geldiniz! Lütfen kimlik bilgilerinizi girin.",
+            "heroTitle": {
+                "welcome": "Hoş",
+                "back": "Geldiniz"
+            },
+            "heroSubtitle": "Özel fırsatlara erişmek ve yaklaşan maceralarınızı kolayca yönetmek için giriş yapın.",
+            "benefits": {
+                "exclusiveRates": "Sadece üyelere özel oranlar ve tekliflere erişim",
+                "freeCancellation": "Esnek seçeneklerle çoğu rezervasyonda ücretsiz iptal",
+                "priorityService": "Öncelikli müşteri hizmetleri ve seyahat desteği"
+            },
+            "emailLabel": "E-posta adresi",
+            "emailPlaceholder": "siz@ornek.com",
+            "passwordLabel": "Şifre",
+            "rememberMe": "Beni hatırla",
+            "signInButton": "Giriş yap",
+            "noAccountYet": "Henüz hesabınız yok mu?",
+            "createAccount": "Hesap oluştur",
+            "successMessage": "Giriş başarılı! Tekrar hoş geldiniz.",
+            "errorMessage": "Yanlış e-posta veya şifre. Lütfen tekrar deneyin."
+        },
+        "Register": {
+            "title": "Hesap oluştur",
+            "subtitle": "Başlamak için bilgilerinizi doldurun.",
+            "heroTitle": {
+                "join": "Hemen",
+                "now": "Katılın"
+            },
+            "heroSubtitle": "Özel seyahat fırsatlarının kilidini açmak ve seyahatlerinizi kolayca yönetmek için hesap oluşturun.",
+            "benefits": {
+                "memberPricing": "Özel üye fiyatlarıyla seyahatlerinizi rezerve edin",
+                "personalizedRecommendations": "Kişiselleştirilmiş seyahat önerileri alın",
+                "manageBookings": "Tüm rezervasyonlarınızı tek yerde yönetin"
+            },
+            "firstNameLabel": "Ad",
+            "firstNamePlaceholder": "Ahmet",
+            "lastNameLabel": "Soyad",
+            "lastNamePlaceholder": "Yılmaz",
+            "emailLabel": "E-posta adresi",
+            "emailPlaceholder": "siz@ornek.com",
+            "passwordLabel": "Şifre",
+            "passwordHelp": "Şifre en az 8 karakter içermeli ve en az bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter bulunmalıdır.",
+            "createAccountButton": "Hesap Oluştur",
+            "alreadyHaveAccount": "Zaten hesabınız var mı?",
+            "signIn": "Giriş yap",
+            "successMessage": "Kayıt başarılı! Lütfen giriş yapın.",
+            "genericError": "Bir şeyler yanlış gitti",
+            "registrationFailed": "Kayıt başarısız"
+        },
+        "ForgotPassword": {
+            "title": "Şifremi Unuttum?",
+            "subtitle": "Şifrenizi sıfırlamak için kayıtlı e-posta adresinizi girin.",
+            "heroTitle": {
+                "reset": "Şifre",
+                "password": "Sıfırla"
+            },
+            "heroSubtitle": "Hesabınıza güvenli bir şekilde geri dönmenize yardımcı olacağız.",
+            "benefits": {
+                "quickRecovery": "Hızlı ve kolay şifre kurtarma işlemi",
+                "secureReset": "E-posta doğrulama ile güvenli şifre sıfırlama",
+                "quickAccess": "Dakikalar içinde hesabınıza tekrar erişim"
+            },
+            "emailLabel": "E-posta adresi",
+            "emailPlaceholder": "siz@ornek.com",
+            "sendResetLinkButton": "Sıfırlama Bağlantısı Gönder",
+            "backToLogin": "Girişe Geri Dön",
+            "successMessage": "Sıfırlama bağlantısı e-posta adresinize başarıyla gönderildi",
+            "errors": {
+                "emailNotFound": "E-posta bulunamadı. Lütfen e-posta adresinizi kontrol edin.",
+                "emailNotVerified": "E-posta doğrulanmamış. Lütfen önce e-postanızı doğrulayın.",
+                "generic": "Bir hata oluştu. Lütfen tekrar deneyin."
+            }
+        },
+        "UpdatePassword": {
+            "title": "Şifre Sıfırla",
+            "subtitle": "{{email}} için yeni bir şifre girin",
+            "heroTitle": {
+                "create": "Yeni Şifre",
+                "newPassword": "Oluştur"
+            },
+            "heroSubtitle": "Seyahat planlarınızı güvende tutmak için hesabınız için güçlü, güvenli bir şifre belirleyin.",
+            "benefits": {
+                "strongerPassword": "Güvenliği artırmak için daha güçlü bir şifre oluşturun",
+                "protectInformation": "Kişisel bilgilerinizi ve rezervasyonlarınızı koruyun",
+                "quickAccess": "Seyahat fırsatlarını keşfetmeye hemen geri dönün"
+            },
+            "newPasswordLabel": "Yeni Şifre",
+            "confirmPasswordLabel": "Şifreyi Onayla",
+            "passwordHelp": "Şifre en az 8 karakter içermeli ve en az bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter bulunmalıdır.",
+            "resetPasswordButton": "Şifre Sıfırla",
+            "backToLogin": "Girişe Geri Dön",
+            "successMessage": "Şifreniz başarıyla sıfırlandı.",
+            "errors": {
+                "generic": "Bir hata oluştu. Lütfen tekrar deneyin."
+            }
+        },
+        "Layout": {
+            "travelDestinationAlt": "Seyahat destinasyonu",
+            "memberBenefits": "Üye Avantajları",
+            "privacySecurity": {
+                "title": "Gizliliğiniz ve Güvenliğiniz",
+                "description": "Kişisel bilgileriniz endüstri standardı güvenlik protokolleri kullanılarak şifrelenir ve korunur. Açık izniniz olmadan verilerinizi asla paylaşmayız."
+            }
+        },
+        "PasswordInput": {
+            "forgotPassword": "Şifremi unuttum?",
+            "showPassword": "Şifreyi göster",
+            "hidePassword": "Şifreyi gizle"
+        },
+        "Button": {
+            "processing": "İşleniyor..."
+        },
+        "Validation": {
+            "fieldRequired": "{{field}} gereklidir",
+            "firstNameRequired": "Ad gereklidir",
+            "lastNameRequired": "Soyad gereklidir",
+            "emailRequired": "E-posta gereklidir",
+            "emailInvalid": "Lütfen geçerli bir e-posta adresi girin",
+            "passwordRequired": "Şifre gereklidir",
+            "confirmPasswordRequired": "Lütfen şifrenizi onaylayın",
+            "passwordComplexity": "Şifre en az 8 karakter içermeli ve en az bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter bulunmalıdır.",
+            "minLength": "En az {{count}} karakter olmalıdır",
+            "passwordsDoNotMatch": "Şifreler uyuşmuyor"
+        }
+    },
+    "Navbar": {
+        "pleaseLogin": "Seyahatlerinizi görüntülemek için lütfen giriş yapın",
+        "logoutSuccess": "Başarıyla çıkış yapıldı",
+        "becomeHost": "Ev Sahibi Ol",
+        "myTrip": "Seyahatim",
+        "notifications": "Bildirimler",
+        "profileSettings": "Profil Ayarları",
+        "helpFeedback": "Yardım ve Geri Bildirim",
+        "logout": "Çıkış Yap",
+        "signUp": "Kayıt Ol",
+        "login": "Giriş Yap",
+        "referral": "Öneri Yap ve Kazan"
+    },
+    "Footer": {
+        "companyTitle": "Şirket",
+        "aboutUs": "Hakkımızda",
+        "whyChooseUs": "Neden Bizi Seçmelisiniz",
+        "pricing": "Fiyatlandırma",
+        "testimonials": "Müşteri Görüşleri",
+        "resourcesTitle": "Kaynaklar",
+        "privacyPolicy": "Gizlilik Politikası",
+        "termsAndConditions": "Şartlar ve Koşullar",
+        "blog": "Blog",
+        "contactUs": "İletişim",
+        "productTitle": "Ürün",
+        "projectManagement": "Proje Yönetimi",
+        "timeTracker": "Zaman Takipçisi",
+        "timeSchedule": "Zaman Programı",
+        "leadGeneration": "Müşteri Adayı Oluşturma",
+        "emailPlaceholder": "E-posta adresinizi girin",
+        "subscribeButton": "Abone Ol",
+        "copyright": "{year} Al Hajz - Tüm hakları saklıdır"
+    },
+    "Profile": {
+        "editProfile": "Profili Düzenle",
+        "signOut": "Çıkış Yap",
+        "overview": "Genel Bakış",
+        "myTrips": "Seyahatlerim",
+        "preferences": "Tercihler",
+        "security": "Güvenlik",
+        "notifications": "Bildirimler",
+        "helpCenter": "Yardım Merkezi",
+        "tripsCompleted": "Tamamlanan Seyahatler",
+        "sinceJoining": "Katılımdan beri",
+        "averageRating": "Ortalama Değerlendirme",
+        "fromHosts": "Ev sahiplerinden",
+        "savedPlaces": "Kayıtlı Yerler",
+        "wishlisted": "İstek Listesi",
+        "quickActions": "Hızlı İşlemler",
+        "bookTrip": "Seyahat Rezervasyonu",
+        "savedPlacesAction": "Kayıtlı Yerler",
+        "rewards": "Ödüller",
+        "deals": "Fırsatlar",
+        "securitySettings": "Güvenlik Ayarları",
+        "changePassword": "Şifre Değiştir",
+        "updatePassword": "Şifrenizi güncelleyin",
+        "twoFactorAuth": "İki Faktörlü Kimlik Doğrulama",
+        "twoFactorDesc": "Hesabınıza ekstra güvenlik katmanı ekleyin",
+        "enable2FA": "2FA'yı Etkinleştir",
+        "profileUpdatedSuccess": "Profil başarıyla güncellendi",
+        "profileUpdateFailed": "Profil güncellenemedi",
+        "contentComingSoon": "{{tab}} için içerik yakında geliyor...",
+        "newPasswordOptional": "Yeni Şifre (opsiyonel)",
+        "confirmNewPassword": "Yeni Şifreyi Onayla",
+        "joined": "{{date}} tarihinde katıldı",
+        "notificationsDesc": "Bildirim tercihlerinizi yönetin ve son bildirimleri görüntüleyin.",
+        "recentNotifications": "Son Bildirimler"
+    },
+    "HotelCard": {
+        "heroTitle": "Yolculuğunuz İçin Mükemmel Konaklamayı Bulun",
+        "heroSubtitle": "Özel fiyatlarla muhteşem konaklamaları keşfedin",
+        "locationPlaceholder": "Nereye gidiyorsunuz?",
+        "searchButton": "Ara",
+        "specialOffer": "Özel teklif: İlk rezervasyonunuzda %25'e varan indirim!",
+        "errorNoHotels": "Seçilen konum için mevcut otel bulunmuyor.",
+        "errorInvalidLocation": "Lütfen geçerli bir konum girin.",
+        "errorSelectDates": "Lütfen hem giriş hem de çıkış tarihlerini seçin.",
+        "exclusiveOffers": "Özel Teklifler Mevcut",
+        "freeCancellation": "Ücretsiz İptal",
+        "bestPriceGuarantee": "En İyi Fiyat Garantisi",
+        "downloadourapp": "Uygulamamızı İndirin"
+    },
+    "Referral": {
+        "heroTitle": "Arkadaşını Davet Et",
+        "heroSubtitle": "Arkadaşlarını davet et ve katıldıklarında özel ödüllerin keyfini çıkar",
+        "howItWorks": "Nasıl Çalışır",
+        "howItWorksSubTitle": "Ödül kazanmak için kişileri davet et",
+        "step1Title": "Davet gönder",
+        "step1Desc": "Davet linkini arkadaşlarınla paylaş ve ödül kazan",
+        "step2Title": "Kayıt Ol",
+        "step2Desc": "Referans linkinizi kullanarak hizmetimize kaydolmalarını sağlayın",
+        "step3Title": "Kazan",
+        "step3Desc": "Ödül kazanın",
+        "stepLabel": "Adım {{number}}",
+        "shareYourLink": "Referans Linkinizi Paylaşın",
+        "shareDescription": "Referans linkinizi kopyalayarak arkadaşlarınıza göndererek veya sosyal medyada paylaşarak da paylaşabilirsiniz.",
+        "copy": "Referans linkini kopyala",
+        "copied": "Kopyalandı!",
+        "shareVia": "Şu yolla paylaş",
+        "generateQr": "QR Kod Oluştur",
+        "scanToShare": "Paylaşmak için Tarat",
+        "scanDescription": "Bu QR kodu taratın veya arkadaşlarınızla paylaşmak için kaydedin.",
+        "hideReferrals": "Referansları Gizle",
+        "viewYourReferrals": "Referanslarınızı Görüntüle",
+        "total": "Toplam:",
+        "referrals": "referans",
+        "wallet": "Cüzdan",
+        "currentBalance": "Mevcut Bakiye",
+        "totalEarned": "Toplam Kazanılan",
+        "totalRedeemed": "Toplam Kullanılan",
+        "redeemEarnings": "Kazancınızı Kullanın",
+        "enterAmount": "Miktarı Girin",
+        "availableBalance": "Kullanılabilir Bakiye",
+        "redeem": "Kullan",
+        "lastUpdated": "Son Güncelleme",
+        "redeemSuccess": "Kullanım başarılı! Kazancınız cüzdanınıza eklendi.",
+        "tableName": "Ad",
+        "tableEmail": "E-posta",
+        "tableReferralDate": "Referans Tarihi",
+        "tableId": "ID",
+        "noWalletData": "Cüzdan verisi bulunamadı.",
+        "startReferring": "Şimdi Referans Vermeye Başla",
+        "refreshWallet": "Cüzdanı Yenile",
+        "noToken": "Lütfen daha sonra tekrar deneyiniz.",
+        "walletError": "Cüzdan verisi bulunamadı.",
+        "insufficientBalance": "Kullanmak için yetersiz bakiye.",
+        "redeemError": "Kazanç kullanımında hata. Lütfen daha sonra tekrar deneyiniz.",
+        "yourReferralLink": "Referans Linkiniz",
+        "noReferrals": "Henüz referansınız yok.",
+        "shareToEarn": "Arkadaşlarınız kayıt olduğunda ödül kazanmak için referans linkinizi paylaşın.",
+        "shareLink": "Linki Paylaş",
+        "generateReferral": "Referans Linki Oluştur",
+        "generateOnce": "Referans linkinizi bir kez oluşturun ve ödül kazanmaya başlamak için arkadaşlarınızla paylaşın.",
+        "generated": "Referans linki başarıyla oluşturuldu!",
+        "copiedToClipboard": "Panoya kopyalandı!"
+    },
+    "HotelListing": {
+        "CompactSearchBar": {
+            "locationPlaceholder": "Nereye gidiyorsunuz?",
+            "checkInPlaceholder": "Giriş tarihi",
+            "checkOutPlaceholder": "Çıkış tarihi",
+            "searchButton": "Ara",
+            "errorSameDates": "Giriş ve çıkış tarihleri aynı olamaz.",
+            "errorInvalidLocation": "Lütfen geçerli bir konum girin.",
+            "errorSelectDates": "Lütfen hem giriş hem de çıkış tarihlerini seçin.",
+            "errorNoHotels": "Seçilen konum için müsait otel bulunmuyor.",
+            "ariaClearSearch": "Aramayı temizle",
+            "ariaSearchHotels": "Otel ara",
+            "ariaSearching": "Aranıyor..."
+        },
+        "HotelCardItem": {
+            "noImage": "Resim yok",
+            "descriptionFallback": "Bu harika tesiste rahat bir konaklama deneyimi yaşayın.",
+            "contactLabel": "İletişim",
+            "viewRoomButton": "Odayı Görüntüle",
+            "amenitiesList": {
+                "wifi": "Ücretsiz WiFi",
+                "swimming_pool": "Yüzme Havuzu",
+                "fitness_center": "Fitness Merkezi",
+                "spa_and_wellness": "Spa ve Wellness",
+                "restaurant": "Restoran",
+                "room_service": "Oda Servisi",
+                "bar_and_lounge": "Bar ve Lounge",
+                "parking": "Park Yeri",
+                "concierge_services": "Concierge Hizmetleri",
+                "pet_friendly": "Evcil Hayvan Dostu",
+                "business_facilities": "İş Olanakları",
+                "laundry_services": "Çamaşırhane Hizmetleri",
+                "child_friendly_facilities": "Çocuk Dostu Olanaklar",
+                "non_smoking_rooms": "Sigara İçilmeyen Odalar",
+                "facilities_for_disabled_guests": "Engelli misafirler için olanaklar",
+                "family_rooms": "Aile Odaları"
+            }
+        },
+        "heroTitle": "Mükemmel Konaklamanızı Bulun",
+        "heroSubtitle": "En iyi fiyatlarla konaklama rezervasyonu yapın",
+        "hotelsIn": "Oteller -",
+        "yourDestination": "hedefiniz",
+        "selectDates": "Tarihleri seçin",
+        "propertiesFound": "tesis bulundu",
+        "nights": "gece",
+        "filters": "Filtreler",
+        "activeFilter": "aktif filtre",
+        "activeFilters": "aktif filtre",
+        "clearAll": "Tümünü temizle",
+        "popularFilters": "Popüler Filtreler",
+        "freeWifi": "Ücretsiz WiFi",
+        "parking": "Park Yeri",
+        "breakfast": "Kahvaltı",
+        "searchPropertyName": "Tesis adına göre ara",
+        "sortBy": "Sırala",
+        "recommended": "Önerilen",
+        "highestRating": "En Yüksek Puan",
+        "lowestRating": "En Düşük Puan",
+        "whyBookWithTripSwift": "Neden TripSwift ile Rezervasyon?",
+        "freeCancellation": "Ücretsiz İptal",
+        "freeCancellationDesc": "Tesislerimizin çoğu giriş tarihinden 24 saat öncesine kadar ücretsiz iptal imkanı sunuyor.",
+        "bestPriceGuarantee": "En İyi Fiyat Garantisi",
+        "bestPriceGuaranteeDesc": "Daha düşük fiyat mı buldunuz? Biz eşitleriz ve size ek %10 indirim veririz.",
+        "secureBooking": "Güvenli Rezervasyon",
+        "secureBookingDesc": "Kişisel bilgilerinizi korumak için endüstri standardı şifreleme kullanıyoruz.",
+        "noHotelsError": "Verilen arama kriterlerine uygun otel bulunamadı.",
+        "tryModifyingSearch": "Lütfen aramayı değiştirmeyi deneyin"
+    },
+    "HotelBox": {
+        "DateRange": {
+            "checkInPlaceholder": "Giriş Tarihi",
+            "checkOutPlaceholder": "Çıkış Tarihi"
+        },
+        "FilterModal": {
+            "title": "Filtreler",
+            "propertyRating": "Tesis Puanı",
+            "amenities": "Olanaklar",
+            "sortBy": "Sırala",
+            "cancel": "Tüm filtreleri temizle",
+            "applyFilters": "{{count}} sonucu görüntüle",
+            "ariaCloseModal": "Modalı kapat",
+            "ariaSortOrder": "Sıralama düzeni",
+            "ratingUp": "ve Üzeri",
+            "amenitiesList": {
+                "wifi": "Ücretsiz WiFi",
+                "swimming_pool": "Yüzme Havuzu",
+                "fitness_center": "Fitness Merkezi",
+                "spa_and_wellness": "Spa ve Wellness",
+                "restaurant": "Restoran",
+                "room_service": "Oda Servisi",
+                "bar_and_lounge": "Bar ve Lounge",
+                "parking": "Park Yeri",
+                "concierge_services": "Concierge Hizmetleri",
+                "pet_friendly": "Evcil Hayvan Dostu",
+                "business_facilities": "İş Olanakları",
+                "laundry_services": "Çamaşırhane Hizmetleri",
+                "child_friendly_facilities": "Çocuk Dostu Olanaklar",
+                "non_smoking_rooms": "Sigara İçilmeyen Odalar",
+                "facilities_for_disabled_guests": "Engelli misafirler için olanaklar",
+                "family_rooms": "Aile Odaları"
+            },
+            "sortOptions": {
+                "recommended": "Önerilen",
+                "rating_desc": "Puan: Yüksekten Düşüğe",
+                "rating_asc": "Puan: Düşükten Yükseğe",
+                "price_desc": "Fiyat: Yüksekten Düşüğe",
+                "price_asc": "Fiyat: Düşükten Yükseğe"
+            }
+        }
+    },
+    "HomeSections": {
+        "FeaturedOffers": {
+            "title": "Öne Çıkan Teklifler",
+            "limitedTime": "Sınırlı Süre",
+            "endsIn": "Bitiş:",
+            "summerSpecial": {
+                "title": "Yaz Özel",
+                "description": "Otel Rezervasyonlarında %50'ye Varan İndirim",
+                "validTill": "2s 45d"
+            },
+            "luxuryStay": {
+                "title": "Lüks Konaklama",
+                "description": "Premium Otellerde %30'a Varan İndirim",
+                "validTill": "5s 30d"
+            },
+            "weekendGetaway": {
+                "title": "Hafta Sonu Kaçamağı",
+                "description": "Seçili Otellerde Şimdi Rezerve Et Sonra Öde",
+                "validTill": "3s 15d"
+            }
+        },
+        "PopularHotels": {
+            "title": "Popüler Oteller",
+            "freeCancellation": "Ücretsiz İptal",
+            "breakfast": "Kahvaltı",
+            "startingFrom": "Başlangıç fiyatı",
+            "bookNow": "Şimdi Rezerve Et",
+            "hotels": {
+                "grandPlaza": {
+                    "name": "Grand Plaza Hotel"
+                },
+                "sunsetBeach": {
+                    "name": "Sunset Beach Resort"
+                },
+                "mountainView": {
+                    "name": "Mountain View Lodge"
+                },
+                "cityLights": {
+                    "name": "City Lights Hotel"
+                }
+            }
+        },
+        "ExploreDestinations": {
+            "title": "Destinasyonları Keşfet",
+            "descriptionTemplate": "{{city}} şehrindeki otelleri keşfet",
+            "imageAlt": "{{name}} destinasyonu",
+            "goToGroup": "{{count}} grubuna git",
+            "exploreNow": "Şimdi Keşfet"
+        }
+    },
+    "RoomsPage": {
+        "backToSearch": "Aramaya Dön",
+        "starHotelRating": "Yıldızlı Otel Değerlendirmesi",
+        "viewPropertyDetails": "Tesis Detaylarını Görüntüle",
+        "aboutThisProperty": "Bu tesis hakkında",
+        "showMore": "Daha fazla göster",
+        "showLess": "Daha az göster",
+        "noImagesAvailable": "Görsel bulunmuyor",
+        "propertyAmenities": "Tesis Olanakları",
+        "nights": "Gece",
+        "nightsPlural": "Gece",
+        "stay": "konaklama",
+        "filter": "Filtre",
+        "viewAllPhotos": "Tüm Fotoğrafları Görüntüle",
+        "amenitiesList": {
+            "wifi": "Ücretsiz WiFi",
+            "swimming_pool": "Yüzme Havuzu",
+            "fitness_center": "Fitness Merkezi",
+            "spa_and_wellness": "Spa ve Wellness",
+            "restaurant": "Restoran",
+            "room_service": "Oda Servisi",
+            "bar_and_lounge": "Bar ve Lounge",
+            "parking": "Park Yeri",
+            "concierge_services": "Concierge Hizmetleri",
+            "pet_friendly": "Evcil Hayvan Dostu",
+            "business_facilities": "İş Olanakları",
+            "laundry_services": "Çamaşırhane Hizmetleri",
+            "child_friendly_facilities": "Çocuk Dostu Olanaklar",
+            "non_smoking_rooms": "Sigara İçilmeyen Odalar",
+            "facilities_for_disabled_guests": "Engelli misafirler için olanaklar",
+            "family_rooms": "Aile Odaları"
+        },
+        "noAmenitiesSpecified": "Bu tesis için herhangi bir olanak belirtilmemiş.",
+        "contactInformation": "İletişim Bilgileri",
+        "allRooms": "Tüm Odalar",
+        "searchRoomName": "Oda adına göre ara",
+        "availableRooms": "Müsait Odalar",
+        "showingRooms_one": "{{count}} oda gösteriliyor",
+        "showingRooms_other": "{{count}} oda gösteriliyor",
+        "noRoomsAvailableTitle": "Müsait Oda Yok",
+        "noRoomsAvailableMessage": "Kriterlerinize uygun oda bulamadık. Arama filtrelerinizi veya tarihlerinizi ayarlamayı deneyin.",
+        "goBack": "Geri Dön",
+        "clearFilters": "Filtreleri Temizle",
+        "loadingRoomsMessage": "Müsait odalar yükleniyor...",
+        "priceNotAvailable": "",
+        "qrCode": {
+            "discountTitle": "İndiriminizi Kullanın",
+            "qrCodeAlt": "İndirim QR Kodu",
+            "scanToApply": "Uygulamak için tarayın",
+            "instructions": {
+                "scanAtCheckout": "Bu odayı Alhajz uygulamasında açmak için QR kodu tarayın.",
+                "applyDiscount": "Uygulama yüklü değilse, indirmeniz için yönlendirileceksiniz.",
+                "validityNote": "Bu oda için özel indirim almak için uygulama üzerinden rezervasyon yapın."
+            }
+        },
+        "RoomCard": {
+            "roomImageAlt": "Oda",
+            "off": "İNDİRİM",
+            "adults": "yetişkin",
+            "children": "çocuk",
+            "night": "gece",
+            "bookNow": "Şimdi Rezervasyon Yap",
+            "viewBookingPolicies": "Rezervasyon politikalarını görüntüle",
+            "notAvailable": "Müsait Değil",
+            "securePayment": "Güvenli ödeme",
+            "defaultamenities": {
+                "kingBed": "King Size Yatak",
+                "bathroom": "Özel Banyo"
+            },
+            "roomAmenities": {
+                "basic": {
+                    "bed": "Yatak",
+                    "bedTypes": {
+                        "single": "Tek Kişilik",
+                        "double": "Çift Kişilik",
+                        "king": "King Size",
+                        "twin": "İkiz Yatak",
+                        "queen": "Queen Size"
+                    },
+                    "bathroom": "Özel Banyo",
+                    "linensBedding": "Çarşaf ve Yatak Takımı",
+                    "linens": "Temiz Çarşaflar",
+                    "bidet": "Bide",
+                    "toiletPaper": "Tuvalet Kağıdı",
+                    "towelsSheets": "Havlu ve Çarşaflar",
+                    "freeToiletries": "Ücretsiz Banyo Malzemeleri",
+                    "shower": "Duş",
+                    "toilet": "Tuvalet"
+                },
+                "furniture": {
+                    "tableChairs": "Masa ve Sandalyeler",
+                    "desk": "Çalışma Masası",
+                    "dresserWardrobe": "Şifonyer ve Dolap",
+                    "sofaSeating": "Kanepe Oturma Alanı",
+                    "diningTable": "Yemek Masası",
+                    "readingChair": "Okuma Koltuğu"
+                },
+                "spaceLayout": {
+                    "diningArea": "Yemek Alanı",
+                    "sittingArea": "Oturma Alanı",
+                    "balcony": "Balkon"
+                },
+                "technology": {
+                    "television": "Televizyon",
+                    "telephone": "Telefon",
+                    "wifiInternet": "Wi-Fi İnternet",
+                    "flatScreenTV": "Düz Ekran TV",
+                    "satelliteChannels": "Uydu Kanalları",
+                    "cableChannels": "Kablo Kanalları"
+                },
+                "climateControl": {
+                    "airConditioning": "Klima",
+                    "heating": "Isıtma"
+                },
+                "kitchenetteMiniBar": {
+                    "smallRefrigerator": "Mini Buzdolabı",
+                    "microwave": "Mikrodalga",
+                    "refrigerator": "Buzdolabı",
+                    "kitchenware": "Mutfak Eşyaları",
+                    "electricKettle": "Elektrikli Su Isıtıcısı",
+                    "oven": "Fırın",
+                    "stovetop": "Ocak",
+                    "teaCoffeeMaker": "Çay/Kahve Makinesi"
+                },
+                "safetySecurity": {
+                    "safe": "Oda İçi Kasa",
+                    "smokeDetectors": "Duman Dedektörleri",
+                    "fireExtinguisher": "Yangın Söndürücü"
+                },
+                "toiletries": {
+                    "shampooConditioner": "Şampuan ve Saç Kremi",
+                    "soap": "Sabun",
+                    "hairDryer": "Saç Kurutma Makinesi"
+                },
+                "workLeisure": {
+                    "workDesk": "Çalışma Masası",
+                    "additionalLighting": "Ek Aydınlatma",
+                    "ironingFacilities": "Ütüleme Olanakları"
+                },
+                "accessibilityFeatures": {
+                    "accessibleBathroom": "Engelsiz Banyo",
+                    "wheelchairAccessibility": "Tekerlekli Sandalye Erişimi",
+                    "upperFloorsAccessibleByElevator": "Üst Katlara Asansörle Erişim",
+                    "entireUnitWheelchairAccessible": "Tüm Birim Tekerlekli Sandalye Erişimli"
+                }
+            },
+            "policies": {
+                "title": "Rezervasyon Politikaları",
+                "closeModal": "Pencereyi kapat",
+                "cancellationPolicy": "İptal Politikası",
+                "policyTypes": {
+                    "flexible": "Esnek",
+                    "moderate": "Orta",
+                    "strict": "Katı",
+                    "nonrefundable": "İade Edilemez"
+                },
+                "amendmentPolicy": "Değişiklik Politikası",
+                "amendmentPoints": {
+                    "dateChanges": "Tarih değişiklikleri müsaitlik durumuna bağlıdır",
+                    "changes72Hours": "Giriş tarihinden 72 saat önce yapılan değişiklikler ek ücrete tabi olabilir",
+                    "roomUpgrades": "Oda yükseltmeleri müsaitlik durumu ve ek ücrete bağlıdır",
+                    "reducingStay": "Konaklama süresinin azaltılması iptal politikasına tabidir"
+                },
+                "gotIt": "Anladım"
+            },
+            "seeMore": "Daha fazla gör",
+            "showLess": "Daha az göster"
+        }
+    },
+    "CancellationPolicies": {
+        "policyTypes": {
+            "flexible": {
+                "description": "Giriş tarihinden 24 saat öncesine kadar ücretsiz iptal. Bundan sonra rezervasyon iade edilmez.",
+                "shortDescription": "Giriş tarihinden 24 saat öncesine kadar ücretsiz iptal",
+                "bulletPoints": [
+                    "Tam iade: Giriş tarihinden 24 saatten fazla önce iptal edilirse",
+                    "İade yok: Giriş tarihinden 24 saat içinde iptal edilirse"
+                ]
+            },
+            "moderate": {
+                "description": "Giriş tarihinden 5+ gün önce iptal edilirse tam iade. Giriş tarihinden 1-5 gün önce %50 iade. Giriş tarihinden 24 saat içinde iade yok.",
+                "shortDescription": "Giriş tarihinden 5 gün öncesine kadar ücretsiz iptal",
+                "bulletPoints": [
+                    "Tam iade: Giriş tarihinden 5+ gün önce iptal edilirse",
+                    "50% iade: Giriş tarihinden 1-5 gün önce iptal edilirse",
+                    "İade yok: Giriş tarihinden 24 saat içinde iptal edilirse"
+                ]
+            },
+            "strict": {
+                "description": "Giriş tarihinden 7+ gün önce iptal edilirse tam iade. Giriş tarihinden 1-7 gün önce %50 iade. Giriş tarihinden 24 saat içinde iade yok.",
+                "shortDescription": "Giriş tarihinden 7 gün öncesine kadar ücretsiz iptal",
+                "bulletPoints": [
+                    "Tam iade: Giriş tarihinden 7+ gün önce iptal edilirse",
+                    "50% iade: Giriş tarihinden 1-7 gün önce iptal edilirse",
+                    "İade yok: Giriş tarihinden 24 saat içinde iptal edilirse"
+                ]
+            },
+            "nonrefundable": {
+                "description": "Bu rezervasyon iade edilemez. İptal zamanlamasından bağımsız olarak iade sağlanmayacaktır.",
+                "shortDescription": "İade edilemez tarife",
+                "bulletPoints": [
+                    "İade yok: Bu rezervasyon hiçbir zaman iade edilemez",
+                    "İade edilemez rezervasyonlar genellikle indirimli fiyat ile gelir"
+                ]
+            }
+        },
+        "roomCardPolicyDescriptions": {
+            "flexible": "Giriş tarihinden 24 saat öncesine kadar ücretsiz iptal",
+            "moderate": "Giriş tarihinden 5 gün öncesine kadar ücretsiz iptal",
+            "strict": "Giriş tarihinden 7 gün öncesine kadar ücretsiz iptal",
+            "nonrefundable": "Özel indirimli iade edilemez tarife"
+        }
+    },
+    "BookingComponents": {
+        "GuestInformationModal": {
+            "completeYourBooking": "Rezervasyonunuzu Tamamlayın",
+            "guestDetailsStep": "Misafir Detayları",
+            "reviewAndPayStep": "İnceleme ve Ödeme",
+            "roomSummary": "Oda Özeti",
+            "priceLoading": "",
+            "roomType": "Oda Tipi",
+            "checkIn": "Giriş",
+            "checkOut": "Çıkış",
+            "nights": "Gece",
+            "nightsPlural": "Gece",
+            "guestInformation": "Misafir Bilgileri",
+            "dob": "Doğum Tarihi",
+            "firstNameLabel": "Ad",
+            "firstNamePlaceholder": "Adınızı girin",
+            "firstNameError": "Ad zorunludur",
+            "lastNameLabel": "Soyad",
+            "lastNamePlaceholder": "Soyadınızı girin",
+            "lastNameError": "Soyad zorunludur",
+            "emailLabel": "E-posta Adresi",
+            "emailPlaceholder": "ornek.email@example.com",
+            "emailInfo": "Rezervasyon onayınız bu e-posta adresine gönderilecektir",
+            "emailError": "E-posta zorunludur.",
+            "emailInvalidError": "Lütfen geçerli bir e-posta adresi girin",
+            "emailNotVerified": "Lütfen e-postanızı doğrulayın",
+            "verifyEmail": "E-posta Doğrula",
+            "verifyPhone": "Telefon Doğrula",
+            "verifyOtp": "OTP Doğrula",
+            "otpPlaceholder": "OTP girin",
+            "otpExpiresIn": "Süre dolumu",
+            "otpSent": "E-postanıza OTP gönderildi",
+            "otpSendFailed": "OTP gönderilemedi",
+            "otpSendError": "OTP gönderme hatası",
+            "otpEmptyError": "Lütfen OTP'yi girin",
+            "otpInvalidError": "Geçersiz OTP",
+            "otpVerifyError": "OTP doğrulama hatası",
+            "emailVerified": "E-posta başarıyla doğrulandı",
+            "phoneVerified": "Telefon başarıyla doğrulandı",
+            "phoneLabel": "Telefon Numarası",
+            "phonePlaceholder": "Telefon numaranızı girin",
+            "phoneInfo": "Rezervasyon ile ilgili bildirimler için",
+            "phoneError": "Telefon numarası zorunludur",
+            "phoneLengthError": "Türkiye için telefon numarası tam olarak 10 haneli olmalıdır.",
+            "phoneIndiaError": "Hindistan için telefon numarası tam olarak 10 haneli olmalıdır.",
+            "phoneInternationalError": "Telefon numarası en az 8 haneli olmalıdır.",
+            "guestDetailsSection": "Misafir Detayları",
+            "roomSingular": "Oda",
+            "roomsPlural": "Oda",
+            "adultSingular": "Yetişkin",
+            "adultsPlural": "Yetişkin",
+            "childSingular": "Çocuk",
+            "childrenPlural": "Çocuk",
+            "infantSingular": "Bebek",
+            "infantsPlural": "Bebek",
+            "guestDisplayFormat": "Odalar ve Misafirler",
+            "childrenPartFormat": "Çocuklar",
+            "informationVerified": "Bilgiler başarıyla doğrulandı!",
+            "propertyInfoMissing": "Tesis bilgileri eksik. Lütfen tekrar deneyin.",
+            "bookingSummary": "Rezervasyon Özeti",
+            "stayDetails": "Konaklama Detayları",
+            "primaryGuest": "Ana Misafir",
+            "guests": "Misafirler",
+            "email": "E-posta",
+            "phone": "Telefon",
+            "priceDetails": "Fiyat Detayları",
+            "roomRate": "Oda Fiyatı",
+            "totalAmount": "Toplam Tutar",
+            "baseRatePerRoomPerNight": "Temel Fiyat (oda başına gece başına)",
+            "additionalGuestCharges": "Ek Misafir Ücretleri",
+            "priceIncludes": "Fiyat {{rooms}} oda için {{guests}} misafiri kapsar",
+            "paymentNoticeTitle": "Ödeme güvenli şekilde işlenecektir",
+            "paymentNoticeDescription": "Devam ederek şartlar ve koşullarımızı ve gizlilik politikamızı kabul etmiş olursunuz.",
+            "backToDetails": "Detaylara Dön",
+            "cancel": "İptal",
+            "continueToReview": "İncelemeye Devam Et",
+            "proceedToPayment": "Ödemeye Geç",
+            "phoneNotVerified": "Telefon numarası doğrulanmadı",
+            "phoneInvalidError": "Lütfen geçerli bir telefon numarası girin",
+            "processing": "İşleniyor...",
+            "verifying": "Doğrulanıyor",
+            "priceFetchError": "Güncellenmiş fiyat alınamadı. Lütfen daha sonra tekrar deneyin."
+        }
+    },
+    "BookingTabs": {
+        "userNotLoggedIn": "Kullanıcı giriş yapmamış",
+        "noBooking": "Rezervasyon bulunmuyor",
+        "BookingHeader": {
+            "backToHome": "Ana Sayfaya Dön",
+            "yourBookings": "Rezervasyonlarınız",
+            "viewManageTrack": "Tüm otel rezervasyonlarınızı tek yerden görüntüleyin, yönetin ve takip edin"
+        },
+        "BookingTabsNavigation": {
+            "allBookings": "Tüm Rezervasyonlar",
+            "upcoming": "Yaklaşan",
+            "completed": "Tamamlanan",
+            "cancelled": "İptal Edilen"
+        },
+        "LoadingState": {
+            "retrievingBookings": "Rezervasyonlarınız alınıyor",
+            "fetchingDetails": "Rezervasyon detaylarınızı alırken lütfen bekleyin..."
+        },
+        "ErrorState": {
+            "noBookingsFound": "Hesabınızla ilişkili herhangi bir rezervasyon bulamadık.",
+            "startBookingNow": "Şimdi Rezervasyon Yap"
+        },
+        "EmptyState": {
+            "heading": {
+                "all": "Rezervasyon bulunamadı",
+                "upcoming": "Yaklaşan rezervasyon yok",
+                "completed": "Tamamlanan konaklama yok",
+                "cancelled": "İptal edilen rezervasyon yok"
+            },
+            "paragraph": {
+                "all": "Bir sonraki seyahatinizi planlamaya başlayın!",
+                "upcoming": "Yaklaşan otel rezervasyonunuz bulunmuyor.",
+                "completed": "Henüz tamamladığınız konaklama yok.",
+                "cancelled": "İptal edilen rezervasyonunuz bulunmuyor."
+            },
+            "bookHotelButton": "Otel Rezervasyonu Yap"
+        },
+        "BookingCard": {
+            "bookingId": "Rezervasyon ID",
+            "nightSingular": "Gece",
+            "nightsPlural": "Gece",
+            "checkIn": "Giriş",
+            "checkOut": "Çıkış",
+            "roomType": "Oda Tipi",
+            "standardRoom": "Standart Oda",
+            "paymentMethod": "Ödeme Yöntemi",
+            "primaryGuest": "Ana Misafir",
+            "rateBreakdown": "Fiyat Dökümü",
+            "viewBookingDetails": "Rezervasyon Detaylarını Görüntüle",
+            "modify": "Değiştir",
+            "cancel": "İptal Et"
+        },
+        "BookingPagination": {
+            "show": "Göster",
+            "perPage": "sayfa başına",
+            "showing": "Gösterilen",
+            "of": "/",
+            "bookings": "rezervasyon",
+            "noBookingsToShow": "Gösterilecek rezervasyon yok"
+        },
+        "CancellationModal": {
+            "confirmCancellation": "İptali Onayla",
+            "reviewBeforeProceeding": "İptal işlemine devam etmeden önce lütfen aşağıdaki detayları inceleyin",
+            "bookingDetails": "Rezervasyon Detayları",
+            "property": "Tesis",
+            "room": "Oda",
+            "stayDates": "Konaklama Tarihleri",
+            "nightStay_one": "{{count}} gece konaklama",
+            "nightStay_other": "{{count}} gece konaklama",
+            "totalAmount": "Toplam Tutar",
+            "calculatingDetails": "İptal detayları hesaplanıyor...",
+            "policyTypes": {
+                "flexible": "Esnek İptal Politikası",
+                "moderate": "Orta İptal Politikası",
+                "strict": "Katı İptal Politikası",
+                "nonrefundable": "İade Edilemez Politika"
+            },
+            "refundEligible": "%{{percentage}} İade Hakkı",
+            "policyTerms": "Politika Şartları",
+            "yourRefundStatus": "İade Durumunuz",
+            "refundExplanation": "Giriş tarihine ve {{policyType}} politikasına göre %{{percentage}} iade alacaksınız.",
+            "financialBreakdown": "Mali Döküm",
+            "originalPayment": "Orijinal Ödeme Tutarı",
+            "cancellationFee": "İptal Ücreti",
+            "refundAmount": "İade Tutarı",
+            "reasonForCancellation": "İptal Nedeni",
+            "reasonPlaceholder": "Lütfen neden iptal ettiğinizi belirtin (isteğe bağlı)...",
+            "feedbackHelpsImprove": "Geri bildiriminiz hizmetlerimizi geliştirmemize yardımcı olur. Bu bilgi sadece dahili kullanım içindir.",
+            "success": "Başarılı",
+            "error": "Hata",
+            "successWithRefund": "Rezervasyonunuz başarıyla iptal edildi. ₹{{amount}} tutarında iade işleme alınacak.",
+            "successNoRefund": "Rezervasyonunuz başarıyla iptal edildi. İptal politikası gereği iade yapılmayacak.",
+            "errorCancelling": "Rezervasyon iptal edilemedi. Lütfen tekrar deneyin veya destek ile iletişime geçin.",
+            "errorRetrievingPolicy": "İptal politikası bilgileri alınamadı. Devam edebilirsiniz ancak ücret bilgileri doğru olmayabilir.",
+            "actionCannotBeUndone": "Bu işlem geri alınamaz",
+            "cancellationWarning": "İptali onayladığınızda rezervasyonunuz anında iptal edilecek ve geri alınamayacak. Varsa iadeler yukarıdaki politikaya göre işleme alınacak.",
+            "keepMyReservation": "Rezervasyonumu Koru",
+            "processing": "İşleniyor...",
+            "confirmCancellationButton": "İptali Onayla",
+            "invalidDate": "Geçersiz Tarih",
+            "cancellationProcessedSuccess": "Rezervasyon iptali başarıyla işlendi",
+            "cancellationFailed": "İptal başarısız",
+            "checkInDatePassed": "Rezervasyon iptal edilemez. Giriş tarihiniz geçmiş."
+        },
+        "AmendReservationModal": {
+            "title": "Rezervasyonunuzu Güncelleyin",
+            "subtitle": "{{propertyName}} tesisindeki yaklaşan konaklamanızda değişiklik yapın",
+            "currentBookingDetails": "Mevcut Rezervasyon Detayları",
+            "stayDates": "Konaklama Tarihleri",
+            "nightsCount_one": "{{count}} gece",
+            "nightsCount_other": "{{count}} gece",
+            "guests": "Misafirler",
+            "guestsCount": "{{adults}} Yetişkin, {{children}} Çocuk",
+            "roomDetails": "Oda Detayları",
+            "ratePlan": "Tarife Planı",
+            "bestAvailableRate": "En İyi Mevcut Fiyat",
+            "total": "toplam",
+            "whatToChange": "Neyi değiştirmek istiyorsunuz?",
+            "estimatedTotal": "Tahmini Toplam",
+            "amendmentTypes": {
+                "dates": "Tarihler",
+                "guests": "Misafirler",
+                "roomType": "Oda Tipi",
+                "specialRequests": "Özel İstekler"
+            },
+            "changeDates": "Tarihleri Değiştir",
+            "selectNewDates": "Yeni Konaklama Tarihlerini Seçin",
+            "checkInDate": "Giriş Tarihi",
+            "checkOutDate": "Çıkış Tarihi",
+            "stayDuration_one": "Konaklama süresi: {{count}} gece",
+            "stayDuration_other": "Konaklama süresi: {{count}} gece",
+            "nightsAdded_one": "(+{{count}} gece)",
+            "nightsAdded_other": "(+{{count}} gece)",
+            "nightsReduced_one": "(-{{count}} gece)",
+            "nightsReduced_other": "(-{{count}} gece)",
+            "changeGuests": "Misafirleri Değiştir",
+            "numberOfAdults": "Yetişkin Sayısı",
+            "numberOfChildren": "Çocuk Sayısı",
+            "adult_one": "Yetişkin",
+            "adult_other": "Yetişkin",
+            "child_one": "Çocuk",
+            "child_other": "Çocuk",
+            "guestsNote": "Ekstra misafirler için ek ücret uygulanabilir. Maksimum kapasite oda tipine göre değişir.",
+            "changeRoomType": "Oda Tipini Değiştir",
+            "roomType": "Oda Tipi",
+            "roomTypeNote": "Oda tipi değişiklikleri müsaitlik durumuna bağlıdır ve toplam fiyatı etkileyebilir.",
+            "updateSpecialRequests": "Özel İstekleri Güncelle",
+            "specialRequestsLabel": "Özel İstekler veya Tercihler",
+            "specialRequestsPlaceholder": "Yüksek kat, erken giriş gibi özel istek veya tercihlerinizi girin",
+            "specialRequestsNote": "Özel istekler müsaitlik durumuna bağlıdır ve garanti edilemez.",
+            "priceAdjustment": "Fiyat Düzeltmesi",
+            "additionalPayment": "Ek ödeme gerekli",
+            "additionalChargeExplanation": "Değişiklikleriniz ₹{{amount}} ek ücrete neden olacak",
+            "refundToBeProcessed": "İade işleme alınacak",
+            "refundExplanation": "Değişiklikleriniz ₹{{amount}} iade ile sonuçlanacak",
+            "amendmentPolicies": "Güncelleme Politikaları",
+            "policies": {
+                "dateChanges": "Tarih değişiklikleri müsaitlik durumuna bağlıdır",
+                "changes72Hours": "Girişten 72 saat önceki değişiklikler ek ücrete tabi olabilir",
+                "roomUpgrades": "Oda yükseltmeleri müsaitlik durumuna ve ek ücrete tabidir",
+                "reducingStay": "Konaklama süresinin kısaltılması orijinal rezervasyonun iptal politikasına tabi olabilir"
+            },
+            "cancel": "İptal",
+            "processing": "İşleniyor...",
+            "confirmAmendment": "Güncellemeyi Onayla",
+            "errors": {
+                "selectValidDates": "Lütfen geçerli giriş ve çıkış tarihleri seçin.",
+                "unableToAmend": "Rezervasyon güncellenemiyor. Lütfen tekrar deneyin veya destek ile iletişime geçin.",
+                "unableToFetchPrice": "Güncellenmiş fiyatlandırma alınamıyor. Lütfen tekrar deneyin veya destek ile iletişime geçin.",
+                "invalidFirstName": "Ad gerekli",
+                "invalidLastName": "Soyad gerekli",
+                "dobRequired": "Doğum tarihi gerekli.",
+                "selectRoomType": "Lütfen bir oda tipi seçin.",
+                "selectRatePlan": "Lütfen bir tarife planı seçin.",
+                "invalidDateRange": "Çıkış tarihi giriş tarihinden sonra olmalıdır.",
+                "correctFormErrors": "Göndermeden önce formdaki hataları düzeltin."
+            },
+            "success": {
+                "reservationAmended": "Rezervasyonunuz başarıyla güncellendi.",
+                "additionalPayment": "₹{{amount}} tutarında ek ödeme işleme alınacak.",
+                "refundProcessed": "₹{{amount}} tutarında iade işleme alınacak.",
+                "noChange": "Toplam fiyatta değişiklik yok."
+            },
+            "roomTypes": {
+                "standard": "Standart Oda",
+                "deluxe": "Delüks Oda",
+                "suite": "Suit Oda",
+                "executive": "Yönetici Suiti",
+                "family": "Aile Odası"
+            },
+            "ratePlans": {
+                "bestAvailable": "En İyi Mevcut Fiyat",
+                "aaaMember": "AAA Üye Fiyatı",
+                "package": "Paket Fiyatı",
+                "weekend": "Hafta Sonu Özel"
+            },
+            "modifications": {
+                "changedCheckIn": "Giriş tarihi değiştirildi",
+                "changedCheckOut": "Çıkış tarihi değiştirildi",
+                "changedRoomType": "Oda tipi {{roomType}} olarak değiştirildi",
+                "changedGuestCount": "Misafir sayısı değiştirildi",
+                "changedRatePlan": "Tarife planı {{ratePlanName}} olarak değiştirildi"
+            }
+        },
+        "BookingDetailsModal": {
+            "bookingId": "Rezervasyon ID",
+            "bookingNumber": "Rezervasyon #{{id}}",
+            "closeModal": "Modalı kapat",
+            "status": {
+                "confirmed": "Onaylandı",
+                "pending": "Beklemede",
+                "cancelled": "İptal Edildi"
+            },
+            "stayDetails": "Konaklama Detayları",
+            "checkIn": "Giriş",
+            "checkOut": "Çıkış",
+            "duration": "Süre",
+            "nightsStay_one": "{{count}} Gece",
+            "nightsStay_other": "{{count}} Gece",
+            "roomType": "Oda Tipi",
+            "roomName": "Oda Adı",
+            "roomsCount_one": "{{count}} Oda",
+            "roomsCount_other": "{{count}} Oda",
+            "guestDetails": "Misafir Detayları",
+            "guestName": "Misafir Adı",
+            "contactNumber": "İletişim Numarası",
+            "email": "E-posta",
+            "adults": "Yetişkinler",
+            "children": "Çocuklar",
+            "specialRequests": "Özel İstekler",
+            "paymentDetails": "Ödeme Detayları",
+            "paymentMethod": "Ödeme Yöntemi",
+            "paymentMethods": {
+                "credit_card": "Kredi Kartı",
+                "debit_card": "Banka Kartı",
+                "pay_at_hotel": "Otelde Öde",
+                "bank_transfer": "Banka Havalesi",
+                "paypal": "PayPal",
+                "google_pay": "Google Pay"
+            },
+            "bookingDate": "Rezervasyon Tarihi",
+            "totalAmount": "Toplam Tutar",
+            "night": "gece",
+            "ratePlan": "Tarife Planı",
+            "modifyBooking": "Rezervasyonu Değiştir",
+            "cancelBooking": "Rezervasyonu İptal Et",
+            "printItinerary": "Seyahat Programını Yazdır",
+            "rooms": "Odalar",
+            "dob": "Doğum Tarihi",
+            "guest": "Misafir",
+            "printFooter": "Rezervasyonunuz için teşekkürler. Sorularınız için lütfen müşteri hizmetlerimizle iletişime geçin.",
+            "printTitle": "Rezervasyon Onayı"
+        }
+    },
+    "Payment": {
+        "PaymentPageContent": {
+            "selectCryptoMethod": "Lütfen yukarıdan bir kripto ödeme yöntemi seçin.",
+            "invalidPayment": {
+                "title": "Geçersiz Ödeme",
+                "message": "Eksik bilgiler nedeniyle ödemenizi işleme alamadık.",
+                "returnToHomepage": "Ana Sayfaya Dön"
+            },
+            "bookingSummary": {
+                "title": "Rezervasyon Özeti",
+                "stayDates": "Konaklama Tarihleri",
+                "night": "gece",
+                "nights": "gece",
+                "guests": "Misafirler",
+                "room": "Oda",
+                "rooms": "Oda",
+                "adult": "Yetişkin",
+                "adults": "Yetişkin",
+                "child": "Çocuk",
+                "children": "Çocuk",
+                "infant": "Bebek",
+                "infants": "Bebek",
+                "guest": "Ana Misafir"
+            },
+            "paymentMethod": {
+                "title": "Ödeme Yöntemi"
+            },
+            "priceDetails": {
+                "title": "Fiyat Detayları",
+                "roomRate": "Oda Ücreti",
+                "perNight": " / gece",
+                "total": "Toplam",
+                "payAtHotelInfo": "Kartınız güvenli bir şekilde saklanacak ancak ödeme otelde alınacak."
+            },
+            "securityBadges": {
+                "securePayments": "Güvenli ödemeler",
+                "noCardStorage": "Kart bilgilerinizi asla tam olarak saklamayız",
+                "freeCancellation": "Ücretsiz iptal mevcut"
+            },
+            "needHelp": {
+                "title": "Yardıma İhtiyacınız Var mı?",
+                "message": "Müşteri hizmetleri ekibimiz rezervasyonunuzla ilgili sorularınızda size yardımcı olmak için 7/24 hizmetinizdedir.",
+                "contactSupport": "Destek ile İletişime Geçin"
+            },
+            "loading": {
+                "title": "Ödeme bilgileri yükleniyor...",
+                "message": "Ödeme sayfanızı hazırlarken lütfen bekleyin."
+            }
+        },
+        "PaymentComponents": {
+            "PaymentOptionSelector": {
+                "title": "Ödeme Seçenekleri",
+                "payNow": "Şimdi Öde",
+                "payNowDescription": "Ödemeyi hemen tamamla",
+                "payAtHotel": "Otelde Öde",
+                "payAtHotelDescription": "Otel ödemesi için kartı güvenli şekilde kaydet",
+                "payWithCrypto": "Kripto ile Öde",
+                "payWithCryptoDescription": "Ödemenizi kripto para ile tamamlayın",
+                "chooseCryptoMethod": "Kripto Ödeme Yöntemini Seçin",
+                "payWithWallet": "Cüzdan ile Öde",
+                "payWithQR": "QR Kod ile Öde"
+            },
+            "PayAtHotelFunction": {
+                "infoTitle": "Otelde Ödeme Bilgisi",
+                "infoMessage": "Kredi kartı bilgileriniz güvenli şekilde saklanacak ancak şimdi ücretlendirilmeyecek. Ödeme oteldeki konaklamanız sırasında işleme alınacak.",
+                "cardDetailsLabel": "Kart Detayları",
+                "stripeNotLoadedError": "Stripe henüz yüklenmedi. Lütfen tekrar deneyin.",
+                "notLoggedInError": "Bu rezervasyonu tamamlamak için giriş yapmanız gerekiyor. Lütfen giriş yapın ve tekrar deneyin.",
+                "cardElementNotFoundError": "Kart elementi bulunamadı",
+                "cardSetupFailedError": "Kart kurulumu başarısız",
+                "processing": "İşleniyor...",
+                "confirmBooking": "Rezervasyonu Onayla",
+                "paymentProcessingError": "Ödeme işlemi sırasında bir hata oluştu",
+                "footer": "Kart bilgileriniz Stripe tarafından şifrelenerek güvenli şekilde işlenir. Tam kart bilgilerinizi asla sunucularımızda saklamayız."
+            }
+        },
+        "PaymentSuccess": {
+            "noBookingDataForDownload": "İndirme için rezervasyon verisi mevcut değil.",
+            "downloadSuccessToast": "Rezervasyon onayı başarıyla indirildi!",
+            "processingBooking": "Rezervasyonunuz işleniyor...",
+            "confirmingReservation": "Rezervasyonunuzu onaylıyoruz. Bu sadece birkaç dakika sürecek.",
+            "bookingFailedTitle": "Rezervasyon Başarısız",
+            "returnToHomepage": "Ana Sayfaya Dön",
+            "bookingConfirmedTitle": "Rezervasyon Onaylandı!",
+            "reservationSuccessMessage": "Rezervasyonunuz başarıyla tamamlandı",
+            "bookingId": "Rezervasyon ID:",
+            "bookingSummaryTitle": "Rezervasyon Özeti",
+            "checkInLabel": "Giriş",
+            "checkOutLabel": "Çıkış",
+            "night": "gece",
+            "nights": "gece",
+            "guestsLabel": "Misafirler",
+            "guestInfoTitle": "Misafir Bilgileri",
+            "guestNameLabel": "Misafir Adı",
+            "guestDefaultName": "Misafir",
+            "emailLabel": "E-posta",
+            "phoneLabel": "Telefon Numarası",
+            "paymentMethodLabel": "Ödeme Yöntemi",
+            "paymentMethodCreditCard": "Kredi Kartı",
+            "paymentMethodPayAtHotel": "Otelde Öde",
+            "paymentMethodUnknown": "Bilinmiyor",
+            "paymentDetailsTitle": "Ödeme Detayları",
+            "roomRate": "Oda Ücreti",
+            "perNight": " / gece",
+            "total": "Toplam",
+            "paymentAtHotelMessage": "Ödeme otelde alınacak",
+            "paymentProcessedMessage": "Ödeme işlendi",
+            "viewMyBookings": "Rezervasyonlarımı Görüntüle",
+            "returnHome": "Ana Sayfaya Dön",
+            "whatsNextTitle": "Sırada Ne Var?",
+            "confirmationEmailSent": "E-posta adresinize onay maili gönderildi",
+            "viewBookingDetails": "Rezervasyon detaylarını hesabınızdan istediğiniz zaman görüntüleyebilirsiniz",
+            "contactSupportForChanges": "Değişiklik yapmanız mı gerekiyor? 7/24 destek için bize ulaşın",
+            "downloadBookingConfirmation": "Rezervasyon Onayını İndir",
+            "needHelpTitle": "Yardıma İhtiyacınız Var mı?",
+            "customerServiceMessage": "Müşteri hizmetleri ekibimiz sorularınızda size yardımcı olmak için 7/24 hizmetinizdedir.",
+            "contactSupportButton": "Destek ile İletişime Geçin",
+            "exploreMoreHotels": "Daha fazla otel seçeneği keşfedin"
+        },
+        "PaymentProgress": {
+            "title": "Kripto Ödeme Geçidi",
+            "subtitle": "Otel rezervasyon ödemenizi kripto para kullanarak tamamlayın",
+            "paymentInfo": "Ödeme Bilgileri",
+            "guestInfo": "Misafir Bilgileri",
+            "scanAndPay": "Tara ve Öde",
+            "payThroughWallet": "Cüzdan ile Öde",
+            "token": "Token",
+            "network": "Ağ",
+            "amount": "Tutar",
+            "hotel": "Otel",
+            "checkIn": "Giriş",
+            "checkOut": "Çıkış",
+            "email": "E-posta",
+            "age": "Yaş",
+            "years": "yaş",
+            "phone": "Telefon",
+            "guests": "Misafirler",
+            "walletAddress": "Cüzdan Adresi",
+            "scanInstructions": "Kripto cüzdanınızla tarayın",
+            "paymentInstructions": "Ödeme Talimatları",
+            "viewBookings": "Rezervasyonlarımı Görüntüle",
+            "returnHome": "Ana Sayfaya Dön",
+            "paymentSuccessful": "Ödeme Başarılı!",
+            "paymentConfirmed": "Ödemeniz onaylandı.",
+            "status": {
+                "pending": "Ödeme Bekleniyor",
+                "completed": "Ödeme Onaylandı",
+                "processing": "Ödeme İşleniyor",
+                "expired": "Ödeme Süresi Doldu",
+                "sessionExpired": "Oturum süresi doldu",
+                "expiringSoon": "Yakında sona eriyor",
+                "maxTimeReached": "Maksimum süreye ulaşıldı",
+                "timeRemaining": "Kalan süre",
+                "securePayment": "Güvenli Ödeme",
+                "default": "Beklemede"
+            },
+            "errors": {
+                "invalidPaymentData": "Geçersiz ödeme verisi",
+                "noPaymentData": "Ödeme verisi bulunamadı",
+                "noAuthToken": "Kimlik doğrulama gerekli"
+            },
+            "loading": {
+                "title": "Ödeme Detayları Yükleniyor",
+                "subtitle": "Kripto ödeme hazırlanıyor..."
+            },
+            "error": {
+                "title": "Ödeme Hatası"
+            },
+            "wallet": {
+                "sendInstruction": "{{network}} ağında {{address}} adresine {{amount}} {{token}} gönderin",
+                "loadingAddress": "Adres yükleniyor..."
+            },
+            "modal": {
+                "waitingConfirmation": "Rezervasyon onayı bekleniyor",
+                "confirmationMessage": "Ödemenizi onaylarken bekleyin. Bu 2-3 dakika sürebilir. Lütfen bu pencereyi kapatmayın."
+            },
+            "actions": {
+                "checkStatus": "Durumu Kontrol Et",
+                "checkBooking": "Rezervasyonu Kontrol Et",
+                "copyAddress": "Adresi kopyala",
+                "addressCopied": "✓ Adres panoya kopyalandı!",
+                "takeMeToBookings": "Rezervasyonlarıma Götür"
+            },
+            "support": {
+                "needHelp": "Yardıma İhtiyacınız Var mı?",
+                "supportMessage": "Destek ekibimiz kripto ödemenizde size yardımcı olmak için 7/24 hizmetinizdedir",
+                "contactSupport": "Destek ile İletişime Geçin",
+                "securityInfo": "Güvenlik Bilgisi"
+            },
+            "walletAddressLabel": "Cüzdan Adresi",
+            "instructions": {
+                "sendAmount": "Tam olarak {{amount}} değerinde {{token}} gönderin",
+                "useNetwork": "Sadece {{network}} ağını kullanın",
+                "doubleCheck": "Göndermeden önce cüzdan adresini iki kez kontrol edin",
+                "confirmationTime": "Ödeme onayı otomatiktir (5-15 dakika)"
+            },
+            "warning": "Önemli: Sadece {{network}} ağında {{token}} gönderin. Başka token gönderme veya yanlış ağ kullanma para kaybına neden olur.",
+            "common": {
+                "important": "Önemli"
+            }
+        }
+    },
+    "GuestBox": {
+        "guests": "Misafirler",
+        "adultsPlural": "Yetişkinler",
+        "adultSingular": "Yetişkin",
+        "infantsPlural": "Bebekler",
+        "infantSingular": "Bebek",
+        "roomsPlural": "Odalar",
+        "roomSingular": "Oda",
+        "childrenPlural": "Çocuklar",
+        "childSingular": "Çocuk",
+        "age": "Yaş",
+        "yearSingular": "yaş",
+        "yearPlural": "yaş",
+        "selectAge": "Yaş seçin",
+        "selectGuests": "Misafir Seçin",
+        "ages": "Yaşlar",
+        "cancel": "İptal",
+        "apply": "Uygula",
+        "defaultText": "1 Oda · 1 Yetişkin · 0 Çocuk",
+        "maxGuestsError": "Oda başına maksimum {{maxGuests}} misafir kabul edilir. Lütfen daha fazla oda ekleyin veya misafir sayısını azaltın.",
+        "selectAgeError": "Lütfen tüm çocuklar ve bebekler için yaş seçin"
+    },
+    "PayWithCryptoQR": {
+        "title": "Kripto ile Öde",
+        "amountLabel": "Tutar",
+        "loadingTokens": "Token'lar yükleniyor...",
+        "loadingNetworks": "Ağlar yükleniyor...",
+        "convertingCurrency": "{{currency}} USD'ye çevriliyor...",
+        "convertedAmount": "Çevrilmiş Tutar",
+        "selectToken": "Token Seç",
+        "selectNetwork": "Ağ Seç",
+        "noNetworksAvailable": "Bu token için kullanılabilir ağ yok",
+        "noTokensAvailable": "Kullanılabilir token yok",
+        "processing": "İşleniyor...",
+        "initiatePayment": "Ödemeyi Başlat",
+        "paymentInitiated": "Kripto ödemesi başarıyla başlatıldı",
+        "token": "Token",
+        "blockchain": "Blok Zinciri",
+        "amount": "Tutar",
+        "status": "Durum",
+        "paymentId": "Ödeme ID",
+        "scanQRCode": "{{network}} ağında {{token}} ile ödeme yapmak için QR kodu tarayın",
+        "qrCodePlaceholder": "QR kod burada görünecek",
+        "sendAmountInstruction": "{{network}} ağını kullanarak yukarıda gösterilen adrese tam tutarı gönderin",
+        "tokenLogoAlt": "{{token}} logosu",
+        "networkLogoAlt": "{{network}} logosu",
+        "errors": {
+            "noAuthToken": "Kimlik doğrulama token'ı bulunamadı",
+            "fetchTokens": "Token'ları getirirken hata",
+            "fetchTokensError": "Token'lar getirilirken bir hata oluştu",
+            "fetchNetworks": "Ağları getirirken hata",
+            "fetchNetworksError": "Ağlar getirilirken bir hata oluştu",
+            "currencyConversion": "Para birimi çevirme hatası",
+            "currencyConversionError": "Para birimi çevirme sırasında bir hata oluştu",
+            "selectionIncomplete": "Lütfen token, ağ seçin ve tutarın çevrildiğinden emin olun",
+            "initiatePayment": "Ödeme başlatma hatası",
+            "initiatePaymentError": "Ödeme başlatılırken bir hata oluştu"
+        }
+    },
+    "notifications": {
+        "title": "Bildirimler",
+        "newNotification": "Yeni Bildirim",
+        "unread": "okunmamış",
+        "markAllRead": "Tümünü okundu olarak işaretle",
+        "markAsRead": "Okundu olarak işaretle",
+        "retry": "Tekrar Dene",
+        "loading": "Bildirimler yükleniyor...",
+        "noUnread": "Okunmamış bildirim yok",
+        "noNotifications": "Henüz bildirim yok",
+        "emptyDescription": "Bir şey geldiğinde sizi bilgilendireceğiz",
+        "unknownTime": "Bilinmeyen zaman",
+        "type": "Tür",
+        "offerCode": "Teklif Kodu",
+        "tabs": {
+            "all": "Tümü",
+            "unread": "Okunmamış"
+        },
+        "errors": {
+            "fetchFailed": "Bildirimler getirilemedi",
+            "loadFailed": "Bildirimler yüklenemedi",
+            "markAllReadFailed": "Tüm bildirimler okundu olarak işaretlenemedi",
+            "markReadFailed": "Bildirim okundu olarak işaretlenemedi",
+            "loadingError": "Bildirimler yüklenirken hata"
+        }
+    },
+    "Help": {
+        "helpCenter": "Yardım Merkezi",
+        "helpCenterDesc": "Rezervasyon, ödemeler ve daha fazlası hakkında sık sorulan soruların cevaplarını bulun.",
+        "searchPlaceholder": "Yardım makalelerinde ara...",
+        "searchAriaLabel": "SSS'lerde ara",
+        "noResults": "Sonuç bulunamadı. Farklı bir arama terimi deneyin.",
+        "allCategories": "Tüm Kategoriler",
+        "popularTopics": "Popüler Konular",
+        "searchResults": "Arama Sonuçları",
+        "clearFilters": "Filtreleri temizle",
+        "stillNeedHelp": "Hala yardıma mı ihtiyacınız var?",
+        "contactDesc": "Destek ekibimiz size 7/24 yardım etmek için burada",
+        "contactFooter": "Yanıt süreleri yoğun saatlerde değişiklik gösterebilir. Acil durumlar için lütfen <phoneLink>telefon numarası</phoneLink> üzerinden bize ulaşın.",
+        "contactPhone": "+1-800-555-1234",
+        "contactPhoneFormatted": "(800) 555-1234",
+        "email": "E-posta Desteği",
+        "emailDesc": "4 saat içinde yanıt vereceğiz",
+        "phone": "Telefon Desteği",
+        "phoneDesc": "Acil durumlar için bizi arayın",
+        "supportOptions": {
+            "email": {
+                "responseTime": "< 4 saat"
+            },
+            "phone": {
+                "responseTime": "7/24"
+            }
+        },
+        "categories": {
+            "booking": {
+                "title": "Rezervasyon ve Bookinglar",
+                "description": "Rezervasyon yapma ve yönetme hakkında sorular"
+            },
+            "payment": {
+                "title": "Ödeme ve Faturalama",
+                "description": "Ödeme yöntemleri, kripto para, faturalama ve iadeler"
+            },
+            "security": {
+                "title": "Güvenlik ve Gizlilik",
+                "description": "Hesap güvenliği ve veri koruması"
+            },
+            "account": {
+                "title": "Hesap ve Profil",
+                "description": "Hesabınızı ve profil ayarlarınızı yönetme"
+            },
+            "promotions": {
+                "title": "Teklifler ve Promosyonlar",
+                "description": "İndirim kuponları ve promosyon teklifleri"
+            }
+        },
+        "contactForm": {
+            "title": "Bize Mesaj Gönderin",
+            "subject": "Konu",
+            "message": "Mesajınız",
+            "messagePlaceholder": "Sorununuzu açıklayın...",
+            "cancel": "İptal",
+            "send": "Mesaj Gönder",
+            "sending": "Gönderiliyor...",
+            "sent": "Mesaj Gönderildi!",
+            "thankYou": "Teşekkürler! Ekibimiz yakında sizinle iletişime geçecek."
+        },
+        "contactFooterNoPhone": "Acil yardım için lütfen e-posta desteğini kullanın.",
+        "faq": {
+            "howToPayQuestion": "Kullanıcı nasıl ödeme yapabilir?",
+            "howToPayAnswer": "Platform, geniş bir kullanıcı tercih yelpazesine hitap etmek için birden fazla uygun ödeme seçeneği sunar. Kullanıcılar \"Otelde Öde\" yöntemini seçebilirler, burada rezervasyon sırasında sadece rezervasyon onayı için kart bilgilerini sağlarlar. Anında herhangi bir ücret alınmaz ve ödeme doğrudan otelde - mülkün özel politikasına bağlı olarak check-in sırasında veya check-out'ta - yapılır.\n\nAyrıca, dijital para birimi tercih eden kullanıcılar için platform USDC, USDT (Polygon ağı), Ethereum, BNB ve Polygon Mainnet ile kripto para ödemelerini destekler. Bu, uluslararası seyahat edenler, teknoloji meraklısı kullanıcılar ve blockchain tabanlı işlemleri tercih edenler için daha fazla esneklik sağlar. Her iki ödeme yöntemi de güvenlik, şeffaflık ve kolaylık sağlamak için tasarlanmıştır.",
+            "cancelReservationQuestion": "Onaylandıktan sonra rezervasyonu iptal etmek mümkün mü?",
+            "cancelReservationAnswer": "Evet. Kullanıcılar onaylanmış rezervasyonları, planlanan check-in zamanından en az 24 saat önce yapmak koşuluyla iptal edebilirler. İptal özelliğine kullanıcı panelinin \"Seyahatlerim\" bölümünden kolayca erişilebilir.\n\nÇoğu otelin belirtilen süre içinde ücretsiz iptale izin verdiğini, ancak bazı mülklerin iade edilmez rezervasyonlar veya özel promosyon oranları gibi daha katı şartları olabileceğini unutmamak önemlidir. Bu nedenle, herhangi bir potansiyel ücretten kaçınmak için kullanıcıların rezervasyon sırasında otelin iptal politikasını gözden geçirmeleri şiddetle tavsiye edilir.",
+            "paymentSecurityQuestion": "Kullanıcı ödeme bilgileri güvenli bir şekilde mi işleniyor?",
+            "paymentSecurityAnswer": "Kesinlikle. Platform, gelişmiş şifreleme teknolojisiyle tanınan, küresel olarak tanınmış ve PCI DSS uyumlu bir ödeme geçidi olan Stripe ile ortaklık kurarak kullanıcı ödeme güvenliğine öncelik verir. Hassas ödeme verileri platformun sunucularında saklanmaz. Kart ödemeleri veya kripto para transferleri için tüm işlemler güvenli, şifreli kanallar aracılığıyla işlenir ve maksimum veri koruması ve kullanıcı güveni sağlar.",
+            "internationalCardsQuestion": "Kullanıcılar uluslararası kredi veya banka kartlarını kullanarak ödeme yapabilirler mi?",
+            "internationalCardsAnswer": "Evet. Ödeme sistemi uluslararası işlemleri tam olarak destekler ve dünyanın her yerinden kullanıcıların kısıtlama olmaksızın otel rezervasyonu yapmalarına olanak tanır. Desteklenen kart türleri Visa, Mastercard ve American Express gibi büyük küresel sağlayıcıları içerir. Para birimi dönüşümleri ödeme geçidi tarafından otomatik olarak işlenir ve uluslararası seyahat edenler için pürüzsüz ve sorunsuz bir rezervasyon deneyimi sağlar.",
+            "receiptQuestion": "Ödeme tamamlandıktan sonra fiş sağlanacak mı?",
+            "receiptAnswer": "Evet. Kullanıcının otelde ödeme, kart ile veya kripto para ile ödeme seçmesi fark etmeksizin, işlem tamamlandıktan sonra otomatik olarak dijital ödeme fişi oluşturulur ve kayıtlı e-posta adresine gönderilir. Bu fiş, rezervasyon referans numarası, otel adı, oda ücreti, vergi detayları ve net ödeme dökümü içerir ve işlem için resmi kayıt olarak hizmet eder.",
+            "accountRequiredQuestion": "Kullanıcıların rezervasyon öncesi hesap oluşturması gerekiyor mu?",
+            "accountRequiredAnswer": "Hesap oluşturma yalnızca kullanıcının rezervasyon yapmak istediği anda gereklidir. Bu, herkesin giriş yapmadan otelleri keşfedebileceği, oda müsaitliğini görüntüleyebileceği, fiyatları karşılaştırabileceği, olanakları kontrol edebileceği ve misafir yorumlarını okuyabileceği anlamına gelir.\n\nAncak, bir oda rezervasyonuna geçerken, sistem kullanıcıdan bir hesap oluşturmasını veya giriş yapmasını isteyecektir. Bu adım, rezervasyon detayları, ödeme onayları ve gelecekteki rezervasyonların güvenli bir şekilde saklanmasını ve \"Seyahatlerim\" bölümünde kolayca erişilebilir olmasını sağlar.",
+            "contactSupportQuestion": "Kullanıcılar müşteri desteği ile nasıl iletişim kurabilir?",
+            "contactSupportAnswer": "Platform, kullanıcıların rezervasyon sorguları, ödeme sorunları veya teknik endişeleri konusunda yardım almak için birden fazla destek kanalı sunmaktadır. Kullanıcılar e-posta desteği ve uygulama içi yardım masası aracılığıyla iletişime geçebilirler. Yanıt süreleri kanala bağlı olarak değişiklik gösterse de, acil rezervasyon veya ödeme ile ilgili sorunlara her zaman öncelik verilmektedir.",
+            "additionalChargesQuestion": "Rezervasyon sırasında herhangi bir ek ücret var mı?",
+            "additionalChargesAnswer": "Rezervasyon özetinde aksi belirtilmedikçe, görüntülenen tüm fiyatlar geçerli vergiler ve ücretler dahildir. Bazı oteller, ekstra yatak, yemek veya geç check-out gibi isteğe bağlı hizmetler için check-in sırasında ek miktarlar talep edebilir. Bunlar rezervasyonu sonuçlandırmadan önce açıkça belirtilir ve tam şeffaflık ile gizli sürpriz olmadığını garanti eder.",
+            "discountCouponQuestion": "Kullanıcı rezervasyon yaparken nasıl indirim alabilir veya kupon kullanabilir?",
+            "discountCouponAnswer": "Teklifler ve indirimlerden yararlanmak için kullanıcıların basit bir süreci takip etmeleri gerekir. Özel promosyon kuponları, seçili otel odalarına veya diğer promosyon malzemelerine yerleştirilen QR kodlarına bağlıdır. Bu QR kodunu mobil cihaz kullanarak tarayarak, kullanıcılar platformun mobil uygulamasına yönlendirilir. Oradan standart rezervasyon süreci ile devam edebilirler. Ödeme aşamasında bir \"Kupon Uygula\" seçeneği görünür - buna dokunmak kullanıcının kodu girmesine ve uygun indirimi toplam rezervasyon tutarına anında uygulamasına olanak tanır."
+        }
+    }
+}
