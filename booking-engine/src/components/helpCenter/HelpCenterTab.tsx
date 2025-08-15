@@ -192,7 +192,7 @@ const HelpCenterTab: React.FC = () => {
           <p className="text-sm sm:text-base text-gray-600 mb-4">
             {t("Help.helpCenterDesc", "Find answers to common questions or contact support.")}
           </p>
-          <div className="relative max-w-md mx-auto">
+          {/* <div className="relative max-w-md mx-auto">
             <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
@@ -202,7 +202,7 @@ const HelpCenterTab: React.FC = () => {
               className="w-full pl-12 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-tripswift-blue focus:border-transparent bg-white shadow-sm text-sm"
               aria-label={t("Help.searchAriaLabel", "Search help articles")}
             />
-          </div>
+          </div> */}
         </div>
       </div>
 

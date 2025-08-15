@@ -125,7 +125,6 @@ export const logout = () =>
         {},
         { headers: { Authorization: `Bearer ${accessToken}` } }
       );
-      toast.success("Logged out successfully");
     } catch (error) {
       console.error("Logout API error:", error);
     } finally {

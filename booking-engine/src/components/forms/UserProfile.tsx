@@ -2,15 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { User, Heart, Lock, Bell, Calendar, ChevronDown, Edit3, Bookmark, CheckCircle, ChevronRight, Gift, Percent, Shield, Star, HelpCircle, Eye, EyeOff, LogOut, Check, X, AlertTriangle, Volume2, VolumeX, Smartphone, Mail } from "lucide-react";
+import { User, Heart, Lock, Bell, Calendar, Edit3, Bookmark, CheckCircle, Gift, Percent, Shield, Star, HelpCircle, Eye, EyeOff, Check, X } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
-import { logout, getUser, updateProfile } from "../../Redux/slices/auth.slice";
+import { getUser, updateProfile } from "../../Redux/slices/auth.slice";
 import {
   fetchNotifications,
   markAsRead,
   markAllAsRead,
-  updateNotificationReadStatus,
-  clearNotifications
+  updateNotificationReadStatus
 } from "../../Redux/slices/notification.slice";
 import { AppDispatch, RootState } from "../../Redux/store";
 import Cookies from "js-cookie";
@@ -18,7 +17,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from "react-i18next";
 import { formatDistanceToNow } from 'date-fns';
 import HelpCenterTab from "@/components/helpCenter/HelpCenterTab";
-
+import ChangePasswordModal from "@/components/forms/ChangePasswordModal";
 // Types
 interface UserProfile {
   firstName: string;
@@ -158,26 +157,6 @@ const StatsCard = ({ icon: Icon, title, value, description }: StatsCardProps) =>
 );
 
 // Profile Section Component
-const ProfileSection = ({ title, children, defaultOpen = true }: ProfileSectionProps) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-
-  return (
-    <Card className="overflow-hidden">
-      <div
-        className="flex items-center justify-between p-4 sm:p-6 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <h2 className="text-base sm:text-lg font-semibold text-[var(--color-secondary-black)]">{title}</h2>
-        {isOpen ? (
-          <ChevronDown className="h-5 w-5 text-gray-500" />
-        ) : (
-          <ChevronRight className="h-5 w-5 text-gray-500" />
-        )}
-      </div>
-      {isOpen && <div className="p-4 sm:p-6 pt-0">{children}</div>}
-    </Card>
-  );
-};
 
 // Notification Item Component
 const NotificationItem = ({
@@ -317,24 +296,35 @@ const EditProfileModal = ({
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
-    if (!formData.firstName.trim()) newErrors.firstName = t("Auth.Validation.firstNameRequired", { defaultValue: "First Name is required" });
-    if (!formData.lastName.trim()) newErrors.lastName = t("Auth.Validation.lastNameRequired", { defaultValue: "Last Name is required" });
+
+    // First Name
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = t("Auth.Validation.firstNameRequired", { defaultValue: "First Name is required" });
+    } else if (!/^[a-zA-Z\s]+$/.test(formData.firstName)) {
+      newErrors.firstName = t("Auth.Validation.firstNameInvalid", { defaultValue: "First Name must contain only letters and spaces" });
+    }
+
+    // Last Name
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = t("Auth.Validation.lastNameRequired", { defaultValue: "Last Name is required" });
+    } else if (!/^[a-zA-Z\s]+$/.test(formData.lastName)) {
+      newErrors.lastName = t("Auth.Validation.lastNameInvalid", { defaultValue: "Last Name must contain only letters and spaces" });
+    }
+
+    // Email
     if (!formData.email.trim()) {
       newErrors.email = t("Auth.Validation.emailRequired", { defaultValue: "Email is required" });
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = t("Auth.Validation.emailInvalid", { defaultValue: "Please enter a valid email address" });
     }
+
+    // Phone
     if (!formData.phone.trim()) {
       newErrors.phone = t("BookingComponents.GuestInformationModal.phoneError", { defaultValue: "Phone number is required" });
     } else if (!/^\d{10}$/.test(formData.phone)) {
       newErrors.phone = t("BookingComponents.GuestInformationModal.phoneLengthError", { defaultValue: "Phone number for India must be exactly 10 digits." });
     }
-    if (formData.password && formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = t("Auth.Validation.passwordsDoNotMatch", { defaultValue: "Passwords do not match" });
-    }
-    if (formData.password && formData.password.length < 6) {
-      newErrors.password = t("Auth.Validation.minLength", { defaultValue: "Must be at least {{count}} characters", count: 6 });
-    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -396,7 +386,9 @@ const EditProfileModal = ({
             {errors.email && <p className="text-xs text-red-600 mt-1">{errors.email}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">{t("BookingComponents.GuestInformationModal.phoneLabel", { defaultValue: "Phone Number" })}</label>
+            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">
+              {t("BookingComponents.GuestInformationModal.phoneLabel", { defaultValue: "Phone Number" })}
+            </label>
             <input
               type="tel"
               value={formData.phone}
@@ -408,58 +400,16 @@ const EditProfileModal = ({
               maxLength={10}
               inputMode="numeric"
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-blue)]"
-              required
+            // Remove required attribute
             />
             {errors.phone && <p className="text-xs text-red-600 mt-1">{errors.phone}</p>}
             {formData.phone.length !== 10 && formData.phone.length > 0 && (
-              <p className="text-xs text-red-600 mt-1">{t("BookingComponents.GuestInformationModal.phoneLengthError", { defaultValue: "Phone number for India must be exactly 10 digits." })}</p>
+              <p className="text-xs text-red-600 mt-1">
+                {t("BookingComponents.GuestInformationModal.phoneLengthError", {
+                  defaultValue: "Phone number for India must be exactly 10 digits."
+                })}
+              </p>
             )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">{t("Profile.newPasswordOptional", { defaultValue: "New Password (optional)" })}</label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-blue)] pr-10"
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? (
-                  <EyeOff className="h-4 w-4 text-gray-500" />
-                ) : (
-                  <Eye className="h-4 w-4 text-gray-500" />
-                )}
-              </button>
-            </div>
-            {errors.password && <p className="text-xs text-red-600 mt-1">{errors.password}</p>}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">{t("Profile.confirmNewPassword", { defaultValue: "Confirm New Password" })}</label>
-            <div className="relative">
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-blue)] pr-10"
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="h-4 w-4 text-gray-500" />
-                ) : (
-                  <Eye className="h-4 w-4 text-gray-500" />
-                )}
-              </button>
-            </div>
-            {errors.confirmPassword && <p className="text-xs text-red-600 mt-1">{errors.confirmPassword}</p>}
           </div>
           <div className="flex flex-col sm:flex-row gap-3 mt-6">
             <Button variant="primary" size="md" type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
@@ -484,6 +434,7 @@ const UserProfile: React.FC = () => {
   const { notifications, unreadCount, isLoading } = useSelector((state: RootState) => state.notifications);
   const [activeTab, setActiveTab] = useState<'overview' | 'bookings' | 'preferences' | 'security' | 'notifications' | 'help'>('overview');
   const [isEditing, setIsEditing] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [notificationSettings, setNotificationSettings] = useState({
     email: true,
     push: true,
@@ -580,10 +531,6 @@ const UserProfile: React.FC = () => {
     }
   };
 
-  const handleLogout = () => {
-    dispatch(logout());
-    window.location.href = "/login";
-  };
 
   const handleTabClick = (tabId: typeof activeTab) => {
     if (tabId === 'bookings') {
@@ -624,8 +571,22 @@ const UserProfile: React.FC = () => {
     }
   };
 
-  const handleClearAllNotifications = () => {
-    dispatch(clearNotifications());
+  const handleChangePassword = async (newPassword: string) => {
+    try {
+      await dispatch(updateProfile({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone,
+        password: newPassword
+      })).unwrap();
+      await dispatch(getUser());
+      toast.success(t("Profile.passwordUpdatedSuccess", { defaultValue: "Password updated successfully" }));
+    } catch (error: any) {
+      console.error("Failed to update password:", error);
+      toast.error(error || t("Profile.passwordUpdateFailed", { defaultValue: "Failed to update password" }));
+      throw error;
+    }
   };
 
   const renderContent = () => {
@@ -751,24 +712,43 @@ const UserProfile: React.FC = () => {
       case 'security':
         return (
           <div className="space-y-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-secondary-black)]">{t("Profile.securitySettings", { defaultValue: "Security Settings" })}</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-secondary-black)]">
+              {t("Profile.securitySettings", { defaultValue: "Security Settings" })}
+            </h2>
+
+            {/* Change Password */}
             <Card className="p-4 sm:p-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 space-y-3 sm:space-y-0">
                 <div>
-                  <h3 className="text-base sm:text-lg font-semibold text-[var(--color-secondary-black)]">{t("Profile.changePassword", { defaultValue: "Password" })}</h3>
-                  <p className="text-sm text-[var(--color-secondary-black)]/60">{t("Profile.updatePassword", { defaultValue: "Update your password" })}</p>
+                  <h3 className="text-base sm:text-lg font-semibold text-[var(--color-secondary-black)]">
+                    {t("Profile.password", { defaultValue: "Password" })}
+                  </h3>
+                  <p className="text-sm text-[var(--color-secondary-black)]/60">
+                    {t("Profile.updatePassword", { defaultValue: "Update your account password" })}
+                  </p>
                 </div>
-                <Button variant="outline" size="md" className="flex items-center border-[var(--color-primary-blue)]/30 bg-[var(--color-primary-blue)]/5 text-[var(--color-primary-blue)] w-full sm:w-auto justify-center" onClick={() => setIsEditing(true)}>
+                <Button
+                  variant="outline"
+                  size="md"
+                  className="flex items-center border-[var(--color-primary-blue)]/30 bg-[var(--color-primary-blue)]/5 text-[var(--color-primary-blue)] w-full sm:w-auto justify-center"
+                  onClick={() => setIsChangingPassword(true)}
+                >
                   <Lock className="h-4 w-4 mr-2" />
                   {t("Profile.changePassword", { defaultValue: "Change Password" })}
                 </Button>
               </div>
             </Card>
+
+            {/* Two-Factor Authentication */}
             <Card className="p-4 sm:p-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 space-y-3 sm:space-y-0">
                 <div>
-                  <h3 className="text-base sm:text-lg font-semibold text-[var(--color-secondary-black)]">{t("Profile.twoFactorAuth", { defaultValue: "Two-Factor Authentication" })}</h3>
-                  <p className="text-sm text-[var(--color-secondary-black)]/60">{t("Profile.twoFactorDesc", { defaultValue: "Add an extra layer of security to your account" })}</p>
+                  <h3 className="text-base sm:text-lg font-semibold text-[var(--color-secondary-black)]">
+                    {t("Profile.twoFactorAuth", { defaultValue: "Two-Factor Authentication" })}
+                  </h3>
+                  <p className="text-sm text-[var(--color-secondary-black)]/60">
+                    {t("Profile.twoFactorDesc", { defaultValue: "Add an extra layer of security to your account" })}
+                  </p>
                 </div>
                 <Button variant="primary" size="md" onClick={() => { }} className="w-full sm:w-auto">
                   {t("Profile.enable2FA", { defaultValue: "Enable 2FA" })}
@@ -879,6 +859,14 @@ const UserProfile: React.FC = () => {
           user={user}
           onSave={handleSaveProfile}
           onClose={() => setIsEditing(false)}
+          t={t}
+        />
+      )}
+
+      {isChangingPassword && (
+        <ChangePasswordModal
+          onClose={() => setIsChangingPassword(false)}
+          onSave={handleChangePassword}
           t={t}
         />
       )}

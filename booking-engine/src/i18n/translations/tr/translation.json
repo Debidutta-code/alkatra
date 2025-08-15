@@ -27,10 +27,10 @@
             "title": "Hesap oluştur",
             "subtitle": "Başlamak için bilgilerinizi doldurun.",
             "heroTitle": {
-                "join": "Hemen",
-                "now": "Katılın"
+                "join": "Şimdi",
+                "now": "Katıl"
             },
-            "heroSubtitle": "Özel seyahat fırsatlarının kilidini açmak ve seyahatlerinizi kolayca yönetmek için hesap oluşturun.",
+            "heroSubtitle": "Özel seyahat fırsatlarının kilidini açmak ve seyahatlerinizi kolayca yönetmek için bir hesap oluşturun.",
             "benefits": {
                 "memberPricing": "Özel üye fiyatlarıyla seyahatlerinizi rezerve edin",
                 "personalizedRecommendations": "Kişiselleştirilmiş seyahat önerileri alın",
@@ -41,15 +41,19 @@
             "lastNameLabel": "Soyad",
             "lastNamePlaceholder": "Yılmaz",
             "emailLabel": "E-posta adresi",
-            "emailPlaceholder": "siz@ornek.com",
+            "emailPlaceholder": "ornek@email.com",
             "passwordLabel": "Şifre",
             "passwordHelp": "Şifre en az 8 karakter içermeli ve en az bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter bulunmalıdır.",
-            "createAccountButton": "Hesap Oluştur",
+            "updateAccountButton": "Hesabı Güncelle",
+            "updatePasswordButton": "Şifre Güncelle",
             "alreadyHaveAccount": "Zaten hesabınız var mı?",
             "signIn": "Giriş yap",
             "successMessage": "Kayıt başarılı! Lütfen giriş yapın.",
-            "genericError": "Bir şeyler yanlış gitti",
-            "registrationFailed": "Kayıt başarısız"
+            "genericError": "Bir şeyler ters gitti",
+            "registrationFailed": "Kayıt başarısız oldu",
+            "createAccountButton": "Hesap Oluştur",
+            "enterNewPassword": "Yeni şifre girin",
+            "reEnterPassword": "Yeni şifreyi tekrar girin"
         },
         "ForgotPassword": {
             "title": "Şifremi Unuttum?",
@@ -189,7 +193,7 @@
         "profileUpdatedSuccess": "Profil başarıyla güncellendi",
         "profileUpdateFailed": "Profil güncellenemedi",
         "contentComingSoon": "{{tab}} için içerik yakında geliyor...",
-        "newPasswordOptional": "Yeni Şifre (opsiyonel)",
+        "newPasswordOptional": "Yeni Şifre",
         "confirmNewPassword": "Yeni Şifreyi Onayla",
         "joined": "{{date}} tarihinde katıldı",
         "notificationsDesc": "Bildirim tercihlerinizi yönetin ve son bildirimleri görüntüleyin.",

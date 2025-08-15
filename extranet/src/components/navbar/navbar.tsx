@@ -32,6 +32,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { RootState, useSelector, useDispatch } from "../../redux/store";
 import Cookies from "js-cookie";
 import { SidebarTrigger, useSidebar } from "@src/components/ui/sidebar";
+import toast from "react-hot-toast";
 
 type Props = {};
 
@@ -63,6 +64,7 @@ export default function Navbar() {
   const handleLogout = () => {
     dispatch(logout());
     Cookies.remove("accessToken");
+    toast.success("Logged out successfully!");
     return router.push("/login");
   };
 

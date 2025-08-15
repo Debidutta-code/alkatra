@@ -45,11 +45,15 @@
       "passwordLabel": "Password",
       "passwordHelp": "Password must contain at least 8 characters including one uppercase letter, one lowercase letter, one number and one special character.",
       "updateAccountButton": "Update Account",
+      "updatePasswordButton": "Update Password",
       "alreadyHaveAccount": "Already have an account?",
       "signIn": "Sign in",
       "successMessage": "Registration successful! Please sign in.",
       "genericError": "Something went wrong",
-      "registrationFailed": "Registration failed"
+      "registrationFailed": "Registration failed",
+      "createAccountButton": "Create Account",
+      "enterNewPassword": "Enter new password",
+      "reEnterPassword": "Re-enter new password"
     },
     "ForgotPassword": {
       "title": "Forgot Password?",
@@ -189,7 +193,7 @@
     "profileUpdatedSuccess": "Profile updated successfully",
     "profileUpdateFailed": "Failed to update profile",
     "contentComingSoon": "Content for {{tab}} coming soon...",
-    "newPasswordOptional": "New Password (optional)",
+    "newPasswordOptional": "New Password",
     "confirmNewPassword": "Confirm New Password",
     "joined": "Joined {{date}}",
     "notificationsDesc": "Manage your notification preferences and view recent notifications.",
@@ -1341,7 +1345,7 @@
       "howToPayQuestion": "How can a user make a payment?",
       "howToPayAnswer": "The platform offers multiple convenient payment options to cater to a wide range of user preferences. Users can choose the \"Pay at Hotel\" method, where they provide their card details during the booking process purely for reservation confirmation. No immediate charge is made, and the payment is settled directly at the hotel—either during check-in or at checkout—depending on the property’s specific policy.\n\nAdditionally, for users who prefer digital currency, the platform supports cryptocurrency payments in USDC, USDT (Polygon network), Ethereum, BNB, and Polygon Mainnet. This ensures greater flexibility for international travelers, tech-savvy users, and those who prefer blockchain-based transactions. Both payment methods are designed to provide security, transparency, and convenience.",
       "cancelReservationQuestion": "Is it possible to cancel a reservation after it is confirmed?",
-      "cancelReservationAnswer": "Yes. Users can cancel confirmed reservations, provided they do so at least 24 hours before the scheduled check-in time. The cancellation feature is easily accessible in the “My Trips” section of the user dashboard.\n\nIt is important to note that while most hotels allow free cancellations within the stated period, some properties may have stricter terms—such as non-refundable bookings or special promotional rates. Therefore, users are strongly advised to review the hotel’s cancellation policy at the time of booking to avoid any potential charges.",
+      "cancelReservationAnswer": "Yes. Users can cancel confirmed reservations, provided they do so at least 24 hours before the scheduled check-in time. The cancellation feature is easily accessible in the “My Trips” section.\n\nIt is important to note that while most hotels allow free cancellations within the stated period, some properties may have stricter terms—such as non-refundable bookings or special promotional rates. Therefore, users are strongly advised to review the hotel’s cancellation policy at the time of booking to avoid any potential charges.",
       "paymentSecurityQuestion": "Is user payment information handled securely?",
       "paymentSecurityAnswer": "Absolutely. The platform prioritizes user payment security by partnering with Stripe, a globally recognized and PCI DSS-compliant payment gateway known for its advanced encryption technology. No sensitive payment data is stored on the platform’s servers. All transactions, whether for card payments or cryptocurrency transfers, are processed through secure, encrypted channels, ensuring maximum data protection and user trust.",
       "internationalCardsQuestion": "Can users pay using international credit or debit cards?",
@@ -1355,7 +1359,7 @@
       "additionalChargesQuestion": "Are there any additional charges during booking?",
       "additionalChargesAnswer": "All displayed prices are inclusive of applicable taxes and fees, unless otherwise specified in the booking summary. Some hotels may charge additional amounts at check-in for optional services such as extra beds, meals, or late check-out. These will be clearly indicated before finalizing the booking, ensuring full transparency and no hidden surprises.",
       "discountCouponQuestion": "How can user get a discount or use a coupon while booking?",
-      "discountCouponAnswer": "To avail of offers and discounts, users need to follow a simple process. Special promotional coupons are linked to QR codes placed in select hotel rooms or other promotional materials. By scanning this QR code using a mobile device, users are redirected to the platform’s mobile application. From there, they can proceed with the standard booking process. At the payment stage, an “Apply Coupon” option will be visible—tapping on this will allow the user to enter the code and instantly apply the eligible discount to their total booking amount."
+      "discountCouponAnswer": "To avail offers and discounts, users need to follow a simple process. Special promotional coupons are linked to QR codes placed in select hotel rooms or other promotional materials. By scanning this QR code using a mobile device, users are redirected to the platform’s mobile application. From there, they can proceed with the standard booking process. At the payment stage, an “Apply Coupon” option will be visible—tapping on this will allow the user to enter the code and instantly apply the eligible discount to their total booking amount."
     }
   }
 }

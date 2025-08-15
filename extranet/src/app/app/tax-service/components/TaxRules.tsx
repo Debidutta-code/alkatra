@@ -24,6 +24,9 @@ type TaxRulesProps = {
 export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: TaxRulesProps) => {
     const [rules, setRules] = useState<TaxRule[]>(initialRules);
     const [loading, setLoading] = useState(false);
+    const [createLoading, setCreateLoading] = useState(false);
+    const [updateLoading, setUpdateLoading] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [filterStatus, setFilterStatus] = useState<"all" | "active" | "inactive">("all");
     // Dropdown options
@@ -59,7 +62,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
         name: "",
         type: "PERCENTAGE" as const,
         value: "",
-        applicableOn: "TOTAL_AMOUNT" as const,
+        applicableOn: "ROOM_RATE" as const,
         country: "",
         description: "",
         validFrom: "",
@@ -83,7 +86,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
         name: "",
         type: "PERCENTAGE",
         value: "",
-        applicableOn: "TOTAL_AMOUNT",
+        applicableOn: "ROOM_RATE",
         country: "",
         description: "",
         validFrom: "",
@@ -163,25 +166,19 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
             return;
         }
 
-        try {
-            await handleUpdate(editingRule, {
-                name: editForm.name.trim(),
-                type: editForm.type as "PERCENTAGE" | "FIXED",
-                value: numValue,
-                applicableOn: editForm.applicableOn as "TOTAL_AMOUNT" | "ROOM_RATE",
-                region: { country: editForm.country.trim() },
-                description: editForm.description || undefined,
-                validFrom: editForm.validFrom ? convertDateToUTC(editForm.validFrom) : undefined,
-                isInclusive: editForm.isInclusive,
-                priority: numPriority,
-            });
+        await handleUpdate(editingRule, {
+            name: editForm.name.trim(),
+            type: editForm.type as "PERCENTAGE" | "FIXED",
+            value: numValue,
+            applicableOn: editForm.applicableOn as "TOTAL_AMOUNT" | "ROOM_RATE",
+            region: { country: editForm.country.trim() },
+            description: editForm.description || undefined,
+            validFrom: editForm.validFrom ? convertDateToUTC(editForm.validFrom) : undefined,
+            isInclusive: editForm.isInclusive,
+            priority: numPriority,
+        });
 
-            setEditingRule(null);
-            toast.success("Tax rule updated successfully!");
-        } catch (error) {
-            console.error("Error saving tax rule:", error);
-            toast.error("Failed to update tax rule. Please try again.");
-        }
+        setEditingRule(null);
     };
 
     const cancelEdit = () => {
@@ -190,7 +187,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
             name: "",
             type: "PERCENTAGE",
             value: "",
-            applicableOn: "TOTAL_AMOUNT",
+            applicableOn: "ROOM_RATE",
             country: "",
             description: "",
             validFrom: "",
@@ -231,7 +228,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
             hotelId: propertyId,
         };
 
-        setLoading(true);
+        setCreateLoading(true);
         try {
             const res = await fetch(`${TAX_API_BASE}/tax-rule`, {
                 method: "POST",
@@ -255,7 +252,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
             console.error("Error creating tax rule:", err);
             toast.error("Network error");
         } finally {
-            setLoading(false);
+            setCreateLoading(false);
         }
     };
 
@@ -264,7 +261,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
             name: "",
             type: "PERCENTAGE",
             value: "",
-            applicableOn: "TOTAL_AMOUNT",
+            applicableOn: "ROOM_RATE",
             country: "",
             description: "",
             validFrom: "",
@@ -294,7 +291,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
     };
 
     const handleUpdate = async (id: string, updates: Partial<Omit<TaxRule, "_id" | "hotelId">>) => {
-        setLoading(true);
+        setUpdateLoading(true);
         try {
             const payload = {
                 ...updates,
@@ -321,14 +318,14 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
             console.error("Error updating tax rule:", err);
             toast.error("Network error: Could not connect to server");
         } finally {
-            setLoading(false);
+            setUpdateLoading(false);
         }
     };
 
     const handleDelete = async () => {
         if (!deleteModal.ruleId) return;
 
-        setLoading(true);
+        setDeleteLoading(true);
         try {
             const res = await fetch(`${TAX_API_BASE}/tax-rule/${deleteModal.ruleId}`, {
                 method: "DELETE",
@@ -349,7 +346,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
             console.error("Error deleting tax rule:", err);
             toast.error("Delete failed");
         } finally {
-            setLoading(false);
+            setDeleteLoading(false);
         }
     };
     const openDeleteModal = (ruleId: string, ruleName: string) => {
@@ -544,7 +541,10 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label className="text-sm font-semibold text-slate-700">Applicable On</Label>
+                                    <Label className="text-sm font-semibold text-slate-700 flex items-center">
+                                        Applicable On
+                                        <span className="text-red-500 ml-1">*</span>
+                                    </Label>
                                     <CustomDropdown
                                         name="applicableOn"
                                         value={form.applicableOn}
@@ -623,10 +623,10 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                     </Button>
                                     <Button
                                         onClick={handleCreate}
-                                        disabled={loading || !form.name.trim() || !form.country.trim() || !form.value}
+                                        disabled={createLoading || !form.name.trim() || !form.country.trim() || !form.value}
                                         className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-8 shadow-lg"
                                     >
-                                        {loading ? (
+                                        {createLoading ? (
                                             <div className="flex items-center">
                                                 <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -817,11 +817,11 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                                         </Button>
                                                         <Button
                                                             onClick={saveEdit}
-                                                            disabled={loading || !editForm.name.trim() || !editForm.country.trim() || !editForm.value}
+                                                            disabled={updateLoading || !editForm.name.trim() || !editForm.country.trim() || !editForm.value}
                                                             size="sm"
                                                             className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
                                                         >
-                                                            {loading ? (
+                                                            {updateLoading ? (
                                                                 <div className="flex items-center">
                                                                     <svg className="animate-spin -ml-1 mr-2 h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

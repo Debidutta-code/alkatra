@@ -25,31 +25,35 @@
     },
     "Register": {
       "title": "إنشاء حساب",
-      "subtitle": "املأ التفاصيل الخاصة بك للبدء.",
+      "subtitle": "املأ بياناتك للبدء.",
       "heroTitle": {
         "join": "انضم",
         "now": "الآن"
       },
-      "heroSubtitle": "أنشئ حسابًا لفتح عروض سفر حصرية وإدارة رحلاتك بسهولة.",
+      "heroSubtitle": "أنشئ حساباً للحصول على عروض سفر حصرية وإدارة رحلاتك بسهولة.",
       "benefits": {
         "memberPricing": "احجز رحلاتك بأسعار خاصة للأعضاء",
-        "personalizedRecommendations": "احصل على توصيات سفر مخصصة",
-        "manageBookings": "إدارة جميع حجوزاتك في مكان واحد"
+        "personalizedRecommendations": "احصل على توصيات سفر مخصصة لك",
+        "manageBookings": "أدر جميع حجوزاتك في مكان واحد"
       },
       "firstNameLabel": "الاسم الأول",
-      "firstNamePlaceholder": "محمد",
+      "firstNamePlaceholder": "أحمد",
       "lastNameLabel": "اسم العائلة",
-      "lastNamePlaceholder": "أحمد",
+      "lastNamePlaceholder": "محمد",
       "emailLabel": "عنوان البريد الإلكتروني",
-      "emailPlaceholder": "you@example.com",
+      "emailPlaceholder": "example@email.com",
       "passwordLabel": "كلمة المرور",
-      "passwordHelp": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل بما في ذلك حرف كبير واحد، وحرف صغير واحد، ورقم واحد، وحرف خاص واحد.",
-      "updateAccountButton": "إنشاء حساب",
+      "passwordHelp": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل بما في ذلك حرف كبير واحد وحرف صغير واحد ورقم واحد ورمز خاص واحد.",
+      "updateAccountButton": "تحديث الحساب",
+      "updatePasswordButton": "تحديث كلمة المرور",
       "alreadyHaveAccount": "هل لديك حساب بالفعل؟",
       "signIn": "تسجيل الدخول",
       "successMessage": "تم التسجيل بنجاح! يرجى تسجيل الدخول.",
       "genericError": "حدث خطأ ما",
-      "registrationFailed": "فشل التسجيل"
+      "registrationFailed": "فشل التسجيل",
+      "createAccountButton": "إنشاء حساب",
+      "enterNewPassword": "أدخل كلمة المرور الجديدة",
+      "reEnterPassword": "أعد إدخال كلمة المرور الجديدة"
     },
     "ForgotPassword": {
       "title": "نسيت كلمة المرور؟",
@@ -189,7 +193,7 @@
     "profileUpdatedSuccess": "تم تحديث الملف الشخصي بنجاح",
     "profileUpdateFailed": "فشل في تحديث الملف الشخصي",
     "contentComingSoon": "المحتوى لـ {{tab}} قادم قريبًا...",
-    "newPasswordOptional": "كلمة مرور جديدة (اختياري)",
+    "newPasswordOptional": "كلمة مرور جديدة",
     "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
     "joined": "انضم في {{date}}",
     "notificationsDesc": "إدارة تفضيلات الإشعارات الخاصة بك وعرض الإشعارات الحديثة.",
