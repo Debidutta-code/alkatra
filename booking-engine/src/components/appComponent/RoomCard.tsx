@@ -6,7 +6,7 @@ import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
-import { logout } from "@/Redux/slices/auth.slice";
+import { logout } from "../../Redux/slices/auth.slice";
 import { useTranslation } from "react-i18next";
 import {
   FaThermometerHalf, FaPhone, FaTv, FaCouch, FaChair, FaDoorClosed, FaDesktop, FaWifi, FaSnowflake, FaBed, FaChild, FaUser, FaTree,
@@ -20,8 +20,8 @@ import {
   FaWheelchair,
   FaPlug
 } from "react-icons/fa";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { getPolicyType, getPolicyStyling, getPolicyBulletPoints } from "@/utils/cancellationPolicies";
+import { Card, CardContent, CardHeader } from "../../components/ui/card";
+import { getPolicyType, getPolicyStyling, getPolicyBulletPoints } from "../../utils/cancellationPolicies";
 
 interface RoomData {
   _id: string;

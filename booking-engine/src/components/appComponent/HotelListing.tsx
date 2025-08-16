@@ -3,13 +3,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { useSearchParams, useRouter } from "next/navigation";
-import { getHotelsByCity } from "@/api/hotel";
-import { FilterState } from "@/components/hotelBox/FilterModal";
+import { getHotelsByCity } from "../../api/hotel";
+import { FilterState } from "../../components/hotelBox/FilterModal";
 import {
   setPropertyId,
   setCheckInDate,
   setCheckOutDate,
-} from "@/Redux/slices/pmsHotelCard.slice";
+} from "../../Redux/slices/pmsHotelCard.slice";
 import {
   Filter,
   Calendar,
@@ -20,17 +20,17 @@ import {
   Shield,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { useSelector } from "@/Redux/store";
-import { formatDate, calculateNights } from "@/utils/dateUtils";
+import { useSelector } from "../../Redux/store";
+import { formatDate, calculateNights } from "../../utils/dateUtils";
 import { useTranslation } from "react-i18next";
 
-import CompactSearchBar from "@/components/hotelBox/CompactSearchBar";
-import HotelCardItem from "@/components/hotelListingComponents/HotelCardItem";
-import ActiveFilters from "@/components/hotelListingComponents/ActiveFilters";
-import FilterSidebar from "@/components/hotelListingComponents/FilterSidebar";
-import MobileFilterDrawer from "@/components/hotelListingComponents/MobileFilterDrawer";
-import LoadingSkeleton from "@/components/hotelListingComponents/LoadingSkeleton";
-import EmptyState from "@/components/hotelListingComponents/EmptyState";
+import CompactSearchBar from "../../components/hotelBox/CompactSearchBar";
+import HotelCardItem from "../../components/hotelListingComponents/HotelCardItem";
+import ActiveFilters from "../../components/hotelListingComponents/ActiveFilters";
+import FilterSidebar from "../../components/hotelListingComponents/FilterSidebar";
+import MobileFilterDrawer from "../../components/hotelListingComponents/MobileFilterDrawer";
+import LoadingSkeleton from "../../components/hotelListingComponents/LoadingSkeleton";
+import EmptyState from "../../components/hotelListingComponents/EmptyState";
 
 interface Hotel {
   _id: string;

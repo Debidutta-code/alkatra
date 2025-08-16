@@ -1,6 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
-import { AMENITIES } from "@/components/hotelBox/FilterModal";
+import { AMENITIES } from "../../components/hotelBox/FilterModal";
 import { useTranslation } from 'react-i18next';
 
 interface ActiveFiltersProps {

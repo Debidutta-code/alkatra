@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import {
   Avatar,
@@ -10,44 +9,30 @@ import {
 import {
   NavigationMenu,
   NavigationMenuContent,
-  NavigationMenuIndicator,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  NavigationMenuViewport,
-  navigationMenuTriggerStyle,
 } from "./../ui/navigation-menu";
 
 import {
   Menubar,
-  MenubarCheckboxItem,
   MenubarContent,
   MenubarItem,
   MenubarMenu,
-  MenubarRadioGroup,
-  MenubarRadioItem,
-  MenubarSeparator,
   MenubarShortcut,
-  MenubarSub,
-  MenubarSubContent,
-  MenubarSubTrigger,
   MenubarTrigger,
 } from "./../ui/menubar";
 
 import { getUser, logout } from "../../redux/slices/authSlice";
 
-import { cn } from "../../lib/utils";
 import Link from "next/link";
 import { Button } from "../ui/button";
-import { Settings, User, LogOut, Users } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { RootState, store, useSelector, useDispatch } from "../../redux/store";
-import { ModeToggle } from "./../mode-toggle";
+import { RootState, useSelector, useDispatch } from "../../redux/store";
 import Cookies from "js-cookie";
-import dynamic from "next/dynamic";
-import { useTheme } from "next-themes";
 import { SidebarTrigger, useSidebar } from "@src/components/ui/sidebar";
+import toast from "react-hot-toast";
 
 type Props = {};
 
@@ -69,19 +54,17 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [noNav, setNoNav] = useState(false);
-  const { open, isMobile } = useSidebar();
+  useSidebar();
 
-  const { user, isAuthenticated } = useSelector(
+  const { user } = useSelector(
     (state: RootState) => state.auth
   );
   const dispatch = useDispatch();
-  // const { theme } = useTheme();
-  // const [logoSrc, setLogoSrc] = useState("/assets/ALHAJZ.png");
-
-
+  
   const handleLogout = () => {
     dispatch(logout());
     Cookies.remove("accessToken");
+    toast.success("Logged out successfully!");
     return router.push("/login");
   };
 
@@ -95,32 +78,13 @@ export default function Navbar() {
     setNoNav(isLoginORregisterPath);
   }, [pathname]);
 
-  // Update logo when theme changes
-  // useEffect(() => {
-  //   if (theme === "dark") {
-  //     setLogoSrc("/assets/TRIP-2.png");
-  //   } else {
-  //     setLogoSrc("/assets/ALHAJZ.png");
-  //   }
-  // }, [theme]);
-
   return (
     <nav
-      // className={cn(
-      //   "md:h-[14vh] h-[12vh] border-b border-gray-200/60 flex items-center justify-between px-10 transition-all duration-300",
-      //   noNav && "hidden",
-      //   open && !isMobile
-      //     ? " w-[calc(100vw-16rem)] md:pr-16 lg:pr-20"
-      //     : " w-[calc(100vw-4rem)]",
-      //   isMobile && "w-full ml-0"
-      // )}
       className={`md:h-[14vh] h-[12vh] border-b px-10 ${noNav ? "hidden" : "flex items-center justify-between"
       } `}
     >
-      {/* Left: Toggle + Logo */}
       <div className="flex md:px-8  items-center gap-2 min-w-0">
         <NavbarSidebarToggle />
-        {/* <Image ... /> */}
       </div>
 
       {/* Right: Menus and Avatar */}
@@ -172,9 +136,6 @@ export default function Navbar() {
                     user.firstName.charAt(0).toUpperCase() +
                     user.firstName.slice(1).toLowerCase()}
                 </span>
-                {/* <span className="text-xs text-muted-foreground">
-      {user?.role || "Guest"}
-    </span> */}
               </div>
             </MenubarTrigger>
             <MenubarContent>

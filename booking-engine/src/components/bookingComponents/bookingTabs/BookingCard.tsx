@@ -16,7 +16,7 @@ import {
   getRoomTypeIcon
 } from './utils';
 import { useTranslation } from 'react-i18next';
-import { formatDate, calculateNights } from "@/utils/dateUtils";
+import { formatDate, calculateNights } from "../../../utils/dateUtils";
 
 interface BookingCardProps {
   booking: Booking;

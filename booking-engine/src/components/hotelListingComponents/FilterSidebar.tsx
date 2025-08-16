@@ -1,6 +1,6 @@
 import React, { useState, useTransition } from 'react';
 import { Star, Check } from 'lucide-react';
-import { AMENITIES } from "@/components/hotelBox/FilterModal";
+import { AMENITIES } from "../../components/hotelBox/FilterModal";
 import i18next, { t, i18n } from 'i18next';
 import { useTranslation } from 'react-i18next';
 interface FilterSidebarProps {

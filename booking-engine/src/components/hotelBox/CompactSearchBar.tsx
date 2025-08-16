@@ -6,9 +6,9 @@ import { Search, MapPin, Calendar, Loader2, X, ChevronRight } from 'lucide-react
 import toast from "react-hot-toast";
 import DateRange from "../hotelBox/DateRange";
 import GuestBox from "../hotelBox/GuestBox";
-import { getHotelsByCity } from '@/api/hotel';
+import { getHotelsByCity } from '../../api/hotel';
 import { format, addDays } from 'date-fns';
-import { useSelector } from "@/Redux/store";
+import { useSelector } from "../../Redux/store";
 import { t } from "i18next";
 import { useTranslation } from "react-i18next";
 

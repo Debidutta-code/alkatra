@@ -29,11 +29,11 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useWalletClient, useChainId } from "wagmi";
 import { sendToken } from "./metamaskServices";
 import toast from "react-hot-toast";
-import { messaging } from "@/utils/firebase.config";
+import { messaging } from "../../../utils/firebase.config";
 import { onMessage } from "firebase/messaging";
 import { useDispatch, useSelector, UseSelector } from "react-redux";
-import { setPaymentData, clearPaymentData } from "@/Redux/slices/payment.slice";
-import { RootState } from "@/Redux/store";
+import { setPaymentData, clearPaymentData } from "../../../Redux/slices/payment.slice";
+import { RootState } from "../../../Redux/store";
 
 interface PaymentData {
     token: string;
@@ -169,7 +169,7 @@ const PaymentProgressPage: React.FC = () => {
     }, []);
 
 
-    const successTimeoutRef = useRef<NodeJS.Timeout>();
+    const successTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Add this useEffect hook after the existing useEffect block
     // useEffect(() => {

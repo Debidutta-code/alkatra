@@ -57,8 +57,13 @@ export const config = {
 
     // Referral System
     referralSystem: {
-        referralLinkBaseUrl: env.REFERRAL_LINK_BASE_URL,
-        referRewardAmount: parseInt(env.REFER_REWARD_AMOUNT, 10),
+        referralLinkBaseUrl: env.REFERRAL_LINK_BASE_URL as string,
+        referRewardAmount: Number(env.REFER_REWARD_AMOUNT),
     },
+
+    taxSystem: {
+        taxRulePrefix: env.TAX_RULE_PREFIX as string,
+        taxGroupPrefix: env.TAX_GROUP_PREFIX as string
+    }
     
 }

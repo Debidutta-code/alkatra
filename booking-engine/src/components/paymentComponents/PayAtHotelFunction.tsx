@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from '../../Redux/store';
 import { setGuestDetails } from '../../Redux/slices/pmsHotelCard.slice';
 import axios from 'axios';
-import { formatDate } from '@/utils/dateUtils';
+import { formatDate } from '../../utils/dateUtils';
 
 interface Guest {
   firstName: string;

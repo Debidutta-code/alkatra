@@ -7,7 +7,7 @@ import { Loader2 } from "lucide-react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
-import { setPaymentData } from "@/Redux/slices/payment.slice";
+import { setPaymentData } from "../../../Redux/slices/payment.slice";
 import { useDispatch } from "react-redux";
 
 

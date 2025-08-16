@@ -4,9 +4,9 @@ import { useState } from "react";
 import axios from "axios";
 import { Mail, ArrowLeft, AlertTriangle, CheckCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import FormInput from "@/components/auth/FormInput";
-import AuthButton from "@/components/auth/AuthButton";
-import AuthLayout from "@/components/auth/AuthLayout";
+import FormInput from "../../../components/auth/FormInput";
+import AuthButton from "../../../components/auth/AuthButton";
+import AuthLayout from "../../../components/auth/AuthLayout";
 
 interface ForgotPasswordProps {
   onBack: () => void;

@@ -223,7 +223,7 @@ export const generatePrintContent = (
               ? `
               <div class="detail-item">
                 <div class="label">${t("BookingTabs.BookingDetailsModal.contactNumber")}</div>
-                <div class="value" dir="ltr">${booking.phone}</div>
+                <div class="value" dir="ltr">+${booking.phone}</div>
               </div>
             `
               : ""}

@@ -1,10 +1,10 @@
 import React from "react";
 import Image from "next/image";
-import Img from "@/components/assets/hotel-1.jpg";
-import Battery from "@/components/assets/battery.png";
-import AC from "@/components/assets/air-conditioner.png";
-import TV from "@/components/assets/smart-tv.png";
-import Wifi from "@/components/assets/wifi.png";
+import Img from "../../components/assets/hotel-1.jpg";
+import Battery from "../../components/assets/battery.png";
+import AC from "../../components/assets/air-conditioner.png";
+import TV from "../../components/assets/smart-tv.png";
+import Wifi from "../../components/assets/wifi.png";
 
 type Props = {};
 

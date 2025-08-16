@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "@/Redux/store";
+import { useDispatch, useSelector } from "../../Redux/store";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { getHotelsByCity } from "@/api/hotel";
+import { getHotelsByCity } from "../../api/hotel";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import i18next from "../../i18n/Index";
-import Home from "@/components/assets/popular/Home.jpg";
+import Home from "../../components/assets/popular/Home.jpg";
 import CompactSearchBar from "../hotelBox/CompactSearchBar";
 import { format, addDays } from "date-fns";
 import QRCodeForAPP from "../ui/qrcode";
@@ -135,7 +135,7 @@ const HotelCard = () => {
               {t("HotelCard.exclusiveOffers")}
             </span>
           </div>
-          <h1 className="text-2xl md-text-4xl lg:w-[90%] xl:w-[100%] mt-4 md:mt-10 lg:text-5xl xl:text-6xl font-tripswift-extrabold text-tripswift-off-white mb-5 leading-tight tracking-tight drop-shadow-lg">
+          <h1 className="text-xl md-text-2xl lg:w-[90%] xl:w-[100%] mt-4 md:mt-10 lg:text-4xl xl:text-6xl font-tripswift-extrabold text-tripswift-off-white mb-5 leading-tight tracking-tight drop-shadow-lg">
             {t("HotelCard.heroTitle")}
           </h1>
 
