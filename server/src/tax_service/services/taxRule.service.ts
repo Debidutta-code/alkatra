@@ -110,7 +110,11 @@ export class TaxRuleService implements ITaxRuleService {
             const taxRule = await this.taxRuleRepository.findById(id);
             if (!taxRule?._id) throw new Error("Tax rule not found");
 
-            if (data.name === taxRule.name) throw new Error("Tax rule name cannot be the same.");
+            /**
+             * I have removed the name check 
+             * because I want to be able to update the name if the client send me the same name.
+             */
+            // if (data.name === taxRule.name) throw new Error("Tax rule name cannot be the same.");
 
             return await this.taxRuleRepository.update(id, data);
         } catch (error: any) {
