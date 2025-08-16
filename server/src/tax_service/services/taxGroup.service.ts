@@ -158,7 +158,10 @@ export class TaxGroupService implements ITaxGroupService {
             const taxGroup = await this.taxGroupRepository.findById(id);
             if (!taxGroup?._id) throw new Error("Tax group not found");
 
-            if (data.rules.length > 0) {
+            /**
+             * This below code is for checking if the tax rules belong to this hotel
+             */
+            if (data.rules && data.rules.length > 0) {
                 const taxRules = await this.taxRuleRepository.findByHotelAndIds(taxGroup.hotelId, data.rules);
 
                 if (taxRules.length !== data.rules.length) {
@@ -166,7 +169,11 @@ export class TaxGroupService implements ITaxGroupService {
                 }
             }
 
-            if (data.name === taxGroup.name) throw new Error("Tax group name cannot be the same.");
+            /**
+             * I have removed the name check 
+             * because I want to be able to update the name if the client send me the same name.
+             */
+            // if (data.name === taxGroup.name) throw new Error("Tax group name cannot be the same.");
 
             return await this.taxGroupRepository.update(id, data);
         } catch (error: any) {
