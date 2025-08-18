@@ -114,8 +114,9 @@ interface DailyBreakDown {
 
 interface TaxInfo {
   name: string;
-  percentage: number;
+  percentage?: number;
   amount: number;
+  type?: string;
 }
 
 interface FinalPrice {
@@ -1346,10 +1347,18 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                             .map((taxItem, index) => (
                               <div key={index} className="flex justify-between items-center py-1">
                                 <span className="text-sm text-tripswift-black/70">
-                                  {taxItem.name || 'Tax'} ({taxItem.percentage || 0}%):
+                                  {taxItem.name || 'Tax'} {
+                                    taxItem.percentage !== undefined
+                                      ? `(${taxItem.percentage}%)`
+                                      : taxItem.type
+                                        ? `(${taxItem.type})`
+                                        : ''
+                                  }:
                                 </span>
                                 <span className="text-sm font-tripswift-medium tabular-nums">
-                                  {finalPrice.dailyBreakdown?.[0]?.currencyCode || "USD"}{" "}
+                                  {finalPrice.dailyBreakdown?.[0]?.currencyCode ||
+                                    finalPrice.dailyBreakdown?.find(day => day.currencyCode)?.currencyCode ||
+                                    "USD"}{" "}
                                   {taxItem.amount.toLocaleString()}
                                 </span>
                               </div>
@@ -1362,7 +1371,9 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                                 {t("BookingComponents.GuestInformationModal.totalTax")}:
                               </span>
                               <span className="text-sm font-tripswift-bold tabular-nums">
-                                {finalPrice.dailyBreakdown?.[0]?.currencyCode || "USD"}{" "}
+                                {finalPrice.dailyBreakdown?.[0]?.currencyCode ||
+                                  finalPrice.dailyBreakdown?.find(day => day.currencyCode)?.currencyCode ||
+                                  "USD"}{" "}
                                 {finalPrice.totalTax.toLocaleString()}
                               </span>
                             </div>
@@ -1402,7 +1413,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                               ? t("BookingComponents.GuestInformationModal.finalAmountIncludingTax")
                               : t("BookingComponents.GuestInformationModal.totalAmount")}
                           </span>
-                          <span className="text-xl font-tripswift-bold text-tripswift-blue tabular-nums">
+                          <span className="text-lg font-tripswift-bold text-tripswift-blue tabular-nums">
                             {finalPrice.dailyBreakdown?.[0]?.currencyCode || "USD"}{" "}
                             {finalPrice.priceAfterTax && typeof finalPrice.priceAfterTax === 'number' && !isNaN(finalPrice.priceAfterTax)
                               ? finalPrice.priceAfterTax.toLocaleString()

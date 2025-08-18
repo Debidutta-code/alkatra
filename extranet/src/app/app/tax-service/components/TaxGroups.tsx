@@ -1,6 +1,6 @@
 // src/app/tax-service/components/TaxGroups.tsx
-
-import { useState, useEffect } from "react";
+import axios from 'axios';
+import { useState } from "react";
 import { Button } from "../../../../components/ui/button";
 import { Input } from "../../../../components/ui/input";
 import { Label } from "../../../../components/ui/label";
@@ -128,26 +128,29 @@ export const TaxGroups = ({
 
     setLoading(true);
     try {
-      const res = await fetch(`${TAX_API_BASE}/tax-group`, {
-        method: "POST",
+      const res = await axios.post(`${TAX_API_BASE}/tax-group`, payload, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload),
       });
 
-      if (res.ok) {
+      if (res.status >= 200 && res.status < 300) {
         await refetchGroups();
         toast.success("Tax group created successfully!");
         setForm({ name: "", selectedRules: [], isActive: true });
-      } else {
-        const errorData = await res.json().catch(() => ({}));
-        toast.error(`Failed to create tax group: ${errorData.message || "Unknown error"}`);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error creating tax group:", err);
-      toast.error("Network error: Could not connect to server");
+
+      if (err.response) {
+        const errorMessage = err.response.data?.message || "Unknown error";
+        toast.error(`Failed to create tax group: ${errorMessage}`);
+      } else if (err.request) {
+        toast.error("Network error: Could not connect to server");
+      } else {
+        toast.error("An unexpected error occurred");
+      }
     } finally {
       setLoading(false);
     }
@@ -208,25 +211,28 @@ export const TaxGroups = ({
 
     setLoading(true);
     try {
-      const res = await fetch(`${TAX_API_BASE}/tax-group/${editingGroup}`, {
-        method: "PUT",
+      const res = await axios.put(`${TAX_API_BASE}/tax-group/${editingGroup}`, payload, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload),
       });
-
-      if (res.ok) {
+      if (res.status >= 200 && res.status < 300) {
         await refetchGroups();
         toast.success("Tax group updated successfully!");
         cancelEdit();
-      } else {
-        toast.error(`Failed to update tax group`);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error updating tax group:", err);
-      toast.error("Network error: Could not connect to server");
+
+      if (err.response) {
+        const errorMessage = err.response.data?.message || "Unknown error";
+        toast.error(`Failed to update tax group: ${errorMessage}`);
+      } else if (err.request) {
+        toast.error("Network error: Could not connect to server");
+      } else {
+        toast.error("An unexpected error occurred");
+      }
     } finally {
       setLoading(false);
     }
@@ -243,24 +249,72 @@ export const TaxGroups = ({
 
     setLoading(true);
     try {
-      const res = await fetch(`${TAX_API_BASE}/tax-group/${deleteModal.groupId}`, {
-        method: "DELETE",
+      const res = await axios.delete(`${TAX_API_BASE}/tax-group/${deleteModal.groupId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
 
-      if (res.ok) {
+      if (res.status >= 200 && res.status < 300) {
         await refetchGroups();
         toast.success("Tax group deleted successfully!");
         closeDeleteModal();
-      } else {
-        const errorData = await res.json().catch(() => ({}));
-        toast.error(`Failed to delete tax group: ${errorData.message || "Unknown error"}`);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error deleting tax group:", err);
-      toast.error("Delete failed");
+
+      if (err.response) {
+        const errorMessage = err.response.data?.message || "Unknown error";
+        toast.error(`Failed to delete tax group: ${errorMessage}`);
+      } else if (err.request) {
+        toast.error("Network error: Could not connect to server");
+      } else {
+        toast.error("Delete failed");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleToggleActive = async (groupId: string, currentActiveStatus: boolean) => {
+    setLoading(true);
+    try {
+      // Find the group to get its current data
+      const group = groups.find(g => g._id === groupId);
+      if (!group) {
+        toast.error("Group not found");
+        return;
+      }
+
+      const payload = {
+        name: group.name,
+        rules: group.rules.map((rule: any) => typeof rule === 'string' ? rule : rule._id),
+        isActive: !currentActiveStatus,
+        hotelId: propertyId,
+      };
+
+      const res = await axios.put(`${TAX_API_BASE}/tax-group/${groupId}`, payload, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (res.status >= 200 && res.status < 300) {
+        await refetchGroups();
+        toast.success(`Tax group ${!currentActiveStatus ? 'activated' : 'deactivated'} successfully!`);
+      }
+    } catch (err: any) {
+      console.error("Error toggling tax group status:", err);
+
+      if (err.response) {
+        const errorMessage = err.response.data?.message || "Unknown error";
+        toast.error(`Failed to ${!currentActiveStatus ? 'activate' : 'deactivate'} tax group: ${errorMessage}`);
+      } else if (err.request) {
+        toast.error("Network error: Could not connect to server");
+      } else {
+        toast.error("An unexpected error occurred");
+      }
     } finally {
       setLoading(false);
     }
@@ -302,6 +356,7 @@ export const TaxGroups = ({
           <div className="space-y-4">
             <div>
               <Label className="text-sm font-medium text-gray-700">Group Name</Label>
+              <span className="text-red-500 ml-1">*</span>
               <Input
                 name="name"
                 value={form.name}
@@ -399,6 +454,7 @@ export const TaxGroups = ({
                       <div className="space-y-4">
                         <div>
                           <Label className="text-sm font-medium text-gray-700">Group Name</Label>
+                          <span className="text-red-500 ml-1">*</span>
                           <Input
                             name="name"
                             value={editForm.name}
@@ -481,7 +537,7 @@ export const TaxGroups = ({
 
                           <div className="mt-2 flex items-center text-sm text-gray-500 space-x-4">
                             <span>{group.rules.length} tax rule{group.rules.length !== 1 ? 's' : ''}</span>
-                            {/* <button
+                            <button
                               onClick={() => toggleGroupExpansion(group._id)}
                               className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
                             >
@@ -490,7 +546,7 @@ export const TaxGroups = ({
                                 }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                               </svg>
-                            </button> */}
+                            </button>
                           </div>
                         </div>
 
@@ -504,7 +560,7 @@ export const TaxGroups = ({
                           >
                             Edit
                           </Button>
-                          {/* <Button
+                          <Button
                             variant="outline"
                             size="sm"
                             onClick={() => handleToggleActive(group._id, group.isActive)}
@@ -515,7 +571,7 @@ export const TaxGroups = ({
                               }`}
                           >
                             {group.isActive ? 'Deactivate' : 'Activate'}
-                          </Button> */}
+                          </Button>
                           <Button
                             variant="destructive"
                             size="sm"
@@ -530,7 +586,7 @@ export const TaxGroups = ({
                     </div>
 
                     {/* Expandable Rules Details */}
-                    {/* {expandedGroups.has(group._id) && (
+                    {expandedGroups.has(group._id) && (
                       <div className="border-t border-gray-100 bg-gray-50 px-6 py-4">
                         <h6 className="text-sm font-medium text-gray-900 mb-3">Associated Tax Rules</h6>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -584,7 +640,7 @@ export const TaxGroups = ({
                           })}
                         </div>
                       </div>
-                    )} */}
+                    )}
                   </div>
                 )}
               </div>

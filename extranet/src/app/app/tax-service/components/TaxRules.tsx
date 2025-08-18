@@ -32,7 +32,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
     // Dropdown options
     const taxTypeOptions = [
         { value: "PERCENTAGE", label: "Percentage (%)" },
-        // { value: "FIXED", label: "Fixed Amount" }
+        { value: "FIXED", label: "Fixed Amount" }
     ];
 
     const applicableOnOptions = [
@@ -40,12 +40,12 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
             value: "ROOM_RATE",
             label: "Room Rate Only",
             description: "Applies only to room charges"
-        }
-        // {
-        //     value: "TOTAL_AMOUNT",
-        //     label: "Total Amount",
-        //     description: "Applies to the entire booking total"
-        // },
+        },
+        {
+            value: "TOTAL_AMOUNT",
+            label: "Total Amount",
+            description: "Applies to the entire booking total"
+        },
     ];
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [deleteModal, setDeleteModal] = useState<{
@@ -65,7 +65,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
         applicableOn: "ROOM_RATE" as const,
         country: "",
         description: "",
-        validFrom: "",
+        validFrom: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
         isInclusive: false,
         priority: 1,
     });
@@ -89,7 +89,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
         applicableOn: "ROOM_RATE",
         country: "",
         description: "",
-        validFrom: "",
+        validFrom: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
         isInclusive: false,
         priority: 1,
     });
@@ -190,7 +190,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
             applicableOn: "ROOM_RATE",
             country: "",
             description: "",
-            validFrom: "",
+            validFrom: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
             isInclusive: false,
             priority: 1,
         });
@@ -264,7 +264,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
             applicableOn: "ROOM_RATE",
             country: "",
             description: "",
-            validFrom: "",
+            validFrom: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
             isInclusive: false,
             priority: 1,
         });
@@ -496,6 +496,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
 
                                 <div className="space-y-2">
                                     <Label className="text-sm font-semibold text-slate-700">Tax Type</Label>
+                                    <span className="text-red-500 ml-1">*</span>
                                     <CustomDropdown
                                         name="type"
                                         value={form.type}
@@ -585,6 +586,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
 
                                 <div className="space-y-2">
                                     <Label className="text-sm font-semibold text-slate-700">Valid From</Label>
+                                    <span className="text-red-500 ml-1">*</span>
                                     <Input
                                         name="validFrom"
                                         type="date"
@@ -694,6 +696,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                     <div className="space-y-2">
                                                         <Label className="text-sm font-semibold text-slate-700">Name</Label>
+                                                        <span className="text-red-500 ml-1">*</span>
                                                         <Input
                                                             name="name"
                                                             value={editForm.name}
@@ -705,6 +708,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
 
                                                     <div className="space-y-2">
                                                         <Label className="text-sm font-semibold text-slate-700">Type</Label>
+                                                        <span className="text-red-500 ml-1">*</span>
                                                         <CustomDropdown
                                                             name="type"
                                                             value={editForm.type}
@@ -719,6 +723,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                                         <Label className="text-sm font-semibold text-slate-700">
                                                             Value {editForm.type === "PERCENTAGE" ? "(%)" : "(Amount)"}
                                                         </Label>
+                                                        <span className="text-red-500 ml-1">*</span>
                                                         <Input
                                                             name="value"
                                                             type="number"
@@ -733,6 +738,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
 
                                                     <div className="space-y-2">
                                                         <Label className="text-sm font-semibold text-slate-700">Country</Label>
+                                                        <span className="text-red-500 ml-1">*</span>
                                                         <Input
                                                             name="country"
                                                             value={editForm.country}
@@ -744,6 +750,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
 
                                                     <div className="space-y-2">
                                                         <Label className="text-sm font-semibold text-slate-700">Applicable On</Label>
+                                                        <span className="text-red-500 ml-1">*</span>
                                                         <CustomDropdown
                                                             name="applicableOn"
                                                             value={editForm.applicableOn}
@@ -781,6 +788,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
 
                                                     <div className="space-y-2">
                                                         <Label className="text-sm font-semibold text-slate-700">Valid From</Label>
+                                                        <span className="text-red-500 ml-1">*</span>
                                                         <Input
                                                             name="validFrom"
                                                             type="date"

@@ -79,11 +79,11 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
           <span className={selectedOption ? 'text-slate-900' : 'text-slate-500'}>
             {selectedOption ? selectedOption.label : placeholder}
           </span>
-          {/* <div className={`transition-transform duration-200 flex-shrink-0 ml-2 ${isOpen ? 'transform rotate-180' : ''}`}>
+          <div className={`transition-transform duration-200 flex-shrink-0 ml-2 ${isOpen ? 'transform rotate-180' : ''}`}>
             <svg className={`w-4 h-4 ${disabled ? 'text-slate-400' : 'text-slate-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
-          </div> */}
+          </div>
         </div>
       </button>
 
