@@ -61,6 +61,9 @@ export async function initializeExpressRoutes({ app }: { app: Express }) {
   app.use("/api/v1/tax-rule", TaxRuleRouter);
   app.use("/api/v1/tax-group", TaxGroupRouter);
 
+  // Customer Review 
+  app.use("/api/v1/review", customerReview);
+
 
   app.all("*", (req: Request, _res: Response, next: NextFunction) => {
     next(new AppError(`Can't find ${req.originalUrl} path on the server`, 404));

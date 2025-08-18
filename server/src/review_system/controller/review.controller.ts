@@ -1,7 +1,8 @@
-import { CustomerReviewService } from "../service";
+import { CustomerReviewService, ReservationService } from "../service";
 import { Request, Response } from "express";
 
 const customerReviewService = new CustomerReviewService();
+const reservationService = new ReservationService();
 
 export class CustomerReviewController {
 
@@ -79,6 +80,24 @@ export class CustomerReviewController {
                 success: false,
                 message: error.message
             });
+        }
+    }
+
+    async emailSend(req: Request, res: Response) {
+        const reservationId = req.params.id;
+        if (!reservationId) {
+            throw new Error("Reservation Id not found");
+        }
+        try {
+            const emailSendResult = await customerReviewService.sendEmailToCustomer(reservationId);
+            if (emailSendResult.success) {
+                return res.status(200).json({ message: emailSendResult.message });
+            } else {
+                return res.status(400).json({ error: emailSendResult.message });
+            }
+        } catch (error: any) {
+            console.error("❌ emailSend error:", error);
+            return res.status(500).json({ error: "Internal Server Error" });
         }
     }
 

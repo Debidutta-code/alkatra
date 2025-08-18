@@ -29,29 +29,6 @@ const propertyAddressSchema = new Schema<PropertyAddressType>({
   zip_code: { type: Number, required: true },
 });
 
-// propertyAddressSchema.pre("save", async function (next) {
-//   const address = this as PropertyAddressType;
-
-//   // Create a new Location document
-//   const newLocation = new Location({
-//     propertyId: address.property_id,
-//     houseNo: address.address_line_1,
-//     // area: address.address_line_2,
-//     pincode: address.zip_code,
-//     country: address.country,
-//     state: address.state,
-//     city: address.city,
-//     coordinates: { type: "Point", coordinates: ["85.7374098", "20.2910851"] },
-//   });
-
-//   // Save the Location document
-//   const savedLocation = await newLocation.save();
-
-//   // Set the location field of the PropertyAddress to the ObjectId of the saved Location
-//   // address.location = savedLocation._id;
-
-//   next();
-// });
 
 const PropertyAddress = mongoose.model<PropertyAddressType>(
   "PropertyAddress",
