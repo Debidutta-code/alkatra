@@ -272,6 +272,12 @@ export class TaxGroupService implements ITaxGroupService {
             }
 
             /**
+             * Check if the tax group is active
+             * If not, return null
+             */
+            if (taxGroupData.isActive === false) return null;
+
+            /**
              * Fetch tax rules for the reservation
              */
             const taxRules = await this.taxRuleRepository.findTaxRulesByIds(taxGroupData.rules);
