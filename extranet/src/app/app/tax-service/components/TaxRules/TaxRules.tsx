@@ -447,18 +447,18 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                         // View Mode
                                         <div>
                                             <div className="p-6">
-                                                {/* <div className="flex justify-between items-start mb-4">
+                                                <div className="flex justify-between items-start mb-4">
                                                     <div className="flex items-center space-x-3">
                                                         <div className={`w-3 h-3 rounded-full ${rule.isInclusive ? 'bg-green-400' : 'bg-gray-400'}`}></div>
                                                         <h3 className="text-lg font-bold text-slate-900">{rule.name}</h3>
                                                     </div>
-                                                    <div className={`px-3 py-1 rounded-full text-xs font-semibold ${rule.isInclusive
+                                                    {/* <div className={`px-3 py-1 rounded-full text-xs font-semibold ${rule.isInclusive
                                                         ? 'bg-green-100 text-green-700'
                                                         : 'bg-gray-100 text-gray-700'
                                                         }`}>
                                                         {rule.isInclusive ? 'Inclusive' : 'Exclusive'}
-                                                    </div>
-                                                </div> */}
+                                                    </div> */}
+                                                </div>
                                                 <div className="grid grid-cols-2 gap-4 mb-4">
                                                     <div className="bg-slate-50 rounded-lg p-3">
                                                         <div className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1">Tax Value</div>
