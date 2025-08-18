@@ -64,7 +64,8 @@ export class TaxGroupService implements ITaxGroupService {
             } else if (rule.type === "FIXED") {
                 return {
                     name: rule.name,
-                    fixed: rule.value
+                    type: (rule.type).toLowerCase(),
+                    amount: Number(rule.value.toFixed(2)),
                 };
             }
         });
