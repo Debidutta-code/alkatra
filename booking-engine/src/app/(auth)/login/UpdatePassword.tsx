@@ -5,9 +5,9 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, AlertTriangle, CheckCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import AuthLayout from "@/components/auth/AuthLayout";
-import PasswordInput from "@/components/auth/PasswordInput";
-import AuthButton from "@/components/auth/AuthButton";
+import AuthLayout from "../../../components/auth/AuthLayout";
+import PasswordInput from "../../../components/auth/PasswordInput";
+import AuthButton from "../../../components/auth/AuthButton";
 
 interface UpdatePasswordProps {
   email: string;

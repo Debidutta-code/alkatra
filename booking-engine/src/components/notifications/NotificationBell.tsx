@@ -5,10 +5,10 @@ import { Bell, X, Check, CheckCheck, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from '@/Redux/store';
+import { RootState, AppDispatch } from '../../Redux/store';
 import { Notification } from './types/notification';
 import { onMessage } from 'firebase/messaging';
-import { messaging } from '@/utils/firebase.config';
+import { messaging } from '../../utils/firebase.config';
 import {
   fetchNotifications,
   markAsRead,
@@ -16,7 +16,7 @@ import {
   updateNotificationReadStatus,
   clearNotifications,
   addNotification
-} from '@/Redux/slices/notification.slice';
+} from '../../Redux/slices/notification.slice';
 import toast from 'react-hot-toast';
 import { t } from "i18next";
 import { useTranslation } from "react-i18next";

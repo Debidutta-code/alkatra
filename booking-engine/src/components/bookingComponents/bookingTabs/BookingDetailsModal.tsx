@@ -15,7 +15,6 @@ import {
   FaRegTimesCircle,
   FaBed,
   FaUsers,
-  FaPhone,
   FaEnvelope,
 } from "react-icons/fa";
 import {
@@ -26,6 +25,7 @@ import {
   getRoomTypeIcon,
 } from "./utils";
 import { printBookingItinerary } from '../PrintBookingItinerary';
+import { Phone } from "lucide-react";
 
 interface BookingDetailsModalProps {
   booking: Booking;
@@ -296,7 +296,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                 {booking.phone && (
                   <div className="flex gap-2 p-2">
                     <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                      <FaPhone className="text-green-600 text-xs" />
+                      <Phone className="text-green-600 text-xs w-3 h-3" />
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 mb-0.5">

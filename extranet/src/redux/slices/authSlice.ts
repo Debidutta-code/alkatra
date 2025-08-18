@@ -39,7 +39,7 @@ const authSlice = createSlice({
     ) {
       state.accessToken = action.payload;
       state.isAuthenticated = true;
-      Cookies.set("accessToken", action.payload, { 
+      Cookies.set("accessToken", action.payload, {
         secure: process.env.NODE_ENV === "production",
         sameSite: "Strict",
         expires: 1 // 1 day
@@ -64,7 +64,7 @@ const authSlice = createSlice({
     ) {
       state.user = action.payload;
       if (action.payload) {
-        Cookies.set("ownerId", action.payload.id, { 
+        Cookies.set("ownerId", action.payload.id, {
           secure: process.env.NODE_ENV === "production",
           sameSite: "Strict"
         });
@@ -80,14 +80,14 @@ const authSlice = createSlice({
 });
 
 // Thunk actions
-export const login = (data: { email: string; password: string }) => 
+export const login = (data: { email: string; password: string }) =>
   async (dispatch: typeof store.dispatch) => {
     try {
       const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`, 
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`,
         data
       );
-      
+
       const { accessToken, user } = res.data.data;
       if (!accessToken) {
         throw new Error("No access token received");
@@ -98,7 +98,7 @@ export const login = (data: { email: string; password: string }) =>
 
       dispatch(setAccessToken(accessToken));
       dispatch(setUser(normalizedUser));
-      
+
       return accessToken;
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
@@ -111,29 +111,31 @@ export const login = (data: { email: string; password: string }) =>
     }
   };
 
-export const logout = () => 
+export const logout = () =>
   async (dispatch: typeof store.dispatch, getState: typeof store.getState) => {
+    const { isAuthenticated } = getState().auth;
+
+    if (!isAuthenticated) return;
+
     const { accessToken } = getState().auth;
-    
+
     try {
       await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/logout`, 
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/logout`,
         {},
         { headers: { Authorization: `Bearer ${accessToken}` } }
       );
-      toast.success("Logged out successfully");
     } catch (error) {
-      // console.error("Logout API error:", error);
-      // toast.success("Logged out (session cleared)");
+      console.error("Logout API error:", error);
     } finally {
       dispatch(removeAccessToken());
     }
   };
 
-export const getUser = () => 
+export const getUser = () =>
   async (dispatch: typeof store.dispatch, getState: typeof store.getState) => {
     const { accessToken, isAuthenticated } = getState().auth;
-    
+
     if (!isAuthenticated || !accessToken) {
       dispatch(logout());
       return;
@@ -170,11 +172,11 @@ export const selectCurrentUser = (state: RootState) => state.auth.user;
 export const selectIsAuthenticated = (state: RootState) => state.auth.isAuthenticated;
 export const selectAuthLoading = (state: RootState) => state.auth.authLoading;
 
-export const { 
-  setAccessToken, 
-  removeAccessToken, 
+export const {
+  setAccessToken,
+  removeAccessToken,
   setUser,
-  setAuthLoading 
+  setAuthLoading
 } = authSlice.actions;
 
 export default authSlice.reducer;

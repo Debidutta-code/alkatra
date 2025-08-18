@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useSelector } from "@/Redux/store";
+import { useSelector } from "../../../Redux/store";
 import jsPDF from 'jspdf';
 
 import Link from "next/link";
@@ -20,7 +20,7 @@ import {
   Mail,
   Phone, // Added Phone icon for phone number display
 } from "lucide-react";
-import { formatDate, calculateNights } from "@/utils/dateUtils";
+import { formatDate, calculateNights } from "../../../utils/dateUtils";
 import { useTranslation } from "react-i18next";
 
 export default function PaymentSuccess() {

@@ -1,8 +1,8 @@
 import React from "react";
 import { DatePicker } from "antd";
 import dayjs, { Dayjs } from "dayjs";
-import { useDispatch } from "@/Redux/store";
-import { setDateRangeDetails } from "@/Redux/slices/hotelcard.slice";
+import { useDispatch } from "../../Redux/store";
+import { setDateRangeDetails } from "../../Redux/slices/hotelcard.slice";
 import { useTranslation } from "react-i18next";
 
 // Type for date range values

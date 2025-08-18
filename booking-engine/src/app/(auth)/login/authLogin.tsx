@@ -4,20 +4,20 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "@/Redux/store";
-import { login } from "@/Redux/slices/auth.slice";
+import { useDispatch } from "../../../Redux/store";
+import { login } from "../../../Redux/slices/auth.slice";
 import { Mail } from "lucide-react";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
 import { useTranslation } from "react-i18next";
 
 // Import shared components
-import AuthLayout from "@/components/auth/AuthLayout";
-import FormInput from "@/components/auth/FormInput";
-import PasswordInput from "@/components/auth/PasswordInput";
-import AuthButton from "@/components/auth/AuthButton";
-import { useFormValidation } from "@/components/auth/hooks/useFormValidation";
-import { getUser } from "@/Redux/slices/pmsHotelCard.slice";
+import AuthLayout from "../../../components/auth/AuthLayout";
+import FormInput from "../../../components/auth/FormInput";
+import PasswordInput from "../../../components/auth/PasswordInput";
+import AuthButton from "../../../components/auth/AuthButton";
+import { useFormValidation } from "../../../components/auth/hooks/useFormValidation";
+import { getUser } from "../../../Redux/slices/pmsHotelCard.slice";
 import ForgotPassword from "./ForgotPassword";
 import UpdatePassword from "./UpdatePassword";
 

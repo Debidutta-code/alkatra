@@ -6,9 +6,9 @@ import { usePathname } from "next/navigation";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
-import { googleLogin } from "@/Redux/slices/auth.slice";
+import { googleLogin } from "../../Redux/slices/auth.slice";
 import toast from "react-hot-toast"
-import { AppDispatch } from "@/Redux/store";
+import { AppDispatch } from "../../Redux/store";
 
 interface AuthLayoutProps {
   children: ReactNode;

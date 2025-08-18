@@ -22,12 +22,12 @@ import {
   DropdownItem,
   Avatar,
 } from "@nextui-org/react";
-import { logout, getUser } from "@/Redux/slices/auth.slice";
+import { logout, getUser } from "../../Redux/slices/auth.slice";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { ThunkDispatch } from "redux-thunk";
 import { AnyAction } from "redux";
-import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { NotificationBell } from "../../components/notifications/NotificationBell";
 import LanguageSwitcher from "../languageSwitcher/LanguageSwitcher";
 import i18next from "i18next";
 

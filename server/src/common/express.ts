@@ -22,6 +22,9 @@ import customerReview from "../review_system/route/review.route";
 // Referral system routes
 import { ReferralRouter } from "../referral_system/routes";
 
+// Tax service routes
+import { TaxRuleRouter, TaxGroupRouter } from "../tax_service/routes";
+
 export async function initializeExpressRoutes({ app }: { app: Express }) {
   app.head("/status", (_, res: Response) => res.status(200).end());
 
@@ -54,8 +57,9 @@ export async function initializeExpressRoutes({ app }: { app: Express }) {
   // Referral system routes
   app.use("/api/v1/referrals", ReferralRouter);
 
-  // Customer Review System
-  app.use("/api/v1/review", customerReview);
+  // Tax Service routes
+  app.use("/api/v1/tax-rule", TaxRuleRouter);
+  app.use("/api/v1/tax-group", TaxGroupRouter);
 
 
   app.all("*", (req: Request, _res: Response, next: NextFunction) => {

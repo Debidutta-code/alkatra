@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from "react";
-
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
@@ -12,12 +12,18 @@ const Home: React.FC = () => {
   const [draftProperties, setDraftProperties] = useState<any[]>([]);
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const userRole = useSelector((state: RootState) => state.auth.user?.role);
+  const router = useRouter();
+
   useEffect(() => {
+    if (!accessToken) {
+      router.push("/login");
+      return;
+    }
     const fetchProperties = async (accessToken: string) => {
       try {
         const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/me`, {
           headers: {
-            Authorization: "Bearer " + accessToken,
+            Authorization: `Bearer ${accessToken}`,
           },
         });
         const { properties, draftProperties } = data.data;

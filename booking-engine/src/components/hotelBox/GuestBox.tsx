@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "@/Redux/store";
-import { setGuestDetails } from "@/Redux/slices/hotelcard.slice";
+import { useDispatch, useSelector } from "../../Redux/store";
+import { setGuestDetails } from "../../Redux/slices/hotelcard.slice";
 import { createPortal } from "react-dom";
 import { ChevronDown, Users } from "lucide-react";
 import dayjs from "dayjs";
