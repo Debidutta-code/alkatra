@@ -598,8 +598,8 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-200">
-                                <label className="flex items-center space-x-3 cursor-pointer">
+                            <div className="flex items-center justify-end mt-8 pt-6 border-t border-slate-200">
+                                {/* <label className="flex items-center space-x-3 cursor-pointer">
                                     <input
                                         type="checkbox"
                                         name="isInclusive"
@@ -612,7 +612,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                         <span className="text-sm font-semibold text-slate-700">Tax Inclusive</span>
                                         <div className="text-xs text-slate-500">Tax included in displayed price</div>
                                     </div>
-                                </label>
+                                </label> */}
 
                                 <div className="flex space-x-3">
                                     <Button
@@ -800,8 +800,8 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                                     </div>
                                                 </div>
 
-                                                <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-200">
-                                                    <label className="flex items-center space-x-2 cursor-pointer">
+                                                <div className="flex items-center justify-end mt-6 pt-4 border-t border-slate-200">
+                                                    {/* <label className="flex items-center space-x-2 cursor-pointer">
                                                         <input
                                                             type="checkbox"
                                                             name="isInclusive"
@@ -811,7 +811,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                                             className="w-4 h-4 text-amber-600 rounded focus:ring-amber-500"
                                                         />
                                                         <span className="text-sm font-semibold text-slate-700">Tax Inclusive</span>
-                                                    </label>
+                                                    </label> */}
 
                                                     <div className="flex space-x-3">
                                                         <Button
@@ -849,7 +849,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                         // Enhanced View Mode
                                         <div>
                                             <div className="p-6">
-                                                <div className="flex justify-between items-start mb-4">
+                                                {/* <div className="flex justify-between items-start mb-4">
                                                     <div className="flex items-center space-x-3">
                                                         <div className={`w-3 h-3 rounded-full ${rule.isInclusive ? 'bg-green-400' : 'bg-gray-400'}`}></div>
                                                         <h3 className="text-lg font-bold text-slate-900">{rule.name}</h3>
@@ -860,7 +860,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                                         }`}>
                                                         {rule.isInclusive ? 'Inclusive' : 'Exclusive'}
                                                     </div>
-                                                </div>
+                                                </div> */}
 
                                                 <div className="grid grid-cols-2 gap-4 mb-4">
                                                     <div className="bg-slate-50 rounded-lg p-3">
