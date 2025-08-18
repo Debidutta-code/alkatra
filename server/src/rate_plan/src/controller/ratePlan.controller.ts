@@ -183,7 +183,7 @@ class RoomPrice {
 
         response.data.tax = taxCalculation;
         response.data.totalTax = totalAmount;
-        response.data.priceAfterTax = response.data.totalAmount + totalAmount;
+        response.data.priceAfterTax = Number((response.data.totalAmount + totalAmount).toFixed(2));
 
         return response
     }
