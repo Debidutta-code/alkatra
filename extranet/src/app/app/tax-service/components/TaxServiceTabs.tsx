@@ -1,6 +1,6 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../../../components/ui/tabs";
-import { TaxRules } from "./TaxRules";
-import { TaxGroups } from "./TaxGroups";
+import { TaxRules } from "./TaxRules/TaxRules";
+import { TaxGroups } from "./TaxGroups/TaxGroups";
 import { Badge } from "../../../../components/ui/badge";
 
 export const TaxServiceTabs = ({

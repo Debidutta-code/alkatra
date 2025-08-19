@@ -901,14 +901,18 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                   )}
 
                   {/* Subtotal */}
-                  <div className="flex justify-between items-center text-sm pt-2 border-t border-gray-200">
-                    <span className="text-tripswift-black/80 font-tripswift-medium">
-                      {t('BookingTabs.AmendReservationModal.subtotal')}
-                    </span>
-                    <span className="font-tripswift-bold text-tripswift-black">
-                      {finalPrice.currencyCode} {finalPrice.totalAmount.toFixed(2)}
-                    </span>
-                  </div>
+                  {finalPrice.tax && Array.isArray(finalPrice.tax) && finalPrice.tax.length > 0 && (
+                    <div className="flex justify-between items-center text-sm pt-2 border-t border-gray-200">
+                      <span className="text-tripswift-black/80 font-tripswift-medium">
+                        {t('BookingTabs.AmendReservationModal.subtotal')}
+                      </span>
+                      <span className="font-tripswift-bold text-tripswift-black">
+                        {finalPrice.currencyCode} {finalPrice.totalAmount.toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Discounts (if any) */}
 
                   {/* Tax Breakdown */}
                   {finalPrice.tax && finalPrice.tax.length > 0 && (
@@ -962,12 +966,14 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
               </div>
 
               {/* Tax Information Notice */}
-              <div className="px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800 flex items-start gap-2">
-                <Info className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                <span className="font-tripswift-medium">
-                  {t('BookingTabs.AmendReservationModal.taxInclusiveNote')}
-                </span>
-              </div>
+              {finalPrice.tax && Array.isArray(finalPrice.tax) && finalPrice.tax.length > 0 && (
+                <div className="px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800 flex items-start gap-2">
+                  <Info className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <span className="font-tripswift-medium">
+                    {t('BookingTabs.AmendReservationModal.taxInclusiveNote')}
+                  </span>
+                </div>
+              )}
             </div>
           )}
 

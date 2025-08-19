@@ -1325,16 +1325,18 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                         </span>
                       </div>
 
-                      {/* Subtotal (before tax) */}
-                      <div className="flex justify-between items-center py-1 border-t border-tripswift-black/10 pt-2">
-                        <span className="text-sm font-tripswift-medium text-tripswift-black">
-                          {t("BookingComponents.GuestInformationModal.subtotalBeforeTax")}:
-                        </span>
-                        <span className="text-sm font-tripswift-bold tabular-nums">
-                          {finalPrice.dailyBreakdown?.[0]?.currencyCode || "USD"}{" "}
-                          {(finalPrice.breakdown?.totalAmount || finalPrice.totalAmount || 0).toLocaleString()}
-                        </span>
-                      </div>
+                      {/* Subtotal (before tax) - Only show if tax data exists */}
+                      {finalPrice.tax && Array.isArray(finalPrice.tax) && finalPrice.tax.length > 0 && (
+                        <div className="flex justify-between items-center py-1 border-t border-tripswift-black/10 pt-2">
+                          <span className="text-sm font-tripswift-medium text-tripswift-black">
+                            {t("BookingComponents.GuestInformationModal.subtotalBeforeTax")}:
+                          </span>
+                          <span className="text-sm font-tripswift-bold tabular-nums">
+                            {finalPrice.dailyBreakdown?.[0]?.currencyCode || "USD"}{" "}
+                            {(finalPrice.breakdown?.totalAmount || finalPrice.totalAmount || 0).toLocaleString()}
+                          </span>
+                        </div>
+                      )}
 
                       {/* Tax Details - Only show if tax data exists */}
                       {finalPrice.tax && Array.isArray(finalPrice.tax) && finalPrice.tax.length > 0 && (
