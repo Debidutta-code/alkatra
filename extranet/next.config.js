@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // output: 'export', // 👈 Important line for static export
+    output: 'export', // 👈 Important line for static export
     reactStrictMode: true,
     trailingSlash: true, // Add this for better static export compatibility
     images: {

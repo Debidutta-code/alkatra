@@ -306,7 +306,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                         className="font-tripswift-medium text-gray-800"
                         dir="ltr"
                       >
-                        {booking.phone}
+                        +{booking.phone}
                       </p>
                     </div>
                   </div>

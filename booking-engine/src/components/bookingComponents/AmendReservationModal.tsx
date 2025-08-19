@@ -56,7 +56,12 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
   const [finalPrice, setFinalPrice] = useState<{
     totalAmount: number;
     currencyCode: string;
-    tax?: Array<{ name: string; percentage: number; amount: number }>;
+    tax?: Array<{
+      name: string;
+      percentage?: number;
+      type?: string;
+      amount: number
+    }>;
     totalTax?: number;
     priceAfterTax?: number;
     breakdown?: {
@@ -286,7 +291,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         if (response.data.success) {
           setFinalPrice({
             totalAmount: response.data.data.totalAmount,
-            currencyCode: response.data.data.dailyBreakdown[0]?.currencyCode || "INR",
+            currencyCode: response.data.data.dailyBreakdown[0]?.currencyCode || "USD",
             tax: response.data.data.tax || [],
             totalTax: response.data.data.totalTax || 0,
             priceAfterTax: response.data.data.priceAfterTax || response.data.data.totalAmount,
@@ -915,7 +920,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                       {finalPrice.tax.map((taxItem, index) => (
                         <div key={index} className="flex justify-between items-center text-sm pl-4">
                           <span className="text-tripswift-black/70 font-tripswift-medium">
-                            {taxItem.name} ({taxItem.percentage}%)
+                            {taxItem.name} {taxItem.percentage ? `(${taxItem.percentage}%)` : '(Fixed)'}
                           </span>
                           <span className="font-tripswift-medium text-tripswift-black">
                             {finalPrice.currencyCode} {taxItem.amount.toFixed(2)}

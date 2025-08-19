@@ -32,7 +32,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
     // Dropdown options
     const taxTypeOptions = [
         { value: "PERCENTAGE", label: "Percentage (%)" },
-        // { value: "FIXED", label: "Fixed Amount" }
+        { value: "FIXED", label: "Fixed Amount" }
     ];
 
     const applicableOnOptions = [
@@ -40,12 +40,12 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
             value: "ROOM_RATE",
             label: "Room Rate Only",
             description: "Applies only to room charges"
-        }
-        // {
-        //     value: "TOTAL_AMOUNT",
-        //     label: "Total Amount",
-        //     description: "Applies to the entire booking total"
-        // },
+        },
+        {
+            value: "TOTAL_AMOUNT",
+            label: "Total Amount",
+            description: "Applies to the entire booking total"
+        },
     ];
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [deleteModal, setDeleteModal] = useState<{
@@ -65,7 +65,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
         applicableOn: "ROOM_RATE" as const,
         country: "",
         description: "",
-        validFrom: "",
+        validFrom: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
         isInclusive: false,
         priority: 1,
     });
@@ -89,7 +89,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
         applicableOn: "ROOM_RATE",
         country: "",
         description: "",
-        validFrom: "",
+        validFrom: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
         isInclusive: false,
         priority: 1,
     });
@@ -190,7 +190,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
             applicableOn: "ROOM_RATE",
             country: "",
             description: "",
-            validFrom: "",
+            validFrom: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
             isInclusive: false,
             priority: 1,
         });
@@ -264,7 +264,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
             applicableOn: "ROOM_RATE",
             country: "",
             description: "",
-            validFrom: "",
+            validFrom: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
             isInclusive: false,
             priority: 1,
         });
@@ -496,6 +496,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
 
                                 <div className="space-y-2">
                                     <Label className="text-sm font-semibold text-slate-700">Tax Type</Label>
+                                    <span className="text-red-500 ml-1">*</span>
                                     <CustomDropdown
                                         name="type"
                                         value={form.type}
@@ -585,6 +586,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
 
                                 <div className="space-y-2">
                                     <Label className="text-sm font-semibold text-slate-700">Valid From</Label>
+                                    <span className="text-red-500 ml-1">*</span>
                                     <Input
                                         name="validFrom"
                                         type="date"
@@ -596,8 +598,8 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-200">
-                                <label className="flex items-center space-x-3 cursor-pointer">
+                            <div className="flex items-center justify-end mt-8 pt-6 border-t border-slate-200">
+                                {/* <label className="flex items-center space-x-3 cursor-pointer">
                                     <input
                                         type="checkbox"
                                         name="isInclusive"
@@ -610,7 +612,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                         <span className="text-sm font-semibold text-slate-700">Tax Inclusive</span>
                                         <div className="text-xs text-slate-500">Tax included in displayed price</div>
                                     </div>
-                                </label>
+                                </label> */}
 
                                 <div className="flex space-x-3">
                                     <Button
@@ -694,6 +696,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                     <div className="space-y-2">
                                                         <Label className="text-sm font-semibold text-slate-700">Name</Label>
+                                                        <span className="text-red-500 ml-1">*</span>
                                                         <Input
                                                             name="name"
                                                             value={editForm.name}
@@ -705,6 +708,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
 
                                                     <div className="space-y-2">
                                                         <Label className="text-sm font-semibold text-slate-700">Type</Label>
+                                                        <span className="text-red-500 ml-1">*</span>
                                                         <CustomDropdown
                                                             name="type"
                                                             value={editForm.type}
@@ -719,6 +723,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                                         <Label className="text-sm font-semibold text-slate-700">
                                                             Value {editForm.type === "PERCENTAGE" ? "(%)" : "(Amount)"}
                                                         </Label>
+                                                        <span className="text-red-500 ml-1">*</span>
                                                         <Input
                                                             name="value"
                                                             type="number"
@@ -733,6 +738,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
 
                                                     <div className="space-y-2">
                                                         <Label className="text-sm font-semibold text-slate-700">Country</Label>
+                                                        <span className="text-red-500 ml-1">*</span>
                                                         <Input
                                                             name="country"
                                                             value={editForm.country}
@@ -744,6 +750,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
 
                                                     <div className="space-y-2">
                                                         <Label className="text-sm font-semibold text-slate-700">Applicable On</Label>
+                                                        <span className="text-red-500 ml-1">*</span>
                                                         <CustomDropdown
                                                             name="applicableOn"
                                                             value={editForm.applicableOn}
@@ -781,6 +788,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
 
                                                     <div className="space-y-2">
                                                         <Label className="text-sm font-semibold text-slate-700">Valid From</Label>
+                                                        <span className="text-red-500 ml-1">*</span>
                                                         <Input
                                                             name="validFrom"
                                                             type="date"
@@ -792,8 +800,8 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                                     </div>
                                                 </div>
 
-                                                <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-200">
-                                                    <label className="flex items-center space-x-2 cursor-pointer">
+                                                <div className="flex items-center justify-end mt-6 pt-4 border-t border-slate-200">
+                                                    {/* <label className="flex items-center space-x-2 cursor-pointer">
                                                         <input
                                                             type="checkbox"
                                                             name="isInclusive"
@@ -803,7 +811,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                                             className="w-4 h-4 text-amber-600 rounded focus:ring-amber-500"
                                                         />
                                                         <span className="text-sm font-semibold text-slate-700">Tax Inclusive</span>
-                                                    </label>
+                                                    </label> */}
 
                                                     <div className="flex space-x-3">
                                                         <Button
@@ -841,7 +849,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                         // Enhanced View Mode
                                         <div>
                                             <div className="p-6">
-                                                <div className="flex justify-between items-start mb-4">
+                                                {/* <div className="flex justify-between items-start mb-4">
                                                     <div className="flex items-center space-x-3">
                                                         <div className={`w-3 h-3 rounded-full ${rule.isInclusive ? 'bg-green-400' : 'bg-gray-400'}`}></div>
                                                         <h3 className="text-lg font-bold text-slate-900">{rule.name}</h3>
@@ -852,7 +860,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                                         }`}>
                                                         {rule.isInclusive ? 'Inclusive' : 'Exclusive'}
                                                     </div>
-                                                </div>
+                                                </div> */}
 
                                                 <div className="grid grid-cols-2 gap-4 mb-4">
                                                     <div className="bg-slate-50 rounded-lg p-3">

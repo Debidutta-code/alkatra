@@ -174,6 +174,16 @@ class RoomPrice {
         const taxCalculation = await container.taxGroupService.calculateTaxRulesForReservation(basePrice, totalPrice, String(propertyInfo.tax_group));
 
         /**
+         * If taxCalculation is empty return the response
+         */
+        if (!taxCalculation) {
+            response.data.tax = [];
+            // response.data.totalTax = 0;
+            // response.data.priceAfterTax = response.data.totalAmount;
+            return response;
+        }
+
+        /**
          * Cummilative total amount
          */
         let totalAmount = 0;
@@ -183,7 +193,7 @@ class RoomPrice {
 
         response.data.tax = taxCalculation;
         response.data.totalTax = totalAmount;
-        response.data.priceAfterTax = response.data.totalAmount + totalAmount;
+        response.data.priceAfterTax = Number((response.data.totalAmount + totalAmount).toFixed(2));
 
         return response
     }

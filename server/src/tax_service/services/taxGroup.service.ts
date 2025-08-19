@@ -64,7 +64,8 @@ export class TaxGroupService implements ITaxGroupService {
             } else if (rule.type === "FIXED") {
                 return {
                     name: rule.name,
-                    fixed: rule.value
+                    type: (rule.type).toLowerCase(),
+                    amount: Number(rule.value.toFixed(2)),
                 };
             }
         });
@@ -269,6 +270,12 @@ export class TaxGroupService implements ITaxGroupService {
             if (!taxGroupData.rules || taxGroupData.rules.length === 0) {
                 throw new Error("No tax rules found for this tax group.");
             }
+
+            /**
+             * Check if the tax group is active
+             * If not, return null
+             */
+            if (taxGroupData.isActive === false) return null;
 
             /**
              * Fetch tax rules for the reservation

@@ -71,7 +71,6 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
             setIsSubmitting(true);
             try {
                 await onSave(formData.password);
-                toast.success(t("Auth.Register.passwordUpdatedSuccess", { defaultValue: "Password updated successfully" }));
                 onClose();
             } catch (error: any) {
                 toast.error(error?.message || t("Auth.Register.passwordUpdateFailed", { defaultValue: "Failed to update password" }));
