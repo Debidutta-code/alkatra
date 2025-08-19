@@ -1,9 +1,48 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { CustomerReviewApi } from "../../api";
 
-export default function CustomerReviewForm() {
+interface CustomerReviewFormProps {
+    id: string;
+}
+
+export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
+
+    const reservationId = id;
+    const [loader, setLoader] = useState(true);
+
+    useEffect(() => {
+        if (!reservationId) return;
+
+        /**
+         * API for fetch review details
+         */
+        const fetchReviewDetails = async () => {
+            try {
+                setLoader(true);
+                const getReviewDetails = await customerReviewApi.getReviewById(reservationId);
+                if (getReviewDetails.status === 200) {
+                    setLoader(false)
+                    router.push('/review-success');
+                    return;
+                }
+            } catch (error: any) {
+
+            }
+            finally {
+                setLoader(false);
+            }
+        };
+
+        fetchReviewDetails();
+    }, [reservationId]);
+
+    const customerReviewApi = new CustomerReviewApi();
+    const router = useRouter();
+
+
     const [formData, setFormData] = useState({
         reservationId: "",
         hotelCode: "",
@@ -13,7 +52,7 @@ export default function CustomerReviewForm() {
         comment: "",
         rating: 0,
     });
-    const { reservationId } = useParams();
+
 
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
@@ -27,39 +66,40 @@ export default function CustomerReviewForm() {
         });
     };
 
+    /**
+     * Star input handle here
+     */
     const handleStarClick = (rating: number) => {
-        // if user clicks the same star again → clear selection
         setFormData({ ...formData, rating: formData.rating === rating ? 0 : rating });
     };
 
+    /**
+     * Cancel button handle
+     */
+
     const handleCancel = () => {
-        setFormData({
-            reservationId: "",
-            hotelCode: "",
-            hotelName: "",
-            userId: "",
-            guestEmail: "",
+        setFormData(prev => ({
+            ...prev,
             comment: "",
-            rating: 0,
-        });
-        setMessage("");
+            rating: 0
+        }));
+        setMessage("");  
     };
 
+    
+
+    /**
+     * Handle submit button
+     */
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setMessage("");
 
         try {
-            const res = await fetch("/api/reviews", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
-            });
+            const formDataSubmit = await customerReviewApi.submitReview(formData);
 
-            const data = await res.json();
-
-            if (res.ok) {
+            if (formDataSubmit.status === 201) {
                 setMessage("✅ Review submitted successfully!");
                 setFormData({
                     reservationId: "",
@@ -70,8 +110,9 @@ export default function CustomerReviewForm() {
                     comment: "",
                     rating: 0,
                 });
+                router.push('/review-success');
             } else {
-                setMessage(`❌ ${data.error || "Failed to submit review"}`);
+                setMessage(`❌ "Failed to submit review"}`);
             }
         } catch (err) {
             console.error(err);
@@ -81,28 +122,30 @@ export default function CustomerReviewForm() {
         }
     };
 
+    /**
+     * UseEffect used here
+     */
     useEffect(() => {
         if (!reservationId) return;
+
+        /**
+         * API for fetch reservation 
+        */
         const fetchReservation = async () => {
             try {
-                const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/review/get/reservation?reservationId=${reservationId}`
-                );
+                const reservationData = await customerReviewApi.getReservationForReview(reservationId as string);
 
-                if (!res.ok) {
-                    throw new Error("Failed to fetch reservation data");
-                }
-
-                const data = await res.json();
 
                 setFormData((prev) => ({
                     ...prev,
-                    reservationId: data.reservationId,
-                    hotelCode: data.hotelCode,
-                    hotelName: data.hotelName,
-                    userId: data.userId,
-                    guestEmail: data.guestEmail,
+                    reservationId: reservationData.reservationId,
+                    hotelCode: reservationData.hotelCode,
+                    hotelName: reservationData.hotelName,
+                    userId: reservationData.userId,
+                    guestEmail: reservationData.email,
                 }));
+
+
             } catch (err) {
                 console.error(err);
                 setMessage("❌ Could not load reservation details.");
@@ -112,78 +155,139 @@ export default function CustomerReviewForm() {
         fetchReservation();
     }, [reservationId]);
 
+
+
     return (
-        <div className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-2xl mt-6">
-            <h2 className="text-2xl font-semibold mb-4 text-black">Leave Your Review</h2>
+        <div
+            className="min-h-screen bg-cover bg-fixed bg-center"
+            style={{
+                backgroundImage: "url('/assets/login3.jpg')",
+                backgroundPosition: "center center"
+            }}
+        >
+            {/* Dark overlay for better readability */}
+            <div className="min-h-screen bg-black bg-opacity-60">
 
-            {message && <div className="mb-4 text-center font-medium">{message}</div>}
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-
-                <input
-                    type="text"
-                    name="hotelName"
-                    placeholder="Hotel Name"
-                    value={formData.hotelName}
-                    onChange={handleChange}
-                    className="w-full p-2 border rounded"
-                    required
-                />
-
-
-
-                <input
-                    type="email"
-                    name="guestEmail"
-                    placeholder="Guest Email"
-                    value={formData.guestEmail}
-                    onChange={handleChange}
-                    className="w-full p-2 border rounded"
-                    required
-                />
-
-                <textarea
-                    name="comment"
-                    placeholder="Your comments..."
-                    value={formData.comment}
-                    onChange={handleChange}
-                    className="w-full p-2 border rounded"
-                    required
-                />
-
-                {/* ⭐ Star Rating */}
-                <div className="flex space-x-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                            type="button"
-                            key={star}
-                            onClick={() => handleStarClick(star)}
-                            className={`text-3xl ${formData.rating >= star ? "text-yellow-400" : "text-gray-300"
-                                }`}
-                        >
-                            ★
-                        </button>
-                    ))}
+                {/* Logo at top center */}
+                <div className="pt-8 px-4 flex justify-start">
+                    <img
+                        src="/assets/TRIP-1.png"
+                        alt="Trip Logo"
+                        className="h-24 w-auto object-contain"
+                    />
                 </div>
 
-                {/* Action buttons */}
-                <div className="flex space-x-4">
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-                    >
-                        {loading ? "Submitting..." : "Submit Review"}
-                    </button>
-                    <button
-                        type="button"
-                        onClick={handleCancel}
-                        className="flex-1 bg-gray-300 text-black py-2 rounded hover:bg-gray-400 transition"
-                    >
-                        Cancel
-                    </button>
+                {/* Review Form Section */}
+                <div className="max-w-4xl mx-auto px-4 py-13">
+                    <div className="bg-white bg-opacity-90 rounded-xl shadow-2xl overflow-hidden backdrop-blur-sm">
+
+                        {/* Form Header */}
+                        <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-white">
+                            <h2 className="text-2xl font-bold">Leave Your Review</h2>
+                            <p className="text-blue-100">We value your feedback</p>
+                        </div>
+
+                        {/* Form Content - keep this part exactly the same */}
+                        <div className="p-6 md:p-6">
+                            {message && (
+                                <div className={`mb-6 p-4 rounded-lg ${message.includes('✅') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                    {message}
+                                </div>
+                            )}
+
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                {/* Hotel Info */}
+                                <div className="space-y-2">
+                                    <label className="block text-gray-700 font-medium">Hotel</label>
+                                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                        <p className="font-semibold">{formData.hotelName}</p>
+                                    </div>
+                                </div>
+
+                                {/* Guest Email */}
+                                <div className="space-y-2">
+                                    <label className="block text-gray-700 font-medium">Your Email</label>
+                                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                        <p className="font-medium text-gray-800">{formData.guestEmail}</p>
+                                    </div>
+                                </div>
+
+                                {/* Rating */}
+                                <div className="space-y-2">
+                                    <label className="block text-gray-700 font-medium">Your Rating</label>
+                                    <div className="flex space-x-1">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <button
+                                                type="button"
+                                                key={star}
+                                                onClick={() => handleStarClick(star)}
+                                                className={`text-4xl ${formData.rating >= star ? "text-yellow-400" : "text-gray-300"}`}
+                                                aria-label={`Rate ${star} star${star !== 1 ? 's' : ''}`}
+                                            >
+                                                ★
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <p className="text-sm text-gray-500">
+                                        {formData.rating ? `You rated ${formData.rating} star${formData.rating !== 1 ? 's' : ''}` : 'Select your rating'}
+                                    </p>
+                                </div>
+
+                                {/* Comments */}
+                                <div className="space-y-2">
+                                    <label htmlFor="comment" className="block text-gray-700 font-medium">
+                                        Your Review
+                                    </label>
+                                    <textarea
+                                        id="comment"
+                                        name="comment"
+                                        placeholder="Share your experience with this hotel..."
+                                        value={formData.comment}
+                                        onChange={handleChange}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        rows={5}
+                                        required
+                                    />
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                                    <button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center"
+                                    >
+                                        {loading ? (
+                                            <>
+                                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                Submitting...
+                                            </>
+                                        ) : (
+                                            "Submit Review"
+                                        )}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleCancel}
+                                        className="flex-1 bg-gray-500 hover:bg-gray-600 text-black font-medium py-3 px-6 rounded-lg transition duration-200"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    {/* Additional Info */}
+                    <div className="mt-8 text-center text-white">
+                        <p>Your feedback helps us improve our services.</p>
+                        <p className="mt-1">Thank you for taking the time to share your experience!</p>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
     );
 }

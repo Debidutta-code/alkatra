@@ -11,9 +11,8 @@ export class ReservationRepository {
         
         const reservationDetails = await ThirdPartyBooking
         .findOne({ reservationId, status: { $ne: "Cancelled" } })
-        .select("hotelCode hotelName email userId");
+        .select("reservationId hotelCode hotelName email userId");
 
-        console.log(`The reservation data we get ${reservationDetails}`);
         if (!reservationDetails) {
             throw new Error ("REPOSITORY: No reservation details found");
         }

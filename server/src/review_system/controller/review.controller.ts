@@ -10,7 +10,7 @@ export class CustomerReviewController {
         try {
             const review = await customerReviewService.addCustomerReview(req.body);
 
-            res.status(201).json({
+            return res.status(201).json({
                 message: "Review created successfully",
                 data: review
             });

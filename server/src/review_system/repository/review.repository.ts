@@ -28,7 +28,7 @@ export class CustomerReviewRepository {
         const reservationData = await ThirdPartyBooking.findOne({ reservationId: reservationId });
 
         if (!reservationData) {
-            throw new Error ("Reservation data not found");
+            throw new Error (`Reservation data not found with your provided ${reservationId}`);
         }
 
         if (

@@ -1,7 +1,9 @@
 import { required } from "joi";
 import mongoose, { Schema, Document, Types } from "mongoose";
+import { reservationsUrl } from "twilio/lib/jwt/taskrouter/util";
 
 export interface IReview extends Document {
+  reservationId: string;
   hotelCode: string;
   hotelName: string;
   userId: Types.ObjectId;
@@ -12,6 +14,7 @@ export interface IReview extends Document {
 }
 
 const ReviewSchema: Schema = new Schema({
+  reservationId: { type: String, required: false, ref: 'ThirdPartyBooking' },
   hotelName: { type: String, required: false, ref: 'PropertyInfo' },
   hotelCode: { type: String, required: false, ref: 'PropertyInfo' },
   userId: { type: Schema.Types.ObjectId, ref: 'User' },

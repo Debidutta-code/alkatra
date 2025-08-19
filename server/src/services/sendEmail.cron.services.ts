@@ -19,7 +19,8 @@ class SendEmailCronService {
     }
 
     public start(): void {
-        if (this.job) return; // Avoid multiple scheduling
+
+        if (this.job) return; 
 
         this.job = cron.schedule("0 12 * * *", async () => {
             try {

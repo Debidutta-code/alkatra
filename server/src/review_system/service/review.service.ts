@@ -31,6 +31,7 @@ export class CustomerReviewService {
         if (query.userId) filters.userId = query.userId;
         if (query.guestEmail) filters.userEmail = query.userEmail;
         if (query.hotelCode) filters.hotelCode = query.hotelCode;
+        if (query.reservationId) filters.reservationId = query.reservationId;
 
         return await customerReviewRepository.getReviews(filters);
     };
@@ -79,7 +80,7 @@ export class CustomerReviewService {
             <p>Dear Customer,</p>
             <p>Thank you for staying with us at <b>${reservationData.hotelName}</b>.</p>
             <p>We value your feedback! Please click the link below to share your review:</p>
-            <a href="${reviewUiUrl}/${reservationId}" target="_blank">Leave a Review</a>
+            <a href="${reviewUiUrl}?reservationId=${reservationId}" target="_blank">Leave a Review</a>
             <p>Best regards,<br/>Hotel Team</p>`;
 
             const mailer = MailFactory.getMailer();
