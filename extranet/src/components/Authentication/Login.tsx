@@ -33,10 +33,9 @@ export default function Login() {
 
   return (
     <div className="relative w-full min-h-screen flex flex-col lg:flex-row">
-      {/* Static Background Image (login-bg-3.jpg only) */}
       <div className="absolute inset-0 lg:relative lg:w-1/2 overflow-hidden">
         <Image
-          src="/assets/login-bg-3.jpg"
+          src="/assets/login-bg.jpg"
           alt="Burj Al Arab"
           fill
           className="object-cover absolute inset-0 z-10"
