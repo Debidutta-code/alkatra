@@ -13,6 +13,19 @@ class CustomerController {
 
   googleAuthController = new AuthController();
 
+
+  private async registerUsers(provider: string, data: any): Promise<any> {
+    switch (provider) {
+      case 'Local':
+        return customerService.registerCustomer(data);
+      case 'Google':
+        return this.googleAuthController.postGoogleAuthData;
+      default:
+        throw new Error(`Unknown auth provider: ${provider}`);
+    }
+  }
+
+
   clientProviderCheck = async (req: Request, res: Response) => {
     const { authProvider } = req.body;
     
@@ -34,7 +47,7 @@ class CustomerController {
     console.log(`The Register Customer function called`);
     try {
       const { referrerId, referralCode } = req.query as { referrerId: string; referralCode: string };
-
+      const authProvider = req.body.authProvider;
       const userBody = req.body;
 
       console.log(`The request body we get ${JSON.stringify(userBody)}`);
@@ -43,7 +56,8 @@ class CustomerController {
        * Register the customer if referrerId and referralCode are not provided
        */
       if (!referrerId && !referralCode) {
-        const customer = await customerService.registerCustomer(userBody);
+        // const customer = await customerService.registerCustomer(userBody);
+        const customer = await this.registerUsers(userBody.authProvider, userBody);
         return res.status(201).json({ message: "Customer registered successfully", data: customer });
       }
 
@@ -66,7 +80,8 @@ class CustomerController {
       /**
        * Now all check's are passed to register the referee
        */
-      const referee = await customerService.registerCustomer(userBody);
+      // const referee = await customerService.registerCustomer(userBody);
+      const referee = await this.registerUsers(userBody.authProvider, userBody);
       if (!referee._id) throw new Error("Unable to register, please again later.");
 
       /**
