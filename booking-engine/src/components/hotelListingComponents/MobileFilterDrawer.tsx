@@ -1,5 +1,6 @@
+"use client";
 import React from 'react';
-import { X, Check, Star } from 'lucide-react';
+import { X, Star } from 'lucide-react';
 import { AMENITIES } from "../../components/hotelBox/FilterModal";
 import { useTranslation } from 'react-i18next';
 import { t } from 'i18next';

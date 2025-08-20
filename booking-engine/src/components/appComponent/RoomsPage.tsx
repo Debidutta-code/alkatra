@@ -6,7 +6,15 @@ import axios from "axios";
 import { RoomCard } from "../../components/appComponent/RoomCard";
 import GuestInformationModal, { Guest } from "../../components/bookingComponents/GuestInformationModal";
 import { useDispatch, useSelector } from "../../Redux/store";
-import { setAmount, setRoomId } from "../../Redux/slices/pmsHotelCard.slice";
+import {
+  setAmount,
+  setRoomId,
+  setCurrency,
+  setRatePlanCode,
+  setRoomType,
+  setHotelCode,
+  setHotelName,
+} from "@/Redux/slices/pmsHotelCard.slice";
 import { setGuestDetails } from "../../Redux/slices/hotelcard.slice";
 import FullscreenGallery from './FullscreenGallery';
 import QRCodeDisplay from "./QRCodeDisplay";
@@ -209,6 +217,15 @@ const RoomsPage: React.FC = () => {
     fetchProperty();
   }, [propertyId]);
 
+  useEffect(() => {
+    if (selectedRoom && propertyCode && propertyDetails) {
+      dispatch(setCurrency(selectedRoom.currency_code));
+      dispatch(setRatePlanCode(selectedRoom.rate_plan_code));
+      dispatch(setRoomType(selectedRoom.room_type));
+      dispatch(setHotelCode(propertyCode));
+      dispatch(setHotelName(propertyDetails.property_name));
+    }
+  }, [selectedRoom, propertyCode]);
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -383,16 +400,15 @@ const RoomsPage: React.FC = () => {
     setSelectedRoom(room);
     setIsModalOpen(true);
     dispatch(setRoomId(room._id));
-
-    // Use amountBeforeTax from baseByGuestAmts
+  
     const guestCount = guestDetails?.guests || 1;
     const matchingRate =
       room.baseByGuestAmts?.find((rate) => rate.numberOfGuests === guestCount) ||
       room.baseByGuestAmts?.[0];
-    const amount = matchingRate ? matchingRate.amountBeforeTax.toFixed(2) : "0.00";
+  
+    const amount = matchingRate ? parseFloat(matchingRate.amountBeforeTax.toFixed(2)) : 0;
     dispatch(setAmount(amount));
   };
-
   const confirmBooking = (formData: {
     email: string;
     phone: string;
@@ -400,36 +416,40 @@ const RoomsPage: React.FC = () => {
     roomId: string;
     checkIn: string;
     checkOut: string;
-    amount: string;
+    amount: number;
     userId?: string;
     rooms?: number;
     adults?: number;
     children?: number;
     infants?: number;
     guests?: Guest[];
+    hotelName: string;
+    ratePlanCode: string;
+    roomType: string;
+    currency?: string;
   }) => {
     console.log("form data", formData);
+  
     const queryParams = new URLSearchParams({
       roomId: formData.roomId,
       propertyId: formData.propertyId,
-      currency: selectedRoom?.currency_code || "",
+      currency: formData.currency || selectedRoom?.currency_code || "",
       checkIn: formData.checkIn,
       checkOut: formData.checkOut,
       email: formData.email,
       phone: formData.phone,
       userId: formData.userId || "",
-      hotelName: propertyDetails?.property_name || "",
-      ratePlanCode: selectedRoom?.rate_plan_code || "",
-      roomType: selectedRoom?.room_type || "",
-      ...(formData.rooms ? { rooms: formData.rooms.toString() } : {}),
-      ...(formData.adults ? { adults: formData.adults.toString() } : {}),
-      ...(formData.children ? { children: formData.children.toString() } : {}),
-      ...(formData.infants ? { infants: formData.infants.toString() } : {}),
-      ...(formData.guests
-        ? { guests: encodeURIComponent(JSON.stringify(formData.guests)) }
-        : {}),
-    }).toString();
-    router.push(`/payment?${queryParams}`);
+      hotelName: formData.hotelName,
+      ratePlanCode: formData.ratePlanCode,
+      roomType: formData.roomType,
+      ...(formData.rooms && { rooms: formData.rooms.toString() }),
+      ...(formData.adults && { adults: formData.adults.toString() }),
+      ...(formData.children && { children: formData.children.toString() }),
+      ...(formData.infants && { infants: formData.infants.toString() }),
+      ...(formData.guests && { guests: encodeURIComponent(JSON.stringify(formData.guests)) }),
+    });
+  
+    router.push(`/payment`);
   };
 
   // Get unique room types
