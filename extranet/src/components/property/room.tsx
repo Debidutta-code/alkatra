@@ -272,7 +272,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
     return data;
   };
 
-  const handlePropertyImageUpload = async () => {
+  const handleRoomImageUpload = async () => {
     try {
       if (files.length) {
         setLoading(true);
@@ -818,7 +818,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
                   setRejected={setRejected}
                   open={openDialog}
                   setOpen={setOpenDialog}
-                  handlePropertyImageUpload={handlePropertyImageUpload}
+                  handleRoomImageUpload={handleRoomImageUpload}
                 />
               )}
             </div>
@@ -942,7 +942,7 @@ function UploadPropertyImages({
   setLoading,
   open,
   setOpen,
-  handlePropertyImageUpload,
+  handleRoomImageUpload,
 }: {
   open: boolean;
   files: IFileWithPreview[];
@@ -952,7 +952,7 @@ function UploadPropertyImages({
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  handlePropertyImageUpload: any;
+  handleRoomImageUpload: any;
 }) {
   const onDrop = useCallback(
     (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
@@ -999,7 +999,7 @@ function UploadPropertyImages({
 
   const handleFileUpload = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await handlePropertyImageUpload();
+    await handleRoomImageUpload();
   };
 
   return (

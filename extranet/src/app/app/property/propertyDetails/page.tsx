@@ -392,7 +392,7 @@ export default function Page() {
         }
         return [container];
       });
-      toast.success("Room updated successfully!");
+      // toast.success("Room updated successfully!");
     } catch (error) {
       console.error("Error updating room:", error);
       toast.error("Failed to update room");
@@ -675,6 +675,7 @@ export default function Page() {
                 onAddRoom={handleAddRoom}
                 onEditRoom={handleEditRoom}
                 onDeleteRoom={handleDeleteRoom}
+                accessToken={accessToken as string}
               />
             </TabsContent>
 

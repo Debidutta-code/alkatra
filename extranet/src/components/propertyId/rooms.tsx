@@ -1,15 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "../../components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Checkbox } from "../../components/ui/checkbox";
 import { Label } from "../../components/ui/label";
 import Image from 'next/image';
 import toast from 'react-hot-toast';
-import { Plus, Save, Trash2, Upload, PenTool, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
+import { Plus, Save, Trash2, Upload, PenTool, ChevronLeft, ChevronRight, ImageIcon, Loader2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../../components/ui/dialog";
 import { useDropzone, FileRejection } from 'react-dropzone';
+import axios from 'axios';
 
 interface IFileWithPreview extends File {
   preview: string;
@@ -42,19 +43,29 @@ interface RoomsProps {
   onAddRoom: (room: RoomType) => Promise<void>;
   onEditRoom: (room: RoomType) => Promise<void>;
   onDeleteRoom: (id: string) => Promise<void>;
+  accessToken: string; // Add this prop
+  uploadEndpoint?: string; // Add this prop
 }
 
 function convertObjectOfObjectsToArray(obj: any): RoomType[] {
   if (obj && typeof obj === 'object') {
     return Object.values(obj);
   }
-  return []; // Return an empty array if input is undefined or null
+  return [];
 }
 
-export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps) {
+export function Rooms({
+  rooms,
+  onAddRoom,
+  onEditRoom,
+  onDeleteRoom,
+  accessToken,
+  uploadEndpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/upload`
+}: RoomsProps) {
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [newRoom, setNewRoom] = useState<RoomType>({
     _id: "",
@@ -84,13 +95,90 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
   const [currentImageIndex, setCurrentImageIndex] = useState<{ [key: string]: number }>({});
   const [files, setFiles] = useState<IFileWithPreview[]>([]);
   const [rejected, setRejected] = useState<FileRejection[]>([]);
-  // Function to toggle description expansion
+
+  const validateFiles = (files: File[]) => {
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxFiles = 20;
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+
+    const validFiles = files.filter(file => {
+      if (file.size > maxSize) {
+        toast.error(`${file.name} is too large (max 10MB)`);
+        return false;
+      }
+      if (!allowedTypes.includes(file.type)) {
+        toast.error(`${file.name} is not a supported image type`);
+        return false;
+      }
+      return true;
+    });
+
+    if (newRoom.image.length + validFiles.length > maxFiles) {
+      toast.error(`Maximum ${maxFiles} images allowed`);
+      return validFiles.slice(0, maxFiles - newRoom.image.length);
+    }
+
+    return validFiles;
+  };
+
+  const uploadImagesToAPI = async (filesToUpload: File[]) => {
+    if (!accessToken) {
+      throw new Error("Missing authentication token");
+    }
+
+    const validFiles = validateFiles(filesToUpload);
+    if (!validFiles.length) return [];
+
+    setUploadingImages(true);
+
+    try {
+      const formData = new FormData();
+      validFiles.forEach((file) => {
+        formData.append('file', file);
+      });
+
+      const uploadResponse = await axios.post(uploadEndpoint, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      let newImageUrls: string[] = [];
+      if (uploadResponse.data?.data?.urls) {
+        newImageUrls = uploadResponse.data.data.urls.map((item: any) =>
+          typeof item === 'string' ? item : item.url || item.secure_url || item
+        );
+      } else if (uploadResponse.data?.urls) {
+        newImageUrls = uploadResponse.data.urls.map((item: any) =>
+          typeof item === 'string' ? item : item.url || item.secure_url || item
+        );
+      } else if (uploadResponse.data?.data) {
+        const data = uploadResponse.data.data;
+        newImageUrls = Array.isArray(data)
+          ? data.map((item: any) => typeof item === 'string' ? item : item.url || item.secure_url || item)
+          : [typeof data === 'string' ? data : data.url || data.secure_url || data];
+      } else {
+        throw new Error('Invalid response format from upload endpoint');
+      }
+
+      return newImageUrls;
+    } catch (error: any) {
+      console.error('Upload failed:', error);
+      const errorMessage = error?.response?.data?.message || error?.message || "Failed to upload images";
+      throw new Error(errorMessage);
+    } finally {
+      setUploadingImages(false);
+    }
+  };
+
   const toggleDescription = (roomId: string) => {
     setExpandedDescriptions(prev => ({
       ...prev,
       [roomId]: !prev[roomId]
     }));
   };
+
   // Function to count words
   const getWordCount = (text: string) => {
     return text.trim().split(/\s+/).length;
@@ -105,10 +193,8 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
     }
     else if (newRoom.total_room <= 0) {
       errors.total_room = "Minimum allowed value is 1"
-    }
-    ;
+    };
     if (newRoom.floor < 0) errors.floor = "Value must be greater than or equal to zero";
-    // if (!newRoom.room_view) errors.room_view = "Room View is required.";
     if (newRoom.room_size === 0) {
       errors.room_size = "Room Size is required."
     }
@@ -122,17 +208,17 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
     }
     else if (newRoom.max_occupancy <= 0) {
       errors.max_occupancy = "Minimum allowed value is 1"
-
     };
     if (newRoom.max_number_of_adults === 0) {
       errors.max_number_of_adults = "Max number of adults is required."
     }
     else if (newRoom.max_number_of_adults <= 0) {
       errors.max_number_of_adults = "Minimum allowed value is 1"
-
     };
     if (newRoom.max_number_of_children < 0) errors.max_number_of_children = "Value must be greater than or equal to zero";
-    if (newRoom.number_of_bedrooms === 0) { errors.number_of_bedrooms = "Number of bedrooms is required." }
+    if (newRoom.number_of_bedrooms === 0) {
+      errors.number_of_bedrooms = "Number of bedrooms is required."
+    }
     else if (newRoom.number_of_bedrooms <= 0) {
       errors.number_of_bedrooms = "Minimum allowed value is 1"
     };
@@ -164,6 +250,12 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
       image: [],
       available: false
     });
+    // Clean up file previews
+    files.forEach(file => {
+      if (file.preview) {
+        URL.revokeObjectURL(file.preview);
+      }
+    });
     setFiles([]);
     setRejected([]);
     setValidationErrors({});
@@ -191,65 +283,10 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
 
   const handleEditRoom = (room: RoomType) => {
     setNewRoom(room);
-    setFiles([]); // Clear any uploaded files
-    setRejected([]); // Clear any rejected files
+    setFiles([]);
+    setRejected([]);
     setShowModal(true);
     setEditMode(true);
-  };
-
-  const resizeImage = (file: File, maxSize: number) => {
-    return new Promise<string>((resolve, reject) => {
-      const img = document.createElement('img');
-      const reader = new FileReader();
-
-      reader.onload = (event) => {
-        img.src = event.target?.result as string;
-      };
-
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-
-        const scale = maxSize / Math.max(img.width, img.height);
-        canvas.width = img.width * scale;
-        canvas.height = img.height * scale;
-
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          canvas.toBlob(
-            (blob) => {
-              if (blob) {
-                const resizedFile = new File([blob], file.name, { type: file.type });
-                const resizedReader = new FileReader();
-                resizedReader.onload = (e) => resolve(e.target?.result as string);
-                resizedReader.onerror = reject;
-                resizedReader.readAsDataURL(resizedFile);
-              }
-            },
-            file.type,
-            0.75 // Quality factor
-          );
-        }
-      };
-
-      img.onerror = reject;
-    });
-  };
-
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      try {
-        const resizedImage = await resizeImage(file, 1024);
-        setSelectedImage(resizedImage);
-        setNewRoom({ ...newRoom, image: [resizedImage] });
-      } catch (error) {
-        console.error('Error resizing image:', error);
-      }
-    }
   };
 
   const handleSaveRoom = async () => {
@@ -264,20 +301,23 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
     setIsSubmitting(true);
 
     try {
-      // Convert files to base64 strings
-      const imagePromises = files.map(file => {
-        return new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.readAsDataURL(file);
-        });
-      });
+      let finalImageUrls = [...newRoom.image]; // Start with existing images
 
-      const newImages = await Promise.all(imagePromises);
+      // Upload new images if any
+      if (files.length > 0) {
+        try {
+          const uploadedUrls = await uploadImagesToAPI(files);
+          finalImageUrls = [...finalImageUrls, ...uploadedUrls];
+          toast.success(`${uploadedUrls.length} image(s) uploaded successfully!`);
+        } catch (uploadError: any) {
+          toast.error(uploadError.message);
+          return; // Don't proceed if image upload fails
+        }
+      }
 
       const roomToSave = {
         ...newRoom,
-        image: [...newRoom.image, ...newImages] // Combine existing and new images
+        image: finalImageUrls
       };
 
       if (editMode) {
@@ -301,7 +341,6 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
   const handleDeleteRoom = async (roomId: string, roomName: string) => {
     try {
       await onDeleteRoom(roomId);
-      // toast.success(`Room ${roomName} deleted successfully!`);
     } catch (error) {
       console.error('Error deleting room:', error);
       toast.error('Failed to delete room. Please try again.');
@@ -319,7 +358,6 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
-      // Reset form when modal closes
       if (!showModal) {
         resetRoomForm();
       }
@@ -333,35 +371,65 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
     accept: {
       'image/*': ['.jpeg', '.jpg', '.png', '.webp']
     },
-    maxSize: 5 * 1024 * 1024, // 5MB
+    maxSize: 10 * 1024 * 1024, // Changed to 10MB to match PMS API
     onDrop: (acceptedFiles, rejectedFiles) => {
       if (acceptedFiles?.length) {
-        setFiles(previousFiles => [
-          ...previousFiles,
-          ...acceptedFiles.map(file =>
-            Object.assign(file, { preview: URL.createObjectURL(file) })
-          )
-        ]);
+        const validFiles = validateFiles(acceptedFiles);
+        if (validFiles.length) {
+          setFiles(previousFiles => [
+            ...previousFiles,
+            ...validFiles.map(file =>
+              Object.assign(file, { preview: URL.createObjectURL(file) })
+            )
+          ]);
+        }
       }
 
       if (rejectedFiles?.length) {
         setRejected(previousFiles => [...previousFiles, ...rejectedFiles]);
+        rejectedFiles.forEach(rejection => {
+          const errors = rejection.errors.map(e => e.message).join(', ');
+          toast.error(`${rejection.file.name}: ${errors}`);
+        });
       }
     }
   });
 
   const removeFile = (name: string) => {
-    setFiles(files => files.filter(file => file.name !== name));
+    setFiles(files => {
+      const fileToRemove = files.find(f => f.name === name);
+      if (fileToRemove?.preview) {
+        URL.revokeObjectURL(fileToRemove.preview);
+      }
+      return files.filter(file => file.name !== name);
+    });
   };
 
   useEffect(() => {
     return () => {
-      files.forEach(file => URL.revokeObjectURL(file.preview));
+      files.forEach(file => {
+        if (file.preview) {
+          URL.revokeObjectURL(file.preview);
+        }
+      });
     };
   }, [files]);
 
   const renderRoomForm = () => (
     <>
+      {/* Show uploading overlay when images are being uploaded */}
+      {uploadingImages && (
+        <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg">
+          <div className="flex items-center gap-3 bg-white rounded-lg px-6 py-4 shadow-lg">
+            <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+            <div>
+              <div className="font-semibold text-gray-800">Uploading images...</div>
+              <div className="text-sm text-gray-500">Please wait while we process your images</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-1">
         {/* Room Name and Room Type */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -678,7 +746,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
                       Drag & drop or <span className="text-primary font-medium underline">browse</span> to choose files
                     </p>
                     <p className="text-xs text-gray-400">
-                      JPEG, PNG, WebP up to 5MB each
+                      JPEG, PNG, WebP up to 10MB each (max 10 images)
                     </p>
                   </div>
                 )}
@@ -732,7 +800,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
                       <div className="h-px bg-gray-200 flex-1"></div>
-                      <span className="text-sm font-medium text-green-600 px-3">New Images</span>
+                      <span className="text-sm font-medium text-green-600 px-3">New Images (will be uploaded)</span>
                       <div className="h-px bg-gray-200 flex-1"></div>
                     </div>
                     <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
@@ -820,7 +888,7 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
           variant="outline"
           type="button"
           onClick={handleCloseModal}
-          disabled={isSubmitting}
+          disabled={isSubmitting || uploadingImages}
           className="w-full sm:w-auto"
         >
           Cancel
@@ -828,13 +896,13 @@ export function Rooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: RoomsProps
         <Button
           type="button"
           onClick={handleSaveRoom}
-          disabled={isSubmitting}
+          disabled={isSubmitting || uploadingImages}
           className="w-full sm:w-auto"
         >
-          {isSubmitting ? (
+          {isSubmitting || uploadingImages ? (
             <span className="flex items-center justify-center">
-              <span className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
-              {editMode ? 'Updating...' : 'Creating...'}
+              <Loader2 className="animate-spin mr-2 h-4 w-4" />
+              {uploadingImages ? 'Uploading Images...' : editMode ? 'Updating...' : 'Creating...'}
             </span>
           ) : (
             <>

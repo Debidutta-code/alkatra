@@ -92,7 +92,7 @@ export default function Navbar() {
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
-              <NavigationMenuTrigger>Properties</NavigationMenuTrigger>
+              {/* <NavigationMenuTrigger>Properties</NavigationMenuTrigger> */}
               <NavigationMenuContent>
                 <div className="p-4 w-[200px] space-y-2">
                   <Link href="/app/bookings">
