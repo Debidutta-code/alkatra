@@ -1,16 +1,13 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import mongoose, { Types } from "mongoose";
 import { CatchAsyncError } from "../middleware/catchAsyncError";
 import ErrorHandler from "../utils/errorHandler";
-import AuthModelType from "../../../user_authentication/src/Model/auth.model";
 import { AuthenticatedRequest } from "../../../customer_authentication/src/types/custom";
 import CryptoPaymentDetails, { CryptoPaymentLog } from "../models/cryptoPayment.model";
 import { v4 as uuidv4 } from "uuid";
-import axios from "axios";
 import { CryptoGuestDetails } from "../models/cryptoUserPaymentInitialStage.model";
 import { createReservationWithCryptoPayment } from "./bookings.controller";
 import { NotificationService } from "../../../notification/src/service/notification.service";
-import convertToLocalTime from "../../../utils/timezone_convert";
 
 let convertedAmount: number;
 
@@ -204,8 +201,6 @@ export const cryptoPaymentInitiate = CatchAsyncError(async (req: AuthenticatedRe
       return res.status(500).json({ message: "All amount variations are already used. Try again later." });
     }
 
-    console.log(`##############The time zone data ${convertToLocalTime()}`);
-    // console.log(`########## Date - ${new Date().toLocaleString}`)
     const cryptoPaymentDetails = new CryptoPaymentDetails({
       customer_id: new Types.ObjectId(userId),
       token,
