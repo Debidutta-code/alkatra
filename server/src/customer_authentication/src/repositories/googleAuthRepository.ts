@@ -1,17 +1,18 @@
-import { GoogleUser, IUser } from "../models/googleUser.model";
-
+import CustomerModel, { ICustomer } from '../models/customer.model';
 
 export class AuthRepository {
-  async findUserByGoogleId(googleId: string): Promise<IUser | null> {
-    return await GoogleUser.findOne({ googleId });
+  
+  async findUserByGoogleId(email: string): Promise<ICustomer | null> {
+    return await CustomerModel.findOne({ email });
   }
 
-  async createUser(data: Partial<IUser>): Promise<IUser> {
-    const user = new GoogleUser(data);
+  async createUser(data: Partial<ICustomer>): Promise<ICustomer> {
+    const user = new CustomerModel(data);
     return await user.save();
   }
 
-  async findUserById(id: string): Promise<IUser | null> {
-    return await GoogleUser.findById(id);
+  async findUserById(id: string): Promise<ICustomer> {
+    return await CustomerModel.findById(id);
   }
+
 }

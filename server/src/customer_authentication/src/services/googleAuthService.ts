@@ -1,8 +1,9 @@
-import { IUser } from "../models/googleUser.model";
 import { AuthRepository } from "../repositories/googleAuthRepository";
 import jwt from 'jsonwebtoken';
 import config from '../../../common/index';
 import { google } from 'googleapis';
+import { ICustomer } from '../models/customer.model';
+
 
 export class AuthService {
   private repository: AuthRepository;
@@ -33,11 +34,15 @@ export class AuthService {
     }
 
     try {
+
       let data: any;
-      const { tokens } = await googleInitializeData.getToken(code)
+      const { tokens } = await googleInitializeData.getToken(code);
       googleInitializeData.setCredentials(tokens);
       const oauth2 = google.oauth2({ version: 'v2', auth: googleInitializeData });
       data = await oauth2.userinfo.get();
+
+      // console.log(`^%$^%$&^%$^%$^%$^%^%$^%$&^%$\nThe data we get from Google WEB auth ${JSON.stringify(data)}`);
+
       return data;
     } catch (error) {
       console.error('Google token exchange or user info fetch failed:');
@@ -71,26 +76,40 @@ export class AuthService {
   }
 
 
-  async handleGoogleAuth(profile: any): Promise<{ user: IUser; token: string }> {
-    let user = await this.repository.findUserByGoogleId(profile.id);
+  async handleGoogleAuth(
+    googleId: string,
+    firstName: string,
+    lastName: string,
+    email: string,
+    avatar: string
+  ):
+    Promise<{
+      user: ICustomer;
+      token: string;
+    }> {
+
+    let user = await this.repository.findUserByGoogleId(email);
+
     if (!user) {
       user = await this.repository.createUser({
-        googleId: profile.id,
-        displayName: profile.displayName,
-        email: profile.emails,
-        avatar: profile.avatar,
+        googleId: googleId,
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        avatar: avatar,
       });
     }
 
     const token = jwt.sign(
       { id: user._id },
-      process.env.JWT_SECRET_KEY || "your-secret-key",
+      process.env.JWT_SECRET_KEY,
       { expiresIn: "7d" }
     );
     return { user, token };
   }
 
-  async getUserById(id: string): Promise<IUser | null> {
+  async getUserById(id: string): Promise<ICustomer> {
     return await this.repository.findUserById(id);
   }
+
 }

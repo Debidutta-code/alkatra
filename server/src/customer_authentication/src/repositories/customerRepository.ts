@@ -1,7 +1,6 @@
 // src/repositories/customerRepository.ts
 import Customer, { ICustomer } from "../models/customer.model";
 import bcrypt from "bcryptjs";
-import { GoogleUser, IUser } from "../models/googleUser.model";
 
 class CustomerRepository {
     async findByEmail(email: string): Promise<ICustomer | null> {
@@ -22,11 +21,6 @@ class CustomerRepository {
     // Get customer by ID
     async findById(id: string): Promise<ICustomer | null> {
         return await Customer.findById(id);
-    }
-
-    // Get customer by ID from Google user collection
-    async findByIdFromGoogleUserCollection(id: string): Promise<IUser | null> {
-        return await GoogleUser.findById(id);
     }
 
     // Update customer profile
