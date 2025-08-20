@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { AuthService } from '../services/googleAuthService';
 import jwt from 'jsonwebtoken';
 import config from '../../../common/index';
-import { google } from 'googleapis';
+
 
 
 export class AuthController {
@@ -36,56 +36,51 @@ export class AuthController {
 
   postGoogleAuthData = async (req: Request, res: Response) => {
     try {
-
       const { code, token } = req.body;
+      
       if (!code && !token) {
         return res.status(400).json({ error: 'Authorization code or token is required' });
       }
 
       const googleInitialize = await this.service.initializeGoogleOAuth();
       if (!googleInitialize) {
-        return res.status(400).json({ error: "Google initialize not " });
+        return res.status(400).json({ error: "Google OAuth initialization failed" });
       }
 
+      let userData;
+      
       if (code) {
-
-        const webLoginData = await this.service.handleGoogleAuthForWeb(code, googleInitialize);
-        if (!webLoginData) {
-          return res.status(400).json({ error: "Google login at web unsuccessful" });
+        userData = await this.service.handleGoogleAuthForWeb(code, googleInitialize);
+        if (!userData?.data) {
+          return res.status(400).json({ error: "Google web authentication failed" });
         }
-
-        const result = await this.service.handleGoogleAuth({
-          id: webLoginData.id,
-          emails: webLoginData.email,
-          displayName: webLoginData.name || webLoginData.given_name || 'Unknown User',
-          avatar: webLoginData.picture,
-        });
-
-        console.log(`The google web result we get ${JSON.stringify(result)}`);
-
-        return res.status(200).json({ token: result.token });
+      } else if (token) {
+        userData = await this.service.handleGoogleAuthForMobile(token, googleInitialize);
+        if (!userData?.data) {
+          return res.status(400).json({ error: "Google mobile authentication failed" });
+        }
       }
 
-      else if (token) {
+      // Extract user data
+      const { id, given_name, family_name, email, picture } = userData.data;
 
-        const mobileLoginData = await this.service.handleGoogleAuthForMobile(token, googleInitialize);
-        if (!mobileLoginData) {
-          return res.status(400).json({ error: "Google login at mobile unsuccessful" });
+      const result = await this.service.handleGoogleAuth(
+        id, given_name, family_name, email, picture,
+      );
+
+      return res.status(200).json({ 
+        token: result.token,
+        user: {
+          id: result.user._id,
+          firstName: result.user.firstName,
+          lastName: result.user.lastName,
+          email: result.user.email,
+          avatar: result.user.avatar
         }
+      });
 
-        const result = await this.service.handleGoogleAuth({
-          id: mobileLoginData.id,
-          emails: mobileLoginData.email,
-          displayName: mobileLoginData.name || mobileLoginData.given_name || 'Unknown User',
-          avatar: mobileLoginData.picture,
-        });
-
-        return res.status(200).json({ token: result.token });
-      }
-    }
-
-    catch (error) {
-      console.error('Error in /auth/google POST:', error);
+    } catch (error) {
+      console.error('Error in Google auth:', error);
       return res.status(500).json({ error: 'Failed to authenticate with Google' });
     }
   }

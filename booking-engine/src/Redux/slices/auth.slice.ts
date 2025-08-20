@@ -111,7 +111,7 @@ export const googleLogin = createAsyncThunk<
     try {
 
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/google/auth/google`, { code, authProvider },
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/register`, { code, authProvider },
         {
           // withCredentials: true,
           headers: {

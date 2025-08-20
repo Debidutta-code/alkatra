@@ -7,26 +7,26 @@ import { AuthenticatedRequest } from "../types/custom";
 import { CustomerReferralService } from "../services";
 import { ValidateService } from "../../../referral_system/services/validate.service";
 import { IUserMessage } from "../models";
+import { AuthController } from "../controllers/googleSocialAuth.controller";
 
 class CustomerController {
 
-  clientProviderCheck = async(req: Request, res: Response) => {
+  googleAuthController = new AuthController();
+
+  clientProviderCheck = async (req: Request, res: Response) => {
     const { authProvider } = req.body;
-    console.log(`*****************The request body we get ${authProvider}`);
-
+    
     switch (authProvider) {
-        case 'Local':
-            await this.registerCustomer(req, res);
-            break;
-        case 'Google':
-            
-            break;
-        default:
-            
-            console.log(`Unknown auth provider: ${authProvider}`);
-            break;
+      case 'Local':
+        await this.registerCustomer(req, res);
+        break;
+      case 'Google':
+        await this.googleAuthController.postGoogleAuthData(req, res);
+        break;
+      default:
+        console.log(`Unknown auth provider: ${authProvider}`);
+        break;
     }
-
   }
 
   // Register a new customer
@@ -34,7 +34,7 @@ class CustomerController {
     console.log(`The Register Customer function called`);
     try {
       const { referrerId, referralCode } = req.query as { referrerId: string; referralCode: string };
-      
+
       const userBody = req.body;
 
       console.log(`The request body we get ${JSON.stringify(userBody)}`);
