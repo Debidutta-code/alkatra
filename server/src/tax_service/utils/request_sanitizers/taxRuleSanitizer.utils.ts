@@ -12,6 +12,7 @@ export class TaxRuleSanitizer {
             value,
             applicableOn,
             region,
+            description,
             validFrom,
             validTo,
             isInclusive = false,
@@ -30,9 +31,10 @@ export class TaxRuleSanitizer {
                 state: region?.state?.trim(),
                 city: region?.city?.trim(),
             },
+            description: description ? String(description).trim() : undefined,
             validFrom: new Date(validFrom),
             validTo: validTo ? new Date(validTo) : undefined,
-            isInclusive:isInclusive,
+            isInclusive: isInclusive,
             priority: priority,
             hotelId: hotelId,
             createdBy: createdBy,
@@ -49,6 +51,7 @@ export class TaxRuleSanitizer {
             value,
             applicableOn,
             region,
+            description,
             validFrom,
             validTo,
             isInclusive,
@@ -72,6 +75,7 @@ export class TaxRuleSanitizer {
             };
         }
 
+        if (description !== undefined) sanitized.description = description ? String(description).trim() : undefined;
         if (validFrom !== undefined) sanitized.validFrom = new Date(validFrom);
         if (validTo !== undefined) sanitized.validTo = new Date(validTo);
         if (isInclusive !== undefined) sanitized.isInclusive = isInclusive;
