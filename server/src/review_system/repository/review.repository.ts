@@ -11,10 +11,11 @@ export class CustomerReviewRepository {
         userId: ObjectId,
         guestEmail: string,
         comment: string,
-        rating: number
+        rating: number,
+        categorizedRating: string
     ) {
         const requiredFields = {
-            reservationId, hotelCode, hotelName, userId, guestEmail, comment, rating
+            reservationId, hotelCode, hotelName, userId, guestEmail, comment, rating, categorizedRating
         };
 
         const missingFields = Object.entries(requiredFields)
@@ -47,7 +48,8 @@ export class CustomerReviewRepository {
             userId,
             guestEmail,
             comment,
-            rating
+            rating,
+            categorizedRating,
         });
         if (!createReviewData) {
             throw new Error("Error at create review data")

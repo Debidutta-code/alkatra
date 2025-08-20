@@ -10,6 +10,7 @@ export interface IReview extends Document {
   guestEmail: string;
   comment: string;
   rating: number;
+  categorizedRating: string;
   createdAt: Date;
 }
 
@@ -21,6 +22,7 @@ const ReviewSchema: Schema = new Schema({
   guestEmail: { type: String, required: false, ref: 'ThirdPartyBooking' },
   comment: { type: String, required: false },
   rating: { type: Number, required: false },
+  categorizedRating: { type: String, required: false },
   createdAt: { type: Date, default: Date.now }
 });
 

@@ -6,15 +6,6 @@ import { useEffect } from "react";
 export default function ReviewSuccessPage() {
 
     const router = useRouter();
-    
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            router.push('/');
-        }, 3000);
-        return () => clearTimeout(timer);
-    }, [router]);
-    
-    
 
     const handleGoHome = () => {
         router.push('/');
@@ -92,11 +83,7 @@ export default function ReviewSuccessPage() {
                                 Return to Home
                             </button>
                         </div>
-
-                        {/* Auto-redirect notice */}
-                        <p className="text-sm text-gray-500 mt-6">
-                            You will be automatically redirected to the home page in 3 seconds
-                        </p>
+                        
                     </div>
                 </div>
             </div>
