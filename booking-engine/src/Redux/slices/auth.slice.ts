@@ -74,15 +74,15 @@ const authSlice = createSlice({
   },
 });
 
-export const { setAccessToken, logout, setUser } = authSlice.actions;
+
 
 // Login thunk for email/password authentication
 export const login = createAsyncThunk<
   string,
-  { email: string; password: string },
+  { email: string; password: string, authProvider: string },
   { dispatch: AppDispatch; state: RootState }
 >("auth/login", async (data, { dispatch }) => {
-  console.log("Login Api Calling here");
+  
   const res = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/login`,
     {
@@ -103,16 +103,15 @@ export const login = createAsyncThunk<
 // Google login thunk
 export const googleLogin = createAsyncThunk<
   { token: string },
-  { code: string },
+  { code: string, authProvider: string },
   { dispatch: AppDispatch; state: RootState }
 >(
   "auth/googleLogin",
-  async ({ code }, { dispatch, rejectWithValue }) => {
+  async ({ code, authProvider }, { dispatch, rejectWithValue }) => {
     try {
-      console.log("🌐 Sending auth code to backend:", code);
 
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/google/auth/google`, { code },
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/google/auth/google`, { code, authProvider },
         {
           // withCredentials: true,
           headers: {
@@ -217,4 +216,6 @@ export const updateProfile = createAsyncThunk<
   }
 });
 
+
+export const { setAccessToken, logout, setUser } = authSlice.actions;
 export default authSlice.reducer;

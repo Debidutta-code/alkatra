@@ -48,15 +48,12 @@ export class AuthController {
       let data;
       if (code) {
         // Web flow: Exchange authorization code for tokens
-        console.log('Received authorization code:', code);
         const { tokens } = await oauth2Client.getToken(code);
-        console.log(`Tokens from Google OAuth: ${JSON.stringify(tokens, null, 2)}`);
         oauth2Client.setCredentials(tokens);
         const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
         ({ data } = await oauth2.userinfo.get());
       } else if (token) {
         // Mobile flow: Handle access token
-        console.log('Received access token:', token);
         oauth2Client.setCredentials({ access_token: token });
         const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
         try {

@@ -10,6 +10,25 @@ import { IUserMessage } from "../models";
 
 class CustomerController {
 
+  async clientProviderCheck(req: Request, res: Response) {
+    const { authProvider } = req.body;
+    console.log(`The request body we get ${authProvider}`);
+
+    switch (authProvider) {
+        case 'Local':
+            await this.registerCustomer(req, res);
+            break;
+        case 'Google':
+            
+            break;
+        default:
+            
+            console.log(`Unknown auth provider: ${authProvider}`);
+            break;
+    }
+
+  }
+
 
   /**
    * @params - registration request body, optional referrerId and referralCode
@@ -21,11 +40,16 @@ class CustomerController {
    *         then register the customer and return the customer details
    */
 
+
   // Register a new customer
   async registerCustomer(req: Request, res: Response): Promise<Response | void> {
+    console.log(`The Register Customer function called`);
     try {
       const { referrerId, referralCode } = req.query as { referrerId: string; referralCode: string };
+      
       const userBody = req.body;
+
+      console.log(`The request body we get ${JSON.stringify(userBody)}`);
 
       /**
        * Register the customer if referrerId and referralCode are not provided
@@ -60,16 +84,16 @@ class CustomerController {
       /**
        * Apply the referral code to the customer
        */
-      const referralResult = await CustomerReferralService.applyReferral({ 
-        referrerId: referrerId, 
-        refereeId: referee._id as string, 
+      const referralResult = await CustomerReferralService.applyReferral({
+        referrerId: referrerId,
+        refereeId: referee._id as string,
         referralCode: referralCode,
         referralLink: validatedReferrer.referralLink,
-        referralQRCode: validatedReferrer.referralQRCode 
+        referralQRCode: validatedReferrer.referralQRCode
       });
 
       return res.status(201).json(referralResult);
-    } 
+    }
     catch (error: any) {
       const statusCode = error.message === "Customer already registered" ? 400 : 500;
       return res.status(statusCode).json({ message: error.message });

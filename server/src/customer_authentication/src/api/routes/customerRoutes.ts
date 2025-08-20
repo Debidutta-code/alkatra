@@ -8,7 +8,8 @@ const router = Router();
 const smsController = new SMSController();
 
 
-router.post("/register", CustomerController.registerCustomer);
+router.post("/register", CustomerController.clientProviderCheck);
+// router.post("/register", CustomerController.registerCustomer);
 router.post("/login", CustomerController.loginCustomer);
 router.get("/all", authenticateCustomer, CustomerController.getAllCustomers);
 router.get("/me", authenticateCustomer, CustomerController.getCustomerOwnData);
