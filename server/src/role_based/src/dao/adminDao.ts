@@ -1,7 +1,8 @@
 import UserModel from "../../../user_authentication/src/Model/auth.model"
 import { PropertyInfo } from "../../../property_management/src/model/property.info.model"
-import {ReservationLog} from "../../../wincloud/src/model/reservationModel"
-import { string } from "joi"
+// import {ReservationLog} from "../../../wincloud/src/model/reservationModel"
+// import { string } from "joi"
+
 class AdminDao{
     public static async getHotelManagersHotel(id:string){
         try {
