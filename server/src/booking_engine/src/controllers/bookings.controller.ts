@@ -571,7 +571,7 @@ export const createReservationWithStoredCard = CatchAsyncError(
                 </tr>
                 <tr>
                   <th>Contact Phone</th>
-                  <td>{{phone}}</td>
+                  <td>+{{phone}}</td>
                 </tr>
               </table>
 
@@ -890,7 +890,7 @@ export async function createReservationWithCryptoPayment(input: {
                 </tr>
                 <tr>
                   <th>Contact Phone</th>
-                  <td>{{phone}}</td>
+                  <td>+{{phone}}</td>
                 </tr>
               </table>
 

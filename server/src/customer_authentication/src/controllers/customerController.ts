@@ -10,9 +10,9 @@ import { IUserMessage } from "../models";
 
 class CustomerController {
 
-  async clientProviderCheck(req: Request, res: Response) {
+  clientProviderCheck = async(req: Request, res: Response) => {
     const { authProvider } = req.body;
-    console.log(`The request body we get ${authProvider}`);
+    console.log(`*****************The request body we get ${authProvider}`);
 
     switch (authProvider) {
         case 'Local':
@@ -28,18 +28,6 @@ class CustomerController {
     }
 
   }
-
-
-  /**
-   * @params - registration request body, optional referrerId and referralCode
-   * Step 1: If referrerId and referralCode are provided
-   *         - then check if the referrer exists and if the referral code matches with referrer referral code
-   *         - then apply the referral code to the customer
-   * 
-   * Step 2: If referrerId and referralCode are not provided
-   *         then register the customer and return the customer details
-   */
-
 
   // Register a new customer
   async registerCustomer(req: Request, res: Response): Promise<Response | void> {
