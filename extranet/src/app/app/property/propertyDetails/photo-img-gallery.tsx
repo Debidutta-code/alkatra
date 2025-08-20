@@ -43,12 +43,9 @@ export function PropertyImageGallery({
   image = [],
   onImagesUpdate,
   editable = false,
-  loading = false,
   propertyId,
   accessToken,
-  uploadEndpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/upload`,
-  updatePropertyEndpoint
-}: PropertyImageGalleryProps) {
+  uploadEndpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/upload`}: PropertyImageGalleryProps) {
   const [currentImage, setCurrentImage] = useState(0);
   const [editMode, setEditMode] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -61,7 +58,6 @@ export function PropertyImageGallery({
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Clean up object URLs when component unmounts or files change
   useEffect(() => {
     return () => {
       files.forEach(file => {
@@ -72,7 +68,6 @@ export function PropertyImageGallery({
     };
   }, [files]);
 
-  // Adjust current image index when images are deleted
   useEffect(() => {
     if (currentImage >= image.length && image.length > 0) {
       setCurrentImage(image.length - 1);
@@ -82,8 +77,8 @@ export function PropertyImageGallery({
   // File validation function
   const validateFiles = (files: File[]) => {
     const maxSize = 10 * 1024 * 1024; // 10MB
-    const maxFiles = 10;
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    const maxFiles = 20;
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
     const validFiles = files.filter(file => {
       if (file.size > maxSize) {
@@ -212,7 +207,6 @@ export function PropertyImageGallery({
     setDeleteConfirmOpen(true);
   };
 
-  // Drag and drop handlers with validation
   const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
     if (acceptedFiles?.length) {
       const validFiles = validateFiles(acceptedFiles);
@@ -245,18 +239,6 @@ export function PropertyImageGallery({
     disabled: !editMode
   });
 
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = Array.from(e.target.files || []);
-    if (selectedFiles.length) {
-      const validFiles = validateFiles(selectedFiles);
-      if (validFiles.length) {
-        const filesWithPreview = validFiles.map(file =>
-          Object.assign(file, { preview: URL.createObjectURL(file) })
-        );
-        setFiles(prev => [...prev, ...filesWithPreview]);
-      }
-    }
-  };
 
   const removeFile = (name: string) => {
     setFiles(files => {
@@ -268,7 +250,6 @@ export function PropertyImageGallery({
     });
   };
 
-  // If no images, show placeholder
   if (image.length === 0) {
     return editable ? (
       <div className="relative group">
@@ -621,12 +602,10 @@ function UploadDialog({
   setOpen,
   files,
   setFiles,
-  rejected,
   setRejected,
   uploading,
   uploadError,
   onUpload,
-  fileInputRef,
   removeFile
 }: {
   open: boolean;
