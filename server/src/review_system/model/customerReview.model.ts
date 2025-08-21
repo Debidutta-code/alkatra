@@ -1,4 +1,3 @@
-import { required } from "joi";
 import mongoose, { Schema, Document, Types } from "mongoose";
 import { reservationsUrl } from "twilio/lib/jwt/taskrouter/util";
 

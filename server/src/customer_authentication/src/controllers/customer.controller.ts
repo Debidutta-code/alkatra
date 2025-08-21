@@ -8,6 +8,7 @@ import { CustomerReferralService } from "../services";
 import { ValidateService } from "../../../referral_system/services/validate.service";
 import { IUserMessage } from "../models";
 import { AuthController } from "../controllers/googleSocialAuth.controller";
+import { googleAuthService } from "../services";
 
 class CustomerController {
 
@@ -15,15 +16,28 @@ class CustomerController {
 
 
     private async registerUsers(provider: string, data: any): Promise<any> {
+        console.log(`Registering user with provider: ${provider}`);
         switch (provider) {
-            case 'Local':
+            case 'local':
                 return customerService.registerCustomer(data);
-            case 'Google':
-                return this.googleAuthController.postGoogleAuthData;
+            case 'google':
+                return googleAuthService.handlePostGoogleAuthData(data);
             default:
                 throw new Error(`Unknown auth provider: ${provider}`);
         }
     }
+
+    // private registerUsers = async (provider: string, data: any): Promise<any> => {
+    //     console.log(`Registering user with provider: ${provider}`);
+    //     switch (provider) {
+    //         case 'local':
+    //             return customerService.registerCustomer(data);
+    //         case 'google':
+    //             return googleAuthService.handlePostGoogleAuthData(data);
+    //         default:
+    //             throw new Error(`Unknown auth provider: ${provider}`);
+    //     }
+    // }
 
     /**
      * Register a new customer
@@ -35,17 +49,16 @@ class CustomerController {
         console.log(`The Register Customer function called`);
         try {
             const { referrerId, referralCode } = req.query as { referrerId: string; referralCode: string };
-            const authProvider = req.body.authProvider;
+            const provider = req.body.provider;
             const userBody = req.body;
-
-            console.log(`The request body we get ${JSON.stringify(userBody)}`);
 
             /**
              * Register the customer if referrerId and referralCode are not provided
              */
             if (!referrerId && !referralCode) {
                 // const customer = await customerService.registerCustomer(userBody);
-                const customer = await this.registerUsers(userBody.authProvider, userBody);
+                console.log(`Registering customer before private registerUser with provider: ${provider}`);
+                const customer = await this.registerUsers(provider, userBody);
                 return res.status(201).json({ message: "Customer registered successfully", data: customer });
             }
 
