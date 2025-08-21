@@ -50,7 +50,7 @@ const Register: React.FC = () => {
       lastName: "",
       email: "",
       password: "",
-      authProvider: "Local",
+      provider: "local",
     },
     {
       firstName: { required: true },

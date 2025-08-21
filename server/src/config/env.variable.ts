@@ -1,4 +1,5 @@
 import { ObjectCannedACL } from "@aws-sdk/client-s3";
+import { SignOptions } from "jsonwebtoken"
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -27,9 +28,9 @@ export const config = {
         },
         jwt: {
             secretKey: env.JWT_SECRET_KEY as string,
-            expiresIn: env.JWT_EXPIRES_IN as string,
+            expiresIn: env.JWT_EXPIRES_IN as SignOptions['expiresIn'],
             secretKeyDev: env.JWT_SECRET_KEY_DEV as string,
-            expiresInDev: env.JWT_EXPIRES_IN_DEV as string
+            expiresInDev: env.JWT_EXPIRES_IN_DEV as SignOptions['expiresIn']
         },
     },
 
@@ -64,6 +65,12 @@ export const config = {
     taxSystem: {
         taxRulePrefix: env.TAX_RULE_PREFIX as string,
         taxGroupPrefix: env.TAX_GROUP_PREFIX as string
+    },
+
+    googleServie: {
+        clientId: env.GOOGLE_CLIENT_ID as string,
+        clientSecret: env.GOOGLE_CLIENT_SECRET as string,
+        frontedCallbackUrl: env.GOOGLE_FRONTEND_CALLBACK_URL as string,
     }
     
 }

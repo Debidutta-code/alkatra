@@ -2,6 +2,7 @@ import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface ICustomer extends Document {
     googleId: string;
+    provider: string;
     avatar: string;
     firstName: string;
     lastName: string;
@@ -20,6 +21,7 @@ export interface ICustomer extends Document {
 
 const CustomerSchema: Schema = new Schema<ICustomer>({
     googleId: { type: String },
+    provider: { type: String, required: true, enum: ["local", "google"] },
     avatar: { type: String },
     firstName: { type: String, required: false },
     lastName: { type: String, required: false },

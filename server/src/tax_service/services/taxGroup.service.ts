@@ -257,7 +257,8 @@ export class TaxGroupService implements ITaxGroupService {
              * Check amount and hotel ID are provided
              */
             if (!basePrice || !totalPrice || !taxGroupID) throw new Error("Missing basePrice, totalPrice or taxGroupID.");
-
+            console.log("Calculating tax rules for reservation with basePrice:", basePrice, "totalPrice:", totalPrice, "taxGroupID:", taxGroupID);
+            console.log("Calculating tax rules for reservation with basePrice:", !basePrice, "totalPrice:", !totalPrice, "taxGroupID:", !taxGroupID);
             Validator.validateAmount(basePrice);
             Validator.validateAmount(totalPrice);
             Validator.validateID(taxGroupID);
