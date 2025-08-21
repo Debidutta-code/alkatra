@@ -171,7 +171,7 @@ class RoomPrice {
         /**
          * Calculating tax
          */
-        const taxCalculation = await container.taxGroupService.calculateTaxRulesForReservation(basePrice, totalPrice, String(propertyInfo.tax_group));
+        const taxCalculation = await container.taxGroupService.calculateTaxRulesForReservation(basePrice, totalPrice, propertyInfo.tax_group);
 
         /**
          * If taxCalculation is empty return the response
