@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { authenticateCustomer } from "../../middleware/authMiddleware";
-import CustomerController from "../../controllers/customerController";
+// import CustomerController from "../../controllers/customerController";
+import CustomerController from "../../controllers/customer.controller";
 import verificationOtpController from "../../controllers/verificationOtp.controller";
 import { SMSController } from "../../controllers/sms.controller";
 
@@ -8,8 +9,8 @@ const router = Router();
 const smsController = new SMSController();
 
 
-router.post("/register", CustomerController.clientProviderCheck);
-// router.post("/register", CustomerController.registerCustomer);
+// router.post("/register", CustomerController.clientProviderCheck);
+router.post("/register", CustomerController.registerCustomer.bind(CustomerController));
 router.post("/login", CustomerController.loginCustomer);
 router.get("/all", authenticateCustomer, CustomerController.getAllCustomers);
 router.get("/me", authenticateCustomer, CustomerController.getCustomerOwnData);

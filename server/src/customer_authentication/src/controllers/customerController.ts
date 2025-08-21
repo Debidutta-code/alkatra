@@ -225,7 +225,7 @@ class CustomerController {
    * Handle customer connect request
    * @request - name, email, reason
    */
-  async connectUser(req: Request, res: Response): Promise<Response> {
+  async connectUser(req: Request, res: Response) {
     try {
       const data = req.body as IUserMessage;
       await customerService.handleCustomerConnectRequest(data);
