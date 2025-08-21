@@ -82,7 +82,7 @@ const authSlice = createSlice({
 // Login thunk for email/password authentication
 export const login = createAsyncThunk<
   string,
-  { email: string; password: string, authProvider: string },
+  { email: string; password: string, provider: string },
   { dispatch: AppDispatch; state: RootState }
 >("auth/login", async (data, { dispatch }) => {
   
@@ -106,15 +106,15 @@ export const login = createAsyncThunk<
 // Google login thunk
 export const googleLogin = createAsyncThunk<
   { token: string },
-  { code: string, authProvider: string },
+  { code: string, provider: string },
   { dispatch: AppDispatch; state: RootState }
 >(
   "auth/googleLogin",
-  async ({ code, authProvider }, { dispatch, rejectWithValue }) => {
+  async ({ code, provider }, { dispatch, rejectWithValue }) => {
     try {
 
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/register`, { code, authProvider },
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/register`, { code, provider },
         {
           // withCredentials: true,
           headers: {

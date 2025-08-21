@@ -42,7 +42,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       if (authResult?.code) {
         console.log("✅ Step 3: Auth code found:", authResult.code);
 
-        const result = await dispatch(googleLogin({ code: authResult.code, authProvider: "Google" })).unwrap();
+        const result = await dispatch(googleLogin({ code: authResult.code, provider: "google" })).unwrap();
 
         toast.success(
           t(`Auth.Login.successMessage`),
