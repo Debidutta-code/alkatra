@@ -2,7 +2,7 @@ import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 
 import { AppError } from "../utils/appError";
 import { CastError } from "mongoose";
-import { WriteError } from "mongodb";
+// import { WriteError } from "mongodb";
 
 const sendDevError = (err: AppError, res: Response): void => {
   res.status(err.statusCode).json({
@@ -30,7 +30,7 @@ const handleCastError = (err: CastError): AppError => {
   return new AppError(message, 400);
 };
 
-const handleDuplicateFieldsError = (err: WriteError): AppError => {
+const handleDuplicateFieldsError = (err: any): AppError => {
   const value = err.errmsg?.match(/(["'])(\\?.)*?\1/)?.[0];
   const message = `Duplicate field value: ${value}, Please try again with another value`;
   return new AppError(message, 400);

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { stringify } from 'flatted';
+// import { stringify } from 'flatted';
 
 export class ApiClient {
     async sendToThirdParty(xml: string): Promise<{ message: string }> {
@@ -14,11 +14,11 @@ export class ApiClient {
                 headers: { 'Content-Type': 'text/xml' },
             });
 
-            console.log("API Response:", stringify(apiResponse));
-            console.log("→ Status:", apiResponse.status);
-            console.log("→ Status Text:", apiResponse.statusText);
-            console.log("→ Headers:", apiResponse.headers);
-            console.log("→ Data:", apiResponse.data);
+            // console.log("API Response:", stringify(apiResponse));
+            // console.log("→ Status:", apiResponse.status);
+            // console.log("→ Status Text:", apiResponse.statusText);
+            // console.log("→ Headers:", apiResponse.headers);
+            // console.log("→ Data:", apiResponse.data);
 
             if (apiResponse.status !== 200) {
                 throw new Error(`Third-party API responded with status code ${apiResponse.status}`);

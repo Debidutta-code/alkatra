@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import convertToLocalTime from '../../../utils/timezone_convert';
 
 const cryptoPaymentSchema = new mongoose.Schema({
   customer_id: {

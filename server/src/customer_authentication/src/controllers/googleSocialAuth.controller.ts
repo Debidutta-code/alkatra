@@ -3,7 +3,6 @@ import { AuthService } from '../services/googleAuthService';
 import jwt from 'jsonwebtoken';
 import config from '../../../common/index';
 import { google } from 'googleapis';
-import { OAuth2Client } from 'google-auth-library';
 
 
 export class AuthController {
