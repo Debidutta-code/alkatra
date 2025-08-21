@@ -6,6 +6,7 @@ import { CustomerRepository } from "../repositories";
 interface IGoogleAuthData {
     code?: string;
     token?: string;
+    provider: string; // 'local' | 'google'
 }
 
 class GoogleAuthService {
@@ -36,15 +37,12 @@ class GoogleAuthService {
     private async googleAuthForWeb(code: string) {
         let data: any;
 
-        const { tokens } = this.googleClient.getToken(code);
-        console.log("Tokens received:", tokens);
+        const { tokens } = await this.googleClient.getToken(code);
         this.googleClient.setCredentials(tokens);
         // const oauth2 = this.googleClient.getOAuth2();
         const oauth2 = google.oauth2({ version: "v2", auth: this.googleClient })
-        console.log("#### OAUTH2: ", oauth2);
         data = await oauth2.userinfo.get();
 
-        console.log("Exiting googleAuthForWeb with data:", data);
         return data;
     }
 
@@ -67,9 +65,6 @@ class GoogleAuthService {
      */
     async handlePostGoogleAuthData(data: IGoogleAuthData) {
         const { code, token } = data;
-        console.log("Code received:", code);
-        console.log("Token received:", token);
-
         if (!code && !token) throw new Error("Authorization code or token is required");
 
         let userData: any;
@@ -80,13 +75,10 @@ class GoogleAuthService {
          * If a token is provided, it will handle Google authentication for mobile.
          */
         if (code) {
-            console.log("Handling Google authentication for web");
             userData = await this.googleAuthForWeb(code);
             if (!userData) throw new Error("Google web authentication failed");
-            console.log("🟢 EXITING IF BLOCK FOR WEB");
         }
         if (token) {
-            console.log("Handling Google authentication for mobile");
             userData = await this.googleAuthForMobile(token);
             if (!userData) throw new Error("Google mobile authentication failed");
             console.log("🟢 EXITING IF BLOCK FOR MOBILE");
@@ -107,6 +99,7 @@ class GoogleAuthService {
                 lastName: family_name,
                 email: email,
                 avatar: picture,
+                provider: data.provider,
             });
         }
 
@@ -118,11 +111,12 @@ class GoogleAuthService {
         return {
             token: tokenData,
             user: {
-                _id: customer._id,
+                id: customer._id,
                 firstName: customer.firstName,
                 lastName: customer.lastName,
                 email: customer.email,
-                avatar: customer.avatar
+                avatar: customer.avatar,
+                provider: customer.provider
             }
         }
     }

@@ -21,23 +21,12 @@ class CustomerController {
             case 'local':
                 return customerService.registerCustomer(data);
             case 'google':
-                return googleAuthService.handlePostGoogleAuthData(data);
+                return googleAuthService.handlePostGoogleAuthData({ ...data, provider: provider });
             default:
                 throw new Error(`Unknown auth provider: ${provider}`);
         }
     }
 
-    // private registerUsers = async (provider: string, data: any): Promise<any> => {
-    //     console.log(`Registering user with provider: ${provider}`);
-    //     switch (provider) {
-    //         case 'local':
-    //             return customerService.registerCustomer(data);
-    //         case 'google':
-    //             return googleAuthService.handlePostGoogleAuthData(data);
-    //         default:
-    //             throw new Error(`Unknown auth provider: ${provider}`);
-    //     }
-    // }
 
     /**
      * Register a new customer
