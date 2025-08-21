@@ -6,12 +6,13 @@ import Avatar from '../UserProfileComponents/Avatar';
 interface ChatbotConversationProps {
   onClose: () => void;
   onFeedback: () => void;
+  userFirstName: string; 
 }
 
-const ChatbotConversation: React.FC<ChatbotConversationProps> = ({ onClose, onFeedback }) => (
+const ChatbotConversation: React.FC<ChatbotConversationProps> = ({ onClose, onFeedback, userFirstName }) => (
   <div>
-    <div className="bg-purple-600 text-white p-4 rounded-t-2xl flex justify-between items-center">
-      <h3 className="text-lg font-semibold">Support Bot</h3>
+    <div className="bg-blue-500 text-white p-4 rounded-t-2xl flex justify-between items-center">
+      <h3 className="text-lg font-semibold">Al-Hajz Chat Bot</h3>
       <Button variant="ghost" size="sm" onClick={onClose}>
         <X className="h-4 w-4" />
       </Button>
@@ -20,7 +21,21 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({ onClose, onFe
       <div className="flex items-end gap-2">
         <Avatar size="sm" fallback={<Bot className="h-4 w-4" />} />
         <div className="bg-purple-100 text-[var(--color-secondary-black)] rounded-lg p-3 max-w-[80%]">
-          Hello! How can I help you?
+          Welcome, {userFirstName}! 👋
+        </div>
+        <p className="text-xs text-[var(--color-secondary-black)]/50">1h ago</p>
+      </div>
+      <div className="flex items-end gap-2">
+        <Avatar size="sm" fallback={<Bot className="h-4 w-4" />} />
+        <div className="bg-purple-100 text-[var(--color-secondary-black)] rounded-lg p-3 max-w-[80%]">
+          I’m your Al-Hajz Chat Bot, here to assist you with booking management, account queries, and more. ✨
+        </div>
+        <p className="text-xs text-[var(--color-secondary-black)]/50">1h ago</p>
+      </div>
+      <div className="flex items-end gap-2">
+        <Avatar size="sm" fallback={<Bot className="h-4 w-4" />} />
+        <div className="bg-purple-100 text-[var(--color-secondary-black)] rounded-lg p-3 max-w-[80%]">
+          How can I help you today?
         </div>
         <p className="text-xs text-[var(--color-secondary-black)]/50">1h ago</p>
       </div>

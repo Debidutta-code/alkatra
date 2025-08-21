@@ -34,6 +34,7 @@ export class AuthController {
     try {
       console.log("Entering into POST GOOGLE AUTH DATA");
       const { code, token } = req.body;
+
       if (!code && !token) {
         return res.status(400).json({ error: 'Authorization code or token is required' });
       }

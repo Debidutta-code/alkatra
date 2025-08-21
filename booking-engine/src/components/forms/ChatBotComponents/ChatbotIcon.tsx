@@ -10,10 +10,14 @@ const ChatbotIcon: React.FC<ChatbotIconProps> = ({ onClick }) => (
   <Button 
     variant="primary" 
     size="lg" 
-    className="rounded-full p-4 shadow-lg bg-purple-600 hover:bg-purple-700" 
+    className="rounded-full p-4 shadow-sm" 
     onClick={onClick}
   >
-    <Bot className="h-6 w-6" />
+    <img 
+      src="/assets/chatbot.png" 
+      alt="Chatbot Icon" 
+      className="h-12 w-15 object-contain"
+    />
   </Button>
 );
 
