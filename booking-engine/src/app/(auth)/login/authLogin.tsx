@@ -64,7 +64,7 @@ const Login: React.FC = () => {
 
     try {
 
-      const loginResult = await dispatch(login({ email: values.email, password: values.password, authProvider: 'local' }));
+      const loginResult = await dispatch(login({ email: values.email, password: values.password, provider: 'local' }));
       
       if (loginResult.meta.requestStatus === 'rejected') {
         throw new Error("Login failed: Wrong email or password");
