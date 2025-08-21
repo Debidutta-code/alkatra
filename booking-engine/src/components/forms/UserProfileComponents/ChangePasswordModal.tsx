@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import { Lock, Eye, EyeOff, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import toast from 'react-hot-toast';
