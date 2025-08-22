@@ -37,6 +37,7 @@ export class AuthService {
 
       let data: any;
       const { tokens } = await googleInitializeData.getToken(code);
+
       googleInitializeData.setCredentials(tokens);
       const oauth2 = google.oauth2({ version: 'v2', auth: googleInitializeData });
       data = await oauth2.userinfo.get();

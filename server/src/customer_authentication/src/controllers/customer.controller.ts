@@ -144,6 +144,7 @@ class CustomerController {
             }
             res.status(200).json({ message: "Customer retrieved successfully", data: customer });
         } catch (error) {
+            console.log(`Faild to get customer data at getCustomerOwnData ${error}`);
             res.status(500).json({ message: "Error retrieving customer", error });
         }
     }

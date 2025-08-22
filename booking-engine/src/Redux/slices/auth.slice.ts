@@ -125,13 +125,12 @@ export const googleLogin = createAsyncThunk<
         }
       );
 
-      console.log("✅ Google login response received:", response);
 
-      if (response.status !== 200) {
+      if (response.status !== 201  ) {
         throw new Error(response.data.error || "Failed to login with Google");
       }
 
-      const { token } = response.data;
+      const token = response.data.data.token;
 
       if (!token) {
         throw new Error("No token received from Google login");
