@@ -85,8 +85,13 @@ class CustomerController {
                 referralQRCode: validatedReferrer.referralQRCode
             });
 
-            referralResult.token = result.token;
-            referralResult.user = result.user;
+            if (provider === 'google') {
+                referralResult.data.token = result.token;
+                referralResult.data.user = result.user;
+            } else {
+                referralResult.token = result.token;
+                referralResult.user = result.user;
+            }
 
             return res.status(201).json(referralResult);
         }
