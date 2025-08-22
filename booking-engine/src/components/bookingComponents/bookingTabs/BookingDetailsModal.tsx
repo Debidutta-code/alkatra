@@ -407,7 +407,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
 
           <button
             className="flex-1 bg-gray-700 text-tripswift-off-white py-2.5 px-4 rounded-lg hover:bg-gray-800 hover:shadow-lg transition-all duration-300 flex items-center justify-center font-tripswift-medium"
-            onClick={() => printBookingItinerary(booking, t, formatDOB)}
+            onClick={() => printBookingItinerary(booking, t, formatDOB, i18n.language)}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
