@@ -77,13 +77,16 @@ class CustomerController {
             /**
              * Apply the referral code to the customer
              */
-            const referralResult = await CustomerReferralService.applyReferral({
+            let referralResult = await CustomerReferralService.applyReferral({
                 referrerId: referrerId,
                 refereeId: provider === 'local' ? referee._id : referee.id,
                 referralCode: referralCode,
                 referralLink: validatedReferrer.referralLink,
                 referralQRCode: validatedReferrer.referralQRCode
             });
+
+            referralResult.token = result.token;
+            referralResult.user = result.user;
 
             return res.status(201).json(referralResult);
         }
