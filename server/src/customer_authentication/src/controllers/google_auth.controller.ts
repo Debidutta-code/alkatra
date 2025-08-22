@@ -54,7 +54,7 @@ export class GoogleAuthController implements IGoogleAuthController {
 
             referralResult.token = userData.token;
 
-            return res.status(201).json(userData);
+            return res.status(201).json(referralResult);
         }
         catch (error: any) {
             console.log("Failed to authenticate with Google:", error);

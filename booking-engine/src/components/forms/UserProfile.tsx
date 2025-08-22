@@ -780,7 +780,7 @@ const UserProfile: React.FC = () => {
                   alt={t("Profile.avatarAlt", { defaultValue: "User profile avatar" })}
                   fallback={
                     <span className="text-lg sm:text-xl font-bold text-[var(--color-primary-off-white)]">
-                      {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+                      {user.firstName.charAt(0)}{user.lastName?.charAt(0)}
                     </span>
                   }
                 />
