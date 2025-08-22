@@ -1,5 +1,5 @@
 import { IGoogleAuthService, IGoogleAuthData, IGoogleUserData } from "../interfaces";
-import { GoogleConfig, googleInstance } from "../../../config";
+import { GoogleConfig } from "../../../config";
 import { GenerateVerifyUtils } from "../../../utils";
 import { CustomerRepository } from "../repositories";
 import { google } from "googleapis";
