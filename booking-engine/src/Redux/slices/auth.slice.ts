@@ -110,7 +110,7 @@ export const googleLogin = createAsyncThunk<
   async ({ code, provider, referrerId, referralCode }, { dispatch, rejectWithValue }) => {
     try {
       // Build the URL with query parameters like the first example
-      let apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/register`;
+      let apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/google/auth/google`;
 
       // Add referral parameters if they exist
       if (referrerId && referralCode) {

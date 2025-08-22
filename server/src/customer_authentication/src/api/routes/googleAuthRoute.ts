@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { authenticateCustomer } from "../../middleware";
 import { customer_authentication_container } from '../../container';
 // import { AuthController } from '../../controllers/googleSocialAuth.controller';
 
@@ -23,7 +24,7 @@ router
 // router.get('/api/user', authController.getUser.bind(authController));
 router
     .route('/api/user')
-    .get(googleAuthController.getUser.bind(googleAuthController));
+    .get(authenticateCustomer, googleAuthController.getUser.bind(googleAuthController));
 
 
     
