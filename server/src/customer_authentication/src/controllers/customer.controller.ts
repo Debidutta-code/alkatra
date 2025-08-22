@@ -16,7 +16,6 @@ class CustomerController {
 
 
     private async registerUsers(provider: string, data: any): Promise<any> {
-        console.log(`Registering user with provider: ${provider}`);
         switch (provider) {
             case 'local':
                 return customerService.registerCustomer(data);
@@ -35,18 +34,16 @@ class CustomerController {
      * It checks the authProvider from the request body and calls the appropriate registration method.
      */
     async registerCustomer(req: Request, res: Response): Promise<Response | void> {
-        console.log(`The Register Customer function called`);
         try {
             const { referrerId, referralCode } = req.query as { referrerId: string; referralCode: string };
-            const provider = req.body.provider;
-            const userBody = req.body;
-
+            // const provider = req.body.provider;
+            const { provider, ...userBody } = req.body;
+            
             /**
              * Register the customer if referrerId and referralCode are not provided
              */
             if (!referrerId && !referralCode) {
                 // const customer = await customerService.registerCustomer(userBody);
-                console.log(`Registering customer before private registerUser with provider: ${provider}`);
                 const customer = await this.registerUsers(provider, userBody);
                 return res.status(201).json({ message: "Customer registered successfully", data: customer });
             }
@@ -71,15 +68,18 @@ class CustomerController {
              * Now all check's are passed to register the referee
              */
             // const referee = await customerService.registerCustomer(userBody);
-            const referee = await this.registerUsers(userBody.authProvider, userBody);
-            if (!referee._id) throw new Error("Unable to register, please again later.");
+            let referee: any;
+            const result = await this.registerUsers(provider, userBody);
+            provider === 'local' ? referee = result : referee = result.user;
+
+            if (!referee) throw new Error("Unable to register, please again later.");
 
             /**
              * Apply the referral code to the customer
              */
             const referralResult = await CustomerReferralService.applyReferral({
                 referrerId: referrerId,
-                refereeId: referee._id as string,
+                refereeId: provider === 'local' ? referee._id : referee.id,
                 referralCode: referralCode,
                 referralLink: validatedReferrer.referralLink,
                 referralQRCode: validatedReferrer.referralQRCode
