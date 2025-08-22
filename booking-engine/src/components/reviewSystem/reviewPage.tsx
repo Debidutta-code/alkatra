@@ -59,6 +59,7 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
     const [commentError, setCommentError] = useState("");
+    const [ratingError, setRatingError] = useState("");
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -84,6 +85,16 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
         setLoading(true);
         setMessage("");
         setCommentError("");
+        setRatingError("");
+
+        /**
+         * Rating field validation 
+         */
+        if (formData.rating === 0) {
+            setRatingError("Please select a star rating");
+            setLoading(false);
+            return;
+        }
 
         /**
          * Comment field validation 
@@ -146,7 +157,7 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
 
             } catch (err) {
                 console.error(err);
-                setMessage("❌ Could not load reservation details.");
+                setMessage("❌ Can not display your details.");
             }
         };
 
@@ -213,12 +224,23 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
                                 {/* Rating */}
                                 <div className="space-y-2">
                                     <label className="block text-gray-700 font-medium">Your Rating</label>
+
+                                    {/* Add rating error display */}
+                                    {ratingError && (
+                                        <div className="p-3 bg-red-100 text-red-800 rounded-lg mb-2">
+                                            {ratingError}
+                                        </div>
+                                    )}
+
                                     <div className="flex space-x-1">
                                         {[1, 2, 3, 4, 5].map((star) => (
                                             <button
                                                 type="button"
                                                 key={star}
-                                                onClick={() => handleStarClick(star)}
+                                                onClick={() => {
+                                                    handleStarClick(star);
+                                                    setRatingError(""); // Clear error when user selects a rating
+                                                }}
                                                 className={`text-4xl ${formData.rating >= star ? "text-yellow-400" : "text-gray-300"}`}
                                                 aria-label={`Rate ${star} star${star !== 1 ? 's' : ''}`}
                                             >
