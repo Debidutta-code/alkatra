@@ -48,6 +48,7 @@ import {
 import LoadingSkeleton from "../hotelListingComponents/LoadingSkeleton";
 import { formatDate, calculateNights } from "../../utils/dateUtils";
 import { useTranslation } from "react-i18next";
+import HotelReviewsSliding from "../../components/reviewSystem/HotelReviews";
 // import QRCodeDisplay from "./QRCodeDisplay";
 
 interface Room {
@@ -138,17 +139,13 @@ const RoomsPage: React.FC = () => {
   const [isGalleryOpen, setIsGalleryOpen] = useState<boolean>(false);
   const [galleryInitialIndex, setGalleryInitialIndex] = useState<number>(0);
   const [showFullDescription, setShowFullDescription] = useState<boolean>(false);
-
-  // New state for handling 400 error
   const [showRoomNotAvailable, setShowRoomNotAvailable] = useState<boolean>(false);
-
-  // Get guest details from Redux
   const { guestDetails } = useSelector((state) => state.hotel);
-
+  console.log(`The guest details we get from redux: ${JSON.stringify(guestDetails)}`);
+  const [isReviewsModalOpen, setIsReviewsModalOpen] = useState<boolean>(false);
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
 
-  // Initialize Redux with URL parameters
   useEffect(() => {
     const roomsParam = searchParams.get("rooms");
     const adults = searchParams.get("adults");
@@ -236,8 +233,10 @@ const RoomsPage: React.FC = () => {
       console.log("Fetching rooms for property:", propertyId, "with code:", propertyCode);
 
       try {
+        const encodedGuestDetails = encodeURIComponent(JSON.stringify(guestDetails));
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}?numberOfRooms=${guestDetails?.rooms || 1}`,
+          // `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}?numberOfRooms=${guestDetails?.rooms || 1}&guestDetails=${encodeURIComponent(JSON.stringify(guestDetails))}`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}?numberOfRooms=${guestDetails?.rooms}&guestDetails=${encodedGuestDetails}`,
           {
             startDate: checkInDate,
             endDate: checkOutDate,
@@ -309,7 +308,17 @@ const RoomsPage: React.FC = () => {
       document.body.style.overflow = 'unset';
     };
   }, [showRoomNotAvailable]);
-
+  useEffect(() => {
+    if (isReviewsModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isReviewsModalOpen]);
+  
   // Helper function to convert amenities to the expected format
   const convertAmenities = (room: Room) => {
     let roomAmenitiesList: string[] = [];
@@ -566,7 +575,6 @@ const RoomsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Property Details Section - Using TripSwift classes */}
       <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] text-tripswift-off-white">
         <div className="container mx-auto px-4 py-5">
           <div className="flex flex-col md:flex-row items-start  md:items-center gap-4">
@@ -637,6 +645,24 @@ const RoomsPage: React.FC = () => {
                   </div>
                 </div>
               </div>
+            )}
+
+            {/* Reviews Button - Updated to open modal */}
+            {propertyCode && (
+              <button
+                onClick={() => setIsReviewsModalOpen(true)}
+                className="flex items-center bg-tripswift-off-white/10 backdrop-blur-sm pl-3.5 pr-4 py-2.5 rounded-xl hover:bg-tripswift-off-white/20 transition-colors cursor-pointer"
+              >
+                <Users
+                  className={`h-5 w-5 text-tripswift-off-white/80 ${i18n.language === "ar" ? "ml-2.5" : "mr-2.5"
+                    }`}
+                />
+                <div>
+                  <div className="text-sm font-tripswift-medium">
+                    {t("RoomsPage.viewReviews", { defaultValue: "Guest Reviews" })}
+                  </div>
+                </div>
+              </button>
             )}
           </div>
         </div>
@@ -1250,6 +1276,52 @@ const RoomsPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {isReviewsModalOpen && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 transition-opacity duration-300"
+            onClick={() => setIsReviewsModalOpen(false)}
+          />
+
+          {/* Sliding Panel */}
+          <div className={`fixed rounded-lg top-0 right-0 h-full w-full sm:w-[600px] lg:w-[700px] bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-out ${isReviewsModalOpen ? 'translate-x-0' : 'translate-x-full'
+            }`}>
+
+            {/* Panel Header */}
+            <div className="sticky top-0 bg-white rounded-lg px-6 py-5 z-10">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <h2 className="text-xl font-semibold text-gray-900 pr-10">
+                    {t("RoomsPage.reviews.modalTitle", {
+                      propertyName: propertyDetails?.property_name || "Hotel",
+                      defaultValue: `Guest reviews for ${propertyDetails?.property_name || "Hotel"}`
+                    })}
+                  </h2>
+                </div>
+                <button
+                  onClick={() => setIsReviewsModalOpen(false)}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors duration-200 flex-shrink-0"
+                >
+                  <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Panel Content - Scrollable */}
+            <div className="overflow-y-auto h-full pb-20">
+              <div className="px-6 py-4">
+                {propertyCode && (
+                  <HotelReviewsSliding hotelCode={propertyCode} />
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       <FullscreenGallery
         images={propertyDetails?.image || []}

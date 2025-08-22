@@ -1,7 +1,8 @@
 import { app } from "./app";
 import { mongoClient, config } from "./config";
 import { initializeExpressRoutes } from "./common/express";
-import { autoCancelCron } from "./services";
+import { autoCancelCron, sendEmailCron } from "./services";
+
 
 const { port, host, baseUrl } = config.server;
 
@@ -10,6 +11,7 @@ async function shutdown(signal: string): Promise<void> {
         console.log(`Received ${signal}, shutting down...`);
         await mongoClient.disconnect();
         autoCancelCron.stop();
+        sendEmailCron.stop();
         console.log("Successfully shut down the application.");
     } catch (error) {
         console.error("[SHUTDOWN ERROR]", error);
@@ -41,6 +43,7 @@ async function shutdown(signal: string): Promise<void> {
          * Start auto cancel cron job for cryto-payment
          */
         autoCancelCron.start();
+        sendEmailCron.start();
 
         /**
          * Graceful shutdown

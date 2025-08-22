@@ -90,7 +90,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         <div className="absolute inset-0 bg-[url('/patterns/dot-pattern.png')] opacity-10 z-20"></div>
         <div className="absolute inset-0 transition-transform duration-3000 hover:scale-105">
           <Image
-            src="/assets/login.jpg"
+            src="/assets/login3.jpg"
             alt={t('Auth.Layout.travelDestinationAlt')}
             layout="fill"
             objectFit="cover"

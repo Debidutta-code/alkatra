@@ -34,17 +34,6 @@ const router = Router();
 export default (app: Router) => {
 
   app.use("/property", router); 
-
-  // API for brand to db
-  // router.route("/updateExistingBrand").patch(updateExistingBrand as any);
-  // router.route("/deleteBrand/:_id").delete(deleteExistingBrandByID as any);
-  // router.route("/getBrand/:_id").get(getBrandDetailsByID as any);
-  // router.route("/getAllBrand").get(getAllBrand as any);
-  // router
-    // .route("/payment_method")
-    // .post(protect as any, createPaymentMethod as any);
-  // router.route("/property-category").get(getAllPropertiesOfCategory as any);
-  // property type
   router
     .route("/type")
     .post(protect as any, createPropertyType as any)
@@ -54,9 +43,6 @@ export default (app: Router) => {
   
   router.route("/getAdminProperties").get(protect as any,getAdminProperties as any);
   router.route("/me").get(protect as any, getMyProperties as any);
-
-  // get all property rateplans
-  // router.route("/getRateplan/:id").get(protect as any, getAllRatePlans as any)
 
   // property category
   router
@@ -99,13 +85,6 @@ export default (app: Router) => {
     .get(getPropertyInfoById as any)
     .patch(protect as any, updatePropertyInfo as any)
     .delete(protect as any, deleteProperty as any);  
-
-  // router
-  //   .route("/price/:id")
-  //   .post(protect as any, createRoomRatePlan as any)
-  //   .patch(protect as any, updateRoomRatePlan as any)
-  //   .get(getRoomRatePlan as any)
-  //   .delete(protect as any, deleteRoomRatePlan as any);
 
   router.route("/location/:location").get(getAllHotelDetailsAccordingToLocation as any);
 };

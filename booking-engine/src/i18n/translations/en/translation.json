@@ -1361,5 +1361,32 @@
       "discountCouponQuestion": "How can user get a discount or use a coupon while booking?",
       "discountCouponAnswer": "To avail offers and discounts, users need to follow a simple process. Special promotional coupons are linked to QR codes placed in select hotel rooms or other promotional materials. By scanning this QR code using a mobile device, users are redirected to the platform’s mobile application. From there, they can proceed with the standard booking process. At the payment stage, an “Apply Coupon” option will be visible—tapping on this will allow the user to enter the code and instantly apply the eligible discount to their total booking amount."
     }
+  },
+  "Reviews": {
+    "guestReviewsFor": "Guest reviews for {{hotelName}}",
+    "weAimForRealReviews": "We aim for 100% real reviews",
+    "writeAReview": "Write a review",
+    "reviews": "reviews",
+    "all": "All",
+    "superb": "Superb",
+    "good": "Good",
+    "poor": "Poor",
+    "marMay": "Mar–May",
+    "junAug": "Jun–Aug",
+    "sepNov": "Sep–Nov",
+    "decFeb": "Dec–Feb",
+    "mostRelevant": "Most relevant",
+    "newestFirst": "Newest first",
+    "oldestFirst": "Oldest first",
+    "highestRated": "Highest rated",
+    "lowestRated": "Lowest rated",
+    "guestReviews": "Guest reviews ({{count}})",
+    "reviewedOn": "Reviewed: {{date}}",
+    "noReviews": "No reviews yet",
+    "beFirstToReview": "Be the first to share your experience!",
+    "filtersAndSort":"Filters & Sort",
+    "reviewScores": "Review scores",
+    "timeOfYear": "Time of year",
+    "sortReviewsBy": "Sort reviews by"
   }
 }
