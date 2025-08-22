@@ -10,6 +10,7 @@ interface SendEmailInput {
 }
 
 class EmailService {
+  
   public async sendEmail(input: SendEmailInput): Promise<void> {
     const { to, subject, text, html } = input;
 

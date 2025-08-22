@@ -8,7 +8,8 @@ import {
   getRoomsByPropertyId,
   getRoomsByPropertyId2,
   getRoomsForBooking,
-  getAllRoomTypes
+  getAllRoomTypes,
+  getDeepLinkData
 } from "../../controller/room.controller";
 
 const router = Router();
@@ -16,6 +17,7 @@ const router = Router();
 export default (app: Router) => {
   app.use("/room", router);
 
+  router.route("/get/deep_link_data/:id").get(getDeepLinkData as any);
   router.route("/rooms_by_propertyId/:id").get(getRoomsByPropertyId as any);
   router.route("/rooms_by_propertyId2/:id").post(getRoomsByPropertyId2 as any);
   router.route("/getRoomsForBooking/:id").get(getRoomsForBooking as any);

@@ -305,7 +305,6 @@ export default function PropertyInfo({ onNext }: Props) {
     return data;
   };
 
-  // Also add a success message when images are uploaded
   const handlePropertyImageUpload = async () => {
     try {
       if (files.length) {

@@ -1361,5 +1361,32 @@
             "discountCouponQuestion": "Kullanıcı rezervasyon yaparken nasıl indirim alabilir veya kupon kullanabilir?",
             "discountCouponAnswer": "Teklifler ve indirimlerden yararlanmak için kullanıcıların basit bir süreci takip etmeleri gerekir. Özel promosyon kuponları, seçili otel odalarına veya diğer promosyon malzemelerine yerleştirilen QR kodlarına bağlıdır. Bu QR kodunu mobil cihaz kullanarak tarayarak, kullanıcılar platformun mobil uygulamasına yönlendirilir. Oradan standart rezervasyon süreci ile devam edebilirler. Ödeme aşamasında bir \"Kupon Uygula\" seçeneği görünür - buna dokunmak kullanıcının kodu girmesine ve uygun indirimi toplam rezervasyon tutarına anında uygulamasına olanak tanır."
         }
+    },
+    "Reviews": {
+        "guestReviewsFor": "{{hotelName}} için misafir yorumları",
+        "weAimForRealReviews": "%100 gerçek yorumları hedefliyoruz",
+        "writeAReview": "Yorum yaz",
+        "reviews": "yorumlar",
+        "all": "Tümü",
+        "superb": "Mükemmel",
+        "good": "İyi",
+        "poor": "Kötü",
+        "marMay": "Mar–May",
+        "junAug": "Haz–Ağu",
+        "sepNov": "Eyl–Kas",
+        "decFeb": "Ara–Şub",
+        "mostRelevant": "En alakalı",
+        "newestFirst": "En yeni önce",
+        "oldestFirst": "En eski önce",
+        "highestRated": "En yüksek puanlı",
+        "lowestRated": "En düşük puanlı",
+        "guestReviews": "Misafir yorumları ({{count}})",
+        "reviewedOn": "İnceleme tarihi: {{date}}",
+        "noReviews": "Henüz yorum yok",
+        "beFirstToReview": "Deneyiminizi paylaşan ilk kişi olun!",
+        "filtersAndSort": "Filtreler ve Sıralama",
+        "reviewScores": "Yorum puanları",
+        "timeOfYear": "Yılın zamanı",
+        "sortReviewsBy": "Yorumları sırala"
     }
 }
