@@ -103,27 +103,37 @@ export const login = createAsyncThunk<
 // Google login thunk
 export const googleLogin = createAsyncThunk<
   { token: string },
-  { code: string, provider: string },
+  { code: string, provider: string, referrerId?: string | null, referralCode?: string | null },
   { dispatch: AppDispatch; state: RootState }
 >(
   "auth/googleLogin",
-  async ({ code, provider }, { dispatch, rejectWithValue }) => {
+  async ({ code, provider, referrerId, referralCode }, { dispatch, rejectWithValue }) => {
     try {
+      // Build the URL with query parameters like the first example
+      let apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/register`;
+
+      // Add referral parameters if they exist
+      if (referrerId && referralCode) {
+        const params = new URLSearchParams({
+          referrerId: referrerId,
+          referralCode: referralCode,
+        });
+        apiUrl += `?${params.toString()}`;
+      }
+      console.log(`The body of google login ${code}, ${provider}, ${referrerId}, ${referralCode}`);
 
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/register`, { code, provider },
+        apiUrl,
+        { code, provider }, // Request body
         {
-          // withCredentials: true,
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
           },
-          
         }
       );
 
-
-      if (response.status !== 201  ) {
+      if (response.status !== 201) {
         throw new Error(response.data.error || "Failed to login with Google");
       }
 
