@@ -23,11 +23,13 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
             try {
                 setLoader(true);
                 const getReviewDetails = await customerReviewApi.getReviewById(reservationId);
-                if (getReviewDetails.status === 200) {
+                console.log(`The reservation details we get ${JSON.stringify(getReviewDetails)}`);
+                if (!getReviewDetails )  {
                     setLoader(false)
                     router.push('/review-success');
                     return;
                 }
+                else return 
             } catch (error: any) {
 
             }
@@ -71,22 +73,7 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
      */
     const handleStarClick = (rating: number) => {
         setFormData({ ...formData, rating: formData.rating === rating ? 0 : rating });
-    };
-
-    /**
-     * Cancel button handle
-     */
-
-    const handleCancel = () => {
-        setFormData(prev => ({
-            ...prev,
-            comment: "",
-            rating: 0
-        }));
-        setMessage("");  
-    };
-
-    
+    };    
 
     /**
      * Handle submit button
@@ -268,13 +255,6 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
                                         ) : (
                                             "Submit Review"
                                         )}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={handleCancel}
-                                        className="flex-1 bg-gray-500 hover:bg-gray-600 text-black font-medium py-3 px-6 rounded-lg transition duration-200"
-                                    >
-                                        Cancel
                                     </button>
                                 </div>
                             </form>

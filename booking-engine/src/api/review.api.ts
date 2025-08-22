@@ -17,7 +17,7 @@ class CustomerReviewApi {
     comment: string;
     rating: number;
   }) {
-  
+
     const response = await fetch(`${this.baseUrl}/review/create`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -41,11 +41,29 @@ class CustomerReviewApi {
    * Get a specific review by ID
    */
   async getReviewById(reviewId: string) {
+  try {
     const response = await fetch(`${this.baseUrl}/review/get?reservationId=${reviewId}`);
-    return await response;
-  }
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
+    const data = await response.json(); 
   
+    if (data.data.customerReview.length === 0) {
+      return true;
+    }
+
+    
+    return false; 
+
+  } catch (error) {
+    console.error("Error fetching review:", error);
+    throw error;
+  }
+}
+
+
 }
 
 export { CustomerReviewApi };
