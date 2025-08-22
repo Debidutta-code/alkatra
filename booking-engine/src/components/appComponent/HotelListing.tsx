@@ -185,38 +185,17 @@ const HotelListing: React.FC = () => {
     setRatingFilter(rating);
   };
 
-  // Function to handle the View Room button click
   const handleViewRoom = (hotelId: string) => {
     if (hotelId) {
       dispatch(setPropertyId(hotelId));
-      localStorage.setItem("property_id", hotelId);
     }
     if (checkinDate) {
       dispatch(setCheckInDate(checkinDate));
-      localStorage.setItem("checkin_date", checkinDate);
     }
     if (checkoutDate) {
       dispatch(setCheckOutDate(checkoutDate));
-      localStorage.setItem("checkout_date", checkoutDate);
     }
-
-    // Store guest details in localStorage for consistency
-    if (guestDetails && Object.keys(guestDetails).length > 0) {
-      localStorage.setItem("guest_details", JSON.stringify(guestDetails));
-      if (guestDetails.rooms) {
-        localStorage.setItem("rooms", guestDetails.rooms.toString());
-      }
-    }
-
-    // Pass guest details in the URL
-    const guestParams = guestDetails
-      ? `&rooms=${guestDetails.rooms || 1}&adults=${guestDetails.guests || 1
-      }&children=${guestDetails.children || 0}&infant=${guestDetails.infants || 0
-      }`
-      : "";
-
-    // Use Next.js router instead of window.location.href
-    router.push(`/hotel?id=${hotelId}&checkin=${checkinDate}&checkout=${checkoutDate}${guestParams}`);
+    router.push("/hotel");
   };
 
   // Apply filters to hotel data
