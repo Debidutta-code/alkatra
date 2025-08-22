@@ -169,6 +169,11 @@ class RoomPrice {
         const propertyInfo: any = await propertyInfoService.getPropertyByHotelCode(hotelCode);
 
         /**
+         * If tax group is not assigned to the property return the response
+         */
+        if (!propertyInfo.tax_group) return response;
+
+        /**
          * Calculating tax
          */
         const taxCalculation = await container.taxGroupService.calculateTaxRulesForReservation(basePrice, totalPrice, propertyInfo.tax_group);
