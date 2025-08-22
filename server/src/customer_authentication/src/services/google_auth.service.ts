@@ -67,6 +67,8 @@ class GoogleAuthService {
         const { code, token } = data;
         if (!code && !token) throw new Error("Authorization code or token is required");
 
+        console.log(`The token and code we get\nCode: ${code}\nToken: ${token}`);
+
         let userData: any;
 
         /**
@@ -84,7 +86,11 @@ class GoogleAuthService {
             console.log("🟢 EXITING IF BLOCK FOR MOBILE");
         }
 
+        console.log(`The user details ${JSON.stringify(userData.data)}`);
+
         const { id, given_name, family_name, email, picture } = userData.data;
+
+        
 
         /**
          * Check if a customer with the provided email exists.
@@ -101,7 +107,10 @@ class GoogleAuthService {
                 avatar: picture,
                 provider: data.provider,
             });
+            
         }
+
+        console.log(customer);
 
         /**
          * Generate a JWT token for the customer.

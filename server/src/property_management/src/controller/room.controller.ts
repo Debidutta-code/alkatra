@@ -309,9 +309,7 @@ const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, nex
     guestDetails = JSON.parse(decodeURIComponent(req.query.guestDetails));
   } else if (Array.isArray(req.query.guestDetails) && typeof req.query.guestDetails[0] === "string") {
     guestDetails = JSON.parse(decodeURIComponent(req.query.guestDetails[0]));
-  } else {
-    return next(new Error("Invalid guestDetails parameter"));
-  }
+  } 
 
   if (!startDate || !endDate || !hotelCode || !propertyInfoId || !numberOfRooms) {
     return next(new Error("Required fields are missing"));
