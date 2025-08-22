@@ -16,22 +16,20 @@ class ChatBotApi {
         try {
             const response = await fetch(`${this.baseUrl}/chat/session`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'Authorization': `Bearer ${token}` 
+                },
             });
             if (response.status !== 200) {
                 throw new Error ("Session ID generate failed");
             }
             return response;
         } catch (error) {
-
+            console.log(`Server error at `);
+            throw new Error ('Server Error');
         }
-    }
-
-
-
-
-
-
+    };
 }
 
 export { ChatBotApi };
