@@ -7,18 +7,16 @@ interface ChatbotIconProps {
 }
 
 const ChatbotIcon: React.FC<ChatbotIconProps> = ({ onClick }) => (
-  <Button 
-    variant="primary" 
-    size="lg" 
-    className="rounded-full p-4 shadow-sm" 
+  <button 
     onClick={onClick}
+    className="bg-transparent border-none p-0 cursor-pointer hover:opacity-80 transition-opacity"
   >
     <img 
       src="/assets/chatbot.png" 
       alt="Chatbot Icon" 
-      className="h-12 w-15 object-contain"
+      className="h-12 w-15"
     />
-  </Button>
+  </button>
 );
 
 export default ChatbotIcon;

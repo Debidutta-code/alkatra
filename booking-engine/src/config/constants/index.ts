@@ -1,0 +1,1 @@
+export { ChatBotConfig } from './chatBot.config';

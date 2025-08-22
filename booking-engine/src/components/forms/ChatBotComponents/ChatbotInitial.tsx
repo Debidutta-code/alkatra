@@ -44,10 +44,10 @@ const ChatbotInitial: React.FC<ChatbotInitialProps> = ({ onStartChat, onClose })
           </li>
         </ul>
       </div>
-      <Button 
-        variant="outline" 
-        size="md" 
-        className="w-full flex items-center justify-between" 
+      <Button
+        variant="outline"
+        size="md"
+        className="w-full flex items-center justify-between"
         onClick={onStartChat}
       >
         Talk with chatbot
@@ -58,9 +58,35 @@ const ChatbotInitial: React.FC<ChatbotInitialProps> = ({ onStartChat, onClose })
   );
 
   return (
-    <div className="p-4">
-      <Header />
-      <Body />
+    <div className="bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 p-4 pb-8 rounded-t-2xl w-full h-40">
+
+      {/* top row with Chat bot title and close button */}
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-md font-semibold text-white">Al-Hajz Chatbot</h3>
+        <button
+          onClick={onClose}
+          className="p-1 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+        >
+          <X className="h-4 w-4 text-white" />
+        </button>
+      </div>
+
+      <div className="flex flex-col items-center">
+
+        {/* Middle screen Chatbot logo  */}
+        <div className="w-16 h-16 mb-3">
+          <img
+            src="/assets/chatbot.png"
+            alt="Chatbot"
+            className="w-16 h-16 object-contain"
+          />
+        </div>
+
+        <p className="items-center text-white text-md font-semibold">
+          Our chatbot is here to assist you instantly
+        </p>
+
+      </div>
     </div>
   );
 }
