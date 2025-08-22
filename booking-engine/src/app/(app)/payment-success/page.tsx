@@ -51,7 +51,7 @@ export default function PaymentSuccess() {
   const reduxInfants = guestDetails?.infants || 0;
   const reduxEmail = guestDetails?.email || email;
   const reduxPhone = guestDetails?.phone || phone;
-
+  const currency = useSelector((state: any) => state.pmsHotelCard.currency);
   const [booking, setBooking] = useState<any>(null);
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState(
@@ -72,11 +72,11 @@ export default function PaymentSuccess() {
   } = useSelector((state: any) => state.pmsHotelCard);
 
   // Combine data sources with priority order: Booking API > URL params > Redux > Default
-  const amount = amountParam 
-  ? parseFloat((parseFloat(amountParam).toFixed(2))) 
-  : reduxAmount != null 
-    ? parseFloat(parseFloat(reduxAmount).toFixed(2)) 
-    : 0;
+  const amount = amountParam
+    ? parseFloat((parseFloat(amountParam).toFixed(2)))
+    : reduxAmount != null
+      ? parseFloat(parseFloat(reduxAmount).toFixed(2))
+      : 0;
   const handleDownloadConfirmation = () => {
     if (!amount) {
       toast.error(t("Payment.PaymentSuccess.noAmountForDownload"));
@@ -680,7 +680,7 @@ export default function PaymentSuccess() {
                         {t("Payment.PaymentSuccess.total")}
                       </span>
                       <span className="font-tripswift-bold text-base sm:text-lg text-tripswift-blue">
-                        {(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {currency} {(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="text-[10px] sm:text-xs text-tripswift-black/50 text-right mt-1">

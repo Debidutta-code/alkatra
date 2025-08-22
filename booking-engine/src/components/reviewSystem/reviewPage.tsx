@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CustomerReviewApi } from "../../api";
 
@@ -11,7 +11,7 @@ interface CustomerReviewFormProps {
 export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
 
     const reservationId = id;
-    const [loader, setLoader] = useState(true);
+    const [, setLoader] = useState(true);
 
     useEffect(() => {
         if (!reservationId) return;

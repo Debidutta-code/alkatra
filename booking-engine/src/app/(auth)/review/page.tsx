@@ -2,8 +2,6 @@
 
 
 import CustomerReviewForm from "@/components/reviewSystem/reviewPage";
-import { useParams } from 'next/navigation';
-import { CustomerReviewApi } from '@/api';
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 

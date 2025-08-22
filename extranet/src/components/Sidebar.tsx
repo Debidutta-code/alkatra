@@ -11,16 +11,16 @@ import Image from "next/image";
 import {
   X,
   Building2,
-  Users,
   ChevronRight,
   Layers,
   Crown,
-  Shield,
   LayoutDashboard,
-  Hotel
+  Hotel,
+  Users,
+  FileText,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
@@ -46,7 +46,7 @@ export default function AppSidebar({ role }: { role?: string }) {
     name: "",
     status: false
   })
-  
+
   const fetchHotelAdminHotel = async (accessToken: string) => {
     try {
       const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/getHotelManagerRooms`, {
@@ -65,12 +65,12 @@ export default function AppSidebar({ role }: { role?: string }) {
       setPropertyId({ ...propertyId, status: false })
     }
   }
-  
+
   useEffect(() => {
     if (!accessToken || role != "hotelManager") return;
     fetchHotelAdminHotel(accessToken);
   }, [accessToken]);
-  
+
   const navigationItems: NavigationItem[] = [
     {
       title: "Dashboard",
@@ -95,6 +95,17 @@ export default function AppSidebar({ role }: { role?: string }) {
       icon: Hotel,
       restricted: role !== "hotelManager",
       description: `${!propertyId?.status ? "Create Your Property First" : ""}`
+    },
+    {
+      title: `Reservations`,
+      href: "/app/bookings",
+      icon: FileText,
+    },
+    {
+      title: "Manage Members",
+      href: "/app/manageMembers",
+      icon: Users,
+      restricted: role !== "superAdmin" && role !== "groupManager"
     },
     {
       title: "Notifications",
@@ -178,7 +189,7 @@ export default function AppSidebar({ role }: { role?: string }) {
   return (
     <div className="">
       <Sidebar
-        className="border-r-2 border-gray-400">
+        className="border-r-2 border-gray-200">
         <SidebarHeader className="border-b border-gray-200/60 dark:border-gray-800/60 h-[12vh] md:h-[14vh] bg-gradient-to-r from-white via-blue-50/50 to-white dark:from-gray-900 dark:via-gray-800/50 dark:to-gray-900">
           <div className="flex items-center justify-between  px-3 h-full">
             <div className="flex items-center gap-3">
@@ -186,10 +197,9 @@ export default function AppSidebar({ role }: { role?: string }) {
                 <Image
                   src="/assets/ALHAJZ.png"
                   alt="Al Hajz"
-                  width={0}
-                  height={0}
-                  sizes="(max-width: 768px) 80px, 100px"
-                  className="w-full h-auto object-contain"
+                  width={100}
+                  height={100}
+                  className="pl-2.5"
                 />
               </div>
             </div>

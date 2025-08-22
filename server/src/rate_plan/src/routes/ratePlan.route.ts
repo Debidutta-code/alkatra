@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { RatePlanController,RoomPrice } from "../controller/ratePlan.controller";
+import { RatePlanController, RoomPrice } from "../controller/ratePlan.controller";
 import { protect } from "../../../user_authentication/src/Middleware/auth.middleware";
 
 const route = Router();
@@ -41,21 +41,26 @@ route.post(
   }
 )
 
-route.get("/hotelRoomPrice",async(req:Request,res:Response,next:NextFunction)=>{
-  const response=await RoomPrice.getRoomPriceByHotelCode(req,res,next)
+route.get("/hotelRoomPrice", async (req: Request, res: Response, next: NextFunction) => {
+  const response = await RoomPrice.getRoomPriceByHotelCode(req, res, next)
   res.status(200).json(response)
 })
-route.post("/getRoomRentPrice",async(req:Request,res:Response,next:NextFunction)=>{
-  const response=await RoomPrice.getRoomRentController(req,res,next)
-  res.status(200).json(response)
+route.post("/getRoomRentPrice", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const response = await RoomPrice.getRoomRentController(req, res, next)
+    res.status(200).json(response)
+  } catch (error: any) {
+    console.error("Error in getRoomRentPrice route:", error);
+    res.status(500).json({ message: error.message });
+  }
 })
 
-route.get("/getRoomType/all",protect,async(req:Request,res:Response,next:NextFunction)=>{
-  const response=await RoomPrice.getAllRoomTypeController(req)
+route.get("/getRoomType/all", protect, async (req: Request, res: Response, next: NextFunction) => {
+  const response = await RoomPrice.getAllRoomTypeController(req)
   res.status(200).json(response)
 })
-route.post("/checkAvailability",async(req:Request,res:Response,next:NextFunction)=>{
-  const response=await RoomPrice.checkAvailabilityController(req,res,next)
+route.post("/checkAvailability", async (req: Request, res: Response, next: NextFunction) => {
+  const response = await RoomPrice.checkAvailabilityController(req, res, next)
   res.status(200).json(response)
 })
 

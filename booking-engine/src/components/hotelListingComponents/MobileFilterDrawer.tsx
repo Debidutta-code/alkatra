@@ -7,7 +7,7 @@ import { t } from 'i18next';
 interface MobileFilterDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  sidebarRef: React.RefObject<HTMLDivElement | null>;
+  sidebarRef: React.RefObject<HTMLDivElement>;
   amenities: { [key: string]: boolean };
   sortOrder: string;
   ratingFilter: number | null;
