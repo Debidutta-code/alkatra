@@ -1,22 +1,18 @@
-import { google } from "googleapis";
+import { IGoogleAuthService, IGoogleAuthData, IGoogleUserData } from "../interfaces";
 import { GoogleConfig, googleInstance } from "../../../config";
 import { GenerateVerifyUtils } from "../../../utils";
 import { CustomerRepository } from "../repositories";
+import { google } from "googleapis";
 
-interface IGoogleAuthData {
-    code?: string;
-    token?: string;
-    provider: string; // 'local' | 'google'
-}
 
-class GoogleAuthService {
+export class GoogleAuthService implements IGoogleAuthService {
     private static instance: GoogleAuthService;
     private googleClient: any;
     private customerRepository: any;
 
-    private constructor() {
+    private constructor(googleInstance: GoogleConfig) {
         this.customerRepository = CustomerRepository;
-        this.googleClient = googleInstance.getOAuth2Client();
+        this.googleClient = googleInstance;
         if (!this.googleClient) throw new Error("Google OAuth initialization failed");
     }
 
@@ -24,113 +20,104 @@ class GoogleAuthService {
      * Get the singleton instance of GoogleAuthService.
      * @returns {GoogleAuthService} The singleton instance of GoogleAuthService.
      */
-    static getInstance(): GoogleAuthService {
+    static getInstance(googleInstance: GoogleConfig): GoogleAuthService {
         if (!GoogleAuthService.instance) {
-            GoogleAuthService.instance = new GoogleAuthService();
+            GoogleAuthService.instance = new GoogleAuthService(googleInstance);
         }
         return GoogleAuthService.instance;
     }
 
-
-
-
-    private async googleAuthForWeb(code: string) {
+    /**
+     * Private method to handle Google authentication for web.
+     * @param {string} code - The authorization code received from Google.
+     * @returns {Promise<any>} The user data returned from Google.
+     */
+    private async googleAuthForWeb(code: string): Promise<any> {
         let data: any;
 
         const { tokens } = await this.googleClient.getToken(code);
         this.googleClient.setCredentials(tokens);
-        // const oauth2 = this.googleClient.getOAuth2();
-        const oauth2 = google.oauth2({ version: "v2", auth: this.googleClient })
+        const oauth2 = google.oauth2({ version: "v2", auth: this.googleClient });
         data = await oauth2.userinfo.get();
 
         return data;
     }
 
-    private async googleAuthForMobile(token: string) {
+    /**
+     * Private method to handle Google authentication for mobile.
+     * @param {string} token - The access token received from Google.
+     * @returns {Promise<any>} The user data returned from Google.
+     */
+    private async googleAuthForMobile(token: string): Promise<any> {
         let data: any;
 
         this.googleClient.setCredentials({ access_token: token });
-        // const oauth2 = this.googleClient.getOAuth2();
-        const oauth2 = google.oauth2({ version: "v2", auth: this.googleClient })
+        const oauth2 = google.oauth2({ version: "v2", auth: this.googleClient });
         data = await oauth2.userinfo.get();
 
         return data;
     }
+
+
 
 
 
     /**
-     * Handle the post request for Google authentication data.
-     * @param data - The data containing either a code or a token for Google authentication.
+     * Authenticate a user using Google OAuth.
      */
-    async handlePostGoogleAuthData(data: IGoogleAuthData) {
-        const { code, token } = data;
-        if (!code && !token) throw new Error("Authorization code or token is required");
+    async authenticate(data: IGoogleAuthData): Promise<IGoogleUserData> {
+        try {
+            const { code, token } = data;
+            if (!code && !token) throw new Error("Code or token is required for Google authentication");
 
-        console.log(`The token and code we get\nCode: ${code}\nToken: ${token}`);
+            let userData: any;
 
-        let userData: any;
+            /**
+             * Get user data based on whether a code or token is provided.
+             */
+            code ?
+                (userData = await this.googleAuthForWeb(code as string)) :
+                (userData = await this.googleAuthForMobile(token as string));
 
-        /**
-         * Get user data based on whether a code or token is provided.
-         * If a code is provided, it will handle Google authentication for web.
-         * If a token is provided, it will handle Google authentication for mobile.
-         */
-        if (code) {
-            userData = await this.googleAuthForWeb(code);
-            if (!userData) throw new Error("Google web authentication failed");
-        }
-        if (token) {
-            userData = await this.googleAuthForMobile(token);
-            if (!userData) throw new Error("Google mobile authentication failed");
-            console.log("🟢 EXITING IF BLOCK FOR MOBILE");
-        }
+            if (!userData) throw new Error("Failed to retrieve user data from Google");
 
-        console.log(`The user details ${JSON.stringify(userData.data)}`);
-
-        const { id, given_name, family_name, email, picture } = userData.data;
-
-        
-
-        /**
-         * Check if a customer with the provided email exists.
-         * If not, create a new customer with the provided Google data.
-         */
-        let customer = await this.customerRepository.findByEmail(email);
-
-        if (!customer) {
-            customer = await this.customerRepository.create({
-                googleId: id,
-                firstName: given_name,
-                lastName: family_name,
-                email: email,
-                avatar: picture,
-                provider: data.provider,
-            });
-            
-        }
-
-        console.log(customer);
-
-        /**
-         * Generate a JWT token for the customer.
-         */
-        const tokenData = GenerateVerifyUtils.generateToken({ id: customer._id })
-
-        return {
-            token: tokenData,
-            user: {
-                id: customer._id,
-                firstName: customer.firstName,
-                lastName: customer.lastName,
-                email: customer.email,
-                avatar: customer.avatar,
-                provider: customer.provider
+            /**
+             * Check if the user already exists in the database. 
+             * If not, create a new customer record.
+             */
+            let customer = await this.customerRepository.findByEmail(userData.email);
+            if (!customer) {
+                customer = await this.customerRepository.create({
+                    googleId: userData.id,
+                    firstName: userData.given_name,
+                    lastName: userData.family_name,
+                    email: userData.email,
+                    avatar: userData.picture,
+                    provider: data.provider,
+                });
             }
+
+            const jwtToken = GenerateVerifyUtils.generateToken({ id: customer._id });
+
+            return {
+                token: jwtToken,
+                user: {
+                    id: customer._id,
+                    firstName: customer.firstName,
+                    lastName: customer.lastName,
+                    email: customer.email,
+                    avatar: customer.avatar,
+                    provider: customer.provider
+                }
+            }
+        } 
+        catch (error: any) {
+            console.error("Google authentication failed:", error);
+            throw error.message;
         }
     }
 
 }
 
-const googleAuthService = GoogleAuthService.getInstance();
-export { googleAuthService, GoogleAuthService };
+// const googleAuthService = GoogleAuthService.getInstance();
+// export { googleAuthService, GoogleAuthService };
