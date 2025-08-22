@@ -8,23 +8,22 @@ import { CustomerReferralService } from "../services";
 import { ValidateService } from "../../../referral_system/services/validate.service";
 import { IUserMessage } from "../models";
 import { AuthController } from "../controllers/googleSocialAuth.controller";
-import { googleAuthService } from "../services";
 
 class CustomerController {
 
     googleAuthController = new AuthController();
 
 
-    private async registerUsers(provider: string, data: any): Promise<any> {
-        switch (provider) {
-            case 'local':
-                return customerService.registerCustomer(data);
-            case 'google':
-                return googleAuthService.handlePostGoogleAuthData({ ...data, provider: provider });
-            default:
-                throw new Error(`Unknown auth provider: ${provider}`);
-        }
-    }
+    // private async registerUsers(provider: string, data: any): Promise<any> {
+    //     switch (provider) {
+    //         case 'local':
+    //             return customerService.registerCustomer(data);
+    //         case 'google':
+    //             return googleAuthService.handlePostGoogleAuthData({ ...data, provider: provider });
+    //         default:
+    //             throw new Error(`Unknown auth provider: ${provider}`);
+    //     }
+    // }
 
 
     /**
@@ -37,13 +36,15 @@ class CustomerController {
         try {
             const { referrerId, referralCode } = req.query as { referrerId: string; referralCode: string };
             const { provider, ...userBody } = req.body;
+
+            if (!provider) throw new Error("Auth Provider is required");
             
             /**
              * Register the customer if referrerId and referralCode are not provided
              */
             if (!referrerId && !referralCode) {
-                // const customer = await customerService.registerCustomer(userBody);
-                const customer = await this.registerUsers(provider, userBody);
+                const customer = await customerService.registerCustomer({...userBody, provider});
+                // const customer = await this.registerUsers(provider, userBody);
                 return res.status(201).json({ message: "Customer registered successfully", data: customer });
             }
 
@@ -53,37 +54,32 @@ class CustomerController {
              * 2. Check if the referrer exists and if the referral code matches with referrer referral code.
              * 3. Match referral code with referrer referral code.
              */
-            ValidateService.validateReferralCodeAndReferrerId(referrerId, referralCode);
-            const validatedReferrer = await CustomerReferralService.validateReferrerForReferral(referrerId);
-            CustomerReferralService.matchReferralCode(validatedReferrer.referralCode, referralCode);
-
+            // ValidateService.validateReferralCodeAndReferrerId(referrerId, referralCode);
+            // const validatedReferrer = await CustomerReferralService.validateReferrerForReferral(referrerId);
+            // CustomerReferralService.matchReferralCode(validatedReferrer.referralCode, referralCode);
+            const validatedReferrer = await CustomerReferralService.validateReferrals(referrerId, referralCode);
 
             /**
              * Now all check's are passed to register the referee
              */
-            // const referee = await customerService.registerCustomer(userBody);
-            let referee: any;
-            const result = await this.registerUsers(provider, userBody);
-            provider === 'local' ? referee = result : referee = result.user;
+            const referee = await customerService.registerCustomer({ ...userBody, provider });
+            // let referee: any;
+            // const result = await this.registerUsers(provider, userBody);
+            // provider === 'local' ? referee = result : referee = result.user;
 
-            if (!referee) throw new Error("Unable to register, please again later.");
+            if (!referee._id) throw new Error("Unable to register, please again later.");
 
 
             /**
              * Apply the referral code to the customer
              */
-            let referralResult = await CustomerReferralService.applyReferral({
+            const referralResult = await CustomerReferralService.applyReferral({
                 referrerId: referrerId,
-                refereeId: provider === "local" ? referee._id : referee.id,
+                refereeId: referee._id as string,
                 referralCode: referralCode,
                 referralLink: validatedReferrer.referralLink,
                 referralQRCode: validatedReferrer.referralQRCode
             });
-
-            if (provider === "google") {
-                referralResult.data.token = result.token;
-                referralResult.data.user = result.user;
-            }
 
 
             return res.status(201).json(referralResult);

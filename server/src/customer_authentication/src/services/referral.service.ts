@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import { referralService } from "../../../referral_system/container";
 import CustomerRepository from "../repositories/customerRepository";
+import { ValidateService } from "../../../referral_system/services/validate.service";
 
 
 type ReferralDetails = {
@@ -118,6 +119,21 @@ export class CustomerReferralService {
             referralLink: user.referralLink,
             referralQRCode: user.referralQRCode
         };
+    }
+
+
+    static async validateReferrals(referrerId: string, referralCode: string): Promise<any> {
+        try {
+            ValidateService.validateReferralCodeAndReferrerId(referrerId, referralCode);
+            const validatedReferrer = await this.validateReferrerForReferral(referrerId);
+            this.matchReferralCode(validatedReferrer.referralCode, referralCode);
+
+            return validatedReferrer;
+        } 
+        catch (error: any) {
+            console.error("Error validating referrals:", error);
+            throw error.message;
+        }
     }
 
 }
