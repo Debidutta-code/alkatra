@@ -36,7 +36,6 @@ class CustomerController {
     async registerCustomer(req: Request, res: Response): Promise<Response | void> {
         try {
             const { referrerId, referralCode } = req.query as { referrerId: string; referralCode: string };
-            // const provider = req.body.provider;
             const { provider, ...userBody } = req.body;
             
             /**
@@ -50,19 +49,14 @@ class CustomerController {
 
 
             /**
-             * Validate the referrerId and referralCode
+             * 1. Validate the referrerId and referralCode.
+             * 2. Check if the referrer exists and if the referral code matches with referrer referral code.
+             * 3. Match referral code with referrer referral code.
              */
             ValidateService.validateReferralCodeAndReferrerId(referrerId, referralCode);
-
-            /**
-             * Check if the referrer exists and if the referral code matches with referrer referral code
-             */
             const validatedReferrer = await CustomerReferralService.validateReferrerForReferral(referrerId);
-
-            /**
-             * Match referral code with referrer referral code
-             */
             CustomerReferralService.matchReferralCode(validatedReferrer.referralCode, referralCode);
+
 
             /**
              * Now all check's are passed to register the referee
@@ -74,24 +68,23 @@ class CustomerController {
 
             if (!referee) throw new Error("Unable to register, please again later.");
 
+
             /**
              * Apply the referral code to the customer
              */
             let referralResult = await CustomerReferralService.applyReferral({
                 referrerId: referrerId,
-                refereeId: provider === 'local' ? referee._id : referee.id,
+                refereeId: provider === "local" ? referee._id : referee.id,
                 referralCode: referralCode,
                 referralLink: validatedReferrer.referralLink,
                 referralQRCode: validatedReferrer.referralQRCode
             });
 
-            if (provider === 'google') {
+            if (provider === "google") {
                 referralResult.data.token = result.token;
                 referralResult.data.user = result.user;
-            } else {
-                referralResult.token = result.token;
-                referralResult.user = result.user;
             }
+
 
             return res.status(201).json(referralResult);
         }
