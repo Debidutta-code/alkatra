@@ -10,7 +10,7 @@ export class GoogleAuthService implements IGoogleAuthService {
     private googleClient: any;
     private customerRepository: any;
 
-    private constructor(googleInstance: GoogleConfig) {
+    private constructor(googleInstance: any) {
         this.customerRepository = CustomerRepository;
         this.googleClient = googleInstance;
         if (!this.googleClient) throw new Error("Google OAuth initialization failed");
@@ -20,7 +20,7 @@ export class GoogleAuthService implements IGoogleAuthService {
      * Get the singleton instance of GoogleAuthService.
      * @returns {GoogleAuthService} The singleton instance of GoogleAuthService.
      */
-    static getInstance(googleInstance: GoogleConfig): GoogleAuthService {
+    static getInstance(googleInstance: any): GoogleAuthService {
         if (!GoogleAuthService.instance) {
             GoogleAuthService.instance = new GoogleAuthService(googleInstance);
         }
@@ -85,14 +85,16 @@ export class GoogleAuthService implements IGoogleAuthService {
              * Check if the user already exists in the database. 
              * If not, create a new customer record.
              */
-            let customer = await this.customerRepository.findByEmail(userData.email);
+            const { id, given_name, family_name, email, picture } = userData.data;
+
+            let customer = await this.customerRepository.findByEmail(email);
             if (!customer) {
                 customer = await this.customerRepository.create({
-                    googleId: userData.id,
-                    firstName: userData.given_name,
-                    lastName: userData.family_name,
-                    email: userData.email,
-                    avatar: userData.picture,
+                    googleId: id,
+                    firstName: given_name,
+                    lastName: family_name,
+                    email: email,
+                    avatar: picture,
                     provider: data.provider,
                 });
             }
@@ -110,7 +112,7 @@ export class GoogleAuthService implements IGoogleAuthService {
                     provider: customer.provider
                 }
             }
-        } 
+        }
         catch (error: any) {
             console.error("Google authentication failed:", error);
             throw error.message;

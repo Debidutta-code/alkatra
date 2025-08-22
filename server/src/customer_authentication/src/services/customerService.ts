@@ -17,7 +17,7 @@ class CustomerService {
 
     // new customer register
     async registerCustomer(customerData: Partial<ICustomer>): Promise<ICustomer> {
-        const { firstName, lastName, email, password, phone } = customerData;
+        const { firstName, lastName, email, password, phone, provider } = customerData;
         if (!firstName || !lastName || !email || !password) {
             const errors: Record<string, string | null> = {
                 firstName: !firstName ? "Firstname is required" : null,
@@ -44,6 +44,7 @@ class CustomerService {
             phone,
             password: hashedPassword,
             role: "customer",
+            provider: provider,
             createdAt: new Date(),
             updatedAt: new Date(),
         });

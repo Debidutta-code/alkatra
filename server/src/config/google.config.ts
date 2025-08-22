@@ -8,7 +8,7 @@ const {
 } = config.googleServie;
 
 
-class GoogleConfig {
+export class GoogleConfig {
     private static instance: GoogleConfig;
     private oauth2Client: any;
 
@@ -36,5 +36,5 @@ class GoogleConfig {
     }
 }
 
-const googleInstance = GoogleConfig.getInstance();
-export { googleInstance, GoogleConfig };
+// const googleInstance = GoogleConfig.getInstance();
+// export { googleInstance, GoogleConfig };

@@ -137,7 +137,7 @@ export const googleLogin = createAsyncThunk<
         throw new Error(response.data.error || "Failed to login with Google");
       }
 
-      const token = response.data.data.token;
+      const token = response.data.token;
 
       if (!token) {
         throw new Error("No token received from Google login");
