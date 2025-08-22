@@ -24,12 +24,12 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
                 setLoader(true);
                 const getReviewDetails = await customerReviewApi.getReviewById(reservationId);
                 console.log(`The reservation details we get ${JSON.stringify(getReviewDetails)}`);
-                if (!getReviewDetails )  {
+                if (!getReviewDetails) {
                     setLoader(false)
                     router.push('/review-success');
                     return;
                 }
-                else return 
+                else return
             } catch (error: any) {
 
             }
@@ -58,6 +58,7 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
 
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
+    const [commentError, setCommentError] = useState("");
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -73,7 +74,7 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
      */
     const handleStarClick = (rating: number) => {
         setFormData({ ...formData, rating: formData.rating === rating ? 0 : rating });
-    };    
+    };
 
     /**
      * Handle submit button
@@ -82,6 +83,16 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
         e.preventDefault();
         setLoading(true);
         setMessage("");
+        setCommentError("");
+
+        /**
+         * Comment field validation 
+         */
+        if (!formData.comment.trim()) {
+            setCommentError("Please share your experience in the comment field");
+            setLoading(false);
+            return;
+        }
 
         try {
             const formDataSubmit = await customerReviewApi.submitReview(formData);
@@ -221,6 +232,11 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
                                 </div>
 
                                 {/* Comments */}
+                                {commentError && (
+                                    <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-lg">
+                                        {commentError}
+                                    </div>
+                                )}
                                 <div className="space-y-2">
                                     <label htmlFor="comment" className="block text-gray-700 font-medium">
                                         Your Review
@@ -233,7 +249,6 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
                                         onChange={handleChange}
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                         rows={5}
-                                        required
                                     />
                                 </div>
 
