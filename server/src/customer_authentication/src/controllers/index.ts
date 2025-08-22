@@ -1,0 +1,1 @@
+export { GoogleAuthController } from './google_auth.controller';
