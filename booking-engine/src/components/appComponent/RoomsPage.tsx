@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import { RoomCard } from "../../components/appComponent/RoomCard";
 import GuestInformationModal, { Guest } from "../../components/bookingComponents/GuestInformationModal";
@@ -15,6 +15,7 @@ import {
   setHotelCode,
   setHotelName,
 } from "@/Redux/slices/pmsHotelCard.slice";
+import { setGuestDetails } from "../../Redux/slices/hotelcard.slice";
 import FullscreenGallery from './FullscreenGallery';
 import QRCodeDisplay from "./QRCodeDisplay";
 import {
@@ -114,6 +115,7 @@ interface PropertyDetails {
 
 const RoomsPage: React.FC = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { property_id: propertyId, checkInDate, checkOutDate } = useSelector((state: any) => state.pmsHotelCard);
   const { guestDetails } = useSelector((state) => state.hotel);
   console.log(`The guest details we get from redux: ${JSON.stringify(guestDetails)}`);
@@ -142,20 +144,24 @@ const RoomsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //   if (!guestDetails || Object.keys(guestDetails).length === 0) {
-  //     console.warn("No guestDetails found in Redux. Using defaults.");
-  //     dispatch(
-  //       setGuestDetails({
-  //         rooms: 1,
-  //         guests: 1,
-  //         children: 0,
-  //         infants: 0,
-  //         childAges: [],
-  //       })
-  //     );
-  //   }
-  // }, [guestDetails, dispatch]);
+  useEffect(() => {
+    const roomsParam = searchParams.get("rooms");
+    const adults = searchParams.get("adults");
+    const children = searchParams.get("children");
+    const infants = searchParams.get("infant");
+
+    if (roomsParam || adults || children || infants) {
+      dispatch(
+        setGuestDetails({
+          rooms: Number(roomsParam) || 1,
+          guests: Number(adults) || 1,
+          children: Number(children) || 0,
+          infants: Number(infants) || 0,
+          childAges: Array(Number(children) || 0).fill(0),
+        })
+      );
+    }
+  }, [searchParams, dispatch]);
 
   // Helper function to display guest count information
   const getGuestCountDisplay = () => {

@@ -195,7 +195,20 @@ const HotelListing: React.FC = () => {
     if (checkoutDate) {
       dispatch(setCheckOutDate(checkoutDate));
     }
-    router.push("/hotel");
+
+    if (guestDetails && Object.keys(guestDetails).length > 0) {
+      localStorage.setItem("guest_details", JSON.stringify(guestDetails));
+      if (guestDetails.rooms) {
+        localStorage.setItem("rooms", guestDetails.rooms.toString());
+      }
+    }
+
+    const guestParams = guestDetails
+      ? `&rooms=${guestDetails.rooms || 1}&adults=${guestDetails.guests || 1
+      }&children=${guestDetails.children || 0}&infant=${guestDetails.infants || 0
+      }`
+      : "";
+    router.push(`/hotel?${guestParams}`);
   };
 
   // Apply filters to hotel data
