@@ -5,7 +5,7 @@ interface ChatState {
 }
 
 const initialState: ChatState = {
-  sessionId: null,
+  sessionId: '',
 };
 
 const chatSlice = createSlice({
@@ -14,10 +14,13 @@ const chatSlice = createSlice({
   reducers: {
     setSessionId: (state, action: PayloadAction<string>) => {
       state.sessionId = action.payload;
+      console.log(`Session ID stored successfully: ${action.payload}`);
     },
+
     clearSessionId: (state) => {
       state.sessionId = null;
     },
+
   },
 });
 

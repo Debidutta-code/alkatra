@@ -1,5 +1,5 @@
 class ChatBotConfig {
-
+    private static instance: ChatBotConfig;
     private baseUrl: string;
 
     constructor(baseUrl: string = process.env.NEXT_PUBLIC_CHATBOT_URL ?? '') {
@@ -11,6 +11,17 @@ class ChatBotConfig {
         else {
             this.baseUrl = baseUrl;
         }
+    }
+
+    static getInstance() {
+        if (!ChatBotConfig.instance) {
+            return ChatBotConfig.instance = new ChatBotConfig();
+        }
+        return ChatBotConfig.instance;
+    }
+    
+    getBaseUrl(): string {
+        return this.baseUrl;
     }
 }
 

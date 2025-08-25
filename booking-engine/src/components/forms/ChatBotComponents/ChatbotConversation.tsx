@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X, Smile, Paperclip, Send, Bot } from 'lucide-react';
 import Button from '../UserProfileComponents/Button';
 import Avatar from '../UserProfileComponents/Avatar';
-import { ChatBotApi } from '../../../api'
+import { useSelector } from 'react-redux';
+import { RootState } from '@/Redux/store';
+import { ChatBotApi } from '@/api';
 
 interface ChatbotConversationProps {
   onClose: () => void;
@@ -11,6 +13,40 @@ interface ChatbotConversationProps {
 }
 
 const ChatbotConversation: React.FC<ChatbotConversationProps> = ({ onClose, onFeedback, userFirstName }) => {
+  const [chatInput, setChatInput] = useState('');
+
+  const chatBotApi = ChatBotApi.getInstance();
+
+  /**
+   * Here the user JWT token getting from redux
+   */
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+  if (!accessToken) {
+    throw new Error("The JWT token didn't get for chatbot");
+  }
+
+  /**
+   * Here the session id is getting from Redux
+   */
+  const sessionId = useSelector((state: RootState) => state.chat.sessionId);
+  if (!sessionId) {
+    throw new Error("The session ID not getting for Chatbot");
+  }
+
+  const botChatApi = async (accessToken: string, sessionId: string, chatInput: string) => {
+    if (!accessToken || !sessionId || !chatInput) {
+      throw new Error("The required details are not found for ChatBot");
+    }
+
+    const chatResult = await chatBotApi.chatApi(accessToken, sessionId, chatInput);
+
+    if (!chatResult) {
+      throw new Error('Not get your answer from Bot');
+    }
+    setChatInput('');
+    console.log(`The answer of your question is ${chatResult}`);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center">
       {/* Header area - matching initial page style */}
@@ -74,11 +110,17 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({ onClose, onFe
             <input
               type="text"
               placeholder="Ask anything ..."
+              onChange={(event) => {
+                setChatInput(event.target.value);
+              }}
+
               className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-600"
             />
             <Smile className="h-5 w-5 text-gray-500 cursor-pointer" />
             <Paperclip className="h-5 w-5 text-gray-500 cursor-pointer" />
-            <Button variant="ghost" size="sm" className="p-1">
+            <Button variant="ghost" size="sm" className="p-1" onClick={() => { 
+              botChatApi(accessToken, sessionId, chatInput) 
+            }}>
               <Send className="h-5 w-5 text-purple-600" />
             </Button>
           </div>

@@ -1,16 +1,18 @@
 import { ChatBotConfig } from '../config';
 
 class ChatBotApi {
-
+    private static instance: ChatBotApi;
     private baseUrl: string;
 
-    constructor(baseUrl: string = process.env.NEXT_PUBLIC_CHATBOT_URL ?? '') {
-        console.log(`The chatbot base url we get: ${baseUrl}`);
+    constructor() {
+        this.baseUrl = ChatBotConfig.getInstance().getBaseUrl();
+    }
 
-        if (!baseUrl) {
-            throw new Error("ChatBot base URL is required. Please set NEXT_PUBLIC_CHATBOT_URL environment variable.");
+    static getInstance() {
+        if (!ChatBotApi.instance) {
+            return ChatBotApi.instance = new ChatBotApi();
         }
-        this.baseUrl = baseUrl;
+        return ChatBotApi.instance;
     }
 
     /**
@@ -34,9 +36,9 @@ class ChatBotApi {
             if (response.status !== 200) {
                 throw new Error("Session ID generate failed");
             }
-            
-            const sessionId  = await response.json();
-            
+
+            const sessionId = await response.json();
+
             return sessionId.sessionId;
         } catch (error: any) {
             console.log(`Server error at generating chat session ID`, error.message);
@@ -55,6 +57,7 @@ class ChatBotApi {
             throw new Error("Token and Session ID required to get Chat");
         }
         try {
+
             const chatResponse = await fetch(`${this.baseUrl}/chat/message`, {
                 method: 'POST',
                 headers: {
@@ -72,6 +75,7 @@ class ChatBotApi {
             }
 
             const responseData = chatResponse.json();
+            console.log(`The chat bot answer we get ${JSON.stringify(responseData)}`);
             return responseData;
         } catch (error: any) {
             console.log(`Server error at chat`, error.message);

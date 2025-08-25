@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/Redux/store';
-import { ChatBotApi } from '@/api/chatBot.api';
+import { ChatBotApi } from '@/api';
 import { setSessionId } from '../../../Redux/slices/chatbot.slice';
 import { ArrowRight, Gift, Shield, Lock, Star, X } from 'lucide-react';
 
@@ -27,6 +27,8 @@ const ChatbotPage: React.FC<ChatbotPageProps> = ({ onStartChat, onClose }) => {
     if (!newSessionId) {
       throw new Error("Chatbot session can't generate");
     }
+
+    console.log(`@@@@@@@@@@@@@ The session id we get ${newSessionId}`)
     dispatch(setSessionId(newSessionId)); 
   };
 
