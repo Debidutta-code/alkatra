@@ -153,7 +153,7 @@ class RoomPrice {
         )
         if (response.success === false) {
             console.error("Error in getRoomRentController:", response.message)
-            return;
+            return response;
         }
 
 
