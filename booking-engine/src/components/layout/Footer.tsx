@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import React from "react";
-import img from "../assets/TRIP-1.png";
+import img from "../assets/Alhajz.png";
 import { usePathname } from "next/navigation";
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -24,7 +24,7 @@ const Footer = (props: Props) => {
             {/* Logo Section */}
             <div className="flex items-start">
               <Image
-                src="/assets/TRIP-1.png"
+                src="/assets/Alhajz.png"
                 width={170}
                 height={20}
                 alt="TripSwift - Redefines Hospitality Technology"

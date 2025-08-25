@@ -7,8 +7,8 @@ type BookingType = {
   user: string;
   booking_user_name: string
   booking_user_email: string,
-  booking_user_phone: Number,
-  amount: Number;
+  booking_user_phone: number,
+  amount: number;
   payment: string;
   booking_dates: Date;
   status: string;

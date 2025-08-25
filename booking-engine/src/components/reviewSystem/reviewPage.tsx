@@ -23,11 +23,13 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
             try {
                 setLoader(true);
                 const getReviewDetails = await customerReviewApi.getReviewById(reservationId);
-                if (getReviewDetails.status === 200) {
+                console.log(`The reservation details we get ${JSON.stringify(getReviewDetails)}`);
+                if (!getReviewDetails) {
                     setLoader(false)
                     router.push('/review-success');
                     return;
                 }
+                else return
             } catch (error: any) {
 
             }
@@ -56,6 +58,8 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
 
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
+    const [commentError, setCommentError] = useState("");
+    const [ratingError, setRatingError] = useState("");
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -74,27 +78,32 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
     };
 
     /**
-     * Cancel button handle
-     */
-
-    const handleCancel = () => {
-        setFormData(prev => ({
-            ...prev,
-            comment: "",
-            rating: 0
-        }));
-        setMessage("");  
-    };
-
-    
-
-    /**
      * Handle submit button
      */
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setMessage("");
+        setCommentError("");
+        setRatingError("");
+
+        /**
+         * Rating field validation 
+         */
+        if (formData.rating === 0) {
+            setRatingError("Please select a star rating");
+            setLoading(false);
+            return;
+        }
+
+        /**
+         * Comment field validation 
+         */
+        if (!formData.comment.trim()) {
+            setCommentError("Please share your experience in the comment field");
+            setLoading(false);
+            return;
+        }
 
         try {
             const formDataSubmit = await customerReviewApi.submitReview(formData);
@@ -148,7 +157,7 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
 
             } catch (err) {
                 console.error(err);
-                setMessage("❌ Could not load reservation details.");
+                setMessage("❌ Can not display your details.");
             }
         };
 
@@ -215,12 +224,23 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
                                 {/* Rating */}
                                 <div className="space-y-2">
                                     <label className="block text-gray-700 font-medium">Your Rating</label>
+
+                                    {/* Add rating error display */}
+                                    {ratingError && (
+                                        <div className="p-3 bg-red-100 text-red-800 rounded-lg mb-2">
+                                            {ratingError}
+                                        </div>
+                                    )}
+
                                     <div className="flex space-x-1">
                                         {[1, 2, 3, 4, 5].map((star) => (
                                             <button
                                                 type="button"
                                                 key={star}
-                                                onClick={() => handleStarClick(star)}
+                                                onClick={() => {
+                                                    handleStarClick(star);
+                                                    setRatingError(""); // Clear error when user selects a rating
+                                                }}
                                                 className={`text-4xl ${formData.rating >= star ? "text-yellow-400" : "text-gray-300"}`}
                                                 aria-label={`Rate ${star} star${star !== 1 ? 's' : ''}`}
                                             >
@@ -234,6 +254,11 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
                                 </div>
 
                                 {/* Comments */}
+                                {commentError && (
+                                    <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-lg">
+                                        {commentError}
+                                    </div>
+                                )}
                                 <div className="space-y-2">
                                     <label htmlFor="comment" className="block text-gray-700 font-medium">
                                         Your Review
@@ -246,7 +271,6 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
                                         onChange={handleChange}
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                         rows={5}
-                                        required
                                     />
                                 </div>
 
@@ -268,13 +292,6 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
                                         ) : (
                                             "Submit Review"
                                         )}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={handleCancel}
-                                        className="flex-1 bg-gray-500 hover:bg-gray-600 text-black font-medium py-3 px-6 rounded-lg transition duration-200"
-                                    >
-                                        Cancel
                                     </button>
                                 </div>
                             </form>

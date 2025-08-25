@@ -11,18 +11,12 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Shield, CreditCard, CheckCircle, Clock, CalendarRange, Users, Loader2 } from "lucide-react";
 import Link from "next/link";
 import axios from "axios";
-
-interface RootState {
-  auth: {
-    user: UserType | null;
-    token?: string;
-  };
-}
+import { RootState } from "@/Redux/store";
 
 interface UserType {
   firstName: string;
@@ -50,71 +44,110 @@ function PaymentPageContent() {
   const [convertedAmount, setConvertedAmount] = useState<number | null>(null);
   const searchParams = useSearchParams();
   const authUser = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch();
+  const pmsHotelCard = useSelector((state: RootState) => state.pmsHotelCard);
 
   // Get booking parameters from URL
   // const amount = isNaN(parseInt(searchParams.get("amount") || "0", 10)) ? 0 : parseInt(searchParams.get("amount") || "0", 10); 
-  const currency = searchParams.get("currency")?.toLowerCase() || "";
-  const firstName = searchParams.get('firstName') || authUser?.firstName || '';
-  const lastName = searchParams.get('lastName') || authUser?.lastName || '';
-  const email = searchParams.get('email') || authUser?.email || '';
-  const phone = searchParams.get('phone') || authUser?.phone || '';
-  const roomId = searchParams.get('roomId') || '';
-  const propertyId = searchParams.get('propertyId') || '';
-  const checkIn = searchParams.get('checkIn') || '';
-  const checkOut = searchParams.get('checkOut') || '';
-  const userId = authUser?._id || searchParams.get('userId') || '';
-  const hotelName = searchParams.get('hotelName');
-  const hotelCode = searchParams.get('hotelCode');
-  const ratePlanCode = searchParams.get('ratePlanCode')?.toUpperCase() || '';
-  const roomType = searchParams.get('roomType') || '';
+  // const currency = searchParams.get("currency")?.toLowerCase() || "";
+  // const firstName = searchParams.get('firstName') || authUser?.firstName || '';
+  // const lastName = searchParams.get('lastName') || authUser?.lastName || '';
+  // const email = searchParams.get('email') || authUser?.email || '';
+  // const phone = searchParams.get('phone') || authUser?.phone || '';
+  // const roomId = searchParams.get('roomId') || '';
+  // const propertyId = searchParams.get('propertyId') || '';
+  // const checkIn = searchParams.get('checkIn') || '';
+  // const checkOut = searchParams.get('checkOut') || '';
+  // const userId = authUser?._id || searchParams.get('userId') || '';
+  // const hotelName = searchParams.get('hotelName');
+  // const hotelCode = searchParams.get('hotelCode');
+  // const ratePlanCode = searchParams.get('ratePlanCode')?.toUpperCase() || '';
+  // const roomType = searchParams.get('roomType') || '';
 
-  // Get guest counts from URL parameters
-  const rooms = parseInt(searchParams.get('rooms') || '1', 10);
-  const adults = parseInt(searchParams.get('adults') || '1', 10);
-  const children = parseInt(searchParams.get('children') || '0', 10);
-  const infants = parseInt(searchParams.get('infants') || '0', 10);
-  const amountFromRedux = useSelector((state: any) => state.pmsHotelCard.amount);
-  console.log(`>>>>>>>>>>>>>>>>>###################The amount we get from Redux is: ${amountFromRedux}`);
+  // // Get guest counts from URL parameters
+  // const rooms = parseInt(searchParams.get('rooms') || '1', 10);
+  // const adults = parseInt(searchParams.get('adults') || '1', 10);
+  // const children = parseInt(searchParams.get('children') || '0', 10);
+  // const infants = parseInt(searchParams.get('infants') || '0', 10);
+  // const amountFromRedux = useSelector((state: any) => state.pmsHotelCard.amount);
+  // console.log(`>>>>>>>>>>>>>>>>>###################The amount we get from Redux is: ${amountFromRedux}`);
 
+  const guestDetails = useSelector(
+    (state: RootState) => state.pmsHotelCard.guestDetails
+  );
+  const firstName = guestDetails?.guests?.[0]?.firstName || "";
+  const lastName = guestDetails?.guests?.[0]?.lastName || "";
+  const email = guestDetails?.email || "";
+  const phone = guestDetails?.phone || "";
+
+  const currency = (pmsHotelCard?.currency || "").toLowerCase();
+  const hotelCode = pmsHotelCard?.hotelCode || "";
+  const ratePlanCode = pmsHotelCard?.ratePlanCode || "";
+  const roomType = pmsHotelCard?.roomType || "";
+
+  const roomId = pmsHotelCard.room_id || "";
+  const propertyId = pmsHotelCard.property_id || "";
+  const checkIn = pmsHotelCard.checkInDate || "";
+  const checkOut = pmsHotelCard.checkOutDate || "";
+  const userId = authUser?._id || searchParams.get("userId") || "";
+  const hotelName = pmsHotelCard?.hotelName || "";
+
+  // Get guest counts
+  console.log(
+    "?????????????????????????????????????????????currency:",
+    currency
+  );
+  const amountFromRedux = useSelector(
+    (state: RootState) => state.pmsHotelCard.amount || 0
+  );
+  const rooms = guestDetails?.rooms || 0;
+  const adults = guestDetails?.adults || 0;
+  const children = guestDetails?.children || 0;
+  const infants = guestDetails?.infants || 0;
+
+  // const amountFromRedux = useSelector((state: any) => state.pmsHotelCard.amount);
+  console.log(
+    `>>>>>>>>>>>>>>>>>###################The amount we get from Redux is: ${amountFromRedux}`
+  );
   const { i18n } = useTranslation();
-
-  // Use amount from Redux only
-  const amount = amountFromRedux || '0'; // Still a string
-  console.log(`<><><><><><><><><><><><>The amount we are Getting from amountFromRedux is: ${parseFloat(amount).toFixed(2)}`); // Clean log
-  // Parse guests from query parameters
-  const guests: Guest[] = (() => {
-    try {
-      const guestsStr = searchParams.get('guests');
-      if (!guestsStr) {
-        console.warn('No guests query parameter provided');
-        return [{ firstName: firstName || 'Guest', lastName: lastName || 'User', type: 'adult', dob: '' }];
-      }
-      const parsed = JSON.parse(decodeURIComponent(guestsStr));
-      if (!Array.isArray(parsed) || parsed.length === 0) {
-        console.warn('Guests query parameter is empty or not an array:', parsed);
-        return [{ firstName: firstName || 'Guest', lastName: lastName || 'User', type: 'adult', dob: '' }];
-      }
-      return parsed.map((guest: any) => ({
-        firstName: guest.firstName || '',
-        lastName: guest.lastName || '',
-        dob: guest.dob || '',
-        type: ['adult', 'child', 'infant'].includes(guest.type) ? guest.type : 'adult'
-      }));
-    } catch (error) {
-      console.error('Failed to parse guests:', error);
-      return [{ firstName: firstName || 'Guest', lastName: lastName || 'User', type: 'adult', dob: '' }];
-    }
-  })();
+  const amount = amountFromRedux ?? 0;
+  console.log(`<><><><><><><><><><><><>The amount we are Getting from amountFromRedux is: ${amount.toFixed(2)}`);
+  // const guests: Guest[] = (() => {
+  //   try {
+  //     const guestsStr = searchParams.get('guests');
+  //     if (!guestsStr) {
+  //       console.warn('No guests query parameter provided');
+  //       return [{ firstName: firstName || 'Guest', lastName: lastName || 'User', type: 'adult', dob: '' }];
+  //     }
+  //     const parsed = JSON.parse(decodeURIComponent(guestsStr));
+  //     if (!Array.isArray(parsed) || parsed.length === 0) {
+  //       console.warn('Guests query parameter is empty or not an array:', parsed);
+  //       return [{ firstName: firstName || 'Guest', lastName: lastName || 'User', type: 'adult', dob: '' }];
+  //     }
+  //     return parsed.map((guest: any) => ({
+  //       firstName: guest.firstName || '',
+  //       lastName: guest.lastName || '',
+  //       dob: guest.dob || '',
+  //       type: ['adult', 'child', 'infant'].includes(guest.type) ? guest.type : 'adult'
+  //     }));
+  //   } catch (error) {
+  //     console.error('Failed to parse guests:', error);
+  //     return [{ firstName: firstName || 'Guest', lastName: lastName || 'User', type: 'adult', dob: '' }];
+  //   }
+  // })();
+  const guests = useSelector(
+    (state: any) => state.pmsHotelCard.guestDetails.guests
+  );
 
   const nights = calculateNights(checkIn, checkOut);
 
-  const numericAmount = parseFloat(amount) || 0;
-  const ratePerNight = nights > 0 ? (numericAmount / nights) : 0;
+  const numericAmount = amount || 0;
+  // const ratePerNight = nights > 0 ? (numericAmount / nights) : 0;
 
   const bookingDetails = {
     roomId,
     propertyId,
-    amount: amount.toString(),
+    amount,
     currency,
     checkIn,
     checkOut,

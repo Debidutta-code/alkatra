@@ -6,14 +6,19 @@ import axios from "axios";
 interface PmsHotelCardState {
   property_id: string | null;
   room_id: string | null;
-  amount: string | null;
+  amount: number | null;
   user_id: string | null;
   checkInDate: string | null;
   checkOutDate: string | null;
   guestDetails: Record<string, any>;
-  baseRatePerNight: string | null; 
-  additionalGuestCharges: string | null; 
-  requestedRooms: string | null; 
+  baseRatePerNight: string | null;
+  additionalGuestCharges: string | null;
+  requestedRooms: string | null;
+  hotelCode: string | null;
+  ratePlanCode: string | null;
+  roomType: string | null;
+  currency: string | null;
+  hotelName: string | null;
 }
 
 const initialState: PmsHotelCardState = {
@@ -24,9 +29,14 @@ const initialState: PmsHotelCardState = {
   checkInDate: null,
   checkOutDate: null,
   guestDetails: {},
-  baseRatePerNight: null, 
-  additionalGuestCharges: null, 
-  requestedRooms: null, 
+  baseRatePerNight: null,
+  additionalGuestCharges: null,
+  requestedRooms: null,
+  hotelCode: null,
+  ratePlanCode: null,
+  roomType: null,
+  currency: null,
+  hotelName: null,
 };
 
 const pmsHotelCardSlice = createSlice({
@@ -39,7 +49,7 @@ const pmsHotelCardSlice = createSlice({
     setRoomId: (state, action: PayloadAction<string>) => {
       state.room_id = action.payload;
     },
-    setAmount: (state, action: PayloadAction<string>) => {
+    setAmount: (state, action: PayloadAction<number>) => {
       state.amount = action.payload;
     },
     setUserId: (state, action: PayloadAction<string>) => {
@@ -54,14 +64,29 @@ const pmsHotelCardSlice = createSlice({
     setGuestDetails: (state, action: PayloadAction<Record<string, any>>) => {
       state.guestDetails = action.payload;
     },
-    setBaseRatePerNight: (state, action: PayloadAction<string>) => { 
+    setBaseRatePerNight: (state, action: PayloadAction<string>) => {
       state.baseRatePerNight = action.payload;
     },
-    setAdditionalGuestCharges: (state, action: PayloadAction<string>) => { 
+    setAdditionalGuestCharges: (state, action: PayloadAction<string>) => {
       state.additionalGuestCharges = action.payload;
     },
-    setRequestedRooms: (state, action: PayloadAction<string>) => { 
+    setRequestedRooms: (state, action: PayloadAction<string>) => {
       state.requestedRooms = action.payload;
+    },
+    setHotelCode: (state, action: PayloadAction<string>) => {
+      state.hotelCode = action.payload;
+    },
+    setRatePlanCode: (state, action: PayloadAction<string>) => {
+      state.ratePlanCode = action.payload;
+    },
+    setRoomType: (state, action: PayloadAction<string>) => {
+      state.roomType = action.payload;
+    },
+    setCurrency: (state, action: PayloadAction<string>) => {
+      state.currency = action.payload;
+    },
+    setHotelName: (state, action: PayloadAction<string>) => {
+      state.hotelName = action.payload;
     },
   },
 });
@@ -74,28 +99,33 @@ export const {
   setCheckOutDate,
   setAmount,
   setGuestDetails,
-  setBaseRatePerNight, 
-  setAdditionalGuestCharges, 
-  setRequestedRooms, 
+  setBaseRatePerNight,
+  setAdditionalGuestCharges,
+  setRequestedRooms,
+  setHotelCode,
+  setRatePlanCode,
+  setRoomType,
+  setCurrency,
+  setHotelName,
 } = pmsHotelCardSlice.actions;
 
 export const getUser =
   () =>
-  async (dispatch: typeof store.dispatch, getState: typeof store.getState) => {
-    const accessToken = Cookies.get("accessToken");
-    try {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/me`, {
-        headers: {
-          Authorization: "Bearer " + accessToken,
-        },
-      });
-      const user = res?.data?.data;
-      console.log("API response user:", user);
-      dispatch(setUserId(user._id));
-      console.log("2 setUserId called with:", user._id);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  };
+    async (dispatch: typeof store.dispatch, getState: typeof store.getState) => {
+      const accessToken = Cookies.get("accessToken");
+      try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/me`, {
+          headers: {
+            Authorization: "Bearer " + accessToken,
+          },
+        });
+        const user = res?.data?.data;
+        console.log("API response user:", user);
+        dispatch(setUserId(user._id));
+        console.log("2 setUserId called with:", user._id);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
 
 export default pmsHotelCardSlice.reducer;

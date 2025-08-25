@@ -2,6 +2,7 @@ import { IReview } from "../model";
 import { CustomerReviewRepository } from "../repository";
 import { ReservationService } from "./reservation.service";
 import { MailFactory } from "../../customer_authentication/src/services/mailFactory";
+import { config } from "../../config";
 
 const customerReviewRepository = new CustomerReviewRepository();
 const reservationService = new ReservationService();
@@ -50,70 +51,59 @@ export class CustomerReviewService {
 
 
     async getAllReviews(query: any) {
+        console.log(`The query we get ${JSON.stringify(query)}`);
+
         const filters: any = {};
 
-        // Build OR conditions array
-        const orConditions = [];
-
-        const hotelCode = query.hotelCode;
-
-        if (query.userId) orConditions.push({ userId: query.userId });
-        if (query.guestEmail) orConditions.push({ guestEmail: query.guestEmail });
-        if (query.hotelCode) orConditions.push({ hotelCode: query.hotelCode });
-        if (query.reservationId) orConditions.push({ reservationId: query.reservationId });
-        if (query.rating) orConditions.push({ rating: query.rating });
-        if (query.categoryRating) orConditions.push({ categorizedRating: query.categoryRating });
-
-
-        // Apply OR logic if any conditions exist
-        if (orConditions.length > 0) {
-            filters.$and = orConditions;
-        }
+        // Build filter conditions directly
+        if (query.userId) filters.userId = query.userId;
+        if (query.guestEmail) filters.guestEmail = query.guestEmail;
+        if (query.hotelCode) filters.hotelCode = query.hotelCode;
+        if (query.reservationId) filters.reservationId = query.reservationId;
+        if (query.rating) filters.rating = query.rating;
+        if (query.categoryRating) filters.categorizedRating = query.categoryRating;
 
         // Add date range filtering for createdAt
         if (query.startDate || query.endDate) {
             const dateFilter: any = {};
-
-            if (query.startDate) {
-                dateFilter.$gte = new Date(query.startDate);
-            }
-
+            if (query.startDate) dateFilter.$gte = new Date(query.startDate);
             if (query.endDate) {
                 const endDate = new Date(query.endDate);
                 endDate.setHours(23, 59, 59, 999);
                 dateFilter.$lte = endDate;
             }
-
             filters.createdAt = dateFilter;
         }
 
-        const reviews = await customerReviewRepository.getReviews({ hotelCode });
+        console.log(`The filters we built: ${JSON.stringify(filters)}`);
 
-        console.log(`The reviews we get ${JSON.stringify(reviews)}`);
-
-        // Calculate average rating
+        // Get reviews for average calculation (only by hotelCode)
         let averageRating = null;
-        if (reviews.length > 0) {
-            const ratings = reviews.map(review => review.rating).filter(rating => rating !== undefined && rating !== null);
-
-            if (ratings.length > 0) {
-                const sum = ratings.reduce((total, rating) => total + rating, 0);
-                averageRating = parseFloat((sum / ratings.length).toFixed(2));
+        let totalReviews = 0;
+        if (query.hotelCode) {
+            const reviews = await customerReviewRepository.getReviews({ hotelCode: query.hotelCode });
+            console.log(`The reviews we get ${JSON.stringify(reviews)}`);
+            if (reviews.length > 0) {
+                const ratings = reviews.map(review => review.rating).filter(rating => rating !== undefined && rating !== null);
+                if (ratings.length > 0) {
+                    const sum = ratings.reduce((total, rating) => total + rating, 0);
+                    averageRating = parseFloat((sum / ratings.length).toFixed(2));
+                }
+                totalReviews = reviews.length;
             }
         }
 
-        const customerReview = await customerReviewRepository.getReviews(filters);
-        if (!customerReview) {
-            throw new Error ("Reviews not found");
-        }
-        // return await customerReviewRepository.getReviews(filters);
+        // Log filters before calling getReviews for filtered reviews
+        console.log(`Filters before calling getReviews: ${JSON.stringify(filters)}`);
 
+        // Get filtered reviews
+        const customerReview = await customerReviewRepository.getReviews(filters);
         return {
             averageRating: averageRating,
-            totalReviews: reviews.length,
-            customerReview
+            totalReviews: totalReviews,
+            customerReview: customerReview || []
         };
-    };
+    }
 
     async updateCustomerReview(reviewId: string, userId, reviewData: Partial<IReview>) {
         if (!reviewId || !userId) {
@@ -132,7 +122,7 @@ export class CustomerReviewService {
     async sendEmailToCustomer(reservationId: string) {
         try {
             const reservationData = await reservationService.getReservationData(reservationId);
-            const reviewUiUrl = process.env.REVIEW_UI_URL;
+            const reviewUiUrl = config.server.reviewUrl;
 
             if (!reservationData) {
                 return { success: false, message: "No reservation data found for Email Send" };

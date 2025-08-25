@@ -6,7 +6,15 @@ import axios from "axios";
 import { RoomCard } from "../../components/appComponent/RoomCard";
 import GuestInformationModal, { Guest } from "../../components/bookingComponents/GuestInformationModal";
 import { useDispatch, useSelector } from "../../Redux/store";
-import { setAmount, setRoomId } from "../../Redux/slices/pmsHotelCard.slice";
+import {
+  setAmount,
+  setRoomId,
+  setCurrency,
+  setRatePlanCode,
+  setRoomType,
+  setHotelCode,
+  setHotelName,
+} from "@/Redux/slices/pmsHotelCard.slice";
 import { setGuestDetails } from "../../Redux/slices/hotelcard.slice";
 import FullscreenGallery from './FullscreenGallery';
 import QRCodeDisplay from "./QRCodeDisplay";
@@ -108,9 +116,9 @@ interface PropertyDetails {
 const RoomsPage: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const propertyId = searchParams.get("id");
-  const checkInDate = searchParams.get("checkin") || "2024-11-20";
-  const checkOutDate = searchParams.get("checkout") || "2024-12-24";
+  const { property_id: propertyId, checkInDate, checkOutDate } = useSelector((state: any) => state.pmsHotelCard);
+  const { guestDetails } = useSelector((state) => state.hotel);
+  console.log(`The guest details we get from redux: ${JSON.stringify(guestDetails)}`);
   const [rooms, setRooms] = useState<RoomResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -132,8 +140,6 @@ const RoomsPage: React.FC = () => {
   const [galleryInitialIndex, setGalleryInitialIndex] = useState<number>(0);
   const [showFullDescription, setShowFullDescription] = useState<boolean>(false);
   const [showRoomNotAvailable, setShowRoomNotAvailable] = useState<boolean>(false);
-  const { guestDetails } = useSelector((state) => state.hotel);
-  console.log(`The guest details we get from redux: ${JSON.stringify(guestDetails)}`);
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState<boolean>(false);
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
@@ -206,6 +212,15 @@ const RoomsPage: React.FC = () => {
     fetchProperty();
   }, [propertyId]);
 
+  useEffect(() => {
+    if (selectedRoom && propertyCode && propertyDetails) {
+      dispatch(setCurrency(selectedRoom.currency_code));
+      dispatch(setRatePlanCode(selectedRoom.rate_plan_code));
+      dispatch(setRoomType(selectedRoom.room_type));
+      dispatch(setHotelCode(propertyCode));
+      dispatch(setHotelName(propertyDetails.property_name));
+    }
+  }, [selectedRoom, propertyCode]);
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -301,7 +316,7 @@ const RoomsPage: React.FC = () => {
       document.body.style.overflow = '';
     };
   }, [isReviewsModalOpen]);
-  
+
   // Helper function to convert amenities to the expected format
   const convertAmenities = (room: Room) => {
     let roomAmenitiesList: string[] = [];
@@ -393,15 +408,14 @@ const RoomsPage: React.FC = () => {
     setIsModalOpen(true);
     dispatch(setRoomId(room._id));
 
-    // Use amountBeforeTax from baseByGuestAmts
     const guestCount = guestDetails?.guests || 1;
     const matchingRate =
       room.baseByGuestAmts?.find((rate) => rate.numberOfGuests === guestCount) ||
       room.baseByGuestAmts?.[0];
-    const amount = matchingRate ? matchingRate.amountBeforeTax.toFixed(2) : "0.00";
+
+    const amount = matchingRate ? parseFloat(matchingRate.amountBeforeTax.toFixed(2)) : 0;
     dispatch(setAmount(amount));
   };
-
   const confirmBooking = (formData: {
     email: string;
     phone: string;
@@ -409,36 +423,39 @@ const RoomsPage: React.FC = () => {
     roomId: string;
     checkIn: string;
     checkOut: string;
-    amount: string;
+    amount: number;
     userId?: string;
     rooms?: number;
     adults?: number;
     children?: number;
     infants?: number;
     guests?: Guest[];
+    hotelName: string;
+    ratePlanCode: string;
+    roomType: string;
+    currency?: string;
   }) => {
     console.log("form data", formData);
-    const queryParams = new URLSearchParams({
-      roomId: formData.roomId,
-      propertyId: formData.propertyId,
-      currency: selectedRoom?.currency_code || "",
-      checkIn: formData.checkIn,
-      checkOut: formData.checkOut,
-      email: formData.email,
-      phone: formData.phone,
-      userId: formData.userId || "",
-      hotelName: propertyDetails?.property_name || "",
-      ratePlanCode: selectedRoom?.rate_plan_code || "",
-      roomType: selectedRoom?.room_type || "",
-      ...(formData.rooms ? { rooms: formData.rooms.toString() } : {}),
-      ...(formData.adults ? { adults: formData.adults.toString() } : {}),
-      ...(formData.children ? { children: formData.children.toString() } : {}),
-      ...(formData.infants ? { infants: formData.infants.toString() } : {}),
-      ...(formData.guests
-        ? { guests: encodeURIComponent(JSON.stringify(formData.guests)) }
-        : {}),
-    }).toString();
-    router.push(`/payment?${queryParams}`);
+
+    // const queryParams = new URLSearchParams({
+    //   roomId: formData.roomId,
+    //   propertyId: formData.propertyId,
+    //   currency: formData.currency || selectedRoom?.currency_code || "",
+    //   checkIn: formData.checkIn,
+    //   checkOut: formData.checkOut,
+    //   email: formData.email,
+    //   phone: formData.phone,
+    //   userId: formData.userId || "",
+    //   hotelName: formData.hotelName,
+    //   ratePlanCode: formData.ratePlanCode,
+    //   roomType: formData.roomType,
+    //   ...(formData.rooms && { rooms: formData.rooms.toString() }),
+    //   ...(formData.adults && { adults: formData.adults.toString() }),
+    //   ...(formData.children && { children: formData.children.toString() }),
+    //   ...(formData.infants && { infants: formData.infants.toString() }),
+    //   ...(formData.guests && { guests: encodeURIComponent(JSON.stringify(formData.guests)) }),
+    // });
+    router.push(`/payment`);
   };
 
   // Get unique room types

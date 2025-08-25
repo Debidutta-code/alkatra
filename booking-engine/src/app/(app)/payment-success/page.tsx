@@ -18,7 +18,7 @@ import {
   ArrowRight,
   Download,
   Mail,
-  Phone, // Added Phone icon for phone number display
+  Phone,
 } from "lucide-react";
 import { formatDate, calculateNights } from "../../../utils/dateUtils";
 import { useTranslation } from "react-i18next";
@@ -33,16 +33,9 @@ export default function PaymentSuccess() {
   const amountParam = searchParams.get("amount");
   const reference = searchParams.get("reference");
   const paymentMethod = searchParams.get("method") || "CREDIT_CARD";
-  const checkIn = searchParams.get("checkIn");
-  const checkOut = searchParams.get("checkOut");
-  const propertyId = searchParams.get("PropertyId");
-
-  // Parse guest counts from URL params
   const rooms = parseInt(searchParams.get("rooms") || "1", 10);
   const adults = parseInt(searchParams.get("adults") || "1", 10);
   const children = parseInt(searchParams.get("children") || "0", 10);
-
-  // Get guest details from Redux (new addition)
   const { guestDetails } = useSelector((state: any) => state.pmsHotelCard);
   const reduxGuests = guestDetails?.guests || null;
   const reduxRooms = guestDetails?.rooms || rooms;
@@ -51,9 +44,9 @@ export default function PaymentSuccess() {
   const reduxInfants = guestDetails?.infants || 0;
   const reduxEmail = guestDetails?.email || email;
   const reduxPhone = guestDetails?.phone || phone;
-  const currency = useSelector((state: any) => state.pmsHotelCard.currency);
   const [booking, setBooking] = useState<any>(null);
   const [error, setError] = useState(false);
+  const currency = useSelector((state: any) => state.pmsHotelCard.currency);
   const [errorMessage, setErrorMessage] = useState(
     t("Payment.PaymentSuccess.errorMessageDefault")
   );
@@ -201,56 +194,6 @@ export default function PaymentSuccess() {
     }
 
     const handleBooking = async () => {
-      const token = Cookies.get("accessToken");
-      const payload = {
-        data: {
-          type: "hotel-order",
-          guests: [
-            {
-              tid: 1,
-              title: "MR",
-              firstName,
-              lastName,
-              phone: phone || guestDetails?.phone || "+33679278416",
-              email,
-            },
-          ],
-          travelAgent: {
-            contact: {
-              email: "support@ota.com",
-            },
-          },
-          roomAssociations: [
-            {
-              guestReferences: [{ guestReference: "1" }],
-              roomId: room_id,
-            },
-          ],
-          payment: {
-            method: paymentMethod,
-            amount,
-            ...(paymentMethod === "CREDIT_CARD" && {
-              paymentCard: {
-                paymentCardInfo: {
-                  vendorCode: "VI",
-                  cardNumber: "4151289722471370",
-                  expiryDate: "2026-08",
-                  holderName: `${firstName} ${lastName}`,
-                },
-              },
-            }),
-          },
-          bookingDetails: {
-            propertyId: property_id,
-            checkInDate: checkInDate,
-            checkOutDate: checkOutDate,
-            userId: authUser?._id,
-            rooms: rooms,
-            adults: adults,
-            children: children,
-          },
-        },
-      };
 
       try {
         isRequestSent.current = true;
@@ -325,7 +268,7 @@ export default function PaymentSuccess() {
     window.history.replaceState({}, "", paymentSuccessUrl);
 
     // Step 3: Handle back button
-    const handlePopState = (event: PopStateEvent) => {
+    const handlePopState = () => {
       router.push(hotelUrl);
     };
 

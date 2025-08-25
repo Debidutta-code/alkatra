@@ -29,7 +29,7 @@ export class CustomerReviewRepository {
         const reservationData = await ThirdPartyBooking.findOne({ reservationId: reservationId });
 
         if (!reservationData) {
-            throw new Error (`Reservation data not found with your provided ${reservationId}`);
+            throw new Error(`Reservation data not found with your provided ${reservationId}`);
         }
 
         if (
@@ -57,13 +57,11 @@ export class CustomerReviewRepository {
     };
 
     async getReviews(filters: any) {
+        console.log(`The filter data we get ${JSON.stringify(filters)}`);
         const reviewDetails = await CustomerReviewModel.find(filters).sort({ createdAt: -1 });
-        
-        if (!reviewDetails.length || !reviewDetails) {
-            throw new Error("No review data found. Please check your provided details.");
-        }
+        console.log(`The review details we get ${JSON.stringify(reviewDetails)}`);
         return reviewDetails;
-    };
+    }
 
     async updateReview(reviewId: string, userId, updatedData: any) {
 
@@ -73,7 +71,7 @@ export class CustomerReviewRepository {
          * This deletes each field which are in RestrictedFields
          */
         restrictedFields.forEach(field => delete updatedData[field]);
-        
+
         const updatedReview = await CustomerReviewModel.findOneAndUpdate(
             { _id: reviewId, userId: userId },
             { $set: updatedData },
@@ -90,7 +88,7 @@ export class CustomerReviewRepository {
             _id: reviewId,
             customerId: customerId
         });
-        
+
         if (!deletedReview) {
             throw new Error("Review not found or delete failed");
         }

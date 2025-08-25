@@ -90,22 +90,19 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         <div className="absolute inset-0 bg-[url('/patterns/dot-pattern.png')] opacity-10 z-20"></div>
         <div className="absolute inset-0 transition-transform duration-3000 hover:scale-105">
           <Image
-            src="/assets/login3.jpg"
+            src="/assets/login.jpg"
             alt={t('Auth.Layout.travelDestinationAlt')}
-            // layout="fill"
-            // objectFit="cover"
-            width={1200}
-            height={600}
+            layout="fill"
+            objectFit="cover"
             className="object-center filter saturate-110"
             priority
             quality={95}
-            unoptimized
           />
         </div>
         <div className="absolute inset-0 flex flex-col justify-center items-start z-30 p-16">
           <div className="mb-6 drop-shadow-2xl transform hover:scale-105 transition-transform duration-300">
             <Image
-              src="/assets/TRIP-1.png"
+              src="/assets/Alhajz.png"
               width={160}
               height={80}
               alt="TripSwift"
@@ -140,7 +137,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         <div className="w-full max-w-[410px]">
           <div className="flex justify-center mb-6 lg:hidden">
             <Image
-              src="/assets/TRIP-1.png"
+              src="/assets/Alhajz.png"
               width={140}
               height={70}
               alt="TripSwift"

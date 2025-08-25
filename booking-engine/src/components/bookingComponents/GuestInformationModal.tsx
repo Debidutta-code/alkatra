@@ -74,7 +74,7 @@ interface GuestInformationModalProps {
     roomId: string;
     checkIn: string;
     checkOut: string;
-    amount: string;
+    amount: number;
     userId?: string;
     rooms?: number;
     adults?: number;
@@ -571,47 +571,20 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         selectedRoom.propertyId ||
         "";
       if (!propertyId) {
-        console.log("Missing propertyId");
-        // setErrorMessage(
-        //   t("BookingComponents.GuestInformationModal.propertyInfoMissing")
-        // );
-        toast.error(
-          t("BookingComponents.GuestInformationModal.propertyInfoMissing")
-        );
+        toast.error(t("BookingComponents.GuestInformationModal.propertyInfoMissing"));
         return;
       }
       if (!finalPrice || !finalPrice.totalAmount) {
-        console.log("Missing finalPrice or totalAmount");
-        // setErrorMessage(
-        //   t("BookingComponents.GuestInformationModal.priceFetchError")
-        // );
-        toast.error(
-          t("BookingComponents.GuestInformationModal.priceFetchError")
-        );
+        toast.error(t("BookingComponents.GuestInformationModal.priceFetchError"));
         return;
       }
-      const totalPrice = finalPrice?.priceAfterTax ?? finalPrice?.totalAmount ?? 0;
-      console.log("@@@@@@@@@@@@@>>>>>>>>>>>Total Price (including tax):", totalPrice);
-      console.log("@@@@@@@@@@@@@>>>>>>>>>>>Total Price with String:", totalPrice.toString());
-      dispatch(setAmount(totalPrice.toString()));
-      console.log("Booking Payload:", {
-        firstName: guests[0]?.firstName || "",
-        lastName: guests[0]?.lastName || "",
-        email,
-        phone: phone || "",
-        propertyId,
-        roomId: selectedRoom._id,
-        checkIn: checkInDate,
-        checkOut: checkOutDate,
-        amount: finalPrice?.totalAmount.toString(),
-        userId: authUser?._id,
-        rooms: guestData?.rooms || 1,
-        adults: guestData?.guests || 1,
-        children: guestData?.children || 0,
-        guests,
-      });
 
-      console.log("Setting isLoading to true for handleConfirmBooking");
+      const totalPrice = parseFloat((finalPrice.priceAfterTax ?? finalPrice.totalAmount ?? 0).toFixed(2));
+
+      // ✅ Dispatch number to Redux
+      dispatch(setAmount(totalPrice));
+
+      // ✅ Pass number to onConfirmBooking
       setIsLoading(true);
       try {
         const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 500));
@@ -623,7 +596,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
             roomId: selectedRoom._id,
             checkIn: checkInDate,
             checkOut: checkOutDate,
-            amount: totalPrice.toString(),
+            amount: totalPrice, // ← number, not string
             userId: authUser?._id,
             rooms: guestData?.rooms || 1,
             adults: guestData?.guests || 1,
@@ -631,31 +604,17 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
             infants: guestData?.infants || 0,
             guests,
             hotelName: guestData?.hotelName || "",
-            ratePlanCode: finalPrice?.dailyBreakdown && finalPrice.dailyBreakdown.length > 0
-              ? finalPrice.dailyBreakdown[0].ratePlanCode
-              : "",
-            roomType: selectedRoom?.room_type || "",
-            currency: finalPrice?.dailyBreakdown && finalPrice.dailyBreakdown.length > 0
-              ? finalPrice.dailyBreakdown[0].currencyCode
-              : "",
+            ratePlanCode: finalPrice.dailyBreakdown?.[0]?.ratePlanCode || "",
+            roomType: selectedRoom.room_type || "",
+            currency: finalPrice.dailyBreakdown?.[0]?.currencyCode || "",
           }),
           minLoadingTime,
         ]);
-        console.log("onConfirmBooking completed successfully");
       } catch (error) {
-        console.error("Error in handleConfirmBooking:", error);
-        // setErrorMessage(
-        //   t("BookingComponents.GuestInformationModal.bookingError")
-        // );
-        toast.error(
-          t("BookingComponents.GuestInformationModal.bookingError")
-        );
+        toast.error(t("BookingComponents.GuestInformationModal.bookingError"));
       } finally {
-        console.log("Setting isLoading to false for handleConfirmBooking");
         setIsLoading(false);
       }
-    } else {
-      console.log("isFormUpdated or selectedRoom is missing", { isFormUpdated, selectedRoom });
     }
   };
 

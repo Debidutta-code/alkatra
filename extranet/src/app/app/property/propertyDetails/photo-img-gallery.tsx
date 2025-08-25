@@ -58,7 +58,6 @@ export function PropertyImageGallery({
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Clean up object URLs when component unmounts or files change
   useEffect(() => {
     return () => {
       files.forEach(file => {
@@ -69,7 +68,6 @@ export function PropertyImageGallery({
     };
   }, [files]);
 
-  // Adjust current image index when images are deleted
   useEffect(() => {
     if (currentImage >= image.length && image.length > 0) {
       setCurrentImage(image.length - 1);
@@ -209,7 +207,6 @@ export function PropertyImageGallery({
     setDeleteConfirmOpen(true);
   };
 
-  // Drag and drop handlers with validation
   const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
     if (acceptedFiles?.length) {
       const validFiles = validateFiles(acceptedFiles);
@@ -253,7 +250,6 @@ export function PropertyImageGallery({
     });
   };
 
-  // If no images, show placeholder
   if (image.length === 0) {
     return editable ? (
       <div className="relative group">

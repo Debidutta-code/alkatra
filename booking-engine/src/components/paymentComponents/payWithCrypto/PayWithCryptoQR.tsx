@@ -17,7 +17,7 @@ interface CryptoToken {
 }
 
 interface BookingDetails {
-  amount: string;
+  amount: number;
   currency: string;
   [key: string]: any;
 }
@@ -130,7 +130,7 @@ const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onCon
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/crypto/currency-conversion`,
           {
             currency: bookingDetails.currency,
-            amount: parseFloat(bookingDetails.amount),
+            amount: bookingDetails.amount,
           },
           {
             headers: {
