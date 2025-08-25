@@ -13,6 +13,7 @@ import pmsHotelCardReducer from "./slices/pmsHotelCard.slice";
 import paymentReducer from "./slices/payment.slice";
 import notificationReducer from './slices/notification.slice';
 import { persistReducer, persistStore } from "redux-persist";
+import chatReducer from './slices/chatbot.slice'; 
 import storage from "./storage";
 
 const persistConfig = {
@@ -29,6 +30,7 @@ const rootReducer = combineReducers({
   pmsHotelCard: pmsHotelCardReducer,
   payment: paymentReducer,
   notifications: notificationReducer,
+  chat: chatReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

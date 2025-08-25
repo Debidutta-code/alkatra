@@ -106,7 +106,7 @@ const PaymentProgressPage: React.FC = () => {
 
     // Timer for tracking payment time
     useEffect(() => {
-        const initialDuration = 2400; // 40 minutes in seconds
+        const initialDuration = 600; // 40 minutes in seconds
         setTimeElapsed(initialDuration); // Initialize with starting value
         const timer = setInterval(() => {
             setTimeElapsed((prev) => {
@@ -120,6 +120,7 @@ const PaymentProgressPage: React.FC = () => {
 
         return () => clearInterval(timer);
     }, []);
+    
     // Inside the useEffect for retrieving payment data for QR
     useEffect(() => {
         const timer = setTimeout(() => {

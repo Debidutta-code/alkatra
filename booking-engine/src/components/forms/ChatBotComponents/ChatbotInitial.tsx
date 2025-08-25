@@ -1,7 +1,36 @@
 import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '@/Redux/store';
+import { ChatBotApi } from '@/api/chatBot.api';
+import { setSessionId } from '../../../Redux/slices/chatbot.slice';
 import { ArrowRight, Gift, Shield, Lock, Star, X } from 'lucide-react';
 
-const ChatbotPage = ({ onStartChat, onClose }) => {
+interface ChatbotPageProps {
+  onStartChat: () => void;
+  onClose: () => void;
+}
+
+const ChatbotPage: React.FC<ChatbotPageProps> = ({ onStartChat, onClose }) => {
+
+  const chatBotApi = new ChatBotApi();
+  const dispatch = useDispatch<AppDispatch>();
+
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+  if (!accessToken) {
+    throw new Error("The JWT token didn't get for chatbot");
+  }
+
+  const newGenerateSessionid = async (accessToken: string) => {
+
+    const newSessionId = await chatBotApi.generateSessionId(accessToken);
+    
+    if (!newSessionId) {
+      throw new Error("Chatbot session can't generate");
+    }
+    dispatch(setSessionId(newSessionId)); 
+  };
+
+
   return (
     <div className="flex flex-col items-center justify-center">
       {/* Header area */}
@@ -87,10 +116,13 @@ const ChatbotPage = ({ onStartChat, onClose }) => {
           </div>
 
           <button
-            onClick={onStartChat}
+            onClick={() => {
+              newGenerateSessionid(accessToken);
+              onStartChat();
+            }}
             className="flex items-center bg-purple-500 text-grey-700 px-2 py-2 rounded-full hover:bg-purple-600 transition-colors"
           >
-            <ArrowRight className="h-4 w-4"/>
+            <ArrowRight className="h-4 w-4" />
           </button>
         </div>
       </div>

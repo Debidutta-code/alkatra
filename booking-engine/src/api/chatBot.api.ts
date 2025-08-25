@@ -2,6 +2,17 @@ import { ChatBotConfig } from '../config';
 
 class ChatBotApi {
 
+    private baseUrl: string;
+
+    constructor(baseUrl: string = process.env.NEXT_PUBLIC_CHATBOT_URL ?? '') {
+        console.log(`The chatbot base url we get: ${baseUrl}`);
+
+        if (!baseUrl) {
+            throw new Error("ChatBot base URL is required. Please set NEXT_PUBLIC_CHATBOT_URL environment variable.");
+        }
+        this.baseUrl = baseUrl;
+    }
+
     /**
      * Generate session id
      * @JWT token pass in header as bearer
@@ -11,17 +22,22 @@ class ChatBotApi {
             throw new Error("Token not found for generate CHAT Session ID");
         }
         try {
-            const response = await fetch(`${ChatBotConfig}/chat/session`, {
+            console.log(`@@@@@@@@@@@@@Entered onto try block`);
+            const response = await fetch(`${this.baseUrl}/chat/session`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
             });
+            console.log("Reach the if block");
             if (response.status !== 200) {
                 throw new Error("Session ID generate failed");
             }
-            return response;
+            
+            const sessionId  = await response.json();
+            
+            return sessionId.sessionId;
         } catch (error: any) {
             console.log(`Server error at generating chat session ID`, error.message);
             throw new Error('Server Error');
@@ -39,7 +55,7 @@ class ChatBotApi {
             throw new Error("Token and Session ID required to get Chat");
         }
         try {
-            const chatResponse = await fetch(`${ChatBotConfig}/chat/message`, {
+            const chatResponse = await fetch(`${this.baseUrl}/chat/message`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

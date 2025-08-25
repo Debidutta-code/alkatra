@@ -20,7 +20,7 @@ class AutoCancelCronService {
 
         this.job = cron.schedule("*/1 * * * *", async () => {
             try {
-                const fortyMinutesAgo = new Date(Date.now() - 40 * 60 * 1000);
+                const fortyMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
 
                 const cryptoPaymentDetails = await CryptoPaymentDetails.updateMany(
                     {
