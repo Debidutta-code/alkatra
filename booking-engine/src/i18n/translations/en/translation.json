@@ -477,9 +477,9 @@
       "qrCodeAlt": "Discount QR Code",
       "scanToApply": "Scan to apply",
       "instructions": {
-        "applyDiscount": "",
-        "scanAtCheckout": "Scan the QR code to book this room in the Alhajz app.",
-        "validityNote": "Book through the app to get an exclusive discount for this room."
+        "applyDiscount": "Download the Alhajz app from the Play Store (if you haven’t already).",
+        "scanAtCheckout": "Scan the QR code to book this room directly in the app.",
+        "validityNote": "Book through the app to unlock your exclusive discount."
       }
     },
     "RoomCard": {
@@ -593,7 +593,7 @@
         "gotIt": "Got it"
       },
       "seeMore": "See more",
-      "showLess": "Show less"
+      "seeLess": "See less"
     }
   },
   "CancellationPolicies": {

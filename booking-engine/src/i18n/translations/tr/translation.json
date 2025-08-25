@@ -477,8 +477,9 @@
             "qrCodeAlt": "İndirim QR Kodu",
             "scanToApply": "Uygulamak için tarayın",
             "instructions": {
-                "scanAtCheckout": "Bu odayı Alhajz uygulamasında açmak için QR kodu tarayın.",
-                "validityNote": "Bu oda için özel indirim almak için uygulama üzerinden rezervasyon yapın."
+                "applyDiscount": "İndiriminizi kullanmak için lütfen Alhajz uygulamasını Google Play'den indirin (henüz indirmediyseniz).",
+                "scanAtCheckout": "Bu odayı uygulama üzerinden doğrudan rezerve etmek için QR kodunu tarayın.",
+                "validityNote": "Özel indiriminizi etkinleştirmek için lütfen uygulama üzerinden rezervasyon yapın."
             }
         },
         "RoomCard": {
@@ -592,7 +593,7 @@
                 "gotIt": "Anladım"
             },
             "seeMore": "Daha fazla gör",
-            "showLess": "Daha az göster"
+            "seeLess": "Daha az göster"
         }
     },
     "CancellationPolicies": {

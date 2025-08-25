@@ -51,10 +51,10 @@ const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ qrCode }) => {
               Use Your Discount
             </h4> */}
             <ul className="text-description text-tripswift-black/70 space-y-2">
-              {/* <li className="flex items-start">
+              <li className="flex items-start">
                 <span className={`${i18n.language === "ar" ? "ml-2" : "mr-2"}`}>•</span>
                 {t("RoomsPage.qrCode.instructions.applyDiscount")}
-              </li> */}
+              </li>
               <li className="flex items-start">
                 <span className={`${i18n.language === "ar" ? "ml-2" : "mr-2"}`}>•</span>
                 {t("RoomsPage.qrCode.instructions.scanAtCheckout")}
