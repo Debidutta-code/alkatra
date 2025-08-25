@@ -2,6 +2,7 @@ import { IReview } from "../model";
 import { CustomerReviewRepository } from "../repository";
 import { ReservationService } from "./reservation.service";
 import { MailFactory } from "../../customer_authentication/src/services/mailFactory";
+import { config } from "../../config";
 
 const customerReviewRepository = new CustomerReviewRepository();
 const reservationService = new ReservationService();
@@ -121,7 +122,7 @@ export class CustomerReviewService {
     async sendEmailToCustomer(reservationId: string) {
         try {
             const reservationData = await reservationService.getReservationData(reservationId);
-            const reviewUiUrl = process.env.REVIEW_UI_URL;
+            const reviewUiUrl = config.server.reviewUrl;
 
             if (!reservationData) {
                 return { success: false, message: "No reservation data found for Email Send" };
