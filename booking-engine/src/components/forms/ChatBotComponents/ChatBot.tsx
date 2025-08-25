@@ -31,7 +31,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ userFirstName }) => {
   return (
     <div className="fixed bottom-4 right-4 z-50">
       {isOpen && (
-        <Card className="w-80 mb-4 shadow-xl overflow-hidden">
+        <Card className="w-96 mb-4 shadow-xl">
           {view === 'initial' && (
             <ChatbotInitial
               onStartChat={() => handleChangeView('chat')}
@@ -52,7 +52,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ userFirstName }) => {
           )}
         </Card>
       )}
-      <div className="relative">
+      <div className="relative right-0">
         <ChatbotIcon onClick={handleOpen} />
       </div>
     </div>
