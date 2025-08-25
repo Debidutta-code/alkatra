@@ -14,7 +14,7 @@ const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ qrCode }) => {
 
   // Log qrCode for debugging
   console.log("QRCodeDisplay qrCode:", qrCode.slice(0, 100), "Length:", qrCode.length);
-  const {i18n}=useTranslation();
+  const { i18n } = useTranslation();
   return (
     <div className="relative overflow-hidden bg-tripswift-off-white rounded-lg">
       {/* Main Content */}
@@ -38,7 +38,7 @@ const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ qrCode }) => {
             </div>
           </div>
           <div className="flex items-center justify-center mt-2 text-xs text-tripswift-black/60 font-tripswift-regular">
-            <Smartphone className={`h-3 w-3  text-tripswift-blue ${i18n.language==="ar" ? "ml-1":"mr-1"}`} />
+            <Smartphone className={`h-3 w-3  text-tripswift-blue ${i18n.language === "ar" ? "ml-1" : "mr-1"}`} />
             {t("RoomsPage.qrCode.scanToApply")}
           </div>
         </div>
@@ -51,16 +51,16 @@ const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ qrCode }) => {
               Use Your Discount
             </h4> */}
             <ul className="text-description text-tripswift-black/70 space-y-2">
+              {/* <li className="flex items-start">
+                <span className={`${i18n.language === "ar" ? "ml-2" : "mr-2"}`}>•</span>
+                {t("RoomsPage.qrCode.instructions.applyDiscount")}
+              </li> */}
               <li className="flex items-start">
-                <span className={`${i18n.language==="ar" ? "ml-2":"mr-2"}`}>•</span>
+                <span className={`${i18n.language === "ar" ? "ml-2" : "mr-2"}`}>•</span>
                 {t("RoomsPage.qrCode.instructions.scanAtCheckout")}
               </li>
               <li className="flex items-start">
-                <span className={`${i18n.language==="ar" ? "ml-2":"mr-2"}`}>•</span>
-                {t("RoomsPage.qrCode.instructions.applyDiscount")}
-              </li>
-              <li className="flex items-start">
-                <span className={`${i18n.language==="ar" ? "ml-2":"mr-2"}`}>•</span>
+                <span className={`${i18n.language === "ar" ? "ml-2" : "mr-2"}`}>•</span>
                 {t("RoomsPage.qrCode.instructions.validityNote")}
               </li>
             </ul>

@@ -478,7 +478,6 @@
             "scanToApply": "Uygulamak için tarayın",
             "instructions": {
                 "scanAtCheckout": "Bu odayı Alhajz uygulamasında açmak için QR kodu tarayın.",
-                "applyDiscount": "Uygulama yüklü değilse, indirmeniz için yönlendirileceksiniz.",
                 "validityNote": "Bu oda için özel indirim almak için uygulama üzerinden rezervasyon yapın."
             }
         },
