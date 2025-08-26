@@ -4,10 +4,22 @@ import { ReservationService } from "./reservation.service";
 import { MailFactory } from "../../customer_authentication/src/services/mailFactory";
 import { config } from "../../config";
 
-const customerReviewRepository = new CustomerReviewRepository();
-const reservationService = new ReservationService();
 
 export class CustomerReviewService {
+    private static instance: CustomerReviewService;
+
+    private customerReviewRepository = CustomerReviewRepository.getInstance();
+    private reservationService = ReservationService.getInstance();
+
+    constructor() { }
+
+    static getInstance(): CustomerReviewService {
+        if (!CustomerReviewService.instance) {
+            CustomerReviewService.instance = new CustomerReviewService();
+        }
+        return CustomerReviewService.instance;
+    }
+
 
     async ratingCategorize(rating: number): Promise<string> {
         if (!rating) {
@@ -26,7 +38,7 @@ export class CustomerReviewService {
         }
     }
 
-    async addCustomerReview(reviewData) {
+    async addCustomerReview(reviewData: any) {
         const { reservationId, hotelCode, hotelName, userId, guestEmail, comment, rating } = reviewData;
 
         const requiredFields = {
@@ -46,7 +58,7 @@ export class CustomerReviewService {
             throw new Error("No categorized rating found");
         }
 
-        return await customerReviewRepository.newReviewCreate(reservationId, hotelCode, hotelName, userId, guestEmail, comment, rating, categorizedRating);
+        return await this.customerReviewRepository.newReviewCreate(reservationId, hotelCode, hotelName, userId, guestEmail, comment, rating, categorizedRating);
     };
 
 
@@ -81,7 +93,7 @@ export class CustomerReviewService {
         let averageRating = null;
         let totalReviews = 0;
         if (query.hotelCode) {
-            const reviews = await customerReviewRepository.getReviews({ hotelCode: query.hotelCode });
+            const reviews = await this.customerReviewRepository.getReviews({ hotelCode: query.hotelCode });
             console.log(`The reviews we get ${JSON.stringify(reviews)}`);
             if (reviews.length > 0) {
                 const ratings = reviews.map(review => review.rating).filter(rating => rating !== undefined && rating !== null);
@@ -97,7 +109,7 @@ export class CustomerReviewService {
         console.log(`Filters before calling getReviews: ${JSON.stringify(filters)}`);
 
         // Get filtered reviews
-        const customerReview = await customerReviewRepository.getReviews(filters);
+        const customerReview = await this.customerReviewRepository.getReviews(filters);
         return {
             averageRating: averageRating,
             totalReviews: totalReviews,
@@ -109,20 +121,27 @@ export class CustomerReviewService {
         if (!reviewId || !userId) {
             throw new Error("Review ID and Customer ID is required");
         }
-        return await customerReviewRepository.updateReview(reviewId, userId, reviewData);
+        return await this.customerReviewRepository.updateReview(reviewId, userId, reviewData);
     };
 
     async deleteCustomerReview(reviewId: string, customerId: string) {
         if (!reviewId || !customerId) {
             throw new Error("Review ID and Customer ID are required");
         }
-        return await customerReviewRepository.deleteReview(reviewId, customerId);
+        return await this.customerReviewRepository.deleteReview(reviewId, customerId);
     };
 
     async sendEmailToCustomer(reservationId: string) {
         try {
-            const reservationData = await reservationService.getReservationData(reservationId);
+            const reservationData = await this.reservationService.getReservationData(reservationId);
             const reviewUiUrl = config.server.reviewUrl;
+
+            console.log("Review URL: ", reviewUiUrl);
+
+            if (!reviewUiUrl || reviewUiUrl === "undefined") {
+                console.error("Review URL is not configured properly:", reviewUiUrl);
+                return { success: false, message: "Review URL configuration missing" };
+            }
 
             if (!reservationData) {
                 return { success: false, message: "No reservation data found for Email Send" };
@@ -141,6 +160,8 @@ export class CustomerReviewService {
 
             const toCustomerEmail = reservationData.email;
             const emailSubject = "Please provide your review";
+            const finalReviewUrl = `${reviewUiUrl}?reservationId=${reservationId}`;
+            console.log(`Final Review URL: ${finalReviewUrl}`);
 
             const text = `Dear Customer, thank you for staying with us at ${reservationData.hotelName}. 
                 We value your feedback! Please click the link below to share your review.`;
@@ -149,7 +170,7 @@ export class CustomerReviewService {
             <p>Dear Customer,</p>
             <p>Thank you for staying with us at <b>${reservationData.hotelName}</b>.</p>
             <p>We value your feedback! Please click the link below to share your review:</p>
-            <a href="${reviewUiUrl}?reservationId=${reservationId}" target="_blank">Leave a Review</a>
+            <a href="${finalReviewUrl}" target="_blank">Leave a Review</a>
             <p>Best regards,<br/>Hotel Team</p>`;
 
             const mailer = MailFactory.getMailer();

@@ -1,8 +1,8 @@
 import { CustomerReviewService, ReservationService } from "../service";
 import { Request, Response } from "express";
 
-const customerReviewService = new CustomerReviewService();
-const reservationService = new ReservationService();
+const customerReviewService = CustomerReviewService.getInstance();
+const reservationService = ReservationService.getInstance();
 
 export class CustomerReviewController {
 

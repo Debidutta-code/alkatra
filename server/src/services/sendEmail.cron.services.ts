@@ -2,7 +2,7 @@ import cron, { ScheduledTask } from "node-cron";
 import { ThirdPartyBooking } from "../wincloud/src/model/reservationModel";
 import { CustomerReviewService } from "../review_system/service";
 
-const customerReviewService = new CustomerReviewService();
+const customerReviewService = CustomerReviewService.getInstance();
 
 
 class SendEmailCronService {
@@ -22,7 +22,8 @@ class SendEmailCronService {
 
         if (this.job) return; 
 
-        this.job = cron.schedule("0 0 12 * * *", async () => {
+        // this.job = cron.schedule("0 0 12 * * *", async () => {
+        this.job = cron.schedule("*/1 * * * *", async () => {
             try {
                 const startOfDay = new Date();
                 startOfDay.setHours(0, 0, 0, 0);

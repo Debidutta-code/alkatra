@@ -4,6 +4,16 @@ const reservationRepository = new ReservationRepository();
 
 
 export class ReservationService {
+    private static instance: ReservationService;
+
+    private constructor() { }
+
+    public static getInstance(): ReservationService {
+        if (!ReservationService.instance) {
+            ReservationService.instance = new ReservationService();
+        }
+        return ReservationService.instance;
+    }
 
     async getReservationData(reservationid: String) {
         try {

@@ -31,7 +31,7 @@ export const config = {
             secretKeyDev: env.JWT_SECRET_KEY_DEV as string,
             expiresInDev: env.JWT_EXPIRES_IN_DEV as string
         },
-        reviewUrl: env.REVIEW_UI_URL as string
+        reviewUrl: env.REVIEW_UI_URL as string || "https://book.trip-swift.ai/review"
     },
 
     companyName: env.COMPANY_NAME as string,
