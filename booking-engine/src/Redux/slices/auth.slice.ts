@@ -133,7 +133,6 @@ export const googleLogin = createAsyncThunk<
             "Content-Type": "application/json",
             Accept: "application/json",
           },
-
         }
       );
 
