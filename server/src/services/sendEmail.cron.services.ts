@@ -22,8 +22,8 @@ class SendEmailCronService {
 
         if (this.job) return; 
 
-        this.job = cron.schedule("0 0 12 * * *", async () => {
         // this.job = cron.schedule("*/1 * * * *", async () => {
+        this.job = cron.schedule("0 0 12 * * *", async () => {
             try {
                 const startOfDay = new Date();
                 startOfDay.setHours(0, 0, 0, 0);

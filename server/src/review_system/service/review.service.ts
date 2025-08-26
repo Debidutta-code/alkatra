@@ -160,7 +160,7 @@ export class CustomerReviewService {
 
             const toCustomerEmail = reservationData.email;
             const emailSubject = "Please provide your review";
-            const finalReviewUrl = `${reviewUiUrl}?reservationId=${reservationId}`;
+            const finalReviewUrl = (`${reviewUiUrl}?reservationId=${reservationId}`).toString();
             console.log(`Final Review URL: ${finalReviewUrl}`);
 
             const text = `Dear Customer, thank you for staying with us at ${reservationData.hotelName}. 
@@ -170,7 +170,7 @@ export class CustomerReviewService {
             <p>Dear Customer,</p>
             <p>Thank you for staying with us at <b>${reservationData.hotelName}</b>.</p>
             <p>We value your feedback! Please click the link below to share your review:</p>
-            <a href="${finalReviewUrl}" target="_blank">Leave a Review</a>
+            <a href=${finalReviewUrl} target="_blank">Leave a Review</a>
             <p>Best regards,<br/>Hotel Team</p>`;
 
             const mailer = MailFactory.getMailer();
