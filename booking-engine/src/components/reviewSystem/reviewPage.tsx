@@ -170,7 +170,7 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
         <div
             className="min-h-screen bg-cover bg-fixed bg-center"
             style={{
-                backgroundImage: "url('/assets/login3.jpg')",
+                backgroundImage: "url('/assets/login.jpg')",
                 backgroundPosition: "center center"
             }}
         >
@@ -180,7 +180,7 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
                 {/* Logo at top center */}
                 <div className="pt-8 px-4 flex justify-start">
                     <img
-                        src="/assets/TRIP-1.png"
+                        src="/assets/Alhajz.png"
                         alt="Trip Logo"
                         className="h-24 w-auto object-contain"
                     />
