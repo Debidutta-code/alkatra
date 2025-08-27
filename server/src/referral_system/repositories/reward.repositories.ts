@@ -1,6 +1,6 @@
 import { IRewardRepository } from "../interfaces";
 import { RewardModel, IReward } from "../models";
-import { toObjectId } from "../utils";
+import { GenerateUtils } from "../utils";
 
 export class RewardRepository implements IRewardRepository {
     /**
@@ -21,6 +21,6 @@ export class RewardRepository implements IRewardRepository {
      * @returns The matched reward document or null if not found
      */
     async findByUserId(userId: string): Promise<IReward[] | null> {
-        return await RewardModel.findOne({ customerId: toObjectId(userId) });
+        return await RewardModel.findOne({ customerId: GenerateUtils.toObjectId(userId) });
     }
 }

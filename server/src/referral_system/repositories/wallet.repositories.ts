@@ -1,6 +1,7 @@
+import { ClientSession } from "mongoose";
 import { IWalletRepository } from "../interfaces";
 import { WalletModel, IWallet } from "../models";
-import { toObjectId } from "../utils";
+import { GenerateUtils } from "../utils";
 
 export class WalletRepository implements IWalletRepository {
 
@@ -10,9 +11,9 @@ export class WalletRepository implements IWalletRepository {
      * @param wallet - Partial wallet data containing customerId and balance
      * @returns The newly created wallet document
      */
-    async createWallet(wallet: Partial<IWallet>): Promise<IWallet> {
+    async createWallet(wallet: Partial<IWallet>, session: ClientSession): Promise<IWallet> {
         const newWallet = new WalletModel(wallet);
-        return await newWallet.save();
+        return await newWallet.save({ session });
     }
 
 
@@ -38,7 +39,7 @@ export class WalletRepository implements IWalletRepository {
      * @returns The wallet document for the specified user or null if not found
      */
     async getWalletByUserId(userId: string): Promise<IWallet | null> {
-        return await WalletModel.findOne({ customerId: toObjectId(userId) });
+        return await WalletModel.findOne({ customerId: GenerateUtils.toObjectId(userId) });
     }
 }
 
