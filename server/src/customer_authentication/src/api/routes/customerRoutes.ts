@@ -15,7 +15,9 @@ router.get("/me", authenticateCustomer, CustomerController.getCustomerOwnData);
 router.patch("/update", authenticateCustomer, CustomerController.updateCustomerProfile); 
 router.post("/verify-email", CustomerController.checkEmailExists);
 router.patch("/reset-password", CustomerController.updatePassword);
-router.post('/send-otp', verificationOtpController.sendOTP);
+// router.post('/send-otp', verificationOtpController.sendOTP);
+router.post('/send-otp', verificationOtpController.customerEmailVerification);
+
 router.post('/verify-otp', verificationOtpController.verifyOTP);
 router.post('/send-sms',smsController.sendSMS );
 
