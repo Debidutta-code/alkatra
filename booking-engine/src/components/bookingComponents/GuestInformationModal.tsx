@@ -10,7 +10,7 @@ import { formatDate, calculateNights } from "../../utils/dateUtils";
 import { useTranslation } from "react-i18next";
 import { verifyApi } from "../../api/verify";
 import axios from "axios";
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 // Interfaces remain unchanged
 export interface Guest {

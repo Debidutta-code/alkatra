@@ -2,6 +2,7 @@
 import Customer, { ICustomer } from "../models/customer.model";
 import bcrypt from "bcryptjs";
 import { GoogleUser, IUser } from "../models/googleUser.model";
+import { ClientSession } from "mongoose";
 
 class CustomerRepository {
     async findByEmail(email: string): Promise<ICustomer | null> {
@@ -64,18 +65,45 @@ class CustomerRepository {
     /**
      * Update customer information for referrals
      */
-    async updateReferralInfo(customerId: string, referralCode: string, referralLink: string, referralQRCode: string): Promise<ICustomer | null> {
+    async updateReferralInfo(customerId: string, referralCode: string, referralLink: string, referralQRCode: string, session: ClientSession): Promise<ICustomer | null> {
         return await Customer.findByIdAndUpdate(
             customerId,
             {
                 referralCode: referralCode,
                 referralLink: referralLink,
                 referralQRCode: referralQRCode,
-                updatedAt: new Date()
+                updatedAt: new Date(),
             },
-            { new: true } // Return the updated document
+            { new: true, session }, // Return the updated document
         );
     }
+
+
+    /**
+     * Remove referral details from customer document
+     * @param customerId - ID of the customer whose referral details are to be removed
+     * @returns The updated customer document or null if not found
+     */
+    async removeReferralInfo(customerId: string): Promise<ICustomer | null> {
+        try {
+            return await Customer.findByIdAndUpdate(
+                customerId,
+                {
+                    $unset: {
+                        referralCode: "",
+                        referralLink: "",
+                        referralQRCode: ""
+                    },
+                    updatedAt: new Date()
+                },
+                { new: true } // Return the updated document
+            );
+        } catch (error: any) {
+            console.error("Error removing referral details:", error);
+            return null;
+        }
+    }
+
 }
 
 export default new CustomerRepository();
