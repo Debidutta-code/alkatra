@@ -86,9 +86,14 @@ class RatePlanController {
 
     public static async getRatePlanByHotelCode(req: Request, res: Response, next: NextFunction) {
         try {
+            console.log("###################### Inside getRatePlanByHotelCode controller");
             const { hotelCode } = req.params;
-
+            
+            console.log("Entering into getRatePlanByHotelCode SERVICE");
             const response = await RatePlanService.getRatePlanByHotelCode(hotelCode);
+            if (!response) {
+                throw new Error("No rate plans found for this hotel code")
+            }
 
             return response;
         } catch (error) {
@@ -99,19 +104,36 @@ class RatePlanController {
 
     public static async getRatePlanByHotel(req: Request, res: Response, next: NextFunction) {
         try {
-            // const { hotelCode, invTypeCode, startDate, endDate } = req.body;
-            const { hotelCode, invTypeCode } = req.body;
-            // console.log(hotelCode, invTypeCode, startDate, endDate)
-            console.log(hotelCode, invTypeCode)
 
-            const page = req.query?.page.toString()
-            const response = await RatePlanService.getRatePlanByHotel(
-                hotelCode,
-                invTypeCode && invTypeCode,
-                // startDate && new Date(startDate), 
-                // endDate && new Date(endDate), 
-                page && parseInt(page)
-            );
+            console.log("##################### Inside getRatePlanByHotel controller");
+            const { hotelCode } = req.body;
+            if (!hotelCode) {
+                throw new Error("Hotel code is required");
+            }
+
+            const invTypeCode = req.query?.invTypeCode as string;
+            const page = req.query?.page ? parseInt(req.query.page as string) : 1;
+            const limit = req.query?.limit ? parseInt(req.query.limit as string) : 10;
+
+            if (isNaN(page) || page < 1) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Page must be a positive integer.',
+                });
+            }
+
+            if (isNaN(limit) || limit < 1) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Limit must be a positive integer.',
+                });
+            }
+
+            console.log("Entering into getRatePlanByHotel SERVICE");
+            const response = await RatePlanService.getRatePlanByHotel(hotelCode, invTypeCode, page, limit);
+            if (!response) {
+                throw new Error("No rate plans found for this hotel code")
+            }
 
             return response;
         } catch (error) {

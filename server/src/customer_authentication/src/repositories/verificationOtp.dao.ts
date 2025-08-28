@@ -4,7 +4,7 @@ class OTPDao {
   async createOTP(data: Partial<IOTP>): Promise<{ identifier: string; status: OTPStatus }> {
     const identifier = data.identifier;
     console.log("identifier", identifier);
-    const ifIdentifierExists = await OTPModel.findOne({ identifier }).select("identifier status");
+    const ifIdentifierExists = await OTPModel.findOne({ identifier, status: {$eq:( "pending, verified" )} }).select("identifier status");
     if (!ifIdentifierExists) {
       const result = await OTPModel.create(data);
       if (!result) {

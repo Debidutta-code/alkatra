@@ -99,27 +99,51 @@ class RatePlanService {
   }
 
   public static async getRatePlanByHotelCode(hotelCode: string) {
-    const ratePlans = await RatePlanDao.getRatePlanByHotelCode(hotelCode);
+    try {
+      if (!hotelCode) {
+        throw new Error("Hotel code is required");
+      }
+      const ratePlans = await RatePlanDao.getRatePlanByHotelCode(hotelCode);
 
-    if (ratePlans.length === 0) throw new Error("No rate plans found for this hotel code");
+      if (ratePlans.length === 0) {
+        throw new Error("No rate plans found for this hotel code");
+      }
 
-    return {
-      success: true,
-      message: "Rate plans retrieved successfully",
-      data: ratePlans,
-    };
+      return {
+        success: true,
+        message: "Rate plans retrieved successfully",
+        data: ratePlans,
+      };
+    } catch (error) {
+      console.error("Error in getRatePlanByHotelCode:", error);
+      throw error;
+    }
+
   }
 
   // public static async getRatePlanByHotel(hotelCode: string, invTypeCode?: string, startDate?: Date, endDate?: Date, page?: number) {
-  public static async getRatePlanByHotel(hotelCode: string, invTypeCode?: string, page?: number) {
-    // const ratePlans = await RatePlanDao.getRatePlanByHotel(hotelCode, invTypeCode && invTypeCode, startDate && startDate, endDate && endDate, page && page);
-    const ratePlans = await RatePlanDao.getRatePlanByHotel(hotelCode, invTypeCode && invTypeCode, page && page);
-    // console.log(ratePlans)
-    return {
-      success: true,
-      message: "Rate plans retrieved successfully",
-      data: ratePlans,
-    };
+  public static async getRatePlanByHotel(hotelCode: string, invTypeCode?: string, page?: number, limit?: number) {
+
+    try {
+      
+      if (!hotelCode || !page || !limit) {
+        throw new Error("Hotel and inventory code is required");
+      }
+
+      const ratePlans = await RatePlanDao.getRatePlanByHotel(hotelCode, invTypeCode && invTypeCode, page && page, limit && limit);
+
+      if (!ratePlans) {
+        throw new Error("No rate plans found for this hotel code");
+      }
+
+      return {
+        success: true,
+        message: "Rate plans retrieved successfully",
+        data: ratePlans,
+      };
+    } catch (error) {
+
+    }
   }
 
 }
