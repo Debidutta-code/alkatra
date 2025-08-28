@@ -325,7 +325,7 @@
     "recommended": "Recommended",
     "highestRating": "Highest Rating",
     "lowestRating": "Lowest Rating",
-    "whyBookWithTripSwift": "Why Book With TripSwift",
+    "whyBookWithAlhajz": "Why Book With Alhajz",
     "freeCancellation": "Free Cancellation",
     "freeCancellationDesc": "Most of our properties offer free cancellation up to 24 hours before check-in.",
     "bestPriceGuarantee": "Best Price Guarantee",
@@ -777,7 +777,7 @@
       "standardRoom": "Standard Room",
       "paymentMethod": "Payment Method",
       "primaryGuest": "Primary Guest",
-      "rateBreakdown": "Rate Breakdown",
+      "rateBreakdown": "Total Amount",
       "viewBookingDetails": "View Booking Details",
       "modify": "Modify",
       "cancel": "Cancel"

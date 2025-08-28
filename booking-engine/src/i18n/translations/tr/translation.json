@@ -325,7 +325,7 @@
         "recommended": "Önerilen",
         "highestRating": "En Yüksek Puan",
         "lowestRating": "En Düşük Puan",
-        "whyBookWithTripSwift": "Neden TripSwift ile Rezervasyon?",
+        "whyBookWithAlhajz": "Neden Alhajz ile Rezervasyon Yapmalısınız?",
         "freeCancellation": "Ücretsiz İptal",
         "freeCancellationDesc": "Tesislerimizin çoğu giriş tarihinden 24 saat öncesine kadar ücretsiz iptal imkanı sunuyor.",
         "bestPriceGuarantee": "En İyi Fiyat Garantisi",
@@ -777,7 +777,7 @@
             "standardRoom": "Standart Oda",
             "paymentMethod": "Ödeme Yöntemi",
             "primaryGuest": "Ana Misafir",
-            "rateBreakdown": "Fiyat Dökümü",
+            "rateBreakdown": "Toplam Tutar",
             "viewBookingDetails": "Rezervasyon Detaylarını Görüntüle",
             "modify": "Değiştir",
             "cancel": "İptal Et"

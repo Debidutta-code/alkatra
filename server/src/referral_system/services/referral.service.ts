@@ -1,16 +1,16 @@
-import { 
-    IReferralData, 
-    IGenerateReferralPayload, 
-    IReferralRepository, 
-    IReferralService, 
-    IWalletService, 
-    IReferralRequest 
+import {
+    IReferralData,
+    IGenerateReferralPayload,
+    IReferralRepository,
+    IReferralService,
+    IWalletService,
+    IReferralRequest
 } from "../interfaces";
-import { toObjectId, generateQRCode } from "../utils";
-import { nanoid } from "nanoid";
+import { GenerateUtils } from "../utils";
 import { CustomerReferralService } from "../../customer_authentication/src/services";
-import { ValidateService } from  "../services"
+import { ValidateService } from "../services"
 import { config } from "../../config";
+import mongoose from "mongoose";
 
 
 export class ReferralService implements IReferralService {
@@ -18,7 +18,7 @@ export class ReferralService implements IReferralService {
     private walletService: IWalletService;
 
     constructor(
-        referralRepository: IReferralRepository, 
+        referralRepository: IReferralRepository,
         walletService: IWalletService
     ) {
         this.referralRepository = referralRepository;
@@ -33,42 +33,57 @@ export class ReferralService implements IReferralService {
      * @returns An object containing the referral link and QR code, or a message if the referral already exists.
      */
     async generateReferralLinkAndQR(userId: string) {
-        const referrals: IGenerateReferralPayload = await CustomerReferralService.findUserWithReferral(userId);
+        const session = await mongoose.startSession();
+        session.startTransaction();
+        try {
+            const referrals: IGenerateReferralPayload = await CustomerReferralService.findUserWithReferral(userId);
 
-        if (referrals.referralLink !== undefined && referrals.referralQRCode !== undefined) {
-            return {
-                message: "Referral link already exists",
-                referrerId: userId,
-                referral_link: referrals.referralLink,
-                referral_qr_code: referrals.referralQRCode
-            };
+            // If referral details already exist, return them
+            if (referrals?.referralLink && referrals?.referralQRCode) {
+                return GenerateUtils.referralSuccessMessage(userId, referrals.referralLink, referrals.referralQRCode);
+            }
+
+            // Step 1: Generate a unique referrals
+            const { referralCode, referralLink, referralQRCode } = await GenerateUtils.generateReferrals(userId);
+
+            // Step 2: Save the referrals to the customer database
+            const isUserUpdated: boolean = await CustomerReferralService.updateCustomerWithReferral(userId, referralCode, referralLink, referralQRCode, session);
+            if (!isUserUpdated) throw new Error("Failed to update user with referral details");
+
+            /**
+             * Step 3: Create a new Wallet for referrer
+             * But ensure that a wallet does not already exist for the user
+             */
+            const existingWallet = await this.walletService.fetchWalletByUser(userId);
+
+            /**
+             * If a wallet already exists, return the existing referral link and QR code
+             * to avoid creating duplicate wallets.
+             */
+            if (existingWallet) return GenerateUtils.referralSuccessMessage(userId, referralLink, referralQRCode);
+
+
+            /**
+             * If no wallet exists, create a new wallet for the user
+             */
+            await this.walletService.initializeWallet(userId, session);
+            // if (!wallet) {
+            //     await CustomerReferralService.removeReferralDetailsFromCustomer(userId);
+            //     throw new Error("Failed to create wallet for user");
+            // }
+
+            return GenerateUtils.referralSuccessMessage(userId, referralLink, referralQRCode);
         }
-
-        // Step 1: Generate a unique referrals
-        const referralCode = `${userId.slice(0, 5)}${nanoid(4)}`;
-        const referralLink = `${config.referralSystem.referralLinkBaseUrl}?referrerId=${userId}&referralCode=${referralCode}`;
-        const referralQRCode = await generateQRCode(referralLink);
-
-        // Step 2: Save the referrals to the customer database
-        const isUserUpdated: boolean = await CustomerReferralService.updateCustomerWithReferral(
-            userId,
-            referralCode,
-            referralLink,
-            referralQRCode
-        );
-        if (!isUserUpdated) throw new Error("Failed to update user with referral details");
-
-        // Step 3: Create a new Wallet for referrer
-        await this.walletService.initializeWallet(userId);
-
-        // Step 4: Create a new Reward document for referrer
-
-        return {
-            message: "Referral link generated successfully",
-            referrerId: userId,
-            referral_link: referralLink,
-            referral_qr_code: referralQRCode
-        };
+        catch (error: any) {
+            await session.abortTransaction();
+            session.endSession();
+            console.error("Failed to generate referral link and QR code:", error);
+            throw new Error("Unable to generate referrals at this moment. Please try again later.");
+        }
+        finally {
+            await session.commitTransaction();
+            session.endSession();
+        }
     }
 
 
@@ -88,11 +103,11 @@ export class ReferralService implements IReferralService {
         // Step 2: Check if the referrer exists
         const existingReferral = await this.referralRepository.findByReferrerAndReferee(referralData.referrerId, referralData.refereeId);
         if (existingReferral) throw new Error("Referral already exists between these users");
-        
+
         // Step 3: Create a new referral document
         const newReferral = await this.referralRepository.createReferral({
-            referrerId: toObjectId(referralData.referrerId),
-            refereeId: toObjectId(referralData.refereeId),
+            referrerId: GenerateUtils.toObjectId(referralData.referrerId),
+            refereeId: GenerateUtils.toObjectId(referralData.refereeId),
             referralCodeUsed: referralData.referralCode,
             referralLink: referralData.referralLink,
             referralQRCode: referralData.referralQRCode,

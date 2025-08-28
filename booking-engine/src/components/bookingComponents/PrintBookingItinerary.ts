@@ -318,16 +318,20 @@ export const printBookingItinerary = (
   formatDOB: (dob: string) => string,
   currentLang: string = "en"
 ) => {
-  const printWindow = window.open("", "_blank");
-  if (printWindow) {
-    const printContent = generatePrintContent(booking, t, formatDOB, currentLang);
-    printWindow.document.write(printContent);
-    printWindow.document.close();
-    printWindow.focus();
+  const printContent = generatePrintContent(booking, t, formatDOB, currentLang);
 
-    setTimeout(() => {
-      printWindow.print();
-      printWindow.close();
-    }, 600);
+  const blob = new Blob([printContent], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+
+  const printWindow = window.open(url, '_blank');
+  if (printWindow) {
+    printWindow.focus();
+    printWindow.addEventListener('load', () => {
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+        URL.revokeObjectURL(url);
+      }, 600);
+    });
   }
 };

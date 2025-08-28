@@ -325,7 +325,7 @@
     "recommended": "موصى به",
     "highestRating": "أعلى تقييم",
     "lowestRating": "أدنى تقييم",
-    "whyBookWithTripSwift": "لماذا احجز مع تريب سويفت",
+    "whyBookWithAlhajz": "لماذا تحجز مع الحج",
     "freeCancellation": "إلغاء مجاني",
     "freeCancellationDesc": "معظم عقاراتنا تقدم إلغاء مجاني حتى 24 ساعة قبل تسجيل الوصول.",
     "bestPriceGuarantee": "ضمان أفضل سعر",
@@ -778,7 +778,7 @@
       "standardRoom": "غرفة قياسية",
       "paymentMethod": "طريقة الدفع",
       "primaryGuest": "الضيف الأساسي",
-      "rateBreakdown": "تفاصيل السعر",
+      "rateBreakdown": "المبلغ الإجمالي",
       "viewBookingDetails": "عرض تفاصيل الحجز",
       "modify": "تعديل",
       "cancel": "إلغاء"
