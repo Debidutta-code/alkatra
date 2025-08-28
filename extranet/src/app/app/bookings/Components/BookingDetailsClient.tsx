@@ -448,7 +448,7 @@ export default function BookingDetailsClient({ bookingId }: BookingDetailsClient
                   <div>
                     <div className="text-xs text-slate-500 dark:text-slate-400">Phone</div>
                     <div className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                      +91 {booking.userDetails?.phone || booking.phone}
+                      +91{booking.userDetails?.phone || booking.phone}
                     </div>
                   </div>
                 </div>
