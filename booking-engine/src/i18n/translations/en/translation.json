@@ -1390,5 +1390,9 @@
     "reviewScores": "Review scores",
     "timeOfYear": "Time of year",
     "sortReviewsBy": "Sort reviews by"
+  },
+  "NetworkStatus": {
+    "offline": "You are offline. Please check your internet connection.",
+    "online": "You are back online!"
   }
 }

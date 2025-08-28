@@ -1389,5 +1389,9 @@
         "reviewScores": "Yorum puanları",
         "timeOfYear": "Yılın zamanı",
         "sortReviewsBy": "Yorumları sırala"
+    },
+    "NetworkStatus": {
+        "offline": "Çevrimdışısınız. Lütfen internet bağlantınızı kontrol edin.",
+        "online": "Yeniden çevrimiçi oldunuz!"
     }
 }
