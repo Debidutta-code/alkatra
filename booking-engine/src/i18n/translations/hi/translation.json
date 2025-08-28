@@ -325,7 +325,7 @@
     "recommended": "अनुशंसित",
     "highestRating": "उच्चतम रेटिंग",
     "lowestRating": "निम्नतम रेटिंग",
-    "whyBookWithTripSwift": "ट्रिपस्विफ्ट के साथ बुक क्यों करें",
+    "whyBookWithAlhajz": "अलहाज़ के साथ बुक क्यों करें",
     "freeCancellation": "मुफ्त रद्दीकरण",
     "freeCancellationDesc": "हमारी अधिकांश प्रॉपर्टी चेक-इन से 24 घंटे पहले तक मुफ्त रद्दीकरण प्रदान करती हैं।",
     "bestPriceGuarantee": "सर्वश्रेष्ठ मूल्य गारंटी",
@@ -778,7 +778,7 @@
       "standardRoom": "मानक कमरा",
       "paymentMethod": "भुगतान विधि",
       "primaryGuest": "प्राथमिक अतिथि",
-      "rateBreakdown": "दर का विवरण",
+      "rateBreakdown": "कुल राशि",
       "viewBookingDetails": "बुकिंग विवरण देखें",
       "modify": "संशोधित करें",
       "cancel": "रद्द करें"
