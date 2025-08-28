@@ -26,7 +26,7 @@ export interface IOTP extends Document {
 }
 
 const OTPSchema: Schema<IOTP> = new Schema({
-  identifier: { type: String, required: true, unique: true },
+  identifier: { type: String, required: true },
   otp: { type: String, required: true },
   status: { type: String, enum: Object.values(OTPStatus), default: OTPStatus.PENDING },
   expiresAt: { type: Date, required: true },

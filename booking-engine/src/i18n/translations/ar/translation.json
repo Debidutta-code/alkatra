@@ -265,7 +265,8 @@
     "generateReferral": "إنشاء رابط الإحالة",
     "generateOnce": "أنشئ رابط الإحالة الخاص بك مرة واحدة وشاركه مع أصدقائك لتبدأ في كسب المكافآت.",
     "generated": "تم إنشاء رابط الإحالة بنجاح!",
-    "copiedToClipboard": "تم نسخ الرابط إلى الحافظة!"
+    "copiedToClipboard": "تم نسخ الرابط إلى الحافظة!",
+    "fetchError": "فشل في تحميل الإحالات. يرجى المحاولة مرة أخرى."
   },
   "HotelListing": {
     "CompactSearchBar": {

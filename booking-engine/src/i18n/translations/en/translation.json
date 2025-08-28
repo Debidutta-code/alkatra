@@ -265,7 +265,8 @@
     "generateReferral": "Generate Referral Link",
     "generateOnce": "Generate your referral link once and share it with your friends to start earning rewards.",
     "generated": "Referral link generated successfully!",
-    "copiedToClipboard": "Copied to clipboard!"
+    "copiedToClipboard": "Copied to clipboard!",
+    "fetchError": "Failed to load referrals. Please try again."
   },
   "HotelListing": {
     "CompactSearchBar": {
@@ -678,6 +679,7 @@
       "otpInvalidError": "Invalid OTP",
       "otpVerifyError": "Error verifying OTP",
       "emailVerified": "Email verified successfully",
+      "emailAlreadyVerified": "Email is already verified",
       "phoneVerified": "Phone verified successfully",
       "phoneLabel": "Phone Number",
       "phonePlaceholder": "Enter phone number",
