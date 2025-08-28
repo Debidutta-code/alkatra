@@ -1,6 +1,6 @@
 import { IReward } from "../models";
 import { IRewardRepository, IRewardService } from "../interfaces";
-import { toObjectId } from "../utils";
+import { GenerateUtils } from "../utils";
 import { ValidateService } from "./validate.service";
 import { config } from "../../config";
 
@@ -42,8 +42,8 @@ export class RewardService implements IRewardService {
         
 
         const reward = {
-            customerId: toObjectId(userId),
-            referralId: toObjectId(referralId),
+            customerId: GenerateUtils.toObjectId(userId),
+            referralId: GenerateUtils.toObjectId(referralId),
             rewardType: type,
             amount,
             issuedAt: new Date(),

@@ -13,27 +13,125 @@ export class RoomService {
 
     private roomRepository = new RoomRepository();
 
-    async storeDeepLinkData ( couponCode: string, startDate: string, endDate: string, hotelCode: string, guestDetails , getPropertyDetails ) {
-        console.log(`Get data to store in deep link ${couponCode}, 
-            ${startDate}, 
-            ${endDate}, 
-            ${hotelCode}, 
-            ${JSON.stringify(guestDetails)}, 
-            ${JSON.stringify(getPropertyDetails)}
-        `)
+    async storeDeepLinkData(couponCode: string, startDate: string, endDate: string, hotelCode: string, guestDetails, getPropertyDetails) {
+
         if (!couponCode || !startDate || !endDate || !hotelCode || !guestDetails || !getPropertyDetails) {
-            throw new Error ("Required details are not found for storing in Deep link model");
+            throw new Error("Required details are not found for storing in Deep link model");
         }
-        return await roomRepository.storeDeepLinkData( couponCode, startDate, endDate, hotelCode, guestDetails, getPropertyDetails );
+        return await roomRepository.storeDeepLinkData(couponCode, startDate, endDate, hotelCode, guestDetails, getPropertyDetails);
     }
-    
-    async getDeepLinkData ( deepLinkId: string ) {
+
+    async getDeepLinkData(deepLinkId: string) {
         console.log(`The getting deep link data in service ${deepLinkId}`);
         if (!deepLinkId) {
-            throw new Error ("Deep link id not found in service");
+            throw new Error("Deep link id not found in service");
         }
         return await roomRepository.getDeepLinkData(deepLinkId);
     }
+
+    // async getRoomsByPropertyId(params: {
+    //     propertyInfoId: string;
+    //     numberOfRooms: number;
+    //     startDate: string;
+    //     endDate: string;
+    //     hotelCode: string;
+    //     guestDetails: string;
+    // }) {
+    //     const { propertyInfoId, numberOfRooms, startDate, endDate, hotelCode, guestDetails } = params;
+
+    //     // 1. Validate property & rooms concurrently
+    //     const [propertyDetails, rooms] = await Promise.all([
+    //         this.roomRepository.getPropertyById(propertyInfoId),
+    //         this.roomRepository.getRoomsByPropertyId(propertyInfoId)
+    //     ]);
+
+    //     if (!propertyDetails || propertyDetails.property_code !== hotelCode) {
+    //         throw new AppError(`Property not found or property code mismatch`, 404);
+    //     }
+    //     if (!rooms.length) {
+    //         throw new AppError("No room found with given property ID", 404);
+    //     }
+    //     const roomTypes = rooms.map(r => r.room_type);
+
+    //     // 2. Validate dates
+    //     const parsedStartDate = new Date(startDate);
+    //     const parsedEndDate = new Date(endDate);
+    //     if (isNaN(parsedStartDate.getTime()) || isNaN(parsedEndDate.getTime())) {
+    //         throw new AppError("Invalid date format for startDate or endDate", 400);
+    //     }
+    //     const normalizedStartDate = new Date(Date.UTC(parsedStartDate.getUTCFullYear(), parsedStartDate.getUTCMonth(), parsedStartDate.getUTCDate()));
+    //     const normalizedEndDate = new Date(Date.UTC(parsedEndDate.getUTCFullYear(), parsedEndDate.getUTCMonth(), parsedEndDate.getUTCDate()));
+    //     if (normalizedStartDate > normalizedEndDate) {
+    //         throw new AppError("startDate cannot be after endDate", 400);
+    //     }
+
+    //     // 3. Check availability with a single, batched query
+    //     const availabilityData = await this.roomRepository.checkRoomsAvailability(hotelCode, roomTypes, normalizedStartDate, normalizedEndDate, numberOfRooms);
+
+    //     const unavailableRoomTypes: { roomType: string; dates: string[] }[] = [];
+    //     const availableRoomTypes: string[] = [];
+
+    //     // Group the availability results by room type
+    //     const unavailableMap = new Map<string, string[]>();
+    //     availabilityData.forEach(item => {
+    //         const dateStr = item.startDate.toISOString().split("T")[0];
+    //         if (!unavailableMap.has(item.invTypeCode)) {
+    //             unavailableMap.set(item.invTypeCode, []);
+    //         }
+    //         unavailableMap.get(item.invTypeCode)!.push(dateStr);
+    //     });
+
+    //     // Determine fully available room types
+    //     const dateList: Date[] = [];
+    //     let current = new Date(normalizedStartDate);
+    //     while (current <= normalizedEndDate) {
+    //         dateList.push(new Date(current));
+    //         current.setDate(current.getDate() + 1);
+    //     }
+    //     const totalDays = dateList.length;
+
+    //     for (const roomType of roomTypes) {
+    //         const unavailableDates = unavailableMap.get(roomType);
+    //         if (unavailableDates && unavailableDates.length === totalDays) {
+    //             unavailableRoomTypes.push({ roomType, dates: unavailableDates });
+    //         } else {
+    //             availableRoomTypes.push(roomType);
+    //         }
+    //     }
+
+    //     if (!availableRoomTypes.length) {
+    //         const errorMessage = unavailableRoomTypes
+    //             .map(({ roomType, dates }) => `Room type ${roomType} is unavailable on ${dates.join(", ")} for ${numberOfRooms} rooms`)
+    //             .join("; ");
+    //         throw new AppError(errorMessage, 400);
+    //     }
+
+    //     // 4. Fetch rooms with rates concurrently
+    //     const [roomsWithRates, couponCodeResult, storedDeepLinkData] = await Promise.all([
+    //         this.roomRepository.getRoomsWithRates(propertyInfoId, availableRoomTypes, hotelCode, normalizedStartDate, normalizedEndDate),
+    //         generateCouponCode(),
+    //         this.storeDeepLinkData(couponCodeResult.code, startDate, endDate, hotelCode, guestDetails, propertyDetails)
+    //     ]);
+
+    //     if (!roomsWithRates.length) {
+    //         throw new AppError(`No room rates found for selected range: ${startDate} to ${endDate}`, 400);
+    //     }
+    //     if (!storedDeepLinkData) {
+    //         throw new Error("Data can't store in DB");
+    //     }
+
+    //     // 5. Generate QR code
+    //     const deepLinkUrl = `${process.env.DEEP_LINK}/property/${propertyInfoId}?deepLinkCode=${storedDeepLinkData}`;
+    //     const qrCodeData = await QRCode.toDataURL(deepLinkUrl);
+
+    //     return {
+    //         roomsWithRates,
+    //         couponCode: couponCodeResult.code,
+    //         deepLink: deepLinkUrl,
+    //         qrCode: qrCodeData,
+    //         unavailableRoomTypes
+    //     };
+    // }
 
     async getRoomsByPropertyId(params: {
         propertyInfoId: string;
@@ -44,21 +142,46 @@ export class RoomService {
         guestDetails: string;
     }) {
         const { propertyInfoId, numberOfRooms, startDate, endDate, hotelCode, guestDetails } = params;
+        
+        const { propertyDetails, rooms, roomTypes, normalizedStartDate, normalizedEndDate } = await this.validateAndFetchInitialData(params);
+        
+        const { availableRoomTypes, unavailableRoomTypes } = await this.checkRoomAvailability(
+            hotelCode,
+            roomTypes,
+            normalizedStartDate,
+            normalizedEndDate,
+            numberOfRooms
+        );
+        
+        const { roomsWithRates, couponCode, deepLink, qrCode } = await this.fetchRatesAndGenerateData({
+            propertyInfoId,
+            availableRoomTypes,
+            hotelCode,
+            normalizedStartDate,
+            normalizedEndDate,
+            startDate,
+            endDate,
+            guestDetails,
+            propertyDetails
+        });
+        
+        return {
+            roomsWithRates,
+            couponCode,
+            deepLink,
+            qrCode,
+            unavailableRoomTypes
+        };
+    }
 
-        // 1. Validate property
-        const propertyDetails = await this.roomRepository.getPropertyById(propertyInfoId);
-        if (!propertyDetails || propertyDetails.property_code !== hotelCode) {
-            throw new AppError(`Property not found or property code mismatch`, 404);
-        }
-
-        // 2. Validate rooms
-        const rooms = await this.roomRepository.getRoomsByPropertyId(propertyInfoId);
-        if (!rooms.length) {
-            throw new AppError("No room found with given property ID", 404);
-        }
-        const roomTypes = rooms.map(r => r.room_type);
-
-        // 3. Validate dates
+    private async validateAndFetchInitialData(params: {
+        propertyInfoId: string;
+        startDate: string;
+        endDate: string;
+        hotelCode: string;
+    }) {
+        const { propertyInfoId, startDate, endDate, hotelCode } = params;
+        
         const parsedStartDate = new Date(startDate);
         const parsedEndDate = new Date(endDate);
         if (isNaN(parsedStartDate.getTime()) || isNaN(parsedEndDate.getTime())) {
@@ -69,71 +192,122 @@ export class RoomService {
         if (normalizedStartDate > normalizedEndDate) {
             throw new AppError("startDate cannot be after endDate", 400);
         }
+        
+        const [propertyDetails, rooms] = await Promise.all([
+            this.roomRepository.getPropertyById(propertyInfoId),
+            this.roomRepository.getRoomsByPropertyId(propertyInfoId)
+        ]);
+        
+        if (!propertyDetails || propertyDetails.property_code !== hotelCode) {
+            throw new AppError(`Property not found or property code mismatch`, 404);
+        }
+        if (!rooms.length) {
+            throw new AppError("No room found with given property ID", 404);
+        }
+        
+        return {
+            propertyDetails,
+            rooms,
+            roomTypes: rooms.map(r => r.room_type),
+            normalizedStartDate,
+            normalizedEndDate
+        };
+    }
 
-        // 4. Check availability
+    private async checkRoomAvailability(
+        hotelCode: string,
+        roomTypes: string[],
+        startDate: Date,
+        endDate: Date,
+        numberOfRooms: number
+    ) {
+        const availabilityData = await this.roomRepository.checkRoomsAvailability(hotelCode, roomTypes, startDate, endDate, numberOfRooms);
+        const unavailableMap = new Map<string, string[]>();
+        availabilityData.forEach(item => {
+            const dateStr = item['startDate'];
+            if (!unavailableMap.has(item.invTypeCode)) {
+                unavailableMap.set(item.invTypeCode, []);
+            }
+            unavailableMap.get(item.invTypeCode)!.push(dateStr);
+        });
+        
         const dateList: Date[] = [];
-        let current = new Date(normalizedStartDate);
-        while (current <= normalizedEndDate) {
+        let current = new Date(startDate);
+        while (current <= endDate) {
             dateList.push(new Date(current));
             current.setDate(current.getDate() + 1);
         }
-
+        
+        const totalDays = dateList.length;
         const unavailableRoomTypes: { roomType: string; dates: string[] }[] = [];
         const availableRoomTypes: string[] = [];
-
         for (const roomType of roomTypes) {
-            const unavailableDates: string[] = [];
-            for (const date of dateList) {
-                const roomAvailability = await this.roomRepository.checkRoomAvailability(hotelCode, roomType, date, numberOfRooms);
-                if (!roomAvailability) {
-                    unavailableDates.push(date.toISOString().split("T")[0]);
-                }
-            }
-            if (unavailableDates.length) {
+            const unavailableDates = unavailableMap.get(roomType);
+            if (unavailableDates && unavailableDates.length === totalDays) {
                 unavailableRoomTypes.push({ roomType, dates: unavailableDates });
             } else {
                 availableRoomTypes.push(roomType);
             }
         }
-
+        
         if (!availableRoomTypes.length) {
             const errorMessage = unavailableRoomTypes
                 .map(({ roomType, dates }) => `Room type ${roomType} is unavailable on ${dates.join(", ")} for ${numberOfRooms} rooms`)
                 .join("; ");
             throw new AppError(errorMessage, 400);
         }
+        
+        return { availableRoomTypes, unavailableRoomTypes };
+    }
 
-        // 5. Fetch rooms with rates
-        const roomsWithRates = await this.roomRepository.getRoomsWithRates(propertyInfoId, availableRoomTypes, hotelCode, normalizedStartDate, normalizedEndDate);
+    private async fetchRatesAndGenerateData(params: {
+        propertyInfoId: string;
+        availableRoomTypes: string[];
+        hotelCode: string;
+        normalizedStartDate: Date;
+        normalizedEndDate: Date;
+        startDate: string;
+        endDate: string;
+        guestDetails: string;
+        propertyDetails: any;
+    }) {
+        const {
+            propertyInfoId,
+            availableRoomTypes,
+            hotelCode,
+            normalizedStartDate,
+            normalizedEndDate,
+            startDate,
+            endDate,
+            guestDetails,
+            propertyDetails
+        } = params;
+        const [roomsWithRates, couponCodeResult] = await Promise.all([
+            this.roomRepository.getRoomsWithRates(propertyInfoId, availableRoomTypes, hotelCode, normalizedStartDate, normalizedEndDate),
+            generateCouponCode()
+        ]);
         if (!roomsWithRates.length) {
             throw new AppError(`No room rates found for selected range: ${startDate} to ${endDate}`, 400);
         }
-
-        // 6. Generate coupon & QR
-        const couponCode = await generateCouponCode();        
-        const getPropertyDetails = await propertyDetailsService.getRoomsByPropertyIdService(propertyInfoId);
-
-        const storedDeepLinkData = await this.storeDeepLinkData( couponCode.code, startDate, endDate, hotelCode, guestDetails, getPropertyDetails );
-
+        const storedDeepLinkData = await this.storeDeepLinkData(
+            couponCodeResult.code,
+            startDate,
+            endDate,
+            hotelCode,
+            guestDetails,
+            propertyDetails
+        );
         if (!storedDeepLinkData) {
-            throw new Error ("Data can't store in DB");
+            throw new Error("Data can't store in DB");
         }
-        
-        const deepLinkUrl = `${process.env.DEEP_LINK}/property/${propertyInfoId}
-            ?deepLinkCode=${storedDeepLinkData}`;
-
+        const deepLinkUrl = `${process.env.DEEP_LINK}/property/${propertyInfoId}?deepLinkCode=${storedDeepLinkData}`;
         const qrCodeData = await QRCode.toDataURL(deepLinkUrl);
-
         return {
             roomsWithRates,
-            couponCode: couponCode.code,
+            couponCode: couponCodeResult.code,
             deepLink: deepLinkUrl,
-            qrCode: qrCodeData,
-            unavailableRoomTypes
+            qrCode: qrCodeData
         };
     }
 
-    
-
-    
 }

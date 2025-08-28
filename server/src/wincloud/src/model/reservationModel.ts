@@ -99,7 +99,7 @@ const reservationLogSchema = new Schema<IReservationLog>({
     status: { type: String, required: true },
     process: { type: String, required: true, enum: ['Reservation', 'Amend Reservation', 'Cancellation'] },
     errorMessage: { type: String, required: false },
-    timestamp: { type: Date, default: () => new Date() },
+    timestamp: { type: Date, default: () => new Date()},
 });
 
 export const ThirdPartyBooking = model<IThirdPartyBooking>('WincloudReservation', thirdPartyBookingSchema);

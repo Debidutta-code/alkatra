@@ -1,6 +1,6 @@
 import { IReferralRepository, IReferralRequest, IReferralResponse } from "../interfaces";
 import { ReferralModel, IReferral } from "../models";
-import { toObjectId } from "../utils";
+import { GenerateUtils } from "../utils";
 
 export class ReferralRepository implements IReferralRepository {
     /**
@@ -24,8 +24,8 @@ export class ReferralRepository implements IReferralRepository {
      */
     async findByReferrerAndReferee(referrerId: string, refereeId: string): Promise<IReferral | null> {
         return await ReferralModel.findOne({
-            referrerId: toObjectId(referrerId),
-            refereeId: toObjectId(refereeId),
+            referrerId: GenerateUtils.toObjectId(referrerId),
+            refereeId: GenerateUtils.toObjectId(refereeId),
         });
     }
 
@@ -63,7 +63,7 @@ export class ReferralRepository implements IReferralRepository {
         // });
 
         const [result] = await ReferralModel.aggregate([
-            { $match: { referrerId: toObjectId(payload.referrerId) } },
+            { $match: { referrerId: GenerateUtils.toObjectId(payload.referrerId) } },
             {
                 $facet: {
                     data: [
@@ -118,7 +118,7 @@ export class ReferralRepository implements IReferralRepository {
      */
     async findByRefereeId(refereeId: string): Promise<IReferral | null> {
         return await ReferralModel.findOne({
-            refereeId: toObjectId(refereeId),
+            refereeId: GenerateUtils.toObjectId(refereeId),
         });
     }
 

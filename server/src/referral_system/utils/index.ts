@@ -1,4 +1,1 @@
-export { 
-    toObjectId,
-    generateQRCode
-} from "./generate";
+export { GenerateUtils } from "./generate";
