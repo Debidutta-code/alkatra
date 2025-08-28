@@ -16,6 +16,7 @@ interface IInventory {
   hotelCode: string;
   hotelName?: string;
   invTypeCode: string;
+  ratePlanCode: string;
   availability: { startDate: Date; endDate: Date; count: number };
 }
 
@@ -41,13 +42,15 @@ interface RoomWithRates {
     _id: string;
     currencyCode: string;
     ratePlanCode: string;
+    startDate: Date;
+    endDate: Date;
     baseByGuestAmts: { amountBeforeTax: number; numberOfGuests: number } | null;
   } | null;
 }
 
 class RatePlanDao {
 
-  
+
   public static async create(ratePlanData: RatePlanType) {
     try {
       const ratePlan = new RatePlan(ratePlanData);
@@ -134,146 +137,20 @@ class RatePlanDao {
 
   /**
   * Get available rooms with their corresponding rates using aggregation pipeline
+  * @hotelCode
+  * @invTypeCode
+  * @ratePlanCode
+  * @page
+  * @limit
   */
- 
-  // public static async getRatePlanByHotel(
-  //   hotelCode: string,
-  //   invTypeCode?: string,
-  //   page?: number,
-  //   limit?: number
-  // ): Promise<{
-  //   data: RoomWithRates[];
-  //   pagination: {
-  //     currentPage: number;
-  //     totalPages: number;
-  //     totalResults: number;
-  //     hasNextPage: boolean;
-  //     hasPreviousPage: boolean;
-  //     resultsPerPage: number;
-  //   };
-  // }> {
-  //   page = page ?? 1;
-  //   limit = limit ?? 10;
-  //   const resultsPerPage = 10;
-  //   const skip = (page - 1) * resultsPerPage;
-
-  //   // Build match stage for inventory based on given parameters
-  //   const inventoryMatch: any = { hotelCode };
-  //   if (invTypeCode) {
-  //     inventoryMatch.invTypeCode = invTypeCode;
-  //   }
-  //   const startDate = startOfDay(new Date()); // Set to midnight of current day
-  //   inventoryMatch["availability.startDate"] = { $gte: startDate };
-
-  //   // UPDATED RATE LOOKUP PIPELINE
-  //   const rateLookupPipeline: any[] = [
-  //     {
-  //       $match: {
-  //         $expr: {
-  //           $and: [
-  //             { $eq: ["$hotelCode", "$$hotelCode"] },
-  //             { $eq: ["$invTypeCode", "$$invTypeCode"] },
-  //             { $eq: ["$startDate", "$$inventoryStartDate"] }
-  //           ]
-  //         }
-  //       }
-  //     }
-  //   ];
-
-  //   // Pipeline for counting total results
-  //   const countPipeline = [
-  //     { $match: inventoryMatch },
-  //     {
-  //       $lookup: {
-  //         from: "rateamountdatewises",
-  //         let: {
-  //           hotelCode: "$hotelCode",
-  //           invTypeCode: "$invTypeCode",
-  //           inventoryStartDate: "$availability.startDate"
-  //         },
-  //         pipeline: rateLookupPipeline,
-  //         as: "rates"
-  //       }
-  //     },
-  //     { $count: "total" }
-  //   ];
-
-  //   const dataPipeline = [
-  //     { $match: inventoryMatch },
-  //     {
-  //       $lookup: {
-  //         from: "rateamountdatewises",
-  //         let: {
-  //           hotelCode: "$hotelCode",
-  //           invTypeCode: "$invTypeCode",
-  //           inventoryStartDate: "$availability.startDate"
-  //         },
-  //         pipeline: rateLookupPipeline,
-  //         as: "rates"
-  //       }
-  //     },
-  //     { $skip: skip },
-  //     { $limit: resultsPerPage },
-  //     {
-  //       $project: {
-  //         _id: 1,
-  //         hotelCode: 1,
-  //         hotelName: 1,
-  //         invTypeCode: 1,
-  //         availability: 1,
-  //         rates: {
-  //           $cond: {
-  //             if: { $gt: [{ $size: "$rates" }, 0] },
-  //             then: {
-  //               $let: {
-  //                 vars: { firstRate: { $arrayElemAt: ["$rates", 0] } },
-  //                 in: {
-  //                   _id: "$$firstRate._id",
-  //                   currencyCode: "$$firstRate.currencyCode",
-  //                   ratePlanCode: "$$firstRate.ratePlanCode",
-  //                   baseByGuestAmts: {
-  //                     $cond: {
-  //                       if: { $gt: [{ $size: "$$firstRate.baseByGuestAmts" }, 0] },
-  //                       then: { $arrayElemAt: ["$$firstRate.baseByGuestAmts", 0] },
-  //                       else: null
-  //                     }
-  //                   },
-  //                 }
-  //               }
-  //             },
-  //             else: null
-  //           }
-  //         }
-  //       }
-  //     }
-  //   ];
-
-  //   const [countResult, dataResult] = await Promise.all([
-  //     Inventory.aggregate(countPipeline),
-  //     Inventory.aggregate(dataPipeline)
-  //   ]);
-
-  //   const totalResults = countResult[0]?.total || 0;
-  //   const totalPages = Math.ceil(totalResults / resultsPerPage);
-
-  //   return {
-  //     data: dataResult,
-  //     pagination: {
-  //       currentPage: page,
-  //       totalPages,
-  //       totalResults,
-  //       hasNextPage: page < totalPages,
-  //       hasPreviousPage: page > 1,
-  //       resultsPerPage
-  //     }
-  //   };
-  // }
-
   public static async getRatePlanByHotel(
     hotelCode: string,
     invTypeCode?: string,
+    ratePlanCode?: string,
     page: number = 1,
-    limit: number = 10
+    limit: number = 10,
+    startDate: Date,
+    endDate: Date
   ): Promise<{
     data: RoomWithRates[];
     pagination: {
@@ -287,31 +164,24 @@ class RatePlanDao {
   }> {
     try {
 
-      console.log("##################### Inside getRatePlanByHotel dao");
-      console.log(`hotelCode: ${hotelCode}`);
-      console.log(`invTypeCode: ${invTypeCode}`);
-      console.log(`page: ${page}`);
-      console.log(`limit: ${limit}`);
-
       const resultsPerPage = limit;
       const skip = (page - 1) * resultsPerPage;
 
       const [inventory, ratePlans] = await Promise.all([
-        this.getInventoryByHotel(hotelCode, invTypeCode),
-        this.getRoomRateByHotel(hotelCode, invTypeCode),
+        this.getInventoryOfHotel(hotelCode, invTypeCode, startDate, endDate),
+        this.getRoomRateOfHotel(hotelCode, invTypeCode, ratePlanCode, startDate, endDate),
       ]);
 
       const mappedData = this.mapInventoryToRatePlans(inventory, ratePlans);
       if (!mappedData) {
         throw new Error("No mapped data found");
       }
-  
 
       const totalResults = mappedData.length;
       const paginatedData = mappedData.slice(skip, skip + resultsPerPage);
       const totalPages = Math.ceil(totalResults / resultsPerPage);
 
-      return {
+      const result = {
         data: paginatedData,
         pagination: {
           currentPage: page,
@@ -322,6 +192,9 @@ class RatePlanDao {
           resultsPerPage,
         },
       };
+
+
+      return result;
     } catch (error) {
       throw new Error(`Failed to fetch rate plans: ${error.message}`);
     }
@@ -330,11 +203,11 @@ class RatePlanDao {
   /**
    * Helper: Get inventory by hotel
    */
-  private static async getInventoryByHotel(
+  private static async getInventoryOfHotel(
     hotelCode: string,
     invTypeCode?: string,
-    startDate: Date = endOfDay(new Date()),
-    endDate: Date = endOfDay(new Date())
+    startDate: Date,
+    endDate: Date
   ) {
     try {
 
@@ -342,16 +215,22 @@ class RatePlanDao {
       if (invTypeCode) {
         inventoryMatch.invTypeCode = invTypeCode;
       }
-      
-      inventoryMatch["availability.startDate"] = { $gte: startDate };
-      inventoryMatch["availability.endDate"] = { $lte: endDate };
-      console.log(`@@@@############### inventoryMatch: ${JSON.stringify(inventoryMatch)}`);
 
-      // Query inventory
+      if (startDate) {
+        inventoryMatch["availability.startDate"] = { $gte: startOfDay(startDate) };
+      } else {
+        inventoryMatch["availability.startDate"] = { $gte: startOfDay(new Date()) };
+      }
+      if (endDate) {
+        inventoryMatch["availability.endDate"] = { $lte: endOfDay(endDate) };
+      }
+
+      inventoryMatch["availability.startDate"] = { $gte: startOfDay(new Date()) };
+
       const inventory = await Inventory.aggregate([
         { $match: inventoryMatch },
       ]);
-      
+
       return inventory;
     } catch (error) {
       console.log(`Failed to fetch inventory: ${error.message}`);
@@ -363,11 +242,12 @@ class RatePlanDao {
    * Helper: Get rateplan by hotel
    */
 
-  private static async getRoomRateByHotel(
+  private static async getRoomRateOfHotel(
     hotelCode: string,
-    invTypeCode: string,
-    startDate: Date = endOfDay(new Date()),
-    endDate: Date = endOfDay(addDays(new Date(), 1)),
+    invTypeCode?: string,
+    ratePlanCode?: string,
+    startDate: Date,
+    endDate: Date
   ) {
     try {
 
@@ -375,18 +255,24 @@ class RatePlanDao {
       if (invTypeCode) {
         ratePlanMatch.invTypeCode = invTypeCode;
       }
-      
-      console.log(`@@@@############### ratePlanMatch: ${JSON.stringify(ratePlanMatch)}`);
+      if (ratePlanCode) {
+        ratePlanMatch.ratePlanCode = ratePlanCode;
+      }
 
-      ratePlanMatch["startDate"] = { $lte: startDate.toISOString() };
-      ratePlanMatch["endDate"] = { $lte: endDate.toISOString() };
-      console.log(`@@@@############### ratePlanMatch: ${JSON.stringify(ratePlanMatch)}`);
+      if (startDate) {
+        ratePlanMatch.startDate = { $gte: startOfDay(startDate) };
+      } else {
+        ratePlanMatch.startDate = { $gte: startOfDay(new Date()) };
+      }
+      if (endDate) {
+        ratePlanMatch.endDate = { $lte: endOfDay(endDate) };
+      }
+
+      ratePlanMatch.startDate = { $gte: startOfDay(new Date()) };
 
       const ratePlan = await RateAmount.aggregate([
         { $match: ratePlanMatch },
       ]);
-
-      console.log(`@#@#@#@#@#@#@#@#@ The rate plan we get ${JSON.stringify(ratePlan)}`);
 
       return ratePlan;
 
@@ -404,26 +290,22 @@ class RatePlanDao {
     inventory: IInventory[],
     ratePlans: IRatePlan[]
   ): RoomWithRates[] {
-    return inventory
-      .map((inv) => {
 
-        /**
-         * Matching rate plan and inventory according to 
-         * @hotelCode 
-         * @invTypeCode 
-         * @startDate
-         */
+    const results: RoomWithRates[] = [];
+    
+    inventory.forEach((inv) => {
+      
+      const matchingRates = ratePlans.filter(
+        (rate) =>
+          rate.hotelCode === inv.hotelCode &&
+          rate.invTypeCode === inv.invTypeCode &&
+          rate.startDate.getTime() <= inv.availability.startDate.getTime() &&
+          rate.endDate.getTime() >= inv.availability.endDate.getTime()
+      );
 
-        const matchingRate = ratePlans.find(
-          (rate) =>
-            rate.hotelCode === inv.hotelCode &&
-            rate.invTypeCode === inv.invTypeCode &&
-            rate.startDate.toISOString() === inv.availability.startDate.toISOString()
-        );
-
-        if (!matchingRate) return null;
-
-        return {
+      matchingRates.forEach((matchingRate) => {
+        
+        const result: RoomWithRates = {
           _id: inv._id,
           hotelCode: inv.hotelCode,
           hotelName: inv.hotelName,
@@ -433,14 +315,19 @@ class RatePlanDao {
             _id: matchingRate._id,
             currencyCode: matchingRate.currencyCode,
             ratePlanCode: matchingRate.ratePlanCode,
+            startDate: matchingRate.startDate,
+            endDate: matchingRate.endDate,
             baseByGuestAmts:
               matchingRate.baseByGuestAmts.length > 0
                 ? matchingRate.baseByGuestAmts[0]
                 : null,
           },
         };
-      })
-      .filter((item): item is RoomWithRates => item !== null);
+
+        results.push(result);
+      });
+    });
+    return results;
   }
 
 

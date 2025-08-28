@@ -105,13 +105,13 @@ class RatePlanController {
     public static async getRatePlanByHotel(req: Request, res: Response, next: NextFunction) {
         try {
 
-            console.log("##################### Inside getRatePlanByHotel controller");
+            
             const { hotelCode } = req.body;
             if (!hotelCode) {
                 throw new Error("Hotel code is required");
             }
 
-            const invTypeCode = req.query?.invTypeCode as string;
+            const {invTypeCode, ratePlanCode, startDate, endDate} = req.query;
             const page = req.query?.page ? parseInt(req.query.page as string) : 1;
             const limit = req.query?.limit ? parseInt(req.query.limit as string) : 10;
 
@@ -130,7 +130,15 @@ class RatePlanController {
             }
 
             console.log("Entering into getRatePlanByHotel SERVICE");
-            const response = await RatePlanService.getRatePlanByHotel(hotelCode, invTypeCode, page, limit);
+            const response = await RatePlanService.getRatePlanByHotel(
+                hotelCode, 
+                invTypeCode as string, 
+                ratePlanCode as string, 
+                page, 
+                limit, 
+                startDate, 
+                endDate
+            );
             if (!response) {
                 throw new Error("No rate plans found for this hotel code")
             }

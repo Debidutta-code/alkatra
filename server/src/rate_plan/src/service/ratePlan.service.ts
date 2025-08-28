@@ -122,15 +122,31 @@ class RatePlanService {
   }
 
   // public static async getRatePlanByHotel(hotelCode: string, invTypeCode?: string, startDate?: Date, endDate?: Date, page?: number) {
-  public static async getRatePlanByHotel(hotelCode: string, invTypeCode?: string, page?: number, limit?: number) {
+  public static async getRatePlanByHotel(
+    hotelCode: string, 
+    invTypeCode?: string, 
+    ratePlanCode?: string, 
+    page?: number, 
+    limit?: number,
+    startDate: Date, 
+    endDate: Date,
+  ) {
 
     try {
       
-      if (!hotelCode || !page || !limit) {
+      if (!hotelCode || !page || !limit) {         
         throw new Error("Hotel and inventory code is required");
       }
 
-      const ratePlans = await RatePlanDao.getRatePlanByHotel(hotelCode, invTypeCode && invTypeCode, page && page, limit && limit);
+      const ratePlans = await RatePlanDao.getRatePlanByHotel(
+        hotelCode, 
+        invTypeCode && invTypeCode, 
+        ratePlanCode && ratePlanCode, 
+        page && page, 
+        limit && limit,
+        startDate && startDate,
+        endDate && endDate
+      );
 
       if (!ratePlans) {
         throw new Error("No rate plans found for this hotel code");
@@ -261,15 +277,6 @@ class RoomRentCalculationService {
         };
       }
 
-      console.log('=== Service Debug Info ===');
-      console.log('Hotel Code:', hotelcode);
-      console.log('Inv Type Code:', invTypeCode);
-      console.log('Original Start Date:', startDate2);
-      console.log('Original End Date:', endDate2);
-      console.log('Processed Start Date:', start);
-      console.log('Processed End Date:', end);
-      console.log('Number of Nights:', numberOfNights);
-
       // Get inventory with rates
       const inventory = await HotelPricesDao.getInventoryWithRates(
         hotelcode,
@@ -278,7 +285,7 @@ class RoomRentCalculationService {
         endOfDay(endDate2)
       );
 
-      console.log('=== Inventory Data Debug ===');
+
       console.log('Inventory Length:', inventory?.length);
 
       if (inventory && inventory.length > 0) {
@@ -463,11 +470,6 @@ class RoomRentCalculationService {
   ): any {
 
     try {
-      console.log('=== Day by Day Calculation Debug ===');
-      console.log('Start Date:', startDate);
-      console.log('End Date:', endDate);
-      console.log('Number of Nights:', numberOfNights);
-      console.log('Adults:', noOfAdults, 'Children:', noOfChildrens, 'Rooms:', noOfRooms);
 
       const dailyBreakdown: any[] = [];
       let totalAmount = 0;
@@ -486,10 +488,10 @@ class RoomRentCalculationService {
       console.log(`Generated ${stayDates.length} nights:`, stayDates.map(d => d.toDateString()));
 
       for (const date of stayDates) {
-        console.log(`\n=== Processing Date: ${date.toDateString()} ===`);
+        
 
         const dayOfWeek = this.getDayOfWeek(date);
-        console.log('Day of Week:', dayOfWeek);
+        
 
         let bestRateForDay: any = null;
         let lowestAmountForDay = Infinity;
@@ -501,7 +503,7 @@ class RoomRentCalculationService {
             continue;
           }
 
-          console.log(`Checking rate for this date...`);
+          
 
           const rate = item.rate;
           const isApplicable = this.isRateApplicableForDate(rate, date, dayOfWeek);
@@ -521,10 +523,7 @@ class RoomRentCalculationService {
             noOfRooms
           );
 
-          console.log(`Rate calculation result:`, {
-            success: rateCalculation.success,
-            totalAmount: rateCalculation.success ? rateCalculation.totalAmountForDay : 'FAILED'
-          });
+          
 
           if (rateCalculation.success && rateCalculation.totalAmountForDay < lowestAmountForDay) {
             lowestAmountForDay = rateCalculation.totalAmountForDay;
@@ -534,11 +533,11 @@ class RoomRentCalculationService {
               currencyCode: rate.currencyCode,
               date: date
             };
-            console.log(`New best rate found: ${rate.ratePlanCode} with total ${lowestAmountForDay}`);
+            
           }
         }
 
-        console.log(`Total applicable rates for ${date.toDateString()}: ${applicableRatesCount}`);
+        
 
         if (!bestRateForDay) {
           console.log(`ERROR: No suitable rates found for ${date.toDateString()}`);
@@ -572,11 +571,7 @@ class RoomRentCalculationService {
         totalAdditionalCharges += bestRateForDay.additionalGuestCharges * noOfRooms;
       }
 
-      console.log('=== Final Calculation Results ===');
-      console.log('Total Amount:', totalAmount);
-      console.log('Total Base Amount:', totalBaseAmount);
-      console.log('Total Additional Charges:', totalAdditionalCharges);
-      console.log('Daily Breakdown Length:', dailyBreakdown.length);
+      
 
       const averageBaseRate = numberOfNights > 0 ? totalBaseAmount / numberOfNights / noOfRooms : 0;
 
