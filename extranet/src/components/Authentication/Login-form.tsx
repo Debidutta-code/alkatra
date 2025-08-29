@@ -27,12 +27,12 @@ const loginSchema = z.object({
     .min(1, "Email is required")
     .email("Please provide a valid email address"),
   password: z
-    .string()
-    .min(1, "Password is required")
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-      "Password must contain at least 8 characters including one uppercase letter, one lower case letter, one number and one special character."
-    ),
+  .string()
+  .min(1, "Password is required")
+  .regex(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/,
+    "Password must contain at least 8 characters including one uppercase letter, one lower case letter, one number and one special character."
+  ),
 });
 
 type Inputs = {
