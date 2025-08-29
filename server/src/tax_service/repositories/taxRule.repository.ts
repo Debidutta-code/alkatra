@@ -36,7 +36,34 @@ export class TaxRuleRepository implements ITaxRuleRepository {
 
     async update(id: string, data: Partial<ITaxRule>): Promise<ITaxRule | null> {
         try {
-            return await TaxRuleModel.findByIdAndUpdate(id, data, { new: true }).exec();
+            /**
+             * This is a separate object to hold the update operations
+             */
+            const updateOps: { $set?: Partial<ITaxRule>; $unset?: { description?: 1 } } = {
+                $set: {},
+            };
+
+            /**
+             * Copy all fields except description to $set, skipping undefined values
+             * Use 'as any' to bypass strict typing
+             */
+            for (const [key, value] of Object.entries(data)) {
+                if (key !== 'description' && value !== undefined) {
+                    (updateOps.$set as any)[key] = value;
+                }
+            }
+
+            /**
+             * Handle description separately
+             */
+            if ('description' in data) {
+                updateOps.$set!.description = data.description ?? '';
+            } else {
+                updateOps.$unset = { description: 1 };
+            }
+
+            // return await TaxRuleModel.findByIdAndUpdate(id, data, { new: true }).exec();
+            return await TaxRuleModel.findByIdAndUpdate(id, updateOps, { new: true }).exec();
         } catch (error: any) {
             console.error("Failed to update tax rule at Repository Layer:", error);
             throw error;
@@ -107,12 +134,12 @@ export class TaxRuleRepository implements ITaxRuleRepository {
         try {
             const taxRules = await TaxRuleModel.find(
                 { _id: { $in: ruleIds } },
-                { 
-                    type: 1, 
-                    value: 1, 
-                    applicableOn: 1, 
+                {
+                    type: 1,
+                    value: 1,
+                    applicableOn: 1,
                     name: 1,
-                    _id: 0 
+                    _id: 0
                 }
             ).lean();
 
