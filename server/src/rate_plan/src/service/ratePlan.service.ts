@@ -127,9 +127,7 @@ class RatePlanService {
     invTypeCode?: string, 
     ratePlanCode?: string, 
     page?: number, 
-    limit?: number,
-    startDate: Date, 
-    endDate: Date,
+    limit?: number
   ) {
 
     try {
@@ -143,9 +141,7 @@ class RatePlanService {
         invTypeCode && invTypeCode, 
         ratePlanCode && ratePlanCode, 
         page && page, 
-        limit && limit,
-        startDate && startDate,
-        endDate && endDate
+        limit && limit
       );
 
       if (!ratePlans) {

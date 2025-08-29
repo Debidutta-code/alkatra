@@ -135,9 +135,7 @@ class RatePlanController {
                 invTypeCode as string, 
                 ratePlanCode as string, 
                 page, 
-                limit, 
-                startDate, 
-                endDate
+                limit
             );
             if (!response) {
                 throw new Error("No rate plans found for this hotel code")

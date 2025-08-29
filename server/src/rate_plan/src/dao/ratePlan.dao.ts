@@ -148,9 +148,7 @@ class RatePlanDao {
     invTypeCode?: string,
     ratePlanCode?: string,
     page: number = 1,
-    limit: number = 10,
-    startDate: Date,
-    endDate: Date
+    limit: number = 10
   ): Promise<{
     data: RoomWithRates[];
     pagination: {
@@ -168,8 +166,8 @@ class RatePlanDao {
       const skip = (page - 1) * resultsPerPage;
 
       const [inventory, ratePlans] = await Promise.all([
-        this.getInventoryOfHotel(hotelCode, invTypeCode, startDate, endDate),
-        this.getRoomRateOfHotel(hotelCode, invTypeCode, ratePlanCode, startDate, endDate),
+        this.getInventoryOfHotel(hotelCode, invTypeCode),
+        this.getRoomRateOfHotel(hotelCode, invTypeCode, ratePlanCode),
       ]);
 
       const mappedData = this.mapInventoryToRatePlans(inventory, ratePlans);
@@ -205,9 +203,7 @@ class RatePlanDao {
    */
   private static async getInventoryOfHotel(
     hotelCode: string,
-    invTypeCode?: string,
-    startDate: Date,
-    endDate: Date
+    invTypeCode?: string
   ) {
     try {
 
@@ -216,14 +212,14 @@ class RatePlanDao {
         inventoryMatch.invTypeCode = invTypeCode;
       }
 
-      if (startDate) {
-        inventoryMatch["availability.startDate"] = { $gte: startOfDay(startDate) };
-      } else {
-        inventoryMatch["availability.startDate"] = { $gte: startOfDay(new Date()) };
-      }
-      if (endDate) {
-        inventoryMatch["availability.endDate"] = { $lte: endOfDay(endDate) };
-      }
+      // if (startDate) {
+      //   inventoryMatch["availability.startDate"] = { $gte: startOfDay(startDate) };
+      // } else {
+      //   inventoryMatch["availability.startDate"] = { $gte: startOfDay(new Date()) };
+      // }
+      // if (endDate) {
+      //   inventoryMatch["availability.endDate"] = { $lte: endOfDay(endDate) };
+      // }
 
       inventoryMatch["availability.startDate"] = { $gte: startOfDay(new Date()) };
 
@@ -245,9 +241,7 @@ class RatePlanDao {
   private static async getRoomRateOfHotel(
     hotelCode: string,
     invTypeCode?: string,
-    ratePlanCode?: string,
-    startDate: Date,
-    endDate: Date
+    ratePlanCode?: string
   ) {
     try {
 
@@ -259,14 +253,14 @@ class RatePlanDao {
         ratePlanMatch.ratePlanCode = ratePlanCode;
       }
 
-      if (startDate) {
-        ratePlanMatch.startDate = { $gte: startOfDay(startDate) };
-      } else {
-        ratePlanMatch.startDate = { $gte: startOfDay(new Date()) };
-      }
-      if (endDate) {
-        ratePlanMatch.endDate = { $lte: endOfDay(endDate) };
-      }
+      // if (startDate) {
+      //   ratePlanMatch.startDate = { $gte: startOfDay(startDate) };
+      // } else {
+      //   ratePlanMatch.startDate = { $gte: startOfDay(new Date()) };
+      // }
+      // if (endDate) {
+      //   ratePlanMatch.endDate = { $lte: endOfDay(endDate) };
+      // }
 
       ratePlanMatch.startDate = { $gte: startOfDay(new Date()) };
 
