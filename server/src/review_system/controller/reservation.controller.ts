@@ -1,7 +1,7 @@
 import { ReservationService } from "../service";
 import { Request, Response } from "express";
 
-const reservationService = new ReservationService();
+const reservationService = ReservationService.getInstance();
 
 export class ReservationController {
 

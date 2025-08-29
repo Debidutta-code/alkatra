@@ -265,7 +265,8 @@
         "generateReferral": "Referans Linki Oluştur",
         "generateOnce": "Referans linkinizi bir kez oluşturun ve ödül kazanmaya başlamak için arkadaşlarınızla paylaşın.",
         "generated": "Referans linki başarıyla oluşturuldu!",
-        "copiedToClipboard": "Panoya kopyalandı!"
+        "copiedToClipboard": "Panoya kopyalandı!",
+        "fetchError": "Yönlendirmeler yüklenemedi. Lütfen tekrar deneyin."
     },
     "HotelListing": {
         "CompactSearchBar": {
@@ -325,7 +326,7 @@
         "recommended": "Önerilen",
         "highestRating": "En Yüksek Puan",
         "lowestRating": "En Düşük Puan",
-        "whyBookWithTripSwift": "Neden TripSwift ile Rezervasyon?",
+        "whyBookWithAlhajz": "Neden Alhajz ile Rezervasyon Yapmalısınız?",
         "freeCancellation": "Ücretsiz İptal",
         "freeCancellationDesc": "Tesislerimizin çoğu giriş tarihinden 24 saat öncesine kadar ücretsiz iptal imkanı sunuyor.",
         "bestPriceGuarantee": "En İyi Fiyat Garantisi",
@@ -477,9 +478,9 @@
             "qrCodeAlt": "İndirim QR Kodu",
             "scanToApply": "Uygulamak için tarayın",
             "instructions": {
-                "scanAtCheckout": "Bu odayı Alhajz uygulamasında açmak için QR kodu tarayın.",
-                "applyDiscount": "Uygulama yüklü değilse, indirmeniz için yönlendirileceksiniz.",
-                "validityNote": "Bu oda için özel indirim almak için uygulama üzerinden rezervasyon yapın."
+                "applyDiscount": "İndiriminizi kullanmak için lütfen Alhajz uygulamasını Google Play'den indirin (henüz indirmediyseniz).",
+                "scanAtCheckout": "Bu odayı uygulama üzerinden doğrudan rezerve etmek için QR kodunu tarayın.",
+                "validityNote": "Özel indiriminizi etkinleştirmek için lütfen uygulama üzerinden rezervasyon yapın."
             }
         },
         "RoomCard": {
@@ -593,7 +594,7 @@
                 "gotIt": "Anladım"
             },
             "seeMore": "Daha fazla gör",
-            "showLess": "Daha az göster"
+            "seeLess": "Daha az göster"
         }
     },
     "CancellationPolicies": {
@@ -777,7 +778,7 @@
             "standardRoom": "Standart Oda",
             "paymentMethod": "Ödeme Yöntemi",
             "primaryGuest": "Ana Misafir",
-            "rateBreakdown": "Fiyat Dökümü",
+            "rateBreakdown": "Toplam Tutar",
             "viewBookingDetails": "Rezervasyon Detaylarını Görüntüle",
             "modify": "Değiştir",
             "cancel": "İptal Et"
@@ -1388,5 +1389,9 @@
         "reviewScores": "Yorum puanları",
         "timeOfYear": "Yılın zamanı",
         "sortReviewsBy": "Yorumları sırala"
+    },
+    "NetworkStatus": {
+        "offline": "Çevrimdışısınız. Lütfen internet bağlantınızı kontrol edin.",
+        "online": "Yeniden çevrimiçi oldunuz!"
     }
 }

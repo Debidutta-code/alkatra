@@ -1,7 +1,8 @@
 import { IWallet } from "../models";
 import { IWalletRepository, IWalletService } from "../interfaces";
-import { toObjectId } from "../utils";
+import { GenerateUtils } from "../utils";
 import { ValidateService } from "./validate.service";
+import { ClientSession } from "mongoose";
 
 export class WalletService implements IWalletService {
     private walletRepository: IWalletRepository;
@@ -17,15 +18,15 @@ export class WalletService implements IWalletService {
      * @param userId - The ID of the user
      * @returns The created wallet document
      */
-    async initializeWallet(userId: string): Promise<IWallet> {
+    async initializeWallet(userId: string, session: ClientSession): Promise<IWallet> {
         const walletData: Partial<IWallet> = {
-            customerId: toObjectId(userId),
+            customerId: GenerateUtils.toObjectId(userId),
             totalEarned: 0,
             totalRedeemed: 0,
             currentBalance: 0,
             currency: "USD"
         };
-        return await this.walletRepository.createWallet(walletData);
+        return await this.walletRepository.createWallet(walletData, session);
     }
 
 

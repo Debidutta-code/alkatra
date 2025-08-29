@@ -540,7 +540,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
                         onClick={() => setShowFullDescription(false)}
                         className="text-xs text-tripswift-blue hover:text-[#054B8F] font-tripswift-medium ml-1 transition-colors duration-200 inline-flex items-center"
                       >
-                        ({t('RoomsPage.RoomCard.showLess')})
+                        ({t('RoomsPage.RoomCard.seeLess')})
                       </button>
                     )}
                   </>
@@ -617,7 +617,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
                   onClick={() => setShowAllAmenities(prev => !prev)}
                   className="text-xs text-tripswift-blue hover:text-[#054B8F] font-tripswift-medium"
                 >
-                  ({t(`RoomsPage.RoomCard.${showAllAmenities ? 'showLess' : 'seeMore'}`)})
+                  ({t(`RoomsPage.RoomCard.${showAllAmenities ? 'seeLess' : 'seeMore'}`)})
                 </button>
               )}
             </div>

@@ -1,3 +1,4 @@
+import { ClientSession } from "mongoose";
 import { IWallet } from "../models";
 import { Request, Response } from "express";
 
@@ -8,7 +9,7 @@ export interface IWalletRepository {
      * @param wallet - Partial wallet data containing customerId, totalEarned, totalRedeemed, currentBalance, and currency
      * @returns The newly created wallet document
      */
-    createWallet(wallet: Partial<IWallet>): Promise<IWallet>;
+    createWallet(wallet: Partial<IWallet>, session: ClientSession): Promise<IWallet>;
 
     /**
      * Updates the wallet balance for a specific user.
@@ -36,7 +37,7 @@ export interface IWalletService {
      * @param userId - The ID of the user
      * @returns The created wallet document
      */
-    initializeWallet(userId: string): Promise<IWallet>;
+    initializeWallet(userId: string, session?: ClientSession): Promise<IWallet>;
 
 
     /**

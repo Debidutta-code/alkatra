@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import { ClientSession, Types } from "mongoose";
 import { referralService } from "../../../referral_system/container";
 import CustomerRepository from "../repositories/customerRepository";
 
@@ -83,6 +83,7 @@ export class CustomerReferralService {
         referralCode: string,
         referralLink: string,
         referralQRCode: string,
+        session: ClientSession
     ): Promise<any> {
         if (!userId && !Types.ObjectId.isValid(userId)) throw new Error("Invalid user ID");
         if (!referralCode || !referralLink || !referralQRCode) throw new Error("All referral details are required");
@@ -92,7 +93,8 @@ export class CustomerReferralService {
             userId,
             referralCode,
             referralLink,
-            referralQRCode
+            referralQRCode,
+            session
         );
 
         if (!updatedUser) {
@@ -118,6 +120,28 @@ export class CustomerReferralService {
             referralLink: user.referralLink,
             referralQRCode: user.referralQRCode
         };
+    }
+
+
+    /**
+     * Removes referral details from a customer's document.
+     * @param userId - ID of the user whose referral details are to be removed
+     * @return true if referral details were successfully removed, otherwise false
+     */
+    static async removeReferralDetailsFromCustomer(userId: string): Promise<boolean> {
+        try {
+            if (!userId && !Types.ObjectId.isValid(userId)) throw new Error("Invalid user ID");
+
+            const updatedUser = await CustomerRepository.removeReferralInfo(userId);
+            if (!updatedUser) {
+                throw new Error("Failed to remove referral details from customer");
+            }
+
+            return true;
+        } catch (error: any) {
+            console.error("Error removing referral details from customer:", error);
+            return false;
+        }
     }
 
 }

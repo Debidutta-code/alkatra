@@ -83,6 +83,7 @@ const HotelListing: React.FC = () => {
   const location = searchParams.get("location");
   const checkinDate = searchParams.get("checkin");
   const checkoutDate = searchParams.get("checkout");
+  const [viewRoomLoading, setViewRoomLoading] = useState<string | null>(null);
 
   // Initialize search params
   useEffect(() => {
@@ -185,30 +186,43 @@ const HotelListing: React.FC = () => {
     setRatingFilter(rating);
   };
 
-  const handleViewRoom = (hotelId: string) => {
-    if (hotelId) {
-      dispatch(setPropertyId(hotelId));
-    }
-    if (checkinDate) {
-      dispatch(setCheckInDate(checkinDate));
-    }
-    if (checkoutDate) {
-      dispatch(setCheckOutDate(checkoutDate));
-    }
+  const handleViewRoom = async (hotelId: string) => {
+    try {
+      // Set loading state for this specific hotel
+      setViewRoomLoading(hotelId);
 
-    if (guestDetails && Object.keys(guestDetails).length > 0) {
-      localStorage.setItem("guest_details", JSON.stringify(guestDetails));
-      if (guestDetails.rooms) {
-        localStorage.setItem("rooms", guestDetails.rooms.toString());
+      if (hotelId) {
+        dispatch(setPropertyId(hotelId));
       }
-    }
+      if (checkinDate) {
+        dispatch(setCheckInDate(checkinDate));
+      }
+      if (checkoutDate) {
+        dispatch(setCheckOutDate(checkoutDate));
+      }
 
-    const guestParams = guestDetails
-      ? `&rooms=${guestDetails.rooms || 1}&adults=${guestDetails.guests || 1
-      }&children=${guestDetails.children || 0}&infant=${guestDetails.infants || 0
-      }`
-      : "";
-    router.push(`/hotel?${guestParams}`);
+      if (guestDetails && Object.keys(guestDetails).length > 0) {
+        localStorage.setItem("guest_details", JSON.stringify(guestDetails));
+        if (guestDetails.rooms) {
+          localStorage.setItem("rooms", guestDetails.rooms.toString());
+        }
+      }
+
+      const guestParams = guestDetails
+        ? `&rooms=${guestDetails.rooms || 1}&adults=${guestDetails.guests || 1}&children=${guestDetails.children || 0}&infant=${guestDetails.infants || 0}`
+        : "";
+
+      // Add a small delay to show loading state (optional)
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      router.push(`/hotel?${guestParams}`);
+    } catch (error) {
+      console.error("Error navigating to hotel:", error);
+      toast.error("Failed to view room. Please try again.");
+    } finally {
+      // Reset loading state after navigation
+      setViewRoomLoading(null);
+    }
   };
 
   // Apply filters to hotel data
@@ -592,6 +606,7 @@ const HotelListing: React.FC = () => {
                       onViewRoom={handleViewRoom}
                       checkinDate={checkinDate}
                       checkoutDate={checkoutDate}
+                      isLoading={viewRoomLoading === hotel._id}
                     />
                   </div>
                 ))}
@@ -601,8 +616,8 @@ const HotelListing: React.FC = () => {
             {filteredHotels.length > 0 && !isLoading && (
               <div className="mt-6 bg-tripswift-off-white rounded-xl shadow-sm border border-gray-200 p-4">
                 <h3 className="font-tripswift-bold text-lg text-tripswift-black mb-4">
-                  {t("HotelListing.whyBookWithTripSwift", {
-                    defaultValue: "Why Book With TripSwift",
+                  {t("HotelListing.whyBookWithAlhajz", {
+                    defaultValue: "Why Book With Alhajz",
                   })}
                 </h3>
 

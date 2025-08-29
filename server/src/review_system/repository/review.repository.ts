@@ -3,6 +3,16 @@ import { CustomerReviewModel } from "../model";
 import { ThirdPartyBooking } from "../../wincloud/src/model/reservationModel";
 
 export class CustomerReviewRepository {
+    private static instance: CustomerReviewRepository;
+
+    private constructor() { }
+
+    static getInstance(): CustomerReviewRepository {
+        if (!CustomerReviewRepository.instance) {
+            CustomerReviewRepository.instance = new CustomerReviewRepository();
+        }
+        return CustomerReviewRepository.instance;
+    }
 
     async newReviewCreate(
         reservationId: string,

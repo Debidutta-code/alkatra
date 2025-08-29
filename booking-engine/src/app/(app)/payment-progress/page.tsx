@@ -852,7 +852,7 @@ const PaymentProgressPage: React.FC = () => {
 
                                                     {/* Address & Instructions */}
                                                     <div className="space-y-4">
-                                                        <div className="p-4 bg-gray-50 rounded-xl">
+                                                        {/* <div className="p-4 bg-gray-50 rounded-xl">
                                                             <label className="text-tripswift-black/70 font-tripswift-medium block mb-2">Wallet Address</label>
                                                             <div className="flex items-center gap-2">
                                                                 <code className="flex-1 text-sm text-tripswift-black/80 bg-tripswift-off-white px-3 py-2 rounded-lg font-mono break-all border">
@@ -870,7 +870,7 @@ const PaymentProgressPage: React.FC = () => {
                                                             {copied && (
                                                                 <p className="text-green-600 text-sm mt-2 font-tripswift-medium">✓ Address copied to clipboard!</p>
                                                             )}
-                                                        </div>
+                                                        </div> */}
 
                                                         {/* Instructions */}
                                                         <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
