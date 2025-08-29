@@ -126,6 +126,8 @@ class RatePlanService {
     hotelCode: string, 
     invTypeCode?: string, 
     ratePlanCode?: string, 
+    startDate?:string,
+    endDate?: string,
     page?: number, 
     limit?: number
   ) {
@@ -140,6 +142,8 @@ class RatePlanService {
         hotelCode, 
         invTypeCode && invTypeCode, 
         ratePlanCode && ratePlanCode, 
+        startDate && startDate, 
+        endDate && endDate,
         page && page, 
         limit && limit
       );

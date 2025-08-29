@@ -3,6 +3,7 @@ import RatePlan from "../model/ratePlan.model";
 import RateAmount from "../../../wincloud/src/model/ratePlanDateWise.model"
 import { Inventory } from "../../../wincloud/src/model/inventoryModel"
 import { startOfDay, endOfDay, addDays } from 'date-fns';
+import { start } from "repl";
 
 interface UpdatePlanData {
   rateAmountId: string;
@@ -147,6 +148,8 @@ class RatePlanDao {
     hotelCode: string,
     invTypeCode?: string,
     ratePlanCode?: string,
+    startDate?: string,
+    endDate?: string,
     page: number = 1,
     limit: number = 10
   ): Promise<{
@@ -166,8 +169,8 @@ class RatePlanDao {
       const skip = (page - 1) * resultsPerPage;
 
       const [inventory, ratePlans] = await Promise.all([
-        this.getInventoryOfHotel(hotelCode, invTypeCode),
-        this.getRoomRateOfHotel(hotelCode, invTypeCode, ratePlanCode),
+        this.getInventoryOfHotel(hotelCode, invTypeCode, startDate, endDate),
+        this.getRoomRateOfHotel(hotelCode, invTypeCode, ratePlanCode, startDate, endDate),
       ]);
 
       const mappedData = this.mapInventoryToRatePlans(inventory, ratePlans);
@@ -203,7 +206,9 @@ class RatePlanDao {
    */
   private static async getInventoryOfHotel(
     hotelCode: string,
-    invTypeCode?: string
+    invTypeCode?: string,
+    startDate?: string,
+    endDate?: string
   ) {
     try {
 
@@ -212,16 +217,16 @@ class RatePlanDao {
         inventoryMatch.invTypeCode = invTypeCode;
       }
 
-      // if (startDate) {
-      //   inventoryMatch["availability.startDate"] = { $gte: startOfDay(startDate) };
-      // } else {
-      //   inventoryMatch["availability.startDate"] = { $gte: startOfDay(new Date()) };
-      // }
-      // if (endDate) {
-      //   inventoryMatch["availability.endDate"] = { $lte: endOfDay(endDate) };
-      // }
+      if (startDate) {
+        inventoryMatch["availability.startDate"] = { $gte: startOfDay(startDate) };
+      } else {
+        inventoryMatch["availability.startDate"] = { $gte: startOfDay(new Date()) };
+      }
+      if (endDate) {
+        inventoryMatch["availability.endDate"] = { $lte: endOfDay(endDate) };
+      }
 
-      inventoryMatch["availability.startDate"] = { $gte: startOfDay(new Date()) };
+      // inventoryMatch["availability.startDate"] = { $gte: startOfDay(new Date()) };
 
       const inventory = await Inventory.aggregate([
         { $match: inventoryMatch },
@@ -241,7 +246,9 @@ class RatePlanDao {
   private static async getRoomRateOfHotel(
     hotelCode: string,
     invTypeCode?: string,
-    ratePlanCode?: string
+    ratePlanCode?: string,
+    startDate?: string,
+    endDate?: string
   ) {
     try {
 
@@ -253,16 +260,22 @@ class RatePlanDao {
         ratePlanMatch.ratePlanCode = ratePlanCode;
       }
 
-      // if (startDate) {
-      //   ratePlanMatch.startDate = { $gte: startOfDay(startDate) };
-      // } else {
-      //   ratePlanMatch.startDate = { $gte: startOfDay(new Date()) };
-      // }
-      // if (endDate) {
-      //   ratePlanMatch.endDate = { $lte: endOfDay(endDate) };
-      // }
+      if (startDate) {
+        ratePlanMatch.startDate = { $gte: startOfDay(startDate) };
+      } else {
+        ratePlanMatch.startDate = { $gte: startOfDay(new Date()) };
+      }
 
-      ratePlanMatch.startDate = { $gte: startOfDay(new Date()) };
+      if (endDate) {
+        ratePlanMatch.endDate = { $lte: endOfDay(endDate) };
+      }
+      else {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        ratePlanMatch.endDate = { $lte: startOfDay(tomorrow) };
+      }
+
+      // ratePlanMatch.startDate = { $gte: startOfDay(new Date()) };
 
       const ratePlan = await RateAmount.aggregate([
         { $match: ratePlanMatch },
@@ -286,19 +299,19 @@ class RatePlanDao {
   ): RoomWithRates[] {
 
     const results: RoomWithRates[] = [];
-    
+
     inventory.forEach((inv) => {
-      
+
       const matchingRates = ratePlans.filter(
         (rate) =>
-          rate.hotelCode === inv.hotelCode &&
-          rate.invTypeCode === inv.invTypeCode &&
-          rate.startDate.getTime() <= inv.availability.startDate.getTime() &&
-          rate.endDate.getTime() >= inv.availability.endDate.getTime()
+          rate.hotelCode === inv.hotelCode
+          && rate.invTypeCode === inv.invTypeCode
+          && rate.startDate.getTime() === inv.availability.startDate.getTime()
+          // && rate.endDate.getTime() >= inv.availability.endDate.getTime()
       );
 
       matchingRates.forEach((matchingRate) => {
-        
+
         const result: RoomWithRates = {
           _id: inv._id,
           hotelCode: inv.hotelCode,

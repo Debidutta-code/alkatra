@@ -114,6 +114,7 @@ class RatePlanController {
             const {invTypeCode, ratePlanCode, startDate, endDate} = req.query;
             const page = req.query?.page ? parseInt(req.query.page as string) : 1;
             const limit = req.query?.limit ? parseInt(req.query.limit as string) : 10;
+            console.log(`The start date and end date we get ${startDate} and ${endDate}`);
 
             if (isNaN(page) || page < 1) {
                 return res.status(400).json({
@@ -134,8 +135,10 @@ class RatePlanController {
                 hotelCode, 
                 invTypeCode as string, 
                 ratePlanCode as string, 
+                startDate as string,
+                endDate as string,
                 page, 
-                limit
+                limit,                
             );
             if (!response) {
                 throw new Error("No rate plans found for this hotel code")
