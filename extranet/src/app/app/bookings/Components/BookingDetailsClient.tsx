@@ -83,11 +83,11 @@ export default function BookingDetailsClient({ bookingId }: BookingDetailsClient
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-    
+
     return age;
   };
 
@@ -116,7 +116,7 @@ export default function BookingDetailsClient({ bookingId }: BookingDetailsClient
       try {
         setError("");
         setLoading(true);
-        
+
         const data = await getBookingById(bookingId);
         console.log("^^^^^^^^^^^^^^^^^^^^^^^^\n", bookingId);
         console.log("Booking data received:", data);
@@ -219,7 +219,7 @@ export default function BookingDetailsClient({ bookingId }: BookingDetailsClient
                   {error || "The booking you're looking for is either invalid or does not exist."}
                 </p>
                 <div className="text-center">
-                  <Button 
+                  <Button
                     onClick={handleBackToList}
                     className="bg-tripswift-blue hover:bg-tripswift-dark-blue text-white"
                   >
@@ -321,20 +321,18 @@ export default function BookingDetailsClient({ bookingId }: BookingDetailsClient
                         const age = calculateAge(guest.dob);
                         const isPrimary = index === 0;
                         return (
-                          <div 
-                            key={guest._id} 
-                            className={`p-3 rounded-lg border-2 transition-all ${
-                              isPrimary 
-                                ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800' 
+                          <div
+                            key={guest._id}
+                            className={`p-3 rounded-lg border-2 transition-all ${isPrimary
+                                ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
                                 : 'bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700'
-                            }`}
+                              }`}
                           >
                             <div className="flex items-center gap-2.5 mb-2">
-                              <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-medium ${
-                                isPrimary 
-                                  ? 'bg-gradient-to-br from-tripswift-blue to-purple-600' 
+                              <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-medium ${isPrimary
+                                  ? 'bg-gradient-to-br from-tripswift-blue to-purple-600'
                                   : 'bg-gradient-to-br from-slate-400 to-slate-600'
-                              }`}>
+                                }`}>
                                 {guest.firstName.charAt(0).toUpperCase()}
                               </div>
                               <div className="flex-1">
@@ -448,7 +446,7 @@ export default function BookingDetailsClient({ bookingId }: BookingDetailsClient
                   <div>
                     <div className="text-xs text-slate-500 dark:text-slate-400">Phone</div>
                     <div className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                      +91{booking.userDetails?.phone || booking.phone}
+                      +{booking.userDetails?.phone || booking.phone}
                     </div>
                   </div>
                 </div>

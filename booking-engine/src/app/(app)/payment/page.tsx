@@ -488,9 +488,18 @@ function PaymentPageContent() {
                     <p className="text-tripswift-black/70 text-sm mb-4">
                       {t('Payment.PaymentPageContent.needHelp.message')}
                     </p>
-                    <div className="text-tripswift-blue font-tripswift-medium cursor-pointer hover:underline">
+                    <Link
+                      href={`https://mail.google.com/mail/?view=cm&fs=1&to=business.alhajz@gmail.com&su=${encodeURIComponent(
+                        "Support Request - Booking Assistance"
+                      )}&body=${encodeURIComponent(
+                        "Hello, I need help with my booking."
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-tripswift-blue font-tripswift-medium cursor-pointer hover:underline"
+                    >
                       {t('Payment.PaymentPageContent.needHelp.contactSupport')}
-                    </div>
+                    </Link>
                   </div>
                 </div>
               </div>
