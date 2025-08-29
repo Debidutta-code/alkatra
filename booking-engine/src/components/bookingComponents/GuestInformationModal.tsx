@@ -202,7 +202,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   const [phoneCountdown, setPhoneCountdown] = useState(0);
   const [emailVerified, setEmailVerified] = useState(false);
   const [phoneVerified, setPhoneVerified] = useState(false);
-
+  const [emailAlreadyVerified, setEmailAlreadyVerified] = useState(false);
 
   const [activeSection, setActiveSection] = useState<"details" | "review">(
     "details"
@@ -383,21 +383,25 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     setIsEmailVerifying(true);
     try {
       const response = await verifyApi.sendEmailOtp(email);
-      // setUpdateMessage(
-      //   response.message || t("BookingComponents.GuestInformationModal.otpSent")
-      // );
-      toast.success(
-        t("BookingComponents.GuestInformationModal.otpSent")
-      );
-      setEmailOtpSent(true);
-      setEmailCountdown(300);
-      setEmailVerified(false);
+
+      // Check if email is already verified
+      if (response.status === "verified") {
+        toast.success(t("BookingComponents.GuestInformationModal.emailAlreadyVerified"));
+        setEmailVerified(true);
+        setEmailAlreadyVerified(true); // Set this flag for already verified emails
+        setEmailOtpSent(false);
+        setEmailCountdown(0);
+        setEmailOtp("");
+      } else if (response.status === "pending") {
+        toast.success(t("BookingComponents.GuestInformationModal.otpSent"));
+        setEmailOtpSent(true);
+        setEmailCountdown(300);
+        setEmailVerified(false);
+        setEmailAlreadyVerified(false); // Reset this flag for new verifications
+      }
     } catch (err: any) {
-      // setErrorMessage(
-      //   err.message || t("BookingComponents.GuestInformationModal.otpSendFailed")
-      // );
       toast.error(
-        t("BookingComponents.GuestInformationModal.otpSendFailed")
+        err.message || t("BookingComponents.GuestInformationModal.otpSendFailed")
       );
     } finally {
       setIsEmailVerifying(false);
@@ -406,24 +410,20 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
 
   const handleVerifyEmailOtp = async () => {
     if (!emailOtp.trim()) {
-      // setErrorMessage(t("BookingComponents.GuestInformationModal.otpEmptyError"));
       toast.error(t("BookingComponents.GuestInformationModal.otpEmptyError"));
       return;
     }
 
     try {
       const response = await verifyApi.verifyEmailOtp(email, emailOtp);
-      // setUpdateMessage(t("BookingComponents.GuestInformationModal.emailVerified"));
       toast.success(t("BookingComponents.GuestInformationModal.emailVerified"));
       setEmailVerified(true);
+      setEmailAlreadyVerified(false); // This was verified through OTP, not already verified
       setEmailOtpSent(false);
       setEmailCountdown(0);
       setEmailOtp("");
       setErrorMessage(null);
     } catch (err: any) {
-      // setErrorMessage(
-      //   err.message || t("BookingComponents.GuestInformationModal.otpInvalidError")
-      // );
       toast.error(
         t("BookingComponents.GuestInformationModal.otpInvalidError")
       );
@@ -967,6 +967,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                             }
                             if (emailVerified && newEmail !== email) {
                               setEmailVerified(false);
+                              setEmailAlreadyVerified(false);
                               setEmailOtpSent(false);
                               setEmailOtp("");
                               setEmailCountdown(0);
@@ -1043,7 +1044,10 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       )}
                       {emailVerified && (
                         <p className="text-xs text-green-600 mt-1">
-                          ✅ {t("BookingComponents.GuestInformationModal.emailVerified")}
+                          ✅ {emailAlreadyVerified
+                            ? t("BookingComponents.GuestInformationModal.emailAlreadyVerified")
+                            : t("BookingComponents.GuestInformationModal.emailVerified")
+                          }
                         </p>
                       )}
                       {errors.email && (

@@ -265,7 +265,8 @@
         "generateReferral": "Referans Linki Oluştur",
         "generateOnce": "Referans linkinizi bir kez oluşturun ve ödül kazanmaya başlamak için arkadaşlarınızla paylaşın.",
         "generated": "Referans linki başarıyla oluşturuldu!",
-        "copiedToClipboard": "Panoya kopyalandı!"
+        "copiedToClipboard": "Panoya kopyalandı!",
+        "fetchError": "Yönlendirmeler yüklenemedi. Lütfen tekrar deneyin."
     },
     "HotelListing": {
         "CompactSearchBar": {
@@ -1388,5 +1389,9 @@
         "reviewScores": "Yorum puanları",
         "timeOfYear": "Yılın zamanı",
         "sortReviewsBy": "Yorumları sırala"
+    },
+    "NetworkStatus": {
+        "offline": "Çevrimdışısınız. Lütfen internet bağlantınızı kontrol edin.",
+        "online": "Yeniden çevrimiçi oldunuz!"
     }
 }

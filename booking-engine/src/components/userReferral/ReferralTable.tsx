@@ -58,9 +58,6 @@ export default function ReferralTable() {
   };
 
   const toggleShowReferrals = () => {
-    if (!showReferrals) {
-      fetchMyReferrals();
-    }
     setShowReferrals(!showReferrals);
   };
 
