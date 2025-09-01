@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import Image from "next/image";
 import { CheckCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import { googleLogin } from "../../Redux/slices/auth.slice";
 import toast from "react-hot-toast"
 import { AppDispatch } from "../../Redux/store";
+import { useSearchParams } from "next/navigation";
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -29,11 +30,24 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
   heroSubtitle,
   benefits,
 }) => {
+  const searchParams = useSearchParams();
   const { t } = useTranslation();
   const pathname = usePathname();
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
 
+  const [referralCode, setReferralCode] = useState<string | null>('');
+  const [referrerId, setReferrerId] = useState<string | null>('');
+
+  useEffect(() => {
+      const referrerId = searchParams.get("referrerId");
+      const referralCode = searchParams.get("referralCode");
+
+      setReferralCode(referralCode);
+      setReferrerId(referrerId);
+    }, []);
+  
+  
   const responseGoogle = async (authResult: any) => {
     console.log("✅ Step 1: Entered responseGoogle");
     try {
@@ -42,8 +56,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       if (authResult?.code) {
         console.log("✅ Step 3: Auth code found:", authResult.code);
 
-        const result = await dispatch(googleLogin({ code: authResult.code })).unwrap();
-        console.log("✅ Step 4: Dispatch result:", result);
+        const result = await dispatch(googleLogin({ code: authResult.code, provider: "google", referrerId, referralCode })).unwrap();
 
         toast.success(
           t(`Auth.Login.successMessage`),

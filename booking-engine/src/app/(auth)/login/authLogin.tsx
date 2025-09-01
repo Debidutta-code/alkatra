@@ -44,13 +44,14 @@ const Login: React.FC = () => {
     { email: "", password: "" },
     {
       email: { required: true, email: true },
-      password: { required: true }
+      password: { required: true },
+      
     }
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted with values:", values);
+    
     if (!validateForm()) {
       console.log("Login Validation errors:", errors);
       toast.error(t('Login failed'), {
@@ -58,11 +59,13 @@ const Login: React.FC = () => {
       });
       return;
     }
+
     setLoading(true);
+
     try {
-      console.log("Dispatching login action...");
-      const loginResult = await dispatch(login({ email: values.email, password: values.password }));
-      console.log(`Login result: ${JSON.stringify(loginResult)}`);
+
+      const loginResult = await dispatch(login({ email: values.email, password: values.password, provider: 'local' }));
+      
       if (loginResult.meta.requestStatus === 'rejected') {
         throw new Error("Login failed: Wrong email or password");
       }

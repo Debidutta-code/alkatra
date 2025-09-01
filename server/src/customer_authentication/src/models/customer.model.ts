@@ -1,6 +1,9 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface ICustomer extends Document {
+    googleId: string;
+    provider: string;
+    avatar: string;
     firstName: string;
     lastName: string;
     email: string;
@@ -17,13 +20,16 @@ export interface ICustomer extends Document {
 }
 
 const CustomerSchema: Schema = new Schema<ICustomer>({
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
+    googleId: { type: String },
+    provider: { type: String, required: true, enum: ["local", "google"] },
+    avatar: { type: String },
+    firstName: { type: String, required: false },
+    lastName: { type: String, required: false },
+    email: { type: String, required: false, unique: true },
     phone: { type: String, required: false },
-    password: { type: String, required: true },
+    password: { type: String, required: false },
     address: { type: String },
-    role: { type: String, required: true, enum: ["customer"], default: "customer" },
+    role: { type: String, required: false, enum: ["customer"], default: "customer" },
     permissions: [{ type: Schema.Types.ObjectId, ref: "Permission" }],
     referralCode: { type: String, unique: true, sparse: true },
     referralLink: { type: String, unique: true, sparse: true },

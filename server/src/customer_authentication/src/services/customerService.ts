@@ -4,7 +4,6 @@ import customerRepository from "../repositories/customerRepository";
 import { isValidPassword } from "../utils/passwordValidator";
 import { ICustomer } from "../models/customer.model";
 import jwt from "jsonwebtoken";
-import { IUser } from "../models/googleUser.model";
 import { UserMessageRepository } from "../repositories";
 import { IUserMessage } from "../interfaces/userMessage.interface";
 
@@ -18,7 +17,7 @@ class CustomerService {
 
     // new customer register
     async registerCustomer(customerData: Partial<ICustomer>): Promise<ICustomer> {
-        const { firstName, lastName, email, password, phone } = customerData;
+        const { firstName, lastName, email, password, phone, provider } = customerData;
         if (!firstName || !lastName || !email || !password) {
             const errors: Record<string, string | null> = {
                 firstName: !firstName ? "Firstname is required" : null,
@@ -45,6 +44,7 @@ class CustomerService {
             phone,
             password: hashedPassword,
             role: "customer",
+            provider: provider,
             createdAt: new Date(),
             updatedAt: new Date(),
         });
@@ -101,41 +101,9 @@ class CustomerService {
 
             let customer = await customerRepository.findById(decoded.id);
             if (!customer) {
-                if (!customer) {
-                    customer = await this.getGoogleCustomerOwnData(token);
-                    return customer;
-                }
+                throw new Error ("Customer not found");
             }
             return customer;
-        } catch (error: any) {
-            throw new Error(`Error retrieving customer: ${error.message}`);
-        }
-    }
-
-    async getGoogleCustomerOwnData(token: string): Promise<any> {
-        try {
-            const secretKey = process.env.JWT_SECRET_KEY || "your_secret_key";
-            const decoded = jwt.verify(token, secretKey) as { id: string };
-
-            if (!decoded.id) {
-                throw new Error("Invalid token: missing ID");
-            }
-
-            const customer = await customerRepository.findByIdFromGoogleUserCollection(decoded.id);
-            if (!customer) {
-                throw new Error("Customer details not found");
-            }
-
-            const [firstName, ...rest] = customer.displayName?.split(" ") || ["Unknown"];
-            const lastName = rest.join(" ") || "";
-
-            return {
-                _id: customer._id,
-                firstName,
-                lastName,
-                email: customer.email,
-                avatar: customer.avatar || null
-            };
         } catch (error: any) {
             throw new Error(`Error retrieving customer: ${error.message}`);
         }

@@ -77,15 +77,15 @@ const authSlice = createSlice({
   },
 });
 
-export const { setAccessToken, logout, setUser } = authSlice.actions;
+
 
 // Login thunk for email/password authentication
 export const login = createAsyncThunk<
   string,
-  { email: string; password: string },
+  { email: string; password: string, provider: string },
   { dispatch: AppDispatch; state: RootState }
 >("auth/login", async (data, { dispatch }) => {
-  console.log("Login Api Calling here");
+  
   const res = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/login`,
     {
@@ -106,33 +106,41 @@ export const login = createAsyncThunk<
 // Google login thunk
 export const googleLogin = createAsyncThunk<
   { token: string },
-  { code: string },
+  { code: string, provider: string, referrerId?: string | null, referralCode?: string | null },
   { dispatch: AppDispatch; state: RootState }
 >(
   "auth/googleLogin",
-  async ({ code }, { dispatch, rejectWithValue }) => {
+  async ({ code, provider, referrerId, referralCode }, { dispatch, rejectWithValue }) => {
     try {
-      console.log("🌐 Sending auth code to backend:", code);
+      // Build the URL with query parameters like the first example
+      let apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/google/auth/google`;
+
+      // Add referral parameters if they exist
+      if (referrerId && referralCode) {
+        const params = new URLSearchParams({
+          referrerId: referrerId,
+          referralCode: referralCode,
+        });
+        apiUrl += `?${params.toString()}`;
+      }
+      console.log(`The body of google login ${code}, ${provider}, ${referrerId}, ${referralCode}`);
 
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/google/auth/google`, { code },
+        apiUrl,
+        { code, provider }, // Request body
         {
-          // withCredentials: true,
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
           },
-
         }
       );
 
-      console.log("✅ Google login response received:", response);
-
-      if (response.status !== 200) {
+      if (response.status !== 201) {
         throw new Error(response.data.error || "Failed to login with Google");
       }
 
-      const { token } = response.data;
+      const token = response.data.token;
 
       if (!token) {
         throw new Error("No token received from Google login");
@@ -217,4 +225,6 @@ export const updateProfile = createAsyncThunk<
   }
 });
 
+
+export const { setAccessToken, logout, setUser } = authSlice.actions;
 export default authSlice.reducer;

@@ -270,7 +270,7 @@ const Navbar: React.FC = () => {
                     name={`${user.firstName} ${user.lastName}`}
                     fallback={
                       <p className="text-lg font-tripswift-bold text-tripswift-off-white">
-                        {user.firstName.charAt(0) + user.lastName.charAt(0)}
+                        {user.firstName.charAt(0) + user.lastName?.charAt(0)}
                       </p>
                     }
                   />
@@ -429,9 +429,13 @@ const Navbar: React.FC = () => {
                     size="sm"
                     className="bg-tripswift-blue text-tripswift-off-white"
                     fallback={
-                      <p className="text-lg font-tripswift-bold text-tripswift-off-white">
-                        {user.firstName.charAt(0) + user.lastName.charAt(0)}
-                      </p>
+                      // <p className="text-lg font-tripswift-bold text-tripswift-off-white">
+                      //   {user.firstName.charAt(0) + user.lastName?.charAt(0)}
+                      // </p>
+                        user.lastName
+                          ? user.firstName.charAt(0) + user.lastName.charAt(0)
+                          : user.firstName.slice(0, 2)
+
                     }
                   />
                   <div>

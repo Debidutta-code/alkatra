@@ -11,21 +11,21 @@ import { useTranslation } from 'react-i18next';
 import HelpCenterTab from '@/components/helpCenter/HelpCenterTab';
 import { Chatbot } from './ChatBotComponents';
 
-import { 
-  User, 
-  Heart, 
-  Lock, 
-  Bell, 
-  Calendar, 
-  Edit3, 
-  Bookmark, 
-  CheckCircle, 
-  Gift, 
-  Percent, 
-  Shield, 
-  HelpCircle, 
-  Star, 
-  Check 
+import {
+  User,
+  Heart,
+  Lock,
+  Bell,
+  Calendar,
+  Edit3,
+  Bookmark,
+  CheckCircle,
+  Gift,
+  Percent,
+  Shield,
+  HelpCircle,
+  Star,
+  Check
 } from 'lucide-react';
 
 import {
@@ -35,14 +35,14 @@ import {
   updateNotificationReadStatus,
 } from '../../Redux/slices/notification.slice';
 
-import { 
-  Avatar, 
-  Button, 
-  Card, 
-  ChangePasswordModal, 
-  EditProfileModal, 
-  NotificationItem, 
-  StatsCard 
+import {
+  Avatar,
+  Button,
+  Card,
+  ChangePasswordModal,
+  EditProfileModal,
+  NotificationItem,
+  StatsCard
 } from './UserProfileComponents';
 
 
@@ -90,7 +90,7 @@ const UserProfile: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'bookings' | 'preferences' | 'security' | 'notifications' | 'help'>('overview');
   const [isEditing, setIsEditing] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
-  
+
   const [notificationSettings, setNotificationSettings] = useState({
     email: true,
     push: true,
@@ -477,8 +477,8 @@ const UserProfile: React.FC = () => {
                   alt={t('Profile.avatarAlt', { defaultValue: 'User profile avatar' })}
                   fallback={
                     <span className="text-lg sm:text-xl font-bold text-[var(--color-primary-off-white)]">
-                      {user.firstName.charAt(0)}
-                      {user.lastName.charAt(0)}
+                      {user.firstName.charAt(0)}{user.lastName?.charAt(0)}
+
                     </span>
                   }
                 />
@@ -529,8 +529,8 @@ const UserProfile: React.FC = () => {
                     key={item.id}
                     onClick={() => handleTabClick(item.id)}
                     className={`flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2 text-xs font-medium rounded-md transition-colors min-w-[60px] relative ${activeTab === item.id
-                        ? 'bg-[var(--color-primary-blue)]/10 text-[var(--color-primary-blue)]'
-                        : 'text-[var(--color-secondary-black)]/60 hover:bg-gray-50 hover:text-[var(--color-secondary-black)]'
+                      ? 'bg-[var(--color-primary-blue)]/10 text-[var(--color-primary-blue)]'
+                      : 'text-[var(--color-secondary-black)]/60 hover:bg-gray-50 hover:text-[var(--color-secondary-black)]'
                       }`}
                   >
                     <div className="relative">
@@ -560,7 +560,7 @@ const UserProfile: React.FC = () => {
           t={t}
         />
       )}
-      <Chatbot userFirstName = {user.firstName} />
+      <Chatbot userFirstName={user.firstName} />
     </div>
   );
 };
