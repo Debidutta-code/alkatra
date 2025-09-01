@@ -18,6 +18,7 @@ import Auth from "../../../user_authentication/src/Model/auth.model";
 import { PropertyInfo } from "../../../property_management/src/model/property.info.model";
 import UserModel from "../../../user_authentication/src/Model/auth.model";
 import { MailFactory } from "../../../customer_authentication/src/services/mailFactory";
+import { BookingService } from "../services";
 
 const mailer = MailFactory.getMailer();
 
@@ -634,9 +635,9 @@ export const createReservationWithStoredCard = CatchAsyncError(
           text: `Your booking has been confirmed`,
         });
 
-         
 
-        
+
+
       }
       catch (error: any) {
         return res.status(500).json({ message: "❌ Failed to send confirmation email" });
@@ -943,11 +944,11 @@ export async function createReservationWithCryptoPayment(input: {
     const finalHtml = template(templateData);
 
     await mailer.sendMail({
-          to: email,
-          subject: `Booking Confirmation - ${hotelName}`,
-          html: finalHtml,
-          text: `Your booking has been confirmed`,
-        });
+      to: email,
+      subject: `Booking Confirmation - ${hotelName}`,
+      html: finalHtml,
+      text: `Your booking has been confirmed`,
+    });
 
     return {
       message: "Reservation with crypto confirmed",
@@ -1495,7 +1496,7 @@ export const cancelThirdPartyReservation = CatchAsyncError(
         const template = Handlebars.compile(htmlContent);
         const finalHtml = template(templateData);
 
-         await mailer.sendMail({
+        await mailer.sendMail({
           to: email,
           subject: `Booking Cancellation Confirmation - ${hotelName}`,
           html: finalHtml,
@@ -1822,3 +1823,98 @@ export const getAllHotelsByRole = CatchAsyncError(
     }
   }
 );
+
+export class BookingController {
+
+  private bookingService: BookingService;
+
+  constructor(bookingService: BookingService) {
+    if (!bookingService) {
+      throw new Error("BookingService is required");
+    }
+    this.bookingService = bookingService;
+  }
+
+
+
+  async updatePayAtHotelBookings(req: any, res: Response, next: NextFunction) {
+    try {
+      
+      const userId = req.user?.id;
+      if (!userId) {
+        throw new Error("User ID is required");
+      }
+      
+      const reservationId = req.params.id;
+      if (!reservationId) {
+        throw new Error("Reservation ID is required");
+      }
+      
+      const reservationDetails = await this.bookingService.getBookings(reservationId);
+      if (!reservationDetails) {
+        throw new Error("No reservation details found");
+      }
+      
+      const {
+        checkInDate,
+        checkOutDate,
+        hotelCode,
+        hotelName,
+        ratePlanCode,
+        numberOfRooms,
+        roomTypeCode,
+        roomTotalPrice,
+        currencyCode,
+        email,
+        phone,
+        guests,
+      } = req.body;
+
+      const requiredFields = {
+        reservationId,
+        checkInDate,
+        checkOutDate,
+        hotelCode,
+        ratePlanCode,
+        numberOfRooms,
+        roomTypeCode,
+        roomTotalPrice,
+        currencyCode,
+        email,
+        phone,
+        guests,
+      };
+
+      await this.bookingService.checkRequiredField( requiredFields );
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const checkIn = new Date(checkInDate);
+      const checkOut = new Date(checkOutDate);
+
+      if (checkIn < today || checkOut <= checkIn) {
+        return res.status(400).json({
+          message: "Check-in date cannot be in the past or Check-out date must be after check-in date",
+        });
+      }
+
+      if (!Array.isArray(guests) || guests.length === 0) {
+        return res.status(400).json({ message: "Guest details are required" });
+      }
+
+      
+
+
+
+
+
+
+
+    }
+    catch (error) {
+      console.error("Error at updating booking details:", error.message);
+      return res.status(500).json({ "message": "Internal Server Error while updating booking" });
+    }
+  }
+
+}
