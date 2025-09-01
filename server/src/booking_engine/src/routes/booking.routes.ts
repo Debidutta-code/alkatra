@@ -33,8 +33,8 @@ const router = Router();
 router.route("/customers/booking/details/:id").get(getBookingDetailsOfUser);
 router.route("/create-reservation-with-card").post(authenticateCustomer as any, createReservationWithStoredCard);
 
-router.route("/update-reservation/:id").patch(authenticateCustomer as any, bookingController.updatePayAtHotelBookings.bind(bookingController));
-// router.route("/update-reservation/:id").patch(authenticateCustomer as any, updateThirdPartyReservation);
+// router.route("/update-reservation/:id").patch(authenticateCustomer as any, bookingController.updatePayAtHotelBookings.bind(bookingController));
+router.route("/update-reservation/:id").patch(authenticateCustomer as any, updateThirdPartyReservation);
 router.route("/cancel-reservation/:id").patch(authenticateCustomer as any, cancelThirdPartyReservation);
 
 
