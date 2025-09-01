@@ -181,7 +181,7 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
                 <div className="pt-8 px-4 flex justify-start">
                     <img
                         src="/assets/Alhajz.png"
-                        alt="Trip Logo"
+                        alt="Al-Hajz Logo"
                         className="h-24 w-auto object-contain"
                     />
                 </div>

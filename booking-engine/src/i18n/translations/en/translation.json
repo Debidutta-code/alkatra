@@ -265,7 +265,8 @@
     "generateReferral": "Generate Referral Link",
     "generateOnce": "Generate your referral link once and share it with your friends to start earning rewards.",
     "generated": "Referral link generated successfully!",
-    "copiedToClipboard": "Copied to clipboard!"
+    "copiedToClipboard": "Copied to clipboard!",
+    "fetchError": "Failed to load referrals. Please try again."
   },
   "HotelListing": {
     "CompactSearchBar": {
@@ -325,7 +326,7 @@
     "recommended": "Recommended",
     "highestRating": "Highest Rating",
     "lowestRating": "Lowest Rating",
-    "whyBookWithTripSwift": "Why Book With TripSwift",
+    "whyBookWithAlhajz": "Why Book With Alhajz",
     "freeCancellation": "Free Cancellation",
     "freeCancellationDesc": "Most of our properties offer free cancellation up to 24 hours before check-in.",
     "bestPriceGuarantee": "Best Price Guarantee",
@@ -678,6 +679,7 @@
       "otpInvalidError": "Invalid OTP",
       "otpVerifyError": "Error verifying OTP",
       "emailVerified": "Email verified successfully",
+      "emailAlreadyVerified": "Email is already verified",
       "phoneVerified": "Phone verified successfully",
       "phoneLabel": "Phone Number",
       "phonePlaceholder": "Enter phone number",
@@ -777,7 +779,7 @@
       "standardRoom": "Standard Room",
       "paymentMethod": "Payment Method",
       "primaryGuest": "Primary Guest",
-      "rateBreakdown": "Rate Breakdown",
+      "rateBreakdown": "Total Amount",
       "viewBookingDetails": "View Booking Details",
       "modify": "Modify",
       "cancel": "Cancel"
@@ -1110,7 +1112,39 @@
       "needHelpTitle": "Need Help?",
       "customerServiceMessage": "Our customer service team is available 24/7 to assist you with any questions.",
       "contactSupportButton": "Contact Support",
-      "exploreMoreHotels": "Explore more hotel options"
+      "exploreMoreHotels": "Explore more hotel options",
+      "missingBookingDetailsToast": "Missing booking details. Unable to download confirmation.",
+      "PDF": {
+        "bookingConfirmation": "BOOKING CONFIRMATION",
+        "reservationConfirmed": "Your reservation has been confirmed",
+        "confirmed": "CONFIRMED",
+        "bookingReference": "Booking Reference",
+        "guestInformation": "GUEST INFORMATION",
+        "guestName": "Guest Name:",
+        "email": "Email:",
+        "phone": "Phone:",
+        "hotelDetails": "HOTEL DETAILS",
+        "hotelNameNotAvailable": "Hotel Name Not Available",
+        "bookingDetails": "BOOKING DETAILS",
+        "checkInDate": "Check-in Date:",
+        "checkOutDate": "Check-out Date:",
+        "duration": "Duration:",
+        "night": "night",
+        "nights": "nights",
+        "guests": "Guests:",
+        "roomType": "Room Type:",
+        "standardRoom": "Standard Room",
+        "paymentInformation": "PAYMENT INFORMATION",
+        "paymentMethod": "Payment Method: Pay at Hotel",
+        "payAtHotelDescription": "Please pay the full amount at the hotel during check-in",
+        "totalAmount": "TOTAL AMOUNT:",
+        "importantNotes": "IMPORTANT NOTES",
+        "carryValidID": "• Please carry a valid photo ID for check-in",
+        "paymentDue": "• Full payment is due at the hotel during check-in",
+        "contactForChanges": "• For any changes or cancellations, contact us immediately",
+        "contactInfo": "For assistance, contact us at: bussines.alhajz@gmail.com",
+        "thankYou": "Thank you for choosing our service. We look forward to serving you!"
+      }
     },
     "PaymentProgress": {
       "title": "Crypto Payment Gateway",
@@ -1388,5 +1422,9 @@
     "reviewScores": "Review scores",
     "timeOfYear": "Time of year",
     "sortReviewsBy": "Sort reviews by"
+  },
+  "NetworkStatus": {
+    "offline": "You are offline. Please check your internet connection.",
+    "online": "You are back online!"
   }
 }

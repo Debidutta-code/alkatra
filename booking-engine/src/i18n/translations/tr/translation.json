@@ -265,7 +265,8 @@
         "generateReferral": "Referans Linki Oluştur",
         "generateOnce": "Referans linkinizi bir kez oluşturun ve ödül kazanmaya başlamak için arkadaşlarınızla paylaşın.",
         "generated": "Referans linki başarıyla oluşturuldu!",
-        "copiedToClipboard": "Panoya kopyalandı!"
+        "copiedToClipboard": "Panoya kopyalandı!",
+        "fetchError": "Yönlendirmeler yüklenemedi. Lütfen tekrar deneyin."
     },
     "HotelListing": {
         "CompactSearchBar": {
@@ -325,7 +326,7 @@
         "recommended": "Önerilen",
         "highestRating": "En Yüksek Puan",
         "lowestRating": "En Düşük Puan",
-        "whyBookWithTripSwift": "Neden TripSwift ile Rezervasyon?",
+        "whyBookWithAlhajz": "Neden Alhajz ile Rezervasyon Yapmalısınız?",
         "freeCancellation": "Ücretsiz İptal",
         "freeCancellationDesc": "Tesislerimizin çoğu giriş tarihinden 24 saat öncesine kadar ücretsiz iptal imkanı sunuyor.",
         "bestPriceGuarantee": "En İyi Fiyat Garantisi",
@@ -777,7 +778,7 @@
             "standardRoom": "Standart Oda",
             "paymentMethod": "Ödeme Yöntemi",
             "primaryGuest": "Ana Misafir",
-            "rateBreakdown": "Fiyat Dökümü",
+            "rateBreakdown": "Toplam Tutar",
             "viewBookingDetails": "Rezervasyon Detaylarını Görüntüle",
             "modify": "Değiştir",
             "cancel": "İptal Et"
@@ -1110,7 +1111,38 @@
             "needHelpTitle": "Yardıma İhtiyacınız Var mı?",
             "customerServiceMessage": "Müşteri hizmetleri ekibimiz sorularınızda size yardımcı olmak için 7/24 hizmetinizdedir.",
             "contactSupportButton": "Destek ile İletişime Geçin",
-            "exploreMoreHotels": "Daha fazla otel seçeneği keşfedin"
+            "exploreMoreHotels": "Daha fazla otel seçeneği keşfedin",
+            "PDF": {
+                "bookingConfirmation": "REZERVASYON ONAYI",
+                "reservationConfirmed": "Rezervasyonunuz onaylandı",
+                "confirmed": "ONAYLANDI",
+                "bookingReference": "Rezervasyon Referansı",
+                "guestInformation": "MİSAFİR BİLGİLERİ",
+                "guestName": "Misafir Adı:",
+                "email": "E-posta:",
+                "phone": "Telefon:",
+                "hotelDetails": "OTEL BİLGİLERİ",
+                "hotelNameNotAvailable": "Otel Adı Mevcut Değil",
+                "bookingDetails": "REZERVASYON DETAYLARI",
+                "checkInDate": "Giriş Tarihi:",
+                "checkOutDate": "Çıkış Tarihi:",
+                "duration": "Süre:",
+                "night": "gece",
+                "nights": "gece",
+                "guests": "Misafirler:",
+                "roomType": "Oda Tipi:",
+                "standardRoom": "Standart Oda",
+                "paymentInformation": "ÖDEME BİLGİLERİ",
+                "paymentMethod": "Ödeme Yöntemi: Otelden Ödeme",
+                "payAtHotelDescription": "Lütfen giriş sırasında otelde tam tutarı ödeyin",
+                "totalAmount": "TOPLAM TUTAR:",
+                "importantNotes": "ÖNEMLİ NOTLAR",
+                "carryValidID": "• Giriş için geçerli bir fotoğraf kimliği taşıyın",
+                "paymentDue": "• Tam ödeme, giriş sırasında otelde yapılacaktır",
+                "contactForChanges": "• Değişiklikler veya iptaller için lütfen hemen bizimle iletişime geçin",
+                "contactInfo": "Yardım için bize şu adresten ulaşın: bussines.alhajz@gmail.com",
+                "thankYou": "Hizmetimizi tercih ettiğiniz için teşekkür ederiz. Sizin için hizmet vermeyi dört gözle bekliyoruz!"
+            }
         },
         "PaymentProgress": {
             "title": "Kripto Ödeme Geçidi",
@@ -1388,5 +1420,9 @@
         "reviewScores": "Yorum puanları",
         "timeOfYear": "Yılın zamanı",
         "sortReviewsBy": "Yorumları sırala"
+    },
+    "NetworkStatus": {
+        "offline": "Çevrimdışısınız. Lütfen internet bağlantınızı kontrol edin.",
+        "online": "Yeniden çevrimiçi oldunuz!"
     }
 }

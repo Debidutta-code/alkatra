@@ -265,7 +265,8 @@
     "generateReferral": "إنشاء رابط الإحالة",
     "generateOnce": "أنشئ رابط الإحالة الخاص بك مرة واحدة وشاركه مع أصدقائك لتبدأ في كسب المكافآت.",
     "generated": "تم إنشاء رابط الإحالة بنجاح!",
-    "copiedToClipboard": "تم نسخ الرابط إلى الحافظة!"
+    "copiedToClipboard": "تم نسخ الرابط إلى الحافظة!",
+    "fetchError": "فشل في تحميل الإحالات. يرجى المحاولة مرة أخرى."
   },
   "HotelListing": {
     "CompactSearchBar": {
@@ -325,7 +326,7 @@
     "recommended": "موصى به",
     "highestRating": "أعلى تقييم",
     "lowestRating": "أدنى تقييم",
-    "whyBookWithTripSwift": "لماذا احجز مع تريب سويفت",
+    "whyBookWithAlhajz": "لماذا تحجز مع الحج",
     "freeCancellation": "إلغاء مجاني",
     "freeCancellationDesc": "معظم عقاراتنا تقدم إلغاء مجاني حتى 24 ساعة قبل تسجيل الوصول.",
     "bestPriceGuarantee": "ضمان أفضل سعر",
@@ -778,7 +779,7 @@
       "standardRoom": "غرفة قياسية",
       "paymentMethod": "طريقة الدفع",
       "primaryGuest": "الضيف الأساسي",
-      "rateBreakdown": "تفاصيل السعر",
+      "rateBreakdown": "المبلغ الإجمالي",
       "viewBookingDetails": "عرض تفاصيل الحجز",
       "modify": "تعديل",
       "cancel": "إلغاء"
@@ -1108,7 +1109,38 @@
       "customerServiceMessage": "فريق خدمة العملاء لدينا متاح على مدار الساعة طوال أيام الأسبوع لمساعدتك في أي أسئلة.",
       "contactSupportButton": "اتصل بالدعم",
       "exploreMoreHotels": "استكشاف المزيد من خيارات الفنادق",
-      "phoneLabel": "رقم الهاتف"
+      "phoneLabel": "رقم الهاتف",
+      "PDF": {
+        "bookingConfirmation": "تأكيد الحجز",
+        "reservationConfirmed": "تم تأكيد حجزك",
+        "confirmed": "مؤكد",
+        "bookingReference": "رقم الحجز",
+        "guestInformation": "معلومات الضيف",
+        "guestName": "اسم الضيف:",
+        "email": "البريد الإلكتروني:",
+        "phone": "الهاتف:",
+        "hotelDetails": "تفاصيل الفندق",
+        "hotelNameNotAvailable": "اسم الفندق غير متوفر",
+        "bookingDetails": "تفاصيل الحجز",
+        "checkInDate": "تاريخ تسجيل الوصول:",
+        "checkOutDate": "تاريخ تسجيل المغادرة:",
+        "duration": "المدة:",
+        "night": "ليلة",
+        "nights": "ليالٍ",
+        "guests": "الضيوف:",
+        "roomType": "نوع الغرفة:",
+        "standardRoom": "غرفة قياسية",
+        "paymentInformation": "معلومات الدفع",
+        "paymentMethod": "طريقة الدفع: الدفع في الفندق",
+        "payAtHotelDescription": "يرجى دفع المبلغ بالكامل في الفندق عند تسجيل الوصول",
+        "totalAmount": "المبلغ الإجمالي:",
+        "importantNotes": "ملاحظات هامة",
+        "carryValidID": "• يرجى إحضار بطاقة هوية صورة شخصية سارية عند تسجيل الوصول",
+        "paymentDue": "• يُستحق الدفع الكامل في الفندق عند تسجيل الوصول",
+        "contactForChanges": "• للتعديلات أو الإلغاءات، يرجى الاتصال بنا فورًا",
+        "contactInfo": "للحصول على المساعدة، يرجى الاتصال بنا على: bussines.alhajz@gmail.com",
+        "thankYou": "شكرًا لاختيارك لخدمتنا. نتطلع إلى خدمتك!"
+      }
     },
     "PaymentProgress": {
       "title": "بوابة الدفع بالعملات المشفرة",
@@ -1386,5 +1418,9 @@
     "reviewScores": "درجات التقييم",
     "timeOfYear": "وقت السنة",
     "sortReviewsBy": "ترتيب التقييمات حسب"
+  },
+  "NetworkStatus": {
+    "offline": "أنت غير متصل بالإنترنت. يرجى التحقق من اتصالك.",
+    "online": "لقد عدت إلى الإنترنت!"
   }
 }

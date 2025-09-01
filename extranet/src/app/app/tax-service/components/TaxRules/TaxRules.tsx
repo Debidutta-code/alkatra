@@ -151,7 +151,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
             value: numValue,
             applicableOn: editForm.applicableOn as "TOTAL_AMOUNT" | "ROOM_RATE",
             region: { country: editForm.country.trim() },
-            description: editForm.description || undefined,
+            description: editForm.description || "",
             validFrom: editForm.validFrom ? convertDateToUTC(editForm.validFrom) : undefined,
             isInclusive: editForm.isInclusive,
             priority: numPriority,

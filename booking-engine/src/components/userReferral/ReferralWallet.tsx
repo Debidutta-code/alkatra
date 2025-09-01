@@ -56,10 +56,10 @@ export default function ReferralWallet() {
       console.error("Failed to fetch wallet data:", error);
 
       // Use a unique ID to prevent duplicate toasts
-      toast.error(
-        t("Referral.walletError") || "Failed to load wallet data. Please try again.",
-        { id: "wallet-fetch-error" } // Ensures only one instance of this toast
-      );
+      // toast.error(
+      //   t("Referral.walletError") || "Failed to load wallet data. Please try again.",
+      //   { id: "wallet-fetch-error" } // Ensures only one instance of this toast
+      // );
     } finally {
       setLoading(false);
       setIsFetching(false); // Unlock
