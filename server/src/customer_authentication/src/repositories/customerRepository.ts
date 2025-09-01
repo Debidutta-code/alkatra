@@ -29,13 +29,6 @@ class CustomerRepository {
         if (!customer) {
             return null;
         }
-        if (updateData.email && updateData.email !== customer.email) {
-            const existingCustomer = await Customer.findOne({ email: updateData.email });
-            if (existingCustomer) {
-                throw new Error("Email already exists");
-            }
-            customer.email = updateData.email;
-        }
         if (updateData.firstName) customer.firstName = updateData.firstName;
         if (updateData.lastName) customer.lastName = updateData.lastName;
         if (updateData.phone) customer.phone = updateData.phone;
