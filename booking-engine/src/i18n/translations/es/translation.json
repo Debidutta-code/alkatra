@@ -325,7 +325,7 @@
         "recommended": "Recomendado",
         "highestRating": "Calificación más alta",
         "lowestRating": "Calificación más baja",
-        "whyBookWithTripSwift": "¿Por qué reservar con TripSwift?",
+        "whyBookWithAlhajz": "Por Qué Reservar Con Alhajz",
         "freeCancellation": "Cancelación gratuita",
         "freeCancellationDesc": "La mayoría de nuestras propiedades ofrecen cancelación gratuita hasta 24 horas antes del check-in.",
         "bestPriceGuarantee": "Garantía de mejor precio",
@@ -441,6 +441,7 @@
         "stay": "estadía",
         "filter": "Filtrar",
         "viewAllPhotos": "Ver todas las fotos",
+        "viewReviews": "Reseñas de Huéspedes",
         "amenitiesList": {
             "wifi": "Wi-Fi gratis",
             "swimming_pool": "Piscina",
@@ -593,7 +594,7 @@
                 "gotIt": "Entendido"
             },
             "seeMore": "Ver más",
-            "showLess": "Ver menos"
+            "seeLess": "Ver menos"
         }
     },
     "CancellationPolicies": {
@@ -1388,5 +1389,9 @@
         "reviewScores": "Puntuaciones de las opiniones",
         "timeOfYear": "Época del año",
         "sortReviewsBy": "Ordenar opiniones por"
+    },
+    "NetworkStatus": {
+        "offline": "Estás desconectado. Por favor verifica tu conexión a internet.",
+        "online": "¡Estás de vuelta en línea!"
     }
 }
