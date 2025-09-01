@@ -40,6 +40,8 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({ onClose, onFe
 
     const chatResult = await chatBotApi.chatApi(accessToken, sessionId, chatInput);
 
+    console.log(`The chat bot answer we get ${JSON.stringify(chatResult)}`);
+
     if (!chatResult) {
       throw new Error('Not get your answer from Bot');
     }
