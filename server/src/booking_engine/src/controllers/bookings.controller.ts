@@ -22,6 +22,9 @@ import { BookingService } from "../services";
 
 const mailer = MailFactory.getMailer();
 
+
+
+
 const calculateAgeCategory = (dob: string) => {
   const birthDate = new Date(dob);
   const today = new Date();
@@ -1836,25 +1839,24 @@ export class BookingController {
   }
 
 
-
   async updatePayAtHotelBookings(req: any, res: Response, next: NextFunction) {
     try {
-      
+
       const userId = req.user?.id;
       if (!userId) {
         throw new Error("User ID is required");
       }
-      
+
       const reservationId = req.params.id;
       if (!reservationId) {
         throw new Error("Reservation ID is required");
       }
-      
+
       const reservationDetails = await this.bookingService.getBookings(reservationId);
       if (!reservationDetails) {
         throw new Error("No reservation details found");
       }
-      
+
       const {
         checkInDate,
         checkOutDate,
@@ -1885,7 +1887,7 @@ export class BookingController {
         guests,
       };
 
-      await this.bookingService.checkRequiredField( requiredFields );
+      await this.bookingService.checkRequiredField(requiredFields);
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -1902,13 +1904,38 @@ export class BookingController {
         return res.status(400).json({ message: "Guest details are required" });
       }
 
-      
+      const ageCodeCount: Record<string, number> = { "7": 0, "8": 0, "10": 0 };
 
+      const categorizedGuests = await Promise.all(
+        guests.map(async ({ firstName, lastName, dob }) => {
+          if (!dob) {
+            throw new Error(`DOB missing for ${firstName} ${lastName}`);
+          }
+          const { age, category, ageCode } = await this.bookingService.calculateAgeCategory(dob);
+          ageCodeCount[ageCode] = (ageCodeCount[ageCode] || 0) + 1;
+          return { firstName, lastName, dob, age, category, ageCode };
+        })
+      );
 
-
-
-
-
+      const amendReservationInput: AmendReservationInput = {
+        bookingDetails: {
+          userId,
+          reservationId,
+          checkInDate,
+          checkOutDate,
+          hotelCode,
+          hotelName,
+          ratePlanCode,
+          roomTypeCode,
+          numberOfRooms,
+          roomTotalPrice,
+          currencyCode,
+          guests,
+          email,
+          phone,
+        },
+        ageCodeSummary: ageCodeCount,
+      };
 
     }
     catch (error) {
