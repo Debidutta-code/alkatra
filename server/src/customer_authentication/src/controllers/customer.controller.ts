@@ -14,18 +14,6 @@ class CustomerController {
     googleAuthController = new AuthController();
 
 
-    // private async registerUsers(provider: string, data: any): Promise<any> {
-    //     switch (provider) {
-    //         case 'local':
-    //             return customerService.registerCustomer(data);
-    //         case 'google':
-    //             return googleAuthService.handlePostGoogleAuthData({ ...data, provider: provider });
-    //         default:
-    //             throw new Error(`Unknown auth provider: ${provider}`);
-    //     }
-    // }
-
-
     /**
      * Register a new customer
      * 
@@ -149,13 +137,17 @@ class CustomerController {
     // Update customer profile
     async updateCustomerProfile(req: AuthenticatedRequest, res: Response): Promise<void> {
         try {
-            const { firstName, lastName, phone, email, password } = req.body;
             const customerId = req.user?.id;
+            const { firstName, lastName, phone, email, password } = req.body;
+            
 
             if (!customerId) {
                 res.status(401).json({ message: "Unauthorized" });
                 return;
             }
+
+            console.log("############## The data we get by the request body for update");
+            console.log(req.body);
 
             const customer = await customerService.updateCustomerProfile(customerId, { firstName, lastName, phone, email, password });
             if (!customer) {

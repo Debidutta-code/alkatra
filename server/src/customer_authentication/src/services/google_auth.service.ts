@@ -118,7 +118,7 @@ export class GoogleAuthService implements IGoogleAuthService {
             throw error.message;
         }
     }
-
+    
 }
 
 // const googleAuthService = GoogleAuthService.getInstance();
