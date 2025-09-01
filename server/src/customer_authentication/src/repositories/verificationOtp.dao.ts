@@ -1,8 +1,21 @@
-import OTPModel, { IOTP, OTPStatus } from '../models/verification.model';
+import OTPModel, { IOTP, OTPStatus, OTPType } from '../models/verification.model';
 
 class OTPDao {
-  async createOTP(data: Partial<IOTP>): Promise<IOTP> {
-    return await OTPModel.create(data);
+  async createOTP(data: Partial<IOTP>): Promise<{ identifier: string; status: OTPStatus }> {
+    const identifier = data.identifier;
+    console.log("identifier", identifier);
+    const ifIdentifierExists = await OTPModel.findOne({ identifier, status: {$eq:( "pending, verified" )} }).select("identifier status");
+    if (!ifIdentifierExists) {
+      const result = await OTPModel.create(data);
+      if (!result) {
+        throw new Error('Failed to create OTP.');
+      }
+      return ({
+        identifier: result.identifier,
+        status: result.status
+      });
+    }
+    return ifIdentifierExists;
   }
 
   async findLatestOTP(identifier: string, type: string): Promise<IOTP | null> {
@@ -27,6 +40,11 @@ class OTPDao {
   async incrementAttempts(id: string): Promise<void> {
     await OTPModel.findByIdAndUpdate(id, { $inc: { attemptCount: 1 } });
   }
+
+  async findUser(identifier: string, type: OTPType) {
+    return await OTPModel.findOne({ identifier, type, status: { $eq: "verified" } }).select("identifier, status");
+  }
+
 }
 
 export default new OTPDao();

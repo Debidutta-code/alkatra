@@ -2,7 +2,7 @@ import cron, { ScheduledTask } from "node-cron";
 import { ThirdPartyBooking } from "../wincloud/src/model/reservationModel";
 import { CustomerReviewService } from "../review_system/service";
 
-const customerReviewService = new CustomerReviewService();
+const customerReviewService = CustomerReviewService.getInstance();
 
 
 class SendEmailCronService {
@@ -22,7 +22,8 @@ class SendEmailCronService {
 
         if (this.job) return; 
 
-        this.job = cron.schedule("0 12 * * *", async () => {
+        // this.job = cron.schedule("*/1 * * * *", async () => {
+        this.job = cron.schedule("0 0 12 * * *", async () => {
             try {
                 const startOfDay = new Date();
                 startOfDay.setHours(0, 0, 0, 0);
@@ -34,6 +35,8 @@ class SendEmailCronService {
                     status: { $ne: "Cancelled" },
                     checkOutDate: { $gte: startOfDay, $lte: endOfDay }
                 }).select("reservationId checkOutDate");
+
+                console.log(`The reservation data we get: ${JSON.stringify(reservationData)}`);
 
                 if (reservationData && reservationData.length > 0) {
                     for (const reservation of reservationData) {

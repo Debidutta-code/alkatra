@@ -10,7 +10,7 @@ import { formatDate, calculateNights } from "../../utils/dateUtils";
 import { useTranslation } from "react-i18next";
 import { verifyApi } from "../../api/verify";
 import axios from "axios";
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 // Interfaces remain unchanged
 export interface Guest {
@@ -74,7 +74,7 @@ interface GuestInformationModalProps {
     roomId: string;
     checkIn: string;
     checkOut: string;
-    amount: string;
+    amount: number;
     userId?: string;
     rooms?: number;
     adults?: number;
@@ -202,7 +202,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   const [phoneCountdown, setPhoneCountdown] = useState(0);
   const [emailVerified, setEmailVerified] = useState(false);
   const [phoneVerified, setPhoneVerified] = useState(false);
-
+  const [emailAlreadyVerified, setEmailAlreadyVerified] = useState(false);
 
   const [activeSection, setActiveSection] = useState<"details" | "review">(
     "details"
@@ -383,21 +383,25 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
     setIsEmailVerifying(true);
     try {
       const response = await verifyApi.sendEmailOtp(email);
-      // setUpdateMessage(
-      //   response.message || t("BookingComponents.GuestInformationModal.otpSent")
-      // );
-      toast.success(
-        t("BookingComponents.GuestInformationModal.otpSent")
-      );
-      setEmailOtpSent(true);
-      setEmailCountdown(300);
-      setEmailVerified(false);
+
+      // Check if email is already verified
+      if (response.status === "verified") {
+        toast.success(t("BookingComponents.GuestInformationModal.emailAlreadyVerified"));
+        setEmailVerified(true);
+        setEmailAlreadyVerified(true); // Set this flag for already verified emails
+        setEmailOtpSent(false);
+        setEmailCountdown(0);
+        setEmailOtp("");
+      } else if (response.status === "pending") {
+        toast.success(t("BookingComponents.GuestInformationModal.otpSent"));
+        setEmailOtpSent(true);
+        setEmailCountdown(300);
+        setEmailVerified(false);
+        setEmailAlreadyVerified(false); // Reset this flag for new verifications
+      }
     } catch (err: any) {
-      // setErrorMessage(
-      //   err.message || t("BookingComponents.GuestInformationModal.otpSendFailed")
-      // );
       toast.error(
-        t("BookingComponents.GuestInformationModal.otpSendFailed")
+        err.message || t("BookingComponents.GuestInformationModal.otpSendFailed")
       );
     } finally {
       setIsEmailVerifying(false);
@@ -406,24 +410,20 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
 
   const handleVerifyEmailOtp = async () => {
     if (!emailOtp.trim()) {
-      // setErrorMessage(t("BookingComponents.GuestInformationModal.otpEmptyError"));
       toast.error(t("BookingComponents.GuestInformationModal.otpEmptyError"));
       return;
     }
 
     try {
       const response = await verifyApi.verifyEmailOtp(email, emailOtp);
-      // setUpdateMessage(t("BookingComponents.GuestInformationModal.emailVerified"));
       toast.success(t("BookingComponents.GuestInformationModal.emailVerified"));
       setEmailVerified(true);
+      setEmailAlreadyVerified(false); // This was verified through OTP, not already verified
       setEmailOtpSent(false);
       setEmailCountdown(0);
       setEmailOtp("");
       setErrorMessage(null);
     } catch (err: any) {
-      // setErrorMessage(
-      //   err.message || t("BookingComponents.GuestInformationModal.otpInvalidError")
-      // );
       toast.error(
         t("BookingComponents.GuestInformationModal.otpInvalidError")
       );
@@ -571,47 +571,20 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         selectedRoom.propertyId ||
         "";
       if (!propertyId) {
-        console.log("Missing propertyId");
-        // setErrorMessage(
-        //   t("BookingComponents.GuestInformationModal.propertyInfoMissing")
-        // );
-        toast.error(
-          t("BookingComponents.GuestInformationModal.propertyInfoMissing")
-        );
+        toast.error(t("BookingComponents.GuestInformationModal.propertyInfoMissing"));
         return;
       }
       if (!finalPrice || !finalPrice.totalAmount) {
-        console.log("Missing finalPrice or totalAmount");
-        // setErrorMessage(
-        //   t("BookingComponents.GuestInformationModal.priceFetchError")
-        // );
-        toast.error(
-          t("BookingComponents.GuestInformationModal.priceFetchError")
-        );
+        toast.error(t("BookingComponents.GuestInformationModal.priceFetchError"));
         return;
       }
-      const totalPrice = finalPrice?.priceAfterTax ?? finalPrice?.totalAmount ?? 0;
-      console.log("@@@@@@@@@@@@@>>>>>>>>>>>Total Price (including tax):", totalPrice);
-      console.log("@@@@@@@@@@@@@>>>>>>>>>>>Total Price with String:", totalPrice.toString());
-      dispatch(setAmount(totalPrice.toString()));
-      console.log("Booking Payload:", {
-        firstName: guests[0]?.firstName || "",
-        lastName: guests[0]?.lastName || "",
-        email,
-        phone: phone || "",
-        propertyId,
-        roomId: selectedRoom._id,
-        checkIn: checkInDate,
-        checkOut: checkOutDate,
-        amount: finalPrice?.totalAmount.toString(),
-        userId: authUser?._id,
-        rooms: guestData?.rooms || 1,
-        adults: guestData?.guests || 1,
-        children: guestData?.children || 0,
-        guests,
-      });
 
-      console.log("Setting isLoading to true for handleConfirmBooking");
+      const totalPrice = parseFloat((finalPrice.priceAfterTax ?? finalPrice.totalAmount ?? 0).toFixed(2));
+
+      // ✅ Dispatch number to Redux
+      dispatch(setAmount(totalPrice));
+
+      // ✅ Pass number to onConfirmBooking
       setIsLoading(true);
       try {
         const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 500));
@@ -623,7 +596,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
             roomId: selectedRoom._id,
             checkIn: checkInDate,
             checkOut: checkOutDate,
-            amount: totalPrice.toString(),
+            amount: totalPrice, // ← number, not string
             userId: authUser?._id,
             rooms: guestData?.rooms || 1,
             adults: guestData?.guests || 1,
@@ -631,31 +604,17 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
             infants: guestData?.infants || 0,
             guests,
             hotelName: guestData?.hotelName || "",
-            ratePlanCode: finalPrice?.dailyBreakdown && finalPrice.dailyBreakdown.length > 0
-              ? finalPrice.dailyBreakdown[0].ratePlanCode
-              : "",
-            roomType: selectedRoom?.room_type || "",
-            currency: finalPrice?.dailyBreakdown && finalPrice.dailyBreakdown.length > 0
-              ? finalPrice.dailyBreakdown[0].currencyCode
-              : "",
+            ratePlanCode: finalPrice.dailyBreakdown?.[0]?.ratePlanCode || "",
+            roomType: selectedRoom.room_type || "",
+            currency: finalPrice.dailyBreakdown?.[0]?.currencyCode || "",
           }),
           minLoadingTime,
         ]);
-        console.log("onConfirmBooking completed successfully");
       } catch (error) {
-        console.error("Error in handleConfirmBooking:", error);
-        // setErrorMessage(
-        //   t("BookingComponents.GuestInformationModal.bookingError")
-        // );
-        toast.error(
-          t("BookingComponents.GuestInformationModal.bookingError")
-        );
+        toast.error(t("BookingComponents.GuestInformationModal.bookingError"));
       } finally {
-        console.log("Setting isLoading to false for handleConfirmBooking");
         setIsLoading(false);
       }
-    } else {
-      console.log("isFormUpdated or selectedRoom is missing", { isFormUpdated, selectedRoom });
     }
   };
 
@@ -1008,6 +967,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                             }
                             if (emailVerified && newEmail !== email) {
                               setEmailVerified(false);
+                              setEmailAlreadyVerified(false);
                               setEmailOtpSent(false);
                               setEmailOtp("");
                               setEmailCountdown(0);
@@ -1084,7 +1044,10 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
                       )}
                       {emailVerified && (
                         <p className="text-xs text-green-600 mt-1">
-                          ✅ {t("BookingComponents.GuestInformationModal.emailVerified")}
+                          ✅ {emailAlreadyVerified
+                            ? t("BookingComponents.GuestInformationModal.emailAlreadyVerified")
+                            : t("BookingComponents.GuestInformationModal.emailVerified")
+                          }
                         </p>
                       )}
                       {errors.email && (

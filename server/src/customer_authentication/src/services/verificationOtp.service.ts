@@ -13,27 +13,47 @@ class OTPService {
     return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit
   }
 
-  async sendOTP(identifier: string, type: OTPType): Promise<void> {
-    const mode = process.env.MODE || 'development'; // or use NODE_ENV
+  async emailVerification(identifier: string, type: OTPType) {
+    try {
+      if (!identifier || !type) {
+        throw new Error('OTP-SERVICE: Identifier and type are required.');
+      }
+
+      const userEmail = await OTPDao.findUser(identifier, type);
+      
+      if (!userEmail) {
+        const userData = await this.sendOTP(identifier, type);
+        console.log(`The created data we get ${userData}`);
+        return userData;
+      } else {
+        console.log(`The email already verified ${userEmail}`);
+        return userEmail;
+      }
+    } catch (error) {
+      console.log(`❌ Failed to verify the email`);
+      return { success: false, message: `Failed to verify email: ${error.message}` };
+    }
+  }
+
+  private async sendOTP(identifier: string, type: OTPType) {
+    const mode = process.env.MODE || 'development';
 
     console.log(`🔍 Sending OTP in ${mode} mode for type: ${type}`);
 
     const otp = mode === 'production' ? this.generateOTP() : '123456';
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 mins
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
-    await OTPDao.createOTP({ identifier, otp, type, expiresAt, status: OTPStatus.PENDING });
+
     try {
+      const result = await OTPDao.createOTP({ identifier, otp, type, expiresAt, status: OTPStatus.PENDING });
+      if (!result) {
+        throw new Error('Failed to create OTP.');
+      }
       if (type === OTPType.MAIL_VERIFICATION) {
         const subject = `Your OTP for ${type.toUpperCase()}`;
         const html = `<p>Your OTP is: <strong>${otp}</strong></p><p>This code will expire in 5 minutes.</p>`;
 
         if (process.env.MODE === 'production') {
-          // await emailService.sendEmail({
-          //   to: identifier,
-          //   subject,
-          //   html,
-          //   text: `Your OTP is ${otp}`,
-          // });
           mailer.sendMail({
             to: identifier,
             subject,
@@ -54,10 +74,10 @@ class OTPService {
           console.log('📱 [DEV MODE] SMS not sent. OTP:', otp);
         }
       }
+      return result;
     } catch (error) {
       console.error('❌ Failed to send OTP email:', error);
-      throw new Error('OTP sending failed. Please try again.'); // 
-      // optionally: delete the OTP record or handle the failure
+      throw new Error('OTP sending failed. Please try again.');
 
     }
 

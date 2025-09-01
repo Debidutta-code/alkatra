@@ -29,6 +29,7 @@ interface IThirdPartyBooking extends Document {
     thirdPartyReservationIdType8?: string;
     thirdPartyReservationIdType3?: string;
     createdAt: Date;
+    updatedAt: Date;
 }
 
 interface IReservationLog extends Document {
@@ -78,6 +79,7 @@ const thirdPartyBookingSchema = new Schema<IThirdPartyBooking>({
     userId: { type: String, required: true },
     status: { type: String, required: false, enum: ['Confirmed', 'Pending', 'Cancelled'] },
     createdAt: { type: Date, default: () => new Date() },
+    updatedAt: { type: Date, default: () => new Date() },
 });
 
 const reservationLogSchema = new Schema<IReservationLog>({
@@ -99,7 +101,7 @@ const reservationLogSchema = new Schema<IReservationLog>({
     status: { type: String, required: true },
     process: { type: String, required: true, enum: ['Reservation', 'Amend Reservation', 'Cancellation'] },
     errorMessage: { type: String, required: false },
-    timestamp: { type: Date, default: () => new Date() },
+    timestamp: { type: Date, default: () => new Date()},
 });
 
 export const ThirdPartyBooking = model<IThirdPartyBooking>('WincloudReservation', thirdPartyBookingSchema);

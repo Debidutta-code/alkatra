@@ -289,13 +289,23 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         );
 
         if (response.data.success) {
+          const data = response.data.data;
+
+          // Calculate final price based on available data
+          let finalPriceAfterTax = data.totalAmount;
+          if (data.priceAfterTax && data.priceAfterTax > 0) {
+            finalPriceAfterTax = data.priceAfterTax;
+          } else if (data.totalTax && data.totalTax > 0) {
+            finalPriceAfterTax = data.totalAmount + data.totalTax;
+          }
+
           setFinalPrice({
-            totalAmount: response.data.data.totalAmount,
-            currencyCode: response.data.data.dailyBreakdown[0]?.currencyCode || "USD",
-            tax: response.data.data.tax || [],
-            totalTax: response.data.data.totalTax || 0,
-            priceAfterTax: response.data.data.priceAfterTax || response.data.data.totalAmount,
-            breakdown: response.data.data.breakdown
+            totalAmount: data.totalAmount,
+            currencyCode: data.dailyBreakdown[0]?.currencyCode || "USD",
+            tax: data.tax && Array.isArray(data.tax) && data.tax.length > 0 ? data.tax : [],
+            totalTax: data.totalTax || 0,
+            priceAfterTax: finalPriceAfterTax,
+            breakdown: data.breakdown
           });
         } else {
           setFinalPrice(null);
@@ -359,8 +369,21 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         },
         { withCredentials: true }
       );
+
       if (finalPriceResponse.data.success) {
-        return finalPriceResponse.data.data.totalAmount;
+        const data = finalPriceResponse.data.data;
+
+        // Calculate final price based on whether taxes exist
+        if (data.priceAfterTax && data.priceAfterTax > 0) {
+          // If priceAfterTax exists and is greater than 0, use it
+          return data.priceAfterTax;
+        } else if (data.totalTax && data.totalTax > 0) {
+          // If totalTax exists, add it to totalAmount
+          return data.totalAmount + data.totalTax;
+        } else {
+          // No taxes, use totalAmount
+          return data.totalAmount;
+        }
       } else {
         throw new Error(finalPriceResponse.data.message);
       }
@@ -380,7 +403,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
     }
     let valid = true;
     const newErrors: { [key: string]: string } = {};
-
+  
     // Validate Date Range
     if (!dateRange || !dateRange[0] || !dateRange[1]) {
       newErrors["dateRange"] = t('BookingTabs.AmendReservationModal.errors.selectValidDates');
@@ -389,7 +412,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
       newErrors["dateRange"] = t('BookingTabs.AmendReservationModal.errors.invalidDateRange');
       valid = false;
     }
-
+  
     // Validate Guests
     guests.forEach((guest, idx) => {
       if (!guest.firstName || !/^[A-Za-z\s]+$/.test(guest.firstName)) {
@@ -405,7 +428,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         valid = false;
       }
     });
-
+  
     // Validate Room Type and Rate Plan (optional, assuming they are required)
     if (!roomTypeCode) {
       newErrors["roomTypeCode"] = t('BookingTabs.AmendReservationModal.errors.selectRoomType');
@@ -415,9 +438,9 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
       newErrors["ratePlanCode"] = t('BookingTabs.AmendReservationModal.errors.selectRatePlan');
       valid = false;
     }
-
+  
     setErrors(newErrors);
-
+  
     if (!valid) {
       setAmendmentMessage({
         type: 'error',
@@ -425,9 +448,9 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
       });
       return;
     }
-
+  
     setLoading(true);
-
+  
     try {
       const guestData = {
         rooms: guestBreakdown.rooms,
@@ -435,14 +458,15 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         children: guestBreakdown.children,
         infants: guestBreakdown.infants,
       };
-
-      const finalPrice = await getFinalPrice(
+  
+      // Get the actual final price value
+      const finalPriceValue = await getFinalPrice(
         { room_type: roomTypeCode },
         dateRange[0].format('YYYY-MM-DD'),
         dateRange[1].format('YYYY-MM-DD'),
         guestData
       );
-
+  
       const amendedData = {
         reservationId: booking.reservationId,
         hotelCode: booking.hotelCode,
@@ -450,8 +474,8 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         ratePlanCode: ratePlanCode,
         numberOfRooms: guestBreakdown.rooms,
         roomTypeCode: roomTypeCode,
-        roomTotalPrice: finalPrice,
-        currencyCode: booking.currencyCode,
+        roomTotalPrice: finalPriceValue,
+        currencyCode: finalPrice?.currencyCode || booking.currencyCode,
         email: booking.email,
         phone: booking.phone,
         checkInDate: dateRange[0].format('YYYY-MM-DD'),
@@ -462,9 +486,9 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
           dob: g.dob || ""
         })),
       };
-
+  
       const token = Cookies.get("accessToken");
-
+  
       await axios.patch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/booking/update-reservation/${booking.reservationId}`,
         amendedData,
@@ -475,16 +499,16 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
           }
         }
       );
-
+  
       setAmendmentMessage({
         type: 'success',
         text: t('BookingTabs.AmendReservationModal.success.reservationAmended'),
       });
-
+  
       setTimeout(() => {
         onAmendComplete(booking._id, amendedData);
       }, 2000);
-
+  
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message || t('BookingTabs.AmendReservationModal.errors.unableToAmend');
       setAmendmentMessage({
@@ -900,7 +924,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                     </div>
                   )}
 
-                  {/* Subtotal */}
+                  {/* Subtotal - only show if there are taxes */}
                   {finalPrice.tax && Array.isArray(finalPrice.tax) && finalPrice.tax.length > 0 && (
                     <div className="flex justify-between items-center text-sm pt-2 border-t border-gray-200">
                       <span className="text-tripswift-black/80 font-tripswift-medium">
@@ -912,9 +936,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                     </div>
                   )}
 
-                  {/* Discounts (if any) */}
-
-                  {/* Tax Breakdown */}
+                  {/* Tax Breakdown - only show if taxes exist */}
                   {finalPrice.tax && finalPrice.tax.length > 0 && (
                     <div className="space-y-2">
                       <h5 className="text-sm font-tripswift-bold text-tripswift-black/80 flex items-center gap-1.5">
@@ -965,7 +987,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                 </div>
               </div>
 
-              {/* Tax Information Notice */}
+              {/* Tax Information Notice - only show if taxes exist */}
               {finalPrice.tax && Array.isArray(finalPrice.tax) && finalPrice.tax.length > 0 && (
                 <div className="px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800 flex items-start gap-2">
                   <Info className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />

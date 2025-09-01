@@ -29,7 +29,7 @@ interface PayAtHotelProps {
     propertyId: string;
     checkIn: string;
     checkOut: string;
-    amount: string;
+    amount: number;
     userId?: string;
     hotelName?: string;
     ratePlanCode?: string;
@@ -43,13 +43,13 @@ interface PayAtHotelProps {
   };
 }
 
-const formatCurrency = (amount: string, currency: string = 'INR') => {
+const formatCurrency = (amount: number, currency: string): string => {
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: currency,
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
-  }).format(parseFloat(amount));
+  }).format(amount);
 };
 
 const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
@@ -178,7 +178,7 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
         ratePlanCode: bookingDetails.ratePlanCode || " ",
         numberOfRooms: bookingDetails.rooms || 1,
         roomTypeCode: bookingDetails.roomType || "",
-        roomTotalPrice: isNaN(parseFloat(bookingDetails.amount)) ? 0 : parseFloat(bookingDetails.amount),
+        roomTotalPrice: bookingDetails.amount,
         currencyCode: bookingDetails.currency?.toUpperCase() || " ",
         email: bookingDetails.email,
         phone: bookingDetails.phone,
@@ -211,7 +211,7 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
                 • Rooms: ${bookingDetails.rooms || 1}
                 • Check-in: ${formatDate(bookingDetails.checkIn)}
                 • Check-out: ${formatDate(bookingDetails.checkOut)}
-                • Total: ${formatCurrency(bookingDetails.amount, bookingDetails.currency)}`
+                • Total: ${formatCurrency(bookingDetails.amount, bookingDetails.currency || 'USD')}`
             },
             {
               withCredentials: true,
@@ -224,8 +224,6 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
           );
         }
       } catch (smsError: any) {
-        // console.error("Failed to send confirmation SMS:", smsError?.response?.data || smsError.message);
-        // Don't fail the booking process if SMS fails
       }
 
       // Dispatch guest details to Redux
@@ -329,8 +327,8 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
         type="submit"
         disabled={!stripe || isLoading || !!validationError || !isCardComplete}
         className={`w-full py-3 px-4 rounded-lg transition-all duration-300 ${isLoading || !stripe || validationError || !isCardComplete
-            ? 'bg-gray-300 cursor-not-allowed text-tripswift-black/50'
-            : 'bg-tripswift-blue hover:bg-[#054B8F] text-tripswift-off-white'
+          ? 'bg-gray-300 cursor-not-allowed text-tripswift-black/50'
+          : 'bg-tripswift-blue hover:bg-[#054B8F] text-tripswift-off-white'
           } font-tripswift-semibold`}
       >
         {isLoading ? (

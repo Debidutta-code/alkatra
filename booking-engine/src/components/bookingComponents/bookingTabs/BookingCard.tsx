@@ -35,12 +35,6 @@ const BookingCard: React.FC<BookingCardProps> = ({
 }) => {
   const { t, i18n } = useTranslation();
 
-  // Calculate number of nights
-  const nights = calculateNights(booking.checkInDate, booking.checkOutDate);
-
-  // Calculate per-night rate
-  const nightlyRate = nights > 0 ? Math.round((booking.totalAmount || 0) / nights) : booking.totalAmount || 0;
-
   // Get primary guest name (first guest or fallback to booking.email)
   const primaryGuest = booking.guestDetails && booking.guestDetails.length > 0
     ? `${booking.guestDetails[0].firstName} ${booking.guestDetails[0].lastName}`

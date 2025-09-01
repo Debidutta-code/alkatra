@@ -421,7 +421,7 @@ const GuestBox: React.FC<GuestBoxProps> = ({ onChange }) => {
               </div>
             </div>
             <div className="bg-white border border-tripswift-black/10 hover:border-tripswift-blue/20 rounded-md shadow-sm transition-all duration-200 h-11 pl-12 flex items-center">
-              <span className="text-tripswift-black/70 ml-3 mr-3 text-sm font-tripswift-medium">
+              <span className="text-tripswift-black/70 ml-3 mr-14 text-sm font-tripswift-medium">
                 {displayText || t("GuestBox.defaultText")}
               </span>
             </div>

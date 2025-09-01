@@ -1,12 +1,9 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSelector } from "../../../Redux/store";
-import jsPDF from 'jspdf';
-
 import Link from "next/link";
 import {
   Calendar,
@@ -18,10 +15,11 @@ import {
   ArrowRight,
   Download,
   Mail,
-  Phone, // Added Phone icon for phone number display
+  Phone,
 } from "lucide-react";
 import { formatDate, calculateNights } from "../../../utils/dateUtils";
 import { useTranslation } from "react-i18next";
+import { generateBookingConfirmationPDF } from '../payment-success/BookingConfirmationPDF';
 
 export default function PaymentSuccess() {
   const { t, i18n } = useTranslation();
@@ -33,16 +31,9 @@ export default function PaymentSuccess() {
   const amountParam = searchParams.get("amount");
   const reference = searchParams.get("reference");
   const paymentMethod = searchParams.get("method") || "CREDIT_CARD";
-  const checkIn = searchParams.get("checkIn");
-  const checkOut = searchParams.get("checkOut");
-  const propertyId = searchParams.get("PropertyId");
-
-  // Parse guest counts from URL params
   const rooms = parseInt(searchParams.get("rooms") || "1", 10);
   const adults = parseInt(searchParams.get("adults") || "1", 10);
   const children = parseInt(searchParams.get("children") || "0", 10);
-
-  // Get guest details from Redux (new addition)
   const { guestDetails } = useSelector((state: any) => state.pmsHotelCard);
   const reduxGuests = guestDetails?.guests || null;
   const reduxRooms = guestDetails?.rooms || rooms;
@@ -51,9 +42,9 @@ export default function PaymentSuccess() {
   const reduxInfants = guestDetails?.infants || 0;
   const reduxEmail = guestDetails?.email || email;
   const reduxPhone = guestDetails?.phone || phone;
-  const currency = useSelector((state: any) => state.pmsHotelCard.currency);
   const [booking, setBooking] = useState<any>(null);
   const [error, setError] = useState(false);
+  const currency = useSelector((state: any) => state.pmsHotelCard.currency);
   const [errorMessage, setErrorMessage] = useState(
     t("Payment.PaymentSuccess.errorMessageDefault")
   );
@@ -78,60 +69,20 @@ export default function PaymentSuccess() {
       ? parseFloat(parseFloat(reduxAmount).toFixed(2))
       : 0;
   const handleDownloadConfirmation = () => {
-    if (!amount) {
-      toast.error(t("Payment.PaymentSuccess.noAmountForDownload"));
-      return;
-    }
-
-    const doc = new jsPDF();
-
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(12);
-
-    let y = 20;
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(16);
-    doc.text('Booking Confirmation', 20, y);
-    y += 10;
-
-    doc.setLineWidth(0.5);
-    doc.line(20, y, 190, y);
-    y += 10;
-
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(12);
-
-    // Call getBookingId once and reuse the result
-    const bookingId = getBookingId();
-
-    const details = [
-      `Booking ID: ${bookingId}`, // Use the stored bookingId
-      `Guest Name: ${getGuestName()}`,
-      `Email: ${reduxEmail}`,
-      `Phone: ${reduxPhone}`,
-      `Hotel: ${guestDetails?.hotelName || 'N/A'}`,
-      `Check-In Date: ${formatDate(checkInDate || guestDetails?.checkInDate)}`,
-      `Check-Out Date: ${formatDate(checkOutDate || guestDetails?.checkOutDate)}`,
-      `Nights: ${getBookingNights()}`,
-      `Guests: ${getGuestCountDisplay()}`,
-      `Payment Method: Pay at Hotel`,
-      `Total Amount: ₹{(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-    ];
-
-    details.forEach(detail => {
-      doc.text(detail, 20, y);
-      y += 10;
+    generateBookingConfirmationPDF({
+      amount,
+      currency,
+      guestDetails,
+      checkInDate,
+      checkOutDate,
+      reduxEmail,
+      reduxPhone,
+      getGuestName,
+      getBookingNights,
+      getGuestCountDisplay,
+      getBookingId,
+      t
     });
-
-    y += 10;
-    doc.setLineWidth(0.5);
-    doc.line(20, y, 190, y);
-    y += 10;
-    doc.text('Thank you for booking with us!', 20, y);
-
-    doc.save(`Booking_Confirmation_${bookingId}.pdf`);
-    toast.success(t("Payment.PaymentSuccess.downloadSuccessToast"));
   };
 
   useEffect(() => {
@@ -201,56 +152,6 @@ export default function PaymentSuccess() {
     }
 
     const handleBooking = async () => {
-      const token = Cookies.get("accessToken");
-      const payload = {
-        data: {
-          type: "hotel-order",
-          guests: [
-            {
-              tid: 1,
-              title: "MR",
-              firstName,
-              lastName,
-              phone: phone || guestDetails?.phone || "+33679278416",
-              email,
-            },
-          ],
-          travelAgent: {
-            contact: {
-              email: "support@ota.com",
-            },
-          },
-          roomAssociations: [
-            {
-              guestReferences: [{ guestReference: "1" }],
-              roomId: room_id,
-            },
-          ],
-          payment: {
-            method: paymentMethod,
-            amount,
-            ...(paymentMethod === "CREDIT_CARD" && {
-              paymentCard: {
-                paymentCardInfo: {
-                  vendorCode: "VI",
-                  cardNumber: "4151289722471370",
-                  expiryDate: "2026-08",
-                  holderName: `${firstName} ${lastName}`,
-                },
-              },
-            }),
-          },
-          bookingDetails: {
-            propertyId: property_id,
-            checkInDate: checkInDate,
-            checkOutDate: checkOutDate,
-            userId: authUser?._id,
-            rooms: rooms,
-            adults: adults,
-            children: children,
-          },
-        },
-      };
 
       try {
         isRequestSent.current = true;
@@ -325,7 +226,7 @@ export default function PaymentSuccess() {
     window.history.replaceState({}, "", paymentSuccessUrl);
 
     // Step 3: Handle back button
-    const handlePopState = (event: PopStateEvent) => {
+    const handlePopState = () => {
       router.push(hotelUrl);
     };
 
@@ -767,9 +668,18 @@ export default function PaymentSuccess() {
                 <p className="text-sm sm:text-base text-tripswift-black/70 mb-3 sm:mb-4">
                   {t("Payment.PaymentSuccess.customerServiceMessage")}
                 </p>
-                <button className="btn-tripswift-primary py-2 px-3 sm:px-4 rounded-lg w-full flex items-center justify-center gap-2 text-center font-tripswift-medium transition-all duration-300 text-xs sm:text-sm">
+                <Link
+                  href={`https://mail.google.com/mail/?view=cm&fs=1&to=business.alhajz@gmail.com&su=${encodeURIComponent(
+                    "Support Request - Booking Assistance"
+                  )}&body=${encodeURIComponent(
+                    "Hello, I need help with my booking. My booking reference is: [Please include your reference]."
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-tripswift-primary py-2 px-3 sm:px-4 rounded-lg w-full flex items-center justify-center gap-2 text-center font-tripswift-medium transition-all duration-300 text-xs sm:text-sm"
+                >
                   {t("Payment.PaymentSuccess.contactSupportButton")}
-                </button>
+                </Link>
 
                 {/* Explore more hotels link */}
                 <div className="mt-3 sm:mt-4 text-center">

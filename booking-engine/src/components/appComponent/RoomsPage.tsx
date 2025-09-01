@@ -6,7 +6,15 @@ import axios from "axios";
 import { RoomCard } from "../../components/appComponent/RoomCard";
 import GuestInformationModal, { Guest } from "../../components/bookingComponents/GuestInformationModal";
 import { useDispatch, useSelector } from "../../Redux/store";
-import { setAmount, setRoomId } from "../../Redux/slices/pmsHotelCard.slice";
+import {
+  setAmount,
+  setRoomId,
+  setCurrency,
+  setRatePlanCode,
+  setRoomType,
+  setHotelCode,
+  setHotelName,
+} from "@/Redux/slices/pmsHotelCard.slice";
 import { setGuestDetails } from "../../Redux/slices/hotelcard.slice";
 import FullscreenGallery from './FullscreenGallery';
 import QRCodeDisplay from "./QRCodeDisplay";
@@ -41,7 +49,6 @@ import LoadingSkeleton from "../hotelListingComponents/LoadingSkeleton";
 import { formatDate, calculateNights } from "../../utils/dateUtils";
 import { useTranslation } from "react-i18next";
 import HotelReviewsSliding from "../../components/reviewSystem/HotelReviews";
-// import QRCodeDisplay from "./QRCodeDisplay";
 
 interface Room {
   _id: string;
@@ -108,9 +115,9 @@ interface PropertyDetails {
 const RoomsPage: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const propertyId = searchParams.get("id");
-  const checkInDate = searchParams.get("checkin") || "2024-11-20";
-  const checkOutDate = searchParams.get("checkout") || "2024-12-24";
+  const { property_id: propertyId, checkInDate, checkOutDate } = useSelector((state: any) => state.pmsHotelCard);
+  const { guestDetails } = useSelector((state) => state.hotel);
+  console.log(`The guest details we get from redux: ${JSON.stringify(guestDetails)}`);
   const [rooms, setRooms] = useState<RoomResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -132,9 +139,8 @@ const RoomsPage: React.FC = () => {
   const [galleryInitialIndex, setGalleryInitialIndex] = useState<number>(0);
   const [showFullDescription, setShowFullDescription] = useState<boolean>(false);
   const [showRoomNotAvailable, setShowRoomNotAvailable] = useState<boolean>(false);
-  const { guestDetails } = useSelector((state) => state.hotel);
-  console.log(`The guest details we get from redux: ${JSON.stringify(guestDetails)}`);
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState<boolean>(false);
+  const [isPropertyLoading, setIsPropertyLoading] = useState<boolean>(true);
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
 
@@ -184,6 +190,8 @@ const RoomsPage: React.FC = () => {
     const fetchProperty = async () => {
       if (!propertyId) return;
 
+      setIsPropertyLoading(true);
+
       try {
         const propertyResponse = await axios.get(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${propertyId}`
@@ -201,11 +209,22 @@ const RoomsPage: React.FC = () => {
         sessionStorage.setItem("propertyCode", propDetails.property_code);
       } catch (error) {
         console.error("Error fetching property:", error);
+      } finally {
+        setIsPropertyLoading(false);
       }
     };
     fetchProperty();
   }, [propertyId]);
 
+  useEffect(() => {
+    if (selectedRoom && propertyCode && propertyDetails) {
+      dispatch(setCurrency(selectedRoom.currency_code));
+      dispatch(setRatePlanCode(selectedRoom.rate_plan_code));
+      dispatch(setRoomType(selectedRoom.room_type));
+      dispatch(setHotelCode(propertyCode));
+      dispatch(setHotelName(propertyDetails.property_name));
+    }
+  }, [selectedRoom, propertyCode]);
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -218,7 +237,6 @@ const RoomsPage: React.FC = () => {
       try {
         const encodedGuestDetails = encodeURIComponent(JSON.stringify(guestDetails));
         const response = await axios.post(
-          // `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}?numberOfRooms=${guestDetails?.rooms || 1}&guestDetails=${encodeURIComponent(JSON.stringify(guestDetails))}`,
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/room/rooms_by_propertyId2/${propertyId}?numberOfRooms=${guestDetails?.rooms}&guestDetails=${encodedGuestDetails}`,
           {
             startDate: checkInDate,
@@ -301,7 +319,7 @@ const RoomsPage: React.FC = () => {
       document.body.style.overflow = '';
     };
   }, [isReviewsModalOpen]);
-  
+
   // Helper function to convert amenities to the expected format
   const convertAmenities = (room: Room) => {
     let roomAmenitiesList: string[] = [];
@@ -393,15 +411,14 @@ const RoomsPage: React.FC = () => {
     setIsModalOpen(true);
     dispatch(setRoomId(room._id));
 
-    // Use amountBeforeTax from baseByGuestAmts
     const guestCount = guestDetails?.guests || 1;
     const matchingRate =
       room.baseByGuestAmts?.find((rate) => rate.numberOfGuests === guestCount) ||
       room.baseByGuestAmts?.[0];
-    const amount = matchingRate ? matchingRate.amountBeforeTax.toFixed(2) : "0.00";
+
+    const amount = matchingRate ? parseFloat(matchingRate.amountBeforeTax.toFixed(2)) : 0;
     dispatch(setAmount(amount));
   };
-
   const confirmBooking = (formData: {
     email: string;
     phone: string;
@@ -409,36 +426,39 @@ const RoomsPage: React.FC = () => {
     roomId: string;
     checkIn: string;
     checkOut: string;
-    amount: string;
+    amount: number;
     userId?: string;
     rooms?: number;
     adults?: number;
     children?: number;
     infants?: number;
     guests?: Guest[];
+    hotelName: string;
+    ratePlanCode: string;
+    roomType: string;
+    currency?: string;
   }) => {
     console.log("form data", formData);
-    const queryParams = new URLSearchParams({
-      roomId: formData.roomId,
-      propertyId: formData.propertyId,
-      currency: selectedRoom?.currency_code || "",
-      checkIn: formData.checkIn,
-      checkOut: formData.checkOut,
-      email: formData.email,
-      phone: formData.phone,
-      userId: formData.userId || "",
-      hotelName: propertyDetails?.property_name || "",
-      ratePlanCode: selectedRoom?.rate_plan_code || "",
-      roomType: selectedRoom?.room_type || "",
-      ...(formData.rooms ? { rooms: formData.rooms.toString() } : {}),
-      ...(formData.adults ? { adults: formData.adults.toString() } : {}),
-      ...(formData.children ? { children: formData.children.toString() } : {}),
-      ...(formData.infants ? { infants: formData.infants.toString() } : {}),
-      ...(formData.guests
-        ? { guests: encodeURIComponent(JSON.stringify(formData.guests)) }
-        : {}),
-    }).toString();
-    router.push(`/payment?${queryParams}`);
+
+    // const queryParams = new URLSearchParams({
+    //   roomId: formData.roomId,
+    //   propertyId: formData.propertyId,
+    //   currency: formData.currency || selectedRoom?.currency_code || "",
+    //   checkIn: formData.checkIn,
+    //   checkOut: formData.checkOut,
+    //   email: formData.email,
+    //   phone: formData.phone,
+    //   userId: formData.userId || "",
+    //   hotelName: formData.hotelName,
+    //   ratePlanCode: formData.ratePlanCode,
+    //   roomType: formData.roomType,
+    //   ...(formData.rooms && { rooms: formData.rooms.toString() }),
+    //   ...(formData.adults && { adults: formData.adults.toString() }),
+    //   ...(formData.children && { children: formData.children.toString() }),
+    //   ...(formData.infants && { infants: formData.infants.toString() }),
+    //   ...(formData.guests && { guests: encodeURIComponent(JSON.stringify(formData.guests)) }),
+    // });
+    router.push(`/payment`);
   };
 
   // Get unique room types
@@ -649,481 +669,476 @@ const RoomsPage: React.FC = () => {
       </div>
 
       <div className="container mx-auto px-4 py-4">
-        <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          {/* Collapsible header - TripSwift branded */}
-          <div
-            className="flex justify-between items-center bg-tripswift-blue/5 p-4 cursor-pointer"
-            onClick={() => setShowPropertyDetails(!showPropertyDetails)}
-          >
-            <div>
-              <h1 className="text-property-title">
-                {propertyDetails?.property_name ||
-                  t("RoomsPage.viewPropertyDetails")}
-              </h1>
-              {propertyDetails?.property_address && (
-                <div className="text-location flex items-center text-gray-600 mt-1.5">
-                  <MapPin className={`h-4 w-4  text-tripswift-blue flex-shrink-0 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
-                  <span className="font-tripswift-regular text-sm">
-                    {getFormattedAddress(propertyDetails.property_address)}
-                  </span>
-                </div>
-              )}
+        {isPropertyLoading ? (
+          <LoadingSkeleton type="property" count={1} />
+        ) : (
+          <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            {/* Collapsible header - TripSwift branded */}
+            <div
+              className="flex justify-between items-center bg-tripswift-blue/5 p-4 cursor-pointer"
+              onClick={() => setShowPropertyDetails(!showPropertyDetails)}
+            >
+              <div>
+                <h1 className="text-property-title">
+                  {propertyDetails?.property_name ||
+                    t("RoomsPage.viewPropertyDetails")}
+                </h1>
+                {propertyDetails?.property_address && (
+                  <div className="text-location flex items-center text-gray-600 mt-1.5">
+                    <MapPin className={`h-4 w-4  text-tripswift-blue flex-shrink-0 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} />
+                    <span className="font-tripswift-regular text-sm">
+                      {getFormattedAddress(propertyDetails.property_address)}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <ChevronDown
+                className={`h-5 w-5 text-tripswift-black/70 transform transition-transform duration-300 ${showPropertyDetails ? "rotate-180" : ""
+                  }`}
+              />
             </div>
-            <ChevronDown
-              className={`h-5 w-5 text-tripswift-black/70 transform transition-transform duration-300 ${showPropertyDetails ? "rotate-180" : ""
-                }`}
-            />
-          </div>
 
-          {showPropertyDetails && (
-            <div className="px-4 pt-3 pb-4">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                {/* Property images gallery */}
-                <div className="lg:col-span-2">
-                  {/* Main container with padding to allow for inner rounded images */}
-                  <div className="relative rounded-xl overflow-hidden bg-white shadow-sm p-1.5">
-                    {propertyDetails?.image &&
-                      Array.isArray(propertyDetails.image) &&
-                      propertyDetails.image.length > 0 ? (
-                      <>
-                        {/* Different layouts based on image count */}
-                        {propertyDetails.image.length === 1 ? (
-                          /* Single image layout with 4-sided curve */
-                          <div
-                            className="h-[280px] rounded-xl overflow-hidden cursor-pointer group relative"
-                            onClick={() => {
-                              setGalleryInitialIndex(0);
-                              setIsGalleryOpen(true);
-                            }}
-                          >
-                            <img
-                              src={propertyDetails.image[0]}
-                              alt={propertyDetails.property_name || "Property"}
-                              className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                            />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
-                          </div>
-                        ) : propertyDetails.image.length === 2 ? (
-                          /* Two images layout - EACH with 4-sided curve */
-                          <div className="grid grid-cols-2 gap-2 h-[280px]">
-                            {propertyDetails.image.map((img, index) => (
-                              <div
-                                key={index}
-                                className="relative h-full rounded-xl overflow-hidden cursor-pointer group"
-                                onClick={() => {
-                                  setGalleryInitialIndex(index);
-                                  setIsGalleryOpen(true);
-                                }}
-                              >
-                                <img
-                                  src={img}
-                                  alt={`${propertyDetails.property_name || "Property"} view ${index + 1}`}
-                                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                                />
-                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
-                                {index === selectedImage && (
-                                  <div className="absolute inset-0 shadow-inner ring-2 ring-tripswift-blue/30"></div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        ) : propertyDetails.image.length <= 4 ? (
-                          /* 3-4 images layout - EACH with 4-sided curve */
-                          <div className="grid grid-cols-2 gap-2 h-[280px]">
-                            {/* Main selected image - larger with 4-sided curve */}
+            {showPropertyDetails && (
+              <div className="px-4 pt-3 pb-4">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  {/* Property images gallery */}
+                  <div className="lg:col-span-2">
+                    {/* Main container with padding to allow for inner rounded images */}
+                    <div className="relative rounded-xl overflow-hidden bg-white shadow-sm p-1.5">
+                      {propertyDetails?.image &&
+                        Array.isArray(propertyDetails.image) &&
+                        propertyDetails.image.length > 0 ? (
+                        <>
+                          {/* Different layouts based on image count */}
+                          {propertyDetails.image.length === 1 ? (
+                            /* Single image layout with 4-sided curve */
                             <div
-                              className="col-span-2 md:col-span-1 row-span-2 relative rounded-xl overflow-hidden cursor-pointer group"
-                              style={{ minHeight: '280px' }}
+                              className="h-[280px] rounded-xl overflow-hidden cursor-pointer group relative"
                               onClick={() => {
-                                setGalleryInitialIndex(selectedImage);
+                                setGalleryInitialIndex(0);
                                 setIsGalleryOpen(true);
                               }}
                             >
                               <img
-                                src={propertyDetails.image[selectedImage]}
+                                src={propertyDetails.image[0]}
                                 alt={propertyDetails.property_name || "Property"}
-                                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                                className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                               />
                               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
                             </div>
-
-                            {/* Grid of other images - each with 4-sided curve */}
-                            <div className="hidden md:grid md:grid-cols-1 gap-2" style={{ height: '280px' }}>
-                              {propertyDetails.image
-                                .filter((_, i) => i !== selectedImage)
-                                .slice(0, 2)
-                                .map((img, index) => {
-                                  const images = propertyDetails?.image;
-                                  const originalIndex = images?.findIndex((i) => i === img);
-                                  return (
-                                    <div
-                                      key={index}
-                                      className="relative cursor-pointer rounded-xl overflow-hidden group flex-1"
-                                      style={{ minHeight: '136px' }}
-                                      onClick={() => {
-                                        if (images && Array.isArray(images)) {
-                                          const newIndex = images.findIndex((i) => i === img);
-                                          if (newIndex !== -1) {
-                                            setSelectedImage(newIndex);
-                                          }
-                                        }
-                                      }}
-                                      onDoubleClick={() => {
-                                        if (originalIndex !== undefined && originalIndex !== -1) {
-                                          setGalleryInitialIndex(originalIndex);
-                                          setIsGalleryOpen(true);
-                                        }
-                                      }}
-                                    >
-                                      <img
-                                        src={img}
-                                        alt={`Property view ${index + 1}`}
-                                        className="w-full h-full object-cover object-center group-hover:opacity-90 group-hover:scale-105 transition-all duration-300"
-                                      />
-                                    </div>
-                                  );
-                                })}
-                              {propertyDetails.image.length > 3 && selectedImage !== 3 && (
+                          ) : propertyDetails.image.length === 2 ? (
+                            /* Two images layout - EACH with 4-sided curve */
+                            <div className="grid grid-cols-2 gap-2 h-[280px]">
+                              {propertyDetails.image.map((img, index) => (
                                 <div
-                                  className="relative cursor-pointer rounded-xl overflow-hidden group flex-1"
-                                  style={{ minHeight: '136px' }}
-                                  onClick={() => setSelectedImage(3)}
-                                  onDoubleClick={() => {
-                                    setGalleryInitialIndex(3);
+                                  key={index}
+                                  className="relative h-full rounded-xl overflow-hidden cursor-pointer group"
+                                  onClick={() => {
+                                    setGalleryInitialIndex(index);
                                     setIsGalleryOpen(true);
                                   }}
                                 >
                                   <img
-                                    src={propertyDetails.image[3]}
-                                    alt={`Property view 4`}
-                                    className="w-full h-full object-cover object-center group-hover:opacity-90 group-hover:scale-105 transition-all duration-300"
+                                    src={img}
+                                    alt={`${propertyDetails.property_name || "Property"} view ${index + 1}`}
+                                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                                   />
+                                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
+                                  {index === selectedImage && (
+                                    <div className="absolute inset-0 shadow-inner ring-2 ring-tripswift-blue/30"></div>
+                                  )}
                                 </div>
-                              )}
+                              ))}
                             </div>
-                          </div>
-                        ) : (
-                          /* 5+ images layout - EACH with 4-sided curve */
-                          <div className="grid grid-cols-4 gap-2 h-[280px]">
-                            {/* Main selected image with 4-sided curve */}
-                            <div
-                              className="col-span-4 md:col-span-2 md:row-span-2 relative rounded-xl overflow-hidden cursor-pointer group"
-                              style={{ minHeight: '280px' }}
-                              onClick={() => {
-                                setGalleryInitialIndex(selectedImage);
-                                setIsGalleryOpen(true);
-                              }}
-                            >
-                              <img
-                                src={propertyDetails.image[selectedImage]}
-                                alt={propertyDetails.property_name || "Property"}
-                                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                              />
-                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
-                            </div>
-
-                            {/* Grid of other images - each with 4-sided curve */}
-                            <div className="hidden md:grid md:col-span-2 md:grid-cols-2 md:grid-rows-2 gap-2" style={{ height: '280px' }}>
-                              {propertyDetails.image
-                                .filter((_, i) => i !== selectedImage)
-                                .slice(0, 3)
-                                .map((img, index) => {
-                                  const images = propertyDetails?.image;
-                                  const originalIndex = images?.findIndex((i) => i === img);
-                                  return (
-                                    <div
-                                      key={index}
-                                      className="relative cursor-pointer rounded-xl overflow-hidden group"
-                                      style={{ minHeight: '136px' }}
-                                      onClick={() => {
-                                        if (images && Array.isArray(images)) {
-                                          const newIndex = images.findIndex((i) => i === img);
-                                          if (newIndex !== -1) {
-                                            setSelectedImage(newIndex);
-                                          }
-                                        }
-                                      }}
-                                      onDoubleClick={() => {
-                                        if (originalIndex !== undefined && originalIndex !== -1) {
-                                          setGalleryInitialIndex(originalIndex);
-                                          setIsGalleryOpen(true);
-                                        }
-                                      }}
-                                    >
-                                      <img
-                                        src={img}
-                                        alt={`Property view ${index + 1}`}
-                                        className="w-full h-full object-cover object-center group-hover:opacity-90 group-hover:scale-105 transition-all duration-300"
-                                      />
-                                    </div>
-                                  );
-                                })}
-
-                              {/* Last image with overlay showing more images - with 4-sided curve */}
+                          ) : propertyDetails.image.length <= 4 ? (
+                            /* 3-4 images layout - EACH with 4-sided curve */
+                            <div className="grid grid-cols-2 gap-2 h-[280px]">
+                              {/* Main selected image - larger with 4-sided curve */}
                               <div
-                                className="relative cursor-pointer rounded-xl overflow-hidden group"
-                                style={{ minHeight: '136px' }}
+                                className="col-span-2 md:col-span-1 row-span-2 relative rounded-xl overflow-hidden cursor-pointer group"
+                                style={{ minHeight: '280px' }}
                                 onClick={() => {
-                                  setGalleryInitialIndex(4);
+                                  setGalleryInitialIndex(selectedImage);
                                   setIsGalleryOpen(true);
                                 }}
                               >
                                 <img
-                                  src={propertyDetails.image[4]}
-                                  alt="More property images"
-                                  className="w-full h-full object-cover object-center brightness-75 group-hover:brightness-50 transition-all duration-300"
+                                  src={propertyDetails.image[selectedImage]}
+                                  alt={propertyDetails.property_name || "Property"}
+                                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                                 />
-                                <div className="absolute inset-0 flex items-center justify-center text-tripswift-off-white">
-                                  <div className="text-center">
-                                    <ImageIcon className="h-6 w-6 mx-auto mb-1" />
-                                    <span className="font-tripswift-medium">
-                                      +{propertyDetails.image.length - 4}
-                                    </span>
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
+                              </div>
+
+                              {/* Grid of other images - each with 4-sided curve */}
+                              <div className="hidden md:grid md:grid-cols-1 gap-2" style={{ height: '280px' }}>
+                                {propertyDetails.image
+                                  .filter((_, i) => i !== selectedImage)
+                                  .slice(0, 2)
+                                  .map((img, index) => {
+                                    const images = propertyDetails?.image;
+                                    const originalIndex = images?.findIndex((i) => i === img);
+                                    return (
+                                      <div
+                                        key={index}
+                                        className="relative cursor-pointer rounded-xl overflow-hidden group flex-1"
+                                        style={{ minHeight: '136px' }}
+                                        onClick={() => {
+                                          if (images && Array.isArray(images)) {
+                                            const newIndex = images.findIndex((i) => i === img);
+                                            if (newIndex !== -1) {
+                                              setSelectedImage(newIndex);
+                                            }
+                                          }
+                                        }}
+                                        onDoubleClick={() => {
+                                          if (originalIndex !== undefined && originalIndex !== -1) {
+                                            setGalleryInitialIndex(originalIndex);
+                                            setIsGalleryOpen(true);
+                                          }
+                                        }}
+                                      >
+                                        <img
+                                          src={img}
+                                          alt={`Property view ${index + 1}`}
+                                          className="w-full h-full object-cover object-center group-hover:opacity-90 group-hover:scale-105 transition-all duration-300"
+                                        />
+                                      </div>
+                                    );
+                                  })}
+                                {propertyDetails.image.length > 3 && selectedImage !== 3 && (
+                                  <div
+                                    className="relative cursor-pointer rounded-xl overflow-hidden group flex-1"
+                                    style={{ minHeight: '136px' }}
+                                    onClick={() => setSelectedImage(3)}
+                                    onDoubleClick={() => {
+                                      setGalleryInitialIndex(3);
+                                      setIsGalleryOpen(true);
+                                    }}
+                                  >
+                                    <img
+                                      src={propertyDetails.image[3]}
+                                      alt={`Property view 4`}
+                                      className="w-full h-full object-cover object-center group-hover:opacity-90 group-hover:scale-105 transition-all duration-300"
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            /* 5+ images layout - EACH with 4-sided curve */
+                            <div className="grid grid-cols-4 gap-2 h-[280px]">
+                              {/* Main selected image with 4-sided curve */}
+                              <div
+                                className="col-span-4 md:col-span-2 md:row-span-2 relative rounded-xl overflow-hidden cursor-pointer group"
+                                style={{ minHeight: '280px' }}
+                                onClick={() => {
+                                  setGalleryInitialIndex(selectedImage);
+                                  setIsGalleryOpen(true);
+                                }}
+                              >
+                                <img
+                                  src={propertyDetails.image[selectedImage]}
+                                  alt={propertyDetails.property_name || "Property"}
+                                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                                />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
+                              </div>
+
+                              {/* Grid of other images - each with 4-sided curve */}
+                              <div className="hidden md:grid md:col-span-2 md:grid-cols-2 md:grid-rows-2 gap-2" style={{ height: '280px' }}>
+                                {propertyDetails.image
+                                  .filter((_, i) => i !== selectedImage)
+                                  .slice(0, 3)
+                                  .map((img, index) => {
+                                    const images = propertyDetails?.image;
+                                    const originalIndex = images?.findIndex((i) => i === img);
+                                    return (
+                                      <div
+                                        key={index}
+                                        className="relative cursor-pointer rounded-xl overflow-hidden group"
+                                        style={{ minHeight: '136px' }}
+                                        onClick={() => {
+                                          if (images && Array.isArray(images)) {
+                                            const newIndex = images.findIndex((i) => i === img);
+                                            if (newIndex !== -1) {
+                                              setSelectedImage(newIndex);
+                                            }
+                                          }
+                                        }}
+                                        onDoubleClick={() => {
+                                          if (originalIndex !== undefined && originalIndex !== -1) {
+                                            setGalleryInitialIndex(originalIndex);
+                                            setIsGalleryOpen(true);
+                                          }
+                                        }}
+                                      >
+                                        <img
+                                          src={img}
+                                          alt={`Property view ${index + 1}`}
+                                          className="w-full h-full object-cover object-center group-hover:opacity-90 group-hover:scale-105 transition-all duration-300"
+                                        />
+                                      </div>
+                                    );
+                                  })}
+
+                                {/* Last image with overlay showing more images - with 4-sided curve */}
+                                <div
+                                  className="relative cursor-pointer rounded-xl overflow-hidden group"
+                                  style={{ minHeight: '136px' }}
+                                  onClick={() => {
+                                    setGalleryInitialIndex(4);
+                                    setIsGalleryOpen(true);
+                                  }}
+                                >
+                                  <img
+                                    src={propertyDetails.image[4]}
+                                    alt="More property images"
+                                    className="w-full h-full object-cover object-center brightness-75 group-hover:brightness-50 transition-all duration-300"
+                                  />
+                                  <div className="absolute inset-0 flex items-center justify-center text-tripswift-off-white">
+                                    <div className="text-center">
+                                      <ImageIcon className="h-6 w-6 mx-auto mb-1" />
+                                      <span className="font-tripswift-medium">
+                                        +{propertyDetails.image.length - 4}
+                                      </span>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
-                        {/* Navigation controls */}
-                        {propertyDetails.image.length > 2 && (
-                          <>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const images = propertyDetails.image;
-                                if (images && Array.isArray(images) && images.length > 0) {
-                                  setSelectedImage((prev) =>
-                                    prev <= 0 ? images.length - 1 : prev - 1
-                                  );
-                                }
-                              }}
-                              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-tripswift-off-white/90 backdrop-blur-sm rounded-full p-2.5 shadow-lg hover:bg-tripswift-off-white transition-colors duration-300 z-10 group border border-white/20"
-                            >
-                              <ChevronLeft className="h-5 w-5 text-gray-700 group-hover:text-black transition-colors duration-300" />
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const images = propertyDetails.image;
-                                if (images && Array.isArray(images) && images.length > 0) {
-                                  setSelectedImage((prev) =>
-                                    prev >= images.length - 1 ? 0 : prev + 1
-                                  );
-                                }
-                              }}
-                              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-tripswift-off-white/90 backdrop-blur-sm rounded-full p-2.5 shadow-lg hover:bg-tripswift-off-white transition-colors duration-300 z-10 group border border-white/20"
-                            >
-                              <ChevronRight className="h-5 w-5 text-gray-700 group-hover:text-black transition-colors duration-300" />
-                            </button>
+                          {/* Navigation controls */}
+                          {propertyDetails.image.length > 2 && (
+                            <>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const images = propertyDetails.image;
+                                  if (images && Array.isArray(images) && images.length > 0) {
+                                    setSelectedImage((prev) =>
+                                      prev <= 0 ? images.length - 1 : prev - 1
+                                    );
+                                  }
+                                }}
+                                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-tripswift-off-white/90 backdrop-blur-sm rounded-full p-2.5 shadow-lg hover:bg-tripswift-off-white transition-colors duration-300 z-10 group border border-white/20"
+                              >
+                                <ChevronLeft className="h-5 w-5 text-gray-700 group-hover:text-black transition-colors duration-300" />
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const images = propertyDetails.image;
+                                  if (images && Array.isArray(images) && images.length > 0) {
+                                    setSelectedImage((prev) =>
+                                      prev >= images.length - 1 ? 0 : prev + 1
+                                    );
+                                  }
+                                }}
+                                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-tripswift-off-white/90 backdrop-blur-sm rounded-full p-2.5 shadow-lg hover:bg-tripswift-off-white transition-colors duration-300 z-10 group border border-white/20"
+                              >
+                                <ChevronRight className="h-5 w-5 text-gray-700 group-hover:text-black transition-colors duration-300" />
+                              </button>
 
-                            {/* Counter */}
-                            <div className="absolute text-white bottom-4 right-4 bg-black/70 backdrop-blur-sm text-xs py-1.5 px-4 rounded-full font-tripswift-medium shadow-lg z-10 border border-white/20">
-                              {selectedImage + 1} / {propertyDetails.image.length}
-                            </div>
-                          </>
-                        )}
-
-                        {/* View all photos button */}
-                        {propertyDetails.image.length >= 3 && (
-                          <button
-                            className="absolute top-4 right-4 bg-tripswift-off-white backdrop-blur-sm text-tripswift-black text-xs font-tripswift-medium px-3.5 py-2 rounded-full shadow-lg flex items-center duration-300 z-10 border border-white/20"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setGalleryInitialIndex(selectedImage);
-                              setIsGalleryOpen(true);
-                            }}
-                          >
-                            <ImageIcon className="h-3.5 w-3.5 mr-1.5" />
-                            {t("RoomsPage.viewAllPhotos", { defaultValue: "View all photos" })}
-                          </button>
-                        )}
-
-                        {/* Click to view overlay hint */}
-                        <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-sm text-white text-xs font-tripswift-medium px-2.5 py-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10 border border-white/20">
-                          Click to view
-                        </div>
-
-                      </>
-                    ) : (
-                      <div className="w-full h-[280px] rounded-xl flex items-center justify-center bg-gray-50">
-                        <div className="text-center">
-                          <ImageIcon className="h-12 w-12 text-gray-300 mx-auto mb-2" />
-                          <span className="text-gray-400 font-tripswift-medium">
-                            {t("RoomsPage.noImagesAvailable")}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Image thumbnails with 4-sided curve - Enhanced */}
-                  {propertyDetails?.image &&
-                    Array.isArray(propertyDetails.image) &&
-                    propertyDetails.image.length >= 3 && (
-                      <div className="flex mt-3 space-x-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-                        {propertyDetails.image.map((img, index) => (
-                          <div
-                            key={index}
-                            onClick={() => setSelectedImage(index)}
-                            onDoubleClick={() => {
-                              setGalleryInitialIndex(index);
-                              setIsGalleryOpen(true);
-                            }}
-                            className={`w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-xl overflow-hidden cursor-pointer relative transition-all duration-300 group border-2 ${selectedImage === index
-                              ? "shadow-lg scale-105 border-tripswift-blue"
-                              : "opacity-70 hover:opacity-90 border-transparent"
-                              }`}
-                            title="Click to select, double-click to view fullscreen"
-                          >
-                            <img
-                              src={img}
-                              alt={`Thumbnail ${index + 1}`}
-                              className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                            />
-                            {selectedImage === index && (
-                              <div className="absolute inset-0 bg-tripswift-blue/20 flex items-center justify-center">
-                                <div className="w-3 h-3 bg-tripswift-blue rounded-full"></div>
+                              {/* Counter */}
+                              <div className="absolute text-white bottom-4 right-4 bg-black/70 backdrop-blur-sm text-xs py-1.5 px-4 rounded-full font-tripswift-medium shadow-lg z-10 border border-white/20">
+                                {selectedImage + 1} / {propertyDetails.image.length}
                               </div>
-                            )}
-                            {/* Fullscreen icon on hover */}
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
-                              <ImageIcon className="h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  {/* Property description */}
-                  {/* {propertyDetails?.description && (
-                    <div className="mt-4">
-                      <h3 className="text-section-heading mb-2">{t('RoomsPage.aboutThisProperty')}</h3>
-                      <p className="text-description">
-                        {propertyDetails.description}
-                      </p>
-                    </div>
-                  )} */}
-                  {/* Property amenities section */}
-                  <div className="mt-4">
-                    <h3 className="text-section-heading mb-3">
-                      {t("RoomsPage.propertyAmenities")}
-                    </h3>
-                    {propertyDetails?.property_amenities?.amenities &&
-                      Object.keys(propertyDetails.property_amenities.amenities).length > 0 ? (
-                      <div className="flex flex-wrap gap-2">
-                        {Object.entries(propertyDetails.property_amenities.amenities)
-                          .filter(([_, hasAmenity]) => hasAmenity)
-                          .map(([amenity]) => (
-                            <div
-                              key={amenity}
-                              className="flex items-center text-xs font-tripswift-medium text-tripswift-blue bg-tripswift-blue/5 border border-tripswift-blue/20 px-2 py-1 rounded-md"
+                            </>
+                          )}
+
+                          {/* View all photos button */}
+                          {propertyDetails.image.length >= 3 && (
+                            <button
+                              className="absolute top-4 right-4 bg-tripswift-off-white backdrop-blur-sm text-tripswift-black text-xs font-tripswift-medium px-3.5 py-2 rounded-full shadow-lg flex items-center duration-300 z-10 border border-white/20"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setGalleryInitialIndex(selectedImage);
+                                setIsGalleryOpen(true);
+                              }}
                             >
-                              {getAmenityIcon(amenity)}
-                              <span className={`capitalize ${i18n.language === "ar" ? "mr-2" : "ml-2"}`}>
-                                {t(`RoomsPage.amenitiesList.${amenity}`)}
-                              </span>
+                              <ImageIcon className="h-3.5 w-3.5 mr-1.5" />
+                              {t("RoomsPage.viewAllPhotos", { defaultValue: "View all photos" })}
+                            </button>
+                          )}
+
+                          {/* Click to view overlay hint */}
+                          <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-sm text-white text-xs font-tripswift-medium px-2.5 py-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10 border border-white/20">
+                            Click to view
+                          </div>
+
+                        </>
+                      ) : (
+                        <div className="w-full h-[280px] rounded-xl flex items-center justify-center bg-gray-50">
+                          <div className="text-center">
+                            <ImageIcon className="h-12 w-12 text-gray-300 mx-auto mb-2" />
+                            <span className="text-gray-400 font-tripswift-medium">
+                              {t("RoomsPage.noImagesAvailable")}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Image thumbnails with 4-sided curve - Enhanced */}
+                    {propertyDetails?.image &&
+                      Array.isArray(propertyDetails.image) &&
+                      propertyDetails.image.length >= 3 && (
+                        <div className="flex mt-3 space-x-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                          {propertyDetails.image.map((img, index) => (
+                            <div
+                              key={index}
+                              onClick={() => setSelectedImage(index)}
+                              onDoubleClick={() => {
+                                setGalleryInitialIndex(index);
+                                setIsGalleryOpen(true);
+                              }}
+                              className={`w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-xl overflow-hidden cursor-pointer relative transition-all duration-300 group border-2 ${selectedImage === index
+                                ? "shadow-lg scale-105 border-tripswift-blue"
+                                : "opacity-70 hover:opacity-90 border-transparent"
+                                }`}
+                              title="Click to select, double-click to view fullscreen"
+                            >
+                              <img
+                                src={img}
+                                alt={`Thumbnail ${index + 1}`}
+                                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                              />
+                              {selectedImage === index && (
+                                <div className="absolute inset-0 bg-tripswift-blue/20 flex items-center justify-center">
+                                  <div className="w-3 h-3 bg-tripswift-blue rounded-full"></div>
+                                </div>
+                              )}
+                              {/* Fullscreen icon on hover */}
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                                <ImageIcon className="h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                              </div>
                             </div>
                           ))}
-                      </div>
-                    ) : (
-                      <p className="text-description">
-                        {t("RoomsPage.noAmenitiesSpecified")}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Property amenities and contact info */}
-                <div className="lg:col-span-1">
-                  {/* QR Code section */}
-                  <div className="bg-tripswift-blue/5 p-4 rounded-xl">
-                    {qrCodeData.qrCode && qrCodeData.couponCode && (
-                      <QRCodeDisplay qrCode={qrCodeData.qrCode} />
-                    )}
-                  </div>
-                  {/* Property description */}
-                  {propertyDetails?.description && (
-                    <div className="bg-tripswift-off-white p-4 rounded-xl border border-gray-100 mb-4">
-                      <h3 className="text-section-heading mb-2">{t('RoomsPage.aboutThisProperty')}</h3>
-                      <p className="text-description leading-relaxed">
-                        {propertyDetails.description.split(' ').length > 10 ? (
-                          <>
-                            {showFullDescription
-                              ? propertyDetails.description
-                              : propertyDetails.description.split(' ').slice(0, 10).join(' ') + '...'}
-                            <button
-                              type="button"
-                              className="text-tripswift-blue font-tripswift-medium text-sm ml-1"
-                              onClick={() => setShowFullDescription(!showFullDescription)}
-                            >
-                              {showFullDescription ? t('RoomsPage.showLess') : t('RoomsPage.showMore')}
-                            </button>
-                          </>
-                        ) : (
-                          propertyDetails.description
-                        )}
-                      </p>
+                        </div>
+                      )}
+                    {/* Property amenities section */}
+                    <div className="mt-4">
+                      <h3 className="text-section-heading mb-3">
+                        {t("RoomsPage.propertyAmenities")}
+                      </h3>
+                      {propertyDetails?.property_amenities?.amenities &&
+                        Object.keys(propertyDetails.property_amenities.amenities).length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                          {Object.entries(propertyDetails.property_amenities.amenities)
+                            .filter(([_, hasAmenity]) => hasAmenity)
+                            .map(([amenity]) => (
+                              <div
+                                key={amenity}
+                                className="flex items-center text-xs font-tripswift-medium text-tripswift-blue bg-tripswift-blue/5 border border-tripswift-blue/20 px-2 py-1 rounded-md"
+                              >
+                                {getAmenityIcon(amenity)}
+                                <span className={`capitalize ${i18n.language === "ar" ? "mr-2" : "ml-2"}`}>
+                                  {t(`RoomsPage.amenitiesList.${amenity}`)}
+                                </span>
+                              </div>
+                            ))}
+                        </div>
+                      ) : (
+                        <p className="text-description">
+                          {t("RoomsPage.noAmenitiesSpecified")}
+                        </p>
+                      )}
                     </div>
-                  )}
+                  </div>
 
-                  {/* Contact information */}
-                  <div className="bg-tripswift-off-white p-4 rounded-xl border border-gray-100">
-                    <h3 className="text-section-heading mb-3">
-                      {t("RoomsPage.contactInformation")}
-                    </h3>
-                    <div className="space-y-2">
-                      {propertyDetails?.property_contact && (
-                        <div className="flex items-center text-description">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className={`h-4 w-4 text-tripswift-blue flex-shrink-0 ${i18n.language === "ar" ? "ml-3" : "mr-3"}`}
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                            />
-                          </svg>
-                          <span className="break-all">{propertyDetails.property_contact}</span>
-                        </div>
+                  {/* Property amenities and contact info */}
+                  <div className="lg:col-span-1">
+                    {/* QR Code section */}
+                    <div className="bg-tripswift-blue/5 p-4 rounded-xl">
+                      {qrCodeData.qrCode && qrCodeData.couponCode && (
+                        <QRCodeDisplay qrCode={qrCodeData.qrCode} />
                       )}
-                      {propertyDetails?.property_email && (
-                        <div className="flex items-center text-description">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className={`h-4 w-4 text-tripswift-blue flex-shrink-0 ${i18n.language === "ar" ? "ml-3" : "mr-3"}`}
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                            />
-                          </svg>
-                          <span className="break-all">{propertyDetails.property_email}</span>
-                        </div>
-                      )}
-                      {propertyDetails?.property_address && (
-                        <div className="flex items-start text-description">
-                          <MapPin className={`h-4 w-4 text-tripswift-blue flex-shrink-0 mt-0.5 ${i18n.language === "ar" ? "ml-3" : "mr-3"}`} />
-                          <span className="leading-relaxed">{getFormattedAddress(propertyDetails.property_address)}</span>
-                        </div>
-                      )}
+                    </div>
+                    {/* Property description */}
+                    {propertyDetails?.description && (
+                      <div className="bg-tripswift-off-white p-4 rounded-xl border border-gray-100 mb-4">
+                        <h3 className="text-section-heading mb-2">{t('RoomsPage.aboutThisProperty')}</h3>
+                        <p className="text-description leading-relaxed">
+                          {propertyDetails.description.split(' ').length > 10 ? (
+                            <>
+                              {showFullDescription
+                                ? propertyDetails.description
+                                : propertyDetails.description.split(' ').slice(0, 10).join(' ') + '...'}
+                              <button
+                                type="button"
+                                className="text-tripswift-blue font-tripswift-medium text-sm ml-1"
+                                onClick={() => setShowFullDescription(!showFullDescription)}
+                              >
+                                {showFullDescription ? t('RoomsPage.showLess') : t('RoomsPage.showMore')}
+                              </button>
+                            </>
+                          ) : (
+                            propertyDetails.description
+                          )}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Contact information */}
+                    <div className="bg-tripswift-off-white p-4 rounded-xl border border-gray-100">
+                      <h3 className="text-section-heading mb-3">
+                        {t("RoomsPage.contactInformation")}
+                      </h3>
+                      <div className="space-y-2">
+                        {propertyDetails?.property_contact && (
+                          <div className="flex items-center text-description">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className={`h-4 w-4 text-tripswift-blue flex-shrink-0 ${i18n.language === "ar" ? "ml-3" : "mr-3"}`}
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                              />
+                            </svg>
+                            <span className="break-all">{propertyDetails.property_contact}</span>
+                          </div>
+                        )}
+                        {propertyDetails?.property_email && (
+                          <div className="flex items-center text-description">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className={`h-4 w-4 text-tripswift-blue flex-shrink-0 ${i18n.language === "ar" ? "ml-3" : "mr-3"}`}
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                              />
+                            </svg>
+                            <span className="break-all">{propertyDetails.property_email}</span>
+                          </div>
+                        )}
+                        {propertyDetails?.property_address && (
+                          <div className="flex items-start text-description">
+                            <MapPin className={`h-4 w-4 text-tripswift-blue flex-shrink-0 mt-0.5 ${i18n.language === "ar" ? "ml-3" : "mr-3"}`} />
+                            <span className="leading-relaxed">{getFormattedAddress(propertyDetails.property_address)}</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Main content */}

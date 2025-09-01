@@ -13,6 +13,10 @@ const initialState: AuthState = {
   user: null,
 };
 
+const cookieOptions = {
+  sameSite: 'strict' as const,
+};
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -23,21 +27,22 @@ const authSlice = createSlice({
     ) => {
       state.isAuthenticated = true;
       state.accessToken = action.payload;
-      Cookies.set("accessToken", action.payload);
-      Cookies.set("isAuthenticated", "true");
+      Cookies.set("accessToken", action.payload, cookieOptions);
+      Cookies.set("isAuthenticated", "true", cookieOptions);
     },
-    setUser(
-      state: Draft<typeof initialState>,
-      action: PayloadAction<typeof initialState.user>
-    ) {
+    setUser(state: Draft<typeof initialState>, action: PayloadAction<typeof initialState.user>) {
       state.user = action.payload;
+      if (action.payload) {
+        Cookies.set("userData", JSON.stringify(action.payload), cookieOptions);
+      }
     },
     logout: (state) => {
       state.isAuthenticated = false;
       state.user = null;
-      Cookies.set("accessToken", "");
-      localStorage.removeItem("user");
-      localStorage.removeItem("authToken");
+      state.accessToken = "";
+      Cookies.remove("accessToken");
+      Cookies.remove("isAuthenticated");
+      Cookies.remove("userData");
     },
   },
   extraReducers: (builder) => {
@@ -51,10 +56,9 @@ const authSlice = createSlice({
           email: action.payload.email,
           phone: action.payload.phone || state.user?.phone,
         };
-        localStorage.setItem("user", JSON.stringify(action.payload));
+        Cookies.set("userData", JSON.stringify(action.payload), cookieOptions);
       })
       .addCase(updateProfile.pending, (state) => {
-        // Handle pending state if needed
       })
       .addCase(updateProfile.rejected, (state, action) => {
         state.user = state.user;
@@ -64,7 +68,6 @@ const authSlice = createSlice({
         state.accessToken = action.payload.token;
         Cookies.set("accessToken", action.payload.token);
         Cookies.set("isAuthenticated", "true");
-        localStorage.setItem("authToken", action.payload.token);
       })
       .addCase(googleLogin.rejected, (state, action) => {
         state.isAuthenticated = false;
@@ -94,7 +97,7 @@ export const login = createAsyncThunk<
     throw new Error(res.data.error || "Failed to login");
   }
   const token = res.data.token;
-  Cookies.set("accessToken", token);
+  Cookies.set("accessToken", token, cookieOptions);
   dispatch(setAccessToken(token));
   await dispatch(getUser());
   return token;
@@ -119,7 +122,7 @@ export const googleLogin = createAsyncThunk<
             "Content-Type": "application/json",
             Accept: "application/json",
           },
-          
+
         }
       );
 
@@ -137,9 +140,7 @@ export const googleLogin = createAsyncThunk<
 
       console.log("🔑 Token received from backend:", token);
 
-      // Store token in cookies and localStorage
-      Cookies.set("accessToken", token);
-      localStorage.setItem("authToken", token);
+      Cookies.set("accessToken", token, cookieOptions);
 
       // Update Redux state
       dispatch(setAccessToken(token));
@@ -172,8 +173,7 @@ export const getUser = createAsyncThunk<
   let accessToken = Cookies.get("accessToken");
   console.log(`The access token we get from cookies ${accessToken}`);
   // if (!accessToken) {
-  //   accessToken = localStorage.getItem("authToken") || "";
-  //   console.log(`The access token we get from localstorage ${accessToken}`);
+  // const token = Cookies.get("accessToken");
   // }
   if (!accessToken) return;
   const res = await axios.get(
@@ -186,7 +186,7 @@ export const getUser = createAsyncThunk<
   );
 
   dispatch(setUser(res.data.data));
-  localStorage.setItem("user", JSON.stringify(res.data.data));
+  Cookies.set("userData", JSON.stringify(res.data.data), cookieOptions);
 });
 
 // Update profile thunk
@@ -196,7 +196,7 @@ export const updateProfile = createAsyncThunk<
   { dispatch: AppDispatch; state: RootState }
 >("auth/updateProfile", async (data, { rejectWithValue }) => {
   try {
-    const token = Cookies.get("accessToken") || localStorage.getItem("authToken") || "";
+    const token = Cookies.get("accessToken") || "";
     const response = await axios.patch(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/update`,
       data,
