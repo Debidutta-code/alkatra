@@ -1,5 +1,8 @@
 {
   "Auth": {
+    "Referral": {
+      "alreadyExists": "आपका इस उपयोगकर्ता के साथ पहले से ही रेफरल संबंध है"
+    },
     "Login": {
       "title": "अपने खाते में साइन इन करें",
       "subtitle": "वापस आने पर स्वागत है! कृपया अपना क्रेडेंशियल दर्ज करें।",
@@ -21,7 +24,12 @@
       "noAccountYet": "अभी तक कोई खाता नहीं है?",
       "createAccount": "खाता बनाएं",
       "successMessage": "लॉगिन सफल! वापस आने पर स्वागत है।",
-      "errorMessage": "गलत ईमेल या पासवर्ड। कृपया फिर से प्रयास करें।"
+      "errorMessage": "गलत ईमेल या पासवर्ड। कृपया फिर से प्रयास करें।",
+      "loginFailed": "लॉगिन असफल।",
+      "wrongCredentials": "लॉगिन असफल: गलत ईमेल या पासवर्ड",
+      "googleSignIn": "Google के साथ साइन इन करें",
+      "userAlreadyExists": "इस ईमेल के साथ खाता पहले से मौजूद है",
+      "genericError": "Google लॉगिन के दौरान एक त्रुटि हुई"
     },
     "Register": {
       "title": "खाता बनाएं",
@@ -442,6 +450,7 @@
     "stay": "रुकना",
     "filter": "फ़िल्टर",
     "viewAllPhotos": "सभी फोटो देखें",
+    "viewReviews": "अतिथि समीक्षाएं",
     "amenitiesList": {
       "wifi": "मुफ्त वाईफाई",
       "swimming_pool": "स्विमिंग पूल",
@@ -679,6 +688,7 @@
       "otpInvalidError": "अमान्य ओटीपी",
       "otpVerifyError": "ओटीपी सत्यापन में त्रुटि",
       "emailVerified": "ईमेल सफलतापूर्वक सत्यापित हुआ",
+      "emailAlreadyVerified": "ईमेल पहले से सत्यापित है",
       "phoneVerified": "फोन सफलतापूर्वक सत्यापित हुआ",
       "phoneLabel": "फोन नंबर",
       "phonePlaceholder": "फोन नंबर दर्ज करें",

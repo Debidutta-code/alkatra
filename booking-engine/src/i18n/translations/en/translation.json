@@ -1,5 +1,8 @@
 {
   "Auth": {
+    "Referral": {
+      "alreadyExists": "You already have a referral relationship with this user"
+    },
     "Login": {
       "title": "Sign in to your account",
       "subtitle": "Welcome back! Please enter your credentials.",
@@ -21,7 +24,12 @@
       "noAccountYet": "Don't have an account yet?",
       "createAccount": "Create an account",
       "successMessage": "Login successful! Welcome back.",
-      "errorMessage": "Incorrect email or password. Please try again."
+      "errorMessage": "Incorrect email or password. Please try again.",
+      "loginFailed": "Login failed.",
+      "wrongCredentials": "Login failed: Wrong email or password",
+      "googleSignIn": "Sign in with Google",
+      "userAlreadyExists": "An account with this email already exists",
+      "genericError": "An error occurred during Google login"
     },
     "Register": {
       "title": "Create an account",
@@ -442,6 +450,7 @@
     "stay": "stay",
     "filter": "Filter",
     "viewAllPhotos": "View All Photos",
+    "viewReviews": "Guest Reviews",
     "amenitiesList": {
       "wifi": "Free Wifi",
       "swimming_pool": "Swimming Pool",

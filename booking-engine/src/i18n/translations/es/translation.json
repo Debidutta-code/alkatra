@@ -1,0 +1,1406 @@
+{
+    "Auth": {
+        "Referral": {
+            "alreadyExists": "Ya tienes una relación de referido con este usuario"
+        },
+        "Login": {
+            "title": "Inicia sesión en tu cuenta",
+            "subtitle": "¡Bienvenido de nuevo! Por favor, ingresa tus credenciales.",
+            "heroTitle": {
+                "welcome": "Bienvenido",
+                "back": "de vuelta"
+            },
+            "heroSubtitle": "Inicia sesión para acceder a ofertas exclusivas y gestionar tus próximas aventuras con facilidad.",
+            "benefits": {
+                "exclusiveRates": "Acceso a tarifas y ofertas exclusivas para miembros",
+                "freeCancellation": "Cancelación gratuita en la mayoría de reservas con opciones flexibles",
+                "priorityService": "Servicio al cliente prioritario y soporte de viaje"
+            },
+            "emailLabel": "Dirección de correo electrónico",
+            "emailPlaceholder": "tú@ejemplo.com",
+            "passwordLabel": "Contraseña",
+            "rememberMe": "Recordarme",
+            "signInButton": "Iniciar sesión",
+            "noAccountYet": "¿Aún no tienes una cuenta?",
+            "createAccount": "Crear una cuenta",
+            "successMessage": "¡Inicio de sesión exitoso! Bienvenido de nuevo.",
+            "errorMessage": "Correo o contraseña incorrectos. Por favor, inténtalo de nuevo.",
+            "loginFailed": "Error de inicio de sesión.",
+            "wrongCredentials": "Error de inicio de sesión: Correo electrónico o contraseña incorrectos",
+            "googleSignIn": "Iniciar sesión con Google",
+            "userAlreadyExists": "Ya existe una cuenta con este correo electrónico",
+            "genericError": "Ocurrió un error durante el inicio de sesión con Google"
+        },
+        "Register": {
+            "title": "Crear una cuenta",
+            "subtitle": "Completa tus datos para comenzar.",
+            "heroTitle": {
+                "join": "Únete",
+                "now": "ahora"
+            },
+            "heroSubtitle": "Crea una cuenta para desbloquear ofertas exclusivas de viaje y gestionar tus reservas fácilmente.",
+            "benefits": {
+                "memberPricing": "Reserva tus viajes con precios especiales para miembros",
+                "personalizedRecommendations": "Recibe recomendaciones de viaje personalizadas",
+                "manageBookings": "Gestiona todas tus reservas en un solo lugar"
+            },
+            "firstNameLabel": "Nombre",
+            "firstNamePlaceholder": "Juan",
+            "lastNameLabel": "Apellido",
+            "lastNamePlaceholder": "Pérez",
+            "emailLabel": "Dirección de correo electrónico",
+            "emailPlaceholder": "tú@ejemplo.com",
+            "passwordLabel": "Contraseña",
+            "passwordHelp": "La contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, una minúscula, un número y un carácter especial.",
+            "updateAccountButton": "Actualizar cuenta",
+            "updatePasswordButton": "Actualizar contraseña",
+            "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+            "signIn": "Iniciar sesión",
+            "successMessage": "¡Registro exitoso! Por favor, inicia sesión.",
+            "genericError": "Algo salió mal",
+            "registrationFailed": "El registro falló",
+            "createAccountButton": "Crear cuenta",
+            "enterNewPassword": "Ingresa la nueva contraseña",
+            "reEnterPassword": "Vuelve a ingresar la nueva contraseña"
+        },
+        "ForgotPassword": {
+            "title": "¿Olvidaste tu contraseña?",
+            "subtitle": "Ingresa tu dirección de correo registrada para restablecer tu contraseña.",
+            "heroTitle": {
+                "reset": "Restablecer",
+                "password": "contraseña"
+            },
+            "heroSubtitle": "Te ayudaremos a recuperar el acceso a tu cuenta de forma segura.",
+            "benefits": {
+                "quickRecovery": "Proceso rápido y sencillo de recuperación de contraseña",
+                "secureReset": "Restablecimiento seguro mediante verificación por correo",
+                "quickAccess": "Vuelve a acceder a tu cuenta en minutos"
+            },
+            "emailLabel": "Dirección de correo electrónico",
+            "emailPlaceholder": "tú@ejemplo.com",
+            "sendResetLinkButton": "Enviar enlace de restablecimiento",
+            "backToLogin": "Volver al inicio de sesión",
+            "successMessage": "El enlace de restablecimiento fue enviado correctamente a tu correo.",
+            "errors": {
+                "emailNotFound": "Correo no encontrado. Por favor, verifica tu dirección de correo.",
+                "emailNotVerified": "Correo no verificado. Por favor, verifica tu correo primero.",
+                "generic": "Ocurrió un error. Por favor, inténtalo de nuevo."
+            }
+        },
+        "UpdatePassword": {
+            "title": "Restablecer contraseña",
+            "subtitle": "Ingresa una nueva contraseña para {{email}}",
+            "heroTitle": {
+                "create": "Crea",
+                "newPassword": "una nueva contraseña"
+            },
+            "heroSubtitle": "Establece una contraseña segura para proteger tus planes de viaje.",
+            "benefits": {
+                "strongerPassword": "Crea una contraseña más segura para mejorar la protección",
+                "protectInformation": "Protege tu información personal y reservas",
+                "quickAccess": "Vuelve a explorar ofertas de viaje inmediatamente"
+            },
+            "newPasswordLabel": "Nueva contraseña",
+            "confirmPasswordLabel": "Confirmar contraseña",
+            "passwordHelp": "La contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, una minúscula, un número y un carácter especial.",
+            "resetPasswordButton": "Restablecer contraseña",
+            "backToLogin": "Volver al inicio de sesión",
+            "successMessage": "Tu contraseña ha sido restablecida correctamente.",
+            "errors": {
+                "generic": "Ocurrió un error. Por favor, inténtalo de nuevo."
+            }
+        },
+        "Layout": {
+            "travelDestinationAlt": "Destino de viaje",
+            "memberBenefits": "Beneficios para miembros",
+            "privacySecurity": {
+                "title": "Tu privacidad y seguridad",
+                "description": "Tu información personal está encriptada y protegida mediante protocolos de seguridad estándar de la industria. Nunca compartimos tus datos sin tu permiso explícito."
+            }
+        },
+        "PasswordInput": {
+            "forgotPassword": "¿Olvidaste la contraseña?",
+            "showPassword": "Mostrar contraseña",
+            "hidePassword": "Ocultar contraseña"
+        },
+        "Button": {
+            "processing": "Procesando..."
+        },
+        "Validation": {
+            "fieldRequired": "{{field}} es obligatorio",
+            "firstNameRequired": "El nombre es obligatorio",
+            "lastNameRequired": "El apellido es obligatorio",
+            "emailRequired": "El correo electrónico es obligatorio",
+            "emailInvalid": "Por favor, ingresa un correo electrónico válido",
+            "passwordRequired": "La contraseña es obligatoria",
+            "confirmPasswordRequired": "Por favor, confirma tu contraseña",
+            "passwordComplexity": "La contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, una minúscula, un número y un carácter especial.",
+            "minLength": "Debe tener al menos {{count}} caracteres",
+            "passwordsDoNotMatch": "Las contraseñas no coinciden"
+        }
+    },
+    "Navbar": {
+        "pleaseLogin": "Por favor, inicia sesión para ver tus viajes",
+        "logoutSuccess": "Cierre de sesión exitoso",
+        "becomeHost": "Conviértete en anfitrión",
+        "myTrip": "Mi viaje",
+        "notifications": "Notificaciones",
+        "profileSettings": "Configuración del perfil",
+        "helpFeedback": "Ayuda y comentarios",
+        "logout": "Cerrar sesión",
+        "signUp": "Registrarse",
+        "login": "Iniciar sesión",
+        "referral": "Recomienda y gana"
+    },
+    "Footer": {
+        "companyTitle": "Empresa",
+        "aboutUs": "Sobre nosotros",
+        "whyChooseUs": "Por qué elegirnos",
+        "pricing": "Precios",
+        "testimonials": "Testimonios",
+        "resourcesTitle": "Recursos",
+        "privacyPolicy": "Política de privacidad",
+        "termsAndConditions": "Términos y condiciones",
+        "blog": "Blog",
+        "contactUs": "Contáctanos",
+        "productTitle": "Producto",
+        "projectManagement": "Gestión de proyectos",
+        "timeTracker": "Control de tiempo",
+        "timeSchedule": "Horario",
+        "leadGeneration": "Generación de leads",
+        "emailPlaceholder": "Ingresa tu correo electrónico",
+        "subscribeButton": "Suscribirse",
+        "copyright": "{year} Al Hajz - Todos los derechos reservados"
+    },
+    "Profile": {
+        "editProfile": "Editar perfil",
+        "signOut": "Cerrar sesión",
+        "overview": "Resumen",
+        "myTrips": "Mis viajes",
+        "preferences": "Preferencias",
+        "security": "Seguridad",
+        "notifications": "Notificaciones",
+        "helpCenter": "Centro de ayuda",
+        "tripsCompleted": "Viajes completados",
+        "sinceJoining": "Desde que se unió",
+        "averageRating": "Calificación promedio",
+        "fromHosts": "De los anfitriones",
+        "savedPlaces": "Lugares guardados",
+        "wishlisted": "En lista de deseos",
+        "quickActions": "Acciones rápidas",
+        "bookTrip": "Reservar viaje",
+        "savedPlacesAction": "Lugares guardados",
+        "rewards": "Recompensas",
+        "deals": "Ofertas",
+        "securitySettings": "Configuración de seguridad",
+        "changePassword": "Cambiar contraseña",
+        "updatePassword": "Actualiza tu contraseña",
+        "twoFactorAuth": "Autenticación de dos factores",
+        "twoFactorDesc": "Agrega una capa adicional de seguridad a tu cuenta",
+        "enable2FA": "Habilitar 2FA",
+        "profileUpdatedSuccess": "Perfil actualizado correctamente",
+        "profileUpdateFailed": "No se pudo actualizar el perfil",
+        "contentComingSoon": "Contenido de {{tab}} próximamente...",
+        "newPasswordOptional": "Nueva contraseña",
+        "confirmNewPassword": "Confirmar nueva contraseña",
+        "joined": "Miembro desde {{date}}",
+        "notificationsDesc": "Gestiona tus preferencias de notificaciones y consulta las notificaciones recientes.",
+        "recentNotifications": "Notificaciones recientes"
+    },
+    "HotelCard": {
+        "heroTitle": "Encuentra la estadía perfecta para tu viaje",
+        "heroSubtitle": "Descubre alojamientos increíbles a precios exclusivos",
+        "locationPlaceholder": "¿A dónde vas?",
+        "searchButton": "Buscar",
+        "specialOffer": "Oferta especial: ¡Obtén hasta un 25% de descuento en tu primera reserva!",
+        "errorNoHotels": "No hay hoteles disponibles para la ubicación seleccionada.",
+        "errorInvalidLocation": "Por favor, ingresa una ubicación válida.",
+        "errorSelectDates": "Por favor, selecciona las fechas de entrada y salida.",
+        "exclusiveOffers": "Ofertas exclusivas disponibles",
+        "freeCancellation": "Cancelación gratuita",
+        "bestPriceGuarantee": "Garantía de mejor precio",
+        "downloadourapp": "Descarga nuestra aplicación"
+    },
+    "Referral": {
+        "heroTitle": "Recomienda a un amigo",
+        "heroSubtitle": "Invita a tus amigos y disfruta de recompensas exclusivas cuando se registren",
+        "howItWorks": "Cómo funciona",
+        "howItWorksSubTitle": "Invita personas y gana recompensas",
+        "step1Title": "Envía la invitación",
+        "step1Desc": "Comparte el enlace de invitación con amigos y gana recompensas",
+        "step2Title": "Registro",
+        "step2Desc": "Haz que se registren en nuestro servicio usando tu enlace de referencia",
+        "step3Title": "Gana",
+        "step3Desc": "Recibe tus recompensas",
+        "stepLabel": "Paso {{number}}",
+        "shareYourLink": "Comparte tu enlace de referencia",
+        "shareDescription": "También puedes compartir tu enlace de referencia copiándolo y enviándolo a tus amigos o compartiéndolo en redes sociales.",
+        "copy": "Copiar enlace de referencia",
+        "copied": "¡Copiado!",
+        "shareVia": "Compartir mediante",
+        "generateQr": "Generar código QR",
+        "scanToShare": "Escanee para compartir",
+        "scanDescription": "Escanee este código QR o guárdelo para compartirlo con amigos.",
+        "hideReferrals": "Ocultar referidos",
+        "viewYourReferrals": "Ver tus referidos",
+        "total": "Total:",
+        "referrals": "referidos",
+        "wallet": "Billetera",
+        "currentBalance": "Saldo actual",
+        "totalEarned": "Total ganado",
+        "totalRedeemed": "Total canjeado",
+        "redeemEarnings": "Canjear tus ganancias",
+        "enterAmount": "Ingresa el monto",
+        "availableBalance": "Saldo disponible",
+        "redeem": "Canjear",
+        "lastUpdated": "Última actualización",
+        "redeemSuccess": "¡Canje exitoso! Tus ganancias han sido agregadas a tu billetera.",
+        "tableName": "Nombre",
+        "tableEmail": "Correo electrónico",
+        "tableReferralDate": "Fecha de referencia",
+        "tableId": "ID",
+        "noWalletData": "No hay datos disponibles en la billetera.",
+        "startReferring": "Empieza a recomendar ahora",
+        "refreshWallet": "Actualizar billetera",
+        "noToken": "Por favor, inténtalo más tarde.",
+        "walletError": "No hay datos disponibles en la billetera.",
+        "insufficientBalance": "Saldo insuficiente para canjear.",
+        "redeemError": "Error al canjear las ganancias. Por favor, inténtalo más tarde.",
+        "yourReferralLink": "Tu enlace de referencia",
+        "noReferrals": "Aún no tienes referidos.",
+        "shareToEarn": "Comparte tu enlace de referencia para ganar recompensas cuando tus amigos se registren.",
+        "shareLink": "Compartir enlace",
+        "generateReferral": "Generar enlace de referencia",
+        "generateOnce": "Genera tu enlace de referencia una vez y compártelo con tus amigos para empezar a ganar recompensas.",
+        "generated": "¡Enlace de referencia generado con éxito!",
+        "copiedToClipboard": "¡Copiado al portapapeles!"
+    },
+    "HotelListing": {
+        "CompactSearchBar": {
+            "locationPlaceholder": "¿A dónde vas?",
+            "checkInPlaceholder": "Fecha de entrada",
+            "checkOutPlaceholder": "Fecha de salida",
+            "searchButton": "Buscar",
+            "errorSameDates": "Las fechas de entrada y salida no pueden ser iguales.",
+            "errorInvalidLocation": "Por favor, ingresa una ubicación válida.",
+            "errorSelectDates": "Por favor, selecciona las fechas de entrada y salida.",
+            "errorNoHotels": "No hay hoteles disponibles para la ubicación seleccionada.",
+            "ariaClearSearch": "Limpiar búsqueda",
+            "ariaSearchHotels": "Buscar hoteles",
+            "ariaSearching": "Buscando..."
+        },
+        "HotelCardItem": {
+            "noImage": "Sin imagen",
+            "descriptionFallback": "Disfruta de una estadía cómoda en este maravilloso alojamiento.",
+            "contactLabel": "Contacto",
+            "viewRoomButton": "Ver habitación",
+            "amenitiesList": {
+                "wifi": "Wi-Fi gratis",
+                "swimming_pool": "Piscina",
+                "fitness_center": "Gimnasio",
+                "spa_and_wellness": "Spa y bienestar",
+                "restaurant": "Restaurante",
+                "room_service": "Servicio a la habitación",
+                "bar_and_lounge": "Bar y salón",
+                "parking": "Estacionamiento",
+                "concierge_services": "Servicios de conserjería",
+                "pet_friendly": "Mascotas permitidas",
+                "business_facilities": "Instalaciones para negocios",
+                "laundry_services": "Servicio de lavandería",
+                "child_friendly_facilities": "Instalaciones para niños",
+                "non_smoking_rooms": "Habitaciones para no fumadores",
+                "facilities_for_disabled_guests": "Instalaciones para huéspedes con discapacidad",
+                "family_rooms": "Habitaciones familiares"
+            }
+        },
+        "heroTitle": "Encuentra tu estadía perfecta",
+        "heroSubtitle": "Reserva alojamientos al mejor precio",
+        "hotelsIn": "Hoteles en",
+        "yourDestination": "tu destino",
+        "selectDates": "Selecciona fechas",
+        "propertiesFound": "propiedades encontradas",
+        "nights": "noches",
+        "filters": "Filtros",
+        "activeFilter": "filtro activo",
+        "activeFilters": "filtros activos",
+        "clearAll": "Limpiar todo",
+        "popularFilters": "Filtros populares",
+        "freeWifi": "Wi-Fi gratis",
+        "parking": "Estacionamiento",
+        "breakfast": "Desayuno",
+        "searchPropertyName": "Buscar propiedad por nombre",
+        "sortBy": "Ordenar por",
+        "recommended": "Recomendado",
+        "highestRating": "Calificación más alta",
+        "lowestRating": "Calificación más baja",
+        "whyBookWithAlhajz": "Por Qué Reservar Con Alhajz",
+        "freeCancellation": "Cancelación gratuita",
+        "freeCancellationDesc": "La mayoría de nuestras propiedades ofrecen cancelación gratuita hasta 24 horas antes del check-in.",
+        "bestPriceGuarantee": "Garantía de mejor precio",
+        "bestPriceGuaranteeDesc": "¿Encuentras un precio más bajo? Lo igualamos y te damos un 10% adicional de descuento.",
+        "secureBooking": "Reserva segura",
+        "secureBookingDesc": "Utilizamos cifrado estándar de la industria para proteger tu información personal.",
+        "noHotelsError": "No se encontraron hoteles con los criterios de búsqueda indicados.",
+        "tryModifyingSearch": "Intenta modificar tu búsqueda"
+    },
+    "HotelBox": {
+        "DateRange": {
+            "checkInPlaceholder": "Fecha de entrada",
+            "checkOutPlaceholder": "Fecha de salida"
+        },
+        "FilterModal": {
+            "title": "Filtros",
+            "propertyRating": "Calificación del alojamiento",
+            "amenities": "Servicios",
+            "sortBy": "Ordenar por",
+            "cancel": "Limpiar todos los filtros",
+            "applyFilters": "Ver {{count}} resultados",
+            "ariaCloseModal": "Cerrar modal",
+            "ariaSortOrder": "Orden de clasificación",
+            "ratingUp": "y superior",
+            "amenitiesList": {
+                "wifi": "Wi-Fi gratis",
+                "swimming_pool": "Piscina",
+                "fitness_center": "Gimnasio",
+                "spa_and_wellness": "Spa y bienestar",
+                "restaurant": "Restaurante",
+                "room_service": "Servicio a la habitación",
+                "bar_and_lounge": "Bar y salón",
+                "parking": "Estacionamiento",
+                "concierge_services": "Servicios de conserjería",
+                "pet_friendly": "Mascotas permitidas",
+                "business_facilities": "Instalaciones para negocios",
+                "laundry_services": "Servicio de lavandería",
+                "child_friendly_facilities": "Instalaciones para niños",
+                "non_smoking_rooms": "Habitaciones para no fumadores",
+                "facilities_for_disabled_guests": "Instalaciones para huéspedes con discapacidad",
+                "family_rooms": "Habitaciones familiares"
+            },
+            "sortOptions": {
+                "recommended": "Recomendado",
+                "rating_desc": "Calificación: Alta a baja",
+                "rating_asc": "Calificación: Baja a alta",
+                "price_desc": "Precio: Alto a bajo",
+                "price_asc": "Precio: Bajo a alto"
+            }
+        }
+    },
+    "HomeSections": {
+        "FeaturedOffers": {
+            "title": "Ofertas destacadas",
+            "limitedTime": "Tiempo limitado",
+            "endsIn": "Termina en",
+            "summerSpecial": {
+                "title": "Oferta de verano",
+                "description": "Hasta un 50% de descuento en reservas de hoteles",
+                "validTill": "2h 45m"
+            },
+            "luxuryStay": {
+                "title": "Estadía de lujo",
+                "description": "Hasta un 30% de descuento en hoteles premium",
+                "validTill": "5h 30m"
+            },
+            "weekendGetaway": {
+                "title": "Escape de fin de semana",
+                "description": "Reserva ahora y paga después en hoteles seleccionados",
+                "validTill": "3h 15m"
+            }
+        },
+        "PopularHotels": {
+            "title": "Hoteles populares",
+            "freeCancellation": "Cancelación gratuita",
+            "breakfast": "Desayuno",
+            "startingFrom": "Desde",
+            "bookNow": "Reservar ahora",
+            "hotels": {
+                "grandPlaza": {
+                    "name": "Hotel Grand Plaza"
+                },
+                "sunsetBeach": {
+                    "name": "Resort Sunset Beach"
+                },
+                "mountainView": {
+                    "name": "Lodge Vista de la Montaña"
+                },
+                "cityLights": {
+                    "name": "Hotel City Lights"
+                }
+            }
+        },
+        "ExploreDestinations": {
+            "title": "Explora destinos",
+            "descriptionTemplate": "Explora hoteles en {{city}}",
+            "imageAlt": "Destino {{name}}",
+            "goToGroup": "Ir al grupo {{count}}",
+            "exploreNow": "Explorar ahora"
+        }
+    },
+    "RoomsPage": {
+        "backToSearch": "Volver a la búsqueda",
+        "starHotelRating": "Calificación de estrellas del hotel",
+        "viewPropertyDetails": "Ver detalles del alojamiento",
+        "aboutThisProperty": "Acerca de este alojamiento",
+        "showMore": "Mostrar más",
+        "showLess": "Mostrar menos",
+        "noImagesAvailable": "No hay imágenes disponibles",
+        "propertyAmenities": "Servicios del alojamiento",
+        "nights": "noche",
+        "nightsPlural": "noches",
+        "stay": "estadía",
+        "filter": "Filtrar",
+        "viewAllPhotos": "Ver todas las fotos",
+        "viewReviews": "Reseñas de Huéspedes",
+        "amenitiesList": {
+            "wifi": "Wi-Fi gratis",
+            "swimming_pool": "Piscina",
+            "fitness_center": "Gimnasio",
+            "spa_and_wellness": "Spa y bienestar",
+            "restaurant": "Restaurante",
+            "room_service": "Servicio a la habitación",
+            "bar_and_lounge": "Bar y salón",
+            "parking": "Estacionamiento",
+            "concierge_services": "Servicios de conserjería",
+            "pet_friendly": "Mascotas permitidas",
+            "business_facilities": "Instalaciones para negocios",
+            "laundry_services": "Servicio de lavandería",
+            "child_friendly_facilities": "Instalaciones para niños",
+            "non_smoking_rooms": "Habitaciones para no fumadores",
+            "facilities_for_disabled_guests": "Instalaciones para huéspedes con discapacidad",
+            "family_rooms": "Habitaciones familiares"
+        },
+        "noAmenitiesSpecified": "No se han especificado servicios para este alojamiento.",
+        "contactInformation": "Información de contacto",
+        "allRooms": "Todas las habitaciones",
+        "searchRoomName": "Buscar habitación por nombre",
+        "availableRooms": "Habitaciones disponibles",
+        "showingRooms_one": "Mostrando {{count}} habitación",
+        "showingRooms_other": "Mostrando {{count}} habitaciones",
+        "noRoomsAvailableTitle": "No hay habitaciones disponibles",
+        "noRoomsAvailableMessage": "No pudimos encontrar habitaciones que coincidan con tus criterios. Intenta ajustar los filtros o fechas.",
+        "goBack": "Volver",
+        "clearFilters": "Limpiar filtros",
+        "loadingRoomsMessage": "Cargando habitaciones disponibles...",
+        "priceNotAvailable": "",
+        "qrCode": {
+            "discountTitle": "Usa tu descuento",
+            "qrCodeAlt": "Código QR de descuento",
+            "scanToApply": "Escanee para aplicar",
+            "instructions": {
+                "scanAtCheckout": "Escanee el código QR para abrir esta habitación en la aplicación Alhajz.",
+                "applyDiscount": "Si la aplicación no está instalada, se te pedirá que la descargues.",
+                "validityNote": "Reserva a través de la aplicación para obtener un descuento exclusivo para esta habitación."
+            }
+        },
+        "RoomCard": {
+            "roomImageAlt": "Habitación",
+            "off": "DESCUENTO",
+            "adults": "adultos",
+            "children": "niños",
+            "night": "noche",
+            "bookNow": "Reservar ahora",
+            "viewBookingPolicies": "Ver políticas de reserva",
+            "notAvailable": "No disponible",
+            "securePayment": "Pago seguro",
+            "defaultamenities": {
+                "kingBed": "Cama king",
+                "bathroom": "Baño privado"
+            },
+            "roomAmenities": {
+                "basic": {
+                    "bed": "Cama",
+                    "bedTypes": {
+                        "single": "Individual",
+                        "double": "Doble",
+                        "king": "King",
+                        "twin": "Dos camas individuales",
+                        "queen": "Queen"
+                    },
+                    "bathroom": "Baño privado",
+                    "linensBedding": "Ropa de cama",
+                    "linens": "Ropa de cama fresca",
+                    "bidet": "Bidet",
+                    "toiletPaper": "Papel higiénico",
+                    "towelsSheets": "Toallas y sábanas",
+                    "freeToiletries": "Artículos de aseo gratuitos",
+                    "shower": "Ducha",
+                    "toilet": "Inodoro"
+                },
+                "furniture": {
+                    "tableChairs": "Mesa y sillas",
+                    "desk": "Escritorio",
+                    "dresserWardrobe": "Cómoda y armario",
+                    "sofaSeating": "Sofá",
+                    "diningTable": "Mesa de comedor",
+                    "readingChair": "Silla para leer"
+                },
+                "spaceLayout": {
+                    "diningArea": "Área de comedor",
+                    "sittingArea": "Área de estar",
+                    "balcony": "Balcón"
+                },
+                "technology": {
+                    "television": "Televisión",
+                    "telephone": "Teléfono",
+                    "wifiInternet": "Internet Wi-Fi",
+                    "flatScreenTV": "Televisión de pantalla plana",
+                    "satelliteChannels": "Canales por satélite",
+                    "cableChannels": "Canales por cable"
+                },
+                "climateControl": {
+                    "airConditioning": "Aire acondicionado",
+                    "heating": "Calefacción"
+                },
+                "kitchenetteMiniBar": {
+                    "smallRefrigerator": "Minibar",
+                    "microwave": "Microondas",
+                    "refrigerator": "Refrigerador",
+                    "kitchenware": "Utensilios de cocina",
+                    "electricKettle": "Tetera eléctrica",
+                    "oven": "Horno",
+                    "stovetop": "Estufa",
+                    "teaCoffeeMaker": "Cafetera/tetera"
+                },
+                "safetySecurity": {
+                    "safe": "Caja fuerte en la habitación",
+                    "smokeDetectors": "Detectores de humo",
+                    "fireExtinguisher": "Extintor de incendios"
+                },
+                "toiletries": {
+                    "shampooConditioner": "Champú y acondicionador",
+                    "soap": "Jabón",
+                    "hairDryer": "Secador de pelo"
+                },
+                "workLeisure": {
+                    "workDesk": "Escritorio",
+                    "additionalLighting": "Iluminación adicional",
+                    "ironingFacilities": "Plancha y tabla de planchar"
+                },
+                "accessibilityFeatures": {
+                    "accessibleBathroom": "Baño accesible",
+                    "wheelchairAccessibility": "Accesible para sillas de ruedas",
+                    "upperFloorsAccessibleByElevator": "Pisos superiores accesibles por ascensor",
+                    "entireUnitWheelchairAccessible": "Unidad completa accesible para sillas de ruedas"
+                }
+            },
+            "policies": {
+                "title": "Políticas de reserva",
+                "closeModal": "Cerrar modal",
+                "cancellationPolicy": "Política de cancelación",
+                "policyTypes": {
+                    "flexible": "Flexible",
+                    "moderate": "Moderada",
+                    "strict": "Estricta",
+                    "nonrefundable": "No reembolsable"
+                },
+                "amendmentPolicy": "Política de modificaciones",
+                "amendmentPoints": {
+                    "dateChanges": "Los cambios de fecha están sujetos a disponibilidad",
+                    "changes72Hours": "Los cambios dentro de las 72 horas posteriores al check-in pueden tener cargos adicionales",
+                    "roomUpgrades": "Las mejoras de habitación están sujetas a disponibilidad y cargos adicionales",
+                    "reducingStay": "Acortar la estadía está sujeto a la política de cancelación"
+                },
+                "gotIt": "Entendido"
+            },
+            "seeMore": "Ver más",
+            "seeLess": "Ver menos"
+        }
+    },
+    "CancellationPolicies": {
+        "policyTypes": {
+            "flexible": {
+                "description": "Cancelación gratuita hasta 24 horas antes del check-in. Después de ese momento, la reserva no es reembolsable.",
+                "shortDescription": "Cancelación gratuita hasta 24 horas antes del check-in",
+                "bulletPoints": [
+                    "Reembolso completo: Si se cancela con más de 24 horas de antelación al check-in",
+                    "Sin reembolso: Si se cancela dentro de las 24 horas previas al check-in"
+                ]
+            },
+            "moderate": {
+                "description": "Reembolso completo si se cancela con 5 o más días de antelación al check-in. 50% de reembolso entre 1 y 5 días antes del check-in. Sin reembolso dentro de las 24 horas previas al check-in.",
+                "shortDescription": "Cancelación gratuita hasta 5 días antes del check-in",
+                "bulletPoints": [
+                    "Reembolso completo: Si se cancela con 5 o más días de antelación al check-in",
+                    "50% de reembolso: Si se cancela entre 1 y 5 días antes del check-in",
+                    "Sin reembolso: Si se cancela dentro de las 24 horas previas al check-in"
+                ]
+            },
+            "strict": {
+                "description": "Reembolso completo si se cancela con 7 o más días de antelación al check-in. 50% de reembolso si se cancela entre 1 y 7 días antes del check-in. Sin reembolso dentro de las 24 horas previas al check-in.",
+                "shortDescription": "Cancelación gratuita hasta 7 días antes del check-in",
+                "bulletPoints": [
+                    "Reembolso completo: Si se cancela con 7 o más días de antelación al check-in",
+                    "50% de reembolso: Si se cancela entre 1 y 7 días antes del check-in",
+                    "Sin reembolso: Si se cancela dentro de las 24 horas previas al check-in"
+                ]
+            },
+            "nonrefundable": {
+                "description": "Esta reserva no es reembolsable. No se proporcionará reembolso independientemente del momento de la cancelación.",
+                "shortDescription": "Tarifa no reembolsable",
+                "bulletPoints": [
+                    "Sin reembolso: Esta reserva no es reembolsable en ningún momento",
+                    "Las tarifas no reembolsables suelen incluir un descuento especial"
+                ]
+            }
+        },
+        "roomCardPolicyDescriptions": {
+            "flexible": "Cancelación gratuita hasta 24h antes del check-in",
+            "moderate": "Cancelación gratuita hasta 5 días antes del check-in",
+            "strict": "Cancelación gratuita hasta 7 días antes del check-in",
+            "nonrefundable": "Tarifa no reembolsable con descuento especial"
+        }
+    },
+    "BookingComponents": {
+        "GuestInformationModal": {
+            "completeYourBooking": "Completa tu reserva",
+            "guestDetailsStep": "Datos del huésped",
+            "reviewAndPayStep": "Revisar y pagar",
+            "roomSummary": "Resumen de la habitación",
+            "priceLoading": "",
+            "roomType": "Tipo de habitación",
+            "checkIn": "Entrada",
+            "checkOut": "Salida",
+            "nights": "noche",
+            "nightsPlural": "noches",
+            "guestInformation": "Información del huésped",
+            "dob": "Fecha de nacimiento",
+            "firstNameLabel": "Nombre",
+            "firstNamePlaceholder": "Ingresa el nombre",
+            "firstNameError": "El nombre es obligatorio",
+            "lastNameLabel": "Apellido",
+            "lastNamePlaceholder": "Ingresa el apellido",
+            "lastNameError": "El apellido es obligatorio",
+            "emailLabel": "Dirección de correo electrónico",
+            "emailPlaceholder": "tu.correo@ejemplo.com",
+            "emailInfo": "La confirmación de tu reserva será enviada a este correo",
+            "emailError": "El correo electrónico es obligatorio.",
+            "emailInvalidError": "Por favor, ingresa un correo electrónico válido",
+            "emailNotVerified": "Por favor, verifica tu correo electrónico",
+            "verifyEmail": "Verificar correo",
+            "verifyPhone": "Verificar teléfono",
+            "verifyOtp": "Verificar OTP",
+            "otpPlaceholder": "Ingresa el código OTP",
+            "otpExpiresIn": "Expira en",
+            "otpSent": "OTP enviado a tu correo electrónico",
+            "otpSendFailed": "No se pudo enviar el OTP",
+            "otpSendError": "Error al enviar el OTP",
+            "otpEmptyError": "Por favor, ingresa el OTP",
+            "otpInvalidError": "OTP inválido",
+            "otpVerifyError": "Error al verificar el OTP",
+            "emailVerified": "Correo verificado correctamente",
+            "emailAlreadyVerified": "El correo electrónico ya está verificado",
+            "phoneVerified": "Teléfono verificado correctamente",
+            "phoneLabel": "Número de teléfono",
+            "phonePlaceholder": "Ingresa el número de teléfono",
+            "phoneInfo": "Para notificaciones relacionadas con la reserva",
+            "phoneError": "El número de teléfono es obligatorio",
+            "phoneLengthError": "El número de teléfono para India debe tener exactamente 10 dígitos.",
+            "phoneIndiaError": "El número de teléfono para India debe tener exactamente 10 dígitos.",
+            "phoneInternationalError": "El número de teléfono debe tener al menos 8 dígitos.",
+            "guestDetailsSection": "Datos del huésped",
+            "roomSingular": "Habitación",
+            "roomsPlural": "Habitaciones",
+            "adultSingular": "Adulto",
+            "adultsPlural": "Adultos",
+            "childSingular": "Niño",
+            "childrenPlural": "Niños",
+            "infantSingular": "Bebé",
+            "infantsPlural": "Bebés",
+            "guestDisplayFormat": "Habitaciones e invitados",
+            "childrenPartFormat": "Niños",
+            "informationVerified": "¡Información verificada correctamente!",
+            "propertyInfoMissing": "Falta información del alojamiento. Por favor, inténtalo de nuevo.",
+            "bookingSummary": "Resumen de la reserva",
+            "stayDetails": "Detalles de la estadía",
+            "primaryGuest": "Huésped principal",
+            "guests": "Huéspedes",
+            "email": "Correo electrónico",
+            "phone": "Teléfono",
+            "priceDetails": "Detalles del precio",
+            "roomRate": "Tarifa de la habitación",
+            "totalAmount": "Monto total",
+            "baseRatePerRoomPerNight": "Tarifa base (por habitación por noche)",
+            "additionalGuestCharges": "Cargos por huéspedes adicionales",
+            "priceIncludes": "El precio incluye {{rooms}} habitaciones para {{guests}} huéspedes",
+            "paymentNoticeTitle": "El pago se procesará de forma segura",
+            "paymentNoticeDescription": "Al continuar, aceptas nuestros términos y condiciones y política de privacidad.",
+            "backToDetails": "Volver a los detalles",
+            "cancel": "Cancelar",
+            "continueToReview": "Continuar a revisión",
+            "proceedToPayment": "Proceder al pago",
+            "phoneNotVerified": "Número de teléfono no verificado",
+            "phoneInvalidError": "Por favor, ingresa un número de teléfono válido",
+            "processing": "Procesando...",
+            "verifying": "Verificando",
+            "priceFetchError": "No se pudo obtener el precio actualizado. Por favor, inténtalo más tarde.",
+            "subtotalBeforeTax": "Subtotal (antes de impuestos)",
+            "totalTax": "Impuestos totales",
+            "finalAmountIncludingTax": "Monto final (con impuestos)",
+            "includesTaxes": "Incluye impuestos y tarifas",
+            "taxBreakdown": "Desglose de impuestos",
+            "includesTaxAmount": "Incluye {{currency}} {{amount}} en impuestos"
+        }
+    },
+    "BookingTabs": {
+        "userNotLoggedIn": "Usuario no inició sesión",
+        "noBooking": "No hay reservas",
+        "BookingHeader": {
+            "backToHome": "Volver al inicio",
+            "yourBookings": "Tus reservas",
+            "viewManageTrack": "Consulta, gestiona y realiza un seguimiento de todas tus reservas de hotel en un solo lugar"
+        },
+        "BookingTabsNavigation": {
+            "allBookings": "Todas las reservas",
+            "upcoming": "Próximas",
+            "completed": "Finalizadas",
+            "cancelled": "Canceladas"
+        },
+        "LoadingState": {
+            "retrievingBookings": "Recuperando tus reservas",
+            "fetchingDetails": "Un momento mientras obtenemos los detalles de tu reserva..."
+        },
+        "ErrorState": {
+            "noBookingsFound": "No pudimos encontrar reservas asociadas a tu cuenta.",
+            "startBookingNow": "Empieza a reservar ahora"
+        },
+        "EmptyState": {
+            "heading": {
+                "all": "No se encontraron reservas",
+                "upcoming": "No tienes reservas próximas",
+                "completed": "No has completado ninguna estadía",
+                "cancelled": "No tienes reservas canceladas"
+            },
+            "paragraph": {
+                "all": "¡Empieza a planear tu próximo viaje!",
+                "upcoming": "No tienes reservas de hotel próximas.",
+                "completed": "Aún no has completado ninguna estadía.",
+                "cancelled": "No tienes reservas canceladas."
+            },
+            "bookHotelButton": "Reservar un hotel"
+        },
+        "BookingCard": {
+            "bookingId": "ID de reserva",
+            "nightSingular": "noche",
+            "nightsPlural": "noches",
+            "checkIn": "Entrada",
+            "checkOut": "Salida",
+            "roomType": "Tipo de habitación",
+            "standardRoom": "Habitación estándar",
+            "paymentMethod": "Método de pago",
+            "primaryGuest": "Huésped principal",
+            "rateBreakdown": "Desglose de tarifa",
+            "viewBookingDetails": "Ver detalles de la reserva",
+            "modify": "Modificar",
+            "cancel": "Cancelar"
+        },
+        "BookingPagination": {
+            "show": "Mostrar",
+            "perPage": "por página",
+            "showing": "Mostrando",
+            "of": "de",
+            "bookings": "reservas",
+            "noBookingsToShow": "No hay reservas para mostrar"
+        },
+        "CancellationModal": {
+            "confirmCancellation": "Confirmar cancelación",
+            "reviewBeforeProceeding": "Por favor, revisa los detalles a continuación antes de proceder con la cancelación",
+            "bookingDetails": "Detalles de la reserva",
+            "property": "Alojamiento",
+            "room": "Habitación",
+            "stayDates": "Fechas de estadía",
+            "nightStay_one": "{{count}} noche",
+            "nightStay_other": "{{count}} noches",
+            "totalAmount": "Monto total",
+            "calculatingDetails": "Calculando detalles de cancelación...",
+            "policyTypes": {
+                "flexible": "Política de cancelación flexible",
+                "moderate": "Política de cancelación moderada",
+                "strict": "Política de cancelación estricta",
+                "nonrefundable": "Política no reembolsable"
+            },
+            "refundEligible": "{{percentage}}% de reembolso disponible",
+            "policyTerms": "Términos de la política",
+            "yourRefundStatus": "Tu estado de reembolso",
+            "refundExplanation": "Según tu fecha de entrada y la política {{policyType}}, recibirás un reembolso del {{percentage}}%.",
+            "financialBreakdown": "Desglose financiero",
+            "originalPayment": "Monto del pago original",
+            "cancellationFee": "Tarifa de cancelación",
+            "refundAmount": "Monto del reembolso",
+            "reasonForCancellation": "Motivo de la cancelación",
+            "reasonPlaceholder": "Indícanos por qué estás cancelando (opcional)...",
+            "feedbackHelpsImprove": "Tu opinión nos ayuda a mejorar nuestros servicios. Esta información se usa únicamente internamente.",
+            "success": "Éxito",
+            "error": "Error",
+            "successWithRefund": "Tu reserva ha sido cancelada correctamente. Se procesará un reembolso de ₹{{amount}}.",
+            "successNoRefund": "Tu reserva ha sido cancelada correctamente. No se emitirá ningún reembolso según la política de cancelación.",
+            "errorCancelling": "No se pudo cancelar la reserva. Por favor, inténtalo de nuevo o contacta al soporte.",
+            "errorRetrievingPolicy": "No se pudo obtener la política de cancelación. Puedes continuar, pero la información sobre tarifas podría no ser precisa.",
+            "actionCannotBeUndone": "Esta acción no se puede deshacer",
+            "cancellationWarning": "Una vez confirmes la cancelación, tu reserva se cancelará inmediatamente y no podrá restaurarse. Cualquier reembolso aplicable se procesará según la política anterior.",
+            "keepMyReservation": "Mantener mi reserva",
+            "processing": "Procesando...",
+            "confirmCancellationButton": "Confirmar cancelación",
+            "invalidDate": "Fecha inválida",
+            "cancellationProcessedSuccess": "Cancelación de la reserva procesada correctamente",
+            "cancellationFailed": "La cancelación falló",
+            "checkInDatePassed": "No se puede cancelar la reserva. Tu fecha de entrada ya ha pasado."
+        },
+        "AmendReservationModal": {
+            "title": "Actualizar tu reserva",
+            "subtitle": "Realiza cambios en tu próxima estadía en {{propertyName}}",
+            "currentBookingDetails": "Detalles de la reserva actual",
+            "stayDates": "Fechas de estadía",
+            "nightsCount_one": "{{count}} noche",
+            "nightsCount_other": "{{count}} noches",
+            "guests": "Huéspedes",
+            "guestsCount": "{{adults}} adultos, {{children}} niños",
+            "roomDetails": "Detalles de la habitación",
+            "ratePlan": "Plan de tarifa",
+            "bestAvailableRate": "Mejor tarifa disponible",
+            "total": "total",
+            "whatToChange": "¿Qué te gustaría cambiar?",
+            "estimatedTotal": "Total estimado",
+            "amendmentTypes": {
+                "dates": "Fechas",
+                "guests": "Huéspedes",
+                "roomType": "Tipo de habitación",
+                "specialRequests": "Solicitudes especiales"
+            },
+            "changeDates": "Cambiar fechas",
+            "selectNewDates": "Selecciona nuevas fechas de estadía",
+            "checkInDate": "Fecha de entrada",
+            "checkOutDate": "Fecha de salida",
+            "stayDuration_one": "Duración de la estadía: {{count}} noche",
+            "stayDuration_other": "Duración de la estadía: {{count}} noches",
+            "nightsAdded_one": "(+{{count}} noche)",
+            "nightsAdded_other": "(+{{count}} noches)",
+            "nightsReduced_one": "(-{{count}} noche)",
+            "nightsReduced_other": "(-{{count}} noches)",
+            "changeGuests": "Cambiar huéspedes",
+            "numberOfAdults": "Número de adultos",
+            "numberOfChildren": "Número de niños",
+            "adult_one": "Adulto",
+            "adult_other": "Adultos",
+            "child_one": "Niño",
+            "child_other": "Niños",
+            "guestsNote": "Pueden aplicarse cargos adicionales por huéspedes extra. La ocupación máxima varía según el tipo de habitación.",
+            "changeRoomType": "Cambiar tipo de habitación",
+            "roomType": "Tipo de habitación",
+            "roomTypeNote": "Los cambios de tipo de habitación están sujetos a disponibilidad y pueden afectar el precio total.",
+            "updateSpecialRequests": "Actualizar solicitudes especiales",
+            "specialRequestsLabel": "Solicitudes o preferencias especiales",
+            "specialRequestsPlaceholder": "Indica cualquier solicitud especial, como piso alto, entrada temprana, etc.",
+            "specialRequestsNote": "Las solicitudes especiales están sujetas a disponibilidad y no se pueden garantizar.",
+            "priceAdjustment": "Ajuste de precio",
+            "additionalPayment": "Se requiere pago adicional",
+            "additionalChargeExplanation": "Tus cambios generarán un cargo adicional de ₹{{amount}}",
+            "refundToBeProcessed": "Reembolso a procesar",
+            "refundExplanation": "Tus cambios generarán un reembolso de ₹{{amount}}",
+            "amendmentPolicies": "Políticas de modificación",
+            "policies": {
+                "dateChanges": "Los cambios de fecha están sujetos a disponibilidad",
+                "changes72Hours": "Los cambios dentro de las 72 horas posteriores al check-in pueden tener cargos adicionales",
+                "roomUpgrades": "Las mejoras de habitación están sujetas a disponibilidad y cargos adicionales",
+                "reducingStay": "Acortar la duración de la estadía puede estar sujeto a la política de cancelación original"
+            },
+            "cancel": "Cancelar",
+            "processing": "Procesando...",
+            "confirmAmendment": "Confirmar actualización",
+            "errors": {
+                "selectValidDates": "Por favor, selecciona fechas de entrada y salida válidas.",
+                "unableToAmend": "No se pudo actualizar la reserva. Por favor, inténtalo de nuevo o contacta al soporte.",
+                "unableToFetchPrice": "No se pudo obtener el precio actualizado. Por favor, inténtalo de nuevo o contacta al soporte.",
+                "invalidFirstName": "El nombre es obligatorio",
+                "invalidLastName": "El apellido es obligatorio",
+                "dobRequired": "La fecha de nacimiento es obligatoria.",
+                "selectRoomType": "Por favor, selecciona un tipo de habitación.",
+                "selectRatePlan": "Por favor, selecciona un plan de tarifa.",
+                "invalidDateRange": "La fecha de salida debe ser posterior a la fecha de entrada.",
+                "correctFormErrors": "Por favor, corrige los errores del formulario antes de enviarlo."
+            },
+            "success": {
+                "reservationAmended": "Tu reserva ha sido actualizada correctamente.",
+                "additionalPayment": "Se procesará un pago adicional de ₹{{amount}}.",
+                "refundProcessed": "Se procesará un reembolso de ₹{{amount}}.",
+                "noChange": "No hay cambios en el precio total."
+            },
+            "roomTypes": {
+                "standard": "Habitación estándar",
+                "deluxe": "Habitación deluxe",
+                "suite": "Suite",
+                "executive": "Suite ejecutiva",
+                "family": "Habitación familiar"
+            },
+            "ratePlans": {
+                "bestAvailable": "Mejor tarifa disponible",
+                "aaaMember": "Tarifa para miembros AAA",
+                "package": "Tarifa de paquete",
+                "weekend": "Oferta de fin de semana"
+            },
+            "modifications": {
+                "changedCheckIn": "Fecha de entrada modificada",
+                "changedCheckOut": "Fecha de salida modificada",
+                "changedRoomType": "Tipo de habitación cambiado a {{roomType}}",
+                "changedGuestCount": "Cantidad de huéspedes modificada",
+                "changedRatePlan": "Plan de tarifa cambiado a {{ratePlanName}}"
+            },
+            "priceBreakdown": "Desglose de precios",
+            "baseAmount": "Monto base",
+            "additionalCharges": "Cargos adicionales",
+            "subtotal": "Subtotal",
+            "taxes": "Impuestos y tarifas",
+            "totalTax": "Impuestos totales",
+            "grandTotal": "Total final",
+            "averagePerNight": "Promedio por noche",
+            "taxInclusiveNote": "Todos los precios incluyen impuestos y tarifas aplicables. El desglose de impuestos se muestra por transparencia."
+        },
+        "BookingDetailsModal": {
+            "bookingId": "ID de reserva",
+            "bookingNumber": "Reserva #{{id}}",
+            "closeModal": "Cerrar modal",
+            "status": {
+                "confirmed": "Confirmada",
+                "pending": "Pendiente",
+                "cancelled": "Cancelada"
+            },
+            "stayDetails": "Detalles de la estadía",
+            "checkIn": "Entrada",
+            "checkOut": "Salida",
+            "duration": "Duración",
+            "nightsStay_one": "{{count}} noche",
+            "nightsStay_other": " {{count}} noches",
+            "roomType": "Tipo de habitación",
+            "roomName": "Nombre de la habitación",
+            "roomsCount_one": "{{count}} habitación",
+            "roomsCount_other": "{{count}} habitaciones",
+            "guestDetails": "Datos del huésped",
+            "guestName": "Nombre del huésped",
+            "contactNumber": "Número de contacto",
+            "email": "Correo electrónico",
+            "adults": "Adultos",
+            "children": "Niños",
+            "specialRequests": "Solicitudes especiales",
+            "paymentDetails": "Detalles del pago",
+            "paymentMethod": "Método de pago",
+            "paymentMethods": {
+                "credit_card": "Tarjeta de crédito",
+                "debit_card": "Tarjeta de débito",
+                "pay_at_hotel": "Pagar en el hotel",
+                "bank_transfer": "Transferencia bancaria",
+                "paypal": "PayPal",
+                "google_pay": "Google Pay"
+            },
+            "bookingDate": "Fecha de reserva",
+            "totalAmount": "Monto total",
+            "night": "noche",
+            "ratePlan": "Plan de tarifa",
+            "modifyBooking": "Modificar reserva",
+            "cancelBooking": "Cancelar reserva",
+            "printItinerary": "Imprimir itinerario",
+            "rooms": "Habitaciones",
+            "dob": "Fecha de nacimiento",
+            "guest": "Huésped",
+            "printFooter": "Gracias por tu reserva. Para cualquier pregunta, por favor contacta a nuestro servicio al cliente.",
+            "printTitle": "Confirmación de reserva"
+        }
+    },
+    "Payment": {
+        "PaymentPageContent": {
+            "selectCryptoMethod": "Por favor, selecciona un método de pago en criptomonedas arriba.",
+            "invalidPayment": {
+                "title": "Pago inválido",
+                "message": "No pudimos procesar tu pago debido a información faltante.",
+                "returnToHomepage": "Volver a la página principal"
+            },
+            "bookingSummary": {
+                "title": "Resumen de la reserva",
+                "stayDates": "Fechas de estadía",
+                "night": "noche",
+                "nights": "noches",
+                "guests": "Huéspedes",
+                "room": "Habitación",
+                "rooms": "Habitaciones",
+                "adult": "Adulto",
+                "adults": "Adultos",
+                "child": "Niño",
+                "children": "Niños",
+                "infant": "Bebé",
+                "infants": "Bebés",
+                "guest": "Huésped principal"
+            },
+            "paymentMethod": {
+                "title": "Método de pago"
+            },
+            "priceDetails": {
+                "title": "Detalles del precio",
+                "roomRate": "Tarifa de la habitación",
+                "perNight": " / noche",
+                "total": "Total",
+                "payAtHotelInfo": "Tu tarjeta se almacenará de forma segura, pero el pago se realizará en el hotel."
+            },
+            "securityBadges": {
+                "securePayments": "Pagos seguros",
+                "noCardStorage": "Nunca almacenamos los datos completos de tu tarjeta",
+                "freeCancellation": "Cancelación gratuita disponible"
+            },
+            "needHelp": {
+                "title": "¿Necesitas ayuda?",
+                "message": "Nuestro equipo de servicio al cliente está disponible las 24 horas para ayudarte con cualquier pregunta sobre tu reserva.",
+                "contactSupport": "Contactar soporte"
+            },
+            "loading": {
+                "title": "Cargando información de pago...",
+                "message": "Por favor, espera mientras preparamos tu proceso de pago."
+            }
+        },
+        "PaymentComponents": {
+            "PaymentOptionSelector": {
+                "title": "Opciones de pago",
+                "payNow": "Pagar ahora",
+                "payNowDescription": "Completa el pago inmediatamente",
+                "payAtHotel": "Pagar en el hotel",
+                "payAtHotelDescription": "Guarda tu tarjeta de forma segura para pagar en el hotel",
+                "payWithCrypto": "Pagar con criptomonedas",
+                "payWithCryptoDescription": "Usa criptomonedas para completar tu pago",
+                "chooseCryptoMethod": "Elige método de pago en criptomonedas",
+                "payWithWallet": "Pagar con billetera",
+                "payWithQR": "Pagar con código QR"
+            },
+            "PayAtHotelFunction": {
+                "infoTitle": "Información de pago en el hotel",
+                "infoMessage": "Los datos de tu tarjeta de crédito se almacenarán de forma segura, pero no se cobrarán ahora. El pago se procesará durante tu estancia en el hotel.",
+                "cardDetailsLabel": "Datos de la tarjeta",
+                "stripeNotLoadedError": "Stripe aún no se ha cargado. Por favor, inténtalo de nuevo.",
+                "notLoggedInError": "Debes iniciar sesión para completar esta reserva. Por favor, inicia sesión e inténtalo de nuevo.",
+                "cardElementNotFoundError": "No se encontró el elemento de tarjeta",
+                "cardSetupFailedError": "Error al configurar la tarjeta",
+                "processing": "Procesando...",
+                "confirmBooking": "Confirmar reserva",
+                "paymentProcessingError": "Ocurrió un error durante el procesamiento del pago",
+                "footer": "Los datos de tu tarjeta están encriptados y procesados de forma segura por Stripe. Nunca almacenamos la información completa de tu tarjeta en nuestros servidores."
+            }
+        },
+        "PaymentSuccess": {
+            "noBookingDataForDownload": "No hay datos de reserva disponibles para descargar.",
+            "downloadSuccessToast": "¡Confirmación de reserva descargada con éxito!",
+            "processingBooking": "Procesando tu reserva...",
+            "confirmingReservation": "Estamos confirmando tu reserva. Esto solo tomará un momento.",
+            "bookingFailedTitle": "Reserva fallida",
+            "returnToHomepage": "Volver a la página principal",
+            "bookingConfirmedTitle": "¡Reserva confirmada!",
+            "reservationSuccessMessage": "Tu reserva se ha completado con éxito",
+            "bookingId": "ID de reserva:",
+            "bookingSummaryTitle": "Resumen de la reserva",
+            "checkInLabel": "Entrada",
+            "checkOutLabel": "Salida",
+            "night": "noche",
+            "nights": "noches",
+            "guestsLabel": "Huéspedes",
+            "guestInfoTitle": "Información del huésped",
+            "guestNameLabel": "Nombre del huésped",
+            "guestDefaultName": "Huésped",
+            "emailLabel": "Correo electrónico",
+            "phoneLabel": "Número de teléfono",
+            "paymentMethodLabel": "Método de pago",
+            "paymentMethodCreditCard": "Tarjeta de crédito",
+            "paymentMethodPayAtHotel": "Pagar en el hotel",
+            "paymentMethodUnknown": "Desconocido",
+            "paymentDetailsTitle": "Detalles del pago",
+            "roomRate": "Tarifa de la habitación",
+            "perNight": " / noche",
+            "total": "Total",
+            "paymentAtHotelMessage": "El pago se realizará en el hotel",
+            "paymentProcessedMessage": "El pago ha sido procesado",
+            "viewMyBookings": "Ver mis reservas",
+            "returnHome": "Volver al inicio",
+            "whatsNextTitle": "¿Qué sigue?",
+            "confirmationEmailSent": "Se ha enviado un correo de confirmación a tu bandeja de entrada",
+            "viewBookingDetails": "Puedes ver los detalles de la reserva en tu cuenta en cualquier momento",
+            "contactSupportForChanges": "¿Necesitas hacer cambios? Contáctanos las 24 horas para soporte",
+            "downloadBookingConfirmation": "Descargar confirmación de reserva",
+            "needHelpTitle": "¿Necesitas ayuda?",
+            "customerServiceMessage": "Nuestro equipo de servicio al cliente está disponible las 24 horas para ayudarte con cualquier pregunta.",
+            "contactSupportButton": "Contactar soporte",
+            "exploreMoreHotels": "Explora más opciones de hoteles"
+        },
+        "PaymentProgress": {
+            "title": "Puerta de pago en criptomonedas",
+            "subtitle": "Completa el pago de tu reserva de hotel usando criptomonedas",
+            "paymentInfo": "Información de pago",
+            "guestInfo": "Información del huésped",
+            "scanAndPay": "Escanear y pagar",
+            "payThroughWallet": "Pagar a través de billetera",
+            "token": "Token",
+            "network": "Red",
+            "amount": "Monto",
+            "hotel": "Hotel",
+            "checkIn": "Entrada",
+            "checkOut": "Salida",
+            "email": "Correo electrónico",
+            "age": "Edad",
+            "years": "años",
+            "phone": "Teléfono",
+            "guests": "Huéspedes",
+            "walletAddress": "Dirección de billetera",
+            "scanInstructions": "Escanee con tu billetera de criptomonedas",
+            "paymentInstructions": "Instrucciones de pago",
+            "viewBookings": "Ver mis reservas",
+            "returnHome": "Volver al inicio",
+            "paymentSuccessful": "¡Pago exitoso!",
+            "paymentConfirmed": "Tu pago ha sido confirmado.",
+            "status": {
+                "pending": "Esperando pago",
+                "completed": "Pago confirmado",
+                "processing": "Procesando pago",
+                "expired": "Pago expirado",
+                "sessionExpired": "Sesión expirada",
+                "expiringSoon": "Expira pronto",
+                "maxTimeReached": "Tiempo máximo alcanzado",
+                "timeRemaining": "Tiempo restante",
+                "securePayment": "Pago seguro",
+                "default": "Pendiente"
+            },
+            "errors": {
+                "invalidPaymentData": "Datos de pago inválidos",
+                "noPaymentData": "No se encontraron datos de pago",
+                "noAuthToken": "Se requiere autenticación"
+            },
+            "loading": {
+                "title": "Cargando detalles de pago",
+                "subtitle": "Preparando pago en criptomonedas..."
+            },
+            "error": {
+                "title": "Error de pago"
+            },
+            "wallet": {
+                "sendInstruction": "Envía {{amount}} {{token}} en la red {{network}} a {{address}}",
+                "loadingAddress": "Cargando dirección..."
+            },
+            "modal": {
+                "waitingConfirmation": "Esperando confirmación de reserva",
+                "confirmationMessage": "Espere mientras confirmamos tu pago. Esto puede tardar hasta 2-3 minutos. No cierres esta ventana."
+            },
+            "actions": {
+                "checkStatus": "Verificar estado",
+                "checkBooking": "Verificar reserva",
+                "copyAddress": "Copiar dirección",
+                "addressCopied": "✓ ¡Dirección copiada al portapapeles!",
+                "takeMeToBookings": "Llévame a Mis Reservas"
+            },
+            "support": {
+                "needHelp": "¿Necesitas ayuda?",
+                "supportMessage": "Nuestro equipo de soporte está disponible las 24 horas para ayudarte con tu pago en criptomonedas",
+                "contactSupport": "Contactar soporte",
+                "securityInfo": "Información de seguridad"
+            },
+            "walletAddressLabel": "Dirección de billetera",
+            "instructions": {
+                "sendAmount": "Envía exactamente el equivalente a {{amount}} en {{token}}",
+                "useNetwork": "Usa únicamente la red {{network}}",
+                "doubleCheck": "Verifica bien la dirección de la billetera antes de enviar",
+                "confirmationTime": "La confirmación del pago es automática (5-15 minutos)"
+            },
+            "warning": "Importante: Solo envíes {{token}} en la red {{network}}. Enviar otros tokens o usar una red incorrecta resultará en la pérdida de fondos.",
+            "common": {
+                "important": "Importante"
+            }
+        }
+    },
+    "GuestBox": {
+        "guests": "Huéspedes",
+        "adultsPlural": "Adultos",
+        "adultSingular": "Adulto",
+        "infantsPlural": "Bebés",
+        "infantSingular": "Bebé",
+        "roomsPlural": "Habitaciones",
+        "roomSingular": "Habitación",
+        "childrenPlural": "Niños",
+        "childSingular": "Niño",
+        "age": "Edad",
+        "yearSingular": "año",
+        "yearPlural": "años",
+        "selectAge": "Seleccionar edad",
+        "selectGuests": "Seleccionar huéspedes",
+        "ages": "Edades",
+        "cancel": "Cancelar",
+        "apply": "Aplicar",
+        "defaultText": "1 habitación · 1 adulto · 0 niños",
+        "maxGuestsError": "Se permite un máximo de {{maxGuests}} huéspedes por habitación. Por favor, añade más habitaciones o reduce el número de huéspedes.",
+        "selectAgeError": "Por favor, selecciona la edad de todos los niños y bebés"
+    },
+    "PayWithCryptoQR": {
+        "title": "Pagar con criptomonedas",
+        "amountLabel": "Monto",
+        "loadingTokens": "Cargando tokens...",
+        "loadingNetworks": "Cargando redes...",
+        "convertingCurrency": "Convirtiendo {{currency}} a USD...",
+        "convertedAmount": "Monto convertido",
+        "selectToken": "Seleccionar token",
+        "selectNetwork": "Seleccionar red",
+        "noNetworksAvailable": "No hay redes disponibles para este token",
+        "noTokensAvailable": "No hay tokens disponibles",
+        "processing": "Procesando...",
+        "initiatePayment": "Iniciar pago",
+        "paymentInitiated": "Pago en criptomonedas iniciado correctamente",
+        "token": "Token",
+        "blockchain": "Blockchain",
+        "amount": "Monto",
+        "status": "Estado",
+        "paymentId": "ID de pago",
+        "scanQRCode": "Escanea el código QR para pagar con {{token}} en la red {{network}}",
+        "qrCodePlaceholder": "El código QR aparecerá aquí",
+        "sendAmountInstruction": "Envía el monto exacto a la dirección mostrada arriba utilizando la red {{network}}",
+        "tokenLogoAlt": "Logo de {{token}}",
+        "networkLogoAlt": "Logo de {{network}}",
+        "errors": {
+            "noAuthToken": "No se encontró el token de autenticación",
+            "fetchTokens": "Error al obtener los tokens",
+            "fetchTokensError": "Ocurrió un error al obtener los tokens",
+            "fetchNetworks": "Error al obtener las redes",
+            "fetchNetworksError": "Ocurrió un error al obtener las redes",
+            "currencyConversion": "Error al convertir la moneda",
+            "currencyConversionError": "Ocurrió un error durante la conversión de moneda",
+            "selectionIncomplete": "Por favor, selecciona el token, la red y asegúrate de que el monto haya sido convertido",
+            "initiatePayment": "Error al iniciar el pago",
+            "initiatePaymentError": "Ocurrió un error al iniciar el pago"
+        }
+    },
+    "notifications": {
+        "title": "Notificaciones",
+        "newNotification": "Nueva notificación",
+        "unread": "no leída",
+        "markAllRead": "Marcar todas como leídas",
+        "markAsRead": "Marcar como leída",
+        "retry": "Reintentar",
+        "loading": "Cargando notificaciones...",
+        "noUnread": "No tienes notificaciones no leídas",
+        "noNotifications": "Aún no tienes notificaciones",
+        "emptyDescription": "Te notificaremos cuando haya algo nuevo",
+        "unknownTime": "Hora desconocida",
+        "type": "Tipo",
+        "offerCode": "Código de oferta",
+        "tabs": {
+            "all": "Todas",
+            "unread": "No leídas"
+        },
+        "errors": {
+            "fetchFailed": "No se pudieron obtener las notificaciones",
+            "loadFailed": "No se pudieron cargar las notificaciones",
+            "markAllReadFailed": "No se pudo marcar todas las notificaciones como leídas",
+            "markReadFailed": "No se pudo marcar la notificación como leída",
+            "loadingError": "Error al cargar las notificaciones"
+        }
+    },
+    "Help": {
+        "helpCenter": "Centro de ayuda",
+        "helpCenterDesc": "Encuentra respuestas a preguntas frecuentes sobre reservas, pagos y más.",
+        "searchPlaceholder": "Buscar artículos de ayuda...",
+        "searchAriaLabel": "Buscar preguntas frecuentes",
+        "noResults": "No se encontraron resultados. Intenta con otro término de búsqueda.",
+        "allCategories": "Todas las categorías",
+        "popularTopics": "Temas populares",
+        "searchResults": "Resultados de búsqueda",
+        "clearFilters": "Limpiar filtros",
+        "stillNeedHelp": "¿Aún necesitas ayuda?",
+        "contactDesc": "Nuestro equipo de soporte está aquí para ayudarte las 24 horas",
+        "contactFooter": "Los tiempos de respuesta pueden variar en horas pico. Para asuntos urgentes, por favor llámanos al <phoneLink>número de teléfono</phoneLink>.",
+        "contactPhone": "+1-800-555-1234",
+        "contactPhoneFormatted": "(800) 555-1234",
+        "email": "Soporte por correo",
+        "emailDesc": "Responderemos en menos de 4 horas",
+        "phone": "Soporte telefónico",
+        "phoneDesc": "Llámanos para asuntos urgentes",
+        "supportOptions": {
+            "email": {
+                "responseTime": "< 4 horas"
+            },
+            "phone": {
+                "responseTime": "24/7"
+            }
+        },
+        "categories": {
+            "booking": {
+                "title": "Reservas y reservaciones",
+                "description": "Preguntas sobre cómo hacer y gestionar reservas"
+            },
+            "payment": {
+                "title": "Pagos y facturación",
+                "description": "Métodos de pago, criptomonedas, facturación y reembolsos"
+            },
+            "security": {
+                "title": "Seguridad y privacidad",
+                "description": "Seguridad de la cuenta y protección de datos"
+            },
+            "account": {
+                "title": "Cuenta y perfil",
+                "description": "Gestión de tu cuenta y configuración de perfil"
+            },
+            "promotions": {
+                "title": "Ofertas y promociones",
+                "description": "Cupones de descuento y ofertas promocionales"
+            }
+        },
+        "contactForm": {
+            "title": "Envíanos un mensaje",
+            "subject": "Asunto",
+            "message": "Tu mensaje",
+            "messagePlaceholder": "Describe tu problema...",
+            "cancel": "Cancelar",
+            "send": "Enviar mensaje",
+            "sending": "Enviando...",
+            "sent": "¡Mensaje enviado!",
+            "thankYou": "¡Gracias! Nuestro equipo se pondrá en contacto contigo pronto."
+        },
+        "contactFooterNoPhone": "Para ayuda inmediata, utiliza el soporte por correo electrónico.",
+        "faq": {
+            "howToPayQuestion": "¿Cómo puede un usuario realizar un pago?",
+            "howToPayAnswer": "La plataforma ofrece múltiples opciones de pago convenientes para satisfacer diversas preferencias. Los usuarios pueden elegir el método \"Pagar en el hotel\", donde proporcionan sus datos de tarjeta durante la reserva únicamente para confirmación. No se realiza un cargo inmediato; el pago se realiza directamente en el hotel, ya sea al momento del check-in o del check-out, según la política del alojamiento.\n\nAdemás, para usuarios que prefieren monedas digitales, la plataforma acepta pagos en criptomonedas como USDC, USDT (red Polygon), Ethereum, BNB y Polygon Mainnet. Esto brinda mayor flexibilidad a viajeros internacionales, usuarios tecnológicos y quienes prefieren transacciones basadas en blockchain. Ambos métodos están diseñados para ofrecer seguridad, transparencia y comodidad.",
+            "cancelReservationQuestion": "¿Es posible cancelar una reserva después de confirmarla?",
+            "cancelReservationAnswer": "Sí. Los usuarios pueden cancelar reservas confirmadas, siempre que lo hagan al menos 24 horas antes de la hora programada de entrada. La función de cancelación está disponible fácilmente en la sección \"Mis viajes\".\n\nEs importante tener en cuenta que, aunque la mayoría de los hoteles permiten cancelaciones gratuitas dentro del periodo indicado, algunos alojamientos pueden tener condiciones más estrictas, como reservas no reembolsables o tarifas promocionales especiales. Por ello, se recomienda encarecidamente revisar la política de cancelación del hotel al momento de reservar, para evitar cargos no deseados.",
+            "paymentSecurityQuestion": "¿Se maneja de forma segura la información de pago del usuario?",
+            "paymentSecurityAnswer": "Absolutamente. La plataforma prioriza la seguridad del pago mediante una asociación con Stripe, una pasarela de pago reconocida mundialmente y conforme con PCI DSS, conocida por su tecnología avanzada de encriptación. Ningún dato sensible de pago se almacena en los servidores de la plataforma. Todas las transacciones, ya sea con tarjeta o transferencias en criptomonedas, se procesan a través de canales seguros y encriptados, garantizando la máxima protección de datos y la confianza del usuario.",
+            "internationalCardsQuestion": "¿Pueden los usuarios pagar con tarjetas de crédito o débito internacionales?",
+            "internationalCardsAnswer": "Sí. El sistema de pago admite completamente transacciones internacionales, permitiendo a usuarios de todo el mundo reservar hoteles sin restricciones. Las tarjetas admitidas incluyen proveedores globales como Visa, Mastercard y American Express. Las conversiones de moneda son manejadas automáticamente por la pasarela de pago, ofreciendo una experiencia sin complicaciones para viajeros internacionales.",
+            "receiptQuestion": "¿Se proporcionará un recibo después de completar el pago?",
+            "receiptAnswer": "Sí. Ya sea que el usuario pague en el hotel, con tarjeta o mediante criptomonedas, un recibo de pago digital se genera automáticamente y se envía al correo electrónico registrado una vez completada la transacción. Este recibo incluye el número de referencia de la reserva, nombre del hotel, tarifa de la habitación, detalles de impuestos y un desglose claro del pago, sirviendo como documento oficial de la transacción.",
+            "accountRequiredQuestion": "¿Necesitan los usuarios crear una cuenta antes de reservar?",
+            "accountRequiredAnswer": "La creación de cuenta solo es necesaria cuando el usuario desea realizar una reserva. Esto significa que cualquiera puede explorar hoteles, ver disponibilidad de habitaciones, comparar precios, revisar servicios y leer opiniones de huéspedes sin iniciar sesión.\n\nSin embargo, al proceder con la reserva, el sistema solicitará al usuario que cree una cuenta o inicie sesión. Este paso asegura que los detalles de la reserva, confirmaciones de pago y futuras reservas se almacenen de forma segura y sean fácilmente accesibles en la sección \"Mis viajes\".",
+            "contactSupportQuestion": "¿Cómo pueden los usuarios contactar al servicio de atención al cliente?",
+            "contactSupportAnswer": "La plataforma ofrece múltiples canales de soporte para ayudar a los usuarios con consultas sobre reservas, problemas de pago o asuntos técnicos. Los usuarios pueden contactarnos por correo electrónico o a través del centro de ayuda en la aplicación. Los tiempos de respuesta varían según el canal, pero siempre se da prioridad a asuntos urgentes relacionados con reservas o pagos.",
+            "additionalChargesQuestion": "¿Hay cargos adicionales durante la reserva?",
+            "additionalChargesAnswer": "Todos los precios mostrados incluyen impuestos y tarifas aplicables, salvo que se indique lo contrario en el resumen de la reserva. Algunos hoteles pueden cobrar montos adicionales al momento del check-in por servicios opcionales como camas extra, comidas o check-out tardío. Estos se indicarán claramente antes de finalizar la reserva, garantizando transparencia total y sin sorpresas ocultas.",
+            "discountCouponQuestion": "¿Cómo puede un usuario obtener un descuento o usar un cupón al reservar?",
+            "discountCouponAnswer": "Para obtener ofertas y descuentos, los usuarios deben seguir un proceso sencillo. Los cupones promocionales especiales están vinculados a códigos QR ubicados en habitaciones de hoteles seleccionados u otros materiales promocionales. Al escanear este código QR con un dispositivo móvil, el usuario es redirigido a la aplicación móvil de la plataforma. Desde allí, puede continuar con el proceso habitual de reserva. En la etapa de pago, aparecerá una opción \"Aplicar cupón\"; al tocarla, el usuario podrá ingresar el código y aplicar instantáneamente el descuento correspondiente al monto total de la reserva."
+        }
+    },
+    "Reviews": {
+        "guestReviewsFor": "Opiniones de huéspedes para {{hotelName}}",
+        "weAimForRealReviews": "Nos aseguramos de que todas las opiniones sean reales",
+        "writeAReview": "Escribir una opinión",
+        "reviews": "opiniones",
+        "all": "Todas",
+        "superb": "Excelente",
+        "good": "Buena",
+        "poor": "Mala",
+        "marMay": "Mar–May",
+        "junAug": "Jun–Ago",
+        "sepNov": "Sep–Nov",
+        "decFeb": "Dic–Feb",
+        "mostRelevant": "Más relevantes",
+        "newestFirst": "Más recientes primero",
+        "oldestFirst": "Más antiguas primero",
+        "highestRated": "Mejor calificadas",
+        "lowestRated": "Peor calificadas",
+        "guestReviews": "Opiniones de huéspedes ({{count}})",
+        "reviewedOn": "Opinión publicada: {{date}}",
+        "noReviews": "Aún no hay opiniones",
+        "beFirstToReview": "¡Sé el primero en compartir tu experiencia!",
+        "filtersAndSort": "Filtros y orden",
+        "reviewScores": "Puntuaciones de las opiniones",
+        "timeOfYear": "Época del año",
+        "sortReviewsBy": "Ordenar opiniones por"
+    },
+    "NetworkStatus": {
+        "offline": "Estás desconectado. Por favor verifica tu conexión a internet.",
+        "online": "¡Estás de vuelta en línea!"
+    }
+}
