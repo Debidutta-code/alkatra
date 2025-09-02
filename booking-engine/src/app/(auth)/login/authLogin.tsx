@@ -45,16 +45,16 @@ const Login: React.FC = () => {
     {
       email: { required: true, email: true },
       password: { required: true },
-      
+
     }
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       console.log("Login Validation errors:", errors);
-      toast.error(t('Login failed'), {
+      toast.error(t('Auth.Login.loginFailed'), {
         icon: '❌',
       });
       return;
@@ -65,9 +65,9 @@ const Login: React.FC = () => {
     try {
 
       const loginResult = await dispatch(login({ email: values.email, password: values.password, provider: 'local' }));
-      
+
       if (loginResult.meta.requestStatus === 'rejected') {
-        throw new Error("Login failed: Wrong email or password");
+        throw new Error(t('Auth.Login.wrongCredentials'));
       }
       if (!loginResult.payload) {
         throw new Error("No token received from server");
