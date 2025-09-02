@@ -3,3 +3,5 @@ export { default as ChatBotFeedback } from './ChatbotFeedback';
 export { default as ChatBotIcon } from './ChatbotIcon';
 export { default as ChatBotInitials } from './ChatbotInitial';
 export { default as Chatbot } from './ChatBot';
+export { default as ChatMessage } from './ChatMessage';
+export { default as TypingIndicator } from './TypingIndicator';

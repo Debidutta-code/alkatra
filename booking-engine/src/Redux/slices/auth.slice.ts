@@ -85,7 +85,6 @@ export const login = createAsyncThunk<
   { email: string; password: string, provider: string },
   { dispatch: AppDispatch; state: RootState }
 >("auth/login", async (data, { dispatch }) => {
-  
   const res = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/login`,
     {
@@ -112,10 +111,8 @@ export const googleLogin = createAsyncThunk<
   "auth/googleLogin",
   async ({ code, provider, referrerId, referralCode }, { dispatch, rejectWithValue }) => {
     try {
-      // Build the URL with query parameters like the first example
       let apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/google/auth/google`;
 
-      // Add referral parameters if they exist
       if (referrerId && referralCode) {
         const params = new URLSearchParams({
           referrerId: referrerId,
@@ -123,11 +120,10 @@ export const googleLogin = createAsyncThunk<
         });
         apiUrl += `?${params.toString()}`;
       }
-      console.log(`The body of google login ${code}, ${provider}, ${referrerId}, ${referralCode}`);
 
       const response = await axios.post(
         apiUrl,
-        { code, provider }, // Request body
+        { code, provider },
         {
           headers: {
             "Content-Type": "application/json",
@@ -150,10 +146,8 @@ export const googleLogin = createAsyncThunk<
 
       Cookies.set("accessToken", token, cookieOptions);
 
-      // Update Redux state
       dispatch(setAccessToken(token));
 
-      // Fetch and store user data
       await dispatch(getUser());
 
       return { token };
@@ -161,6 +155,11 @@ export const googleLogin = createAsyncThunk<
       console.error("❌ Error in googleLogin thunk:", error);
 
       if (axios.isAxiosError(error)) {
+        console.error("❌ Axios error details:", {
+          status: error.response?.status,
+          data: error.response?.data,
+          headers: error.response?.headers
+        });
         return rejectWithValue(
           error.response?.data?.message || "Failed to login with Google"
         );

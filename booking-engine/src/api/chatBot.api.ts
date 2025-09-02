@@ -19,12 +19,14 @@ class ChatBotApi {
      * Generate session id
      * @JWT token pass in header as bearer
      */
-    async generateSessionId(token: string) {
+    async generateSessionId(token: string): Promise<string> {
         if (!token) {
             throw new Error("Token not found for generate CHAT Session ID");
         }
+        
         try {
-            console.log(`@@@@@@@@@@@@@Entered onto try block`);
+            console.log(`Generating session ID...`);
+            
             const response = await fetch(`${this.baseUrl}/chat/session`, {
                 method: 'POST',
                 headers: {
@@ -32,31 +34,34 @@ class ChatBotApi {
                     'Authorization': `Bearer ${token}`
                 },
             });
-            console.log("Reach the if block");
-            if (response.status !== 200) {
-                throw new Error("Session ID generate failed");
+
+            if (!response.ok) {
+                throw new Error(`Session ID generation failed: ${response.status} ${response.statusText}`);
             }
 
-            const sessionId = await response.json();
+            const sessionData = await response.json();
+            console.log('Session generated successfully:', sessionData);
 
-            return sessionId.sessionId;
+            return sessionData.sessionId;
+            
         } catch (error: any) {
-            console.log(`Server error at generating chat session ID`, error.message);
-            throw new Error('Server Error');
+            console.error(`Server error at generating chat session ID:`, error);
+            throw new Error(`Failed to generate session: ${error.message}`);
         }
-    };
-
+    }
 
     /**
      * Chat bot chat api
      * @JWT as bearer for authentication
      * SessionId and Input: query of user pass in body
      */
-    async chatApi(token: string, sessionId: string, inputData: string) {
+    async chatApi(token: string, sessionId: string, inputData: string): Promise<any> {
         if (!token || !sessionId || !inputData) {
-            throw new Error("Token and Session ID required to get Chat");
+            throw new Error("Token, Session ID, and input are required for chat");
         }
+        
         try {
+            console.log('Sending chat message:', { sessionId, inputData });
 
             const chatResponse = await fetch(`${this.baseUrl}/chat/message`, {
                 method: 'POST',
@@ -70,16 +75,19 @@ class ChatBotApi {
                 })
             });
 
-            if (chatResponse.status !== 200) {
-                throw new Error("Issue while getting your answer");
+            if (!chatResponse.ok) {
+                throw new Error(`Chat API failed: ${chatResponse.status} ${chatResponse.statusText}`);
             }
 
-            const responseData = chatResponse.json();
-            console.log(`The chat bot answer we get ${JSON.stringify(responseData)}`);
+            // CRITICAL FIX: Add 'await' here
+            const responseData = await chatResponse.json();
+            console.log(`Chat bot response:`, responseData);
+            
             return responseData;
+            
         } catch (error: any) {
-            console.log(`Server error at chat`, error.message);
-            throw new Error('Server Error');
+            console.error(`Server error during chat:`, error);
+            throw new Error(`Chat failed: ${error.message}`);
         }
     }
 }

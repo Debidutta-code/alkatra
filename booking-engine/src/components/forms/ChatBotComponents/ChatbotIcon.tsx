@@ -1,6 +1,4 @@
 import React from 'react';
-import { Bot } from 'lucide-react';
-import Button from '../UserProfileComponents/Button';
 
 interface ChatbotIconProps {
   onClick: () => void;

@@ -2,8 +2,8 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/Redux/store';
 import { ChatBotApi } from '@/api';
-import { setSessionId } from '../../../Redux/slices/chatbot.slice';
-import { ArrowRight, Gift, Shield, Lock, Star, X } from 'lucide-react';
+import { setSessionId, clearMessages, addUserMessage, setBotTyping, addBotMessage } from '../../../Redux/slices/chatbot.slice';
+import { ArrowRight, Smartphone, HelpCircle, Building, Download, X } from 'lucide-react';
 
 interface ChatbotPageProps {
   onStartChat: () => void;
@@ -11,27 +11,67 @@ interface ChatbotPageProps {
 }
 
 const ChatbotPage: React.FC<ChatbotPageProps> = ({ onStartChat, onClose }) => {
-
+  const [isQuestionsExpanded, setIsQuestionsExpanded] = React.useState(true);
   const chatBotApi = new ChatBotApi();
   const dispatch = useDispatch<AppDispatch>();
 
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+  const sessionId = useSelector((state: RootState) => state.chat.sessionId);
+
   if (!accessToken) {
     throw new Error("The JWT token didn't get for chatbot");
   }
 
   const newGenerateSessionid = async (accessToken: string) => {
+    try {
+      const newSessionId = await chatBotApi.generateSessionId(accessToken);
 
-    const newSessionId = await chatBotApi.generateSessionId(accessToken);
-    
-    if (!newSessionId) {
-      throw new Error("Chatbot session can't generate");
+      if (!newSessionId) {
+        throw new Error("Chatbot session can't generate");
+      }
+
+      console.log(`@@@@@@@@@@@@@ The session id we get ${newSessionId}`);
+      dispatch(setSessionId(newSessionId));
+
+      // Clear any existing messages when starting new session
+      dispatch(clearMessages());
+
+    } catch (error) {
+      console.error('Error generating session ID:', error);
     }
-
-    console.log(`@@@@@@@@@@@@@ The session id we get ${newSessionId}`)
-    dispatch(setSessionId(newSessionId)); 
   };
 
+  // Handle quick question clicks with dynamic API responses
+  const handleQuickQuestion = async (question: string) => {
+    if (!sessionId) {
+      await newGenerateSessionid(accessToken);
+    }
+
+    onStartChat();
+
+    setTimeout(async () => {
+      dispatch(addUserMessage({ text: question }));
+      dispatch(setBotTyping(true));
+
+      try {
+        const currentSessionId = sessionId || await chatBotApi.generateSessionId(accessToken);
+        const botResponse = await chatBotApi.chatApi(accessToken, currentSessionId, question);
+
+        if (botResponse && botResponse.reply) {
+          dispatch(addBotMessage({ text: botResponse.reply }));
+        } else {
+          dispatch(addBotMessage({
+            text: "I'm sorry, I couldn't process your request. Please try again."
+          }));
+        }
+      } catch (error) {
+        console.error('Quick question API error:', error);
+        dispatch(addBotMessage({
+          text: "I'm experiencing some technical difficulties. Please try again in a moment."
+        }));
+      }
+    }, 500);
+  };
 
   return (
     <div className="flex flex-col items-center justify-center">
@@ -69,44 +109,51 @@ const ChatbotPage: React.FC<ChatbotPageProps> = ({ onStartChat, onClose }) => {
 
         {/* Top Box: What do you want to know? */}
         <div className="pb-4 mb-4">
-
           <div className="border-1 border-gray-100 bg-white shadow-lg rounded-lg p-4">
-
             <div className="flex items-center justify-between mb-2">
               <span className="text-gray-700 font-medium">What do you want to know?</span>
-              <span className="text-gray-500">▼</span>
-            </div>
-
-            <div>
               <button
-                className="flex items-center w-full text-left hover:bg-gray-100 rounded transition-colors space-y-1"
-                onClick={() => alert("Free trial info")}
+                onClick={() => setIsQuestionsExpanded(!isQuestionsExpanded)}
+                className="text-gray-500 hover:text-gray-700 transition-colors p-1"
+                aria-label={isQuestionsExpanded ? "Collapse questions" : "Expand questions"}
               >
-                <Gift className="h-5 w-5 text-green-500 mr-2" />
-                <span className="text-blue-700 text-sm">Is there a free trial available?</span>
-              </button>
-              <button
-                className="flex items-center w-full text-left hover:bg-gray-100 rounded transition-colors space-y-1"
-                onClick={() => alert("Data protection info")}
-              >
-                <Shield className="h-5 w-5 text-red-500 mr-2" />
-                <span className="text-blue-700 text-sm">How is my data protected?</span>
-              </button>
-              <button
-                className="flex items-center w-full text-left hover:bg-gray-100 rounded transition-colors space-y-1"
-                onClick={() => alert("Cancellation info")}
-              >
-                <Lock className="h-5 w-5 text-yellow-500 mr-2" />
-                <span className="text-blue-700 text-sm">Can I cancel my subscription at any time?</span>
-              </button>
-              <button
-                className="flex items-center w-full text-left hover:bg-gray-100 rounded transition-colors space-y-1"
-                onClick={() => alert("What's new info")}
-              >
-                <Star className="h-5 w-5 text-pink-500 mr-2" />
-                <span className="text-blue-700 text-sm">What's new?</span>
+                <span className={`transition-transform duration-200 ${isQuestionsExpanded ? 'rotate-180' : ''}`}>
+                  ▼
+                </span>
               </button>
             </div>
+            {isQuestionsExpanded && (
+              <div className="space-y-2">
+                <button
+                  className="flex items-center w-full text-left hover:bg-gray-100 rounded p-2 transition-colors"
+                  onClick={() => handleQuickQuestion("How do I use the Alhajz app?")}
+                >
+                  <Smartphone className="h-5 w-5 text-blue-500 mr-2 flex-shrink-0" />
+                  <span className="text-blue-700 text-sm">How do I use the Alhajz app?</span>
+                </button>
+                <button
+                  className="flex items-center w-full text-left hover:bg-gray-100 rounded p-2 transition-colors"
+                  onClick={() => handleQuickQuestion("What is the Alhajz app for?")}
+                >
+                  <HelpCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+                  <span className="text-blue-700 text-sm">What is the Alhajz app for?</span>
+                </button>
+                <button
+                  className="flex items-center w-full text-left hover:bg-gray-100 rounded p-2 transition-colors"
+                  onClick={() => handleQuickQuestion("Can I book hotels through this app?")}
+                >
+                  <Building className="h-5 w-5 text-orange-500 mr-2 flex-shrink-0" />
+                  <span className="text-blue-700 text-sm">Can I book hotels through this app?</span>
+                </button>
+                <button
+                  className="flex items-center w-full text-left hover:bg-gray-100 rounded p-2 transition-colors"
+                  onClick={() => handleQuickQuestion("Is Alhajz free to download?")}
+                >
+                  <Download className="h-5 w-5 text-purple-500 mr-2 flex-shrink-0" />
+                  <span className="text-blue-700 text-sm">Is Alhajz free to download?</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -122,7 +169,7 @@ const ChatbotPage: React.FC<ChatbotPageProps> = ({ onStartChat, onClose }) => {
               newGenerateSessionid(accessToken);
               onStartChat();
             }}
-            className="flex items-center bg-purple-500 text-grey-700 px-2 py-2 rounded-full hover:bg-purple-600 transition-colors"
+            className="flex items-center bg-purple-500 text-white px-3 py-2 rounded-full hover:bg-purple-600 transition-colors"
           >
             <ArrowRight className="h-4 w-4" />
           </button>

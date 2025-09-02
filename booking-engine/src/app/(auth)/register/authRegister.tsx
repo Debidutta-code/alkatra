@@ -57,7 +57,7 @@ const Register: React.FC = () => {
       lastName: { required: true },
       email: { required: true, email: true },
       password: { required: true, passwordStrength: true },
-      authProvider: { required: true },
+      provider: { required: true },
     }
   );
 

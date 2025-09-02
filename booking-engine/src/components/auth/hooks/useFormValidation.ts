@@ -25,7 +25,7 @@ export function useFormValidation(
   const validateField = (name: string, value: string): string => {
     const rules = fieldConfig[name] || {};
 
-    if (rules.required && !value.trim()) {
+    if (rules.required && (!value || !value.trim())) {
       try {
         const specificKey = `Auth.Validation.${name}Required`;
         const specificMessage = t(specificKey);
@@ -46,7 +46,7 @@ export function useFormValidation(
       return t('Auth.Validation.emailInvalid');
     }
 
-    if (rules.minLength && value.length < rules.minLength) {
+    if (rules.minLength && value && value.length < rules.minLength) {
       return t('Auth.Validation.minLength', { count: rules.minLength });
     }
 
@@ -55,7 +55,6 @@ export function useFormValidation(
         return t('Auth.Validation.passwordComplexity');
       }
     }
-
     return "";
   };
 

@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
-import { X, Smile, Paperclip, Send, Bot } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '@/Redux/store';
+import { X, Smile, Paperclip, Send, AlertCircle } from 'lucide-react';
 import Button from '../UserProfileComponents/Button';
-import Avatar from '../UserProfileComponents/Avatar';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/Redux/store';
 import { ChatBotApi } from '@/api';
+import {
+  addUserMessage,
+  addBotMessage,
+  setBotTyping,
+  setChatError,
+  updateMessageStatus,
+  initializeWelcomeMessages
+} from '../../../Redux/slices/chatbot.slice';
+import ChatMessage from './ChatMessage';
+import TypingIndicator from './TypingIndicator';
 
 interface ChatbotConversationProps {
   onClose: () => void;
@@ -12,46 +21,92 @@ interface ChatbotConversationProps {
   userFirstName: string;
 }
 
-const ChatbotConversation: React.FC<ChatbotConversationProps> = ({ onClose, onFeedback, userFirstName }) => {
+const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
+  onClose,
+  onFeedback,
+  userFirstName
+}) => {
   const [chatInput, setChatInput] = useState('');
-
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatBotApi = ChatBotApi.getInstance();
+  const dispatch = useDispatch<AppDispatch>();
 
-  /**
-   * Here the user JWT token getting from redux
-   */
+  // Redux selectors
+  const { messages, isTyping, error, sessionId } = useSelector((state: RootState) => state.chat);
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
-  if (!accessToken) {
-    throw new Error("The JWT token didn't get for chatbot");
-  }
 
-  /**
-   * Here the session id is getting from Redux
-   */
-  const sessionId = useSelector((state: RootState) => state.chat.sessionId);
-  if (!sessionId) {
-    throw new Error("The session ID not getting for Chatbot");
-  }
+  // Auto-scroll to bottom when new messages arrive
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
-  const botChatApi = async (accessToken: string, sessionId: string, chatInput: string) => {
-    if (!accessToken || !sessionId || !chatInput) {
-      throw new Error("The required details are not found for ChatBot");
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isTyping]);
+
+  // Initialize welcome messages when component mounts
+  useEffect(() => {
+    if (messages.length === 0) {
+      dispatch(initializeWelcomeMessages({ userFirstName }));
     }
+  }, [dispatch, userFirstName, messages.length]);
 
-    const chatResult = await chatBotApi.chatApi(accessToken, sessionId, chatInput);
+  // Retry failed message
+  const handleRetry = (messageText: string) => {
+    setChatInput(messageText);
+  };
 
-    console.log(`The chat bot answer we get ${JSON.stringify(chatResult)}`);
+  // Send message function
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() || !accessToken || !sessionId) return;
 
-    if (!chatResult) {
-      throw new Error('Not get your answer from Bot');
-    }
+    const messageText = chatInput.trim();
+    const messageId = Date.now().toString();
+
+    // Add user message immediately
+    dispatch(addUserMessage({ text: messageText }));
     setChatInput('');
-    console.log(`The answer of your question is ${chatResult}`);
+
+    // Show typing indicator
+    dispatch(setBotTyping(true));
+
+    try {
+      // Call API
+      const botResponse = await chatBotApi.chatApi(accessToken, sessionId, messageText);
+
+      // Add bot response
+      if (botResponse && botResponse.reply) {
+        dispatch(addBotMessage({ text: botResponse.reply }));
+      } else {
+        dispatch(addBotMessage({ text: "I'm sorry, I couldn't process your request. Please try again." }));
+      }
+
+      // Update user message status to sent
+      dispatch(updateMessageStatus({ id: messageId, status: 'sent' }));
+
+    } catch (error) {
+      console.error('Chat error:', error);
+      dispatch(setChatError('Failed to send message. Please try again.'));
+      dispatch(addBotMessage({
+        text: "I'm experiencing some technical difficulties. Please try again in a moment."
+      }));
+
+      // Update user message status to error
+      dispatch(updateMessageStatus({ id: messageId, status: 'error' }));
+    }
+  };
+
+  // Handle Enter key press
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
   };
 
   return (
     <div className="flex flex-col items-center justify-center">
-      {/* Header area - matching initial page style */}
+      {/* Header area */}
       <div className="bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700 p-4 pb-2 rounded-t-2xl w-full max-w-md">
         <div className="flex justify-between items-center mb-3">
           <h4 className="text-md font-semibold text-white">Al-Hajz Chatbot</h4>
@@ -65,76 +120,67 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({ onClose, onFe
         </div>
       </div>
 
-      {/* Body area - matching initial page style */}
+      {/* Body area */}
       <div className="bg-gray-50 w-full max-w-md rounded-b-2xl shadow-lg p-4">
 
-        {/* Your existing chat messages */}
-        <div className="space-y-4 max-h-64 overflow-y-auto mb-4">
-          <div className="flex items-end gap-2">
-            <Avatar size="sm" fallback={<Bot className="h-4 w-4" />} />
-            <div className="bg-purple-100 text-[var(--color-secondary-black)] text-sm rounded-lg p-3 max-w-[80%]">
-              Welcome, {userFirstName}! 👋
-            </div>
-            <p className="text-xs text-[var(--color-secondary-black)]/50">1h ago</p>
+        {/* Error banner */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0" />
+            <span className="text-red-700 text-sm">{error}</span>
+            <button
+              onClick={() => dispatch(setChatError(null))}
+              className="ml-auto text-red-500 hover:text-red-700"
+            >
+              <X className="h-3 w-3" />
+            </button>
           </div>
-          <div className="flex items-end gap-2">
-            <Avatar size="sm" fallback={<Bot className="h-4 w-4" />} />
-            <div className="bg-purple-100 text-[var(--color-secondary-black)] text-sm rounded-lg p-3 max-w-[80%]">
-              I'm your Al-Hajz Chat Bot, here to assist you with booking management, account queries, and more. ✨
-            </div>
-            <p className="text-xs text-[var(--color-secondary-black)]/50">1h ago</p>
-          </div>
-          <div className="flex items-end gap-2">
-            <Avatar size="sm" fallback={<Bot className="h-4 w-4" />} />
-            <div className="bg-purple-100 text-[var(--color-secondary-black)] text-sm rounded-lg p-3 max-w-[80%]">
-              How can I help you today?
-            </div>
-            <p className="text-xs text-[var(--color-secondary-black)]/50">1h ago</p>
-          </div>
-          <div className="flex items-end gap-2 justify-end">
-            <div className="bg-blue-100 text-[var(--color-secondary-black)] text-sm rounded-lg p-3 max-w-[80%]">
-              Can you tell me more about your product?
-            </div>
-            <p className="text-xs text-[var(--color-secondary-black)]/50">1m ago</p>
-          </div>
-          <div className="flex items-end gap-2">
-            <Avatar size="sm" fallback={<Bot className="h-4 w-4" />} />
-            <div className="bg-purple-100 text-[var(--color-secondary-black)] text-sm rounded-lg p-3 max-w-[80%]">
-              Our platform is an innovative solution that helps users manage their bookings efficiently. ✨
-            </div>
-            <p className="text-xs text-[var(--color-secondary-black)]/50">7:20</p>
-          </div>
+        )}
+
+        {/* Messages area */}
+        <div className="space-y-3 max-h-64 overflow-y-auto mb-4 pr-2">
+          {messages.map((message) => (
+            <ChatMessage
+              key={message.id}
+              message={message}
+              userFirstName={userFirstName}
+              onRetry={handleRetry}
+            />
+          ))}
+
+          {/* Typing indicator */}
+          {isTyping && <TypingIndicator />}
+
+          {/* Auto-scroll target */}
+          <div ref={messagesEndRef} />
         </div>
 
-        {/* Your existing input area */}
+        {/* Input area */}
         <div className="border-t border-gray-200 pt-4 pb-1">
           <div className="flex items-center gap-2">
             <input
               type="text"
               placeholder="Ask anything ..."
-              onChange={(event) => {
-                setChatInput(event.target.value);
-              }}
-
-              className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-600"
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              disabled={isTyping}
+              className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-600 disabled:opacity-50"
             />
-            <Smile className="h-5 w-5 text-gray-500 cursor-pointer" />
-            <Paperclip className="h-5 w-5 text-gray-500 cursor-pointer" />
-            <Button variant="ghost" size="sm" className="p-1" onClick={() => { 
-              botChatApi(accessToken, sessionId, chatInput) 
-            }}>
-              <Send className="h-5 w-5 text-purple-600" />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="p-1"
+              onClick={handleSendMessage}
+              disabled={!chatInput.trim() || isTyping}
+            >
+              <Send className={`h-5 w-5 ${chatInput.trim() && !isTyping ? 'text-purple-600' : 'text-gray-400'}`} />
             </Button>
           </div>
         </div>
-
-        {/* Your existing feedback button */}
-        {/* <Button variant="outline" size="sm" className="w-full" onClick={onFeedback}>
-        Provide Feedback
-      </Button> */}
       </div>
     </div>
-  )
+  );
 };
 
 export default ChatbotConversation;

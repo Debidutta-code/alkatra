@@ -40,14 +40,14 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
   const [referrerId, setReferrerId] = useState<string | null>('');
 
   useEffect(() => {
-      const referrerId = searchParams.get("referrerId");
-      const referralCode = searchParams.get("referralCode");
+    const referrerId = searchParams.get("referrerId");
+    const referralCode = searchParams.get("referralCode");
 
-      setReferralCode(referralCode);
-      setReferrerId(referrerId);
-    }, []);
-  
-  
+    setReferralCode(referralCode);
+    setReferrerId(referrerId);
+  }, []);
+
+
   const responseGoogle = async (authResult: any) => {
     console.log("✅ Step 1: Entered responseGoogle");
     try {
@@ -56,7 +56,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       if (authResult?.code) {
         console.log("✅ Step 3: Auth code found:", authResult.code);
 
-        const result = await dispatch(googleLogin({ code: authResult.code, provider: "google", referrerId, referralCode })).unwrap();
+        await dispatch(googleLogin({ code: authResult.code, provider: "google", referrerId, referralCode })).unwrap();
 
         toast.success(
           t(`Auth.Login.successMessage`),
@@ -88,9 +88,9 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
     onSuccess: responseGoogle,
     onError: (error) => {
       console.error("❌ Step 0: Google login failed in hook:", error);
-      toast.error(t("Auth.Google.errorMessage") || "Google login failed", {
-        icon: "❌",
-      });
+      // toast.error(t("Auth.Google.errorMessage") || "Google login failed", {
+      //   icon: "❌",
+      // });
     },
     flow: "auth-code",
     redirect_uri: `${process.env.NEXT_PUBLIC_GOOGLE_AUTH_REDIRECT_URL}/auth/google/callback`,
