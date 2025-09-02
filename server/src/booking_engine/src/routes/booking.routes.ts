@@ -16,7 +16,6 @@ import {
   getBookingDetailsOfUser,
   createReservationWithStoredCard,
   cancelThirdPartyReservation,
-  updateThirdPartyReservation,
   getAllHotelsByRole
 } from "../controllers/bookings.controller";
 import { BookingController } from "../controllers/bookings.controller";
@@ -33,8 +32,7 @@ const router = Router();
 router.route("/customers/booking/details/:id").get(getBookingDetailsOfUser);
 router.route("/create-reservation-with-card").post(authenticateCustomer as any, createReservationWithStoredCard);
 
-router.route("/update-reservation/:id").patch(authenticateCustomer as any, bookingController.updatePayAtHotelBookings.bind(bookingController));
-// router.route("/update-reservation/:id").patch(authenticateCustomer as any, updateThirdPartyReservation);
+router.route("/update-reservation/:id").patch(authenticateCustomer as any, bookingController.updatePayAtHotelBookings.bind(bookingController));9
 router.route("/cancel-reservation/:id").patch(authenticateCustomer as any, cancelThirdPartyReservation);
 
 

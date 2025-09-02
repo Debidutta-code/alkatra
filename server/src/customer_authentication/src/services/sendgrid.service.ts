@@ -6,6 +6,7 @@ import sgMail from '@sendgrid/mail';
 
 export class SendGridMailer implements IMailer {
     private sgMail: any;
+    private mode: any;
 
     constructor () {
         const apiKey = config.mailServie.sendGridApiKey;
@@ -13,10 +14,25 @@ export class SendGridMailer implements IMailer {
             console.log("SendGrid API key is not defined. Please set SENDGRID_API_KEY in .env");
             throw new Error("Mail Service is down temporarily, please try again later.");
         }
+        
+        const environment = config.server.mode;
+        if (!environment) {
+            console.log("Mode is not defined. Please set MODE in .env");
+            throw new Error("Mail Service is down temporarily, please try again later.");
+        }
+        
         this.sgMail = sgMail.setApiKey(apiKey);
+        this.mode = environment;
     }
     
     async sendMail(payload: IEmailInput): Promise<void> {
+        console.log("Current mode:", this.mode);
+
+        if (this.mode === 'development') {
+            console.log(`🛑 Skipped sending email in development mode: ${JSON.stringify(payload)}`);
+            return;
+        }
+        
         const { to, subject, text, html } = payload;
 
         if (!text && !html) {
