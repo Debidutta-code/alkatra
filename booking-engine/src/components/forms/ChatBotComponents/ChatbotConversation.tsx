@@ -30,7 +30,7 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const chatBotApi = ChatBotApi.getInstance();
   const dispatch = useDispatch<AppDispatch>();
-
+  const isShowingWelcome = useSelector((state: RootState) => state.chat.isShowingWelcome);
   // Redux selectors
   const { messages, isTyping, error, sessionId } = useSelector((state: RootState) => state.chat);
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
@@ -44,14 +44,21 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
     scrollToBottom();
   }, [messages, isTyping]);
 
-  // Initialize welcome messages when component mounts
+  const welcomeInitialized = useRef(false);
   useEffect(() => {
-    if (messages.length === 0) {
-      dispatch(initializeWelcomeMessages({ userFirstName }));
-    }
-  }, [dispatch, userFirstName, messages.length]);
+    if (welcomeInitialized.current) return;
 
-  // Retry failed message
+    const skipWelcome = sessionStorage.getItem('skipWelcome') === 'true';
+
+    if (!skipWelcome) {
+      dispatch(initializeWelcomeMessages(userFirstName));
+    }
+
+    sessionStorage.removeItem('skipWelcome');
+    welcomeInitialized.current = true;
+
+  }, [dispatch, userFirstName]);
+
   const handleRetry = (messageText: string) => {
     setChatInput(messageText);
   };
@@ -245,11 +252,11 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    disabled={isTyping || !isConnected}
+                    disabled={isTyping || !isConnected || isShowingWelcome}
                     className="w-full border border-gray-200 rounded-xl px-3 py-2 pr-10 text-sm 
-                             focus:outline-none focus:border-[#076DB3] focus:ring-1 focus:ring-[#076DB3]/20 
-                             disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200
-                             placeholder:text-gray-400 font-noto-sans"
+           focus:outline-none focus:border-[#076DB3] focus:ring-1 focus:ring-[#076DB3]/20 
+           disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200
+           placeholder:text-gray-400 font-noto-sans"
                     maxLength={500}
                   />
 
@@ -265,17 +272,13 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
                 <button
                   onClick={handleSendMessage}
                   disabled={!chatInput.trim() || isTyping || !isConnected}
-                  className={`absolute right-1 bottom-1 p-1.5 rounded-lg transition-all duration-200 ${chatInput.trim() && !isTyping && isConnected
+                  className={`absolute right-1 bottom-2 p-1.5 rounded-lg transition-all duration-200 ${chatInput.trim() && !isTyping && isConnected
                     ? 'bg-gradient-to-r from-[#076DB3] to-[#054B8F] text-white shadow-md hover:shadow-lg hover:scale-105 active:scale-95'
                     : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                     }`}
                   aria-label="Send message"
                 >
-                  {isTyping ? (
-                    <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <Send className="h-3.5 w-3.5" />
-                  )}
+                  <Send className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
@@ -289,12 +292,6 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
               </div>
 
               <div className="flex items-center gap-2 text-xs">
-                {/* <button
-                  onClick={onFeedback}
-                  className="hover:text-[#076DB3] transition-colors duration-200"
-                >
-                  Feedback
-                </button> */}
                 <span className="text-gray-300">•</span>
                 <span>AI Powered</span>
               </div>

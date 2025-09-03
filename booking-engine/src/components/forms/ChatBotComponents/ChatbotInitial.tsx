@@ -11,7 +11,7 @@ interface ChatbotPageProps {
 }
 
 const ChatbotPage: React.FC<ChatbotPageProps> = ({ onStartChat, onClose }) => {
-  const [isQuestionsExpanded, setIsQuestionsExpanded] = React.useState(false);
+  const [isQuestionsExpanded, setIsQuestionsExpanded] = React.useState(true);
   const chatBotApi = new ChatBotApi();
   const dispatch = useDispatch<AppDispatch>();
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
@@ -42,6 +42,10 @@ const ChatbotPage: React.FC<ChatbotPageProps> = ({ onStartChat, onClose }) => {
       await newGenerateSessionid(accessToken);
     }
 
+    dispatch(clearMessages());
+    sessionStorage.setItem('skipWelcome', 'true');
+    console.log('Quick question selected, skipWelcome set to:', sessionStorage.getItem('skipWelcome')); // ✅ Correct
+    console.log('📋 Full sessionStorage:', { ...sessionStorage }); // Shows all items
     onStartChat();
 
     setTimeout(async () => {
@@ -105,7 +109,7 @@ const ChatbotPage: React.FC<ChatbotPageProps> = ({ onStartChat, onClose }) => {
       <div className="relative bg-gradient-to-br from-[#076DB3] via-[#054B8F] to-[#043A73] p-4">
         {/* Header Content */}
         <div className="relative z-10">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center mb-2">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center">
                 <MessageCircle className="h-3 w-3 text-white" />
@@ -139,7 +143,7 @@ const ChatbotPage: React.FC<ChatbotPageProps> = ({ onStartChat, onClose }) => {
       {/* Main Content */}
       <div className="p-4 bg-gray-50">
         {/* Quick Questions Section */}
-        <div className="mb-4">
+        <div className="mb-2">
           <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
             <button
               onClick={() => setIsQuestionsExpanded(!isQuestionsExpanded)}
