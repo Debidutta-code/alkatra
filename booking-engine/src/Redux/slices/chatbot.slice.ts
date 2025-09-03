@@ -105,7 +105,7 @@ const chatSlice = createSlice({
           id: 'welcome-1',
           text: `Welcome, ${action.payload.userFirstName}! 👋`,
           sender: 'bot',
-          timestamp: new Date(Date.now() - 3600000), // 1 hour ago
+          timestamp: new Date(Date.now() - 3600000),
           status: 'sent'
         },
         {

@@ -3,7 +3,6 @@ import { Card } from '../UserProfileComponents';
 import ChatbotIcon from './ChatbotIcon';
 import ChatbotInitial from './ChatbotInitial';
 import ChatbotConversation from './ChatbotConversation';
-import ChatbotFeedback from './ChatbotFeedback';
 
 type View = 'initial' | 'chat' | 'feedback';
 
@@ -31,7 +30,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ userFirstName }) => {
   return (
     <div className="fixed bottom-4 right-4 z-50">
       {isOpen && (
-        <Card className="w-96 mb-4 shadow-xl">
+        <Card className="w-100 mb-4 shadow-xl">
           {view === 'initial' && (
             <ChatbotInitial
               onStartChat={() => handleChangeView('chat')}
@@ -41,13 +40,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ userFirstName }) => {
           {view === 'chat' && (
             <ChatbotConversation
               onClose={handleClose}
-              onFeedback={() => handleChangeView('feedback')}
               userFirstName={userFirstName}
-            />
-          )}
-          {view === 'feedback' && (
-            <ChatbotFeedback
-              onClose={handleClose}
             />
           )}
         </Card>

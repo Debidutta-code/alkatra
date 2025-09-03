@@ -12,7 +12,7 @@ const ChatbotIcon: React.FC<ChatbotIconProps> = ({ onClick }) => (
     <img 
       src="/assets/chatbot.png" 
       alt="Chatbot Icon" 
-      className="h-12 w-15"
+      className="h-14 w-18"
     />
   </button>
 );
