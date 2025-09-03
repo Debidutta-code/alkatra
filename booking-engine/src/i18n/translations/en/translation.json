@@ -274,7 +274,16 @@
     "generateOnce": "Generate your referral link once and share it with your friends to start earning rewards.",
     "generated": "Referral link generated successfully!",
     "copiedToClipboard": "Copied to clipboard!",
-    "fetchError": "Failed to load referrals. Please try again."
+    "fetchError": "Failed to load referrals. Please try again.",
+    "max": "MAX",
+    "platforms": {
+      "whatsapp": "WhatsApp",
+      "facebook": "Facebook",
+      "telegram": "Telegram",
+      "twitter": "Twitter",
+      "linkedin": "LinkedIn"
+    },
+    "shareMessage": "🎉 Join me on Al-Hajz – the smart way to book hotels! Use my referral link: {{referralLink}}"
   },
   "HotelListing": {
     "CompactSearchBar": {
@@ -342,7 +351,12 @@
     "secureBooking": "Secure Booking",
     "secureBookingDesc": "We use industry-standard encryption to protect your personal information.",
     "noHotelsError": "No hotels found for the given search criteria.",
-    "tryModifyingSearch": "Please try modifying the search"
+    "tryModifyingSearch": "Please try modifying the search",
+    "EmptyState": {
+      "noHotelsFound": "No hotels found",
+      "noHotelsDescription": "We couldn't find any hotels matching your criteria. Try adjusting your filters or search terms.",
+      "clearAllFilters": "Clear all filters"
+    }
   },
   "HotelBox": {
     "DateRange": {
@@ -952,7 +966,14 @@
       "totalTax": "Total Tax",
       "grandTotal": "Grand Total",
       "averagePerNight": "Average per night",
-      "taxInclusiveNote": "All prices are inclusive of applicable taxes and fees. Tax breakdown is shown for transparency."
+      "taxInclusiveNote": "All prices are inclusive of applicable taxes and fees. Tax breakdown is shown for transparency.",
+      "adultFirstName": "Adult First Name",
+      "childFirstName": "Child First Name",
+      "infantFirstName": "Infant First Name",
+      "adultLastName": "Adult Last Name",
+      "childLastName": "Child Last Name",
+      "infantLastName": "Infant Last Name",
+      "dateOfBirth": "Date of Birth"
     },
     "BookingDetailsModal": {
       "bookingId": "Booking ID",
