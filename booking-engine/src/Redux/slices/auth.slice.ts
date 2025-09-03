@@ -145,9 +145,7 @@ export const googleLogin = createAsyncThunk<
       console.log("🔑 Token received from backend:", token);
 
       Cookies.set("accessToken", token, cookieOptions);
-
       dispatch(setAccessToken(token));
-
       await dispatch(getUser());
 
       return { token };
@@ -160,9 +158,13 @@ export const googleLogin = createAsyncThunk<
           data: error.response?.data,
           headers: error.response?.headers
         });
-        return rejectWithValue(
-          error.response?.data?.message || "Failed to login with Google"
-        );
+
+        // IMPORTANT: Extract the exact error message from your API response
+        const apiErrorMessage = error.response?.data?.error ||
+          error.response?.data?.message ||
+          "Failed to login with Google";
+
+        return rejectWithValue(apiErrorMessage);
       }
 
       return rejectWithValue("Failed to login with Google");

@@ -1,5 +1,8 @@
 {
     "Auth": {
+        "Referral": {
+            "alreadyExists": "Bu kullanıcı ile zaten bir yönlendirme ilişkiniz bulunuyor"
+        },
         "Login": {
             "title": "Hesabınıza giriş yapın",
             "subtitle": "Tekrar hoş geldiniz! Lütfen kimlik bilgilerinizi girin.",
@@ -21,7 +24,12 @@
             "noAccountYet": "Henüz hesabınız yok mu?",
             "createAccount": "Hesap oluştur",
             "successMessage": "Giriş başarılı! Tekrar hoş geldiniz.",
-            "errorMessage": "Yanlış e-posta veya şifre. Lütfen tekrar deneyin."
+            "errorMessage": "Yanlış e-posta veya şifre. Lütfen tekrar deneyin.",
+            "loginFailed": "Giriş başarısız.",
+            "wrongCredentials": "Giriş başarısız: Yanlış e-posta veya şifre",
+            "googleSignIn": "Google ile giriş yap",
+            "userAlreadyExists": "Bu e-posta ile zaten bir hesap mevcut",
+            "genericError": "Google girişi sırasında bir hata oluştu"
         },
         "Register": {
             "title": "Hesap oluştur",
@@ -680,6 +688,7 @@
             "otpInvalidError": "Geçersiz OTP",
             "otpVerifyError": "OTP doğrulama hatası",
             "emailVerified": "E-posta başarıyla doğrulandı",
+            "emailAlreadyVerified": "E-posta zaten doğrulanmış",
             "phoneVerified": "Telefon başarıyla doğrulandı",
             "phoneLabel": "Telefon Numarası",
             "phonePlaceholder": "Telefon numaranızı girin",
