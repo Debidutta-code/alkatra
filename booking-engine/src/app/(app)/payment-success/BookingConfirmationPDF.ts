@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import toast from 'react-hot-toast';
 import { formatDate } from '@/utils/dateUtils';
+import { t } from 'i18next';
 
 interface BookingData {
   amount: number;
@@ -14,7 +15,6 @@ interface BookingData {
   getBookingNights: () => number;
   getGuestCountDisplay: () => string;
   getBookingId: () => string;
-  t: (key: string) => string;
 }
 
 export const generateBookingConfirmationPDF = (data: BookingData) => {
@@ -30,15 +30,9 @@ export const generateBookingConfirmationPDF = (data: BookingData) => {
     getBookingNights,
     getGuestCountDisplay,
     getBookingId,
-    t,
   } = data;
 
   try {
-    if (!amount || amount <= 0) {
-      toast.error(t('Payment.PaymentSuccess.noAmountForDownload'));
-      return;
-    }
-
     const doc = new jsPDF({ format: 'a4' });
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();

@@ -273,7 +273,17 @@
         "generateReferral": "Generar enlace de referencia",
         "generateOnce": "Genera tu enlace de referencia una vez y compártelo con tus amigos para empezar a ganar recompensas.",
         "generated": "¡Enlace de referencia generado con éxito!",
-        "copiedToClipboard": "¡Copiado al portapapeles!"
+        "copiedToClipboard": "¡Copiado al portapapeles!",
+        "fetchError": "No se pudieron cargar las referencias. Por favor, inténtelo de nuevo.",
+        "max": "Máx.",
+        "platforms": {
+            "whatsapp": "WhatsApp",
+            "facebook": "Facebook",
+            "telegram": "Telegram",
+            "twitter": "Twitter",
+            "linkedin": "LinkedIn"
+        },
+        "shareMessage": "🎉 ¡Únete a mí en Al-Hajz, la forma inteligente de reservar hoteles! Usa mi enlace de referencia: {{referralLink}}"
     },
     "HotelListing": {
         "CompactSearchBar": {
@@ -341,7 +351,12 @@
         "secureBooking": "Reserva segura",
         "secureBookingDesc": "Utilizamos cifrado estándar de la industria para proteger tu información personal.",
         "noHotelsError": "No se encontraron hoteles con los criterios de búsqueda indicados.",
-        "tryModifyingSearch": "Intenta modificar tu búsqueda"
+        "tryModifyingSearch": "Intenta modificar tu búsqueda",
+        "EmptyState": {
+            "noHotelsFound": "No se encontraron hoteles",
+            "noHotelsDescription": "No pudimos encontrar ningún hotel que coincida con sus criterios. Intente ajustar sus filtros o términos de búsqueda.",
+            "clearAllFilters": "Limpiar todos los filtros"
+        }
     },
     "HotelBox": {
         "DateRange": {
@@ -951,7 +966,14 @@
             "totalTax": "Impuestos totales",
             "grandTotal": "Total final",
             "averagePerNight": "Promedio por noche",
-            "taxInclusiveNote": "Todos los precios incluyen impuestos y tarifas aplicables. El desglose de impuestos se muestra por transparencia."
+            "taxInclusiveNote": "Todos los precios incluyen impuestos y tarifas aplicables. El desglose de impuestos se muestra por transparencia.",
+            "adultFirstName": "Nombre del adulto",
+            "childFirstName": "Nombre del niño",
+            "infantFirstName": "Nombre del bebé",
+            "adultLastName": "Apellido del adulto",
+            "childLastName": "Apellido del niño",
+            "infantLastName": "Apellido del bebé",
+            "dateOfBirth": "Fecha de nacimiento"
         },
         "BookingDetailsModal": {
             "bookingId": "ID de reserva",
@@ -1374,13 +1396,13 @@
     },
     "Reviews": {
         "guestReviewsFor": "Opiniones de huéspedes para {{hotelName}}",
-        "weAimForRealReviews": "Nos aseguramos de que todas las opiniones sean reales",
+        "weAimForRealReviews": "Buscamos opiniones 100% reales",
         "writeAReview": "Escribir una opinión",
         "reviews": "opiniones",
-        "all": "Todas",
+        "all": "Todos",
         "superb": "Excelente",
-        "good": "Buena",
-        "poor": "Mala",
+        "good": "Bueno",
+        "poor": "Mal",
         "marMay": "Mar–May",
         "junAug": "Jun–Ago",
         "sepNov": "Sep–Nov",
@@ -1388,10 +1410,10 @@
         "mostRelevant": "Más relevantes",
         "newestFirst": "Más recientes primero",
         "oldestFirst": "Más antiguas primero",
-        "highestRated": "Mejor calificadas",
-        "lowestRated": "Peor calificadas",
+        "highestRated": "Mejor valoradas",
+        "lowestRated": "Peor valoradas",
         "guestReviews": "Opiniones de huéspedes ({{count}})",
-        "reviewedOn": "Opinión publicada: {{date}}",
+        "reviewedOn": "Opinión de: {{date}}",
         "noReviews": "Aún no hay opiniones",
         "beFirstToReview": "¡Sé el primero en compartir tu experiencia!",
         "filtersAndSort": "Filtros y orden",

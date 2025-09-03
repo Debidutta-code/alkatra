@@ -1289,9 +1289,8 @@ const RoomsPage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <h2 className="text-xl font-semibold text-gray-900 pr-10">
-                    {t("RoomsPage.reviews.modalTitle", {
-                      propertyName: propertyDetails?.property_name || "Hotel",
-                      defaultValue: `Guest reviews for ${propertyDetails?.property_name || "Hotel"}`
+                    {t("Reviews.guestReviewsFor", {
+                      hotelName: propertyDetails?.property_name || "Hotel",
                     })}
                   </h2>
                 </div>
