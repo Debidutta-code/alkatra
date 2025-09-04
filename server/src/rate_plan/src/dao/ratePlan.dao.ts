@@ -341,8 +341,18 @@ class RatePlanDao {
 
   public static async getAllRoomType(hotelCode: string) {
     try {
-      const response = await Inventory.distinct("invTypeCode", { hotelCode });
-      return response;
+
+      const invTypeCodes = await Inventory.distinct("invTypeCode", { hotelCode });
+      if (!invTypeCodes) throw new Error ("No room type found");
+
+      const ratePlanCodes = await Promise.all(
+        invTypeCodes.map(async (invTypeCode) => {
+          const ratePlans = await RateAmount.distinct('ratePlanCode', { hotelCode, invTypeCode });
+          return { invTypeCode, ratePlanCodes: ratePlans };
+        })
+      );
+
+      return ratePlanCodes;
     } catch (error) {
       throw new Error(error.message)
     }
