@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import Image from "next/image";
 import { CheckCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import { googleLogin } from "../../Redux/slices/auth.slice";
 import toast from "react-hot-toast"
 import { AppDispatch } from "../../Redux/store";
+import { useSearchParams } from "next/navigation";
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -29,21 +30,57 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
   heroSubtitle,
   benefits,
 }) => {
+  const searchParams = useSearchParams();
   const { t } = useTranslation();
   const pathname = usePathname();
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
 
+  const [referralCode, setReferralCode] = useState<string | null>('');
+  const [referrerId, setReferrerId] = useState<string | null>('');
+
+  useEffect(() => {
+    const referrerId = searchParams.get("referrerId");
+    const referralCode = searchParams.get("referralCode");
+
+    setReferralCode(referralCode);
+    setReferrerId(referrerId);
+  }, []);
+
   const responseGoogle = async (authResult: any) => {
-    console.log("✅ Step 1: Entered responseGoogle");
     try {
-      console.log("🔍 Step 2: Received authResult:", authResult);
-
       if (authResult?.code) {
-        console.log("✅ Step 3: Auth code found:", authResult.code);
+        const result = await dispatch(googleLogin({
+          code: authResult.code,
+          provider: "google",
+          referrerId,
+          referralCode
+        }));
 
-        const result = await dispatch(googleLogin({ code: authResult.code })).unwrap();
-        console.log("✅ Step 4: Dispatch result:", result);
+        // Check if the action was rejected
+        if (googleLogin.rejected.match(result)) {
+          // Extract the error message from rejected payload
+          const errorMessage = result.payload as string;
+          console.log("❌ Rejected payload:", errorMessage);
+
+          if (errorMessage === "Referral already exists between these users") {
+            toast.error(
+              t("Auth.Referral.alreadyExists") || "You already have a referral relationship with this user",
+              { icon: "ℹ️", duration: 5000 }
+            );
+          } else if (errorMessage.includes("User already exists")) {
+            toast.error(
+              t("Auth.Login.userAlreadyExists") || "An account with this email already exists",
+              { icon: "⚠️" }
+            );
+          } else {
+            toast.error(
+              errorMessage || t("Auth.Login.genericError") || "An error occurred during Google login",
+              { icon: "❌" }
+            );
+          }
+          return;
+        }
 
         toast.success(
           t(`Auth.Login.successMessage`),
@@ -52,8 +89,6 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
             duration: 3000,
           }
         );
-
-        console.log("➡️ Step 5: Redirecting to home");
         router.push("/");
       } else {
         console.error("❌ Step 3: Google login failed - No auth code received");
@@ -65,7 +100,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
     } catch (error) {
       console.error("❌ Step 4: Error during Google login dispatch:", error);
       toast.error(
-        t("An error occurred during Google login"),
+        t("Auth.Login.genericError") || "An error occurred during Google login",
         { icon: "❌" }
       );
     }
@@ -75,9 +110,9 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
     onSuccess: responseGoogle,
     onError: (error) => {
       console.error("❌ Step 0: Google login failed in hook:", error);
-      toast.error(t("Auth.Google.errorMessage") || "Google login failed", {
-        icon: "❌",
-      });
+      // toast.error(t("Auth.Google.errorMessage") || "Google login failed", {
+      //   icon: "❌",
+      // });
     },
     flow: "auth-code",
     redirect_uri: `${process.env.NEXT_PUBLIC_GOOGLE_AUTH_REDIRECT_URL}/auth/google/callback`,
@@ -163,7 +198,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                 <path d="M24 48c6.48 0 11.93-2.15 15.89-5.85l-7.98-6.19c-2.22 1.49-5.03 2.38-7.91 2.38-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" fill="#34A853" />
               </svg>
               <span className="text-tripswift-black font-tripswift-medium text-sm">
-                {t('Sign in with Google')}
+                {t('Auth.Login.googleSignIn')}
               </span>
             </button>
             <div className="px-10 py-3 bg-tripswift-off-white/70 border-t border-gray-100 relative overflow-hidden">

@@ -31,7 +31,7 @@ export default function ReferralShare() {
       setLoading(false);
       return;
     }
-    
+
     try {
       const response = await axios.get(`${API_BASE_URL}/customers/referrals`, {
         headers: {
@@ -39,7 +39,7 @@ export default function ReferralShare() {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      
+
       const data = response.data?.data;
       if (data?.referralLink) {
         setReferralLink(data.referralLink);
@@ -68,7 +68,7 @@ export default function ReferralShare() {
 
     try {
       setGenerating(true); // Set generating state
-      
+
       // Step 1: Generate referral
       const response = await axios.post(
         `${API_BASE_URL}/referrals/generate`,
@@ -83,10 +83,10 @@ export default function ReferralShare() {
 
       if (response.data?.message || response.status === 200 || response.status === 201) {
         toast.success(t("Referral.generated") || "Referral generated successfully!");
-        
+
         // Step 2: Immediately fetch the generated referral data
         const fetchSuccess = await fetchReferralData();
-        
+
         if (fetchSuccess) {
           console.log("Referral data fetched successfully after generation");
         } else {
@@ -103,13 +103,13 @@ export default function ReferralShare() {
       let errorMessage = "Failed to generate referral. You may have already generated one.";
       if (axios.isAxiosError(error)) {
         errorMessage =
-          error.response?.data?.message || 
-          error.response?.data?.error || 
+          error.response?.data?.message ||
+          error.response?.data?.error ||
           errorMessage;
       } else if (error instanceof Error) {
         errorMessage = error.message;
       }
-      
+
       console.error("Failed to generate referral:", errorMessage);
       toast.error(t("Referral.generateError") || errorMessage);
     } finally {
@@ -118,41 +118,41 @@ export default function ReferralShare() {
   };
 
   // Generate share message with URL
-  const shareMessage = `Join me on this awesome app! Use my referral link: ${referralLink}`;
+  const shareMessage = `Join Al-Hajz — your new booking platform!\n\nUse my referral link:\n${referralLink}`;
   const encodedMessage = encodeURIComponent(shareMessage);
   const encodedUrl = encodeURIComponent(referralLink);
 
   const sharePlatforms = [
     {
-      name: "WhatsApp",
+      name: t("Referral.platforms.whatsapp"),
       url: `https://wa.me/?text=${encodedMessage}`,
       bg: "bg-green-50 hover:bg-green-100",
       iconColor: "text-green-600",
       Icon: FaWhatsapp,
     },
     {
-      name: "Facebook",
+      name: t("Referral.platforms.facebook"),
       url: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedMessage}`,
       bg: "bg-blue-50 hover:bg-blue-100",
       iconColor: "text-blue-600",
       Icon: FaFacebookF,
     },
     {
-      name: "Telegram",
+      name: t("Referral.platforms.telegram"),
       url: `https://t.me/share/url?url=${encodedUrl}&text=${encodedMessage}`,
       bg: "bg-cyan-50 hover:bg-cyan-100",
       iconColor: "text-cyan-600",
       Icon: FaTelegramPlane,
     },
     {
-      name: "Twitter",
+      name: t("Referral.platforms.twitter"),
       url: `https://twitter.com/intent/tweet?text=${encodedMessage}&url=${encodedUrl}`,
       bg: "bg-sky-50 hover:bg-sky-100",
       iconColor: "text-sky-500",
       Icon: FaTwitter,
     },
     {
-      name: "LinkedIn",
+      name: t("Referral.platforms.linkedin"),
       url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
       bg: "bg-blue-50 hover:bg-blue-100",
       iconColor: "text-blue-700",
@@ -181,7 +181,7 @@ export default function ReferralShare() {
         setLoading(false);
       }
     };
-    
+
     initializeReferralData();
   }, [accessToken]);
 
@@ -243,13 +243,12 @@ export default function ReferralShare() {
                 <button
                   onClick={handleCopyLink}
                   disabled={!referralLink}
-                  className={`p-2.5 rounded-lg transition-all flex-shrink-0 ${
-                    copied
-                      ? "bg-green-100 text-green-600"
-                      : referralLink
+                  className={`p-2.5 rounded-lg transition-all flex-shrink-0 ${copied
+                    ? "bg-green-100 text-green-600"
+                    : referralLink
                       ? "bg-tripswift-blue text-white hover:bg-blue-600 active:scale-95 hover:scale-105"
                       : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  }`}
+                    }`}
                   aria-label={copied ? t("Referral.copied") : t("Referral.copy")}
                 >
                   {copied ? (
@@ -321,11 +320,10 @@ export default function ReferralShare() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => !referralLink && e.preventDefault()}
-                    className={`flex flex-col items-center justify-center p-3 rounded-xl min-w-[72px] transition-all ${
-                      !referralLink
-                        ? "opacity-50 cursor-not-allowed"
-                        : "hover:scale-110 active:scale-105"
-                    } ${bg}`}
+                    className={`flex flex-col items-center justify-center p-3 rounded-xl min-w-[72px] transition-all ${!referralLink
+                      ? "opacity-50 cursor-not-allowed"
+                      : "hover:scale-110 active:scale-105"
+                      } ${bg}`}
                     title={`Share on ${name}`}
                   >
                     <Icon className={`w-5 h-5 ${iconColor}`} aria-hidden="true" />

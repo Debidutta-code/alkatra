@@ -120,6 +120,7 @@ const PaymentProgressPage: React.FC = () => {
 
         return () => clearInterval(timer);
     }, []);
+    
     // Inside the useEffect for retrieving payment data for QR
     useEffect(() => {
         const timer = setTimeout(() => {

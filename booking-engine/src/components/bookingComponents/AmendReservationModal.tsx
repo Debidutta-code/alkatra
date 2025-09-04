@@ -403,7 +403,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
     }
     let valid = true;
     const newErrors: { [key: string]: string } = {};
-  
+
     // Validate Date Range
     if (!dateRange || !dateRange[0] || !dateRange[1]) {
       newErrors["dateRange"] = t('BookingTabs.AmendReservationModal.errors.selectValidDates');
@@ -412,7 +412,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
       newErrors["dateRange"] = t('BookingTabs.AmendReservationModal.errors.invalidDateRange');
       valid = false;
     }
-  
+
     // Validate Guests
     guests.forEach((guest, idx) => {
       if (!guest.firstName || !/^[A-Za-z\s]+$/.test(guest.firstName)) {
@@ -428,7 +428,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         valid = false;
       }
     });
-  
+
     // Validate Room Type and Rate Plan (optional, assuming they are required)
     if (!roomTypeCode) {
       newErrors["roomTypeCode"] = t('BookingTabs.AmendReservationModal.errors.selectRoomType');
@@ -438,9 +438,9 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
       newErrors["ratePlanCode"] = t('BookingTabs.AmendReservationModal.errors.selectRatePlan');
       valid = false;
     }
-  
+
     setErrors(newErrors);
-  
+
     if (!valid) {
       setAmendmentMessage({
         type: 'error',
@@ -448,9 +448,9 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
       });
       return;
     }
-  
+
     setLoading(true);
-  
+
     try {
       const guestData = {
         rooms: guestBreakdown.rooms,
@@ -458,7 +458,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         children: guestBreakdown.children,
         infants: guestBreakdown.infants,
       };
-  
+
       // Get the actual final price value
       const finalPriceValue = await getFinalPrice(
         { room_type: roomTypeCode },
@@ -466,7 +466,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         dateRange[1].format('YYYY-MM-DD'),
         guestData
       );
-  
+
       const amendedData = {
         reservationId: booking.reservationId,
         hotelCode: booking.hotelCode,
@@ -486,9 +486,9 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
           dob: g.dob || ""
         })),
       };
-  
+
       const token = Cookies.get("accessToken");
-  
+
       await axios.patch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/booking/update-reservation/${booking.reservationId}`,
         amendedData,
@@ -499,16 +499,16 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
           }
         }
       );
-  
+
       setAmendmentMessage({
         type: 'success',
         text: t('BookingTabs.AmendReservationModal.success.reservationAmended'),
       });
-  
+
       setTimeout(() => {
         onAmendComplete(booking._id, amendedData);
       }, 2000);
-  
+
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message || t('BookingTabs.AmendReservationModal.errors.unableToAmend');
       setAmendmentMessage({
@@ -774,7 +774,13 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                         <div className="flex-1">
                           <Input
                             className="flex-1"
-                            placeholder={guestType === "adult" ? "Adult First Name" : guestType === "child" ? "Child First Name" : "Infant First Name"}
+                            placeholder={
+                              guestType === "adult"
+                                ? t('BookingTabs.AmendReservationModal.adultFirstName', { defaultValue: "Adult First Name" })
+                                : guestType === "child"
+                                  ? t('BookingTabs.AmendReservationModal.childFirstName', { defaultValue: "Child First Name" })
+                                  : t('BookingTabs.AmendReservationModal.infantFirstName', { defaultValue: "Infant First Name" })
+                            }
                             value={guest.firstName}
                             onChange={e => {
                               handleGuestChange(idx, 'firstName', e.target.value);
@@ -789,7 +795,13 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                         <div className="flex-1">
                           <Input
                             className="flex-1"
-                            placeholder={guestType === "adult" ? "Adult Last Name" : guestType === "child" ? "Child Last Name" : "Infant Last Name"}
+                            placeholder={
+                              guestType === "adult"
+                                ? t('BookingTabs.AmendReservationModal.adultLastName', { defaultValue: "Adult Last Name" })
+                                : guestType === "child"
+                                  ? t('BookingTabs.AmendReservationModal.childLastName', { defaultValue: "Child Last Name" })
+                                  : t('BookingTabs.AmendReservationModal.infantLastName', { defaultValue: "Infant Last Name" })
+                            }
                             value={guest.lastName}
                             onChange={e => {
                               handleGuestChange(idx, 'lastName', e.target.value);
@@ -804,7 +816,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                         <div className="flex-1">
                           <DatePicker
                             className="flex-1 w-full"
-                            placeholder="Date of Birth"
+                            placeholder={t('BookingTabs.AmendReservationModal.dateOfBirth', { defaultValue: "Date of Birth" })}
                             value={guest.dob ? dayjs(guest.dob) : null}
                             onChange={date => {
                               handleGuestChange(idx, 'dob', date?.format('YYYY-MM-DD') || "");

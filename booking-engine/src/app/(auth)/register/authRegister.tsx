@@ -50,12 +50,14 @@ const Register: React.FC = () => {
       lastName: "",
       email: "",
       password: "",
+      provider: "local",
     },
     {
       firstName: { required: true },
       lastName: { required: true },
       email: { required: true, email: true },
       password: { required: true, passwordStrength: true },
+      provider: { required: true },
     }
   );
 

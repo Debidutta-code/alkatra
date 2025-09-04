@@ -1,5 +1,8 @@
 {
   "Auth": {
+    "Referral": {
+      "alreadyExists": "You already have a referral relationship with this user"
+    },
     "Login": {
       "title": "Sign in to your account",
       "subtitle": "Welcome back! Please enter your credentials.",
@@ -21,7 +24,12 @@
       "noAccountYet": "Don't have an account yet?",
       "createAccount": "Create an account",
       "successMessage": "Login successful! Welcome back.",
-      "errorMessage": "Incorrect email or password. Please try again."
+      "errorMessage": "Incorrect email or password. Please try again.",
+      "loginFailed": "Login failed.",
+      "wrongCredentials": "Login failed: Wrong email or password",
+      "googleSignIn": "Sign in with Google",
+      "userAlreadyExists": "An account with this email already exists",
+      "genericError": "An error occurred during Google login"
     },
     "Register": {
       "title": "Create an account",
@@ -266,7 +274,16 @@
     "generateOnce": "Generate your referral link once and share it with your friends to start earning rewards.",
     "generated": "Referral link generated successfully!",
     "copiedToClipboard": "Copied to clipboard!",
-    "fetchError": "Failed to load referrals. Please try again."
+    "fetchError": "Failed to load referrals. Please try again.",
+    "max": "MAX",
+    "platforms": {
+      "whatsapp": "WhatsApp",
+      "facebook": "Facebook",
+      "telegram": "Telegram",
+      "twitter": "Twitter",
+      "linkedin": "LinkedIn"
+    },
+    "shareMessage": "🎉 Join me on Al-Hajz – the smart way to book hotels! Use my referral link: {{referralLink}}"
   },
   "HotelListing": {
     "CompactSearchBar": {
@@ -334,7 +351,12 @@
     "secureBooking": "Secure Booking",
     "secureBookingDesc": "We use industry-standard encryption to protect your personal information.",
     "noHotelsError": "No hotels found for the given search criteria.",
-    "tryModifyingSearch": "Please try modifying the search"
+    "tryModifyingSearch": "Please try modifying the search",
+    "EmptyState": {
+      "noHotelsFound": "No hotels found",
+      "noHotelsDescription": "We couldn't find any hotels matching your criteria. Try adjusting your filters or search terms.",
+      "clearAllFilters": "Clear all filters"
+    }
   },
   "HotelBox": {
     "DateRange": {
@@ -442,6 +464,7 @@
     "stay": "stay",
     "filter": "Filter",
     "viewAllPhotos": "View All Photos",
+    "viewReviews": "Guest Reviews",
     "amenitiesList": {
       "wifi": "Free Wifi",
       "swimming_pool": "Swimming Pool",
@@ -943,7 +966,14 @@
       "totalTax": "Total Tax",
       "grandTotal": "Grand Total",
       "averagePerNight": "Average per night",
-      "taxInclusiveNote": "All prices are inclusive of applicable taxes and fees. Tax breakdown is shown for transparency."
+      "taxInclusiveNote": "All prices are inclusive of applicable taxes and fees. Tax breakdown is shown for transparency.",
+      "adultFirstName": "Adult First Name",
+      "childFirstName": "Child First Name",
+      "infantFirstName": "Infant First Name",
+      "adultLastName": "Adult Last Name",
+      "childLastName": "Child Last Name",
+      "infantLastName": "Infant Last Name",
+      "dateOfBirth": "Date of Birth"
     },
     "BookingDetailsModal": {
       "bookingId": "Booking ID",

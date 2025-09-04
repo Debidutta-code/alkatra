@@ -47,7 +47,7 @@ export class ReferralService implements IReferralService {
             const { referralCode, referralLink, referralQRCode } = await GenerateUtils.generateReferrals(userId);
 
             // Step 2: Save the referrals to the customer database
-            const isUserUpdated: boolean = await CustomerReferralService.updateCustomerWithReferral(userId, referralCode, referralLink, referralQRCode, session);
+            const isUserUpdated: boolean = await CustomerReferralService.updateCustomerWithReferral(userId, referralCode, referralLink, referralQRCode);
             if (!isUserUpdated) throw new Error("Failed to update user with referral details");
 
             /**

@@ -77,15 +77,14 @@ const authSlice = createSlice({
   },
 });
 
-export const { setAccessToken, logout, setUser } = authSlice.actions;
+
 
 // Login thunk for email/password authentication
 export const login = createAsyncThunk<
   string,
-  { email: string; password: string },
+  { email: string; password: string, provider: string },
   { dispatch: AppDispatch; state: RootState }
 >("auth/login", async (data, { dispatch }) => {
-  console.log("Login Api Calling here");
   const res = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/customers/login`,
     {
@@ -106,33 +105,38 @@ export const login = createAsyncThunk<
 // Google login thunk
 export const googleLogin = createAsyncThunk<
   { token: string },
-  { code: string },
+  { code: string, provider: string, referrerId?: string | null, referralCode?: string | null },
   { dispatch: AppDispatch; state: RootState }
 >(
   "auth/googleLogin",
-  async ({ code }, { dispatch, rejectWithValue }) => {
+  async ({ code, provider, referrerId, referralCode }, { dispatch, rejectWithValue }) => {
     try {
-      console.log("🌐 Sending auth code to backend:", code);
+      let apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/google/auth/google`;
+
+      if (referrerId && referralCode) {
+        const params = new URLSearchParams({
+          referrerId: referrerId,
+          referralCode: referralCode,
+        });
+        apiUrl += `?${params.toString()}`;
+      }
 
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/google/auth/google`, { code },
+        apiUrl,
+        { code, provider },
         {
-          // withCredentials: true,
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
           },
-
         }
       );
 
-      console.log("✅ Google login response received:", response);
-
-      if (response.status !== 200) {
+      if (response.status !== 201) {
         throw new Error(response.data.error || "Failed to login with Google");
       }
 
-      const { token } = response.data;
+      const token = response.data.token;
 
       if (!token) {
         throw new Error("No token received from Google login");
@@ -141,11 +145,7 @@ export const googleLogin = createAsyncThunk<
       console.log("🔑 Token received from backend:", token);
 
       Cookies.set("accessToken", token, cookieOptions);
-
-      // Update Redux state
       dispatch(setAccessToken(token));
-
-      // Fetch and store user data
       await dispatch(getUser());
 
       return { token };
@@ -153,9 +153,18 @@ export const googleLogin = createAsyncThunk<
       console.error("❌ Error in googleLogin thunk:", error);
 
       if (axios.isAxiosError(error)) {
-        return rejectWithValue(
-          error.response?.data?.message || "Failed to login with Google"
-        );
+        console.error("❌ Axios error details:", {
+          status: error.response?.status,
+          data: error.response?.data,
+          headers: error.response?.headers
+        });
+
+        // IMPORTANT: Extract the exact error message from your API response
+        const apiErrorMessage = error.response?.data?.error ||
+          error.response?.data?.message ||
+          "Failed to login with Google";
+
+        return rejectWithValue(apiErrorMessage);
       }
 
       return rejectWithValue("Failed to login with Google");
@@ -217,4 +226,6 @@ export const updateProfile = createAsyncThunk<
   }
 });
 
+
+export const { setAccessToken, logout, setUser } = authSlice.actions;
 export default authSlice.reducer;
