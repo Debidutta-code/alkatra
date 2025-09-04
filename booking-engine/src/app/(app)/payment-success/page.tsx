@@ -81,7 +81,6 @@ export default function PaymentSuccess() {
       getBookingNights,
       getGuestCountDisplay,
       getBookingId,
-      t
     });
   };
 
@@ -652,13 +651,13 @@ export default function PaymentSuccess() {
                 </ul>
 
                 {/* Download Booking button */}
-                <button
+                {/* <button
                   onClick={handleDownloadConfirmation}
                   className="mt-3 sm:mt-4 w-full flex items-center justify-center gap-2 border border-tripswift-blue/30 text-tripswift-blue bg-tripswift-blue/5 hover:bg-tripswift-blue/10 py-2 px-3 sm:px-4 rounded-lg text-xs sm:text-sm font-tripswift-medium transition-colors duration-300"
                 >
                   <Download size={14} className="sm:w-4 sm:h-4" />
                   {t("Payment.PaymentSuccess.downloadBookingConfirmation")}
-                </button>
+                </button> */}
               </div>
 
               <div className="bg-tripswift-off-white rounded-xl shadow-md p-4 sm:p-6">

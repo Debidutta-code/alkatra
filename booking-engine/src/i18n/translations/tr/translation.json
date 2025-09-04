@@ -274,7 +274,16 @@
         "generateOnce": "Referans linkinizi bir kez oluşturun ve ödül kazanmaya başlamak için arkadaşlarınızla paylaşın.",
         "generated": "Referans linki başarıyla oluşturuldu!",
         "copiedToClipboard": "Panoya kopyalandı!",
-        "fetchError": "Yönlendirmeler yüklenemedi. Lütfen tekrar deneyin."
+        "fetchError": "Yönlendirmeler yüklenemedi. Lütfen tekrar deneyin.",
+        "max": "Azami",
+        "platforms": {
+            "whatsapp": "WhatsApp",
+            "facebook": "Facebook",
+            "telegram": "Telegram",
+            "twitter": "Twitter",
+            "linkedin": "LinkedIn"
+        },
+        "shareMessage": "🎉 Otelleri akıllıca rezerve etmenin yeni yolu Al-Hajz'ı deneyin! Davet bağlantımı kullanın: {{referralLink}}"
     },
     "HotelListing": {
         "CompactSearchBar": {
@@ -342,7 +351,12 @@
         "secureBooking": "Güvenli Rezervasyon",
         "secureBookingDesc": "Kişisel bilgilerinizi korumak için endüstri standardı şifreleme kullanıyoruz.",
         "noHotelsError": "Verilen arama kriterlerine uygun otel bulunamadı.",
-        "tryModifyingSearch": "Lütfen aramayı değiştirmeyi deneyin"
+        "tryModifyingSearch": "Lütfen aramayı değiştirmeyi deneyin",
+        "EmptyState": {
+            "noHotelsFound": "Otel bulunamadı",
+            "noHotelsDescription": "Arama kriterlerinize uygun otel bulamadık. Lütfen filtrelerinizi veya arama terimlerinizi değiştirerek tekrar deneyin.",
+            "clearAllFilters": "Tüm filtreleri temizle"
+        }
     },
     "HotelBox": {
         "DateRange": {
@@ -952,7 +966,14 @@
             "totalTax": "Toplam Vergi",
             "grandTotal": "Genel Toplam",
             "averagePerNight": "Gece başı ortalama",
-            "taxInclusiveNote": "Tüm fiyatlar uygulanabilir vergi ve ücretleri içermektedir. Şeffaflık için vergi ayrımı gösterilmiştir."
+            "taxInclusiveNote": "Tüm fiyatlar uygulanabilir vergi ve ücretleri içermektedir. Şeffaflık için vergi ayrımı gösterilmiştir.",
+            "adultFirstName": "Yetişkin Adı",
+            "childFirstName": "Çocuk Adı",
+            "infantFirstName": "Bebek Adı",
+            "adultLastName": "Yetişkin Soyadı",
+            "childLastName": "Çocuk Soyadı",
+            "infantLastName": "Bebek Soyadı",
+            "dateOfBirth": "Doğum Tarihi"
         },
         "BookingDetailsModal": {
             "bookingId": "Rezervasyon ID",
@@ -1405,31 +1426,31 @@
         }
     },
     "Reviews": {
-        "guestReviewsFor": "{{hotelName}} için misafir yorumları",
-        "weAimForRealReviews": "%100 gerçek yorumları hedefliyoruz",
-        "writeAReview": "Yorum yaz",
-        "reviews": "yorumlar",
+        "guestReviewsFor": "{{hotelName}} için misafir incelemeleri",
+        "weAimForRealReviews": "Yüzde 100 gerçek incelemeyi hedefliyoruz",
+        "writeAReview": "İnceleme yazın",
+        "reviews": "inceleme",
         "all": "Tümü",
         "superb": "Mükemmel",
         "good": "İyi",
-        "poor": "Kötü",
-        "marMay": "Mar–May",
-        "junAug": "Haz–Ağu",
-        "sepNov": "Eyl–Kas",
-        "decFeb": "Ara–Şub",
+        "poor": "Zayıf",
+        "marMay": "Mart–Mayıs",
+        "junAug": "Haziran–Ağustos",
+        "sepNov": "Eylül–Kasım",
+        "decFeb": "Aralık–Şubat",
         "mostRelevant": "En alakalı",
-        "newestFirst": "En yeni önce",
-        "oldestFirst": "En eski önce",
+        "newestFirst": "Önce en yeniler",
+        "oldestFirst": "Önce en eskiler",
         "highestRated": "En yüksek puanlı",
         "lowestRated": "En düşük puanlı",
-        "guestReviews": "Misafir yorumları ({{count}})",
-        "reviewedOn": "İnceleme tarihi: {{date}}",
-        "noReviews": "Henüz yorum yok",
+        "guestReviews": "Misafir incelemeleri ({{count}})",
+        "reviewedOn": "İncelendi: {{date}}",
+        "noReviews": "Henüz inceleme yok",
         "beFirstToReview": "Deneyiminizi paylaşan ilk kişi olun!",
         "filtersAndSort": "Filtreler ve Sıralama",
-        "reviewScores": "Yorum puanları",
+        "reviewScores": "İnceleme puanları",
         "timeOfYear": "Yılın zamanı",
-        "sortReviewsBy": "Yorumları sırala"
+        "sortReviewsBy": "İncelemeleri sırala göre"
     },
     "NetworkStatus": {
         "offline": "Çevrimdışısınız. Lütfen internet bağlantınızı kontrol edin.",

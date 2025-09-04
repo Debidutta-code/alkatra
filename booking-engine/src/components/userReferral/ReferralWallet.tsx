@@ -105,14 +105,14 @@ export default function ReferralWallet() {
 
       setWalletData(response.data);
       setRedeemAmount("");
-      
+
       // Success toast with unique ID
       toast.success(
         t("Referral.redeemSuccess", {
           amount: redeemAmount,
           currency: walletData?.currency,
         }) ||
-          `Successfully redeemed ${walletData?.currency} ${redeemAmount}!`,
+        `Successfully redeemed ${walletData?.currency} ${redeemAmount}!`,
         { id: "redeem-success" }
       );
     } catch (error) {
@@ -259,7 +259,7 @@ export default function ReferralWallet() {
                           onClick={handleMaxAmount}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-tripswift-blue hover:text-blue-700 text-sm font-semibold bg-white px-2.5 py-1 rounded border border-tripswift-blue/30 hover:shadow-sm transition-all"
                         >
-                          MAX
+                          {t("Referral.max") || "MAX"}
                         </button>
                       </div>
                       <p className="text-xs text-gray-500 mt-2">
@@ -274,11 +274,10 @@ export default function ReferralWallet() {
                       type="button"
                       onClick={handleRedeem}
                       disabled={redeeming || !redeemAmount || parseFloat(redeemAmount) <= 0}
-                      className={`w-full py-3 rounded-xl font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                        redeeming || !redeemAmount || parseFloat(redeemAmount) <= 0
-                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                          : "bg-tripswift-blue text-white hover:bg-blue-600 active:scale-95 focus:ring-tripswift-blue/50"
-                      }`}
+                      className={`w-full py-3 rounded-xl font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${redeeming || !redeemAmount || parseFloat(redeemAmount) <= 0
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-tripswift-blue text-white hover:bg-blue-600 active:scale-95 focus:ring-tripswift-blue/50"
+                        }`}
                     >
                       {redeeming ? (
                         <span className="flex items-center justify-center gap-2">
