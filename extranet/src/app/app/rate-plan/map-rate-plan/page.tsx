@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Filters } from './components/Filters';
 import { RatePlanTable } from './components/RatePlanTable';
 import { SaveButton } from './components/SaveButton';
-import { filterData, updatePrice, updateAvailability, saveData, ratePlanServices, getAllRatePlanServices } from './services/dataService';
+import { filterData, saveData, ratePlanServices, getAllRatePlanServices } from './services/dataService';
 import { RatePlanInterFace, DateRange, paginationTypes, modifiedRatePlanInterface } from './types';
 import toast, { Toaster } from 'react-hot-toast';
 import Pagination from "./components/Pagination"
@@ -15,11 +15,20 @@ import { useRouter, useSearchParams } from 'next/navigation';
 const MapRatePlanPage: React.FC = () => {
   const [data, setData] = useState<RatePlanInterFace[]>([]);
   const [filteredData, setFilteredData] = useState<RatePlanInterFace[]>([]);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const getDefaultDateRange = (): DateRange => {
+  const today = new Date();
+  const nextMonth = new Date(today);
+  nextMonth.setMonth(today.getMonth() + 1);
+  today.setHours(0, 0, 0, 0);
+  nextMonth.setHours(0, 0, 0, 0);
+  return { from: today, to: nextMonth };
+};
+const [dateRange, setDateRange] = useState<DateRange | undefined>(getDefaultDateRange());
   const [selectedRoomType, setSelectedRoomType] = useState<string>('');
   const [selectedRatePlan, setSelectedRatePlan] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
   const [allRoomTypes, setAllRoomTypes] = useState<any[]>([]);
   const [roomTypesLoaded, setRoomTypesLoaded] = useState<boolean>(false);
   const { state, isMobile } = useSidebar();
@@ -32,11 +41,12 @@ const MapRatePlanPage: React.FC = () => {
     totalResults: 200,
     hasNextPage: true,
     hasPreviousPage: false,
-    resultsPerPage: 20
+    resultsPerPage: 10 // Updated default
   });
   const [editButtonClicked, setEditButtonClicked] = useState<boolean>(false);
   const [modifiedValues, setModifiedValues] = useState<modifiedRatePlanInterface[]>([]);
   const [originalData, setOriginalData] = useState<RatePlanInterFace[]>([]);
+
   const getHotelCode = (): string | null => {
     const propertyCodeFromUrl = searchParams.get('propertyCode');
     if (propertyCodeFromUrl) {
@@ -71,7 +81,7 @@ const MapRatePlanPage: React.FC = () => {
     fetchRoomTypes();
   }, []);
 
-  const fetchRatePlans = async () => {
+  const fetchRatePlans = async (resetPage = false) => {
     try {
       setIsLoading(true);
       const hotelCode = getHotelCode();
@@ -80,18 +90,37 @@ const MapRatePlanPage: React.FC = () => {
         router.push('/app/property');
         return;
       }
-      const response = await ratePlanServices(hotelCode, currentPage, selectedRoomType, dateRange?.from, dateRange?.to);
+
+      const pageToUse = resetPage ? 1 : currentPage;
+
+      const response = await ratePlanServices(
+        hotelCode,
+        pageToUse,
+        selectedRoomType,
+        dateRange?.from,
+        dateRange?.to,
+        selectedRatePlan,
+        pageSize
+      );
 
       setData(response.data);
       setOriginalData(response.data);
       setFilteredData(response.data);
+
       const patchedPagination = {
         ...response.pagination,
         totalPage: response.pagination.totalPages,
+        resultsPerPage: pageSize
       };
+
       console.log("Pagination response", response.pagination);
       console.log("patched ", patchedPagination);
-      setPaginationResults(patchedPagination)
+      setPaginationResults(patchedPagination);
+
+      if (resetPage) {
+        setCurrentPage(1);
+      }
+
       setEditButtonClicked(false);
       setModifiedValues([]);
 
@@ -101,13 +130,13 @@ const MapRatePlanPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     if (roomTypesLoaded) {
       fetchRatePlans();
     }
-  }, [currentPage, dateRange, selectedRatePlan, selectedRoomType, roomTypesLoaded]);
+  }, [currentPage, dateRange, selectedRatePlan, selectedRoomType, roomTypesLoaded, pageSize]);
 
   useEffect(() => {
     setFilteredData(filterData(data, dateRange, selectedRoomType, selectedRatePlan, allRoomTypes));
@@ -118,6 +147,14 @@ const MapRatePlanPage: React.FC = () => {
       setCurrentPage(page);
       // Scroll to top when page changes
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    if (newPageSize !== pageSize) {
+      setPageSize(newPageSize);
+      setCurrentPage(1); // Reset to first page when page size changes
+      // The useEffect will trigger fetchRatePlans automatically
     }
   };
 
@@ -179,6 +216,7 @@ const MapRatePlanPage: React.FC = () => {
     setSelectedRoomType('');
     setSelectedRatePlan('');
     setCurrentPage(1); // Reset to first page when filters are reset
+    fetchRatePlans(true); // Reset page when filters are reset
   };
 
   // Check if there are any unsaved changes
@@ -187,14 +225,13 @@ const MapRatePlanPage: React.FC = () => {
   return (
     <div
       className={cn(
-        "flex flex-col min-h-screen transition-all overflow-x-hidden  duration-300",
-        !isMobile && state === "collapsed" && "md:overflow-x-hidden ",
+        "flex flex-col min-h-screen transition-all overflow-x-hidden duration-300",
+        !isMobile && state === "collapsed" && "md:overflow-x-hidden",
         !isMobile && state === "expanded" && ""
       )}
     >
-
       <Toaster position="top-right" />
-      <div className="w-full px-4 sm:px-6 md:px-8 ">
+      <div className="w-full px-4 sm:px-6 md:px-8">
         {roomTypesLoaded && (
           <>
             <Filters
@@ -216,7 +253,8 @@ const MapRatePlanPage: React.FC = () => {
             <SaveButton
               isLoading={isLoading}
               handleSave={handleSave}
-              disabled={!hasUnsavedChanges} />
+              disabled={!hasUnsavedChanges}
+            />
           </div>
         </div>
 
@@ -225,11 +263,12 @@ const MapRatePlanPage: React.FC = () => {
           handlePriceChange={handlePriceChange}
           toggleEditButton={toggleEditButton}
           editButtonVal={editButtonClicked}
-          modifiedValues={modifiedValues} // Pass modified values to show which items are modified
+          modifiedValues={modifiedValues}
+          isLoading={isLoading}
         />
 
-        {/* Pagination Component */}
-        {filteredData.length > 0 && (
+        {/* Dynamic Pagination Component */}
+        {paginationResults.totalResults > 0 && (
           <div className="mt-6 mb-4">
             <Pagination
               currentPage={paginationResults.currentPage}
@@ -239,6 +278,9 @@ const MapRatePlanPage: React.FC = () => {
               hasNextPage={paginationResults.hasNextPage}
               hasPreviousPage={paginationResults.hasPreviousPage}
               onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+              showResultsInfo={true}
+              pageSizeOptions={[6, 10, 20, 50]}
             />
           </div>
         )}

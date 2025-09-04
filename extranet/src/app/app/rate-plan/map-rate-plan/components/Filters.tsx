@@ -32,24 +32,40 @@ export const Filters: React.FC<FiltersProps> = ({
   roomTypes,
   onResetFilters,
 }) => {
-  const ratePlans = Array.from(new Set(
-    data
-      .filter(item => item?.rates !== null)
-      .map(item => item?.rates?.ratePlanCode)
-      .filter(Boolean)
-  ));
+  // Helper function to get unique rate plans based on selected room type
+  const getUniqueRatePlans = (roomTypes: any[], selectedRoomType: string) => {
+    if (!roomTypes || roomTypes.length === 0) return [];
+    
+    if (selectedRoomType) {
+      // If a room type is selected, show only its rate plans
+      const selectedRoom = roomTypes.find(room => room.invTypeCode === selectedRoomType);
+      return selectedRoom ? selectedRoom.ratePlanCodes : [];
+    } else {
+      // If no room type selected, show all unique rate plans
+      const allRatePlans = roomTypes.flatMap(room => room.ratePlanCodes);
+      return [...new Set(allRatePlans)]; // Remove duplicates
+    }
+  };
+
+  const ratePlans = getUniqueRatePlans(roomTypes, selectedRoomType);
 
   useEffect(() => {
     console.log(roomTypes);
   }, [roomTypes]);
+
+  // Reset rate plan when room type changes
+  useEffect(() => {
+    if (selectedRoomType) {
+      setSelectedRatePlan('');
+    }
+  }, [selectedRoomType, setSelectedRatePlan]);
+
   const router = useRouter();
+  
   return (
     <div className="bg-tripswift-off-white rounded-lg p-4 sm:px-6">
-      {/* Top Back Button */}
-
-
       {/* Title and Reset */}
-      <div className="flex flex-wrap  items-center justify-between gap-4 mt-2 mb-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 mt-2 mb-4">
         <div className="flex flex-wrap w-full items-center justify-between gap-2">
           <Button
             variant="outline"
@@ -68,7 +84,6 @@ export const Filters: React.FC<FiltersProps> = ({
             Reset Filters
           </button>
         </div>
-
       </div>
 
       {/* Filters Grid */}
@@ -112,14 +127,15 @@ export const Filters: React.FC<FiltersProps> = ({
             value={selectedRoomType}
             onChange={(e) => {
               setSelectedRoomType(e.target.value);
+              // Rate plan will be reset automatically by useEffect
               e.currentTarget.blur();
             }}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tripswift-blue focus:border-tripswift-blue transition-colors duration-200 bg-white"
           >
             <option value="">All Room Types</option>
-            {roomTypes.map((type: string) => (
-              <option key={type} value={type}>
-                {type}
+            {roomTypes.map((room) => (
+              <option key={room.invTypeCode} value={room.invTypeCode}>
+                {room.invTypeCode}
               </option>
             ))}
           </select>
@@ -142,7 +158,7 @@ export const Filters: React.FC<FiltersProps> = ({
             <option value="">
               {ratePlans.length === 0 ? "No Rate Plans Available" : "All Rate Plans"}
             </option>
-            {ratePlans.map((plan, index) => (
+            {ratePlans.map((plan: string, index: number) => (
               <option key={plan || `plan-${index}`} value={plan}>
                 {plan}
               </option>
@@ -151,6 +167,5 @@ export const Filters: React.FC<FiltersProps> = ({
         </div>
       </div>
     </div>
-
   );
 };

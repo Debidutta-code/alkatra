@@ -1,9 +1,7 @@
 import { DateRange, RatePlanInterFace, modifiedRatePlanInterface } from '../types';
-import { format, isWithinInterval, parseISO } from '../utils/dateUtils';
+import { format } from '../utils/dateUtils';
 import Cookies from 'js-cookie';
 import { fetchRatePlans, getAllRatePlans, modifyRatePlans } from "../API"
-
-
 
 export const filterData = (
   data: RatePlanInterFace[],
@@ -12,43 +10,12 @@ export const filterData = (
   selectedRatePlan: string,
   allRoomTypes: any[]
 ): RatePlanInterFace[] => {
-  // Handle case where data is undefined, null, or not an array
+
   if (!data || !Array.isArray(data) || data.length === 0) {
     return [];
   }
 
-  let filtered = [...data];
-
-  // Filter by date range
-  if (dateRange?.from && dateRange?.to) {
-    filtered = filtered.filter(item => {
-      const startDate = new Date(item.availability.startDate);
-      const endDate = new Date(item.availability.endDate);
-
-      // Check if the item's availability period overlaps with the selected date range
-      const hasOverlap = (
-        startDate <= dateRange.to && endDate >= dateRange.from
-      );
-
-      return hasOverlap;
-    });
-  }
-
-  // Filter by room type (invTypeCode)
-  if (selectedRoomType) {
-    filtered = filtered.filter(item => item?.invTypeCode === selectedRoomType);
-  }
-
-  if (selectedRatePlan) {
-    filtered = filtered.filter(item => {
-      if (item?.rates && item.rates.ratePlanCode) {
-        return item.rates.ratePlanCode === selectedRatePlan;
-      }
-      return false;
-    });
-  }
-
-  return filtered;
+  return [...data];
 };
 
 export const updatePrice = (
@@ -112,18 +79,17 @@ export const getPrice = (item: RatePlanInterFace): number => {
   return item.rates.baseByGuestAmts.amountBeforeTax;
 };
 
-// Helper function to get availability count
 export const getAvailability = (item: RatePlanInterFace): number => {
   return item.availability.count || 0;
 };
 
-// Helper function to get currency code
 export const getCurrencyCode = (item: RatePlanInterFace): string => {
   if (!item.rates) {
     return 'N/A';
   }
   return item.rates.currencyCode || 'N/A';
 };
+
 export const getRatePlanCode = (item: RatePlanInterFace): string => {
   if (!item.rates) {
     return 'No Rate Plan';
@@ -131,7 +97,6 @@ export const getRatePlanCode = (item: RatePlanInterFace): string => {
   return item.rates.ratePlanCode || 'No Rate Plan';
 };
 
-// Helper function to get date range string for display
 export const getDateRangeString = (item: RatePlanInterFace): string => {
   const startDate = format(new Date(item.availability.startDate), 'PPP');
   const endDate = format(new Date(item.availability.endDate), 'PPP');
@@ -166,18 +131,49 @@ export const saveData = async (data: modifiedRatePlanInterface[]): Promise<void>
   await new Promise(resolve => setTimeout(resolve, 1000));
 };
 
-export const ratePlanServices = async (hotelCode: string, pageNo: number, invTypeCode?: string, startDate?: Date, endDate?: Date) => {
+// Updated ratePlanServices function with pageSize parameter
+export const ratePlanServices = async (
+  hotelCode: string, 
+  pageNo: number, 
+  invTypeCode?: string, 
+  startDate?: Date, 
+  endDate?: Date,
+  ratePlanCode?: string,
+  pageSize: number = 10 // Add pageSize parameter
+) => {
   try {
     const accessToken = Cookies.get('accessToken');
     if (!accessToken) {
       throw new Error('No access token found. Please log in.');
     }
-    return await fetchRatePlans(hotelCode, accessToken, pageNo, invTypeCode, startDate, endDate)
+    
+    // Call the existing fetchRatePlans function with pageSize
+    const response = await fetchRatePlans(
+      hotelCode, 
+      accessToken, 
+      pageNo, 
+      invTypeCode, 
+      startDate, 
+      endDate, 
+      ratePlanCode,
+      pageSize // Pass pageSize to API function
+    );
+    
+    return response;
   } catch (error) {
     console.error('Error fetching rate plans:', error);
     return {
       success: false,
-      message: 'Failed to fetch rate plans'
+      message: 'Failed to fetch rate plans',
+      data: [],
+      pagination: {
+        currentPage: 1,
+        totalPages: 0,
+        totalResults: 0,
+        resultsPerPage: pageSize,
+        hasNextPage: false,
+        hasPreviousPage: false
+      }
     };
   }
 }
