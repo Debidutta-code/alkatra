@@ -25,18 +25,24 @@ class CustomerRepository {
 
     // Update customer profile
     async updateProfile(customerId: string, updateData: Partial<ICustomer>): Promise<ICustomer | null> {
-        const customer = await Customer.findById(customerId);
-        if (!customer) {
-            return null;
+        try {
+            const customer = await Customer.findById(customerId);
+            if (!customer) {
+                return null;
+            }
+            if (updateData.firstName) customer.firstName = updateData.firstName;
+            if (updateData.lastName) customer.lastName = updateData.lastName;
+            if (updateData.phone) customer.phone = updateData.phone;
+            if (updateData.password) {
+                customer.password = await bcrypt.hash(updateData.password, 10);
+            }
+            await customer.save();
+            return customer;
         }
-        if (updateData.firstName) customer.firstName = updateData.firstName;
-        if (updateData.lastName) customer.lastName = updateData.lastName;
-        if (updateData.phone) customer.phone = updateData.phone;
-        if (updateData.password) {
-            customer.password = await bcrypt.hash(updateData.password, 10);
+        catch (error) {
+            console.log("Failed to update customer profile", error);
+            throw new Error("Failed to update customer profile");
         }
-        await customer.save();
-        return customer;
     }
 
     // Update customer password
