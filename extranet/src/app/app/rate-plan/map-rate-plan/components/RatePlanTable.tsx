@@ -3,7 +3,7 @@ import React from 'react';
 import { format } from '../utils/dateUtils';
 import { TABLE_HEADERS } from '../constants';
 import { RatePlanInterFace, modifiedRatePlanInterface } from '../types';
-import { getPrice, getAvailability, getCurrencyCode, getDateRangeString } from '../services/dataService';
+import { getPrice, getAvailability, getCurrencyCode } from '../services/dataService';
 
 interface RatePlanTableProps {
   filteredData: RatePlanInterFace[];
@@ -11,6 +11,7 @@ interface RatePlanTableProps {
   toggleEditButton: () => void;
   editButtonVal: boolean;
   modifiedValues: modifiedRatePlanInterface[];
+  isLoading: boolean;
 }
 
 export const RatePlanTable: React.FC<RatePlanTableProps> = ({
@@ -18,7 +19,8 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
   handlePriceChange,
   toggleEditButton,
   editButtonVal,
-  modifiedValues
+  modifiedValues,
+  isLoading
 }) => {
 
   // Check if a specific item has been modified
@@ -36,7 +38,7 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
       availability !== null &&
       availability !== undefined &&
       item.rates?.ratePlanCode
-    ); // Show rows only when both price and availability exist and are greater than 0
+    );
   });
 
   return (
@@ -63,8 +65,8 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
           <button
             onClick={toggleEditButton}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-150 ${editButtonVal
-                ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                : 'bg-blue-100 text-tripswift-dark-blue hover:bg-blue-200'
+              ? 'bg-red-100 text-red-700 hover:bg-red-200'
+              : 'bg-blue-100 text-tripswift-dark-blue hover:bg-blue-200'
               }`}
           >
             {editButtonVal ? 'Disable Edit' : 'Enable Edit'}
@@ -72,7 +74,12 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
         </div>
       </div>
 
-      {availableData.length === 0 ? (
+      {isLoading ? (
+        <div className="flex items-center justify-center p-8">
+          <div className="w-6 h-6 border-4 border-tripswift-blue border-t-transparent rounded-full animate-spin"></div>
+          <span className="ml-3 text-gray-600 font-medium">Loading rate plans...</span>
+        </div>
+      ) : availableData.length === 0 ? (
         <div className="p-8 text-center text-gray-500">
           No data found. Try adjusting your filters.
         </div>
@@ -100,10 +107,10 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
                   <tr
                     key={index}
                     className={`transition-colors duration-150 ${isModified
-                        ? 'bg-orange-50 hover:bg-orange-100 border-l-4 border-orange-400'
-                        : editButtonVal
-                          ? 'hover:bg-blue-50'
-                          : 'hover:bg-gray-50'
+                      ? 'bg-orange-50 hover:bg-orange-100 border-l-4 border-orange-400'
+                      : editButtonVal
+                        ? 'hover:bg-blue-50'
+                        : 'hover:bg-gray-50'
                       }`}
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -136,8 +143,8 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
                           value={getPrice(item)}
                           onChange={(e) => handlePriceChange(item.rates._id, parseFloat(e.target.value) || 0)}
                           className={`w-20 px-2 py-1 text-sm rounded transition-all duration-200 ${editButtonVal
-                              ? `border-2 ${isModified ? 'border-orange-400 bg-orange-50' : 'border-tripswift-blue bg-white'} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm`
-                              : 'border-none bg-transparent focus:outline-none'
+                            ? `border-2 ${isModified ? 'border-orange-400 bg-orange-50' : 'border-tripswift-blue bg-white'} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm`
+                            : 'border-none bg-transparent focus:outline-none'
                             }`}
                           // step="0.01" 
                           min={0}

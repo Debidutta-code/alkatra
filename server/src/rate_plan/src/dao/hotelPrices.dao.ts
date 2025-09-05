@@ -38,7 +38,7 @@ class HotelPricesDao {
     }
 
     public static async getInventoryWithRates(hotelCode: string, invTypeCode: string, start: Date, end: Date) {
-        console.log("The data get from ratePlanService CONTROLLER",hotelCode, invTypeCode, start, end)
+        
         const pipeline = [
             // Stage 1: Match inventory records - ONLY by startDate
             {
@@ -130,7 +130,7 @@ class HotelPricesDao {
                 console.log(item)
                 console.log(item.rate) 
             })
-            console.log("The data get from ratePlanService DAO", results)
+        
             return results
         } catch (error) {
             console.error('Error in aggregation pipeline:', error);

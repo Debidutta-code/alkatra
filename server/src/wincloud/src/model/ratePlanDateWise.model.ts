@@ -59,4 +59,4 @@ const rateAmountSchema = new Schema<IRateAmountDateWise>({
 rateAmountSchema.index({ hotelCode: 1, invTypeCode: 1, startDate: 1, endDate: 1 });
 
  const RateAmount = model<IRateAmountDateWise>('RateAmountDateWise', rateAmountSchema);
- export default RateAmount
+ export default RateAmount;

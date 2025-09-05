@@ -1,7 +1,13 @@
+export interface RoomTypeInterface {
+  invTypeCode: string;
+  ratePlanCodes: string[];
+}
+
 export interface DateRange {
   from: Date;
   to: Date;
 }
+
 export interface RatePlanInterFace {
   _id: string
   availability: {
@@ -9,7 +15,8 @@ export interface RatePlanInterFace {
     endDate: Date;
     startDate: Date;
   },
-  invTypeCode: string; hotelCode: string;
+  invTypeCode: string;
+  hotelCode: string;
   rates: {
     baseByGuestAmts: {
       numberOfGuests: number;
@@ -17,19 +24,21 @@ export interface RatePlanInterFace {
       _id: string;
     };
     currencyCode: string
-    _id:string;
-    ratePlanCode:string
+    _id: string;
+    ratePlanCode: string
   }
 }
-export interface paginationTypes{
-  currentPage:number;
-  totalPage:number;
-  totalResults:number;
-  hasNextPage:boolean;
-  hasPreviousPage:boolean;
-  resultsPerPage:number
+
+export interface paginationTypes {
+  currentPage: number;
+  totalPage: number;
+  totalResults: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  resultsPerPage: number;
 }
-export interface modifiedRatePlanInterface{
-  rateAmountId:string;
-  price:number;
+
+export interface modifiedRatePlanInterface {
+  rateAmountId: string;
+  price: number;
 }

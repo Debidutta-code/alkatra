@@ -1,11 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  MoreHorizontal
-} from 'lucide-react';
+import React from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PaginationProps {
   currentPage: number;
@@ -15,8 +9,9 @@ interface PaginationProps {
   hasNextPage: boolean;
   hasPreviousPage: boolean;
   onPageChange: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
   showResultsInfo?: boolean;
-  compact?: boolean;
+  pageSizeOptions?: number[];
 }
 
 const Pagination: React.FC<PaginationProps> = ({
@@ -27,171 +22,182 @@ const Pagination: React.FC<PaginationProps> = ({
   hasNextPage,
   hasPreviousPage,
   onPageChange,
+  onPageSizeChange,
   showResultsInfo = true,
-  compact = false
+  pageSizeOptions = [5, 10, 20]
 }) => {
   const startItem = (currentPage - 1) * resultsPerPage + 1;
   const endItem = Math.min(currentPage * resultsPerPage, totalResults);
 
-  const [windowWidth, setWindowWidth] = useState(
-    typeof window !== 'undefined' ? window.innerWidth : 0
-  );
+  const getVisiblePages = () => {
+    const pages: (number | string)[] = [];
+    const maxVisiblePages = 7;
 
-  useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const getPageNumbers = () => {
-    const numbers: (number | string)[] = [];
-
-    if (windowWidth < 800) {
-      numbers.push(currentPage);
-      return numbers;
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+      return pages;
     }
 
-    if (totalPages <= 5) {
-      for (let i = 1; i <= totalPages; i++) numbers.push(i);
-      return numbers;
+    // Always show first page
+    pages.push(1);
+
+    if (currentPage > 3) {
+      pages.push('...');
     }
 
-    if (currentPage <= 2) {
-      numbers.push(1, currentPage === 2 ? 2 : '...', '...', totalPages);
-    } else if (currentPage >= totalPages - 1) {
-      numbers.push(1, '...', currentPage === totalPages - 1 ? totalPages - 1 : '...', totalPages);
-    } else {
-      numbers.push(1, '...', currentPage, '...', totalPages);
+    // Show pages around current page
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+
+    for (let i = start; i <= end; i++) {
+      if (i !== 1 && i !== totalPages) {
+        pages.push(i);
+      }
     }
 
-    return numbers;
+    if (currentPage < totalPages - 2) {
+      pages.push('...');
+    }
+
+    // Always show last page (if more than 1 page)
+    if (totalPages > 1) {
+      pages.push(totalPages);
+    }
+
+    return pages;
   };
 
-  const pageNumbers = getPageNumbers();
-
-  const NavButton: React.FC<{
-    onClick: () => void;
-    disabled: boolean;
-    icon: React.ReactNode;
-    label: string;
-    position?: 'first' | 'last' | 'prev' | 'next';
-  }> = ({ onClick, disabled, icon, label, position }) => (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={`
-        group relative p-2.5 rounded-lg border transition-all duration-200 ease-in-out
-        ${disabled
-          ? 'border-gray-200 text-gray-300 cursor-not-allowed bg-gray-50'
-          : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:text-gray-800 hover:bg-gray-50 active:bg-gray-100'}
-        ${position === 'first' || position === 'last' ? 'flex' : ''}
-        focus:outline-none focus:ring-2 focus:ring-tripswift-blue focus:ring-offset-2
-      `}
-      aria-label={label}
-      title={label}
-    >
-      <span className="transition-transform duration-200 group-hover:scale-110">
-        {icon}
-      </span>
-    </button>
-  );
+  const visiblePages = getVisiblePages();
 
   const PageButton: React.FC<{
-    pageNumber: number | string;
-    isActive: boolean;
-    onClick: () => void;
-  }> = ({ pageNumber, isActive, onClick }) => {
-    if (pageNumber === '...') {
+    page: number | string;
+    isActive?: boolean;
+    onClick?: () => void;
+  }> = ({ page, isActive = false, onClick }) => {
+    if (page === '...') {
       return (
-        <div className="flex items-center justify-center w-10 h-10 text-gray-400">
-          <MoreHorizontal size={16} />
-        </div>
+        <span className="px-3 py-2 text-gray-400 text-sm">
+          ...
+        </span>
       );
     }
 
     return (
       <button
-        type="button"
         onClick={onClick}
         className={`
-          relative w-10 h-10 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out
-          focus:outline-none focus:ring-2 focus:ring-tripswift-blue focus:ring-offset-2
+          px-3 py-2 text-sm font-medium rounded transition-colors duration-200 min-w-[32px] h-8 flex items-center justify-center
           ${isActive
-            ? 'bg-blue-600 text-white shadow-md border border-tripswift-blue hover:bg-tripswift-dark-blue hover:shadow-lg transform hover:-translate-y-0.5'
-            : 'text-gray-700 border border-gray-300 hover:border-gray-400 hover:bg-gray-50 hover:text-gray-900 active:bg-gray-100'}
+            ? 'bg-blue-600 text-white'
+            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+          }
         `}
       >
-        {pageNumber}
+        {page}
       </button>
     );
   };
 
+  // Don't show pagination if there's only one page or no results
   if (totalPages <= 1) {
-    return null;
+    return showResultsInfo && totalResults > 0 ? (
+      <div className="flex items-center justify-between py-4 px-4">
+        {onPageSizeChange && (
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-700">Show</span>
+            <select
+              value={resultsPerPage}
+              onChange={(e) => onPageSizeChange(Number(e.target.value))}
+              className="px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              {pageSizeOptions.map(size => (
+                <option key={size} value={size}>
+                  {size} per page
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+        <div className="text-sm text-gray-700">
+          Showing {startItem}-{endItem} of {totalResults} results
+        </div>
+      </div>
+    ) : null;
   }
 
   return (
-    <div
-      className={`
-        flex ${compact ? 'flex-row' : 'flex-col sm:flex-row'} 
-        items-center justify-between gap-4 p-4 bg-white border border-gray-200 rounded-xl shadow-sm
-      `}
-    >
-      {showResultsInfo && !compact && (
-        <div className="text-sm text-gray-600 font-medium">
-          <span>
-            Showing <span className="text-gray-900 font-semibold">{startItem.toLocaleString()}</span> to{' '}
-            <span className="text-gray-900 font-semibold">{endItem.toLocaleString()}</span> of{' '}
-            <span className="text-gray-900 font-semibold">{totalResults.toLocaleString()}</span> results
-          </span>
+    <div className="flex items-center justify-between py-4 px-5">
+      {/* Page size selector - Left side */}
+      {onPageSizeChange && (
+        <div className="flex items-center space-x-2">
+          <span className="text-sm text-gray-700">Show</span>
+          <select
+            value={resultsPerPage}
+            onChange={(e) => onPageSizeChange(Number(e.target.value))}
+            className="px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            {pageSizeOptions.map(size => (
+              <option key={size} value={size}>
+                {size} per page
+              </option>
+            ))}
+          </select>
         </div>
       )}
 
-      <div className="flex items-center gap-2">
-        <NavButton
-          onClick={() => onPageChange(1)}
-          disabled={!hasPreviousPage}
-          icon={<ChevronsLeft size={16} />}
-          label="Go to first page"
-          position="first"
-        />
-        <NavButton
+      {/* Pagination controls - Center */}
+      <div className="flex items-center space-x-1">
+        {/* Previous button */}
+        <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={!hasPreviousPage}
-          icon={<ChevronLeft size={16} />}
-          label="Go to previous page"
-          position="prev"
-        />
-        <div className="flex items-center gap-1.5">
-          {pageNumbers.map((pageNum, index) => (
+          className={`
+            p-2 rounded transition-colors duration-200 flex items-center justify-center
+            ${!hasPreviousPage
+              ? 'text-gray-400 cursor-not-allowed'
+              : 'text-gray-700 hover:bg-gray-100'
+            }
+          `}
+          title="Previous page"
+        >
+          <ChevronLeft size={16} />
+        </button>
+
+        {/* Page numbers */}
+        <div className="flex items-center space-x-1">
+          {visiblePages.map((page, index) => (
             <PageButton
-              key={`${pageNum}-${index}`}
-              pageNumber={pageNum}
-              isActive={pageNum === currentPage}
-              onClick={() => typeof pageNum === 'number' && onPageChange(pageNum)}
+              key={`${page}-${index}`}
+              page={page}
+              isActive={page === currentPage}
+              onClick={typeof page === 'number' ? () => onPageChange(page) : undefined}
             />
           ))}
         </div>
-        <NavButton
+
+        {/* Next button */}
+        <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={!hasNextPage}
-          icon={<ChevronRight size={16} />}
-          label="Go to next page"
-          position="next"
-        />
-        <NavButton
-          onClick={() => onPageChange(totalPages)}
-          disabled={!hasNextPage}
-          icon={<ChevronsRight size={16} />}
-          label="Go to last page"
-          position="last"
-        />
+          className={`
+            p-2 rounded transition-colors duration-200 flex items-center justify-center
+            ${!hasNextPage
+              ? 'text-gray-400 cursor-not-allowed'
+              : 'text-gray-700 hover:bg-gray-100'
+            }
+          `}
+          title="Next page"
+        >
+          <ChevronRight size={16} />
+        </button>
       </div>
 
-      {compact && (
-        <div className="text-xs text-gray-500 sm:hidden">
-          Page {currentPage} of {totalPages}
+      {/* Results info - Right side */}
+      {showResultsInfo && (
+        <div className="text-sm text-gray-700">
+          Showing {startItem}-{endItem} of {totalResults} results
         </div>
       )}
     </div>

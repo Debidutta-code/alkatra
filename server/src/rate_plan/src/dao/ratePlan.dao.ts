@@ -2,47 +2,56 @@ import { RatePlan as RatePlanType } from "../common/interface/ratePlan.interface
 import RatePlan from "../model/ratePlan.model";
 import RateAmount from "../../../wincloud/src/model/ratePlanDateWise.model"
 import { Inventory } from "../../../wincloud/src/model/inventoryModel"
-import { startOfDay, endOfDay } from 'date-fns';
+import { startOfDay, endOfDay, addDays } from 'date-fns';
+import { start } from "repl";
+
 interface UpdatePlanData {
   rateAmountId: string;
   inventoryId: string;
   price: number;
   availability: number;
 }
+
+interface IInventory {
+  _id: string;
+  hotelCode: string;
+  hotelName?: string;
+  invTypeCode: string;
+  ratePlanCode: string;
+  availability: { startDate: Date; endDate: Date; count: number };
+}
+
+interface IRatePlan {
+  _id: string;
+  hotelCode: string;
+  invTypeCode: string;
+  ratePlanCode: string;
+  startDate: Date;
+  endDate: Date;
+  currencyCode: string;
+  baseByGuestAmts: { amountBeforeTax: number; numberOfGuests: number }[];
+  additionalGuestAmounts: { ageQualifyingCode: string; amount: number }[];
+}
+
 interface RoomWithRates {
+  _id: string;
   hotelCode: string;
   hotelName: string;
   invTypeCode: string;
-  availability: {
-    startDate: Date;
-    endDate: Date;
-    count: number;
-  };
-  rates: Array<{
+  availability: { startDate: Date; endDate: Date; count: number };
+  rates: {
+    _id: string;
+    currencyCode: string;
     ratePlanCode: string;
     startDate: Date;
     endDate: Date;
-    days: {
-      mon: boolean;
-      tue: boolean;
-      wed: boolean;
-      thu: boolean;
-      fri: boolean;
-      sat: boolean;
-      sun: boolean;
-    };
-    currencyCode: string;
-    baseByGuestAmts: Array<{
-      amountBeforeTax: number;
-      numberOfGuests: number;
-    }>;
-    additionalGuestAmounts: Array<{
-      ageQualifyingCode: string;
-      amount: number;
-    }>;
-  }>;
+    baseByGuestAmts: { amountBeforeTax: number; numberOfGuests: number } | null;
+  } | null;
 }
+
 class RatePlanDao {
+
+
   public static async create(ratePlanData: RatePlanType) {
     try {
       const ratePlan = new RatePlan(ratePlanData);
@@ -53,6 +62,7 @@ class RatePlanDao {
       throw new Error("Failed to create rate plan");
     }
   }
+
   public static async updateRatePlan(ratePlansData: UpdatePlanData[]) {
     try {
       // Validate input
@@ -125,13 +135,23 @@ class RatePlanDao {
       throw error;
     }
   }
+
   /**
   * Get available rooms with their corresponding rates using aggregation pipeline
+  * @hotelCode
+  * @invTypeCode
+  * @ratePlanCode
+  * @page
+  * @limit
   */
   public static async getRatePlanByHotel(
     hotelCode: string,
     invTypeCode?: string,
-    page?: number
+    ratePlanCode?: string,
+    startDate?: string,
+    endDate?: string,
+    page: number = 1,
+    limit: number = 10
   ): Promise<{
     data: RoomWithRates[];
     pagination: {
@@ -143,125 +163,196 @@ class RatePlanDao {
       resultsPerPage: number;
     };
   }> {
-    page = page ?? 1;
-    const resultsPerPage = 10;
-    const skip = (page - 1) * resultsPerPage;
+    try {
 
-    // Build match stage for inventory based on given parameters
-    const inventoryMatch: any = { hotelCode };
-    if (invTypeCode) {
-      inventoryMatch.invTypeCode = invTypeCode;
+      const resultsPerPage = limit;
+      const skip = (page - 1) * resultsPerPage;
+
+      const [inventory, ratePlans] = await Promise.all([
+        this.getInventoryOfHotel(hotelCode, invTypeCode, startDate, endDate),
+        this.getRoomRateOfHotel(hotelCode, invTypeCode, ratePlanCode, startDate, endDate),
+      ]);
+
+      const mappedData = this.mapInventoryToRatePlans(inventory, ratePlans);
+      if (!mappedData) {
+        throw new Error("No mapped data found");
+      }
+
+      const totalResults = mappedData.length;
+      const paginatedData = mappedData.slice(skip, skip + resultsPerPage);
+      const totalPages = Math.ceil(totalResults / resultsPerPage);
+
+      const result = {
+        data: paginatedData,
+        pagination: {
+          currentPage: page,
+          totalPages,
+          totalResults,
+          hasNextPage: page < totalPages,
+          hasPreviousPage: page > 1,
+          resultsPerPage,
+        },
+      };
+
+
+      return result;
+    } catch (error) {
+      throw new Error(`Failed to fetch rate plans: ${error.message}`);
     }
-    const startDate = startOfDay(new Date()); // Set to midnight of current day
-    inventoryMatch["availability.startDate"] = { $gte: startDate };
-
-    // UPDATED RATE LOOKUP PIPELINE
-    const rateLookupPipeline: any[] = [
-      {
-        $match: {
-          $expr: {
-            $and: [
-              { $eq: ["$hotelCode", "$$hotelCode"] },
-              { $eq: ["$invTypeCode", "$$invTypeCode"] },
-              { $eq: ["$startDate", "$$inventoryStartDate"] }
-            ]
-          }
-        }
-      }
-    ];
-
-    // Pipeline for counting total results
-    const countPipeline = [
-      { $match: inventoryMatch },
-      {
-        $lookup: {
-          from: "rateamountdatewises",
-          let: {
-            hotelCode: "$hotelCode",
-            invTypeCode: "$invTypeCode",
-            inventoryStartDate: "$availability.startDate"
-          },
-          pipeline: rateLookupPipeline,
-          as: "rates"
-        }
-      },
-      { $count: "total" }
-    ];
-
-    const dataPipeline = [
-      { $match: inventoryMatch },
-      {
-        $lookup: {
-          from: "rateamountdatewises",
-          let: {
-            hotelCode: "$hotelCode",
-            invTypeCode: "$invTypeCode",
-            inventoryStartDate: "$availability.startDate"
-          },
-          pipeline: rateLookupPipeline,
-          as: "rates"
-        }
-      },
-      { $skip: skip },
-      { $limit: resultsPerPage },
-      {
-        $project: {
-          _id: 1,
-          hotelCode: 1,
-          hotelName: 1,
-          invTypeCode: 1,
-          availability: 1,
-          rates: {
-            $cond: {
-              if: { $gt: [{ $size: "$rates" }, 0] },
-              then: {
-                $let: {
-                  vars: { firstRate: { $arrayElemAt: ["$rates", 0] } },
-                  in: {
-                    _id: "$$firstRate._id",
-                    currencyCode: "$$firstRate.currencyCode",
-                    ratePlanCode: "$$firstRate.ratePlanCode",
-                    baseByGuestAmts: {
-                      $cond: {
-                        if: { $gt: [{ $size: "$$firstRate.baseByGuestAmts" }, 0] },
-                        then: { $arrayElemAt: ["$$firstRate.baseByGuestAmts", 0] },
-                        else: null
-                      }
-                    },
-                  }
-                }
-              },
-              else: null
-            }
-          }
-        }
-      }
-    ];
-
-    const [countResult, dataResult] = await Promise.all([
-      Inventory.aggregate(countPipeline),
-      Inventory.aggregate(dataPipeline)
-    ]);
-
-    const totalResults = countResult[0]?.total || 0;
-    const totalPages = Math.ceil(totalResults / resultsPerPage);
-
-    return {
-      data: dataResult,
-      pagination: {
-        currentPage: page,
-        totalPages,
-        totalResults,
-        hasNextPage: page < totalPages,
-        hasPreviousPage: page > 1,
-        resultsPerPage
-      }
-    };
   }
+
+  /**
+   * Helper: Get inventory by hotel
+   */
+  private static async getInventoryOfHotel(
+    hotelCode: string,
+    invTypeCode?: string,
+    startDate?: string,
+    endDate?: string
+  ) {
+    try {
+
+      const inventoryMatch: any = { hotelCode };
+      if (invTypeCode) {
+        inventoryMatch.invTypeCode = invTypeCode;
+      }
+
+      if (startDate) {
+        inventoryMatch["availability.startDate"] = { $gte: startOfDay(startDate) };
+      } else {
+        inventoryMatch["availability.startDate"] = { $gte: startOfDay(new Date()) };
+      }
+      if (endDate) {
+        inventoryMatch["availability.endDate"] = { $lte: endOfDay(endDate) };
+      }
+
+      // inventoryMatch["availability.startDate"] = { $gte: startOfDay(new Date()) };
+
+      const inventory = await Inventory.aggregate([
+        { $match: inventoryMatch },
+      ]);
+
+      return inventory;
+    } catch (error) {
+      console.log(`Failed to fetch inventory: ${error.message}`);
+      throw new Error(`Failed to fetch inventory`);
+    }
+  }
+
+  /**
+   * Helper: Get rateplan by hotel
+   */
+
+  private static async getRoomRateOfHotel(
+    hotelCode: string,
+    invTypeCode?: string,
+    ratePlanCode?: string,
+    startDate?: string,
+    endDate?: string
+  ) {
+    try {
+
+      const ratePlanMatch: any = { hotelCode };
+      if (invTypeCode) {
+        ratePlanMatch.invTypeCode = invTypeCode;
+      }
+      if (ratePlanCode) {
+        ratePlanMatch.ratePlanCode = ratePlanCode;
+      }
+
+      if (startDate) {
+        ratePlanMatch.startDate = { $gte: startOfDay(startDate) };
+      } else {
+        ratePlanMatch.startDate = { $gte: startOfDay(new Date()) };
+      }
+
+      if (endDate) {
+        ratePlanMatch.endDate = { $lte: endOfDay(endDate) };
+      }
+      // else {
+      //   const tomorrow = new Date();
+      //   tomorrow.setDate(tomorrow.getDate() + 1);
+      //   ratePlanMatch.endDate = { $lte: startOfDay(tomorrow) };
+      // }
+
+      // ratePlanMatch.startDate = { $gte: startOfDay(new Date()) };
+
+      const ratePlan = await RateAmount.aggregate([
+        { $match: ratePlanMatch },
+      ]);
+
+      return ratePlan;
+
+
+    } catch (error) {
+      console.log(`Failed to fetch rateplan: ${error.message}`);
+      throw new Error(`Failed to fetch rateplan`);
+    }
+  }
+
+  /**
+   * Helper: Map inventory and rate plan
+   */
+  private static mapInventoryToRatePlans(
+    inventory: IInventory[],
+    ratePlans: IRatePlan[]
+  ): RoomWithRates[] {
+
+    const results: RoomWithRates[] = [];
+
+    inventory.forEach((inv) => {
+
+      const matchingRates = ratePlans.filter(
+        (rate) =>
+          rate.hotelCode === inv.hotelCode
+          && rate.invTypeCode === inv.invTypeCode
+          && rate.startDate.getTime() === inv.availability.startDate.getTime()
+          // && rate.endDate.getTime() >= inv.availability.endDate.getTime()
+      );
+
+      matchingRates.forEach((matchingRate) => {
+
+        const result: RoomWithRates = {
+          _id: inv._id,
+          hotelCode: inv.hotelCode,
+          hotelName: inv.hotelName,
+          invTypeCode: inv.invTypeCode,
+          availability: inv.availability,
+          rates: {
+            _id: matchingRate._id,
+            currencyCode: matchingRate.currencyCode,
+            ratePlanCode: matchingRate.ratePlanCode,
+            startDate: matchingRate.startDate,
+            endDate: matchingRate.endDate,
+            baseByGuestAmts:
+              matchingRate.baseByGuestAmts.length > 0
+                ? matchingRate.baseByGuestAmts[0]
+                : null,
+          },
+        };
+
+        results.push(result);
+      });
+    });
+    return results;
+  }
+
+
+
   public static async getAllRoomType(hotelCode: string) {
     try {
-      const response = await Inventory.distinct("invTypeCode", {hotelCode});
-      return response;
+
+      const invTypeCodes = await Inventory.distinct("invTypeCode", { hotelCode });
+      if (!invTypeCodes) throw new Error ("No room type found");
+
+      const ratePlanCodes = await Promise.all(
+        invTypeCodes.map(async (invTypeCode) => {
+          const ratePlans = await RateAmount.distinct('ratePlanCode', { hotelCode, invTypeCode });
+          return { invTypeCode, ratePlanCodes: ratePlans };
+        })
+      );
+
+      return ratePlanCodes;
     } catch (error) {
       throw new Error(error.message)
     }
