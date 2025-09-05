@@ -269,11 +269,11 @@ class RatePlanDao {
       if (endDate) {
         ratePlanMatch.endDate = { $lte: endOfDay(endDate) };
       }
-      else {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        ratePlanMatch.endDate = { $lte: startOfDay(tomorrow) };
-      }
+      // else {
+      //   const tomorrow = new Date();
+      //   tomorrow.setDate(tomorrow.getDate() + 1);
+      //   ratePlanMatch.endDate = { $lte: startOfDay(tomorrow) };
+      // }
 
       // ratePlanMatch.startDate = { $gte: startOfDay(new Date()) };
 
