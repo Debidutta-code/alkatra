@@ -17,15 +17,16 @@ import TypingIndicator from './TypingIndicator';
 interface ChatbotConversationProps {
   onClose: () => void;
   userFirstName: string;
+  isOnline: boolean;
 }
 
 const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
   onClose,
-  userFirstName
+  userFirstName,
+  isOnline 
 }) => {
   const [chatInput, setChatInput] = useState('');
   const [isMinimized, setIsMinimized] = useState(false);
-  const [isConnected, setIsConnected] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const chatBotApi = ChatBotApi.getInstance();
@@ -112,7 +113,6 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
   };
   const clearError = () => {
     dispatch(setChatError(null));
-    setIsConnected(true);
   };
 
   return (
@@ -135,8 +135,8 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
                 <Bot className="h-3.5 w-3.5 text-[#076DB3]" />
               </div>
               {/* Connection status indicator */}
-              <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border border-white ${isConnected ? 'bg-green-400' : 'bg-red-400'
-                } ${isConnected ? 'animate-pulse' : ''}`}></div>
+              <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border border-white ${isOnline ? 'bg-green-400' : 'bg-red-400'
+                } ${isOnline ? 'animate-pulse' : ''}`}></div>
             </div>
 
             <div className="flex-1 min-w-0">
@@ -144,7 +144,7 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
                 Al-Hajz Assistant
               </h4>
               <p className="text-blue-100 text-xs font-noto-sans truncate">
-                {isConnected ? 'Online • Instant replies' : 'Reconnecting...'}
+                {isOnline ? 'Online • Instant replies' : 'Reconnecting...'}
               </p>
             </div>
           </div>
@@ -252,7 +252,7 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    disabled={isTyping || !isConnected || isShowingWelcome}
+                    disabled={isTyping || !isOnline || isShowingWelcome}
                     className="w-full border border-gray-200 rounded-xl px-3 py-2 pr-10 text-sm 
            focus:outline-none focus:border-[#076DB3] focus:ring-1 focus:ring-[#076DB3]/20 
            disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200
@@ -271,8 +271,8 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
                 {/* Send Button */}
                 <button
                   onClick={handleSendMessage}
-                  disabled={!chatInput.trim() || isTyping || !isConnected}
-                  className={`absolute right-1 bottom-2 p-1.5 rounded-lg transition-all duration-200 ${chatInput.trim() && !isTyping && isConnected
+                  disabled={!chatInput.trim() || isTyping || !isOnline}
+                  className={`absolute right-1 bottom-2 p-1.5 rounded-lg transition-all duration-200 ${chatInput.trim() && !isTyping && isOnline
                     ? 'bg-gradient-to-r from-[#076DB3] to-[#054B8F] text-white shadow-md hover:shadow-lg hover:scale-105 active:scale-95'
                     : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                     }`}
@@ -286,9 +286,9 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
             {/* Enhanced Status Bar */}
             <div className="flex items-center justify-between mt-2 text-xs text-gray-500 font-noto-sans">
               <div className="flex items-center gap-1.5">
-                <div className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-green-400 animate-pulse' : 'bg-red-400'
+                <div className={`w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-green-400 animate-pulse' : 'bg-red-400'
                   }`}></div>
-                <span>{isConnected ? 'Connected' : 'Reconnecting...'}</span>
+                <span>{isOnline ? 'Connected' : 'Reconnecting...'}</span>
               </div>
 
               <div className="flex items-center gap-2 text-xs">

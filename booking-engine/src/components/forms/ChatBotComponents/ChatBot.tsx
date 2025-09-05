@@ -1,19 +1,28 @@
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../Redux/store';
 import React, { useEffect, useState } from 'react';
 import { Card } from '../UserProfileComponents';
 import ChatbotIcon from './ChatbotIcon';
 import ChatbotInitial from './ChatbotInitial';
 import ChatbotConversation from './ChatbotConversation';
+import { useRouter } from 'next/navigation';
 
 type View = 'initial' | 'chat' | 'feedback';
 
 interface ChatbotProps {
   userFirstName: string;
+  isOnline: boolean;
 }
 
-const Chatbot: React.FC<ChatbotProps> = ({ userFirstName }) => {
+const Chatbot: React.FC<ChatbotProps> = ({ userFirstName, isOnline }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [view, setView] = useState<View>('initial');
   const [isHovered, setIsHovered] = useState(false);
+  const router = useRouter();
+  const { user, accessToken } = useSelector((state: RootState) => state.auth);
+  const isAuthenticated = !!accessToken && !!user;
+  const connectionStatus = isOnline ? 'Online' : 'Offline';
+  const statusColor = isOnline ? 'text-green-500' : 'text-red-500';
 
   const handleOpen = () => {
     setIsOpen(true);
@@ -23,6 +32,11 @@ const Chatbot: React.FC<ChatbotProps> = ({ userFirstName }) => {
   const handleClose = () => {
     setIsOpen(false);
     setIsHovered(false);
+  };
+
+  const handleLogin = () => {
+    handleClose();
+    router.push('/login');
   };
 
   const handleMouseEnter = () => {
@@ -65,10 +79,15 @@ const Chatbot: React.FC<ChatbotProps> = ({ userFirstName }) => {
       {isOpen && (
         <Card className="w-full max-w-xs mb-4 shadow-xl">
           {view === 'initial' && (
-            <ChatbotInitial onStartChat={() => handleChangeView('chat')} onClose={handleClose} />
+            <ChatbotInitial
+              onStartChat={() => handleChangeView('chat')}
+              onClose={handleClose}
+              onLogin={handleLogin}
+              isAuthenticated={isAuthenticated}
+            />
           )}
-          {view === 'chat' && (
-            <ChatbotConversation onClose={handleClose} userFirstName={userFirstName} />
+          {view === 'chat' && isAuthenticated && (
+            <ChatbotConversation onClose={handleClose} userFirstName={userFirstName} isOnline={isOnline} />
           )}
         </Card>
       )}

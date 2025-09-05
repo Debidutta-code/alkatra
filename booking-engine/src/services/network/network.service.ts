@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
@@ -8,8 +8,11 @@ let offlineToastId: string | null = null; // keep track of the offline toast
 
 const useNetworkStatus = () => {
     const { t } = useTranslation();
+    const [isOnline, setIsOnline] = useState(true);
+
     useEffect(() => {
         const handleOffline = () => {
+            setIsOnline(false);
             if (!offlineToastId) {
                 offlineToastId = toast.error(t('NetworkStatus.offline', {
                     defaultValue: 'You are offline. Please check your internet connection.',
@@ -21,6 +24,7 @@ const useNetworkStatus = () => {
         };
 
         const handleOnline = () => {
+            setIsOnline(true);
             if (offlineToastId) {
                 toast.dismiss(offlineToastId); // remove the sticky offline toast
                 offlineToastId = null;
@@ -43,6 +47,7 @@ const useNetworkStatus = () => {
             window.removeEventListener('online', handleOnline);
         };
     }, []);
+    return isOnline;
 };
 
 export default useNetworkStatus;
