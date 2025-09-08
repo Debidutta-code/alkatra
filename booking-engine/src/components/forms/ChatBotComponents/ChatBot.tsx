@@ -21,8 +21,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ userFirstName, isOnline }) => {
   const router = useRouter();
   const { user, accessToken } = useSelector((state: RootState) => state.auth);
   const isAuthenticated = !!accessToken && !!user;
-  const connectionStatus = isOnline ? 'Online' : 'Offline';
-  const statusColor = isOnline ? 'text-green-500' : 'text-red-500';
+  const [isMinimized, setIsMinimized] = useState(false);
 
   const handleOpen = () => {
     setIsOpen(true);
@@ -51,7 +50,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ userFirstName, isOnline }) => {
     setView(newView);
   };
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !isMinimized) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'auto';
@@ -59,7 +58,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ userFirstName, isOnline }) => {
     return () => {
       document.body.style.overflow = 'auto';
     };
-  }, [isOpen]);
+  }, [isOpen, isMinimized]);
   return (
     <div className="fixed bottom-4 right-4 z-50 flex items-end">
       {/* Chat Preview on Hover (shown beside icon) */}
@@ -87,7 +86,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ userFirstName, isOnline }) => {
             />
           )}
           {view === 'chat' && isAuthenticated && (
-            <ChatbotConversation onClose={handleClose} userFirstName={userFirstName} isOnline={isOnline} />
+            <ChatbotConversation onClose={handleClose} userFirstName={userFirstName} isOnline={isOnline} onMinimizedChange={setIsMinimized} />
           )}
         </Card>
       )}
