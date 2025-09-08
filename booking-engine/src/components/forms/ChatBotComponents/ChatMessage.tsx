@@ -1,6 +1,5 @@
 import React from 'react';
 import { Bot, AlertCircle, CheckCircle, Clock, RefreshCw } from 'lucide-react';
-import Avatar from '../UserProfileComponents/Avatar';
 
 interface Message {
     id: string;

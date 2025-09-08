@@ -18,12 +18,14 @@ interface ChatbotConversationProps {
   onClose: () => void;
   userFirstName: string;
   isOnline: boolean;
+  onMinimizedChange?: (minimized: boolean) => void;
 }
 
 const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
   onClose,
   userFirstName,
-  isOnline 
+  isOnline,
+  onMinimizedChange
 }) => {
   const [chatInput, setChatInput] = useState('');
   const [isMinimized, setIsMinimized] = useState(false);
@@ -152,7 +154,7 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
           {/* Header Controls */}
           <div className="flex items-center gap-1 flex-shrink-0">
             <button
-              onClick={() => setIsMinimized(!isMinimized)}
+              onClick={() => { setIsMinimized(!isMinimized); onMinimizedChange?.(!isMinimized); }}
               className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200"
               aria-label={isMinimized ? "Expand chat" : "Minimize chat"}
             >
