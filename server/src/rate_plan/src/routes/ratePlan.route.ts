@@ -1,8 +1,12 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { RatePlanController, RoomPrice } from "../controller/ratePlan.controller";
+import { RatePlanController, RoomPrice, StartStopWatcher } from "../controller/ratePlan.controller";
 import { protect } from "../../../user_authentication/src/Middleware/auth.middleware";
+import { InventoryService } from "../service/inventory.service";
 
 const route = Router();
+
+const inventoryService = InventoryService.getInstance();
+const startStopWatcher = new StartStopWatcher(inventoryService);
 
 
 route.put(
@@ -62,6 +66,11 @@ route.get("/getRoomType/all", protect, async (req: Request, res: Response, next:
 route.post("/checkAvailability", async (req: Request, res: Response, next: NextFunction) => {
   const response = await RoomPrice.checkAvailabilityController(req, res, next)
   res.status(200).json(response)
+})
+
+route.patch("/updateStatus", async (req: Request, res: Response, next: NextFunction) => {
+  const response = await startStopWatcher.updateStartStopSell.bind(startStopWatcher);
+  res.status(200).json(response);
 })
 
 export default route;

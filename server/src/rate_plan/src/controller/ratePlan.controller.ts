@@ -2,6 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import { RatePlanService, RoomPriceService, RoomRentCalculationService } from "../service/ratePlan.service";
 import { propertyInfoService } from "../../../property_management/src/container";
 import { container } from "../../../tax_service/container";
+import { InventoryService } from "../service/inventory.service";
+import { ParamsDictionary } from "express-serve-static-core";
+import { ParsedQs } from "qs";
 
 class RatePlanController {
 
@@ -88,7 +91,7 @@ class RatePlanController {
         try {
             console.log("###################### Inside getRatePlanByHotelCode controller");
             const { hotelCode } = req.params;
-            
+
             console.log("Entering into getRatePlanByHotelCode SERVICE");
             const response = await RatePlanService.getRatePlanByHotelCode(hotelCode);
             if (!response) {
@@ -105,13 +108,13 @@ class RatePlanController {
     public static async getRatePlanByHotel(req: Request, res: Response, next: NextFunction) {
         try {
 
-            
+
             const { hotelCode } = req.body;
             if (!hotelCode) {
                 throw new Error("Hotel code is required");
             }
 
-            const {invTypeCode, ratePlanCode, startDate, endDate} = req.query;
+            const { invTypeCode, ratePlanCode, startDate, endDate } = req.query;
             const page = req.query?.page ? parseInt(req.query.page as string) : 1;
             const limit = req.query?.limit ? parseInt(req.query.limit as string) : 10;
             console.log(`The start date and end date we get ${startDate} and ${endDate}`);
@@ -132,13 +135,13 @@ class RatePlanController {
 
             console.log("Entering into getRatePlanByHotel SERVICE");
             const response = await RatePlanService.getRatePlanByHotel(
-                hotelCode, 
-                invTypeCode as string, 
-                ratePlanCode as string, 
+                hotelCode,
+                invTypeCode as string,
+                ratePlanCode as string,
                 startDate as string,
                 endDate as string,
-                page, 
-                limit,                
+                page,
+                limit,
             );
             if (!response) {
                 throw new Error("No rate plans found for this hotel code")
@@ -256,6 +259,41 @@ class RoomPrice {
                 message: "Error occur while checking availability for this hotel",
                 error: error.message
             }
+        }
+    }
+}
+
+export class StartStopWatcher {
+    
+    /**
+     * Singleton instance
+     */
+    private inventoryService: InventoryService;
+
+    /**
+    * constructor to enforce singleton pattern
+    */
+    constructor(inventoryService: InventoryService) {
+        if (!inventoryService) {
+            throw new Error("InventoryService is required");
+        }
+        this.inventoryService = inventoryService;
+    }
+
+    /**
+     * Get the singleton instance of StartStopWatcher
+     */
+
+    async updateStartStopSell(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { hotelCode, invTypeCode, ratePlanCode, startDate, endDate } = req.body;
+            console.log("Starting the watcher for inventory update...");
+            const response = await this.inventoryService.updateInventory(hotelCode, invTypeCode, ratePlanCode, startDate, endDate);
+            console.log("Inventory update response:", response);
+            return res.status(200).json({ success: true, message: "Inventory updated successfully", data: response });
+        } catch (error: any) {
+            console.error("Error in startWatcher:", error);
+            return res.status(500).json({ success: false, message: "Failed to start inventory watcher", error: error.message });
         }
     }
 }
