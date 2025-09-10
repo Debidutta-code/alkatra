@@ -800,7 +800,7 @@ export default function XRooms({ onNext, onPrevious }: Props) {
 
         {/* Image field  */}
         <div className="flex w-full lg:flex-row flex-col gap-2">
-          <div className="flex mt-2 lg:w-1/2 w-full lg:gap-3 gap-2 items-center">
+          <div className="flex mt-2 lg:w-1/2 w-full lg:gap-3 gap-2 flex-col lg:flex-row items-start lg:items-center">
             <div className="lg:w-2/3 w-full">
               {propertyImageUrls?.length ? (
                 <PreviewPropertyImages
@@ -823,7 +823,8 @@ export default function XRooms({ onNext, onPrevious }: Props) {
               )}
             </div>
 
-            <div className="flex items-center space-x-2">
+            {/* 👇 Moved checkbox block to be responsive — stacks on mobile, inline on lg 👇 */}
+            <div className="flex items-center space-x-2 mt-2 lg:mt-0">
               <Checkbox
                 id="available"
                 {...register("available")}
@@ -840,23 +841,18 @@ export default function XRooms({ onNext, onPrevious }: Props) {
           </div>
 
           {/* Submit button */}
-          <div className="flex md:w-1/2 md:items-start lg:justify-end gap-4 w-full">
-            <div className="mt-2">
-              <Button
-                className=" md:w-[120px] w-[134px] text-right"
-                onClick={onPrevious}
-                variant={"secondary"}
-                type="button"
-              >
-                Back
-              </Button>
-            </div>
-
-            <div className="mt-2">
-              <Button className=" md:w-[120px]  w-[134px]" type="submit">
-                Next
-              </Button>
-            </div>
+          <div className="flex justify-end gap-4 mt-2 w-full">
+            <Button
+              className="w-[100px] text-right"
+              onClick={onPrevious}
+              variant={"secondary"}
+              type="button"
+            >
+              Back
+            </Button>
+            <Button className="w-[100px]" type="submit">
+              Next
+            </Button>
           </div>
         </div>
       </form>
