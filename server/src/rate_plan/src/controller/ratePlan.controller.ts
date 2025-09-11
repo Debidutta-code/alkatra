@@ -264,37 +264,37 @@ class RoomPrice {
 }
 
 export class StartStopWatcher {
-    
-    /**
-     * Singleton instance
-     */
-    private inventoryService: InventoryService;
+  private inventoryService: InventoryService;
 
-    /**
-    * constructor to enforce singleton pattern
-    */
-    constructor(inventoryService: InventoryService) {
-        if (!inventoryService) {
-            throw new Error("InventoryService is required");
-        }
-        this.inventoryService = inventoryService;
+  constructor(inventoryService: InventoryService) {
+    if (!inventoryService) {
+      throw new Error("InventoryService is required");
     }
+    this.inventoryService = inventoryService;
+  }
 
-    /**
-     * Get the singleton instance of StartStopWatcher
-     */
+  async updateStartStopSell(req: Request, res: Response, next: NextFunction) {
+    try {
+      
+        const { hotelCode, invTypeCode, ratePlanCode, startDate, endDate } = req.body;
 
-    async updateStartStopSell(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { hotelCode, invTypeCode, ratePlanCode, startDate, endDate } = req.body;
-            console.log("Starting the watcher for inventory update...");
-            const response = await this.inventoryService.updateInventory(hotelCode, invTypeCode, ratePlanCode, startDate, endDate);
-            console.log("Inventory update response:", response);
-            return res.status(200).json({ success: true, message: "Inventory updated successfully", data: response });
-        } catch (error: any) {
-            console.error("Error in startWatcher:", error);
-            return res.status(500).json({ success: false, message: "Failed to start inventory watcher", error: error.message });
-        }
+      const response = await this.inventoryService.updateInventory(hotelCode, invTypeCode, ratePlanCode, startDate, endDate);
+
+      const sanitizedResponse = {
+        matchedCount: response.matchedCount,
+        modifiedCount: response.modifiedCount,
+        acknowledged: response.acknowledged,
+      };
+
+      return res.status(200).json({
+        success: true,
+        message: "Inventory updated successfully",
+        data: sanitizedResponse,
+      });
+    } catch (error: any) {
+      console.error("######### Error in startWatcher:", error);
+      return res.status(500).json({ success: false, message: "Failed to start inventory watcher", error: error.message });
     }
+  }
 }
 export { RatePlanController, RoomPrice };   

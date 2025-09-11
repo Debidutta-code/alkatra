@@ -69,8 +69,7 @@ route.post("/checkAvailability", async (req: Request, res: Response, next: NextF
 })
 
 route.patch("/updateStatus", async (req: Request, res: Response, next: NextFunction) => {
-  const response = await startStopWatcher.updateStartStopSell.bind(startStopWatcher);
-  res.status(200).json(response);
-})
+  await startStopWatcher.updateStartStopSell.bind(startStopWatcher)(req, res, next);
+});
 
 export default route;

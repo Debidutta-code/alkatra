@@ -1,16 +1,15 @@
-import { Inventory } from "../../../wincloud/src/model/inventoryModel"
+import { Inventory } from "../../../wincloud/src/model/inventoryModel";
 
 export class InventoryDao {
-
-    private static instance: InventoryDao
+    private static instance: InventoryDao;
 
     private constructor() { }
 
     static getInstance(): InventoryDao {
         if (!InventoryDao.instance) {
-            InventoryDao.instance = new InventoryDao()
+            InventoryDao.instance = new InventoryDao();
         }
-        return InventoryDao.instance
+        return InventoryDao.instance;
     }
 
     async inventoryUpdate(hotelCode: string, invTypeCode: string, ratePlanCode: string, dates: string[]) {
@@ -19,12 +18,11 @@ export class InventoryDao {
         }
 
         try {
-
-            const updateInventories = await Inventory.updateMany(
+            let updateInventories;
+            updateInventories = await Inventory.updateMany(
                 {
                     hotelCode,
                     invTypeCode,
-                    ratePlanCode,
                     "availability.startDate": { $in: dates },
                 },
                 [
@@ -38,7 +36,7 @@ export class InventoryDao {
                                         $cond: {
                                             if: { $eq: ["$status", "open"] },
                                             then: "close",
-                                            else: "close",
+                                            else: "open",
                                         },
                                     },
                                 },
@@ -52,7 +50,11 @@ export class InventoryDao {
                 throw new Error("Failed to update inventory");
             }
 
-            return updateInventories;
+            return {
+                matchedCount: updateInventories.matchedCount,
+                modifiedCount: updateInventories.modifiedCount,
+                acknowledged: updateInventories.acknowledged,
+            };
         } catch (error) {
             throw new Error(`Error updating inventory: ${error.message}`);
         }
