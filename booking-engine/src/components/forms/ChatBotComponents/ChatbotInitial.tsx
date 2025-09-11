@@ -142,7 +142,7 @@ const ChatbotPage: React.FC<ChatbotPageProps> = ({ onStartChat, onClose, onLogin
       </div>
 
       {/* Main Content */}
-      <div className="p-4 bg-gray-50">
+      <div className="p-2 bg-gray-50">
         {/* Quick Questions Section */}
         {isAuthenticated && (
           <div className="mb-2">
@@ -175,7 +175,7 @@ const ChatbotPage: React.FC<ChatbotPageProps> = ({ onStartChat, onClose, onLogin
                           className="group flex items-center w-full text-left p-0.5 rounded hover:bg-gray-50 transition-all duration-200"
                           onClick={() => isAuthenticated ? handleQuickQuestion(item.question) : onLogin()}
                         >
-                          <div className={`w-8 h-8 ${item.bgColor} rounded flex items-center justify-center mr-2 group-hover:scale-105 transition-transform duration-200`}>
+                          <div className={`w-6 h-6 ${item.bgColor} rounded flex items-center justify-center mr-2 group-hover:scale-105 transition-transform duration-200`}>
                             <IconComponent className={`h-4 w-4 ${item.iconColor}`} />
                           </div>
                           <span className="text-gray-700 text-sm font-noto-sans group-hover:text-[#076DB3] transition-colors duration-200">
@@ -249,7 +249,7 @@ const ChatbotPage: React.FC<ChatbotPageProps> = ({ onStartChat, onClose, onLogin
 
         {/* Features Footer */}
         <div className="mt-4">
-          <div className="flex items-center justify-center gap-4 text-xs text-gray-500 font-noto-sans">
+          <div className="flex items-center justify-center gap-16 text-xs text-gray-500 font-noto-sans">
             <div className="flex items-center gap-1">
               <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
               <span>24/7</span>
