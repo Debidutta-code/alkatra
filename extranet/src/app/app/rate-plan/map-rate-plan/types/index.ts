@@ -26,6 +26,7 @@ export interface RatePlanInterFace {
     currencyCode: string
     _id: string;
     ratePlanCode: string
+    isStopSell?: boolean;
   }
 }
 
@@ -41,4 +42,15 @@ export interface paginationTypes {
 export interface modifiedRatePlanInterface {
   rateAmountId: string;
   price: number;
+  isStopSell?: boolean;
+}
+
+export interface SellStatusInterface {
+  rateAmountId: string;
+  isStopSell: boolean;
+}
+
+export interface modifiedSellStatusInterface {
+  rateAmountId: string;
+  isStopSell: boolean;
 }

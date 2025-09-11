@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FilterBar } from '../components/analytics/FilterBar';
+import { FilterBar } from './FilterBar';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area, Legend } from 'recharts';
 import { WifiOff, DollarSign, Home, BookOpen, AlertCircle, RefreshCw, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { useSelector } from "react-redux";

@@ -28,7 +28,6 @@ export const Filters: React.FC<FiltersProps> = ({
   setSelectedRoomType,
   selectedRatePlan,
   setSelectedRatePlan,
-  data,
   roomTypes,
   onResetFilters,
 }) => {

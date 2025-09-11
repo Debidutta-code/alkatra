@@ -1,4 +1,4 @@
-import { DateRange, RatePlanInterFace, modifiedRatePlanInterface } from '../types';
+import { DateRange, RatePlanInterFace, modifiedRatePlanInterface, modifiedSellStatusInterface } from '../types';
 import { format } from '../utils/dateUtils';
 import Cookies from 'js-cookie';
 import { fetchRatePlans, getAllRatePlans, modifyRatePlans } from "../API"
@@ -111,21 +111,50 @@ export const functioncanEditPrice = (item: RatePlanInterFace): boolean => {
   return hasRateData(item) && item.rates?.baseByGuestAmts !== undefined;
 };
 
-export const saveData = async (data: modifiedRatePlanInterface[]): Promise<void> => {
+export const getSellStatus = (item: RatePlanInterFace): boolean => {
+  if (!item.rates) {
+    return false;
+  }
+  return item.rates.isStopSell || false;
+};
+
+// Add this function to check if sell status can be edited
+export const canEditSellStatus = (item: RatePlanInterFace): boolean => {
+  return hasRateData(item) && item.rates?._id !== undefined;
+};
+export const saveData = async (
+  priceData: modifiedRatePlanInterface[], 
+  sellStatusData?: modifiedSellStatusInterface[]
+): Promise<void> => {
   try {
     const accessToken = Cookies.get('accessToken');
     if (!accessToken) {
       throw new Error('No access token found. Please log in.');
     }
-    console.log("From save Data", data)
-    let modifiedRatePlans = data.map((mp) => {
-      const rateAmountId = mp.rateAmountId
-      const price = mp.price
-      return { rateAmountId, price };
-    });
-    return await modifyRatePlans(modifiedRatePlans, accessToken)
+    
+    console.log("From save Data - Price changes:", priceData);
+    console.log("From save Data - Sell status changes:", sellStatusData);
+    
+    // Handle price modifications
+    if (priceData && priceData.length > 0) {
+      let modifiedRatePlans = priceData.map((mp) => {
+        const rateAmountId = mp.rateAmountId;
+        const price = mp.price;
+        return { rateAmountId, price };
+      });
+      await modifyRatePlans(modifiedRatePlans, accessToken);
+    }
+    
+    // Handle sell status modifications (API call will be added later)
+    if (sellStatusData && sellStatusData.length > 0) {
+      // TODO: Add API call for sell status when API is ready
+      // await modifySellStatus(sellStatusData, accessToken);
+      console.log("Sell status changes ready for API integration:", sellStatusData);
+    }
+    
   } catch (error: any) {
     console.error(error.message);
+    throw error;
   }
 
   await new Promise(resolve => setTimeout(resolve, 1000));
@@ -156,7 +185,7 @@ export const ratePlanServices = async (
       startDate, 
       endDate, 
       ratePlanCode,
-      pageSize // Pass pageSize to API function
+      pageSize
     );
     
     return response;

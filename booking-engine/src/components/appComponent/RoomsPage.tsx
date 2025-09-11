@@ -1060,7 +1060,7 @@ const RoomsPage: React.FC = () => {
                     {propertyDetails?.description && (
                       <div className="bg-tripswift-off-white p-4 rounded-xl border border-gray-100 mb-4">
                         <h3 className="text-section-heading mb-2">{t('RoomsPage.aboutThisProperty')}</h3>
-                        <p className="text-description leading-relaxed">
+                        <p className="text-description leading-relaxed whitespace-pre-wrap">
                           {propertyDetails.description.split(' ').length > 10 ? (
                             <>
                               {showFullDescription

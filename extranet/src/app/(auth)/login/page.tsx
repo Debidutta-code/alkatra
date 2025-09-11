@@ -1,5 +1,5 @@
 import React from "react";
-import LoginComponent from '../../../components/Authentication/Login'; // Rename the imported component to avoid conflicts
+import LoginComponent from './login-form';
 
 type Props = {};
 

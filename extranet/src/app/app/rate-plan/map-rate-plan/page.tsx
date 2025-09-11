@@ -5,25 +5,28 @@ import { Filters } from './components/Filters';
 import { RatePlanTable } from './components/RatePlanTable';
 import { SaveButton } from './components/SaveButton';
 import { filterData, saveData, ratePlanServices, getAllRatePlanServices } from './services/dataService';
-import { RatePlanInterFace, DateRange, paginationTypes, modifiedRatePlanInterface } from './types';
+import { RatePlanInterFace, DateRange, paginationTypes, modifiedRatePlanInterface, modifiedSellStatusInterface } from './types';
 import toast, { Toaster } from 'react-hot-toast';
 import Pagination from "./components/Pagination"
 import { useSidebar } from '@src/components/ui/sidebar';
 import { cn } from '@src/lib/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Button } from '@src/components/ui/button';
+import { XCircle } from 'lucide-react';
+import { BulkSellModal } from './components/BulkSellModal';
 
 const MapRatePlanPage: React.FC = () => {
   const [data, setData] = useState<RatePlanInterFace[]>([]);
   const [filteredData, setFilteredData] = useState<RatePlanInterFace[]>([]);
   const getDefaultDateRange = (): DateRange => {
-  const today = new Date();
-  const nextMonth = new Date(today);
-  nextMonth.setMonth(today.getMonth() + 1);
-  today.setHours(0, 0, 0, 0);
-  nextMonth.setHours(0, 0, 0, 0);
-  return { from: today, to: nextMonth };
-};
-const [dateRange, setDateRange] = useState<DateRange | undefined>(getDefaultDateRange());
+    const today = new Date();
+    const nextMonth = new Date(today);
+    nextMonth.setMonth(today.getMonth() + 1);
+    today.setHours(0, 0, 0, 0);
+    nextMonth.setHours(0, 0, 0, 0);
+    return { from: today, to: nextMonth };
+  };
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(getDefaultDateRange());
   const [selectedRoomType, setSelectedRoomType] = useState<string>('');
   const [selectedRatePlan, setSelectedRatePlan] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -34,7 +37,8 @@ const [dateRange, setDateRange] = useState<DateRange | undefined>(getDefaultDate
   const { state, isMobile } = useSidebar();
   const router = useRouter();
   const searchParams = useSearchParams();
-
+  const [modifiedSellStatus, setModifiedSellStatus] = useState<modifiedSellStatusInterface[]>([]);
+  const [availableCombinations, setAvailableCombinations] = useState<string[]>([]);
   const [paginationResults, setPaginationResults] = useState<paginationTypes>({
     currentPage: 1,
     totalPage: 0,
@@ -46,7 +50,7 @@ const [dateRange, setDateRange] = useState<DateRange | undefined>(getDefaultDate
   const [editButtonClicked, setEditButtonClicked] = useState<boolean>(false);
   const [modifiedValues, setModifiedValues] = useState<modifiedRatePlanInterface[]>([]);
   const [originalData, setOriginalData] = useState<RatePlanInterFace[]>([]);
-
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const getHotelCode = (): string | null => {
     const propertyCodeFromUrl = searchParams.get('propertyCode');
     if (propertyCodeFromUrl) {
@@ -123,7 +127,7 @@ const [dateRange, setDateRange] = useState<DateRange | undefined>(getDefaultDate
 
       setEditButtonClicked(false);
       setModifiedValues([]);
-
+      setModifiedSellStatus([]);
     } catch (error) {
       console.error('Error fetching rate plans:', error);
       toast.error('Failed to fetch rate plans data');
@@ -131,7 +135,14 @@ const [dateRange, setDateRange] = useState<DateRange | undefined>(getDefaultDate
       setIsLoading(false);
     }
   };
-
+  useEffect(() => {
+    if (allRoomTypes.length > 0) {
+      const combinations = allRoomTypes.flatMap(room =>
+        room.ratePlanCodes.map((ratePlan: string) => `${room.invTypeCode} - ${ratePlan}`)
+      );
+      setAvailableCombinations(combinations);
+    }
+  }, [allRoomTypes]);
   useEffect(() => {
     if (roomTypesLoaded) {
       fetchRatePlans();
@@ -191,17 +202,46 @@ const [dateRange, setDateRange] = useState<DateRange | undefined>(getDefaultDate
       ];
     });
   };
+  const handleSellStatusChange = (id: string, isStopSell: boolean) => {
+    // Update the data state with new sell status
+    const updatedData = data.map(item => {
+      if (item.rates && item.rates._id === id) {
+        return {
+          ...item,
+          rates: {
+            ...item.rates,
+            isStopSell: isStopSell
+          }
+        };
+      }
+      return item;
+    });
 
+    setData(updatedData);
+
+    setModifiedSellStatus(prev => {
+      const filtered = prev.filter(item => item.rateAmountId !== id);
+
+      return [
+        ...filtered,
+        {
+          rateAmountId: id,
+          isStopSell: isStopSell
+        }
+      ];
+    });
+  };
   const toggleEditButton = () => {
     setEditButtonClicked(!editButtonClicked);
   };
 
   const handleSave = async () => {
     try {
-      if (modifiedValues.length > 0) {
-        await saveData(modifiedValues); // Pass the modified values array
-        toast.success(`Successfully saved ${modifiedValues.length} modification(s)!`);
-        await fetchRatePlans(); // This will clear modifiedValues
+      if (modifiedValues.length > 0 || modifiedSellStatus.length > 0) {
+        await saveData(modifiedValues, modifiedSellStatus); // Pass both arrays
+        const totalChanges = modifiedValues.length + modifiedSellStatus.length;
+        toast.success(`Successfully saved ${totalChanges} modification(s)!`);
+        await fetchRatePlans(); // This will clear both modifiedValues and modifiedSellStatus
       } else {
         toast.error('No changes to save');
       }
@@ -220,7 +260,7 @@ const [dateRange, setDateRange] = useState<DateRange | undefined>(getDefaultDate
   };
 
   // Check if there are any unsaved changes
-  const hasUnsavedChanges = modifiedValues.length > 0;
+  const hasUnsavedChanges = modifiedValues.length > 0 || modifiedSellStatus.length > 0;
 
   return (
     <div
@@ -247,7 +287,31 @@ const [dateRange, setDateRange] = useState<DateRange | undefined>(getDefaultDate
             />
           </>
         )}
-
+        <div className="flex justify-start mt-2 px-6">
+          <Button
+            onClick={() => setIsBulkModalOpen(true)}
+            disabled={!selectedRoomType && !selectedRatePlan && !dateRange}
+            className="gap-2"
+          >
+            <XCircle className="h-4 w-4" />
+            Bulk Stop Sell
+          </Button>
+        </div>
+        <BulkSellModal
+          isOpen={isBulkModalOpen}
+          onClose={() => setIsBulkModalOpen(false)}
+          onConfirm={(data) => {
+            // This will be handled by dataService later
+            console.log("Bulk update:", data);
+            // You can add logic here to update local state
+            setIsBulkModalOpen(false);
+          }}
+          initialData={{
+            dateRange: dateRange ?? getDefaultDateRange(),
+            roomRatePlans: filteredData.map(item => `${item.invTypeCode} - ${item.rates.ratePlanCode}`)
+          }}
+          availableCombinations={availableCombinations}
+        />
         <div className="flex justify-end items-center mt-4">
           <div className="flex items-center space-x-2">
             <SaveButton
@@ -261,9 +325,11 @@ const [dateRange, setDateRange] = useState<DateRange | undefined>(getDefaultDate
         <RatePlanTable
           filteredData={filteredData}
           handlePriceChange={handlePriceChange}
+          handleSellStatusChange={handleSellStatusChange}
           toggleEditButton={toggleEditButton}
           editButtonVal={editButtonClicked}
           modifiedValues={modifiedValues}
+          modifiedSellStatus={modifiedSellStatus}
           isLoading={isLoading}
         />
 
