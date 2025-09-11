@@ -11,8 +11,13 @@ import {
   getAllRoomTypes,
   getDeepLinkData
 } from "../../controller/room.controller";
+import { protect } from "../../../../user_authentication/src/Middleware/auth.middleware";
+import { RatePlanHotelier } from "../../controller/ratePlan.controller";
 
 const router = Router();
+
+// Singleton instance of RatePlanHotelier
+const ratePlanHotelier = new RatePlanHotelier();
 
 export default (app: Router) => {
   app.use("/room", router);
@@ -33,4 +38,7 @@ export default (app: Router) => {
     .post(createRoom as any)
     .patch(updateRoom as any)
     .delete(deleteRoom as any);
+
+  // Rate Plan Create Route
+  router.route("/ratePlan/create").post(protect as any, ratePlanHotelier.createRatePlan.bind(ratePlanHotelier) as any);
 };

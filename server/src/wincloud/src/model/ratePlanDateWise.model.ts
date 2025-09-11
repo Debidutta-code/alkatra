@@ -47,7 +47,7 @@ const rateAmountSchema = new Schema<IRateAmountDateWise>({
     currencyCode: { type: String, required: true },
     baseByGuestAmts: [{
         amountBeforeTax: { type: Number, required: true },
-        numberOfGuests: { type: Number, required: true, enum: [1, 2, 3, 4] },
+        numberOfGuests: { type: Number, required: true },
     }],
     additionalGuestAmounts: [{
         ageQualifyingCode: { type: String, required: true, enum: ['10', '8', '7'] },
@@ -58,5 +58,5 @@ const rateAmountSchema = new Schema<IRateAmountDateWise>({
 
 rateAmountSchema.index({ hotelCode: 1, invTypeCode: 1, startDate: 1, endDate: 1 });
 
- const RateAmount = model<IRateAmountDateWise>('RateAmountDateWise', rateAmountSchema);
- export default RateAmount;
+const RateAmount = model<IRateAmountDateWise>('RateAmountDateWise', rateAmountSchema);
+export default RateAmount;

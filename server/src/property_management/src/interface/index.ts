@@ -1,1 +1,6 @@
-export { CreateRatePlanRequest } from "./ratePlan.interface";
+export {
+    BaseGuestAmount,
+    AdditionalGuestAmount,
+    DaysOfWeek,
+    CreateRatePlanRequest
+} from './ratePlan.interface';

@@ -1,14 +1,14 @@
-interface BaseGuestAmount {
+export interface BaseGuestAmount {
     numberOfGuests: number;
     amountBeforeTax: number;
 }
 
-interface AdditionalGuestAmount {
+export interface AdditionalGuestAmount {
     ageQualifyingCode: number;
     amount: number;
 }
 
-interface DaysOfWeek {
+export interface DaysOfWeek {
     mon: boolean;
     tue: boolean;
     wed: boolean;
