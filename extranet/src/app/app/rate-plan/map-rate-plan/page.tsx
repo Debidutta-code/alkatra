@@ -37,11 +37,11 @@ const [dateRange, setDateRange] = useState<DateRange | undefined>(getDefaultDate
 
   const [paginationResults, setPaginationResults] = useState<paginationTypes>({
     currentPage: 1,
-    totalPage: 10,
-    totalResults: 200,
-    hasNextPage: true,
+    totalPage: 0,
+    totalResults: 0,
+    hasNextPage: false,
     hasPreviousPage: false,
-    resultsPerPage: 10 // Updated default
+    resultsPerPage: 10
   });
   const [editButtonClicked, setEditButtonClicked] = useState<boolean>(false);
   const [modifiedValues, setModifiedValues] = useState<modifiedRatePlanInterface[]>([]);
@@ -280,7 +280,7 @@ const [dateRange, setDateRange] = useState<DateRange | undefined>(getDefaultDate
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
               showResultsInfo={true}
-              pageSizeOptions={[6, 10, 20, 50]}
+              pageSizeOptions={[6, 10, 20]}
             />
           </div>
         )}

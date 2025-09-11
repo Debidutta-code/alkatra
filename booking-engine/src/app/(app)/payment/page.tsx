@@ -242,9 +242,9 @@ function PaymentPageContent() {
                     <div className="flex flex-col md:flex-row md:justify-between gap-6">
                       <div className={`flex items-start`}>
                         <CalendarRange className={`text-tripswift-blue flex-shrink-0`} size={20} />
-                        <div className={` ${i18n.language === "ar" ? "mr-3" : "ml-3"}`}>
+                        <div className={`${i18n.language === "ar" ? "mr-3" : "ml-3"} flex-1 min-w-0 ${i18n.language === "es" ? "md:min-w-[200px]" : ""}`}>
                           <p className="text-sm text-tripswift-black/60">{t('Payment.PaymentPageContent.bookingSummary.stayDates')}</p>
-                          <p className={`text-sm text-tripswift-black/60 break-words ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+                          <p className={`text-sm md:text-xs lg:text-sm text-tripswift-black/60 break-words leading-tight ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
                             {i18n.language === "ar" ? (
                               <>
                                 {formatDate(checkOut, { weekday: 'short', month: 'short', day: 'numeric' })} - {formatDate(checkIn, { weekday: 'short', month: 'short', day: 'numeric' })}

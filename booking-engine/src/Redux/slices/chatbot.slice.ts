@@ -169,13 +169,13 @@ export const initializeWelcomeMessages = (userFirstName: string) => {
     dispatch(startWelcomeSequence());
 
     const welcomeMessages = [
-      { id: 'welcome-1', text: `Welcome, ${userFirstName}! 👋`, delay: 1000 },
+      { id: 'welcome-1', text: `Welcome, ${userFirstName}! 👋`, delay: 300 },
       {
         id: 'welcome-2',
         text: "I'm your Al-Hajz Chat Bot, here to assist you with booking management, account queries, and more. ✨",
-        delay: 2000,
+        delay: 600,
       },
-      { id: 'welcome-3', text: "How can I help you today?", delay: 1500 },
+      { id: 'welcome-3', text: "How can I help you today?", delay: 400 },
     ];
 
     for (let i = 0; i < welcomeMessages.length; i++) {
@@ -186,7 +186,7 @@ export const initializeWelcomeMessages = (userFirstName: string) => {
 
       // Show typing
       dispatch(setBotTyping(true));
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       // Add message
       dispatch(

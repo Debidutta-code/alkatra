@@ -752,7 +752,8 @@
             "finalAmountIncludingTax": "Son Tutar (vergi dahil)",
             "includesTaxes": "Vergi ve ücretler dahildir",
             "taxBreakdown": "Vergi Ayrımı",
-            "includesTaxAmount": "{{currency}} {{amount}} vergi dahil"
+            "includesTaxAmount": "{{currency}} {{amount}} vergi dahil",
+            "dobError": "Doğum tarihi gereklidir"
         }
     },
     "BookingTabs": {

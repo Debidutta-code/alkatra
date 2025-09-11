@@ -752,7 +752,8 @@
       "finalAmountIncludingTax": "Final Amount (including tax)",
       "includesTaxes": "Includes taxes and fees",
       "taxBreakdown": "Tax Breakdown",
-      "includesTaxAmount": "Includes {{currency}} {{amount}} in taxes"
+      "includesTaxAmount": "Includes {{currency}} {{amount}} in taxes",
+      "dobError": "Date of Birth is required"
     }
   },
   "BookingTabs": {

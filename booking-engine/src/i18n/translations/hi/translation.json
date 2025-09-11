@@ -752,7 +752,8 @@
       "finalAmountIncludingTax": "अंतिम राशि (कर सहित)",
       "includesTaxes": "कर और शुल्क शामिल हैं",
       "taxBreakdown": "कर विवरण",
-      "includesTaxAmount": "{{currency}} {{amount}} कर शामिल है"
+      "includesTaxAmount": "{{currency}} {{amount}} कर शामिल है",
+      "dobError": "जन्म तिथि आवश्यक है"
     }
   },
   "BookingTabs": {
