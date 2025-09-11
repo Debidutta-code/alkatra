@@ -752,7 +752,8 @@
       "finalAmountIncludingTax": "المبلغ النهائي (شامل الضريبة)",
       "includesTaxes": "يشمل الضرائب والرسوم",
       "taxBreakdown": "تفصيل الضريبة",
-      "includesTaxAmount": "يتضمن {{amount}} {{currency}} كضرائب"
+      "includesTaxAmount": "يتضمن {{amount}} {{currency}} كضرائب",
+      "dobError": "تاريخ الميلاد مطلوب"
     }
   },
   "BookingTabs": {

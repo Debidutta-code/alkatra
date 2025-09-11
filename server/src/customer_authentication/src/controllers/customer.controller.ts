@@ -232,6 +232,28 @@ class CustomerController {
             return res.status(500).json({ message: "Failed to get referral details of user" });
         }
     }
+
+    async deleteCustomer(req: AuthenticatedRequest, res: Response) {
+        try {
+            const userId = req.user?.id;
+            if (!userId) {
+                return res.status(401).json({ message: "Unauthorized" });
+            }
+
+            const result = await customerService.deleteCustomer(userId);
+            if (!result) {
+                return res.status(404).json({ message: "Customer not found" });
+            }
+
+            
+            return res.status(200).json({ message: "Customer deleted successfully" });
+            
+        }
+        catch (error: any) {
+            console.log("Failed to delete customer: ", error);
+            return res.status(500).json({ message: "Failed to delete customer" });
+        }
+    }
 }
 
 export default new CustomerController();

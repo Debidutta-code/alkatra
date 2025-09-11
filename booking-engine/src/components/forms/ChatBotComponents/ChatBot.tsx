@@ -1,19 +1,27 @@
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../Redux/store';
 import React, { useEffect, useState } from 'react';
 import { Card } from '../UserProfileComponents';
 import ChatbotIcon from './ChatbotIcon';
 import ChatbotInitial from './ChatbotInitial';
 import ChatbotConversation from './ChatbotConversation';
+import { useRouter } from 'next/navigation';
 
 type View = 'initial' | 'chat' | 'feedback';
 
 interface ChatbotProps {
   userFirstName: string;
+  isOnline: boolean;
 }
 
-const Chatbot: React.FC<ChatbotProps> = ({ userFirstName }) => {
+const Chatbot: React.FC<ChatbotProps> = ({ userFirstName, isOnline }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [view, setView] = useState<View>('initial');
   const [isHovered, setIsHovered] = useState(false);
+  const router = useRouter();
+  const { user, accessToken } = useSelector((state: RootState) => state.auth);
+  const isAuthenticated = !!accessToken && !!user;
+  const [isMinimized, setIsMinimized] = useState(false);
 
   const handleOpen = () => {
     setIsOpen(true);
@@ -23,6 +31,11 @@ const Chatbot: React.FC<ChatbotProps> = ({ userFirstName }) => {
   const handleClose = () => {
     setIsOpen(false);
     setIsHovered(false);
+  };
+
+  const handleLogin = () => {
+    handleClose();
+    router.push('/login');
   };
 
   const handleMouseEnter = () => {
@@ -37,7 +50,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ userFirstName }) => {
     setView(newView);
   };
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !isMinimized) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'auto';
@@ -45,7 +58,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ userFirstName }) => {
     return () => {
       document.body.style.overflow = 'auto';
     };
-  }, [isOpen]);
+  }, [isOpen, isMinimized]);
   return (
     <div className="fixed bottom-4 right-4 z-50 flex items-end">
       {/* Chat Preview on Hover (shown beside icon) */}
@@ -65,10 +78,15 @@ const Chatbot: React.FC<ChatbotProps> = ({ userFirstName }) => {
       {isOpen && (
         <Card className="w-full max-w-xs mb-4 shadow-xl">
           {view === 'initial' && (
-            <ChatbotInitial onStartChat={() => handleChangeView('chat')} onClose={handleClose} />
+            <ChatbotInitial
+              onStartChat={() => handleChangeView('chat')}
+              onClose={handleClose}
+              onLogin={handleLogin}
+              isAuthenticated={isAuthenticated}
+            />
           )}
-          {view === 'chat' && (
-            <ChatbotConversation onClose={handleClose} userFirstName={userFirstName} />
+          {view === 'chat' && isAuthenticated && (
+            <ChatbotConversation onClose={handleClose} userFirstName={userFirstName} isOnline={isOnline} onMinimizedChange={setIsMinimized} />
           )}
         </Card>
       )}

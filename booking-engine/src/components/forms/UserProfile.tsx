@@ -9,8 +9,6 @@ import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import HelpCenterTab from '@/components/helpCenter/HelpCenterTab';
-import { Chatbot } from './ChatBotComponents';
-
 import {
   User,
   Heart,
@@ -560,7 +558,6 @@ const UserProfile: React.FC = () => {
           t={t}
         />
       )}
-      <Chatbot userFirstName={user.firstName} />
     </div>
   );
 };

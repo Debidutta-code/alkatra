@@ -28,4 +28,7 @@ router.get("/referrals", authenticateCustomer, CustomerController.getReferrals);
 // Customer connect request API
 router.route("/connect").post(CustomerController.connectUser);
 
+// Customer delete
+router.route("/delete").delete(authenticateCustomer, CustomerController.deleteCustomer);
+
 export default router; 
