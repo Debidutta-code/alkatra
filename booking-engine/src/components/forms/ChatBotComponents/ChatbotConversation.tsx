@@ -123,9 +123,7 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
   };
 
   return (
-    <div className={`flex flex-col bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 ${isMinimized ? 'w-72 h-14' : 'w-full max-w-xs h-[500px]'
-      }`}>
-
+    <div className={`flex flex-col bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 ${isMinimized ? 'w-80 h-14' : 'w-80 h-[500px]'}`}>
       {/* Enhanced Header */}
       <div className="relative bg-gradient-to-br from-[#076DB3] via-[#054B8F] to-[#043A73] p-3">
         {/* Animated background pattern */}
