@@ -1,4 +1,5 @@
 import { RatePlanRepository } from '../repository/ratePlan.repository';
+import { CreateRatePlanRequest } from '../'
 
 export class RatePlanService {
     /**
@@ -25,5 +26,9 @@ export class RatePlanService {
             );
         }
         return RatePlanService.instance;
+    }
+
+    async ratePlanCreate (data: any) {
+
     }
 }

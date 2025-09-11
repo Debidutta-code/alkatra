@@ -1,37 +1,6 @@
 import { NextFunction, Response } from "express";
 import { RatePlanService } from "../service";
-
-interface BaseGuestAmount {
-    numberOfGuests: number;
-    amountBeforeTax: number;
-}
-
-interface AdditionalGuestAmount {
-    ageQualifyingCode: number;
-    amount: number;
-}
-
-interface DaysOfWeek {
-    mon: boolean;
-    tue: boolean;
-    wed: boolean;
-    thu: boolean;
-    fri: boolean;
-    sat: boolean;
-    sun: boolean;
-}
-
-interface CreateRatePlanRequest {
-    hotelCode: string;
-    invTypeCode: string;
-    ratePlanCode: string;
-    startDate: string;
-    endDate: string;
-    currencyCode: string;
-    days: DaysOfWeek;
-    baseGuestAmounts: BaseGuestAmount[];
-    additionalGuestAmounts: AdditionalGuestAmount[];
-}
+import { CreateRatePlanRequest } from "../interface";
 
 class RatePlanHotelier {
 
@@ -53,6 +22,26 @@ class RatePlanHotelier {
                 baseGuestAmounts,
                 additionalGuestAmounts 
             } = req.body;
+
+            const data: CreateRatePlanRequest = {
+                hotelCode,
+                invTypeCode,
+                ratePlanCode,
+                startDate,
+                endDate,
+                currencyCode,
+                days,
+                baseGuestAmounts,
+                additionalGuestAmounts
+            };
+
+            const ratePlanCreateResult = await this.ratePlanService.ratePlanCreate({ data });
+            if (!ratePlanCreateResult) {
+                return res.status(400).json({ message: "Failed to create rate plan" });
+            }
+
+            return res.status(201).json({ message: "Rate plan created successfully", data: ratePlanCreateResult } );
+
         }
         catch (error: any) {
             console.log("Error in createRatePlan controller:", error);
