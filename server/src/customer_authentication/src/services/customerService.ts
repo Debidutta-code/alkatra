@@ -6,6 +6,7 @@ import { ICustomer } from "../models/customer.model";
 import jwt from "jsonwebtoken";
 import { UserMessageRepository } from "../repositories";
 import { IUserMessage } from "../interfaces/userMessage.interface";
+import { ca } from "zod/v4/locales/index.cjs";
 
 class CustomerService {
     private userMessageRepository: UserMessageRepository;
@@ -181,6 +182,35 @@ class CustomerService {
      */
     async findById(id: string): Promise<ICustomer | null> {
         return await customerRepository.findById(id);
+    }
+
+    async deleteCustomer(customerId: string) {
+        try {
+            if (!customerId) {
+                throw new Error("Customer ID is required");
+            }
+
+            const customerDetails = await customerRepository.findById(customerId);
+            if (!customerDetails) {
+                throw new Error("Customer details not found");
+            }
+
+            const storedData = await customerRepository.storeDeletedCustomer(customerDetails);
+            if(!storedData) {
+                throw new Error("SERVICE: Failed to store deleted customer data");
+            }
+
+            const deletedDetails = await customerRepository.findByIdAndDelete(customerId);
+            if (!deletedDetails) {
+                throw new Error("Failed to delete customer");
+            }
+
+            return deletedDetails;
+        }
+        catch (error: any) {
+            console.log("SERVICE: Failed to delete customer", error);
+            throw new Error("Failed to delete customer");
+        }
     }
 
 }

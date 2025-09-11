@@ -1,6 +1,7 @@
 import CustomerModel, { ICustomer } from "./customer.model";
 import OTPModel, { IOTP, OTPStatus, OTPType } from "./verification.model";
 import { IUserMessage, UserMessageModel } from "./userMessage.model";
+import DeletedCustomerModel, { IDeletedCustomer } from "./deletedCustomer.model";
 
 
 export {
@@ -11,5 +12,7 @@ export {
     OTPStatus,
     OTPType,
     IUserMessage,
-    UserMessageModel
+    UserMessageModel,
+    DeletedCustomerModel,
+    IDeletedCustomer
 };
