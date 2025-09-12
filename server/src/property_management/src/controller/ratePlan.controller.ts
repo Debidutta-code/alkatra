@@ -46,7 +46,7 @@ export class RatePlanHotelier {
         }
         catch (error: any) {
             console.log("Error in createRatePlan controller:", error);
-            return res.status(500).json({ message: "Error while creating rate plan" });
+            return res.status(500).json({ message: error.message || "Internal Server Error" });
         }
     }
 }

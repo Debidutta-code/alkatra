@@ -29,30 +29,51 @@ export class RatePlanService {
     }
 
     async ratePlanCreate(data: CreateRatePlanRequest) {
-        try {
-            /**
-             * Check if a rate plan already exists for the given hotelCode and invTypeCode
-             */
-            const existingData = await this.ratePlanRepository.ratePlanFind(data.hotelCode, data.invTypeCode);
-            if (existingData) {
-                throw new Error("Rate plan or inventory already exists for the given hotelCode and invTypeCode");
-            }
-
-            console.log("The data for new rate plan creation:", data);
-
-            /**
-             * If no existing rate plan is found, proceed to create a new rate plan
-             */
-            const createNewRatePlan = await this.ratePlanRepository.ratePlanCreate(data);
-            if (!createNewRatePlan) {
-                throw new Error("Failed to create rate plan");
-            }
-            
-            return createNewRatePlan;
+        /**
+         * Check for hotel name
+         */
+        const hotelName = await this.ratePlanRepository.getHotelName(data.hotelCode);
+        if (!hotelName) {
+            throw new Error("Hotel not found with the given hotel code");
         }
-        catch (error: any) {
-            console.log("Error in ratePlanCreate service:", error);
-            throw new Error("Error while creating rate plan");
+
+        /**
+         * Check for inventory type/ Room type code
+         */
+        const invTypeDetails = await this.ratePlanRepository.checkInvTypeCode(data.invTypeCode);
+        if (!invTypeDetails) {
+            throw new Error("Inventory Type Code not found");
         }
+
+        /**
+         * Check if a rate plan already exists for the given hotelCode and invTypeCode
+         */
+        const existingData = await this.ratePlanRepository.ratePlanFind(data.hotelCode, data.invTypeCode);
+        if (existingData) {
+            throw new Error("Rate plan or inventory already exists for the given hotelCode and invTypeCode");
+        }
+
+        const ratePlanCreateData = {
+            hotelCode: data.hotelCode,
+            hotelName: hotelName,
+            invTypeCode: invTypeDetails,
+            ratePlanCode: data.ratePlanCode,
+            startDate: data.startDate,
+            endDate: data.endDate,
+            days: data.days,
+            currencyCode: data.currencyCode,
+            baseByGuestAmts: data.baseGuestAmounts,
+            additionalGuestAmounts: data.additionalGuestAmounts
+        };
+
+        /**
+         * If no existing rate plan is found, proceed to create a new rate plan
+         */
+        const createNewRatePlan = await this.ratePlanRepository.ratePlanCreate(ratePlanCreateData);
+        if (!createNewRatePlan) {
+            throw new Error("Failed to create rate plan");
+        }
+
+        return createNewRatePlan;
     }
 }
