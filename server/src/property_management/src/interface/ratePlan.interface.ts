@@ -65,7 +65,6 @@ export interface Availability {
 
 export interface IInventory extends Document {
   hotelCode: string;
-  hotelName: string;
   invTypeCode: string;
   availability: Availability;
   createdAt?: Date;

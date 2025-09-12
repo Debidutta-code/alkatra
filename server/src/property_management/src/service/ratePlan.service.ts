@@ -57,14 +57,14 @@ export class RatePlanService {
 
         const ratePlanCreateData = {
             hotelCode: data.hotelCode,
-            hotelName: hotelName,
-            invTypeCode: invTypeCode,
+            hotelName: hotelName.property_name,
+            invTypeCode: invTypeCode.room_type,
             ratePlanCode: data.ratePlanCode,
             startDate: data.startDate,
             endDate: data.endDate,
             days: data.days,
             currencyCode: data.currencyCode,
-            baseByGuestAmts: data.baseGuestAmounts,
+            baseGuestAmounts: data.baseGuestAmounts,
             additionalGuestAmounts: data.additionalGuestAmounts
         };
 
@@ -79,15 +79,16 @@ export class RatePlanService {
         /**
          * After create rate plan, now push the same data to RatePlanDateWise collection
          */
-        // const convertDateWise = await this.ratePlanRepository.convertDateWise(ratePlanCreateData);
-        // if (!convertDateWise) {
-        //     throw new Error("Failed to convert to date-wise rate plan");
-        // }
+        console.log("The rate plan date wise create data", ratePlanCreateData);
+        const convertDateWise = await this.ratePlanRepository.convertDateWise(ratePlanCreateData);
+        if (!convertDateWise) {
+            throw new Error("Failed to convert to date-wise rate plan");
+        }
 
-        // const createDateWiseRatePlan = await this.ratePlanRepository.ratePlanCreateDateWise(convertDateWise);
-        // if (!createDateWiseRatePlan) {
-        //     throw new Error("Failed to create date-wise rate plan");
-        // }
+        const createDateWiseRatePlan = await this.ratePlanRepository.ratePlanCreateDateWise(convertDateWise);
+        if (!createDateWiseRatePlan) {
+            throw new Error("Failed to create date-wise rate plan");
+        }
 
         return createNewRatePlan;
     }

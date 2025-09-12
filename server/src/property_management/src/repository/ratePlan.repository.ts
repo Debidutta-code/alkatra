@@ -92,7 +92,7 @@ export class RatePlanRepository {
     /**
      * Convert rate plan data to date wise data
      */
-    async convertDateWise(data: any) {
+    async convertDateWise(ratePlanCreateData: any) {
         const {
             hotelCode,
             hotelName,
@@ -104,9 +104,7 @@ export class RatePlanRepository {
             currencyCode,
             baseByGuestAmts,
             additionalGuestAmounts
-        } = data;
-
-        console.log("@@@@@@@@@@@@ The data is:", data);
+        } = ratePlanCreateData;
 
         // Validate required fields
         if (!hotelCode || !invTypeCode || !ratePlanCode) {
@@ -142,18 +140,12 @@ export class RatePlanRepository {
      * Insert date wise rate plan data
      * @param data 
      */
-    async ratePlanCreateDateWise(data) {
-        // Generate date-wise records
-        const dateWiseRecords = await this.convertDateWise(data);
-
-        // Insert into RateAmountDateWise collection
-        if (dateWiseRecords.length > 0) {
-            const insertResult = await RateAmountDateWise.insertMany(dateWiseRecords, { ordered: false });
-            // console.log(`✅ Inserted ${insertResult.length} date-wise records for ${data.hotelCode} - ${data.ratePlanCode}`);
+    async ratePlanCreateDateWise(data: any) {
+        
+        if (data.length > 0) {
+            const insertResult = await RateAmountDateWise.insertMany(data, { ordered: false });
             return { insertedCount: insertResult.length };
         }
-
-        // console.log(`No date-wise records to insert for ${data.hotelCode} - ${data.ratePlanCode}`);
         return { insertedCount: 0 };
     }
 }

@@ -45,5 +45,5 @@ export default (app: Router) => {
   router.route("/ratePlan/create").post(protect as any, ratePlanHotelier.createRatePlan.bind(ratePlanHotelier) as any);
 
   // Inventory Create Route
-  router.route("/inventory/create").post(protect as any, inventoryHotelier.createInventory.bind(ratePlanHotelier) as any);
+  router.route("/inventory/create").post(protect as any, inventoryHotelier.createInventory.bind(inventoryHotelier) as any);
 };
