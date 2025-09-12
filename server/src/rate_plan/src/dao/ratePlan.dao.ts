@@ -255,6 +255,7 @@ class RatePlanDao {
       console.log("THe hotel code is", hotelCode);
       const ratePlanMatch: any = { hotelCode };
 
+
       if (invTypeCode) {
         ratePlanMatch.invTypeCode = invTypeCode;
       }
@@ -311,6 +312,7 @@ class RatePlanDao {
           rate.hotelCode === inv.hotelCode
           && rate.invTypeCode === inv.invTypeCode
           && rate.startDate.getTime() === inv.availability.startDate.getTime()
+        // && rate.endDate.getTime() >= inv.availability.endDate.getTime()
         // && rate.endDate.getTime() >= inv.availability.endDate.getTime()
       );
 
