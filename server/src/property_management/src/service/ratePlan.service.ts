@@ -47,14 +47,6 @@ export class RatePlanService {
             throw new Error("Inventory Type Code not found");
         }
 
-        /**
-         * Check if a rate plan already exists for the given hotelCode and invTypeCode
-         */
-        const existingData = await this.ratePlanRepository.ratePlanFind(data.hotelCode, data.invTypeCode);
-        if (existingData) {
-            throw new Error("Rate plan or inventory already exists for the given hotelCode and invTypeCode");
-        }
-
         const ratePlanCreateData = {
             hotelCode: data.hotelCode,
             hotelName: hotelName.property_name,
@@ -71,10 +63,10 @@ export class RatePlanService {
         /**
          * If no existing rate plan is found, proceed to create a new rate plan
          */
-        const createNewRatePlan = await this.ratePlanRepository.ratePlanCreate(ratePlanCreateData);
-        if (!createNewRatePlan) {
-            throw new Error("Failed to create rate plan");
-        }
+        // const createNewRatePlan = await this.ratePlanRepository.ratePlanCreate(ratePlanCreateData);
+        // if (!createNewRatePlan) {
+        //     throw new Error("Failed to create rate plan");
+        // }
 
         /**
          * After create rate plan, now push the same data to RatePlanDateWise collection
@@ -90,6 +82,6 @@ export class RatePlanService {
             throw new Error("Failed to create date-wise rate plan");
         }
 
-        return createNewRatePlan;
+        return createDateWiseRatePlan;
     }
 }

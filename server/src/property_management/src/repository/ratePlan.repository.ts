@@ -137,15 +137,50 @@ export class RatePlanRepository {
 
 
     /**
-     * Insert date wise rate plan data
-     * @param data 
-     */
+ * Insert date wise rate plan data with upsert functionality using bulk operations
+ * @param data 
+ */
     async ratePlanCreateDateWise(data: any) {
-        
-        if (data.length > 0) {
-            const insertResult = await RateAmountDateWise.insertMany(data, { ordered: false });
-            return { insertedCount: insertResult.length };
+        if (data.length === 0) {
+            return { insertedCount: 0, updatedCount: 0 };
         }
-        return { insertedCount: 0 };
+
+        const bulkOps = data.map(item => ({
+            updateOne: {
+                filter: {
+                    hotelCode: item.hotelCode,
+                    invTypeCode: item.invTypeCode,
+                    ratePlanCode: item.ratePlanCode,
+                    startDate: item.startDate,
+                    endDate: item.endDate
+                },
+                update: {
+                    $set: {
+                        days: item.days,
+                        currencyCode: item.currencyCode,
+                        baseByGuestAmts: item.baseByGuestAmts,
+                        additionalGuestAmounts: item.additionalGuestAmounts,
+                        updatedAt: new Date()
+                    },
+                    $setOnInsert: {
+                        hotelName: item.hotelName,
+                        createdAt: item.createdAt || new Date()
+                    }
+                },
+                upsert: true
+            }
+        }));
+
+        try {
+            const bulkResult = await RateAmountDateWise.bulkWrite(bulkOps, { ordered: false });
+            return {
+                insertedCount: bulkResult.upsertedCount,
+                updatedCount: bulkResult.modifiedCount,
+                matchedCount: bulkResult.matchedCount
+            };
+        } catch (error) {
+            console.error('Error in bulk rate plan operation:', error);
+            throw new Error('Failed to create/update rate plans in bulk');
+        }
     }
 }
