@@ -7,7 +7,7 @@ import { CreateInventoryForm } from '../create-inventory/components/CreateInvent
 import { getAllRatePlanServices } from '../map-rate-plan/services/dataService';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { DEFAULT_CURRENCY, SUPPORTED_CURRENCIES } from './constants/index';
+import { SUPPORTED_CURRENCIES } from './constants/index';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@src/components/ui/tabs';
 import { Button } from '@src/components/ui/button';
 
@@ -41,11 +41,24 @@ const CreateRatePlanPage = () => {
     setCreatedRatePlanData(formData);
     setIsRatePlanCreated(true);
     setActiveTab('inventory');
+
+    // Ensure session has latest hotelCode
+    if (formData.hotelCode) {
+      sessionStorage.setItem('hotelCode', formData.hotelCode);
+    }
   };
 
   const handleInventorySuccess = () => {
     sessionStorage.setItem('ratePlanCreateSuccess', 'true');
-    router.push('/app/rate-plan/map-rate-plan');
+
+    // Get propertyCode — from created rate plan or fallback to session
+    const propertyCode = createdRatePlanData?.hotelCode || sessionStorage.getItem('hotelCode') || '';
+
+    if (propertyCode) {
+      router.push(`/app/rate-plan/map-rate-plan?propertyCode=${encodeURIComponent(propertyCode)}`);
+    } else {
+      router.push('/app/rate-plan/map-rate-plan');
+    }
   };
 
   const hotelCode = sessionStorage.getItem('hotelCode') || '';
@@ -61,6 +74,7 @@ const CreateRatePlanPage = () => {
   return (
     <div className="max-w-4xl mx-auto p-4">
       <div className="bg-white rounded-xl shadow-md p-6">
+        {/* ← Back Button */}
         <div className="mb-4">
           <Button
             variant="ghost"
@@ -70,23 +84,23 @@ const CreateRatePlanPage = () => {
             ← Back
           </Button>
         </div>
+
         <h1 className="text-2xl font-tripswift-bold text-gray-900 mb-6">
           Create Rate Plan & Inventory
         </h1>
 
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'ratePlan' | 'inventory')} className="w-full">
+          {/* Tab Navigation */}
           <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="ratePlan" className="text-sm font-medium">
               Step 1: Create Rate Plan
             </TabsTrigger>
-            <TabsTrigger
-              value="inventory"
-              className="text-sm font-medium"
-            >
+            <TabsTrigger value="inventory" className="text-sm font-medium">
               Step 2: Create Inventory
             </TabsTrigger>
           </TabsList>
 
+          {/* Tab Content: Rate Plan */}
           <TabsContent value="ratePlan">
             <CreateRatePlanForm
               hotelCode={hotelCode}
@@ -96,6 +110,7 @@ const CreateRatePlanPage = () => {
             />
           </TabsContent>
 
+          {/* Tab Content: Inventory */}
           <TabsContent value="inventory">
             {createdRatePlanData ? (
               <CreateInventoryForm
@@ -111,14 +126,16 @@ const CreateRatePlanPage = () => {
                 <p className="text-yellow-700 mb-4">
                   You can set up inventory now, but we recommend creating a rate plan first for best results.
                 </p>
-                <div className="flex gap-3">
-                  <CreateInventoryForm
-                    hotelCode={hotelCode}
-                    invTypeCode=""
-                    roomTypes={roomTypes.map(rt => rt.invTypeCode)}
-                    onSuccess={handleInventorySuccess}
-                    onCancel={() => setActiveTab('ratePlan')}
-                  />
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1">
+                    <CreateInventoryForm
+                      hotelCode={hotelCode}
+                      invTypeCode=""
+                      roomTypes={roomTypes.map(rt => rt.invTypeCode)}
+                      onSuccess={handleInventorySuccess}
+                      onCancel={() => setActiveTab('ratePlan')}
+                    />
+                  </div>
                   <Button
                     variant="outline"
                     onClick={() => setActiveTab('ratePlan')}

@@ -89,7 +89,7 @@ const MapRatePlanPage: React.FC = () => {
       const hotelCode = getHotelCode();
       if (!hotelCode) {
         toast.error('Property code not found. Please navigate from the property page.');
-        router.push('/app/property');
+        router.push('/app/property/single');
         return;
       }
 
