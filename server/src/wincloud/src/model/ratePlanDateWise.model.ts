@@ -1,6 +1,6 @@
 import mongoose, { Schema, model, Document } from 'mongoose';
 
-interface IRateAmountDateWise extends Document {
+export interface IRateAmountDateWise extends Document {
     hotelCode: string;
     hotelName: string;
     invTypeCode: string;
@@ -36,13 +36,13 @@ const rateAmountSchema = new Schema<IRateAmountDateWise>({
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     days: {
-        mon: { type: Boolean, required: true },
-        tue: { type: Boolean, required: true },
-        wed: { type: Boolean, required: true },
-        thu: { type: Boolean, required: true },
-        fri: { type: Boolean, required: true },
-        sat: { type: Boolean, required: true },
-        sun: { type: Boolean, required: true },
+        mon: { type: Boolean, required: false },
+        tue: { type: Boolean, required: false },
+        wed: { type: Boolean, required: false },
+        thu: { type: Boolean, required: false },
+        fri: { type: Boolean, required: false },
+        sat: { type: Boolean, required: false },
+        sun: { type: Boolean, required: false },
     },
     currencyCode: { type: String, required: true },
     baseByGuestAmts: [{

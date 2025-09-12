@@ -2,5 +2,6 @@ export {
     BaseGuestAmount,
     AdditionalGuestAmount,
     DaysOfWeek,
-    CreateRatePlanRequest
+    CreateRatePlanRequest,
+    RatePlanDataDateWise,
 } from './ratePlan.interface';

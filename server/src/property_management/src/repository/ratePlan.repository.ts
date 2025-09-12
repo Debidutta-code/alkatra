@@ -1,8 +1,9 @@
 import { Inventory } from '../../../wincloud/src/model/inventoryModel';
 import { RateAmount } from '../../../wincloud/src/model/ratePlanModel';
 import { PropertyInfo } from '../model/property.info.model';
-import { CreateRatePlanRequest } from '../interface';
+import { RatePlanDataDateWise } from '../interface';
 import { Room } from '../model/room.model';
+import RateAmountDateWise, { IRateAmountDateWise } from '../../../wincloud/src/model/ratePlanDateWise.model';
 
 
 export class RatePlanRepository {
@@ -86,5 +87,71 @@ export class RatePlanRepository {
 
         const savedRatePlan = await newRatePlan.save();
         return savedRatePlan;
+    }
+
+    /**
+     * Convert rate plan data to date wise data
+     */
+    async convertDateWise(data) {
+        const {
+            hotelCode,
+            hotelName,
+            invTypeCode,
+            ratePlanCode,
+            startDate,
+            endDate,
+            days,
+            currencyCode,
+            baseByGuestAmts,
+            additionalGuestAmounts
+        } = data;
+
+        // Validate required fields
+        if (!hotelCode || !invTypeCode || !ratePlanCode) {
+            throw new Error('Missing required fields: hotelCode, invTypeCode, or ratePlanCode');
+        }
+
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const dateWiseData: Partial<IRateAmountDateWise>[] = [];
+
+        // Generate one record per day from startDate to endDate (exclusive)
+        for (let date = new Date(start); date < end; date.setDate(date.getDate() + 1)) {
+            dateWiseData.push({
+                hotelCode,
+                hotelName,
+                invTypeCode,
+                ratePlanCode,
+                startDate: new Date(date),
+                endDate: new Date(date.getTime() + 86400000),
+                days,
+                currencyCode,
+                baseByGuestAmts,
+                additionalGuestAmounts,
+                createdAt: new Date()
+            });
+        }
+
+        return dateWiseData;
+    }
+
+
+    /**
+     * Insert date wise rate plan data
+     * @param data 
+     */
+    async ratePlanCreateDateWise(data) {
+        // Generate date-wise records
+        const dateWiseRecords = await this.convertDateWise(data);
+
+        // Insert into RateAmountDateWise collection
+        if (dateWiseRecords.length > 0) {
+            const insertResult = await RateAmountDateWise.insertMany(dateWiseRecords, { ordered: false });
+            console.log(`✅ Inserted ${insertResult.length} date-wise records for ${data.hotelCode} - ${data.ratePlanCode}`);
+            return { insertedCount: insertResult.length };
+        }
+
+        console.log(`No date-wise records to insert for ${data.hotelCode} - ${data.ratePlanCode}`);
+        return { insertedCount: 0 };
     }
 }

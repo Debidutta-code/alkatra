@@ -74,6 +74,20 @@ export class RatePlanService {
             throw new Error("Failed to create rate plan");
         }
 
+        /**
+         * After create rate plan, now push the same data to RatePlanDateWise collection
+         */
+
+        const convertDateWise = await this.ratePlanRepository.convertDateWise(ratePlanCreateData);
+        if (!convertDateWise) {
+            throw new Error("Failed to convert to date-wise rate plan");
+        }
+
+        const createDateWiseRatePlan = await this.ratePlanRepository.ratePlanCreateDateWise(convertDateWise);
+        if (!createDateWiseRatePlan) {
+            throw new Error("Failed to create date-wise rate plan");
+        }
+
         return createNewRatePlan;
     }
 }

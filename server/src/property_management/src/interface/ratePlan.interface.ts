@@ -29,3 +29,30 @@ export interface CreateRatePlanRequest {
     baseGuestAmounts: BaseGuestAmount[];
     additionalGuestAmounts: AdditionalGuestAmount[];
 }
+
+export interface RatePlanDataDateWise {
+    hotelCode: string;
+    hotelName: string;
+    invTypeCode: string;
+    ratePlanCode: string;
+    startDate: string | Date;
+    endDate: string | Date;
+    days: {
+        mon: boolean;
+        tue: boolean;
+        wed: boolean;
+        thu: boolean;
+        fri: boolean;
+        sat: boolean;
+        sun: boolean;
+    };
+    currencyCode: string;
+    baseByGuestAmts: Array<{
+        amountBeforeTax: number;
+        numberOfGuests: number;
+    }>;
+    additionalGuestAmounts: Array<{
+        ageQualifyingCode: string;
+        amount: number;
+    }>;
+}
