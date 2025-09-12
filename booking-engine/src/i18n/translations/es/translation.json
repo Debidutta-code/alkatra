@@ -136,7 +136,10 @@
             "confirmPasswordRequired": "Por favor, confirma tu contraseña",
             "passwordComplexity": "La contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, una minúscula, un número y un carácter especial.",
             "minLength": "Debe tener al menos {{count}} caracteres",
-            "passwordsDoNotMatch": "Las contraseñas no coinciden"
+            "passwordsDoNotMatch": "Las contraseñas no coinciden",
+            "firstNameInvalid": "El nombre solo debe contener letras y espacios",
+            "lastNameInvalid": "El apellido solo debe contener letras y espacios",
+            "namePatternInvalid": "{{field}} solo debe contener letras y espacios"
         }
     },
     "Navbar": {
@@ -752,7 +755,8 @@
             "finalAmountIncludingTax": "Monto final (con impuestos)",
             "includesTaxes": "Incluye impuestos y tarifas",
             "taxBreakdown": "Desglose de impuestos",
-            "includesTaxAmount": "Incluye {{currency}} {{amount}} en impuestos"
+            "includesTaxAmount": "Incluye {{currency}} {{amount}} en impuestos",
+            "dobError": "Se requiere la fecha de nacimiento"
         }
     },
     "BookingTabs": {
@@ -821,7 +825,7 @@
             "bookingDetails": "Detalles de la reserva",
             "property": "Alojamiento",
             "room": "Habitación",
-            "stayDates": "Fechas de estadía",
+            "stayDates": "Fechas de estancia",
             "nightStay_one": "{{count}} noche",
             "nightStay_other": "{{count}} noches",
             "totalAmount": "Monto total",
@@ -863,7 +867,7 @@
             "title": "Actualizar tu reserva",
             "subtitle": "Realiza cambios en tu próxima estadía en {{propertyName}}",
             "currentBookingDetails": "Detalles de la reserva actual",
-            "stayDates": "Fechas de estadía",
+            "stayDates": "Fechas de estancia",
             "nightsCount_one": "{{count}} noche",
             "nightsCount_other": "{{count}} noches",
             "guests": "Huéspedes",
@@ -1035,7 +1039,7 @@
             },
             "bookingSummary": {
                 "title": "Resumen de la reserva",
-                "stayDates": "Fechas de estadía",
+                "stayDates": "Fechas de estancia",
                 "night": "noche",
                 "nights": "noches",
                 "guests": "Huéspedes",
@@ -1417,7 +1421,7 @@
         "noReviews": "Aún no hay opiniones",
         "beFirstToReview": "¡Sé el primero en compartir tu experiencia!",
         "filtersAndSort": "Filtros y orden",
-        "reviewScores": "Puntuaciones de las opiniones",
+        "reviewScores": "Puntuaciones de reseñas",
         "timeOfYear": "Época del año",
         "sortReviewsBy": "Ordenar opiniones por"
     },

@@ -1,5 +1,6 @@
 // src/repositories/customerRepository.ts
 import Customer, { ICustomer } from "../models/customer.model";
+import { DeletedCustomerModel, IDeletedCustomer } from "../models";
 import bcrypt from "bcryptjs";
 
 class CustomerRepository {
@@ -20,6 +21,10 @@ class CustomerRepository {
 
     // Get customer by ID
     async findById(id: string): Promise<ICustomer | null> {
+        if (!id) {
+            throw new Error("REPOSITORY: Customer ID is required");
+        }
+        
         return await Customer.findById(id);
     }
 
@@ -68,6 +73,61 @@ class CustomerRepository {
             },
             { new: true } // Return the updated document
         );
+    }
+
+    /**
+     * Store customer details before delete in customer deletion model
+     * @param deletedCustomerData 
+     * @returns
+     */
+    async storeDeletedCustomer(deletedCustomerData: Partial<IDeletedCustomer>): Promise<any> {
+        try {
+            if (!deletedCustomerData) {
+                throw new Error("No customer data provided for deletion");
+            }
+
+            const storedData = new DeletedCustomerModel({
+                googleId: deletedCustomerData.googleId || "",
+                provider: deletedCustomerData.provider || "",
+                avatar: deletedCustomerData.avatar || "",
+                firstName: deletedCustomerData.firstName || "",
+                lastName: deletedCustomerData.lastName || "",
+                email: deletedCustomerData.email?.toLowerCase().trim() || "",
+                phone: deletedCustomerData.phone?.trim() || "",
+                password: deletedCustomerData.password || "",
+                address: deletedCustomerData.address || "",
+                role: deletedCustomerData.role || "",
+                referralCode: deletedCustomerData.referralCode || "",
+                referralLink: deletedCustomerData.referralLink || "",
+                referralQRCode: deletedCustomerData.referralQRCode || "",
+            });
+
+            // const storeData = new DeletedCustomerModel(deletedCustomerData);
+
+            return await storedData.save();
+        }
+        catch (error: any) {
+            console.log("REPOSITORY: Failed to store deleted customer data", error);
+            throw new Error("Failed to store deleted customer data");
+        }
+    }
+
+    /**
+     * Find customer by ID and delete
+     * @param id 
+     * @returns 
+     */
+    async findByIdAndDelete(id: string) {
+        try {
+            if (!id) {
+                throw new Error("Customer ID is required");
+            }
+            return await Customer.findByIdAndDelete(id);
+        }
+        catch (error: any) {
+            console.log("REPOSITORY: Failed to delete customer", error);
+            throw new Error("Failed to delete customer");
+        }
     }
 }
 

@@ -222,7 +222,7 @@ const ReviewCard = ({ review }: { review: Review }) => {
   return (
     <div key={review._id} className="border-b border-gray-100 pb-4 last:border-b-0">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold text-sm flex-shrink-0">
+        <div className="w-10 h-10 bg-tripswift-blue text-white rounded-full flex items-center justify-center font-semibold text-sm flex-shrink-0">
           {review.guestEmail.charAt(0).toUpperCase()}
         </div>
 
@@ -244,7 +244,7 @@ const ReviewCard = ({ review }: { review: Review }) => {
             </div>
             <div className="text-right flex-shrink-0">
               <div className="flex items-center justify-end gap-1 mb-1">
-                <div className="w-6 h-6 bg-blue-600 text-white rounded text-xs font-semibold flex items-center justify-center">
+                <div className="w-6 h-6 bg-tripswift-blue text-white rounded text-xs font-semibold flex items-center justify-center">
                   {review.rating}
                 </div>
               </div>
@@ -465,7 +465,7 @@ const HotelReviewsSliding: React.FC<HotelReviewsProps> = ({ hotelCode }) => {
           )}
           <button
             onClick={() => setFilters({ rating: "", category: "", dateRange: null })}
-            className="text-blue-600 hover:text-blue-800 underline flex-shrink-0"
+            className="text-tripswift-blue hover:text-tripswift-blue underline flex-shrink-0"
           >
             Clear all
           </button>

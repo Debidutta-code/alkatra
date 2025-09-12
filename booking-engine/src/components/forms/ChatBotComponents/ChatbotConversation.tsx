@@ -17,17 +17,20 @@ import TypingIndicator from './TypingIndicator';
 interface ChatbotConversationProps {
   onClose: () => void;
   userFirstName: string;
+  isOnline: boolean;
+  onMinimizedChange?: (minimized: boolean) => void;
 }
 
 const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
   onClose,
-  userFirstName
+  userFirstName,
+  isOnline,
+  onMinimizedChange
 }) => {
   const [chatInput, setChatInput] = useState('');
   const [isMinimized, setIsMinimized] = useState(false);
-  const [isConnected, setIsConnected] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const chatBotApi = ChatBotApi.getInstance();
   const dispatch = useDispatch<AppDispatch>();
   const isShowingWelcome = useSelector((state: RootState) => state.chat.isShowingWelcome);
@@ -74,6 +77,11 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
     dispatch(addUserMessage({ text: messageText }));
     setChatInput('');
 
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+      inputRef.current.style.height = '40px';
+    }
+
     // Show typing indicator
     dispatch(setBotTyping(true));
 
@@ -112,13 +120,10 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
   };
   const clearError = () => {
     dispatch(setChatError(null));
-    setIsConnected(true);
   };
 
   return (
-    <div className={`flex flex-col bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 ${isMinimized ? 'w-72 h-14' : 'w-full max-w-xs h-[500px]'
-      }`}>
-
+    <div className={`flex flex-col bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 ${isMinimized ? 'w-80 h-14' : 'w-80 h-[500px]'}`}>
       {/* Enhanced Header */}
       <div className="relative bg-gradient-to-br from-[#076DB3] via-[#054B8F] to-[#043A73] p-3">
         {/* Animated background pattern */}
@@ -135,8 +140,8 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
                 <Bot className="h-3.5 w-3.5 text-[#076DB3]" />
               </div>
               {/* Connection status indicator */}
-              <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border border-white ${isConnected ? 'bg-green-400' : 'bg-red-400'
-                } ${isConnected ? 'animate-pulse' : ''}`}></div>
+              <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border border-white ${isOnline ? 'bg-green-400' : 'bg-red-400'
+                } ${isOnline ? 'animate-pulse' : ''}`}></div>
             </div>
 
             <div className="flex-1 min-w-0">
@@ -144,7 +149,7 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
                 Al-Hajz Assistant
               </h4>
               <p className="text-blue-100 text-xs font-noto-sans truncate">
-                {isConnected ? 'Online • Instant replies' : 'Reconnecting...'}
+                {isOnline ? 'Online • Instant replies' : 'Reconnecting...'}
               </p>
             </div>
           </div>
@@ -152,7 +157,7 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
           {/* Header Controls */}
           <div className="flex items-center gap-1 flex-shrink-0">
             <button
-              onClick={() => setIsMinimized(!isMinimized)}
+              onClick={() => { setIsMinimized(!isMinimized); onMinimizedChange?.(!isMinimized); }}
               className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200"
               aria-label={isMinimized ? "Expand chat" : "Minimize chat"}
             >
@@ -235,29 +240,38 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
           </div>
 
           {/* Enhanced Input Area */}
-          <div className="border-t border-gray-200 bg-white p-3">
-            <div className="flex items-end gap-2">
+          <div className="border-t border-gray-200 bg-white p-2">
+            <div className="flex items-center gap-2">
               {/* User Avatar */}
-              <div className="w-7 h-7 bg-gradient-to-br from-[#076DB3] to-[#054B8F] rounded-full flex items-center justify-center flex-shrink-0 mb-1">
-                <User className="h-3.5 w-3.5 text-white" />
+              <div className="w-8 h-8 bg-gradient-to-br from-[#076DB3] to-[#054B8F] rounded-full 
+                                    flex items-center justify-center shadow-md border-2 border-white">
+                <span className="text-white text-xs font-semibold font-noto-sans">
+                  {userFirstName.charAt(0).toUpperCase()}
+                </span>
               </div>
 
               {/* Input Container */}
-              <div className="flex-1 relative">
+              <div className="flex-1 pt-2 relative">
                 <div className="relative">
-                  <input
+                  <textarea
                     ref={inputRef}
-                    type="text"
                     placeholder="Type your message..."
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    disabled={isTyping || !isConnected || isShowingWelcome}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 pr-10 text-sm 
-           focus:outline-none focus:border-[#076DB3] focus:ring-1 focus:ring-[#076DB3]/20 
-           disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200
-           placeholder:text-gray-400 font-noto-sans"
+                    disabled={isTyping || !isOnline || isShowingWelcome}
+                    rows={1}
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 pr-12 text-sm 
+                     focus:outline-none focus:border-[#076DB3] focus:ring-1 focus:ring-[#076DB3]/20 
+                     disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200
+                     placeholder:text-gray-400 font-noto-sans resize-none overflow-hidden min-h-[40px]"
                     maxLength={500}
+                    onInput={(e) => {
+                      const target = e.target as HTMLTextAreaElement;
+                      target.style.height = 'auto';
+                      const newHeight = Math.min(target.scrollHeight, 120);
+                      target.style.height = newHeight + 'px';
+                    }}
                   />
 
                   {/* Character count */}
@@ -266,29 +280,29 @@ const ChatbotConversation: React.FC<ChatbotConversationProps> = ({
                       {chatInput.length}/500
                     </div>
                   )}
-                </div>
 
-                {/* Send Button */}
-                <button
-                  onClick={handleSendMessage}
-                  disabled={!chatInput.trim() || isTyping || !isConnected}
-                  className={`absolute right-1 bottom-2 p-1.5 rounded-lg transition-all duration-200 ${chatInput.trim() && !isTyping && isConnected
-                    ? 'bg-gradient-to-r from-[#076DB3] to-[#054B8F] text-white shadow-md hover:shadow-lg hover:scale-105 active:scale-95'
-                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    }`}
-                  aria-label="Send message"
-                >
-                  <Send className="h-3.5 w-3.5" />
-                </button>
+                  {/* Send Button */}
+                  <button
+                    onClick={handleSendMessage}
+                    disabled={!chatInput.trim() || isTyping || !isOnline}
+                    className={`absolute right-2 top-1/2 -translate-y-[65%] p-1.5 rounded-lg transition-all duration-200 ${chatInput.trim() && !isTyping && isOnline
+                      ? 'bg-gradient-to-r from-[#076DB3] to-[#054B8F] text-white shadow-md hover:shadow-lg hover:scale-105 active:scale-95'
+                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      }`}
+                    aria-label="Send message"
+                  >
+                    <Send className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               </div>
             </div>
 
             {/* Enhanced Status Bar */}
             <div className="flex items-center justify-between mt-2 text-xs text-gray-500 font-noto-sans">
               <div className="flex items-center gap-1.5">
-                <div className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-green-400 animate-pulse' : 'bg-red-400'
+                <div className={`w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-green-400 animate-pulse' : 'bg-red-400'
                   }`}></div>
-                <span>{isConnected ? 'Connected' : 'Reconnecting...'}</span>
+                <span>{isOnline ? 'Connected' : 'Reconnecting...'}</span>
               </div>
 
               <div className="flex items-center gap-2 text-xs">

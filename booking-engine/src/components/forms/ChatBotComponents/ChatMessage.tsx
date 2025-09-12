@@ -1,6 +1,5 @@
 import React from 'react';
 import { Bot, AlertCircle, CheckCircle, Clock, RefreshCw } from 'lucide-react';
-import Avatar from '../UserProfileComponents/Avatar';
 
 interface Message {
     id: string;
@@ -69,13 +68,13 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, userFirstName, onRet
     };
 
     return (
-        <div className={`flex items-end gap-2 animate-in slide-in-from-bottom-2 duration-300 ${
-            message.sender === 'user' ? 'justify-end' : 'justify-start'
-        }`}>
+        <div className={`flex items-end gap-2 animate-in slide-in-from-bottom-2 duration-300 ${message.sender === 'user' ? 'justify-end' : 'justify-start'
+            }`}>
             {/* Enhanced Bot avatar */}
             {message.sender === 'bot' && (
                 <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-gradient-to-br from-[#076DB3] to-[#054B8F] rounded-full flex items-center justify-center shadow-md">
+                    <div className="w-8 h-8 bg-gradient-to-br from-[#076DB3] to-[#054B8F] rounded-full 
+                                    flex items-center justify-center shadow-md border-2 border-white">
                         <Bot className="h-4 w-4 text-white" />
                     </div>
                 </div>
@@ -83,29 +82,43 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, userFirstName, onRet
 
             <div className="flex flex-col max-w-[85%] md:max-w-[80%]">
                 {/* Enhanced Message bubble */}
-                <div className={`text-sm rounded-2xl px-4 py-3 relative shadow-sm ${
-                    message.sender === 'bot'
-                        ? 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800 border border-gray-200'
-                        : message.status === 'error'
-                            ? 'bg-gradient-to-br from-red-50 to-red-100 border border-red-200 text-red-800'
-                            : 'bg-gradient-to-br from-[#076DB3] to-[#054B8F] text-white shadow-md'
-                }`}>
-                    
+                <div className={`text-sm rounded-2xl px-4 py-3 relative shadow-sm ${message.sender === 'bot'
+                    ? 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800 border border-gray-200'
+                    : message.status === 'error'
+                        ? 'bg-gradient-to-br from-red-50 to-red-100 border border-red-200 text-red-800'
+                        : 'bg-gradient-to-br from-[#076DB3] to-[#054B8F] text-white shadow-md'
+                    }`}>
+
                     {/* Message content */}
                     {message.sender === 'bot' ? (
-                        <div
-                            dangerouslySetInnerHTML={{ __html: cleanBotResponse(message.text) }}
-                            className="prose prose-sm max-w-none text-gray-800 
-                                     [&>p]:mb-2 [&>p:last-child]:mb-0
-                                     [&>strong]:text-[#076DB3] [&>strong]:font-semibold
-                                     [&>em]:text-gray-600 [&>em]:italic
-                                     [&>ul]:list-disc [&>ul]:ml-4 [&>ul]:mb-2
-                                     [&>ol]:list-decimal [&>ol]:ml-4 [&>ol]:mb-2
-                                     [&>li]:mb-1"
-                        />
+                        (() => {
+                            const cleanedText = cleanBotResponse(message.text);
+                            const isEmpty = !cleanedText || cleanedText.trim() === '';
+
+                            if (isEmpty) {
+                                return (
+                                    <div className="flex items-center gap-2 text-gray-600">
+                                        <AlertCircle className="mb-10 h-10 w-10 text-amber-500" />
+                                        <span>Sorry, I couldn't generate a response. Could you please rephrase your question?</span>
+                                    </div>
+                                );
+                            }
+
+                            return (
+                                <div
+                                    dangerouslySetInnerHTML={{ __html: cleanedText }}
+                                    className="prose prose-sm max-w-none text-gray-800 
+                         [&>p]:mb-2 [&>p:last-child]:mb-0
+                         [&>strong]:text-[#076DB3] [&>strong]:font-semibold
+                         [&>em]:text-gray-600 [&>em]:italic
+                         [&>ul]:list-disc [&>ul]:ml-4 [&>ul]:mb-2
+                         [&>ol]:list-decimal [&>ol]:ml-4 [&>ol]:mb-2
+                         [&>li]:mb-1"
+                                />
+                            );
+                        })()
                     ) : (
-                        <span className="font-noto-sans">{message.text}</span>
-                    )}
+                        <div className="font-noto-sans whitespace-pre-wrap">{message.text}</div>)}
 
                     {/* Enhanced Error state for failed messages */}
                     {message.status === 'error' && onRetry && (
@@ -129,19 +142,17 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, userFirstName, onRet
                     )}
 
                     {/* Message tail/pointer */}
-                    <div className={`absolute bottom-0 w-3 h-3 transform rotate-45 ${
-                        message.sender === 'bot'
-                            ? 'bg-gray-100 border-r border-b border-gray-200 -left-1.5'
-                            : message.status === 'error'
-                                ? 'bg-red-100 border-r border-b border-red-200 -right-1.5'
-                                : 'bg-[#054B8F] -right-1.5'
-                    }`}></div>
+                    <div className={`absolute bottom-0 w-3 h-3 transform rotate-45 ${message.sender === 'bot'
+                        ? 'bg-gray-100 border-r border-b border-gray-200 -left-1.5'
+                        : message.status === 'error'
+                            ? 'bg-red-100 border-r border-b border-red-200 -right-1.5'
+                            : 'bg-[#054B8F] -right-1.5'
+                        }`}></div>
                 </div>
 
                 {/* Enhanced Timestamp and status */}
-                <div className={`text-xs text-gray-500 mt-2 flex items-center gap-2 font-noto-sans ${
-                    message.sender === 'user' ? 'justify-end' : 'justify-start'
-                }`}>
+                <div className={`text-xs text-gray-500 mt-2 flex items-center gap-2 font-noto-sans ${message.sender === 'user' ? 'justify-end' : 'justify-start'
+                    }`}>
                     <span className="bg-white/80 backdrop-blur-sm px-2 py-0.5 rounded-full">
                         {formatTime(message.timestamp)}
                     </span>

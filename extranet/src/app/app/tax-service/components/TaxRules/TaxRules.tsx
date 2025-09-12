@@ -408,7 +408,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                         <h2 className="text-xl font-bold text-slate-900">Tax Rules ({filteredRules.length})</h2>
                     </div>
 
-                    {filteredRules.length === 0 ? (
+                    {filteredRules.length === 0 && !showCreateForm ? (
                         <div className="text-center py-16 bg-white rounded-2xl shadow-lg border border-slate-200/60">
                             <div className="w-16 h-16 mx-auto mb-6 bg-slate-100 rounded-full flex items-center justify-center">
                                 <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -423,12 +423,6 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                                     ? "Try adjusting your search or filter criteria to find what you're looking for."
                                     : "Get started by creating your first tax rule."}
                             </p>
-                            <Button
-                                onClick={() => setShowCreateForm(true)}
-                                className="bg-gradient-to-r from-tripswift-blue to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl shadow-lg"
-                            >
-                                Create Your First Tax Rule
-                            </Button>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">

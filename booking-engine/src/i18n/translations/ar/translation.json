@@ -136,7 +136,10 @@
       "confirmPasswordRequired": "يرجى تأكيد كلمة المرور الخاصة بك",
       "passwordComplexity": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل بما في ذلك حرف كبير واحد، وحرف صغير واحد، ورقم واحد، وحرف خاص واحد.",
       "minLength": "يجب أن يكون على الأقل {{count}} أحرف",
-      "passwordsDoNotMatch": "كلمات المرور غير متطابقة"
+      "passwordsDoNotMatch": "كلمات المرور غير متطابقة",
+      "firstNameInvalid": "الاسم الأول يجب أن يحتوي على حروف ومسافات فقط",
+      "lastNameInvalid": "اسم العائلة يجب أن يحتوي على حروف ومسافات فقط",
+      "namePatternInvalid": "{{field}} يجب أن يحتوي على حروف ومسافات فقط"
     }
   },
   "Navbar": {
@@ -752,7 +755,8 @@
       "finalAmountIncludingTax": "المبلغ النهائي (شامل الضريبة)",
       "includesTaxes": "يشمل الضرائب والرسوم",
       "taxBreakdown": "تفصيل الضريبة",
-      "includesTaxAmount": "يتضمن {{amount}} {{currency}} كضرائب"
+      "includesTaxAmount": "يتضمن {{amount}} {{currency}} كضرائب",
+      "dobError": "تاريخ الميلاد مطلوب"
     }
   },
   "BookingTabs": {

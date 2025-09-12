@@ -53,8 +53,8 @@ const Register: React.FC = () => {
       provider: "local",
     },
     {
-      firstName: { required: true },
-      lastName: { required: true },
+      firstName: { required: true, namePattern: true },
+      lastName: { required: true, namePattern: true },
       email: { required: true, email: true },
       password: { required: true, passwordStrength: true },
       provider: { required: true },

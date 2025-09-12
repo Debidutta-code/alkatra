@@ -136,7 +136,10 @@
             "confirmPasswordRequired": "Lütfen şifrenizi onaylayın",
             "passwordComplexity": "Şifre en az 8 karakter içermeli ve en az bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter bulunmalıdır.",
             "minLength": "En az {{count}} karakter olmalıdır",
-            "passwordsDoNotMatch": "Şifreler uyuşmuyor"
+            "passwordsDoNotMatch": "Şifreler uyuşmuyor",
+            "firstNameInvalid": "Ad sadece harf ve boşluk karakterleri içerebilir",
+            "lastNameInvalid": "Soyad sadece harf ve boşluk karakterleri içerebilir",
+            "namePatternInvalid": "{{field}} sadece harf ve boşluk karakterleri içerebilir"
         }
     },
     "Navbar": {
@@ -752,7 +755,8 @@
             "finalAmountIncludingTax": "Son Tutar (vergi dahil)",
             "includesTaxes": "Vergi ve ücretler dahildir",
             "taxBreakdown": "Vergi Ayrımı",
-            "includesTaxAmount": "{{currency}} {{amount}} vergi dahil"
+            "includesTaxAmount": "{{currency}} {{amount}} vergi dahil",
+            "dobError": "Doğum tarihi gereklidir"
         }
     },
     "BookingTabs": {

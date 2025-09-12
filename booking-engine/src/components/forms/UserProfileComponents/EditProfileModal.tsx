@@ -51,25 +51,13 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onSave, onClo
       });
     }
 
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = t('Auth.Validation.lastNameRequired', { defaultValue: 'Last Name is required' });
-    } else if (!/^[a-zA-Z\s]+$/.test(formData.lastName)) {
+    if (formData.lastName.trim() && !/^[a-zA-Z\s]+$/.test(formData.lastName)) {
       newErrors.lastName = t('Auth.Validation.lastNameInvalid', {
         defaultValue: 'Last Name must contain only letters and spaces',
       });
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = t('Auth.Validation.emailRequired', { defaultValue: 'Email is required' });
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = t('Auth.Validation.emailInvalid', { defaultValue: 'Please enter a valid email address' });
-    }
-
-    if (!formData.phone.trim()) {
-      newErrors.phone = t('BookingComponents.GuestInformationModal.phoneError', {
-        defaultValue: 'Phone number is required',
-      });
-    } else if (!/^\d{10}$/.test(formData.phone)) {
+    if (formData.phone.trim() && !/^\d{10}$/.test(formData.phone)) {
       newErrors.phone = t('BookingComponents.GuestInformationModal.phoneLengthError', {
         defaultValue: 'Phone number for India must be exactly 10 digits.',
       });
@@ -138,10 +126,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onSave, onClo
             <input
               type="email"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-blue)]"
+              readOnly
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-gray-100 cursor-not-allowed"
             />
-            {errors.email && <p className="text-xs text-red-600 mt-1">{errors.email}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-[var(--color-secondary-black)] mb-1">
