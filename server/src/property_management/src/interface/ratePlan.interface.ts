@@ -56,3 +56,18 @@ export interface RatePlanDataDateWise {
         amount: number;
     }>;
 }
+
+export interface Availability {
+  startDate: Date;
+  endDate: Date;
+  count: number;
+}
+
+export interface IInventory extends Document {
+  hotelCode: string;
+  hotelName: string;
+  invTypeCode: string;
+  availability: Availability;
+  createdAt?: Date;
+  updatedAt?: Date;
+}

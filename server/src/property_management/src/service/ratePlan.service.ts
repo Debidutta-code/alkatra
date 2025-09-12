@@ -33,6 +33,7 @@ export class RatePlanService {
          * Check for hotel name
          */
         const hotelName = await this.ratePlanRepository.getHotelName(data.hotelCode);
+        console.log("The hotel name is: ", hotelName);
         if (!hotelName) {
             throw new Error("Hotel not found with the given hotel code");
         }
@@ -40,8 +41,9 @@ export class RatePlanService {
         /**
          * Check for inventory type/ Room type code
          */
-        const invTypeDetails = await this.ratePlanRepository.checkInvTypeCode(data.invTypeCode);
-        if (!invTypeDetails) {
+        const invTypeCode = await this.ratePlanRepository.checkInvTypeCode(data.invTypeCode);
+        console.log("The inventory type code is: ", invTypeCode);
+        if (!invTypeCode) {
             throw new Error("Inventory Type Code not found");
         }
 
@@ -56,7 +58,7 @@ export class RatePlanService {
         const ratePlanCreateData = {
             hotelCode: data.hotelCode,
             hotelName: hotelName,
-            invTypeCode: invTypeDetails,
+            invTypeCode: invTypeCode,
             ratePlanCode: data.ratePlanCode,
             startDate: data.startDate,
             endDate: data.endDate,
@@ -77,16 +79,15 @@ export class RatePlanService {
         /**
          * After create rate plan, now push the same data to RatePlanDateWise collection
          */
+        // const convertDateWise = await this.ratePlanRepository.convertDateWise(ratePlanCreateData);
+        // if (!convertDateWise) {
+        //     throw new Error("Failed to convert to date-wise rate plan");
+        // }
 
-        const convertDateWise = await this.ratePlanRepository.convertDateWise(ratePlanCreateData);
-        if (!convertDateWise) {
-            throw new Error("Failed to convert to date-wise rate plan");
-        }
-
-        const createDateWiseRatePlan = await this.ratePlanRepository.ratePlanCreateDateWise(convertDateWise);
-        if (!createDateWiseRatePlan) {
-            throw new Error("Failed to create date-wise rate plan");
-        }
+        // const createDateWiseRatePlan = await this.ratePlanRepository.ratePlanCreateDateWise(convertDateWise);
+        // if (!createDateWiseRatePlan) {
+        //     throw new Error("Failed to create date-wise rate plan");
+        // }
 
         return createNewRatePlan;
     }

@@ -44,7 +44,7 @@ export class RatePlanRepository {
      * @returns 
      */
     async checkInvTypeCode(invTypeCode: string) {
-        return await Room.findOne({ room_type_code: invTypeCode }).select('room_type');
+        return await Room.findOne({ room_type: invTypeCode }).select('room_type');
     }
 
     /**
@@ -75,7 +75,7 @@ export class RatePlanRepository {
         const newRatePlan = new RateAmount({
             hotelCode: data.hotelCode,
             hotelName: data.hotelName,
-            invTypeCode: data.checkInvType,
+            invTypeCode: data.invTypeCode,
             ratePlanCode: data.ratePlanCode,
             startDate: data.startDate,
             endDate: data.endDate,
@@ -92,7 +92,7 @@ export class RatePlanRepository {
     /**
      * Convert rate plan data to date wise data
      */
-    async convertDateWise(data) {
+    async convertDateWise(data: any) {
         const {
             hotelCode,
             hotelName,
@@ -106,9 +106,11 @@ export class RatePlanRepository {
             additionalGuestAmounts
         } = data;
 
+        console.log("@@@@@@@@@@@@ The data is:", data);
+
         // Validate required fields
         if (!hotelCode || !invTypeCode || !ratePlanCode) {
-            throw new Error('Missing required fields: hotelCode, invTypeCode, or ratePlanCode');
+            throw new Error('Missing required fields for convert date wise: hotelCode, invTypeCode, or ratePlanCode');
         }
 
         const start = new Date(startDate);
@@ -147,11 +149,11 @@ export class RatePlanRepository {
         // Insert into RateAmountDateWise collection
         if (dateWiseRecords.length > 0) {
             const insertResult = await RateAmountDateWise.insertMany(dateWiseRecords, { ordered: false });
-            console.log(`✅ Inserted ${insertResult.length} date-wise records for ${data.hotelCode} - ${data.ratePlanCode}`);
+            // console.log(`✅ Inserted ${insertResult.length} date-wise records for ${data.hotelCode} - ${data.ratePlanCode}`);
             return { insertedCount: insertResult.length };
         }
 
-        console.log(`No date-wise records to insert for ${data.hotelCode} - ${data.ratePlanCode}`);
+        // console.log(`No date-wise records to insert for ${data.hotelCode} - ${data.ratePlanCode}`);
         return { insertedCount: 0 };
     }
 }

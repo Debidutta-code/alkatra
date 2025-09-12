@@ -4,4 +4,6 @@ export {
     DaysOfWeek,
     CreateRatePlanRequest,
     RatePlanDataDateWise,
+    Availability,
+    IInventory,
 } from './ratePlan.interface';
