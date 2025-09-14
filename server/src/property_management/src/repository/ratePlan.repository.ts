@@ -102,7 +102,7 @@ export class RatePlanRepository {
             endDate,
             days,
             currencyCode,
-            baseByGuestAmts,
+            baseGuestAmounts,
             additionalGuestAmounts
         } = ratePlanCreateData;
 
@@ -126,7 +126,7 @@ export class RatePlanRepository {
                 endDate: new Date(date.getTime() + 86400000),
                 days,
                 currencyCode,
-                baseByGuestAmts,
+                baseByGuestAmts: baseGuestAmounts,
                 additionalGuestAmounts,
                 createdAt: new Date()
             });

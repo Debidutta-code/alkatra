@@ -38,25 +38,24 @@ export class InventoryRepository {
         const end = new Date(availability.endDate);
         const dateWiseData = [];
 
-        // Generate one record per day from startDate to endDate (exclusive)
-        for (let date = new Date(start); date < end; date.setDate(date.getDate() + 1)) {
-            const startOfDay = new Date(date);
-
-            // Set to 00:00:00.000
-            startOfDay.setHours(0, 0, 0, 0);
-
-            const endOfDay = new Date(date);
-
-            // Set to 23:59:59.999
-            endOfDay.setHours(23, 59, 59, 999);
+        // Loop through each date between start and end (inclusive)
+        for (
+            let date = new Date(start.getTime());
+            date <= end;
+            date.setUTCDate(date.getUTCDate() + 1)
+        ) {
+            // Create UTC midnight date
+            const year = date.getUTCFullYear();
+            const month = date.getUTCMonth();
+            const day = date.getUTCDate();
+            const utcMidnight = new Date(Date.UTC(year, month, day)); // Always 00:00:00.000Z
 
             dateWiseData.push({
                 hotelCode,
-                hotelName,
                 invTypeCode,
                 availability: {
-                    startDate: startOfDay,
-                    endDate: endOfDay,
+                    startDate: utcMidnight,
+                    endDate: utcMidnight,
                     count: availability.count
                 },
                 createdAt: new Date(),
@@ -66,6 +65,7 @@ export class InventoryRepository {
 
         return dateWiseData;
     }
+
 
     async createInventory(data: any) {
         try {
@@ -101,7 +101,6 @@ export class InventoryRepository {
             {
                 $set: {
                     'availability.count': availability.count,
-                    hotelName: item.hotelName, 
                     updatedAt: new Date()
                 },
                 $setOnInsert: {
@@ -110,8 +109,8 @@ export class InventoryRepository {
             },
             {
                 upsert: true,
-                new: true, 
-                runValidators: true 
+                new: true,
+                runValidators: true
             }
         );
     }
