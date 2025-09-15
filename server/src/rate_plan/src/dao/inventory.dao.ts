@@ -12,51 +12,93 @@ export class InventoryDao {
         return InventoryDao.instance;
     }
 
-    async inventoryUpdate(hotelCode: string, invTypeCode: string, ratePlanCode: string, dates: string[]) {
-        if (!hotelCode || !invTypeCode || !dates || dates.length === 0) {
+    async inventoryUpdate(hotelCode: string, invTypeCode: string, dateStatusList: { date: string, status: string }[]) {
+        // Validate input parameters
+        if (!hotelCode || !invTypeCode || !dateStatusList || !Array.isArray(dateStatusList) || dateStatusList.length === 0) {
             throw new Error("Invalid input parameters for inventory update");
         }
 
-        try {
-            let updateInventories;
-            updateInventories = await Inventory.updateMany(
-                {
+        // Validate each item in dateStatusList
+        for (const item of dateStatusList) {
+            if (!item.date || !item.status || !['open', 'close'].includes(item.status)) {
+                throw new Error("Each item must have a valid date and status ('open' or 'close')");
+            }
+            // Validate date format
+            if (isNaN(new Date(item.date).getTime())) {
+                throw new Error(`Invalid date format for ${item.date}`);
+            }
+        }
+
+        // Group updates by date to optimize database operations
+        // Updates the status to the provided value, regardless of the existing status
+        const updates = dateStatusList.map(({ date, status }) => ({
+            updateOne: {
+                filter: {
                     hotelCode,
                     invTypeCode,
-                    "availability.startDate": { $in: dates },
+                    "availability.startDate": date,
                 },
-                [
-                    {
-                        $set: {
-                            status: {
-                                $cond: {
-                                    if: { $eq: [{ $type: "$status" }, "missing"] },
-                                    then: "close",
-                                    else: {
-                                        $cond: {
-                                            if: { $eq: ["$status", "open"] },
-                                            then: "close",
-                                            else: "open",
-                                        },
-                                    },
-                                },
-                            },
-                        },
+                update: {
+                    $set: {
+                        status: status,
                     },
-                ]
-            );
+                },
+            },
+        }));
 
-            if (!updateInventories) {
-                throw new Error("Failed to update inventory");
-            }
+        const updateInventories = await Inventory.bulkWrite(updates);
 
-            return {
-                matchedCount: updateInventories.matchedCount,
-                modifiedCount: updateInventories.modifiedCount,
-                acknowledged: updateInventories.acknowledged,
-            };
-        } catch (error) {
-            throw new Error(`Error updating inventory: ${error.message}`);
-        }
+        return {
+            matchedCount: updateInventories.matchedCount,
+            modifiedCount: updateInventories.modifiedCount
+        };
     }
+
+    // async inventoryUpdate(hotelCode: string, invTypeCode: string, ratePlanCode: string, dates: string[]) {
+    //     if (!hotelCode || !invTypeCode || !dates || dates.length === 0) {
+    //         throw new Error("Invalid input parameters for inventory update");
+    //     }
+
+    //     try {
+    //         let updateInventories;
+    //         updateInventories = await Inventory.updateMany(
+    //             {
+    //                 hotelCode,
+    //                 invTypeCode,
+    //                 "availability.startDate": { $in: dates },
+    //             },
+    //             [
+    //                 {
+    //                     $set: {
+    //                         status: {
+    //                             $cond: {
+    //                                 if: { $eq: [{ $type: "$status" }, "missing"] },
+    //                                 then: "close",
+    //                                 else: {
+    //                                     $cond: {
+    //                                         if: { $eq: ["$status", "open"] },
+    //                                         then: "close",
+    //                                         else: "open",
+    //                                     },
+    //                                 },
+    //                             },
+    //                         },
+    //                     },
+    //                 },
+    //             ]
+    //         );
+
+    //         if (!updateInventories) {
+    //             throw new Error("Failed to update inventory");
+    //         }
+
+    //         return {
+    //             matchedCount: updateInventories.matchedCount,
+    //             modifiedCount: updateInventories.modifiedCount,
+    //             acknowledged: updateInventories.acknowledged,
+    //         };
+    //     } catch (error) {
+    //         throw new Error(`Error updating inventory: ${error.message}`);
+    //     }
+    // }
 }
