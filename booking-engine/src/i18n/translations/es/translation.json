@@ -136,7 +136,10 @@
             "confirmPasswordRequired": "Por favor, confirma tu contraseña",
             "passwordComplexity": "La contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, una minúscula, un número y un carácter especial.",
             "minLength": "Debe tener al menos {{count}} caracteres",
-            "passwordsDoNotMatch": "Las contraseñas no coinciden"
+            "passwordsDoNotMatch": "Las contraseñas no coinciden",
+            "firstNameInvalid": "El nombre solo debe contener letras y espacios",
+            "lastNameInvalid": "El apellido solo debe contener letras y espacios",
+            "namePatternInvalid": "{{field}} solo debe contener letras y espacios"
         }
     },
     "Navbar": {

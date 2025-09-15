@@ -270,7 +270,10 @@ const Navbar: React.FC = () => {
                     name={`${user.firstName} ${user.lastName}`}
                     fallback={
                       <p className="text-lg font-tripswift-bold text-tripswift-off-white">
-                        {user.firstName.charAt(0) + user.lastName?.charAt(0)}
+                        {user.lastName
+                          ? user.firstName.charAt(0) + user.lastName.charAt(0)
+                          : user.firstName.slice(0, 2)
+                        }
                       </p>
                     }
                   />
@@ -292,7 +295,7 @@ const Navbar: React.FC = () => {
                 >
                   <div className="flex flex-col gap-1">
                     <p className="text-[16px] font-tripswift-bold text-tripswift-black leading-tight">
-                      {`${user.firstName} ${user.lastName}`}
+                      {`${user.firstName}${user.lastName ? ` ${user.lastName}` : ''}`}
                     </p>
                     <p className="text-xs text-tripswift-black/60 font-tripswift-medium">
                       {user.email}
@@ -432,15 +435,15 @@ const Navbar: React.FC = () => {
                       // <p className="text-lg font-tripswift-bold text-tripswift-off-white">
                       //   {user.firstName.charAt(0) + user.lastName?.charAt(0)}
                       // </p>
-                        user.lastName
-                          ? user.firstName.charAt(0) + user.lastName.charAt(0)
-                          : user.firstName.slice(0, 2)
+                      user.lastName
+                        ? user.firstName.charAt(0) + user.lastName.charAt(0)
+                        : user.firstName.slice(0, 2)
 
                     }
                   />
                   <div>
                     <p className="text-[18px] leading-[23px] tracking-[0px] text-tripswift-black font-tripswift-medium">
-                      {`${user.firstName} ${user.lastName}`}
+                      {`${user.firstName}${user.lastName ? ` ${user.lastName}` : ''}`}
                     </p>
                     <p className="text-[14px] leading-[18px] tracking-[2px] text-tripswift-black/70 font-tripswift-medium">
                       {user.email}

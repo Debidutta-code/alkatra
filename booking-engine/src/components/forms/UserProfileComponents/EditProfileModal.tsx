@@ -51,9 +51,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onSave, onClo
       });
     }
 
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = t('Auth.Validation.lastNameRequired', { defaultValue: 'Last Name is required' });
-    } else if (!/^[a-zA-Z\s]+$/.test(formData.lastName)) {
+    if (formData.lastName.trim() && !/^[a-zA-Z\s]+$/.test(formData.lastName)) {
       newErrors.lastName = t('Auth.Validation.lastNameInvalid', {
         defaultValue: 'Last Name must contain only letters and spaces',
       });
