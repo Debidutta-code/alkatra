@@ -12,7 +12,7 @@ import { useSidebar } from '@src/components/ui/sidebar';
 import { cn } from '@src/lib/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@src/components/ui/button';
-import { XCircle } from 'lucide-react';
+import { Plus, XCircle } from "lucide-react";
 import { BulkSellModal } from './components/BulkSellModal';
 
 const MapRatePlanPage: React.FC = () => {
@@ -91,7 +91,7 @@ const MapRatePlanPage: React.FC = () => {
       const hotelCode = getHotelCode();
       if (!hotelCode) {
         toast.error('Property code not found. Please navigate from the property page.');
-        router.push('/app/property');
+        router.push('/app/property/single');
         return;
       }
 
@@ -312,7 +312,19 @@ const MapRatePlanPage: React.FC = () => {
           }}
           availableCombinations={availableCombinations}
         />
-        <div className="flex justify-end items-center mt-4">
+
+        <div className="flex justify-between items-center mt-4 px-6">
+          {/* LEFT: Create Button */}
+          <Button
+            onClick={() => router.push('/app/rate-plan/create-rate-plan')}
+            variant="default"
+            className="flex items-center gap-2 bg-tripswift-blue hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium shadow-md hover:shadow-lg transition-all"
+          >
+            <Plus className="h-4 w-4" />
+            Create Rate Plan
+          </Button>
+
+          {/* RIGHT: Save Button (existing) */}
           <div className="flex items-center space-x-2">
             <SaveButton
               isLoading={isLoading}

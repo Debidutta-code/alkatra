@@ -4,6 +4,8 @@ import RateAmount from "../../../wincloud/src/model/ratePlanDateWise.model"
 import { Inventory } from "../../../wincloud/src/model/inventoryModel"
 import { startOfDay, endOfDay, addDays } from 'date-fns';
 import { start } from "repl";
+import { PropertyInfo } from "../../../property_management/src/model/property.info.model";
+import { Room } from "../../../property_management/src/model/room.model";
 
 interface UpdatePlanData {
   rateAmountId: string;
@@ -253,7 +255,7 @@ class RatePlanDao {
     try {
       console.log("THe hotel code is", hotelCode);
       const ratePlanMatch: any = { hotelCode };
-      
+
       if (invTypeCode) {
         ratePlanMatch.invTypeCode = invTypeCode;
       }
@@ -310,7 +312,7 @@ class RatePlanDao {
           rate.hotelCode === inv.hotelCode
           && rate.invTypeCode === inv.invTypeCode
           && rate.startDate.getTime() === inv.availability.startDate.getTime()
-          // && rate.endDate.getTime() >= inv.availability.endDate.getTime()
+        // && rate.endDate.getTime() >= inv.availability.endDate.getTime()
       );
 
       matchingRates.forEach((matchingRate) => {
@@ -344,23 +346,42 @@ class RatePlanDao {
 
   public static async getAllRoomType(hotelCode: string) {
     try {
+      const propertyId = await PropertyInfo.findOne({ property_code: hotelCode }).select('_id');
+      if (!propertyId) throw new Error("No property found");
 
-      const invTypeCodes = await Inventory.distinct("invTypeCode", { hotelCode });
-      if (!invTypeCodes) throw new Error ("No room type found");
+      const roomTypeCode = await Room.distinct("room_type", { propertyInfo_id: propertyId._id });
+      if (!roomTypeCode || roomTypeCode.length === 0) throw new Error("No room type found");
 
-      const ratePlanCodes = await Promise.all(
-        invTypeCodes.map(async (invTypeCode) => {
-          const ratePlans = await RateAmount.distinct('ratePlanCode', { hotelCode, invTypeCode });
-          return { invTypeCode, ratePlanCodes: ratePlans };
-        })
-      );
+      const ratePlans = await RateAmount.aggregate([
+        {
+          $match: {
+            hotelCode: hotelCode,
+            invTypeCode: { $in: roomTypeCode }
+          }
+        },
+        {
+          $group: {
+            _id: "$invTypeCode",
+            ratePlanCodes: { $addToSet: "$ratePlanCode" }
+          }
+        }
+      ]);
 
-      return ratePlanCodes;
+      const result = roomTypeCode.map(invTypeCode => {
+        const ratePlanData = ratePlans.find(rp => rp._id === invTypeCode);
+        return {
+          invTypeCode,
+          ratePlanCodes: ratePlanData?.ratePlanCodes || []
+        };
+      });
+
+      return result;
     } catch (error) {
       throw new Error(error.message)
     }
   }
-  
+
+
   public static async getRatePlanByHotelCode(hotelCode: string) {
     return await RatePlan.find(
       { propertyId: hotelCode }

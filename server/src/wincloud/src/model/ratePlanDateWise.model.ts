@@ -1,6 +1,6 @@
 import mongoose, { Schema, model, Document } from 'mongoose';
 
-interface IRateAmountDateWise extends Document {
+export interface IRateAmountDateWise extends Document {
     hotelCode: string;
     hotelName: string;
     invTypeCode: string;
@@ -36,18 +36,18 @@ const rateAmountSchema = new Schema<IRateAmountDateWise>({
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     days: {
-        mon: { type: Boolean, required: true },
-        tue: { type: Boolean, required: true },
-        wed: { type: Boolean, required: true },
-        thu: { type: Boolean, required: true },
-        fri: { type: Boolean, required: true },
-        sat: { type: Boolean, required: true },
-        sun: { type: Boolean, required: true },
+        mon: { type: Boolean, required: false },
+        tue: { type: Boolean, required: false },
+        wed: { type: Boolean, required: false },
+        thu: { type: Boolean, required: false },
+        fri: { type: Boolean, required: false },
+        sat: { type: Boolean, required: false },
+        sun: { type: Boolean, required: false },
     },
     currencyCode: { type: String, required: true },
     baseByGuestAmts: [{
         amountBeforeTax: { type: Number, required: true },
-        numberOfGuests: { type: Number, required: true, enum: [1, 2, 3, 4] },
+        numberOfGuests: { type: Number, required: true },
     }],
     additionalGuestAmounts: [{
         ageQualifyingCode: { type: String, required: true, enum: ['10', '8', '7'] },
@@ -58,5 +58,5 @@ const rateAmountSchema = new Schema<IRateAmountDateWise>({
 
 rateAmountSchema.index({ hotelCode: 1, invTypeCode: 1, startDate: 1, endDate: 1 });
 
- const RateAmount = model<IRateAmountDateWise>('RateAmountDateWise', rateAmountSchema);
- export default RateAmount;
+const RateAmount = model<IRateAmountDateWise>('RateAmountDateWise', rateAmountSchema);
+export default RateAmount;

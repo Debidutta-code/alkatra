@@ -123,28 +123,28 @@ class RatePlanService {
 
   // public static async getRatePlanByHotel(hotelCode: string, invTypeCode?: string, startDate?: Date, endDate?: Date, page?: number) {
   public static async getRatePlanByHotel(
-    hotelCode: string, 
-    invTypeCode?: string, 
-    ratePlanCode?: string, 
-    startDate?:string,
+    hotelCode: string,
+    invTypeCode?: string,
+    ratePlanCode?: string,
+    startDate?: string,
     endDate?: string,
-    page?: number, 
+    page?: number,
     limit?: number
   ) {
 
     try {
-      
-      if (!hotelCode || !page || !limit) {         
+
+      if (!hotelCode || !page || !limit) {
         throw new Error("Hotel and inventory code is required");
       }
 
       const ratePlans = await RatePlanDao.getRatePlanByHotel(
-        hotelCode, 
-        invTypeCode && invTypeCode, 
-        ratePlanCode && ratePlanCode, 
-        startDate && startDate, 
+        hotelCode,
+        invTypeCode && invTypeCode,
+        ratePlanCode && ratePlanCode,
+        startDate && startDate,
         endDate && endDate,
-        page && page, 
+        page && page,
         limit && limit
       );
 
@@ -488,10 +488,10 @@ class RoomRentCalculationService {
       console.log(`Generated ${stayDates.length} nights:`, stayDates.map(d => d.toDateString()));
 
       for (const date of stayDates) {
-        
+
 
         const dayOfWeek = this.getDayOfWeek(date);
-        
+
 
         let bestRateForDay: any = null;
         let lowestAmountForDay = Infinity;
@@ -503,7 +503,7 @@ class RoomRentCalculationService {
             continue;
           }
 
-          
+
 
           const rate = item.rate;
           const isApplicable = this.isRateApplicableForDate(rate, date, dayOfWeek);
@@ -523,7 +523,7 @@ class RoomRentCalculationService {
             noOfRooms
           );
 
-          
+
 
           if (rateCalculation.success && rateCalculation.totalAmountForDay < lowestAmountForDay) {
             lowestAmountForDay = rateCalculation.totalAmountForDay;
@@ -533,11 +533,11 @@ class RoomRentCalculationService {
               currencyCode: rate.currencyCode,
               date: date
             };
-            
+
           }
         }
 
-        
+
 
         if (!bestRateForDay) {
           console.log(`ERROR: No suitable rates found for ${date.toDateString()}`);
@@ -571,7 +571,7 @@ class RoomRentCalculationService {
         totalAdditionalCharges += bestRateForDay.additionalGuestCharges * noOfRooms;
       }
 
-      
+
 
       const averageBaseRate = numberOfNights > 0 ? totalBaseAmount / numberOfNights / noOfRooms : 0;
 
