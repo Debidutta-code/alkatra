@@ -19,6 +19,7 @@ interface IInventory {
   invTypeCode: string;
   ratePlanCode: string;
   availability: { startDate: Date; endDate: Date; count: number };
+  status: string;
 }
 
 interface IRatePlan {
@@ -39,6 +40,7 @@ interface RoomWithRates {
   hotelName: string;
   invTypeCode: string;
   availability: { startDate: Date; endDate: Date; count: number };
+  status: string;
   rates: {
     _id: string;
     currencyCode: string;
@@ -321,6 +323,7 @@ class RatePlanDao {
           hotelName: inv.hotelName,
           invTypeCode: inv.invTypeCode,
           availability: inv.availability,
+          status: inv.status,
           rates: {
             _id: matchingRate._id,
             currencyCode: matchingRate.currencyCode,
