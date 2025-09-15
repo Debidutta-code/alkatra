@@ -4,7 +4,7 @@ import Handlebars from "handlebars";
 import { MailFactory } from "../../../customer_authentication/src/services/mailFactory";
 import { ThirdPartyAmendReservationService } from '../../../wincloud/src/controller/amendReservationController';
 import { ThirdPartyReservationService } from "../../../wincloud/src/service/reservationService";
-import { CallForwarding } from "twilio/lib/rest/lookups/v2/query";
+
 
 interface AmendReservationInput {
   bookingDetails: {

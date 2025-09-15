@@ -5,6 +5,7 @@ import { container } from "../../../tax_service/container";
 import { InventoryService } from "../service/inventory.service";
 import { ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from "qs";
+import { success } from "zod";
 
 class RatePlanController {
 
@@ -264,37 +265,67 @@ class RoomPrice {
 }
 
 export class StartStopWatcher {
-  private inventoryService: InventoryService;
+    private inventoryService: InventoryService;
 
-  constructor(inventoryService: InventoryService) {
-    if (!inventoryService) {
-      throw new Error("InventoryService is required");
+    constructor(inventoryService: InventoryService) {
+        if (!inventoryService) {
+            throw new Error("InventoryService is required");
+        }
+        this.inventoryService = inventoryService;
     }
-    this.inventoryService = inventoryService;
-  }
 
-  async updateStartStopSell(req: Request, res: Response, next: NextFunction) {
-    try {
-      
-        const { hotelCode, invTypeCode, ratePlanCode, startDate, endDate } = req.body;
+    async updateStartStopSell(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { hotelCode, invTypeCode, dateStatusList } = req.body;
 
-      const response = await this.inventoryService.updateInventory(hotelCode, invTypeCode, ratePlanCode, startDate, endDate);
+            /**
+             * Validate dateStatusList is an array
+             */
+            if (!Array.isArray(dateStatusList)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "dateStatusList must be an array"
+                });
+            }
 
-      const sanitizedResponse = {
-        matchedCount: response.matchedCount,
-        modifiedCount: response.modifiedCount,
-        acknowledged: response.acknowledged,
-      };
+            /**
+             * Validate each item in dateStatusList
+             */
+            for (const item of dateStatusList) {
+                if (!item.date || !item.status || !['open', 'close'].includes(item.status)) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Each item must have a valid date and status ('open' or 'close')"
+                    });
+                }
+            }
 
-      return res.status(200).json({
-        success: true,
-        message: "Inventory updated successfully",
-        data: sanitizedResponse,
-      });
-    } catch (error: any) {
-      console.error("######### Error in startWatcher:", error);
-      return res.status(500).json({ success: false, message: "Failed to start inventory watcher", error: error.message });
+            const response = await this.inventoryService.updateInventory(hotelCode, invTypeCode, dateStatusList);
+            if (!response) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Status not changed successfully",
+                });
+            }
+
+            const sanitizedResponse = {
+                matchedCount: response.matchedCount,
+                modifiedCount: response.modifiedCount,
+            };
+
+            return res.status(200).json({
+                success: true,
+                message: "Inventory updated successfully",
+                data: sanitizedResponse,
+            });
+        }
+        catch (error: any) {
+            console.log("Start Stop Sell: Server Error");
+            return res.status(500).json({
+                success: false,
+                message: error.message || "Start Stop sell status update failed",
+            });
+        }
     }
-  }
 }
 export { RatePlanController, RoomPrice };   
