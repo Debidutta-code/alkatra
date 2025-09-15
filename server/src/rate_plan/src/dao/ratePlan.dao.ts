@@ -360,6 +360,7 @@ class RatePlanDao {
       throw new Error(error.message)
     }
   }
+  
   public static async getRatePlanByHotelCode(hotelCode: string) {
     return await RatePlan.find(
       { propertyId: hotelCode }

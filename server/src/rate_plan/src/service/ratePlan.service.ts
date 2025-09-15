@@ -841,4 +841,5 @@ class RoomRentCalculationService {
     }
   }
 }
+
 export { RatePlanService, RoomPriceService, RoomRentCalculationService };
