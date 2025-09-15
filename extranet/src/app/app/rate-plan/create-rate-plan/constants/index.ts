@@ -16,7 +16,8 @@ export const DEFAULT_BASE_GUESTS = [
   { numberOfGuests: 1, amountBeforeTax: 0 },
 ];
 
-export const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'GBP', 'AED', 'SAR', 'INR'];
+// export const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'GBP', 'AED', 'SAR', 'INR'];
+export const SUPPORTED_CURRENCIES = ['USD'];
 export const DEFAULT_ADDITIONAL_GUESTS = [
   { ageQualifyingCode: 10, amount: 0 },
 ];
