@@ -3,9 +3,6 @@ import { RatePlanService, RoomPriceService, RoomRentCalculationService } from ".
 import { propertyInfoService } from "../../../property_management/src/container";
 import { container } from "../../../tax_service/container";
 import { InventoryService } from "../service/inventory.service";
-import { ParamsDictionary } from "express-serve-static-core";
-import { ParsedQs } from "qs";
-import { success } from "zod";
 
 class RatePlanController {
 
