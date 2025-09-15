@@ -1549,4 +1549,8 @@ export class BookingController {
     }
   }
 
+  async bookAgainWithPayAtHotel (req: any, res: Response, next: NextFunction) {
+    
+  }
+
 }
