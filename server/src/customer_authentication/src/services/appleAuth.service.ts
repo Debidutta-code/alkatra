@@ -34,7 +34,7 @@ export class AppleAuthService implements IAppleAuthService {
     /**
      * Verify Apple identity token using Apple's public keys
      */
-    private async verifyIdentityToken(identityToken: string): Promise<any> {
+    private async verifyIdentityToken(identityToken: string, expectedNonce?: string): Promise<any> {
         try {
             // Apple's public keys URL
             const applePublicKeysUrl = 'https://appleid.apple.com/auth/keys';
@@ -65,8 +65,27 @@ export class AppleAuthService implements IAppleAuthService {
                 algorithms: ['RS256'],
                 audience: this.appleConfig.clientId,
                 issuer: 'https://appleid.apple.com'
-            });
+            })as jwt.JwtPayload;
             
+// --- CRITICAL NONCE VALIDATION ---
+            if (expectedNonce) {
+                // The nonce in the token is a SHA256 hash of the original nonce
+                const nonceClaim = verifiedToken.nonce;
+                if (!nonceClaim) {
+                    throw new Error('Nonce claim is missing from the identity token. Potential replay attack.');
+                }
+                // You must hash the original nonce the same way the Flutter app did (SHA256 -> base64Url)
+                const expectedNonceHash = crypto.createHash('sha256').update(expectedNonce).digest('base64url');
+                if (nonceClaim !== expectedNonceHash) {
+                    throw new Error('Nonce validation failed. Token may be reused.');
+                }
+            } else {
+                // If you expect a nonce but none was provided, it's a security warning.
+                // For maximum security, you might require it. For now, we'll just log.
+                console.warn('No nonce provided for validation. Security recommendation: always use a nonce.');
+            }
+            // ---------------------------------
+
             return verifiedToken;
         } catch (error: any) {
             console.error('Apple identity token verification failed:', error.message);
@@ -155,7 +174,7 @@ export class AppleAuthService implements IAppleAuthService {
      */
     async authenticate(data: IAppleAuthData): Promise<IAppleUserData> {
         try {
-            const { identityToken, authorizationCode, firstName, lastName } = data;
+            const { identityToken, authorizationCode, firstName, lastName,nonce} = data;
             
             if (!identityToken && !authorizationCode) {
                 throw new Error("Either identity token or authorization code is required for Apple authentication");
@@ -165,14 +184,14 @@ export class AppleAuthService implements IAppleAuthService {
 
             if (identityToken) {
                 // Verify identity token directly
-                appleUserData = await this.verifyIdentityToken(identityToken);
+                appleUserData = await this.verifyIdentityToken(identityToken, nonce);
             } else if (authorizationCode) {
                 // Exchange authorization code for tokens
                 const tokens = await this.exchangeCodeForToken(authorizationCode);
                 if (!tokens.id_token) {
                     throw new Error("No identity token received from Apple");
                 }
-                appleUserData = await this.verifyIdentityToken(tokens.id_token);
+                appleUserData = await this.verifyIdentityToken(tokens.id_token, nonce);
             }
 
             if (!appleUserData) {

@@ -11,6 +11,7 @@ export interface IAppleAuthData {
     provider: string; // 'apple'
     firstName?: string;
     lastName?: string;
+    nonce?: string; // <-- ADD THIS
 }
 
 /**
