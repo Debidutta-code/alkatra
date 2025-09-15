@@ -7,6 +7,7 @@ interface ValidationRules {
   email?: boolean;
   minLength?: number;
   passwordStrength?: boolean;
+  namePattern?: boolean;
 }
 
 interface FieldConfig {
@@ -39,6 +40,23 @@ export function useFormValidation(
       } catch (error) {
         const fieldLabel = name.charAt(0).toUpperCase() + name.slice(1).replace(/([A-Z])/g, ' $1').trim();
         return `${fieldLabel} is required`;
+      }
+    }
+
+    if (rules.namePattern && value && !/^[a-zA-Z\s]+$/.test(value)) {
+      try {
+        const specificKey = `Auth.Validation.${name}Invalid`;
+        const specificMessage = t(specificKey);
+
+        if (specificMessage === specificKey) {
+          const fieldLabel = name.charAt(0).toUpperCase() + name.slice(1).replace(/([A-Z])/g, ' $1').trim();
+          return t('Auth.Validation.namePatternInvalid', { field: fieldLabel });
+        }
+
+        return specificMessage;
+      } catch (error) {
+        const fieldLabel = name.charAt(0).toUpperCase() + name.slice(1).replace(/([A-Z])/g, ' $1').trim();
+        return `${fieldLabel} must contain only letters and spaces`;
       }
     }
 

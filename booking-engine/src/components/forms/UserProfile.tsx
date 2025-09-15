@@ -100,7 +100,7 @@ const UserProfile: React.FC = () => {
 
   const [user, setUser] = useState<UserProfile>({
     firstName: authUser?.firstName || 'Guest',
-    lastName: authUser?.lastName || 'User',
+    lastName: authUser?.lastName || '',
     email: authUser?.email || '',
     phone: authUser?.phone || '',
     joinDate: authUser?.createdAt
@@ -122,7 +122,7 @@ const UserProfile: React.FC = () => {
       setUser((prev) => ({
         ...prev,
         firstName: authUser.firstName || prev.firstName,
-        lastName: authUser.lastName || prev.lastName,
+        lastName: authUser.lastName || '',
         email: authUser.email || prev.email,
         phone: authUser.phone || prev.phone,
       }));
@@ -186,7 +186,7 @@ const UserProfile: React.FC = () => {
       setUser((prev) => ({
         ...prev,
         firstName: updatedUser.firstName || prev.firstName,
-        lastName: updatedUser.lastName || prev.lastName,
+        lastName: updatedUser.lastName || '',
         email: updatedUser.email || prev.email,
         phone: updatedUser.phone || prev.phone,
       }));
@@ -475,8 +475,10 @@ const UserProfile: React.FC = () => {
                   alt={t('Profile.avatarAlt', { defaultValue: 'User profile avatar' })}
                   fallback={
                     <span className="text-lg sm:text-xl font-bold text-[var(--color-primary-off-white)]">
-                      {user.firstName.charAt(0)}{user.lastName?.charAt(0)}
-
+                      {user.lastName
+                        ? user.firstName.charAt(0) + user.lastName.charAt(0)
+                        : user.firstName.slice(0, 2)
+                      }
                     </span>
                   }
                 />
@@ -484,7 +486,7 @@ const UserProfile: React.FC = () => {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <h1 className="text-lg sm:text-2xl font-bold text-[var(--color-secondary-black)] truncate">
-                    {user.firstName} {user.lastName}
+                    {user.firstName}{user.lastName ? ` ${user.lastName}` : ''}
                   </h1>
                   {user.verified && <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 flex-shrink-0" />}
                 </div>

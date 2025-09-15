@@ -136,7 +136,10 @@
       "confirmPasswordRequired": "Please confirm your password",
       "passwordComplexity": "Password must contain at least 8 characters including one uppercase letter, one lowercase letter, one number and one special character.",
       "minLength": "Must be at least {{count}} characters",
-      "passwordsDoNotMatch": "Passwords do not match"
+      "passwordsDoNotMatch": "Passwords do not match",
+      "firstNameInvalid": "First Name must contain only letters and spaces",
+      "lastNameInvalid": "Last Name must contain only letters and spaces",
+      "namePatternInvalid": "{{field}} must contain only letters and spaces"
     }
   },
   "Navbar": {
