@@ -29,7 +29,6 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
     onSuccess,
 }) => {
     const { createRatePlan, isLoading } = useRatePlanCreate();
-
     const [formData, setFormData] = useState<CreateRatePlanPayload>({
         hotelCode,
         invTypeCode: '',
@@ -49,16 +48,13 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
         baseGuestAmounts: [{ numberOfGuests: 1, amountBeforeTax: 0 }],
         additionalGuestAmounts: [{ ageQualifyingCode: 10, amount: 0 }],
     });
-
     const [errors, setErrors] = useState<Partial<Record<keyof CreateRatePlanPayload | 'baseGuestAmounts' | 'additionalGuestAmounts', string>>>({});
     const handleInputChange = (field: keyof CreateRatePlanPayload, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
-        // Clear error when user starts typing
         if (errors[field]) {
             setErrors(prev => ({ ...prev, [field]: undefined }));
         }
     };
-
     const handleDayToggle = (day: keyof CreateRatePlanPayload['days']) => {
         setFormData(prev => ({
             ...prev,
@@ -144,7 +140,6 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
     };
 
     const validateForm = () => {
-        // Custom validation for mandatory sections
         const customErrors: Partial<Record<keyof CreateRatePlanPayload, string>> = {};
 
         // Validate base guest amounts
@@ -166,16 +161,8 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                 customErrors.additionalGuestAmounts = "All additional guest amounts must be greater than 0";
             }
         }
-
         if (Object.keys(customErrors).length > 0) {
             setErrors(customErrors);
-
-            // Scroll to first error
-            const firstErrorKey = Object.keys(customErrors)[0];
-            const firstErrorElement = document.querySelector(`[data-error-for="${firstErrorKey}"]`);
-            if (firstErrorElement) {
-                firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
             return false;
         }
 
@@ -191,13 +178,6 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                     }
                 });
                 setErrors(fieldErrors);
-
-                // Scroll to first error
-                const firstErrorKey = Object.keys(fieldErrors)[0];
-                const firstErrorElement = document.querySelector(`[data-error-for="${firstErrorKey}"]`);
-                if (firstErrorElement) {
-                    firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
             }
             return false;
         }
@@ -205,11 +185,8 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        // Clear previous errors
         setErrors({});
 
-        // Validate form before API call
         if (!validateForm()) {
             return;
         }
@@ -217,7 +194,7 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
         try {
             await createRatePlan(formData);
             onSuccess?.(formData);
-            // Reset form on success
+
             setFormData({
                 hotelCode,
                 invTypeCode: '',
@@ -238,10 +215,8 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                 additionalGuestAmounts: [{ ageQualifyingCode: 10, amount: 0 }],
             });
 
-            onSuccess?.(formData);
         } catch (error: any) {
             console.error('Create failed:', error);
-            // Error handling is already done in the service
         }
     };
 
@@ -252,7 +227,7 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
             {/* Basic Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2" data-error-for="invTypeCode">
-                    <label className="text-sm font-tripswift-medium text-gray-700">Room Type *</label>
+                    <label className="text-sm font-tripswift-medium text-gray-700">Room Type <span className="text-red-500">*</span></label>
                     <Select value={formData.invTypeCode} onValueChange={(value) => handleInputChange('invTypeCode', value)}>
                         <SelectTrigger className={errors.invTypeCode ? 'border-red-500' : ''}>
                             <SelectValue placeholder="Select room type" />
@@ -271,7 +246,7 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                 </div>
 
                 <div className="space-y-2" data-error-for="ratePlanCode">
-                    <label className="text-sm font-tripswift-medium text-gray-700">Rate Plan Name *</label>
+                    <label className="text-sm font-tripswift-medium text-gray-700">Rate Plan Name <span className="text-red-500">*</span></label>
                     <Input
                         type="text"
                         value={formData.ratePlanCode}
@@ -286,7 +261,7 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                 </div>
 
                 <div className="space-y-2" data-error-for="startDate">
-                    <label className="text-sm font-tripswift-medium text-gray-700">Start Date *</label>
+                    <label className="text-sm font-tripswift-medium text-gray-700">Start Date <span className="text-red-500">*</span></label>
                     <Popover>
                         <PopoverTrigger>
                             <Button
@@ -301,10 +276,17 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                         <PopoverContent className="w-auto p-0">
                             <Calendar
                                 mode="single"
-                                selected={formData.startDate ? new Date(formData.startDate) : undefined}
+                                selected={
+                                    formData.startDate
+                                        ? new Date(`${formData.startDate}T00:00:00`)
+                                        : undefined
+                                }
                                 onSelect={(date) => {
-                                    const selectedDate = date instanceof Date ? date : date?.from;
-                                    handleInputChange('startDate', selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '');
+                                    if (!date) return;
+                                    const selectedDate = date instanceof Date ? date : date.from;
+                                    if (selectedDate) {
+                                        handleInputChange('startDate', format(selectedDate, 'yyyy-MM-dd'));
+                                    }
                                 }}
                             />
                         </PopoverContent>
@@ -315,7 +297,7 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                 </div>
 
                 <div className="space-y-2" data-error-for="endDate">
-                    <label className="text-sm font-tripswift-medium text-gray-700">End Date *</label>
+                    <label className="text-sm font-tripswift-medium text-gray-700">End Date <span className="text-red-500">*</span></label>
                     <Popover>
                         <PopoverTrigger>
                             <Button
@@ -330,10 +312,17 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                         <PopoverContent className="w-auto p-0">
                             <Calendar
                                 mode="single"
-                                selected={formData.endDate ? new Date(formData.endDate) : undefined}
+                                selected={
+                                    formData.endDate
+                                        ? new Date(`${formData.endDate}T00:00:00`)
+                                        : undefined
+                                }
                                 onSelect={(date) => {
-                                    const selectedDate = date instanceof Date ? date : date?.from;
-                                    handleInputChange('endDate', selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '');
+                                    if (!date) return;
+                                    const selectedDate = date instanceof Date ? date : date.from;
+                                    if (selectedDate) {
+                                        handleInputChange('endDate', format(selectedDate, 'yyyy-MM-dd'));
+                                    }
                                 }}
                             />
                         </PopoverContent>
@@ -344,7 +333,7 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                 </div>
 
                 <div className="space-y-2" data-error-for="currencyCode">
-                    <label className="text-sm font-tripswift-medium text-gray-700">Currency *</label>
+                    <label className="text-sm font-tripswift-medium text-gray-700">Currency <span className="text-red-500">*</span></label>
                     <Select value={formData.currencyCode} onValueChange={(value) => handleInputChange('currencyCode', value)}>
                         <SelectTrigger className={errors.currencyCode ? 'border-red-500' : ''}>
                             <SelectValue />
@@ -385,7 +374,7 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
             {/* Base Guest Amounts */}
             <div className="space-y-4" data-error-for="baseGuestAmounts">
                 <div className="flex items-center justify-between">
-                    <label className="text-sm font-tripswift-medium text-gray-700">Base Pricing by Guests *</label>
+                    <label className="text-sm font-tripswift-medium text-gray-700">Base Pricing by Guests <span className="text-red-500">*</span></label>
                     <Button type="button" variant="outline" size="sm" onClick={addBaseGuest} className="gap-1">
                         <Plus className="h-4 w-4" /> Add Guest Tier
                     </Button>
@@ -409,12 +398,12 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-xs text-gray-600">Price (Before Tax)</label>
+                                    <label className="text-xs text-gray-600">Price (Before Tax) <span className="text-red-500">*</span></label>
                                     <Input
                                         type="number"
                                         min="0"
                                         step="0.01"
-                                        value={item.amountBeforeTax}
+                                        value={item.amountBeforeTax === 0 ? '' : item.amountBeforeTax}
                                         onChange={(e) => handleBaseGuestChange(index, 'amountBeforeTax', parseFloat(e.target.value) || 0)}
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter') {
@@ -422,7 +411,7 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                                             }
                                         }}
                                         className="w-full"
-                                        placeholder={index > 0 ? `Min: ${formData.baseGuestAmounts[index - 1].amountBeforeTax + 0.01}` : '0.00'}
+                                        placeholder={index > 0 ? `Min: ${formData.baseGuestAmounts[index - 1].amountBeforeTax + 0.01}` : 'Enter amount'}
                                     />
                                 </div>
                             </div>
@@ -444,7 +433,7 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
             {/* Additional Guest Amounts */}
             <div className="space-y-4" data-error-for="additionalGuestAmounts">
                 <div className="flex items-center justify-between">
-                    <label className="text-sm font-tripswift-medium text-gray-700">Additional Guest Charges *</label>
+                    <label className="text-sm font-tripswift-medium text-gray-700">Additional Guest Charges <span className="text-red-500">*</span></label>
                     <Button type="button" variant="outline" size="sm" onClick={addAdditionalGuest} className="gap-1">
                         <Plus className="h-4 w-4" /> Add Age Category
                     </Button>
@@ -457,7 +446,7 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                         <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                             <div className="flex-1 grid grid-cols-2 gap-3">
                                 <div className="space-y-1">
-                                    <label className="text-xs text-gray-600">Age Category *</label>
+                                    <label className="text-xs text-gray-600">Age Category <span className="text-red-500">*</span></label>
                                     <Select
                                         value={item.ageQualifyingCode.toString()}
                                         onValueChange={(value) => handleAdditionalGuestChange(index, 'ageQualifyingCode', parseInt(value))}
@@ -473,12 +462,12 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                                     </Select>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-xs text-gray-600">Additional Charge *</label>
+                                    <label className="text-xs text-gray-600">Additional Charge <span className="text-red-500">*</span></label>
                                     <Input
                                         type="number"
                                         min="0"
                                         step="0.01"
-                                        value={item.amount}
+                                        value={item.amount === 0 ? '' : item.amount}
                                         onChange={(e) => handleAdditionalGuestChange(index, 'amount', parseFloat(e.target.value) || 0)}
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter') {
@@ -486,7 +475,7 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                                             }
                                         }}
                                         className="w-full"
-                                        placeholder="0.00"
+                                        placeholder="Enter charge amount"
                                     />
                                 </div>
                             </div>

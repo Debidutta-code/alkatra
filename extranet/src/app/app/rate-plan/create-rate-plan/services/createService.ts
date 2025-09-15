@@ -23,7 +23,7 @@ export const useRatePlanCreate = () => {
         days: { ...data.days },
       };
       const result = await apiCreateRatePlan(transformedData, accessToken);
-      toast.success('✅ Rate plan created successfully!');
+      toast.success('Rate plan created successfully!');
       return result;
     } catch (error: any) {
       toast.error(error.message || 'Failed to create rate plan');

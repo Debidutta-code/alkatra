@@ -6,6 +6,7 @@ import { Input } from '@src/components/ui/input';
 import { Button } from '@src/components/ui/button';
 import { Calendar } from '../../map-rate-plan/components/Calender';
 import { Popover, PopoverTrigger, PopoverContent } from '../../map-rate-plan/components/Popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@src/components/ui/select';
 import { format } from '../../map-rate-plan/utils/dateUtils';
 import { Loader2 } from 'lucide-react';
 import { useInventoryCreate } from '../hooks/useInventoryCreate';
@@ -39,9 +40,14 @@ export const CreateInventoryForm: React.FC<CreateInventoryFormProps> = ({
 
   const handleDateSelect = (field: 'startDate' | 'endDate', date: Date | undefined) => {
     if (date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const localDateString = `${year}-${month}-${day}`;
+
       setAvailability(prev => ({
         ...prev,
-        [field]: format(date, 'yyyy-MM-dd'),
+        [field]: localDateString,
       }));
     }
   };
@@ -83,7 +89,7 @@ export const CreateInventoryForm: React.FC<CreateInventoryFormProps> = ({
           count: Number(availability.count),
         },
       });
-      toast.success(`✅ Inventory created for ${selectedRoomType}!`);
+      toast.success(`Inventory created for ${selectedRoomType}!`);
       onSuccess();
     } catch (err: any) {
       toast.error(err.message || 'Failed to create inventory');
@@ -94,28 +100,29 @@ export const CreateInventoryForm: React.FC<CreateInventoryFormProps> = ({
     <div className="space-y-6">
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <p className="text-sm text-blue-800">
-          ⚠️ You must complete this step to finish creating your rate plan.
+          ⚠️ You can set up inventory now, but we recommend creating a rate plan first for best results.
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Room Type Dropdown */}
+        {/* Room Type Dropdown */}
         <div>
           <label className="block text-sm font-tripswift-medium text-gray-700 mb-1">
-            Room Type *
+            Room Type <span className="text-red-500">*</span>
           </label>
-          <select
-            value={selectedRoomType}
-            onChange={(e) => setSelectedRoomType(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="">Select room type</option>
-            {roomTypes.map((roomType) => (
-              <option key={roomType} value={roomType}>
-                {roomType}
-              </option>
-            ))}
-          </select>
+          <Select value={selectedRoomType} onValueChange={setSelectedRoomType}>
+            <SelectTrigger className={errors.selectedRoomType ? 'border-red-500' : ''}>
+              <SelectValue placeholder="Select room type" />
+            </SelectTrigger>
+            <SelectContent>
+              {roomTypes.map((roomType) => (
+                <SelectItem key={roomType} value={roomType}>
+                  {roomType}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {errors.selectedRoomType && (
             <p className="text-xs text-red-500 mt-1">{errors.selectedRoomType}</p>
           )}
@@ -124,7 +131,7 @@ export const CreateInventoryForm: React.FC<CreateInventoryFormProps> = ({
         {/* Start Date */}
         <div>
           <label className="block text-sm font-tripswift-medium text-gray-700 mb-1">
-            Start Date *
+            Start Date <span className="text-red-500">*</span>
           </label>
           <Popover>
             <PopoverTrigger>
@@ -138,7 +145,11 @@ export const CreateInventoryForm: React.FC<CreateInventoryFormProps> = ({
             <PopoverContent className="w-auto p-0">
               <Calendar
                 mode="single"
-                selected={availability.startDate ? new Date(availability.startDate) : undefined}
+                selected={
+                  availability.startDate
+                    ? new Date(`${availability.startDate}T00:00:00`)
+                    : undefined
+                }
                 onSelect={(date) => handleDateSelect('startDate', date as Date)}
               />
             </PopoverContent>
@@ -149,7 +160,7 @@ export const CreateInventoryForm: React.FC<CreateInventoryFormProps> = ({
         {/* End Date */}
         <div>
           <label className="block text-sm font-tripswift-medium text-gray-700 mb-1">
-            End Date *
+            End Date <span className="text-red-500">*</span>
           </label>
           <Popover>
             <PopoverTrigger>
@@ -163,8 +174,11 @@ export const CreateInventoryForm: React.FC<CreateInventoryFormProps> = ({
             <PopoverContent className="w-auto p-0">
               <Calendar
                 mode="single"
-                selected={availability.endDate ? new Date(availability.endDate) : undefined}
-                onSelect={(date) => handleDateSelect('endDate', date as Date)}
+                selected={
+                  availability.endDate
+                    ? new Date(`${availability.endDate}T00:00:00`)
+                    : undefined
+                } onSelect={(date) => handleDateSelect('endDate', date as Date)}
               />
             </PopoverContent>
           </Popover>
@@ -174,7 +188,7 @@ export const CreateInventoryForm: React.FC<CreateInventoryFormProps> = ({
         {/* Count */}
         <div>
           <label className="block text-sm font-tripswift-medium text-gray-700 mb-1">
-            Inventory Count *
+            Inventory Count <span className="text-red-500">*</span>
           </label>
           <Input
             type="number"

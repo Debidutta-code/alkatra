@@ -122,10 +122,6 @@ const CreateRatePlanPage = () => {
               />
             ) : (
               <div className="p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <h3 className="text-lg font-medium text-yellow-800 mb-2">⚠️ No Rate Plan Created Yet</h3>
-                <p className="text-yellow-700 mb-4">
-                  You can set up inventory now, but we recommend creating a rate plan first for best results.
-                </p>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1">
                     <CreateInventoryForm
@@ -136,13 +132,6 @@ const CreateRatePlanPage = () => {
                       onCancel={() => setActiveTab('ratePlan')}
                     />
                   </div>
-                  <Button
-                    variant="outline"
-                    onClick={() => setActiveTab('ratePlan')}
-                    className="text-yellow-800 border-yellow-800 self-start"
-                  >
-                    ← Create Rate Plan First
-                  </Button>
                 </div>
               </div>
             )}
