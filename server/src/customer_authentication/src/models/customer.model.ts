@@ -2,6 +2,7 @@ import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface ICustomer extends Document {
     googleId: string;
+    appleId: string; // Add Apple ID
     provider: string;
     avatar: string;
     firstName: string;
@@ -21,7 +22,8 @@ export interface ICustomer extends Document {
 
 const CustomerSchema: Schema = new Schema<ICustomer>({
     googleId: { type: String },
-    provider: { type: String, required: true, enum: ["local", "google"] },
+    appleId: { type: String }, // Add Apple ID field
+    provider: { type: String, required: true, enum: ["local", "google", "apple"] }, // Add "apple" to enum
     avatar: { type: String },
     firstName: { type: String, required: false },
     lastName: { type: String, required: false },
