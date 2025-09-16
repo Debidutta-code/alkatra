@@ -29,7 +29,8 @@ export const CreateInventoryForm: React.FC<CreateInventoryFormProps> = ({
 }) => {
   const { createInventory, isLoading } = useInventoryCreate();
   const [selectedRoomType, setSelectedRoomType] = useState<string>(invTypeCode);
-
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const [availability, setAvailability] = useState({
     startDate: '',
     endDate: '',
@@ -151,6 +152,7 @@ export const CreateInventoryForm: React.FC<CreateInventoryFormProps> = ({
                     : undefined
                 }
                 onSelect={(date) => handleDateSelect('startDate', date as Date)}
+                disabled={(date) => date < today}
               />
             </PopoverContent>
           </Popover>
@@ -178,7 +180,17 @@ export const CreateInventoryForm: React.FC<CreateInventoryFormProps> = ({
                   availability.endDate
                     ? new Date(`${availability.endDate}T00:00:00`)
                     : undefined
-                } onSelect={(date) => handleDateSelect('endDate', date as Date)}
+                }
+                onSelect={(date) => handleDateSelect('endDate', date as Date)}
+                disabled={(date) => {
+                  if (date < today) return true;
+                  if (availability.startDate) {
+                    const startDate = new Date(availability.startDate);
+                    return date < startDate;
+                  }
+
+                  return false;
+                }}
               />
             </PopoverContent>
           </Popover>
@@ -194,10 +206,20 @@ export const CreateInventoryForm: React.FC<CreateInventoryFormProps> = ({
             type="number"
             min="0"
             value={availability.count}
-            onChange={(e) => setAvailability(prev => ({
-              ...prev,
-              count: e.target.value
-            }))}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === '' || (Number(value) >= 0 && !isNaN(Number(value)))) {
+                setAvailability(prev => ({
+                  ...prev,
+                  count: value
+                }));
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === '-' || e.key === 'e' || e.key === 'E' || e.key === '+') {
+                e.preventDefault();
+              }
+            }}
             placeholder="e.g., 25"
             className={`w-full ${errors.count ? 'border-red-500' : ''}`}
           />
