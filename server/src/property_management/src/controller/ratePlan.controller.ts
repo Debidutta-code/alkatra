@@ -1,208 +1,88 @@
-// import { NextFunction, Response } from "express";
-// import { Request } from "../utils/catchAsync";
-// import { PropertyInfo } from "../model/property.info.model";
-// import PropertyPrice from "../model/ratePlan.model";
-// import { Room } from "../model/room.model";
+import { NextFunction, Response } from "express";
+import { RatePlanService } from "../service";
+import { CreateRatePlanRequest } from "../interface";
+import { AuthenticatedRequest } from "../../../tax_service/interfaces";
 
-// export const createRoomRatePlan = async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//         const { id } = req.params;  // property_id
-//         const {
-//             applicable_room_type,
-//             meal_plan,
-//             room_price,
-//             rate_plan_name,
-//             rate_plan_description,
-//             min_length_stay,
-//             max_length_stay,
-//             min_book_advance,
-//             max_book_advance
-//         } = req.body;
-//         console.log("==== Incoming Create Rate Plan Data ====");
-//         console.log("Params:", req.params);
-//         console.log("Body:", req.body);
+export class RatePlanHotelier {
 
-//         if (!req.body) {
-//             return res.status(401).json({ success: false, message: "All fields are required" })
-//         }
-//         if (!id) {
-//             return res.status(401).json({ success: false, message: "Property ID is required" })
-//         }
+    private ratePlanService: RatePlanService;
+    constructor() {
+        this.ratePlanService = RatePlanService.getInstance();
+    }
 
-//         // create property price
-//         const roomRatePlan = await PropertyPrice.create({
-//             property_id: id,
-//             applicable_room_type,
-//             meal_plan,
-//             room_price,
-//             rate_plan_name,
-//             rate_plan_description,
-//             min_length_stay,
-//             max_length_stay,
-//             min_book_advance,
-//             max_book_advance
-//         })
+    async createRatePlan(req: any, res: Response) {
+        const {
+            hotelCode,
+            invTypeCode,
+            ratePlanCode,
+            startDate,
+            endDate,
+            currencyCode,
+            days,
+            baseGuestAmounts,
+            additionalGuestAmounts
+        } = req.body;
 
-//         // update property info with property price
-//         await PropertyInfo.findByIdAndUpdate(
-//             { _id: id },
-//             { rate_plan: roomRatePlan._id },
-//             { new: true }
-//         );
+        try {
+            // Validate required fields
+            if (!hotelCode || !invTypeCode || !ratePlanCode || !startDate || !endDate || !currencyCode) {
+                return res.status(400).json({ message: "Missing required fields: hotelCode, invTypeCode, ratePlanCode, startDate, endDate, currencyCode" });
+            }
 
-//         await Room.findByIdAndUpdate(
-//             { _id: applicable_room_type },
-//             { rateplan_created: true },
-//             { new: true }
-//         );
+            // Convert string dates to Date objects if needed
+            const startDateObj = typeof startDate === 'string' ? new Date(startDate) : startDate;
+            const endDateObj = typeof endDate === 'string' ? new Date(endDate) : endDate;
 
-//         return res.status(200).json({
-//             success: true,
-//             message: "Property Price created",
-//             roomRatePlan: roomRatePlan
-//         })
-//     }
-//     catch (error: any) {
-//         return res.status(500).json({
-//             success: false,
-//             message: error.message
-//         })
-//     }
-// }
+            // Validate dates are valid
+            if (isNaN(startDateObj.getTime()) || isNaN(endDateObj.getTime())) {
+                return res.status(400).json({ message: "Invalid date format. Use ISO format (YYYY-MM-DD)" });
+            }
 
-// export const updateRoomRatePlan = async (req: Request, res: Response) => {
-//     try {
-//         const rateplanId = req.params.id; // Assuming the rate plan ID is passed in the URL
-//         console.log(`Updating Rate Plan with ID: ${rateplanId}`);
+            // Validate date range
+            if (startDateObj >= endDateObj) {
+                return res.status(400).json({ message: "Start date cannot be greater than or equal to end date" });
+            }
 
-//         const {
-//             meal_plan,
-//             room_price,
-//             rate_plan_name,
-//             rate_plan_description,
-//             min_length_stay,
-//             max_length_stay,
-//             min_book_advance,
-//             max_book_advance
-//         } = req.body;
+            // Check if dates are in the past
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // Today at midnight
 
-//         console.log("==== Incoming Update Rate Plan Data ====");
-//         console.log("Params:", req.params);
-//         console.log("Body:", req.body);
+            if (startDateObj < today || endDateObj < today) {
+                return res.status(400).json({ message: "Dates cannot be in the past" });
+            }
 
-//         // Find and update the rate plan by its ID
-//         const updatedRatePlan = await PropertyPrice.findByIdAndUpdate(
-//             rateplanId,
-//             {
-//                 $set: {
-//                     meal_plan,
-//                     room_price,
-//                     rate_plan_name,
-//                     rate_plan_description,
-//                     min_length_stay,
-//                     max_length_stay,
-//                     min_book_advance,
-//                     max_book_advance
-//                 }
-//             },
-//             { new: true, runValidators: true } // Ensure the updated document is returned and validators are run
-//         );
+            // Validate baseGuestAmounts
+            if (!baseGuestAmounts || !Array.isArray(baseGuestAmounts) || baseGuestAmounts.length === 0) {
+                return res.status(400).json({ message: "At least one base guest amount is required" });
+            }
 
-//         if (!updatedRatePlan) {
-//             return res.status(404).json({ success: false, message: "No rate plan found with the provided ID" });
-//         }
+            // Validate currency code
+            if (currencyCode.length !== 3) {
+                return res.status(400).json({ message: "Currency code must be 3 characters (e.g., USD, EUR)" });
+            }
 
-//         return res.status(200).json({
-//             success: true,
-//             message: "Rate plan updated successfully",
-//             updatedRatePlan: updatedRatePlan
-//         });
-//     } catch (error) {
-//         console.error("Error updating rate plan:", error);
-//         return res.status(500).json({
-//             success: false,
-//             message: "Internal error while updating rate plan, please try again later"
-//         });
-//     }
-// };
+            const data: CreateRatePlanRequest = {
+                hotelCode,
+                invTypeCode,
+                ratePlanCode,
+                startDate: startDateObj,
+                endDate: endDateObj,
+                currencyCode: currencyCode.toUpperCase(),
+                days,
+                baseGuestAmounts,
+                additionalGuestAmounts: additionalGuestAmounts
+            };
 
-// export const getRoomRatePlan = async (req: Request, res: Response) => {
-//     try {
-//         const { id } = req.params;  // room_id
-//         if (!id) {
-//             return res.status(401).json({ success: false, message: "Room ID is required" })
-//         }
-//         const ratePlanList = await PropertyPrice.find({ applicable_room_type: id });
-//         if (!ratePlanList) {
-//             return res.status(401).json({ success: false, message: "No rateplan found for this room" })
-//         }
-//         return res.status(200).json({
-//             success: true,
-//             message: "Price list fetched successfully",
-//             totalRatePlan: ratePlanList.length,
-//             ratePlanList: ratePlanList
-//         })
-//     }
-//     catch (error) {
-//         console.error(error);
-//         return res.status(500).json({
-//             success: false,
-//             message: "Internal error while fetching price, please try again later"
-//         })
-//     }
-// }
+            const ratePlanCreateResult = await this.ratePlanService.ratePlanCreate(data);
+            if (!ratePlanCreateResult) {
+                return res.status(400).json({ message: "Failed to create rate plan" });
+            }
 
-// export const deleteRoomRatePlan = async (req: Request, res: Response) => {
-//     try {
-//         // as multiple rateplans can be associated with the same room so we need to update specific rateplan only using it _id.
-//         const { id } = req.params;  // rate plan id
-//         if (!id) {
-//             return res.status(401).json({ success: false, message: "Rate plan ID is required" })
-//         }
-//         const ratePlan = await PropertyPrice.findByIdAndDelete({ _id: id });
-//         if (!ratePlan) {
-//             return res.status(401).json({ success: false, message: "No rateplan found with this id" })
-//         }
-//         return res.status(200).json({
-//             success: true,
-//             message: "Rateplan deleted successfully",
-//             deletedRatePlan: ratePlan
-//         })
-//     }
-//     catch (error) {
-//         console.error(error);
-//         return res.status(500).json({
-//             success: false,
-//             message: "Internal error while deleting price, please try again later"
-//         })
-//     }
-// }
+            return res.status(201).json({ message: "Rate plan created successfully", data: ratePlanCreateResult });
 
-// export const getAllRatePlans = async (req: Request, res: Response) => {
-//     try {
-//         const property_id = req.params.id;
-//         console.log("property_id: ", property_id)
-//         if (!property_id) {
-//             return res.status(401).json({ success: false, message: "Property ID is required" })
-//         }
-
-//         const ratePlanList = await PropertyPrice.find({ property_id: property_id });
-//         if (!ratePlanList) {
-//             return res.status(401).json({ success: false, message: "No rateplan found for this property" })
-//         }
-
-//         return res.status(200).json({
-//             success: true,
-//             message: "Price list fetched successfully",
-//             totalRatePlan: ratePlanList.length,
-//             ratePlanList: ratePlanList
-//         })
-//     } 
-//     catch (error) {
-//         console.error(error);
-//         return res.status(500).json({
-//             success: false,
-//             message: "Internal error while deleting price, please try again later"
-//         })
-//     }
-// }
+        } catch (error: any) {
+            console.log("Error in createRatePlan controller:", error);
+            return res.status(500).json({ message: error.message || "Internal Server Error" });
+        }
+    }
+}

@@ -1,229 +1,43 @@
-// "use client";
-// import React, { useEffect, useState } from "react";
-// import { Button } from "../../../components/ui/button";
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogDescription,
-//   DialogHeader,
-//   DialogTitle,
-//   DialogTrigger,
-// } from "../../../components/ui/dialog";
-// import { Input } from "../../../components/ui/input";
-// import { Label } from "../../../components/ui/label";
-// import { Button as NextUIButton } from "@nextui-org/react";
-// import { useRouter } from "next/navigation";
-// import toast from "react-hot-toast";
-// import { CardDescription, CardTitle } from "../../../components/ui/card";
-// import { AtSign, Eye, EyeOff, Lock } from "lucide-react";
-// import { z } from "zod";
-// import { SubmitHandler, useForm } from "react-hook-form";
-// import { zodResolver } from "@hookform/resolvers/zod";
-// import { useDispatch } from "./../../../redux/store";
-// import { login, getUser  } from "./../../../redux/slices/authSlice";
-// import { getProperties } from "./../../../redux/slices/propertySlice";
-// import Cookies from "js-cookie";
+"use client";
 
+import React from "react";
+import LoginForm from "../../../components/Authentication/Login-form";
+import Image from "next/image";
 
-// type Props = {};
+export default function Login() {
+  return (
+    <div className="relative w-full min-h-screen flex flex-col lg:flex-row">
+      <div className="absolute inset-0 lg:relative lg:w-1/2 overflow-hidden">
+        <Image
+          src="/assets/login-bg.jpg"
+          alt="Burj Al Arab"
+          fill
+          className="object-cover absolute inset-0 z-10"
+          priority
+        />
 
-// const loginSchema = z.object({
-//   email: z
-//     .string()
-//     .min(1, "Email is required")
-//     .email("Please provide a valid email address"),
-//   password: z
-//     .string()
-//     .regex(
-//       /^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*\d.*\d.*\d).{8,}$/,
-//       "Password should contain at least one uppercase letter, one special character, and be at least 8 characters long"
-//     )
-//     .min(1, "Password is required"),
-// });
+        <div className="absolute inset-0  z-20" />
 
-// type Inputs = {
-//   email: string;
-//   password: string;
-// };
+        <div className="hidden lg:block absolute top-6 left-6 z-30">
+          <div className="bg-gradient-to-br from-white/10 to-yellow-500/20 backdrop-blur-lg p-4 rounded-xl shadow-lg">
+            <Image
+              src="/assets/ALHAJZ.png"
+              alt="Al HaJz Logo"
+              width={120}
+              height={60}
+              className="object-contain"
+            />
+          </div>
+        </div>
+      </div>
 
-// const LoginForm: React.FC<Props> = () => {
-//   const [openDialog, setOpenDialog] = useState<boolean>(false);
-//   const [isVisible, setIsVisible] = useState<boolean>(false);
-//   const [loading, setLoading] = useState<boolean>(false);
-//   const dispatch = useDispatch();
-//   const router = useRouter();
+      <div className="absolute inset-0 lg:hidden bg-black/40 z-10" />
 
-//   const form = useForm<Inputs>({
-//     defaultValues: {
-//       email: "",
-//       password: "",
-//     },
-//     resolver: zodResolver(loginSchema),
-//   });
-
-//   const { register, handleSubmit, formState } = form;
-//   const {
-//     errors: { email: emailError, password: passwordError },
-//   } = formState;
-
-//   useEffect(() => {
-//     if (emailError?.message) {
-//       toast.error(emailError.message);
-//     }
-//     if (passwordError?.message) {
-//       toast.error(passwordError.message);
-//     }
-//   }, [emailError, passwordError]);
-
-//   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-//     setLoading(true);
-//     try {
-//       await dispatch(login(data));
-//       await dispatch(getUser());
-//       await dispatch(getProperties());
-      
-//       toast.success("Login successful!");
-//       router.push("/app/property");
-//     } catch (err) {
-//       toast.error("Login failed. Please check your credentials.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const toggleVisibility = () => setIsVisible((prev) => !prev);
-
-//   return (
-//     <div className="w-[500px]">
-//       <div className="mb-10">
-//         <CardTitle className="text-5xl">
-//           Login | <span className="font-normal text-xl">TripSwift</span>
-//         </CardTitle>
-//       </div>
-//       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-//         <div className="mb-10 space-y-4">
-//           <div>
-//             <Label htmlFor="email">Email</Label>
-//             <Input
-//               withIcon
-//               startIcon={<AtSign size={20} />}
-//               size={"lg"}
-//               {...register("email")}
-//               variant={emailError ? "error" : undefined}
-//               type="email"
-//             />
-//           </div>
-//           <div>
-//             <Label htmlFor="password">Password</Label>
-//             <Input
-//               {...register("password")}
-//               withIcon
-//               startIcon={<Lock size={20} />}
-//               variant={passwordError ? "error" : undefined}
-//               endIcon={
-//                 <Button
-//                   variant={"ghost"}
-//                   onClick={toggleVisibility}
-//                   className="px-0 py-0 hover:bg-transparent"
-//                   type="button"
-//                 >
-//                   {isVisible ? <Eye size={20} /> : <EyeOff size={20} />}
-//                 </Button>
-//               }
-//               size={"lg"}
-//               type={isVisible ? "text" : "password"}
-//             />
-//           </div>
-//           <CardDescription>
-//             <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-//               <DialogTrigger className="underline hover:text-foreground transition-all duration-200">
-//                 Forgot your password?
-//               </DialogTrigger>
-//               <DialogContent>
-//                 <DialogHeader>
-//                   <DialogTitle>Reset Password</DialogTitle>
-//                   <DialogDescription>
-//                     Reset your profile password
-//                   </DialogDescription>
-//                 </DialogHeader>
-//                 <form action="">
-//                   <div>
-//                     <Label htmlFor="email-for-resetPassword">Email</Label>
-//                     <Input
-//                       id="email-for-resetPassword"
-//                       name="newPassword"
-//                       type="password"
-//                       placeholder="Email"
-//                     />
-//                   </div>
-//                   <div>
-//                     <Label htmlFor="newPassword">New Password</Label>
-//                     <Input
-//                       id="newPassword"
-//                       name="newPassword"
-//                       type="password"
-//                       placeholder="New password"
-//                     />
-//                   </div>
-//                   <div>
-//                     <Label htmlFor="confirmPassword">Confirm Password</Label>
-//                     <Input
-//                       id="confirmPassword"
-//                       name="confirmPassword"
-//                       type="password"
-//                       placeholder="Confirm new password"
-//                     />
-//                   </div>
-//                   <div className="mt-4">
-//                     <Button
-//                       type="button"
-//                       onClick={() => setOpenDialog(false)}
-//                       variant={"ghost"}
-//                     >
-//                       Cancel
-//                     </Button>
-//                     <Button type="submit">Reset</Button>
-//                   </div>
-//                 </form>
-//               </DialogContent>
-//             </Dialog>
-//           </CardDescription>
-//         </div>
-//         <div className="flex flex-col items-center">
-//           <span>
-//             Don&apos;t have an account?{" "}
-//             <Button
-//               type="button"
-//               className="px-0"
-//               onClick={() => router.push("/register")}
-//               variant={"link"}
-//             >
-//               Register
-//             </Button>
-//           </span>
-//           <SubmitButton loading={loading} />
-//         </div>
-//       </form>
-//     </div>
-//   );
-// };
-
-// interface SubmitButtonProps {
-//   loading: boolean;
-// }
-
-// const SubmitButton: React.FC<SubmitButtonProps> = ({ loading }) => {
-//   return (
-//     <NextUIButton
-//       size="lg"
-//       type="submit"
-//       variant="solid"
-//       className="bg-primary text-primary-foreground hover:bg-primary/90 w-full"
-//       isLoading={loading}
-//     >
-//       Login
-//     </NextUIButton>
-//   );
-// };
-
-// export default LoginForm;
+      <div className="relative z-40 w-full lg:w-1/2 flex justify-center items-center p-4 sm:p-8 min-h-screen">
+        <div className="w-full max-w-md bg-white/90 backdrop-blur-md p-6 rounded-xl shadow-lg">
+          <LoginForm />
+        </div>
+      </div>
+    </div>
+  );
+}

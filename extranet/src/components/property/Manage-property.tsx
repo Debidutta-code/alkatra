@@ -5,7 +5,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { RootState } from "@src/redux/store";
-import Analytics from "../Analytics";
+import Analytics from "../analytics/Analytics";
 
 const Home: React.FC = () => {
   const [properties, setProperties] = useState<any[]>([]);

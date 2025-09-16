@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 
 interface PopoverProps {
   children: React.ReactNode;
-  content?: React.ReactNode; // Made optional to align with usage
+  content?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }

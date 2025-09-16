@@ -9,24 +9,25 @@ export interface DateRange {
 }
 
 export interface RatePlanInterFace {
-  _id: string
+  _id: string;
   availability: {
     count: number;
     endDate: Date;
     startDate: Date;
-  },
+  };
   invTypeCode: string;
   hotelCode: string;
+  status: 'open' | 'close';
   rates: {
     baseByGuestAmts: {
       numberOfGuests: number;
       amountBeforeTax: number;
       _id: string;
     };
-    currencyCode: string
+    currencyCode: string;
     _id: string;
-    ratePlanCode: string
-  }
+    ratePlanCode: string;
+  };
 }
 
 export interface paginationTypes {
@@ -41,4 +42,15 @@ export interface paginationTypes {
 export interface modifiedRatePlanInterface {
   rateAmountId: string;
   price: number;
+  isStopSell?: boolean;
+}
+
+export interface SellStatusInterface {
+  rateAmountId: string;
+  isStopSell: boolean;
+}
+
+export interface modifiedSellStatusInterface {
+  rateAmountId: string;
+  isStopSell: boolean;
 }

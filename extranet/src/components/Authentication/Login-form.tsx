@@ -6,17 +6,14 @@ import { AtSign, Eye, EyeOff, Lock } from "lucide-react";
 import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useDispatch, RootState, store, useSelector } from "../../redux/store";
+import { useDispatch, store } from "../../redux/store";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import { Button as NextUIButton } from "@nextui-org/react";
-import VerifyEmailForm from "./ForgotPassword";
 import toast from "react-hot-toast";
 import { login, getUser } from "../../redux/slices/authSlice";
 import { getProperties } from "../../redux/slices/propertySlice";
-import { CardTitle } from "../ui/card";
-import { ReloadIcon } from "@radix-ui/react-icons";
 import Image from "next/image";
 
 type Props = {};
@@ -27,12 +24,12 @@ const loginSchema = z.object({
     .min(1, "Email is required")
     .email("Please provide a valid email address"),
   password: z
-  .string()
-  .min(1, "Password is required")
-  .regex(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/,
-    "Password must contain at least 8 characters including one uppercase letter, one lower case letter, one number and one special character."
-  ),
+    .string()
+    .min(1, "Password is required")
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/,
+      "Password must contain at least 8 characters including one uppercase letter, one lower case letter, one number and one special character."
+    ),
 });
 
 type Inputs = {
@@ -63,8 +60,7 @@ const LoginForm = () => {
       await dispatch(getUser());
       await dispatch(getProperties());
       toast.success("Login successful!");
-      console.log("Login data", data);
-      // Get the current user from the store after login
+
       const state = store.getState();
       const currentUser = state.auth.user;
       if (currentUser) {
@@ -93,10 +89,6 @@ const LoginForm = () => {
       setLoading(false);
     }
   };
-
-  if (isForgotPassword) {
-    return <VerifyEmailForm onBack={() => setIsForgotPassword(false)} />;
-  }
 
   return (
     <div className="w-full max-w-md sm:max-w-lg lg:max-w-xl xl:max-w-2xl px-4 sm:px-6 md:px-8">
@@ -187,50 +179,9 @@ const LoginForm = () => {
             )}
           </div>
         </div>
-        {/* <div className="text-right">
-          <Button
-            type="button"
-            variant="link"
-            className="text-primary hover:text-primary/80 px-0"
-            onClick={() => setIsForgotPassword(true)}
-          >
-            Forgot password?
-          </Button>
-        </div> */}
         <div className="space-y-2 pt-2">
-          {/* <NextUIButton
-            type="submit"
-            size="lg"
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
-            isDisabled={ loading}
-          >
-            {loading && <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />}
-            Sign In
-          </NextUIButton> */}
-
-          {/* <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">
-                Don't have an account?
-              </span>
-            </div>
-          </div> */}
         </div>
         <div className="flex flex-col items-center">
-          {/* <span>
-            Don't have an account?{" "}
-            <Button
-              type="button"
-              className="px-0"
-              onClick={() => router.push("/register")}
-              variant={"link"}
-            >
-              Register
-            </Button>
-          </span> */}
           <SubmitButton loading={loading} />
         </div>
       </form>

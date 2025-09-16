@@ -52,7 +52,7 @@ export default function RegisterForm() {
       password: "",
     },
     resolver: zodResolver(registerSchema),
-    mode: "onChange" // Validate on change for better UX
+    mode: "onChange"
   });
 
   const { register, handleSubmit, formState } = form;

@@ -3,3 +3,5 @@ export { FileUploader } from "./file.uploader.service";
 export { PropertyDetails } from "./get.property.details.service";
 export { RoomService } from "./room.service";
 export { PropertyInfoService } from "./propertyInfo.service";
+export { RatePlanService } from "./ratePlan.service";
+export { InventoryService } from "./inventory.service";

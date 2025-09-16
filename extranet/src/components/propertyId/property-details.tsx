@@ -213,6 +213,7 @@ export function PropertyDetails({
                   placeholder="Enter description"
                   rows={4}
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
+                  style={{ whiteSpace: "pre-wrap" }}
                 />
               </div>
             </div>
@@ -241,7 +242,7 @@ export function PropertyDetails({
                 </div>
                 <div className="py-2 flex flex-col sm:flex-row">
                   <div className="w-full sm:w-1/4 text-sm text-gray-500 mb-1 sm:mb-0">Description</div>
-                  <div className="w-full sm:w-3/4 text-sm font-medium break-words">
+                  <div className="w-full sm:w-3/4 text-sm font-medium break-words whitespace-pre-wrap">
                     {property.data.description || 'N/A'}
                   </div>
                 </div>

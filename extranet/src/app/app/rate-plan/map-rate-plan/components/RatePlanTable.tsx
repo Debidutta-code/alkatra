@@ -2,30 +2,44 @@
 import React from 'react';
 import { format } from '../utils/dateUtils';
 import { TABLE_HEADERS } from '../constants';
-import { RatePlanInterFace, modifiedRatePlanInterface } from '../types';
-import { getPrice, getAvailability, getCurrencyCode } from '../services/dataService';
+import { RatePlanInterFace, modifiedRatePlanInterface, modifiedSellStatusInterface } from '../types';
+import { getPrice, getAvailability, getCurrencyCode, getSellStatus, canEditSellStatus } from '../services/dataService';
 
 interface RatePlanTableProps {
   filteredData: RatePlanInterFace[];
   handlePriceChange: (id: string, newPrice: number) => void;
+  handleSellStatusChange: (id: string, isStopSell: boolean) => void;
   toggleEditButton: () => void;
   editButtonVal: boolean;
   modifiedValues: modifiedRatePlanInterface[];
+  modifiedSellStatus: modifiedSellStatusInterface[];
   isLoading: boolean;
 }
 
 export const RatePlanTable: React.FC<RatePlanTableProps> = ({
   filteredData,
   handlePriceChange,
+  handleSellStatusChange,
   toggleEditButton,
   editButtonVal,
   modifiedValues,
+  modifiedSellStatus,
   isLoading
 }) => {
 
-  // Check if a specific item has been modified
-  const isItemModified = (itemId: string) => {
+  // Check if a specific item's price has been modified
+  const isItemPriceModified = (itemId: string) => {
     return modifiedValues.some(modified => modified.rateAmountId === itemId);
+  };
+
+  // Check if a specific item's sell status has been modified
+  const isItemSellStatusModified = (itemId: string) => {
+    return modifiedSellStatus.some(modified => modified.rateAmountId === itemId);
+  };
+
+  // Check if any modification exists for an item
+  const hasAnyModification = (itemId: string) => {
+    return isItemPriceModified(itemId) || isItemSellStatusModified(itemId);
   };
 
   // Filter data to only show rate plans with both price and availability
@@ -41,17 +55,20 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
     );
   });
 
+  // Calculate total modifications
+  const totalModifications = modifiedValues.length + modifiedSellStatus.length;
+
   return (
     <div className="bg-white rounded-xl shadow-md">
-      <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+      <div className="p-6 border-b border-gray-200 flex justify-between items-center">
         <h2 className="text-lg font-semibold text-gray-800">
           Rate Plan Data ({availableData.length} items)
         </h2>
         <div className="flex items-center space-x-4">
-          {modifiedValues.length > 0 && (
+          {totalModifications > 0 && (
             <div className="flex items-center space-x-2">
               <span className="text-sm text-orange-600 font-medium">
-                {modifiedValues.length} unsaved changes
+                {totalModifications} unsaved changes
               </span>
               <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
             </div>
@@ -101,12 +118,16 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
             </thead>
             <tbody className="divide-y divide-gray-100">
               {availableData.map((item, index) => {
-                const isModified = isItemModified(item?.rates?._id);
+                const isPriceModified = isItemPriceModified(item?.rates?._id);
+                const isSellStatusModified = isItemSellStatusModified(item?._id);
+                const hasModifications = hasAnyModification(item?._id);
+                const currentSellStatus = getSellStatus(item);
+                const canEditStatus = canEditSellStatus(item);
 
                 return (
                   <tr
                     key={index}
-                    className={`transition-colors duration-150 ${isModified
+                    className={`transition-colors duration-150 ${hasModifications
                       ? 'bg-orange-50 hover:bg-orange-100 border-l-4 border-orange-400'
                       : editButtonVal
                         ? 'hover:bg-blue-50'
@@ -143,17 +164,16 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
                           value={getPrice(item)}
                           onChange={(e) => handlePriceChange(item.rates._id, parseFloat(e.target.value) || 0)}
                           className={`w-20 px-2 py-1 text-sm rounded transition-all duration-200 ${editButtonVal
-                            ? `border-2 ${isModified ? 'border-orange-400 bg-orange-50' : 'border-tripswift-blue bg-white'} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm`
+                            ? `border-2 ${isPriceModified ? 'border-orange-400 bg-orange-50' : 'border-tripswift-blue bg-white'} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm`
                             : 'border-none bg-transparent focus:outline-none'
                             }`}
-                          // step="0.01" 
                           min={0}
                           disabled={!editButtonVal}
                           readOnly={!editButtonVal}
                         />
                         <span className="text-xs text-gray-500">{getCurrencyCode(item)}</span>
-                        {isModified && (
-                          <div className="w-2 h-2 bg-orange-400 rounded-full" title="Modified"></div>
+                        {isPriceModified && (
+                          <div className="w-2 h-2 bg-orange-400 rounded-full" title="Price Modified"></div>
                         )}
                       </div>
                     </td>
@@ -167,6 +187,31 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
                         disabled={true}
                         readOnly={true}
                       />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center space-x-2">
+                        {canEditStatus ? (
+                          <div className="flex items-center space-x-2">
+                            {/* Replace the button with a static span */}
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-medium ${currentSellStatus
+                                  ? 'bg-red-100 text-red-700'
+                                  : 'bg-green-100 text-green-700'
+                                }`}
+                            >
+                              {currentSellStatus ? 'Stop Sell' : 'Start Sell'}
+                            </span>
+                            {/* You can keep the modification indicator if needed for other logic */}
+                            {isSellStatusModified && (
+                              <div className="w-2 h-2 bg-orange-400 rounded-full" title="Sell Status Modified"></div>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-xs">
+                            N/A
+                          </span>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
