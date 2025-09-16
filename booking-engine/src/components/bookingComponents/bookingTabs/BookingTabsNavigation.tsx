@@ -2,7 +2,7 @@
 import React from 'react';
 import { FaTicketAlt, FaRegCalendarCheck, FaHistory, FaRegTimesCircle } from 'react-icons/fa';
 import { BookingTabType } from './types';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { useTranslation } from 'react-i18next';
 
 interface BookingTabsNavigationProps {
   activeTab: BookingTabType;
@@ -10,7 +10,7 @@ interface BookingTabsNavigationProps {
 }
 
 const BookingTabsNavigation: React.FC<BookingTabsNavigationProps> = ({ activeTab, setActiveTab }) => {
-  const { t ,i18n } = useTranslation(); // Initialize useTranslation
+  const { t ,i18n } = useTranslation();
 
   return (
     <div className="bg-tripswift-off-white rounded-xl shadow-md mb-6 overflow-hidden font-noto-sans">
@@ -24,7 +24,7 @@ const BookingTabsNavigation: React.FC<BookingTabsNavigationProps> = ({ activeTab
         >
           <span className="flex items-center justify-center">
             <FaTicketAlt className={` h-4 w-4 ${i18n.language === "ar" ?"ml-2":"mr-2"}`} />
-            {t('BookingTabs.BookingTabsNavigation.allBookings')} {/* Translated text */}
+            {t('BookingTabs.BookingTabsNavigation.allBookings')}
           </span>
         </button>
         <button
@@ -36,7 +36,7 @@ const BookingTabsNavigation: React.FC<BookingTabsNavigationProps> = ({ activeTab
         >
           <span className="flex items-center justify-center">
             <FaRegCalendarCheck className={` h-4 w-4 ${i18n.language === "ar" ?"ml-2":"mr-2"}`} />
-            {t('BookingTabs.BookingTabsNavigation.upcoming')} {/* Translated text */}
+            {t('BookingTabs.BookingTabsNavigation.upcoming')}
           </span>
         </button>
         <button
@@ -48,7 +48,7 @@ const BookingTabsNavigation: React.FC<BookingTabsNavigationProps> = ({ activeTab
         >
           <span className="flex items-center justify-center">
             <FaHistory className={` h-4 w-4 ${i18n.language === "ar" ?"ml-2":"mr-2"}`} />
-            {t('BookingTabs.BookingTabsNavigation.completed')} {/* Translated text */}
+            {t('BookingTabs.BookingTabsNavigation.completed')}
           </span>
         </button>
         <button
@@ -60,7 +60,7 @@ const BookingTabsNavigation: React.FC<BookingTabsNavigationProps> = ({ activeTab
         >
           <span className="flex items-center justify-center">
             <FaRegTimesCircle className={` h-4 w-4 ${i18n.language === "ar" ?"ml-2":"mr-2"}`} />
-            {t('BookingTabs.BookingTabsNavigation.cancelled')} {/* Translated text */}
+            {t('BookingTabs.BookingTabsNavigation.cancelled')}
           </span>
         </button>
       </div>

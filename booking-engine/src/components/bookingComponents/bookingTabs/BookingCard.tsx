@@ -16,7 +16,7 @@ import {
   getRoomTypeIcon
 } from './utils';
 import { useTranslation } from 'react-i18next';
-import { formatDate, calculateNights } from "../../../utils/dateUtils";
+import { formatDate } from "../../../utils/dateUtils";
 
 interface BookingCardProps {
   booking: Booking;
@@ -24,6 +24,7 @@ interface BookingCardProps {
   onViewDetails: (booking: Booking) => void;
   onModify: (booking: Booking) => void;
   onCancel: (booking: Booking) => void;
+  onBookAgain?: (booking: Booking) => void;
 }
 
 const BookingCard: React.FC<BookingCardProps> = ({
@@ -31,7 +32,8 @@ const BookingCard: React.FC<BookingCardProps> = ({
   activeTab,
   onViewDetails,
   onModify,
-  onCancel
+  onCancel,
+  onBookAgain = () => { },
 }) => {
   const { t, i18n } = useTranslation();
 
@@ -166,6 +168,18 @@ const BookingCard: React.FC<BookingCardProps> = ({
               </button>
             </div>
           )}
+
+        {isPastOrTodayCheckIn && (
+          <button
+            className="w-full mt-3 py-2.5 px-4 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-tripswift-medium shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center text-sm"
+            onClick={() => onBookAgain(booking)}
+          >
+            <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            {t('BookingTabs.BookingCard.bookAgain')}
+          </button>
+        )}
 
       </div>
     </div>
