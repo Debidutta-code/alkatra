@@ -4,17 +4,40 @@ import { Room } from "../model/room.model";
 import { Inventory } from "../../../wincloud/src/model/inventoryModel";
 import RateAmountDateWise from "../../../wincloud/src/model/ratePlanDateWise.model";
 import { DeepLinkModel } from "../model/deepLink.model";
-import { ObjectId } from "mongoose";
 
 export class RoomRepository {
 
-    async checkRoomsAvailability(hotelCode: string, roomTypes: string[], startDate: Date, endDate: Date, numberOfRooms: number) {
+    // async checkRoomsAvailability(hotelCode: string, roomTypes: string[], startDate: Date, endDate: Date, numberOfRooms: number) {
+    //     return Inventory.find({
+    //         hotelCode,
+    //         invTypeCode: { $in: roomTypes },
+    //         startDate: { $gte: startDate, $lte: endDate },
+    //         'availability.count': { $lt: numberOfRooms },
+    //         status: "open",
+    //     });
+    // }
+
+    async checkRoomsAvailability(
+        hotelCode: string,
+        roomTypes: string[],
+        startDate: Date,
+        endDate: Date,
+        numberOfRooms: number
+    ) {
+        console.log("The data we get from SERVICE", { hotelCode, roomTypes, startDate, endDate, numberOfRooms });
+
         return Inventory.find({
             hotelCode,
             invTypeCode: { $in: roomTypes },
-            startDate: { $gte: startDate, $lte: endDate },
-            'availability.count': { $lt: numberOfRooms },
-            status: "open",
+            'availability.startDate': {
+                $gte: startDate,
+                $lte: endDate
+            },
+            'availability.count': { $gte: numberOfRooms },
+            $or: [
+                { status: "open" },
+                { status: { $exists: false } }
+            ]
         });
     }
 
