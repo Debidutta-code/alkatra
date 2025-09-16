@@ -18,7 +18,8 @@ import Auth from "../../../user_authentication/src/Model/auth.model";
 import { PropertyInfo } from "../../../property_management/src/model/property.info.model";
 import UserModel from "../../../user_authentication/src/Model/auth.model";
 import { MailFactory } from "../../../customer_authentication/src/services/mailFactory";
-import { BookingService } from "../services";
+import { BookAgainAvailabilityService, BookingService } from "../services";
+
 
 const mailer = MailFactory.getMailer();
 
@@ -1484,12 +1485,14 @@ export const getAllHotelsByRole = CatchAsyncError(
 export class BookingController {
 
   private bookingService: BookingService;
+  private bookAgainAvailabilityService: BookAgainAvailabilityService;
 
-  constructor(bookingService: BookingService) {
-    if (!bookingService) {
-      throw new Error("BookingService is required");
+  constructor(bookingService: BookingService, bookAgainAvailabilityService: BookAgainAvailabilityService) {
+    if (!bookingService || !bookAgainAvailabilityService) {
+      throw new Error("Services are required");
     }
     this.bookingService = bookingService;
+    this.bookAgainAvailabilityService = bookAgainAvailabilityService;
   }
 
 
@@ -1549,4 +1552,49 @@ export class BookingController {
     }
   }
 
+  async bookAgainCheckAvailability(req: any, res: Response, next: NextFunction) {
+    try {
+
+      /**
+       * Checking for USER 
+       */
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User ID is required" });
+      }
+
+      /**
+       * 
+       */
+      const { hotelCode, invTypeCode, startDate, endDate } = req.query;
+      if (!hotelCode || !invTypeCode || !startDate || !endDate) {
+        return res.status(404).json({
+          success: false,
+          message: "Some data are missing in body",
+        });
+      }
+
+      /**
+       * Calling the service file
+       */
+      const result = await this.bookAgainAvailabilityService.bookAgainAvailability(hotelCode, invTypeCode, startDate, endDate);
+      if (!result) {
+        return res.status(400).json({ message: "No rate plan or inventory found" })
+      }
+
+
+      return res.status(200).json({
+        message: "Rooms are available",
+        result,
+      });
+
+    }
+    catch (error: any) {
+      console.log("Book again process failed");
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
 }

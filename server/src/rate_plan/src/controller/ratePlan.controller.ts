@@ -2,6 +2,10 @@ import { NextFunction, Request, Response } from "express";
 import { RatePlanService, RoomPriceService, RoomRentCalculationService } from "../service/ratePlan.service";
 import { propertyInfoService } from "../../../property_management/src/container";
 import { container } from "../../../tax_service/container";
+import { InventoryService } from "../service/inventory.service";
+import { ParamsDictionary } from "express-serve-static-core";
+import { ParsedQs } from "qs";
+import { success } from "zod";
 
 class RatePlanController {
 
@@ -88,7 +92,7 @@ class RatePlanController {
         try {
             console.log("###################### Inside getRatePlanByHotelCode controller");
             const { hotelCode } = req.params;
-            
+
             console.log("Entering into getRatePlanByHotelCode SERVICE");
             const response = await RatePlanService.getRatePlanByHotelCode(hotelCode);
             if (!response) {
@@ -105,13 +109,13 @@ class RatePlanController {
     public static async getRatePlanByHotel(req: Request, res: Response, next: NextFunction) {
         try {
 
-            
+
             const { hotelCode } = req.body;
             if (!hotelCode) {
                 throw new Error("Hotel code is required");
             }
 
-            const {invTypeCode, ratePlanCode, startDate, endDate} = req.query;
+            const { invTypeCode, ratePlanCode, startDate, endDate } = req.query;
             const page = req.query?.page ? parseInt(req.query.page as string) : 1;
             const limit = req.query?.limit ? parseInt(req.query.limit as string) : 10;
             console.log(`The start date and end date we get ${startDate} and ${endDate}`);
@@ -132,13 +136,13 @@ class RatePlanController {
 
             console.log("Entering into getRatePlanByHotel SERVICE");
             const response = await RatePlanService.getRatePlanByHotel(
-                hotelCode, 
-                invTypeCode as string, 
-                ratePlanCode as string, 
+                hotelCode,
+                invTypeCode as string,
+                ratePlanCode as string,
                 startDate as string,
                 endDate as string,
-                page, 
-                limit,                
+                page,
+                limit,
             );
             if (!response) {
                 throw new Error("No rate plans found for this hotel code")
@@ -256,6 +260,71 @@ class RoomPrice {
                 message: "Error occur while checking availability for this hotel",
                 error: error.message
             }
+        }
+    }
+}
+
+export class StartStopWatcher {
+    private inventoryService: InventoryService;
+
+    constructor(inventoryService: InventoryService) {
+        if (!inventoryService) {
+            throw new Error("InventoryService is required");
+        }
+        this.inventoryService = inventoryService;
+    }
+
+    async updateStartStopSell(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { hotelCode, invTypeCode, dateStatusList } = req.body;
+
+            /**
+             * Validate dateStatusList is an array
+             */
+            if (!Array.isArray(dateStatusList)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "dateStatusList must be an array"
+                });
+            }
+
+            /**
+             * Validate each item in dateStatusList
+             */
+            for (const item of dateStatusList) {
+                if (!item.date || !item.status || !['open', 'close'].includes(item.status)) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Each item must have a valid date and status ('open' or 'close')"
+                    });
+                }
+            }
+
+            const response = await this.inventoryService.updateInventory(hotelCode, invTypeCode, dateStatusList);
+            if (!response) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Status not changed successfully",
+                });
+            }
+
+            const sanitizedResponse = {
+                matchedCount: response.matchedCount,
+                modifiedCount: response.modifiedCount,
+            };
+
+            return res.status(200).json({
+                success: true,
+                message: "Inventory updated successfully",
+                data: sanitizedResponse,
+            });
+        }
+        catch (error: any) {
+            console.log("Start Stop Sell: Server Error");
+            return res.status(500).json({
+                success: false,
+                message: error.message || "Start Stop sell status update failed",
+            });
         }
     }
 }
