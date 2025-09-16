@@ -90,7 +90,7 @@ const Pagination: React.FC<PaginationProps> = ({
         className={`
           px-3 py-2 text-sm font-medium rounded transition-colors duration-200 min-w-[32px] h-8 flex items-center justify-center
           ${isActive
-            ? 'bg-blue-600 text-white'
+            ? 'bg-tripswift-blue text-white'
             : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
           }
         `}
@@ -110,7 +110,7 @@ const Pagination: React.FC<PaginationProps> = ({
             <select
               value={resultsPerPage}
               onChange={(e) => onPageSizeChange(Number(e.target.value))}
-              className="px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-tripswift-blue focus:border-tripswift-blue"
             >
               {pageSizeOptions.map(size => (
                 <option key={size} value={size}>

@@ -14,7 +14,7 @@ import { Button } from '@src/components/ui/button';
 import { Calendar } from './Calender';
 import { format } from '../utils/dateUtils';
 import { Popover, PopoverTrigger, PopoverContent } from './Popover';
-import { XCircle, CheckCircle, CalendarIcon } from 'lucide-react';
+import { XCircle, CheckCircle, CalendarIcon, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface BulkSellModalProps {
@@ -51,7 +51,7 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
     const [applyTo, setApplyTo] = useState<'all' | 'holidays' | 'selected'>('all');
     const [selectedWeekdays, setSelectedWeekdays] = useState<number[]>([0, 6]);
     const [roomRatePlans, setRoomRatePlans] = useState<string[]>([]);
-
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const resetFormData = () => {
         setAction('stop');
         setDateRange(getDefaultDateRange());
@@ -77,11 +77,13 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
         onClose();
     };
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
         if (applyTo === 'selected' && selectedWeekdays.length === 0) {
             toast.error('Please select at least one weekday');
             return;
         }
+
+        setIsLoading(true);
 
         const dateStatusList: { date: string; status: 'open' | 'close' }[] = [];
 
@@ -105,14 +107,19 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                 currentDate.setDate(currentDate.getDate() + 1);
             }
         }
-        onConfirm({
-            action,
-            dateRange,
-            applyTo,
-            roomRatePlans,
-            selectedWeekdays,
-            dateStatusList,
-        });
+
+        try {
+            await onConfirm({
+                action,
+                dateRange,
+                applyTo,
+                roomRatePlans,
+                selectedWeekdays,
+                dateStatusList,
+            });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -377,10 +384,17 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                     </Button>
                     <Button
                         onClick={handleConfirm}
-                        disabled={roomRatePlans.length === 0 || !dateRange.from || !dateRange.to}
+                        disabled={roomRatePlans.length === 0 || !dateRange.from || !dateRange.to || isLoading}
                         className="px-6 py-2 bg-tripswift-blue hover:bg-tripswift-dark-blue text-white font-medium"
                     >
-                        Apply Changes
+                        {isLoading ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Processing...
+                            </>
+                        ) : (
+                            'Apply Changes'
+                        )}
                     </Button>
                 </DialogFooter>
             </DialogContent>
