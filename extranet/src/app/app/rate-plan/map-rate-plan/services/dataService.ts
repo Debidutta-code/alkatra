@@ -1,7 +1,7 @@
 import { DateRange, RatePlanInterFace, modifiedRatePlanInterface, modifiedSellStatusInterface } from '../types';
 import { format } from '../utils/dateUtils';
 import Cookies from 'js-cookie';
-import { fetchRatePlans, getAllRatePlans, modifyRatePlans } from "../API"
+import { fetchRatePlans, getAllRatePlans, modifyRatePlans, updateSellStatus } from "../API"
 
 export const filterData = (
   data: RatePlanInterFace[],
@@ -112,18 +112,15 @@ export const functioncanEditPrice = (item: RatePlanInterFace): boolean => {
 };
 
 export const getSellStatus = (item: RatePlanInterFace): boolean => {
-  if (!item.rates) {
-    return false;
-  }
-  return item.rates.isStopSell || false;
+  return item.status === 'close';
 };
 
-// Add this function to check if sell status can be edited
 export const canEditSellStatus = (item: RatePlanInterFace): boolean => {
-  return hasRateData(item) && item.rates?._id !== undefined;
+  return hasRateData(item) && item.status !== undefined;
 };
+
 export const saveData = async (
-  priceData: modifiedRatePlanInterface[], 
+  priceData: modifiedRatePlanInterface[],
   sellStatusData?: modifiedSellStatusInterface[]
 ): Promise<void> => {
   try {
@@ -131,10 +128,10 @@ export const saveData = async (
     if (!accessToken) {
       throw new Error('No access token found. Please log in.');
     }
-    
+
     console.log("From save Data - Price changes:", priceData);
     console.log("From save Data - Sell status changes:", sellStatusData);
-    
+
     // Handle price modifications
     if (priceData && priceData.length > 0) {
       let modifiedRatePlans = priceData.map((mp) => {
@@ -144,14 +141,14 @@ export const saveData = async (
       });
       await modifyRatePlans(modifiedRatePlans, accessToken);
     }
-    
+
     // Handle sell status modifications (API call will be added later)
     if (sellStatusData && sellStatusData.length > 0) {
       // TODO: Add API call for sell status when API is ready
       // await modifySellStatus(sellStatusData, accessToken);
       console.log("Sell status changes ready for API integration:", sellStatusData);
     }
-    
+
   } catch (error: any) {
     console.error(error.message);
     throw error;
@@ -160,34 +157,33 @@ export const saveData = async (
   await new Promise(resolve => setTimeout(resolve, 1000));
 };
 
-// Updated ratePlanServices function with pageSize parameter
 export const ratePlanServices = async (
-  hotelCode: string, 
-  pageNo: number, 
-  invTypeCode?: string, 
-  startDate?: Date, 
+  hotelCode: string,
+  pageNo: number,
+  invTypeCode?: string,
+  startDate?: Date,
   endDate?: Date,
   ratePlanCode?: string,
-  pageSize: number = 10 // Add pageSize parameter
+  pageSize: number = 10
 ) => {
   try {
     const accessToken = Cookies.get('accessToken');
     if (!accessToken) {
       throw new Error('No access token found. Please log in.');
     }
-    
+
     // Call the existing fetchRatePlans function with pageSize
     const response = await fetchRatePlans(
-      hotelCode, 
-      accessToken, 
-      pageNo, 
-      invTypeCode, 
-      startDate, 
-      endDate, 
+      hotelCode,
+      accessToken,
+      pageNo,
+      invTypeCode,
+      startDate,
+      endDate,
       ratePlanCode,
       pageSize
     );
-    
+
     return response;
   } catch (error) {
     console.error('Error fetching rate plans:', error);
@@ -224,4 +220,29 @@ export const getAllRatePlanServices = async () => {
       message: error.message
     }
   }
+}
+
+export const bulkUpdateSellStatus = async (
+  hotelCode: string,
+  roomRatePlan: string,
+  dateStatusList: { date: string; status: "open" | "close" }[]
+) => {
+  const accessToken = Cookies.get('accessToken');
+  if (!accessToken) {
+    throw new Error('No access token found. Please log in.');
+  }
+
+  const [invTypeCode, ratePlanCode] = roomRatePlan.split(' - ');
+  if (!invTypeCode) {
+    throw new Error('Invalid room/rate plan format');
+  }
+
+  return await updateSellStatus(
+    {
+      hotelCode,
+      invTypeCode,
+      dateStatusList,
+    },
+    accessToken
+  );
 }

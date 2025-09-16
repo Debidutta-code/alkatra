@@ -60,7 +60,7 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
 
   return (
     <div className="bg-white rounded-xl shadow-md">
-      <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+      <div className="p-6 border-b border-gray-200 flex justify-between items-center">
         <h2 className="text-lg font-semibold text-gray-800">
           Rate Plan Data ({availableData.length} items)
         </h2>
@@ -119,8 +119,8 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
             <tbody className="divide-y divide-gray-100">
               {availableData.map((item, index) => {
                 const isPriceModified = isItemPriceModified(item?.rates?._id);
-                const isSellStatusModified = isItemSellStatusModified(item?.rates?._id);
-                const hasModifications = hasAnyModification(item?.rates?._id);
+                const isSellStatusModified = isItemSellStatusModified(item?._id);
+                const hasModifications = hasAnyModification(item?._id);
                 const currentSellStatus = getSellStatus(item);
                 const canEditStatus = canEditSellStatus(item);
 
@@ -188,28 +188,20 @@ export const RatePlanTable: React.FC<RatePlanTableProps> = ({
                         readOnly={true}
                       />
                     </td>
-
-                    {/* New Sell Status Column */}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-2">
                         {canEditStatus ? (
                           <div className="flex items-center space-x-2">
-                            <button
-                              onClick={() => handleSellStatusChange(item.rates._id, !currentSellStatus)}
-                              disabled={!editButtonVal}
-                              className={`px-3 py-1 rounded-full text-xs font-medium transition-all duration-200 ${
-                                !editButtonVal
-                                  ? 'cursor-not-allowed opacity-50'
-                                  : 'cursor-pointer hover:scale-105'
-                              } ${
-                                currentSellStatus
-                                  ? `bg-red-100 text-red-700 ${editButtonVal ? 'hover:bg-red-200' : ''} ${isSellStatusModified ? 'ring-2 ring-orange-400' : ''}`
-                                  : `bg-green-100 text-green-700 ${editButtonVal ? 'hover:bg-green-200' : ''} ${isSellStatusModified ? 'ring-2 ring-orange-400' : ''}`
-                              }`}
-                              title={editButtonVal ? (currentSellStatus ? 'Click to Start Sell' : 'Click to Stop Sell') : 'Enable edit mode to change'}
+                            {/* Replace the button with a static span */}
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-medium ${currentSellStatus
+                                  ? 'bg-red-100 text-red-700'
+                                  : 'bg-green-100 text-green-700'
+                                }`}
                             >
                               {currentSellStatus ? 'Stop Sell' : 'Start Sell'}
-                            </button>
+                            </span>
+                            {/* You can keep the modification indicator if needed for other logic */}
                             {isSellStatusModified && (
                               <div className="w-2 h-2 bg-orange-400 rounded-full" title="Sell Status Modified"></div>
                             )}

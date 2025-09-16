@@ -94,3 +94,29 @@ export const modifyRatePlans = async (ratePlans: modifiedRatePlanInterface[], ac
         };
     }
 };
+
+export const updateSellStatus = async (
+    payload: {
+        hotelCode: string;
+        invTypeCode: string;
+        dateStatusList: { date: string; status: 'open' | 'close' }[];
+    },
+    accessToken: string
+) => {
+    try {
+        const response = await axios.patch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/updateStatus`,
+            payload,
+            {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+
+        return response.data;
+    } catch (error: any) {
+        throw new Error(error.response?.data?.message || 'Failed to update sell status');
+    }
+};

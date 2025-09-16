@@ -1,7 +1,7 @@
 // components/BulkSellModal.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -15,6 +15,7 @@ import { Calendar } from './Calender';
 import { format } from '../utils/dateUtils';
 import { Popover, PopoverTrigger, PopoverContent } from './Popover';
 import { XCircle, CheckCircle, CalendarIcon } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface BulkSellModalProps {
     isOpen: boolean;
@@ -24,10 +25,13 @@ interface BulkSellModalProps {
         dateRange: { from: Date; to: Date };
         applyTo: 'all' | 'holidays' | 'selected';
         roomRatePlans: string[];
+        selectedWeekdays: number[];
+        dateStatusList: { date: string; status: 'open' | 'close' }[];
     }) => void;
     initialData?: {
         dateRange: { from: Date; to: Date };
         roomRatePlans: string[];
+        selectedWeekdays?: number[];
         availableCombinations?: string[];
     };
     availableCombinations: string[];
@@ -40,27 +44,79 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
     initialData,
     availableCombinations,
 }) => {
+    const getDefaultDateRange = () => ({ from: new Date(), to: new Date() });
+
     const [action, setAction] = useState<'start' | 'stop'>('stop');
-    const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>(
-        initialData?.dateRange || { from: new Date(), to: new Date() }
-    );
+    const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>(getDefaultDateRange());
     const [applyTo, setApplyTo] = useState<'all' | 'holidays' | 'selected'>('all');
-    const [roomRatePlans, setRoomRatePlans] = useState<string[]>(
-        initialData?.roomRatePlans || []
-    );
+    const [selectedWeekdays, setSelectedWeekdays] = useState<number[]>([0, 6]);
+    const [roomRatePlans, setRoomRatePlans] = useState<string[]>([]);
+
+    const resetFormData = () => {
+        setAction('stop');
+        setDateRange(getDefaultDateRange());
+        setApplyTo('all');
+        setSelectedWeekdays([0, 6]);
+        setRoomRatePlans([]);
+    };
+    const getUniqueRoomRatePlans = (plans: string[]): string[] => {
+        return [...new Set(plans)];
+    };
+    useEffect(() => {
+        if (isOpen && initialData) {
+            setDateRange(initialData.dateRange || getDefaultDateRange());
+            setRoomRatePlans(getUniqueRoomRatePlans(initialData.roomRatePlans || []));
+            setSelectedWeekdays(initialData.selectedWeekdays || [0, 6]);
+        } else if (isOpen) {
+            resetFormData();
+        }
+    }, [isOpen, initialData]);
+
+    const handleClose = () => {
+        resetFormData();
+        onClose();
+    };
 
     const handleConfirm = () => {
+        if (applyTo === 'selected' && selectedWeekdays.length === 0) {
+            toast.error('Please select at least one weekday');
+            return;
+        }
+
+        const dateStatusList: { date: string; status: 'open' | 'close' }[] = [];
+
+        if (dateRange?.from && dateRange?.to) {
+            const start = new Date(dateRange.from);
+            const end = new Date(dateRange.to);
+            let currentDate = new Date(start);
+
+            while (currentDate <= end) {
+                const dayOfWeek = currentDate.getDay();
+
+                if (applyTo === 'all' || (applyTo === 'selected' && selectedWeekdays.includes(dayOfWeek))) {
+                    const status: 'open' | 'close' = action === 'start' ? 'open' : 'close';
+
+                    dateStatusList.push({
+                        date: format(currentDate, 'yyyy-MM-dd'),
+                        status: status,
+                    });
+                }
+
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+        }
         onConfirm({
             action,
             dateRange,
             applyTo,
             roomRatePlans,
+            selectedWeekdays,
+            dateStatusList,
         });
-        onClose(); // Close modal after confirm
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
+        <Dialog open={isOpen} onOpenChange={handleClose}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto px-6 py-4">
                 <DialogHeader className="border-b pb-4 mb-2">
                     <DialogTitle className="text-xl font-tripswift-bold text-gray-900">
@@ -72,7 +128,6 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                 </DialogHeader>
 
                 <div className="space-y-4">
-
                     {/* === ACTION TYPE === */}
                     <div className="space-y-2">
                         <label className="block text-sm font-tripswift-medium text-gray-700">
@@ -132,12 +187,15 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                                 <Calendar
                                     mode="range"
                                     selected={dateRange}
-                                    onSelect={(range: any) => setDateRange(range)}
+                                    onSelect={(range: any) => {
+                                        setDateRange(range);
+                                    }}
                                     className="p-3"
                                 />
                             </PopoverContent>
                         </Popover>
                     </div>
+
                     {/* === APPLY TO === */}
                     <div className="space-y-2">
                         <label className="block text-sm font-tripswift-medium text-gray-700">
@@ -146,12 +204,12 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                         <div className="grid grid-cols-1 gap-2">
                             {[
                                 { value: 'all', label: 'All Days', desc: 'Apply to every day in selected range' },
-                                { value: 'selected', label: 'Selected Days', desc: 'Manually pick specific days (calendar coming soon)' },
+                                { value: 'selected', label: 'Selected Days', desc: 'Choose specific weekdays to apply changes' },
                             ].map((option) => (
                                 <label
                                     key={option.value}
                                     className={`p-3 border rounded-lg cursor-pointer transition-all ${applyTo === option.value
-                                        ? 'border-blue-500 bg-blue-50'
+                                        ? 'border-tripswift-blue bg-blue-50'
                                         : 'border-gray-300 bg-white hover:bg-gray-50'
                                         }`}
                                 >
@@ -169,17 +227,66 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                                             <div className="text-xs text-gray-500">{option.desc}</div>
                                         </div>
                                         {applyTo === option.value && (
-                                            <div className="w-4 h-4 rounded-full bg-blue-500"></div>
+                                            <div className="w-4 h-4 rounded-full bg-tripswift-blue"></div>
                                         )}
                                     </div>
                                 </label>
                             ))}
                         </div>
+
+                        {/* Weekday Selection */}
+                        {applyTo === 'selected' && (
+                            <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <label className="block text-sm font-tripswift-medium text-gray-700 mb-3">
+                                    Select Specific Weekdays
+                                </label>
+                                <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+                                    {[
+                                        { short: 'Sun', full: 'Sunday', value: 0 },
+                                        { short: 'Mon', full: 'Monday', value: 1 },
+                                        { short: 'Tue', full: 'Tuesday', value: 2 },
+                                        { short: 'Wed', full: 'Wednesday', value: 3 },
+                                        { short: 'Thu', full: 'Thursday', value: 4 },
+                                        { short: 'Fri', full: 'Friday', value: 5 },
+                                        { short: 'Sat', full: 'Saturday', value: 6 },
+                                    ].map(day => (
+                                        <label
+                                            key={day.value}
+                                            className="flex flex-col items-center p-2 border rounded cursor-pointer hover:bg-gray-100 transition-colors"
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedWeekdays.includes(day.value)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setSelectedWeekdays([...selectedWeekdays, day.value]);
+                                                    } else {
+                                                        setSelectedWeekdays(selectedWeekdays.filter(d => d !== day.value));
+                                                    }
+                                                }}
+                                                className="hidden"
+                                            />
+                                            <div className={`w-8 h-8 flex items-center justify-center rounded-full text-xs font-medium transition-colors ${selectedWeekdays.includes(day.value)
+                                                ? 'bg-blue-500 text-white'
+                                                : 'bg-white text-gray-700 border border-gray-300'
+                                                }`}>
+                                                {day.short}
+                                            </div>
+                                            <span className="text-xs text-gray-600 mt-1">{day.full}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                                {selectedWeekdays.length === 0 && (
+                                    <p className="text-xs text-red-500 mt-2">Please select at least one weekday</p>
+                                )}
+                            </div>
+                        )}
                     </div>
+
                     {/* === ROOM & RATE PLAN === */}
                     <div className="space-y-2">
                         <label className="block text-sm font-tripswift-medium text-gray-700">
-                            Room & Rate Plan
+                            Room Type
                         </label>
                         <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
                             {/* Header with Select All / Clear All */}
@@ -189,28 +296,6 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                                         ? `${roomRatePlans.length} selected`
                                         : 'Click below to add combinations'}
                                 </p>
-                                <div className="flex items-center space-x-3">
-                                    {availableCombinations && availableCombinations.length > 0 && (
-                                        <button
-                                            type="button"
-                                            onClick={() => setRoomRatePlans([...availableCombinations])}
-                                            className="text-xs font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors"
-                                            aria-label="Select all combinations"
-                                        >
-                                            Select All
-                                        </button>
-                                    )}
-                                    {roomRatePlans.length > 0 && (
-                                        <button
-                                            type="button"
-                                            onClick={() => setRoomRatePlans([])}
-                                            className="text-xs font-medium text-gray-500 hover:text-gray-700 hover:underline transition-colors"
-                                            aria-label="Clear all selections"
-                                        >
-                                            Clear All
-                                        </button>
-                                    )}
-                                </div>
                             </div>
 
                             {/* Selected Tags */}
@@ -220,15 +305,13 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                                         {roomRatePlans.map((item, i) => (
                                             <div
                                                 key={i}
-                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-800 text-xs font-medium rounded-full border border-blue-200 group hover:bg-blue-100 transition-colors"
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-tripswift-dark-blue text-xs font-medium rounded-full border border-blue-200 group hover:bg-blue-100 transition-colors"
                                             >
                                                 <span>{item}</span>
                                                 <button
                                                     type="button"
-                                                    onClick={() =>
-                                                        setRoomRatePlans(roomRatePlans.filter((_, idx) => idx !== i))
-                                                    }
-                                                    className="ml-1 text-blue-500 hover:text-blue-700 opacity-70 group-hover:opacity-100 transition-all"
+                                                    onClick={() => setRoomRatePlans([])}
+                                                    className="ml-1 text-tripswift-blue hover:text-tripswift-dark-blue opacity-70 group-hover:opacity-100 transition-all"
                                                     aria-label="Remove"
                                                 >
                                                     ×
@@ -252,18 +335,24 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                                                 key={item}
                                                 type="button"
                                                 onClick={() => {
+                                                    // Clear existing selection if any
+                                                    if (roomRatePlans.length > 0) {
+                                                        setRoomRatePlans([]);
+                                                    }
+
+                                                    // Add new selection
                                                     if (!roomRatePlans.includes(item)) {
-                                                        setRoomRatePlans([...roomRatePlans, item]);
+                                                        setRoomRatePlans([item]); // Set as single item array
                                                     }
                                                 }}
-                                                disabled={roomRatePlans.includes(item)}
+                                                disabled={roomRatePlans.length > 0 && !roomRatePlans.includes(item)}
                                                 className={`
-                flex items-center justify-between px-3 py-2.5 text-left text-xs font-medium rounded-lg border transition-all
-                ${roomRatePlans.includes(item)
+                                                flex items-center justify-between px-3 py-2.5 text-left text-xs font-medium rounded-lg border transition-all
+                                                ${roomRatePlans.includes(item)
                                                         ? 'bg-green-50 border-green-300 text-green-800 cursor-default'
                                                         : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 active:scale-98'
                                                     }
-              `}
+                                            `}
                                             >
                                                 <span className="truncate">{item}</span>
                                                 {roomRatePlans.includes(item) && (
@@ -281,7 +370,7 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                 <DialogFooter className="mt-6 pt-4 border-t border-gray-200">
                     <Button
                         variant="outline"
-                        onClick={onClose}
+                        onClick={handleClose}
                         className="px-6 py-2 text-gray-700 hover:bg-gray-100"
                     >
                         Cancel
@@ -289,7 +378,7 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                     <Button
                         onClick={handleConfirm}
                         disabled={roomRatePlans.length === 0 || !dateRange.from || !dateRange.to}
-                        className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                        className="px-6 py-2 bg-tripswift-blue hover:bg-tripswift-dark-blue text-white font-medium"
                     >
                         Apply Changes
                     </Button>

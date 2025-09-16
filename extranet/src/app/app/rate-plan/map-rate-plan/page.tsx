@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Filters } from './components/Filters';
 import { RatePlanTable } from './components/RatePlanTable';
 import { SaveButton } from './components/SaveButton';
-import { filterData, saveData, ratePlanServices, getAllRatePlanServices } from './services/dataService';
+import { filterData, saveData, ratePlanServices, getAllRatePlanServices, bulkUpdateSellStatus } from './services/dataService';
 import { RatePlanInterFace, DateRange, paginationTypes, modifiedRatePlanInterface, modifiedSellStatusInterface } from './types';
 import toast, { Toaster } from 'react-hot-toast';
 import Pagination from "./components/Pagination"
@@ -12,7 +12,7 @@ import { useSidebar } from '@src/components/ui/sidebar';
 import { cn } from '@src/lib/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@src/components/ui/button';
-import { Plus, XCircle } from "lucide-react";
+import { CheckCircle, Plus, XCircle } from "lucide-react";
 import { BulkSellModal } from './components/BulkSellModal';
 
 const MapRatePlanPage: React.FC = () => {
@@ -51,6 +51,7 @@ const MapRatePlanPage: React.FC = () => {
   const [modifiedValues, setModifiedValues] = useState<modifiedRatePlanInterface[]>([]);
   const [originalData, setOriginalData] = useState<RatePlanInterFace[]>([]);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [bulkAction, setBulkAction] = useState<'start' | 'stop'>('stop');
   const getHotelCode = (): string | null => {
     const propertyCodeFromUrl = searchParams.get('propertyCode');
     if (propertyCodeFromUrl) {
@@ -137,12 +138,11 @@ const MapRatePlanPage: React.FC = () => {
   };
   useEffect(() => {
     if (allRoomTypes.length > 0) {
-      const combinations = allRoomTypes.flatMap(room =>
-        room.ratePlanCodes.map((ratePlan: string) => `${room.invTypeCode} - ${ratePlan}`)
-      );
-      setAvailableCombinations(combinations);
+      const roomTypesOnly = allRoomTypes.map(room => room.invTypeCode);
+      setAvailableCombinations(roomTypesOnly);
     }
   }, [allRoomTypes]);
+
   useEffect(() => {
     if (roomTypesLoaded) {
       fetchRatePlans();
@@ -153,10 +153,16 @@ const MapRatePlanPage: React.FC = () => {
     setFilteredData(filterData(data, dateRange, selectedRoomType, selectedRatePlan, allRoomTypes));
   }, [dateRange, selectedRoomType, selectedRatePlan, data, allRoomTypes]);
 
+  useEffect(() => {
+    if (filteredData.length > 0) {
+      const stopSellCount = filteredData.filter(item => item.status === 'close').length;
+      setBulkAction(stopSellCount > filteredData.length / 2 ? 'start' : 'stop');
+    }
+  }, [filteredData]);
+
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= paginationResults.totalPage && page !== currentPage) {
       setCurrentPage(page);
-      // Scroll to top when page changes
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -164,15 +170,12 @@ const MapRatePlanPage: React.FC = () => {
   const handlePageSizeChange = (newPageSize: number) => {
     if (newPageSize !== pageSize) {
       setPageSize(newPageSize);
-      setCurrentPage(1); // Reset to first page when page size changes
-      // The useEffect will trigger fetchRatePlans automatically
+      setCurrentPage(1);
     }
   };
 
   const handlePriceChange = (id: string, newPrice: number) => {
-    // Update the data state with new price
     const updatedData = data.map(item => {
-      // Add null check for item.rates before accessing _id
       if (item.rates && item.rates._id === id) {
         return {
           ...item,
@@ -203,25 +206,19 @@ const MapRatePlanPage: React.FC = () => {
     });
   };
   const handleSellStatusChange = (id: string, isStopSell: boolean) => {
-    // Update the data state with new sell status
-    const updatedData = data.map(item => {
-      if (item.rates && item.rates._id === id) {
+    const updatedData = data.map((item): RatePlanInterFace => {
+      if (item._id === id) {
         return {
           ...item,
-          rates: {
-            ...item.rates,
-            isStopSell: isStopSell
-          }
+          status: isStopSell ? 'close' : 'open'
         };
       }
       return item;
     });
-
     setData(updatedData);
 
     setModifiedSellStatus(prev => {
       const filtered = prev.filter(item => item.rateAmountId !== id);
-
       return [
         ...filtered,
         {
@@ -291,24 +288,55 @@ const MapRatePlanPage: React.FC = () => {
           <Button
             onClick={() => setIsBulkModalOpen(true)}
             disabled={!selectedRoomType && !selectedRatePlan && !dateRange}
-            className="gap-2"
+            className={`gap-2 ${bulkAction === 'start' ? 'bg-green-600 hover:bg-green-700' : 'bg-orange-600 hover:bg-orange-700'} text-white`}
           >
-            <XCircle className="h-4 w-4" />
-            Bulk Stop Sell
+            {bulkAction === 'start' ? (
+              <>
+                <CheckCircle className="h-4 w-4" />
+                Bulk Start/Stop Sell
+              </>
+            ) : (
+              <>
+                <XCircle className="h-4 w-4" />
+                Bulk Start/Stop Sell
+              </>
+            )}
           </Button>
         </div>
         <BulkSellModal
           isOpen={isBulkModalOpen}
           onClose={() => setIsBulkModalOpen(false)}
-          onConfirm={(data) => {
-            // This will be handled by dataService later
-            console.log("Bulk update:", data);
-            // You can add logic here to update local state
-            setIsBulkModalOpen(false);
+          onConfirm={async (data) => {
+            const hotelCode = getHotelCode();
+            if (!hotelCode) {
+              toast.error('Hotel code not found');
+              return;
+            }
+
+            try {
+              setIsLoading(true);
+              for (const roomRatePlan of data.roomRatePlans) {
+                await bulkUpdateSellStatus(
+                  hotelCode,
+                  roomRatePlan,
+                  data.dateStatusList
+                );
+              }
+              toast.success(`Successfully updated ${data.roomRatePlans.length} rate plans!`);
+              setIsBulkModalOpen(false);
+              await fetchRatePlans();
+            } catch (error: any) {
+              console.error('Bulk update error:', error);
+              toast.error(error.message || 'Failed to update sell status');
+            } finally {
+              setIsLoading(false);
+            }
           }}
           initialData={{
             dateRange: dateRange ?? getDefaultDateRange(),
-            roomRatePlans: filteredData.map(item => `${item.invTypeCode} - ${item.rates.ratePlanCode}`)
+            roomRatePlans: filteredData.length > 0
+              ? [filteredData[0].invTypeCode]
+              : []
           }}
           availableCombinations={availableCombinations}
         />
@@ -318,7 +346,7 @@ const MapRatePlanPage: React.FC = () => {
           <Button
             onClick={() => router.push('/app/rate-plan/create-rate-plan')}
             variant="default"
-            className="flex items-center gap-2 bg-tripswift-blue hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium shadow-md hover:shadow-lg transition-all"
+            className="flex items-center gap-2 bg-tripswift-blue hover:bg-tripswift-dark-blue text-white px-4 py-2 rounded-md text-sm font-medium shadow-md hover:shadow-lg transition-all"
           >
             <Plus className="h-4 w-4" />
             Create Rate Plan
