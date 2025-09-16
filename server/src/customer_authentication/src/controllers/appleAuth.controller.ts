@@ -18,7 +18,18 @@ export class AppleAuthController implements IAppleAuthController {
     async authenticate(req: Request, res: Response): Promise<Response> {
         try {
             const { referrerId, referralCode } = req.query as { referrerId: string; referralCode: string };
-            const { provider, identityToken, authorizationCode, firstName, lastName, email } = req.body;
+            const { provider, identityToken, authorizationCode, firstName, lastName, email, nonce } = req.body;
+
+            // Log incoming request for debugging (remove in production)
+            console.log('Apple auth request received:', {
+                hasIdentityToken: !!identityToken,
+                hasAuthorizationCode: !!authorizationCode,
+                hasFirstName: !!firstName,
+                hasLastName: !!lastName,
+                hasEmail: !!email,
+                hasNonce: !!nonce,
+                provider
+            });
 
             // Validate required fields
             if (!provider || provider !== 'apple') {
@@ -37,15 +48,43 @@ export class AppleAuthController implements IAppleAuthController {
                 identityToken, 
                 authorizationCode, 
                 firstName, 
-                lastName 
+                lastName,
+                nonce
             });
             
             if (!userData) {
                 return res.status(401).json({ error: "Failed to authenticate with Apple" });
             }
 
+              // ADD DETAILED LOGGING HERE - RIGHT AFTER SUCCESSFUL AUTHENTICATION
+        console.log('=== BACKEND RESPONSE TO FRONTEND ===');
+        console.log('Complete userData object:', JSON.stringify(userData, null, 2));
+        console.log('Token present:', !!userData.token);
+        console.log('Token value:', userData.token);
+        console.log('User object:', JSON.stringify(userData.user, null, 2));
+        if (userData.user) {
+            console.log('User details:');
+            console.log('  - ID:', userData.user.id);
+            console.log('  - First Name:', userData.user.firstName);
+            console.log('  - Last Name:', userData.user.lastName);
+            console.log('  - Email:', userData.user.email);
+            console.log('  - Provider:', userData.user.provider);
+            console.log('  - Avatar:', userData.user.avatar);
+        }
+        console.log('=====================================');
+
+
+            // Log successful authentication
+            console.log('Apple authentication successful:', {
+                userId: userData.user.id,
+                hasEmail: !!userData.user.email,
+                provider: userData.user.provider
+            });
+
             // If no referral information, return user data directly
             if (!referrerId && !referralCode) {
+                console.log('No referral data - returning user data directly');
+            console.log('Final response to frontend:', JSON.stringify(userData, null, 2));
                 return res.status(201).json(userData);
             }
 
@@ -54,6 +93,8 @@ export class AppleAuthController implements IAppleAuthController {
 
             // Check if user is trying to refer themselves
             if (userData.user.id?.toString() === referrerId) {
+                console.log('User attempting to refer themselves, skipping referral');
+                console.log('Final response to frontend (self-referral):', JSON.stringify(userData, null, 2));
                 return res.status(201).json(userData);
             }
 
@@ -69,26 +110,36 @@ export class AppleAuthController implements IAppleAuthController {
             if (!referralResult) {
                 // If referral fails, still return user data without referral
                 console.warn("Referral application failed, but user authentication succeeded");
+                console.log('Final response to frontend (referral failed):', JSON.stringify(userData, null, 2));
                 return res.status(201).json(userData);
             }
 
             // Add token to referral result
             referralResult.token = userData.token;
-
+         console.log('Referral successful - Final response to frontend:', JSON.stringify(referralResult, null, 2));
             return res.status(201).json(referralResult);
         } catch (error: any) {
             console.error("Apple authentication error:", error.message);
+            console.error("Error stack:", error.stack);
             
-            // Return appropriate error status
-            if (error.message.includes('Invalid') || error.message.includes('token')) {
-                return res.status(401).json({ error: error.message });
+            // More specific error handling
+            if (error.message.includes('Invalid') || error.message.includes('token') || error.message.includes('verification')) {
+                return res.status(401).json({ error: error.message || "Invalid Apple authentication token" });
             }
             
-            if (error.message.includes('required') || error.message.includes('Provider')) {
-                return res.status(400).json({ error: error.message });
+            if (error.message.includes('required') || error.message.includes('Provider') || error.message.includes('missing')) {
+                return res.status(400).json({ error: error.message || "Missing required authentication data" });
+            }
+
+            if (error.message.includes('Apple user identifier') || error.message.includes('sub')) {
+                return res.status(400).json({ error: "Apple user identifier is required but not provided" });
             }
             
-            return res.status(500).json({ error: "Apple authentication failed" });
+            // Generic server error for unknown issues
+            return res.status(500).json({ 
+                error: "Apple authentication failed",
+                details: process.env.NODE_ENV === 'development' ? error.message : undefined
+            });
         }
     }
 

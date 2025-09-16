@@ -174,7 +174,7 @@ export class AppleAuthService implements IAppleAuthService {
      */
     async authenticate(data: IAppleAuthData): Promise<IAppleUserData> {
         try {
-            const { identityToken, authorizationCode, firstName, lastName,nonce} = data;
+            const { identityToken, authorizationCode, firstName, lastName, nonce } = data;
             
             if (!identityToken && !authorizationCode) {
                 throw new Error("Either identity token or authorization code is required for Apple authentication");
@@ -201,27 +201,36 @@ export class AppleAuthService implements IAppleAuthService {
             // Extract user information from verified token
             const { email, sub: appleId, email_verified } = appleUserData;
 
-            if (!email || !appleId) {
-                throw new Error("Required user information not available from Apple");
+            // FIXED: Only require appleId (sub), email might be null on subsequent sign-ins
+            if (!appleId) {
+                throw new Error("Apple user identifier (sub) is required but not provided");
             }
 
-            // Check if user exists by Apple ID or email
-            let customer = await this.appleAuthRepository.findUserByEmailOrAppleId(email, appleId);
+            // First, try to find user by Apple ID (most reliable)
+            let customer = await this.appleAuthRepository.findUserByAppleId(appleId);
+            
+            if (!customer && email) {
+                // If not found by Apple ID but email is available, try to find by email
+                // This handles first-time sign-ins or account linking
+                customer = await this.appleAuthRepository.findUserByEmail(email);
+                
+                if (customer && !customer.appleId) {
+                    // Link Apple account to existing email-based account
+                    customer = await this.appleAuthRepository.updateUserById(customer._id.toString(), {
+                        appleId: appleId,
+                        provider: 'apple'
+                    });
+                }
+            }
             
             if (!customer) {
-                // Create new customer
+                // Create new customer - use provided names or defaults
                 customer = await this.appleAuthRepository.createUser({
                     appleId: appleId,
                     firstName: firstName || 'Apple',
                     lastName: lastName || 'User',
-                    email: email,
+                    email: email || null, // Email might be null
                     provider: 'apple',
-                });
-            } else if (!customer.appleId && customer.email === email) {
-                // Link Apple account to existing email-based account
-                customer = await this.appleAuthRepository.updateUserById(customer._id.toString(), {
-                    appleId: appleId,
-                    provider: 'apple'
                 });
             }
 

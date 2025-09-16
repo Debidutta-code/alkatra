@@ -39,15 +39,20 @@ export class AppleAuthRepository {
   }
 
   /**
-   * Find user by email or Apple ID
+   * Find user by email or Apple ID - Updated to handle null email
    */
-  async findUserByEmailOrAppleId(email: string, appleId: string): Promise<ICustomer | null> {
-    return await CustomerModel.findOne({
+  async findUserByEmailOrAppleId(email: string | null, appleId: string): Promise<ICustomer | null> {
+    const query: any = {
       $or: [
-        { email },
         { appleId }
       ]
-    });
+    };
+    
+    // Only add email to query if it's provided and not null
+    if (email) {
+      query.$or.push({ email });
+    }
+    
+    return await CustomerModel.findOne(query);
   }
 }
-
