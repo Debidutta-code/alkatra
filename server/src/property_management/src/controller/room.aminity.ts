@@ -59,11 +59,6 @@ const createRoomAminity = catchAsync(
 const updateRoomAmenity = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { propertyInfo_id, room_type, amenities } = req.body;
-    console.log("========= Incoming Data =========");
-    console.log("PropertyInfo ID:", propertyInfo_id);
-    console.log("Room Type:", room_type);
-    console.log("Amenities:", amenities);
-    console.log("=================================");
     if (!req.body) {
       next(new AppError("Please fill all the required fields", 400));
     }
@@ -93,9 +88,6 @@ const getRoomAminity = async (req: Request, res: Response, next: NextFunction) =
   try {
     const propertyInfo_id = req.params.id;
     const room_type = req.query.room_type as string | undefined;
-
-    console.log('Property ID:', propertyInfo_id);
-    console.log('Room Type:', room_type);
 
     if (!propertyInfo_id) {
       return next(new AppError('Please provide propertyInfo_id', 400));

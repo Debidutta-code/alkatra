@@ -11,6 +11,7 @@ export interface IInventory extends Document {
   hotelName: string;
   invTypeCode: string;
   availability: Availability;
+  status: string;
   // createdAtIST: Date;
   // updatedAtIST: Date;
 }
@@ -33,6 +34,7 @@ const inventorySchema = new Schema<IInventory>(
     hotelName: { type: String, required: true },
     invTypeCode: { type: String, required: true },
     availability: { type: availabilitySchema, required: true },
+    status: { type: String }
     // createdAtIST: { type: Date, default: getISTTime },
     // updatedAtIST: { type: Date, default: getISTTime },
   },
