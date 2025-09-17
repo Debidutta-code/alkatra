@@ -42,10 +42,6 @@ export class PropertyInfoService {
             throw new Error("Property ID is required");
         }
 
-        if (!property_name || !property_email || !property_contact || !star_rating || !image || !description || !status) {
-            throw new Error("All fields are required");
-        }
-
         const filteredUpdates: Partial<PropertyInfoType> = {};
 
         if (property_name) filteredUpdates.property_name = property_name;

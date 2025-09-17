@@ -44,7 +44,7 @@ const propertyInfoSchema = new Schema<PropertyInfoType>({
   isDraft: { type: Boolean, default: true, },
   rate_plan: [{ type: Schema.Types.ObjectId }],
   tax_group: { type: Schema.Types.ObjectId, ref: "TaxGroup", sparse: true },
-  status: { type: String, enum: ["open", "close"], default: "open", required: false },
+  status: { type: String, enum: ["open", "close"], required: false },
 },{
   timestamps: true,
 });
