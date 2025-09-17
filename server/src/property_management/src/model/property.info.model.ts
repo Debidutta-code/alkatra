@@ -23,6 +23,7 @@ interface PropertyInfoType extends Document {
   isDraft: boolean;
   rate_plan: Types.ObjectId;
   tax_group?: Types.ObjectId;
+  status: string;
 }
 
 const propertyInfoSchema = new Schema<PropertyInfoType>({
@@ -43,6 +44,9 @@ const propertyInfoSchema = new Schema<PropertyInfoType>({
   isDraft: { type: Boolean, default: true, },
   rate_plan: [{ type: Schema.Types.ObjectId }],
   tax_group: { type: Schema.Types.ObjectId, ref: "TaxGroup", sparse: true },
+  status: { type: String, enum: ["open", "close"], default: "open", required: false },
+},{
+  timestamps: true,
 });
 
 const PropertyInfo = mongoose.model<PropertyInfoType>("PropertyInfo", propertyInfoSchema);

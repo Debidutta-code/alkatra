@@ -11,17 +11,18 @@ import PropertyPrice from "../model/ratePlan.model";
 import PropertyRatePlan from "../model/ratePlan.model";
 import mongoose, { Types } from "mongoose";
 import UserModel from "../../../user_authentication/src/Model/auth.model"
+import { PropertyInfoService } from "../service";
 
-interface hotels{
-  _id:string,
-  name:string,
-  image:[]
+interface hotels {
+  _id: string,
+  name: string,
+  image: []
 }
 
-interface Test{
-  groupManagerName:string;
-  _id:string;
-  hotels:hotels[]
+interface Test {
+  groupManagerName: string;
+  _id: string;
+  hotels: hotels[]
 }
 
 const createpropertyInfo = catchAsync(
@@ -131,74 +132,74 @@ const getMyProperties = catchAsync(
 const getAdminProperties = catchAsync(
   async (req: any, res: Response, next: NextFunction) => {
     try {
-      
+
       const userId = req.user?.id;
-      
+
       // Validate userId exists
       if (!userId) {
         return next(new AppError('User ID not found in request', 401));
       }
-      
+
       // Validate userId is a valid ObjectId format
       if (!mongoose.Types.ObjectId.isValid(userId)) {
         return next(new AppError('Invalid user ID format', 400));
       }
-      
+
       const actualUser = await UserModel.findById(userId);
-      
+
       if (!actualUser) {
         return next(new AppError('User not found', 404));
       }
-      
+
       const userRole = actualUser.role;
       let responseData: any = {};
       console.log(userRole)
-      
+
       switch (userRole) {
         case "superAdmin":
           const userEmail = actualUser.email;
-          
+
           // 1. Get direct hotel managers created by superAdmin
           const directHotelManagers = await UserModel.find({
             role: "hotelManager",
             createdBy: userEmail
           });
-          
+
           // 2. Get group managers created by superAdmin
           const groupManagers = await UserModel.find({
             role: "groupManager",
             createdBy: userEmail
           });
-          
+
           // 3. Get properties for direct hotel managers
           const directHotelManagerIds = directHotelManagers.map(hm => hm._id);
           const directProperties = await PropertyInfo.find({
             user_id: { $in: directHotelManagerIds }
           }).select("_id image property_name");
-          
+
           // 4. Process grouped hotels by group manager
           const groupedResults = [];
-          
+
           for (const groupManager of groupManagers) {
             // Get hotel managers under this group manager
             const hotelManagersUnderGroup = await UserModel.find({
               role: "hotelManager",
               createdBy: groupManager.email
             });
-            
+
             // Get properties for these hotel managers
             const hotelManagerIds = hotelManagersUnderGroup.map(hm => hm._id);
             const propertiesUnderGroup = await PropertyInfo.find({
               user_id: { $in: hotelManagerIds }
             }).select("_id image property_name");
-            
+
             // Format hotels array
             const hotels = propertiesUnderGroup.map(property => ({
               _id: property._id,
               name: property.property_name,
               image: property.image || []
             }));
-            
+
             // Add to grouped results
             groupedResults.push({
               groupManagerName: `${groupManager.firstName} ${groupManager.lastName}` || groupManager.email,
@@ -206,27 +207,27 @@ const getAdminProperties = catchAsync(
               hotels: hotels
             });
           }
-          
+
           // Format direct properties
           const directHotels = directProperties.map(property => ({
             _id: property._id,
             name: property.property_name,
             image: property.image || []
           }));
-          
+
           responseData = {
             direct: directHotels,
             grouped: groupedResults,
           };
           break;
-          
+
         case "groupManager":
           // Get hotel managers created by this group manager
           const managedHotelManagers = await UserModel.find({
             role: "hotelManager",
             createdBy: actualUser.email
           });
-          
+
           if (managedHotelManagers.length === 0) {
             console.log('No hotel managers found for this group manager');
             responseData = {
@@ -235,38 +236,38 @@ const getAdminProperties = catchAsync(
             };
             break;
           }
-          
+
           const managedHotelManagerIds = managedHotelManagers.map(hm => hm._id);
           console.log('Managed hotel manager IDs:', managedHotelManagerIds);
-          
+
           // Fetch all properties for these hotel managers
           const allProperties = await PropertyInfo.find({
             user_id: { $in: managedHotelManagerIds }
           }).select("_id image property_name");
-          
+
           // console.log('All properties found:', allProperties.length);
-           const allHotels = allProperties.map(property => ({
+          const allHotels = allProperties.map(property => ({
             _id: property._id,
             name: property.property_name,
             image: property.image || []
           }));
-          
+
           responseData = {
             direct: allHotels,
           };
           break;
-          
+
         default:
           return next(new AppError('Invalid user role', 400));
       }
-      
+
       res.status(200).json({
         status: "success",
         error: false,
         message: "Data fetched successfully",
         data: responseData
       });
-      
+
     } catch (error: any) {
       console.log('Error in getAdminProperties:', error.message);
       console.log('Full error:', error);
@@ -286,6 +287,7 @@ const updatePropertyInfo = catchAsync(
       // property_code,
       image,
       description,
+      status,
     } = req.body;
 
     const property = await PropertyInfo.findById(propertInfoId);
@@ -294,6 +296,7 @@ const updatePropertyInfo = catchAsync(
         new AppError(`No property found with this id ${propertInfoId}`, 404)
       );
     }
+
     // Check for duplicate property_email if changed
     if (property_email && property_email !== property.property_email) {
       const existingEmail = await PropertyInfo.findOne({ property_email });
@@ -302,13 +305,6 @@ const updatePropertyInfo = catchAsync(
       }
     }
 
-    // Check for duplicate property_code if changed
-    // if (property_code && property_code !== property.property_code) {
-    //   const existingCode = await PropertyInfo.findOne({ property_code });
-    //   if (existingCode) {
-    //     return next(new AppError("A property already exists with this property code", 400));
-    //   }
-    // }
     const updateProperty = await PropertyInfo.findByIdAndUpdate(
       propertInfoId,
       {
@@ -320,6 +316,7 @@ const updatePropertyInfo = catchAsync(
           // property_code,
           image,
           description,
+          status,
         }
       },
       { new: true }
@@ -469,3 +466,54 @@ export {
   getProperties,
   getAdminProperties,
 };
+
+
+export class PropertyInfoController {
+
+  private propertyInfoService: PropertyInfoService;
+
+  constructor(propertyInfoService: PropertyInfoService) {
+    this.propertyInfoService = propertyInfoService;
+  }
+
+  async propertyInfoUpdate(req: Request, res: Response, next: NextFunction) {
+    try {
+      const propertInfoId = req.params.id;
+      const {
+        property_name,
+        property_email,
+        property_contact,
+        star_rating,
+        image,
+        description,
+        status,
+      } = req.body;
+
+      const updatedPropertyInfo = await this.propertyInfoService.propertyUpdate(
+        propertInfoId,
+        property_name,
+        property_email,
+        property_contact,
+        star_rating,
+        image,
+        description,
+        status
+      );
+
+      if (!updatedPropertyInfo) {
+        return res.status(404).json({ message: "Property not found" });
+      }
+
+      return res.status(200).json({
+        status: "success",
+        error: false,
+        message: "Property updated successfully",
+        data: updatedPropertyInfo,
+      });
+    }
+    catch (error: any) {
+      console.log("Error updating property:", error);
+      return res.status(500).json({ message: error.message || "Error updating property" });
+    }
+  }
+}

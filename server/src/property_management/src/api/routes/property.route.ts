@@ -28,8 +28,16 @@ import {
 } from "../../controller/propertyaddress.controller";
 import { protect } from "../../../../user_authentication/src/Middleware/auth.middleware";
 import { getAllHotelDetailsAccordingToLocation } from "../../controller/getHotelDetails.controller";
+import { PropertyInfoController } from "../../controller/propertyInfo.controller";
+import { PropertyInfoService } from "../../service/propertyInfo.service";
+import { PropertyInfoRepository } from "../../repositories/propertyInfo.repository";
+
 
 const router = Router();
+
+const propertyInfoRepository = PropertyInfoRepository.getInstance();
+const propertyInfoService = PropertyInfoService.getInstance(propertyInfoRepository);
+const propertyInfoController = new PropertyInfoController(propertyInfoService);
 
 export default (app: Router) => {
 
@@ -83,8 +91,10 @@ export default (app: Router) => {
   router
     .route("/:id")
     .get(getPropertyInfoById as any)
-    .patch(protect as any, updatePropertyInfo as any)
+    // .patch(protect as any, updatePropertyInfo as any)
     .delete(protect as any, deleteProperty as any);  
+
+  router.route("/:id").patch(protect as any, propertyInfoController.propertyInfoUpdate.bind(propertyInfoController));
 
   router.route("/location/:location").get(getAllHotelDetailsAccordingToLocation as any);
 };
