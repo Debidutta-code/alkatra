@@ -24,8 +24,9 @@ export class BookAgainAvailabilityService {
         };
 
         const checkAvailability = await BookAgainRepository.getRatePlanByHotel(hotelCode, invTypeCode, startDate, endDate);
-        if (!checkAvailability) {
-            throw new Error ("Getting error at while checking availability");
+        console.log("checkAvailability", checkAvailability);
+        if (checkAvailability.data.length === 0) {
+            throw new Error (`No rooms are available for the selected dates`);
         }
 
         return checkAvailability;

@@ -135,11 +135,13 @@ export class BookAgainRepository {
                 inventoryMatch["availability.endDate"] = { $lte: endOfDay(endDate) };
             }
 
-            // inventoryMatch["availability.startDate"] = { $gte: startOfDay(new Date()) };
-            console.log("the inventory match is", inventoryMatch);
+            
             const inventory = await Inventory.aggregate([
                 { $match: inventoryMatch },
             ]);
+            if (!inventory) {
+                throw new Error("No inventory found");
+            }
 
             return inventory;
         } catch (error: any) {
@@ -173,19 +175,14 @@ export class BookAgainRepository {
             if (endDate) {
                 ratePlanMatch.endDate = { $lte: endOfDay(endDate) };
             }
-            // else {
-            //   const tomorrow = new Date();
-            //   tomorrow.setDate(tomorrow.getDate() + 1);
-            //   ratePlanMatch.endDate = { $gte: startOfDay(tomorrow) };
-            // }
-
-            // ratePlanMatch.startDate = { $gte: startOfDay(new Date()) };
-            console.log("the rate plan match is", ratePlanMatch);
+            
             const ratePlan = await RateAmount.aggregate([
                 { $match: ratePlanMatch },
             ]);
+            if (!ratePlan) {
+                throw new Error("No rate plan found");
+            }
 
-            console.log("The rate plan we get from DB is ", ratePlan);
 
             return ratePlan;
 
