@@ -7,14 +7,11 @@ import { propertyAminity } from "../model/propertyamenite.model";
 export const getAllHotelDetailsAccordingToLocation = async (req: Request, res: Response) => {
     try {
         const { location } = req.params;
-        console.log(`The location we get from UI is: ${location}`);
+
         const propertyAddresses = await PropertyAddress.aggregate([
             {
                 $match: {
                     $or: [
-                        // { $expr: { $eq: [{ $toLower: "$address_line_1" }, location.toLowerCase()] } },
-                        // { $expr: { $eq: [{ $toLower: "$address_line_2" }, location.toLowerCase()] } },
-                        // { $expr: { $eq: [{ $toLower: "$state" }, location.toLowerCase()] } },
                         { $expr: { $eq: [{ $toLower: "$city" }, location.toLowerCase()] } }
                     ]
                 }
@@ -77,7 +74,7 @@ export const getAllHotelDetailsAccordingToLocation = async (req: Request, res: R
                 }, {});
 
                 hotel.amenities = filteredAmenities;
-                console.log(`Filtered amenities for hotel ${hotel._id}:`, hotel.amenities);
+                
                 return {
                     ...hotel.toObject(),
                     amenities: hotel.amenities
