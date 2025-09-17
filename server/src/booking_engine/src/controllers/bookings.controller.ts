@@ -1584,8 +1584,7 @@ export class BookingController {
 
 
       return res.status(200).json({
-        message: "Rooms are available",
-        result,
+        message: "Rooms are available"
       });
 
     }
