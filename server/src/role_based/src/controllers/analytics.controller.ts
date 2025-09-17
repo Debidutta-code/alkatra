@@ -10,12 +10,11 @@ export default class AnalyticsController {
             const role = req.role;
             const userEmail = req.user.email;
             const userId = req.user.id;
-            console.log("Role:", role, "User Email:", userEmail, "User ID:", userId, "Hotel Name:", hotelName, "Start Date:", startDate, "End Date:", endDate, "Year:", year);
 
             const parsedStartDate = startDate ? new Date(startDate) : undefined;
             const parsedEndDate = endDate ? new Date(endDate) : undefined;
 
-            console.log("Parsed Start Date:", parsedStartDate, "Parsed End Date:", parsedEndDate);
+            
 
             const parsedYear = year && !isNaN(Number(year)) ? parseInt(year) : undefined;
             let hotelCodes: string[] | undefined = [];

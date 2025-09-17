@@ -36,8 +36,13 @@ export const getAllHotelDetailsAccordingToLocation = async (req: Request, res: R
 
         const propertyIds = propertyAddresses.map((item: any) => item.property_id);
         const hotelDetails = await PropertyInfo.find({
-            _id: { $in: propertyIds }
+            _id: { $in: propertyIds },
+            $or: [
+                { status: "open" },
+                { status: { $exists: false } },
+            ]
         });
+
 
         if (hotelDetails.length === 0) {
             return res.status(404).json({
