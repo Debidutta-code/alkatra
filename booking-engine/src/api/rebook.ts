@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
+// Check room availability
 export const checkRoomAvailability = async (
   hotelCode: string,
   roomTypeCode: string,
@@ -25,6 +26,7 @@ export const checkRoomAvailability = async (
     withCredentials: true,
   });
 
+  // Validate response
   if (!response.data.message?.toLowerCase().includes("available")) {
     throw new Error("Room not available for selected dates");
   }
@@ -32,6 +34,7 @@ export const checkRoomAvailability = async (
   return response.data;
 };
 
+// Get room price
 export const getRoomPrice = async (
   hotelCode: string,
   roomTypeCode: string,
@@ -42,6 +45,7 @@ export const getRoomPrice = async (
   noOfInfants: number,
   noOfRooms: number
 ) => {
+  const token = Cookies.get("accessToken");
   const response = await axios.post(
     `${API_BASE_URL}/rate-plan/getRoomRentPrice`,
     {

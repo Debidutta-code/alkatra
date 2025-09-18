@@ -6,8 +6,7 @@ import { DatePicker, Input } from "antd";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import dayjs, { Dayjs } from "dayjs";
-import { CalendarIcon, X, Check, Users, Calendar, BedDouble, CreditCard, Trash2, Plus, Mail, Phone, ArrowLeft } from "lucide-react";
-import axios from "axios";
+import { CalendarIcon, X, Check, Users, Calendar, BedDouble, CreditCard, Trash2, Plus, Mail, ArrowLeft } from "lucide-react";
 import { useDispatch } from "@/Redux/store";
 import {
   setHotelCode,
@@ -20,11 +19,13 @@ import {
   setRequestedRooms,
   setGuestDetails,
   setRatePlanCode,
-  resetPmsHotelCard
+  resetPmsHotelCard,
+  setRoomId,
+  setPropertyId 
 } from "@/Redux/slices/pmsHotelCard.slice";
+import { checkRoomAvailability, getRoomPrice } from "../../api/rebook";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import Cookies from "js-cookie";
 
 // Define TypeScript interface for price data
 interface PriceData {
@@ -80,6 +81,8 @@ interface RebookModalProps {
     guestDetails: any[];
     email?: string;
     phone?: string;
+    roomId?: string;
+    propertyId?: string;
   };
 }
 
@@ -119,7 +122,6 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
   const [contactEmail, setContactEmail] = useState<string>(initialContact.email);
   const [contactPhone, setContactPhone] = useState<string>(initialContact.phone);
   const [rooms, setRooms] = useState<number>(booking.numberOfRooms || 1);
-
   const [isChecking, setIsChecking] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
   const [finalPrice, setFinalPrice] = useState<number | null>(null);
@@ -249,10 +251,11 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
       const missingDob = (g.type === 'child' || g.type === 'infant') && !g.dob;
       return missingName || missingDob;
     });
+
     if (hasEmptyGuest) {
       setMessage({
         type: 'error',
-        text: t("Please fill in first and last name for all guests")
+        text: t("Please fill in first name, last name, and date of birth (for children/infants) for all guests")
       });
       return;
     }
@@ -269,76 +272,44 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
     setMessage(null);
 
     try {
-      const token = Cookies.get("accessToken");
-
       // 1. Check Availability
-      const availabilityRes = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/booking/check/availability`,
-        {
-          params: {
-            hotelCode: booking.hotelCode,
-            invTypeCode: booking.roomTypeCode,
-            startDate: checkInDate.format("YYYY-MM-DD"),
-            endDate: checkOutDate.format("YYYY-MM-DD"),
-          },
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          withCredentials: true,
-        }
+      await checkRoomAvailability(
+        booking.hotelCode,
+        booking.roomTypeCode,
+        checkInDate.format("YYYY-MM-DD"),
+        checkOutDate.format("YYYY-MM-DD")
       );
-
-      if (!availabilityRes.data.message || !availabilityRes.data.message.toLowerCase().includes("available")) {
-        setIsAvailable(false);
-        setMessage({
-          type: 'error',
-          text: t("Room not available for selected dates")
-        });
-        return;
-      }
 
       setIsAvailable(true);
 
       // 2. Get Final Price
-      const priceRes = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomRentPrice`,
-        {
-          hotelCode: booking.hotelCode,
-          invTypeCode: booking.roomTypeCode,
-          startDate: checkInDate.format("YYYY-MM-DD"),
-          endDate: checkOutDate.format("YYYY-MM-DD"),
-          noOfAdults: guests.length,
-          noOfChildrens: 0,
-          noOfInfants: 0,
-          noOfRooms: rooms,
-        },
-        { withCredentials: true }
+      const data = await getRoomPrice(
+        booking.hotelCode,
+        booking.roomTypeCode,
+        checkInDate.format("YYYY-MM-DD"),
+        checkOutDate.format("YYYY-MM-DD"),
+        guests.length,
+        0,
+        0,
+        rooms
       );
 
-      if (priceRes.data.success) {
-        const data = priceRes.data.data;
-        let finalPriceAfterTax = data.totalAmount;
-
-        if (data.priceAfterTax && data.priceAfterTax > 0) {
-          finalPriceAfterTax = data.priceAfterTax;
-        } else if (data.totalTax && data.totalTax > 0) {
-          finalPriceAfterTax = data.totalAmount + data.totalTax;
-        }
-
-        setFinalPrice(finalPriceAfterTax);
-        setLocalCurrency(data.dailyBreakdown?.[0]?.currencyCode || "USD");
-        setPriceData(data);
-
-        setCurrentStep('review');
-
-        setMessage({
-          type: 'success',
-          text: t("Ready to review your booking.")
-        });
-      } else {
-        throw new Error(priceRes.data.message || "Failed to get price");
+      let finalPriceAfterTax = data.totalAmount;
+      if (data.priceAfterTax && data.priceAfterTax > 0) {
+        finalPriceAfterTax = data.priceAfterTax;
+      } else if (data.totalTax && data.totalTax > 0) {
+        finalPriceAfterTax = data.totalAmount + data.totalTax;
       }
+
+      setFinalPrice(finalPriceAfterTax);
+      setLocalCurrency(data.dailyBreakdown?.[0]?.currencyCode || "USD");
+      setPriceData(data);
+
+      setCurrentStep('review');
+      setMessage({
+        type: 'success',
+        text: t("Ready to review your booking.")
+      });
 
     } catch (error: any) {
       console.error("Error during rebooking:", error);
@@ -356,7 +327,7 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
 
   const handleProceedToPayment = () => {
     if (finalPrice === null || !checkInDate || !checkOutDate) return;
-
+  
     const hasEmptyGuest = guests.some(g => !g.firstName.trim() || !g.lastName.trim());
     if (hasEmptyGuest) {
       setMessage({
@@ -365,7 +336,7 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
       });
       return;
     }
-
+  
     if (!contactEmail.trim()) {
       setMessage({
         type: 'error',
@@ -373,11 +344,15 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
       });
       return;
     }
-
-    // ✅ STEP 1: CLEAR OLD STATE FIRST
+  
+    // ✅ STEP 1: CLEAR OLD STATE
     dispatch(resetPmsHotelCard());
-
-    // ✅ STEP 2: Dispatch NEW data
+  
+    // ✅ Get roomId and propertyId from original booking
+    const roomId = booking.roomId || "";
+    const propertyId = booking.propertyId || "";
+  
+    // ✅ STEP 2: Dispatch ALL required data
     dispatch(setHotelCode(booking.hotelCode));
     dispatch(setHotelName(booking.hotelName));
     dispatch(setRoomType(booking.roomTypeCode));
@@ -386,7 +361,9 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
     dispatch(setAmount(finalPrice));
     dispatch(setCurrency(localCurrency));
     dispatch(setRequestedRooms(rooms.toString()));
-
+    dispatch(setRoomId(roomId));          // ✅ Add this
+    dispatch(setPropertyId(propertyId));  // ✅ Add this
+  
     const guestDetailsPayload = {
       guests: guests,
       rooms: rooms,
@@ -396,14 +373,10 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
       email: contactEmail,
       phone: contactPhone,
     };
-
+  
     dispatch(setGuestDetails(guestDetailsPayload));
     dispatch(setRatePlanCode("Non-refundable"));
-
-    // ✅ STEP 3: Clear localStorage (optional, but safe)
-    localStorage.removeItem("pendingRebooking");
-
-    // ✅ STEP 4: Navigate
+  
     onClose();
     router.push("/payment");
   };

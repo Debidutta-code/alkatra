@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import { setPaymentData } from "../../../Redux/slices/payment.slice";
 import { useDispatch } from "react-redux";
+import { useSelector } from "@/Redux/store";
 
 
 interface CryptoToken {
@@ -40,7 +41,7 @@ const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onCon
   const [convertedAmount, setConvertedAmount] = useState<number | null>(null);
   const [paymentInitiated, setPaymentInitiated] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
-
+  const hotelCode = useSelector((state: any) => state.pmsHotelCard.hotelCode);
   const dispatch=useDispatch();
  
   // Fetch crypto token list from API
@@ -210,13 +211,12 @@ const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onCon
 
         // Step 2: Call guest-details-initiate API
         try {
-          const propertyCode = sessionStorage.getItem("propertyCode");
           const guestDetailsResponse = await axios.post(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/crypto/guest-details-initiate`,
             {
               checkInDate: bookingDetails.checkIn,
               checkOutDate: bookingDetails.checkOut,
-              hotelCode: propertyCode,
+              hotelCode: hotelCode,
               hotelName: bookingDetails.hotelName,
               ratePlanCode: bookingDetails.ratePlanCode,
               numberOfRooms: bookingDetails.rooms,

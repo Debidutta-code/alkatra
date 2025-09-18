@@ -203,6 +203,7 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   const [emailVerified, setEmailVerified] = useState(false);
   const [phoneVerified, setPhoneVerified] = useState(false);
   const [emailAlreadyVerified, setEmailAlreadyVerified] = useState(false);
+  const hotelCode = useSelector((state: any) => state.pmsHotelCard.hotelCode);
 
   const [activeSection, setActiveSection] = useState<"details" | "review">(
     "details"
@@ -235,7 +236,6 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
   ) => {
     try {
       console.log("guest data", guestData);
-      const hotelCode = sessionStorage.getItem("propertyCode");
       const finalPriceResponse = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomRentPrice`,
         {

@@ -206,7 +206,7 @@ const RoomsPage: React.FC = () => {
         }
         setPropertyDetails(propDetails);
         setPropertyCode(propDetails.property_code);
-        sessionStorage.setItem("propertyCode", propDetails.property_code);
+        dispatch(setHotelCode(propDetails.property_code));
       } catch (error) {
         console.error("Error fetching property:", error);
       } finally {
