@@ -23,7 +23,7 @@ import { BookAgainAvailabilityService, BookingService } from "../services";
 
 const bookingService = BookingService.getInstance();
 const bookAgainService = BookAgainAvailabilityService.getInstance();
-const bookingController = new BookingController(bookingService, bookAgainService);
+const bookingController = new BookingController(bookingService);
 
 
 import { authenticateCustomer } from "../../../customer_authentication/src/middleware/authMiddleware";
@@ -42,9 +42,5 @@ router.route("/count/:id").get(protect as any, getBookingDetailsForExtranet);
 router.route("/customers/booking/details/:id").get(authenticateCustomer as any, getBookingDetailsOfUser);
 router.route("/hotelname").get(protect as any, getAllHotelsByRole);
 
-/**
- * Book again routes
- */
-router.route("/check/availability").get(authenticateCustomer as any, bookingController.bookAgainCheckAvailability.bind(bookingController));
 
 export default router;

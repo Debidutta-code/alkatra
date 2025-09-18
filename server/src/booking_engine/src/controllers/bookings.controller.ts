@@ -18,8 +18,7 @@ import Auth from "../../../user_authentication/src/Model/auth.model";
 import { PropertyInfo } from "../../../property_management/src/model/property.info.model";
 import UserModel from "../../../user_authentication/src/Model/auth.model";
 import { MailFactory } from "../../../customer_authentication/src/services/mailFactory";
-import { BookAgainAvailabilityService, BookingService } from "../services";
-
+import { BookingService } from "../services";
 
 const mailer = MailFactory.getMailer();
 
@@ -1421,20 +1420,20 @@ export const getBookingDetailsForExtranet = CatchAsyncError(async (req: CustomRe
 export const getAllHotelsByRole = CatchAsyncError(
   async (req: CustomRequest, res: Response, next: NextFunction) => {
     try {
-    
+
       const ownerId = req.user?.id;
       const ownerRole = req.role;
-    
+
       if (!ownerId || !ownerRole) {
         return next(new ErrorHandler("Owner ID and ROLE not available", 400));
       }
-    
+
       const convertedOwnerId = new Types.ObjectId(ownerId);
       const ownerDetails = await UserModel.findById(convertedOwnerId);
       if (!ownerDetails) {
         return next(new ErrorHandler("Owner not found in database", 404));
       }
-  
+
       const allowedRoles = ["superAdmin", "groupManager", "hotelManager"];
       if (!allowedRoles.includes(ownerDetails.role)) {
         return next(new ErrorHandler("Unauthorized access", 403));
@@ -1485,14 +1484,12 @@ export const getAllHotelsByRole = CatchAsyncError(
 export class BookingController {
 
   private bookingService: BookingService;
-  private bookAgainAvailabilityService: BookAgainAvailabilityService;
 
-  constructor(bookingService: BookingService, bookAgainAvailabilityService: BookAgainAvailabilityService) {
-    if (!bookingService || !bookAgainAvailabilityService) {
-      throw new Error("Services are required");
+  constructor(bookingService: BookingService) {
+    if (!bookingService) {
+      throw new Error("BookingService is required");
     }
     this.bookingService = bookingService;
-    this.bookAgainAvailabilityService = bookAgainAvailabilityService;
   }
 
 
@@ -1552,49 +1549,4 @@ export class BookingController {
     }
   }
 
-  async bookAgainCheckAvailability(req: any, res: Response, next: NextFunction) {
-    try {
-
-      /**
-       * Checking for USER 
-       */
-      const userId = req.user?.id;
-      if (!userId) {
-        return res.status(401).json({ message: "User ID is required" });
-      }
-
-      /**
-       * 
-       */
-      const { hotelCode, invTypeCode, startDate, endDate } = req.query;
-      if (!hotelCode || !invTypeCode || !startDate || !endDate) {
-        return res.status(404).json({
-          success: false,
-          message: "Some data are missing in body",
-        });
-      }
-
-      /**
-       * Calling the service file
-       */
-      const result = await this.bookAgainAvailabilityService.bookAgainAvailability(hotelCode, invTypeCode, startDate, endDate);
-      if (!result) {
-        return res.status(400).json({ message: "No rate plan or inventory found" })
-      }
-
-
-      return res.status(200).json({
-        success: true,
-        message: "Rooms are available"
-      });
-
-    }
-    catch (error: any) {
-      console.log("Book again process failed");
-      return res.status(500).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  }
 }
