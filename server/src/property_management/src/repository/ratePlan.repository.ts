@@ -106,6 +106,9 @@ export class RatePlanRepository {
             additionalGuestAmounts
         } = ratePlanCreateData;
 
+
+        console.log("The days we get", days);
+
         // Validate required fields
         if (!hotelCode || !invTypeCode || !ratePlanCode) {
             throw new Error('Missing required fields for convert date wise: hotelCode, invTypeCode, or ratePlanCode');

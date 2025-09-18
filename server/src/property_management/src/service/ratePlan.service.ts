@@ -60,13 +60,7 @@ export class RatePlanService {
             additionalGuestAmounts: data.additionalGuestAmounts
         };
 
-        /**
-         * If no existing rate plan is found, proceed to create a new rate plan
-         */
-        // const createNewRatePlan = await this.ratePlanRepository.ratePlanCreate(ratePlanCreateData);
-        // if (!createNewRatePlan) {
-        //     throw new Error("Failed to create rate plan");
-        // }
+        
 
         /**
          * After create rate plan, now push the same data to RatePlanDateWise collection
