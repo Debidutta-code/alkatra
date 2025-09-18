@@ -6,6 +6,7 @@ interface CalendarProps {
   onSelect?: (date: Date | { from: Date; to: Date } | undefined) => void;
   className?: string;
   initialFocus?: boolean;
+  disabled?: (date: Date) => boolean;
 }
 
 export const Calendar: React.FC<CalendarProps> = ({
@@ -13,7 +14,8 @@ export const Calendar: React.FC<CalendarProps> = ({
   selected,
   onSelect,
   className = '',
-  initialFocus = false
+  initialFocus = false,
+  disabled,
 }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
@@ -78,30 +80,43 @@ export const Calendar: React.FC<CalendarProps> = ({
     const daysInMonth = getDaysInMonth(currentMonth);
     const firstDay = getFirstDayOfMonth(currentMonth);
     const days = [];
-
+  
     // Empty cells for days before the first day of the month
     for (let i = 0; i < firstDay; i++) {
       days.push(<div key={`empty-${i}`} className="h-8 w-8"></div>);
     }
-
+  
     // Days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
       const isSelected = isDateSelected(date);
-
+      const isDisabled = disabled && disabled(date); // 👈 Check if disabled
+  
       days.push(
         <button
           key={day}
           type="button"
-          onClick={() => handleDateClick(date)}
-          className={`h-8 w-8 text-sm rounded hover:bg-blue-100 ${isSelected ? 'bg-tripswift-blue text-white' : 'hover:bg-gray-100'
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!isDisabled) { // 👈 Only trigger if NOT disabled
+              handleDateClick(date);
+            }
+          }}
+          disabled={isDisabled} // 👈 Native disabled attribute
+          className={`h-8 w-8 text-sm rounded flex items-center justify-center
+            ${isDisabled
+              ? 'text-gray-300 cursor-not-allowed opacity-50'
+              : isSelected
+                ? 'bg-tripswift-blue text-white'
+                : 'hover:bg-gray-100'
             }`}
         >
           {day}
         </button>
       );
     }
-
+  
     return days;
   };
 

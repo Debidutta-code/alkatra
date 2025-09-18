@@ -231,7 +231,7 @@ class RatePlanDao {
       }
 
       // inventoryMatch["availability.startDate"] = { $gte: startOfDay(new Date()) };
-      console.log("the inventory match is", inventoryMatch);
+    
       const inventory = await Inventory.aggregate([
         { $match: inventoryMatch },
       ]);
@@ -255,7 +255,7 @@ class RatePlanDao {
     endDate?: string
   ) {
     try {
-      console.log("THe hotel code is", hotelCode);
+
       const ratePlanMatch: any = { hotelCode };
 
       if (invTypeCode) {
@@ -281,12 +281,12 @@ class RatePlanDao {
       // }
 
       // ratePlanMatch.startDate = { $gte: startOfDay(new Date()) };
-      console.log("the rate plan match is", ratePlanMatch);
+      
       const ratePlan = await RateAmount.aggregate([
         { $match: ratePlanMatch },
       ]);
 
-      console.log("The rate plan we get from DB is ", ratePlan);
+      
 
       return ratePlan;
 

@@ -48,19 +48,46 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
         baseGuestAmounts: [{ numberOfGuests: 1, amountBeforeTax: 0 }],
         additionalGuestAmounts: [{ ageQualifyingCode: 10, amount: 0 }],
     });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const [errors, setErrors] = useState<Partial<Record<keyof CreateRatePlanPayload | 'baseGuestAmounts' | 'additionalGuestAmounts', string>>>({});
+
+    // Age category options with labels
+    const ageCategoryOptions = [
+        { value: 10, label: 'Adult' },
+        { value: 8, label: 'Child' },
+        { value: 7, label: 'Infant' }
+    ];
+
+    // Get next available age category
+    const getNextAvailableAgeCategory = () => {
+        const usedCategories = formData.additionalGuestAmounts.map(item => item.ageQualifyingCode);
+        const availableCategory = ageCategoryOptions.find(option => !usedCategories.includes(option.value));
+        return availableCategory?.value || 10; // Default to Adult if all are used (shouldn't happen with max 3)
+    };
+
+    // Check if age category is available for a specific index
+    const isAgeCategoryAvailable = (categoryCode: number, currentIndex: number) => {
+        const usedCategories = formData.additionalGuestAmounts
+            .map((item, index) => index !== currentIndex ? item.ageQualifyingCode : null)
+            .filter(code => code !== null);
+        return !usedCategories.includes(categoryCode);
+    };
+
     const handleInputChange = (field: keyof CreateRatePlanPayload, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
         if (errors[field]) {
             setErrors(prev => ({ ...prev, [field]: undefined }));
         }
     };
+
     const handleDayToggle = (day: keyof CreateRatePlanPayload['days']) => {
         setFormData(prev => ({
             ...prev,
             days: { ...prev.days, [day]: !prev.days[day] },
         }));
     };
+
     const validateAmountOrder = (index: number, newAmount: number) => {
         // Check if new amount is greater than previous guest amount
         if (index > 0) {
@@ -80,32 +107,30 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
 
         return true;
     };
+
     const handleBaseGuestChange = (index: number, field: 'numberOfGuests' | 'amountBeforeTax', value: number) => {
-        if (field === 'amountBeforeTax') {
-            if (!validateAmountOrder(index, value)) {
-                const prevAmount = index > 0 ? formData.baseGuestAmounts[index - 1].amountBeforeTax : 0;
-                const nextAmount = index < formData.baseGuestAmounts.length - 1 ? formData.baseGuestAmounts[index + 1].amountBeforeTax : Infinity;
-
-                let message = '';
-                if (index > 0 && value <= prevAmount) {
-                    message = `Amount must be greater than ${prevAmount} (previous tier)`;
-                } else if (index < formData.baseGuestAmounts.length - 1 && nextAmount > 0 && value >= nextAmount) {
-                    message = `Amount must be less than ${nextAmount} (next tier)`;
-                }
-
-                toast.error(message);
-                return;
-            }
-        }
+        if (value < 0) return;
 
         const updated = [...formData.baseGuestAmounts];
         updated[index] = { ...updated[index], [field]: value };
         setFormData(prev => ({ ...prev, baseGuestAmounts: updated }));
+
+        if (field === 'amountBeforeTax' && value > 0 && errors.baseGuestAmounts) {
+            setErrors(prev => ({ ...prev, baseGuestAmounts: undefined }));
+        }
     };
+
     const addAdditionalGuest = () => {
+        // Don't add if we already have all 3 categories
+        if (formData.additionalGuestAmounts.length >= 3) {
+            toast.error('Maximum 3 age categories allowed');
+            return;
+        }
+
+        const nextAvailableCategory = getNextAvailableAgeCategory();
         setFormData(prev => ({
             ...prev,
-            additionalGuestAmounts: [...prev.additionalGuestAmounts, { ageQualifyingCode: 10, amount: 0 }],
+            additionalGuestAmounts: [...prev.additionalGuestAmounts, { ageQualifyingCode: nextAvailableCategory, amount: 0 }],
         }));
     };
 
@@ -117,6 +142,12 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
     };
 
     const handleAdditionalGuestChange = (index: number, field: 'ageQualifyingCode' | 'amount', value: number) => {
+        if (field === 'amount' && value < 0) return;
+
+        if (field === 'amount' && value > 0 && errors.additionalGuestAmounts) {
+            setErrors(prev => ({ ...prev, additionalGuestAmounts: undefined }));
+        }
+
         const updated = [...formData.additionalGuestAmounts];
         updated[index] = { ...updated[index], [field]: value };
         setFormData(prev => ({ ...prev, additionalGuestAmounts: updated }));
@@ -140,47 +171,62 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
     };
 
     const validateForm = () => {
-        const customErrors: Partial<Record<keyof CreateRatePlanPayload, string>> = {};
+        let customErrors: Partial<Record<keyof CreateRatePlanPayload | 'baseGuestAmounts' | 'additionalGuestAmounts', string>> = {};
 
-        // Validate base guest amounts
-        if (formData.baseGuestAmounts.length === 0) {
-            customErrors.baseGuestAmounts = "Base pricing is required";
-        } else {
-            const hasInvalidBaseAmount = formData.baseGuestAmounts.some(item => item.amountBeforeTax <= 0);
-            if (hasInvalidBaseAmount) {
-                customErrors.baseGuestAmounts = "All base guest amounts must be greater than 0";
+        // First run schema validation to get all required field errors
+        try {
+            createRatePlanSchema.parse(formData);
+        } catch (error: any) {
+            if (error?.issues) {
+                error.issues.forEach((issue: any) => {
+                    if (issue.path[0]) {
+                        customErrors[issue.path[0] as keyof CreateRatePlanPayload] = issue.message;
+                    }
+                });
             }
         }
 
-        // Validate additional guest amounts
+        // Custom validation for base guest amounts
+        if (formData.baseGuestAmounts.length === 0) {
+            customErrors.baseGuestAmounts = "Base pricing is required";
+        } else {
+            const hasInvalidBaseAmount = formData.baseGuestAmounts.some(item =>
+                !item.amountBeforeTax || item.amountBeforeTax <= 0
+            );
+            if (hasInvalidBaseAmount) {
+                customErrors.baseGuestAmounts = "All base guest amounts must be greater than 0";
+            } else {
+                // Validate tier ordering - amounts should increase with guest count
+                for (let i = 1; i < formData.baseGuestAmounts.length; i++) {
+                    const currentAmount = formData.baseGuestAmounts[i].amountBeforeTax;
+                    const previousAmount = formData.baseGuestAmounts[i - 1].amountBeforeTax;
+
+                    if (currentAmount <= previousAmount) {
+                        customErrors.baseGuestAmounts = `Guest tier ${i + 1} amount (${currentAmount}) must be greater than tier ${i} amount (${previousAmount})`;
+                        toast.error(`Guest tier ${i + 1} amount (${currentAmount}) must be greater than tier ${i} amount (${previousAmount})`);
+                        break;
+                    }
+                }
+            }
+        }
+
         if (formData.additionalGuestAmounts.length === 0) {
             customErrors.additionalGuestAmounts = "Additional guest charges are required";
         } else {
-            const hasInvalidAdditionalAmount = formData.additionalGuestAmounts.some(item => item.amount <= 0);
+            const hasInvalidAdditionalAmount = formData.additionalGuestAmounts.some(item =>
+                !item.amount || item.amount <= 0
+            );
             if (hasInvalidAdditionalAmount) {
                 customErrors.additionalGuestAmounts = "All additional guest amounts must be greater than 0";
             }
         }
+
         if (Object.keys(customErrors).length > 0) {
             setErrors(customErrors);
             return false;
         }
 
-        try {
-            createRatePlanSchema.parse(formData);
-            return true;
-        } catch (error: any) {
-            if (error?.issues) {
-                const fieldErrors: Partial<Record<keyof CreateRatePlanPayload, string>> = {};
-                error.issues.forEach((issue: any) => {
-                    if (issue.path[0]) {
-                        fieldErrors[issue.path[0] as keyof CreateRatePlanPayload] = issue.message;
-                    }
-                });
-                setErrors(fieldErrors);
-            }
-            return false;
-        }
+        return true;
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -288,6 +334,7 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                                         handleInputChange('startDate', format(selectedDate, 'yyyy-MM-dd'));
                                     }
                                 }}
+                                disabled={(date) => date < today}
                             />
                         </PopoverContent>
                     </Popover>
@@ -323,6 +370,15 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                                     if (selectedDate) {
                                         handleInputChange('endDate', format(selectedDate, 'yyyy-MM-dd'));
                                     }
+                                }}
+                                disabled={(date) => {
+                                    if (date < today) return true;
+                                    if (formData.startDate) {
+                                        const startDate = new Date(formData.startDate);
+                                        return date < startDate;
+                                    }
+
+                                    return false;
                                 }}
                             />
                         </PopoverContent>
@@ -372,7 +428,7 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
             </div>
 
             {/* Base Guest Amounts */}
-            <div className="space-y-4" data-error-for="baseGuestAmounts">
+            <div className="space-y-2" data-error-for="baseGuestAmounts">
                 <div className="flex items-center justify-between">
                     <label className="text-sm font-tripswift-medium text-gray-700">Base Pricing by Guests <span className="text-red-500">*</span></label>
                     <Button type="button" variant="outline" size="sm" onClick={addBaseGuest} className="gap-1">
@@ -405,8 +461,17 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                                         step="0.01"
                                         value={item.amountBeforeTax === 0 ? '' : item.amountBeforeTax}
                                         onChange={(e) => handleBaseGuestChange(index, 'amountBeforeTax', parseFloat(e.target.value) || 0)}
+                                        onInput={(e) => {
+                                            const input = e.target as HTMLInputElement;
+                                            if (input.value.includes('-')) {
+                                                input.value = input.value.replace('-', '');
+                                            }
+                                        }}
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                            }
+                                            if (e.key === '-' || e.key === 'Minus') {
                                                 e.preventDefault();
                                             }
                                         }}
@@ -415,26 +480,41 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                                     />
                                 </div>
                             </div>
-                            {formData.baseGuestAmounts.length > 1 && (
+                            {/* Only show delete button for the last tier and when there's more than 1 tier */}
+                            {formData.baseGuestAmounts.length > 1 && index === formData.baseGuestAmounts.length - 1 && (
                                 <Button
                                     type="button"
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => removeBaseGuest(index)}
-                                    className="text-red-500 hover:text-red-700"
+                                    className="mt-7 text-red-500 hover:text-red-700"
+                                    title="Remove last guest tier"
                                 >
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
+                            )}
+                            {/* Show a placeholder div to maintain consistent spacing for non-deletable items */}
+                            {!(formData.baseGuestAmounts.length > 1 && index === formData.baseGuestAmounts.length - 1) && (
+                                <div className="w-10 h-10 mt-7"></div>
                             )}
                         </div>
                     ))}
                 </div>
             </div>
+
             {/* Additional Guest Amounts */}
-            <div className="space-y-4" data-error-for="additionalGuestAmounts">
+            <div className="space-y-2" data-error-for="additionalGuestAmounts">
                 <div className="flex items-center justify-between">
                     <label className="text-sm font-tripswift-medium text-gray-700">Additional Guest Charges <span className="text-red-500">*</span></label>
-                    <Button type="button" variant="outline" size="sm" onClick={addAdditionalGuest} className="gap-1">
+                    <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={addAdditionalGuest} 
+                        className="gap-1"
+                        disabled={formData.additionalGuestAmounts.length >= 3}
+                        title={formData.additionalGuestAmounts.length >= 3 ? 'Maximum 3 age categories allowed' : 'Add Age Category'}
+                    >
                         <Plus className="h-4 w-4" /> Add Age Category
                     </Button>
                 </div>
@@ -455,9 +535,17 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                                             <SelectValue placeholder="Select age category" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="10">Adult</SelectItem>
-                                            <SelectItem value="8">Child</SelectItem>
-                                            <SelectItem value="7">Infant</SelectItem>
+                                            {ageCategoryOptions.map(option => (
+                                                <SelectItem 
+                                                    key={option.value} 
+                                                    value={option.value.toString()}
+                                                    disabled={!isAgeCategoryAvailable(option.value, index)}
+                                                    className={!isAgeCategoryAvailable(option.value, index) ? 'opacity-50 cursor-not-allowed' : ''}
+                                                >
+                                                    {option.label}
+                                                    {!isAgeCategoryAvailable(option.value, index) && ' (Already selected)'}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -469,8 +557,17 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                                         step="0.01"
                                         value={item.amount === 0 ? '' : item.amount}
                                         onChange={(e) => handleAdditionalGuestChange(index, 'amount', parseFloat(e.target.value) || 0)}
+                                        onInput={(e) => {
+                                            const input = e.target as HTMLInputElement;
+                                            if (input.value.includes('-')) {
+                                                input.value = input.value.replace('-', '');
+                                            }
+                                        }}
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                            }
+                                            if (e.key === '-' || e.key === 'Minus') {
                                                 e.preventDefault();
                                             }
                                         }}
@@ -485,7 +582,8 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => removeAdditionalGuest(index)}
-                                    className="text-red-500 hover:text-red-700"
+                                    className="mt-7 text-red-500 hover:text-red-700"
+                                    title="Remove age category"
                                 >
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
@@ -494,6 +592,7 @@ export const CreateRatePlanForm: React.FC<CreateRatePlanFormProps> = ({
                     ))}
                 </div>
             </div>
+
             {/* Submit */}
             <div className="pt-4 border-t border-gray-200">
                 <Button

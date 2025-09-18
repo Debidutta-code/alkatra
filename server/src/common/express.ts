@@ -16,6 +16,7 @@ import ratePlaneRoute from "../rate_plan/src/routes/ratePlan.route";
 import couponManagement from "../coupon_management/routes/couponRoutes";
 import notification from "../notification/src/route/notification.route";
 import googleAuth from "../customer_authentication/src/api/routes/googleAuthRoute";
+import appleAuth from "../customer_authentication/src/api/routes/appleAuthRoute";
 import analytics from "../role_based/src/routes/analytics.route";
 import customerReview from "../review_system/route/review.route";
 
@@ -35,6 +36,9 @@ export async function initializeExpressRoutes({ app }: { app: Express }) {
 
   // Google Auth
   app.use("/api/v1/google", googleAuth);
+
+  app.use("/api/v1/apple", appleAuth);
+
   // PMS
   app.use("/api/v1/pms", pmsRoutes());
   // amadeus hotel routes

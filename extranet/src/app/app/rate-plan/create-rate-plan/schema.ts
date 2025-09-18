@@ -4,8 +4,8 @@ export const createRatePlanSchema = z.object({
   hotelCode: z.string().min(1, "Hotel code is required"),
   invTypeCode: z.string().min(1, "Room type is required"),
   ratePlanCode: z.string().min(1, "Rate plan name is required"),
-  startDate: z.string().refine(val => !isNaN(Date.parse(val)), "Invalid start date"),
-  endDate: z.string().refine(val => !isNaN(Date.parse(val)), "Invalid end date"),
+  startDate: z.string().refine(val => !isNaN(Date.parse(val)), "Start date is required"),
+  endDate: z.string().refine(val => !isNaN(Date.parse(val)), "End date is required"),
   currencyCode: z.string().min(1, "Currency is required"),
   days: z.object({
     mon: z.boolean(),
