@@ -3,6 +3,7 @@ import RatePlan from "../model/ratePlan.model";
 import RateAmount from "../../../wincloud/src/model/ratePlanDateWise.model"
 import { Inventory } from "../../../wincloud/src/model/inventoryModel"
 import { startOfDay, endOfDay, addDays } from 'date-fns';
+import { start } from "repl";
 import { PropertyInfo } from "../../../property_management/src/model/property.info.model";
 import { Room } from "../../../property_management/src/model/room.model";
 
@@ -341,6 +342,8 @@ class RatePlanDao {
     return results;
   }
 
+
+
   public static async getAllRoomType(hotelCode: string) {
     try {
       const propertyId = await PropertyInfo.findOne({ property_code: hotelCode }).select('_id');
@@ -377,6 +380,7 @@ class RatePlanDao {
       throw new Error(error.message)
     }
   }
+
 
   public static async getRatePlanByHotelCode(hotelCode: string) {
     return await RatePlan.find(
