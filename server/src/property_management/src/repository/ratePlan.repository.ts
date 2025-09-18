@@ -106,7 +106,9 @@ export class RatePlanRepository {
             additionalGuestAmounts
         } = ratePlanCreateData;
 
-        // Validate required fields
+        /**
+         * Validate required fields
+         */
         if (!hotelCode || !invTypeCode || !ratePlanCode) {
             throw new Error('Missing required fields for convert date wise: hotelCode, invTypeCode, or ratePlanCode');
         }
@@ -115,7 +117,9 @@ export class RatePlanRepository {
         const end = new Date(endDate);
         const dateWiseData: Partial<IRateAmountDateWise>[] = [];
 
-        // Mapping days names to day numbers (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+        /**
+         * Mapping days names to day numbers (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+         */
         const dayNumberMap = {
             sun: 0,
             mon: 1,
