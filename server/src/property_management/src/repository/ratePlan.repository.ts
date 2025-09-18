@@ -106,9 +106,6 @@ export class RatePlanRepository {
             additionalGuestAmounts
         } = ratePlanCreateData;
 
-
-        console.log("The days we get", days);
-
         // Validate required fields
         if (!hotelCode || !invTypeCode || !ratePlanCode) {
             throw new Error('Missing required fields for convert date wise: hotelCode, invTypeCode, or ratePlanCode');
@@ -118,23 +115,78 @@ export class RatePlanRepository {
         const end = new Date(endDate);
         const dateWiseData: Partial<IRateAmountDateWise>[] = [];
 
-        // Generate one record per day from startDate to endDate (exclusive)
-        for (let date = new Date(start); date < end; date.setDate(date.getDate() + 1)) {
-            dateWiseData.push({
-                hotelCode,
-                hotelName,
-                invTypeCode,
-                ratePlanCode,
-                startDate: new Date(date),
-                endDate: new Date(date.getTime() + 86400000),
-                days,
-                currencyCode,
-                baseByGuestAmts: baseGuestAmounts,
-                additionalGuestAmounts,
-                createdAt: new Date()
-            });
+        // Mapping days names to day numbers (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+        const dayNumberMap = {
+            sun: 0,
+            mon: 1,
+            tue: 2,
+            wed: 3,
+            thu: 4,
+            fri: 5,
+            sat: 6
+        };
+
+        /**
+         * Generate one record per day from startDate to endDate (exclusive)
+         */
+        for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
+            const currentDate = new Date(date);
+            const dayOfWeek = currentDate.getDay(); // 0-6 (Sunday-Saturday)
+
+            /**
+             * Check if this day is enabled in the days configuration
+             */
+            let isDayEnabled = false;
+            let currentDayKey = '';
+
+            /**
+             * Find which day key corresponds to this day of week
+             */
+            for (const [dayKey, dayNumber] of Object.entries(dayNumberMap)) {
+                if (dayNumber === dayOfWeek) {
+                    currentDayKey = dayKey;
+                    isDayEnabled = days[dayKey as keyof typeof days];
+                    break;
+                }
+            }
+
+            /**
+             * Only create record if the day is enabled (true)
+             */
+            if (isDayEnabled) {
+                console.log(`Creating rate plan for ${currentDate.toDateString()} (${currentDayKey})`);
+
+                dateWiseData.push({
+                    hotelCode,
+                    hotelName,
+                    invTypeCode,
+                    ratePlanCode,
+                    startDate: new Date(currentDate),
+                    endDate: new Date(currentDate.getTime() + 86400000),
+
+                    /**
+                     * Set only the current day to true, others to false
+                     */
+                    days: {
+                        mon: currentDayKey === 'mon',
+                        tue: currentDayKey === 'tue',
+                        wed: currentDayKey === 'wed',
+                        thu: currentDayKey === 'thu',
+                        fri: currentDayKey === 'fri',
+                        sat: currentDayKey === 'sat',
+                        sun: currentDayKey === 'sun'
+                    },
+                    currencyCode,
+                    baseByGuestAmts: baseGuestAmounts,
+                    additionalGuestAmounts,
+                    createdAt: new Date()
+                });
+            } else {
+                console.log(`Skipping rate plan for ${currentDate.toDateString()} (${currentDayKey}) - day is disabled`);
+            }
         }
 
+        console.log(`Generated ${dateWiseData.length} rate plan records for enabled days`);
         return dateWiseData;
     }
 

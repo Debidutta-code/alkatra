@@ -33,7 +33,7 @@ export class RatePlanService {
          * Check for hotel name
          */
         const hotelName = await this.ratePlanRepository.getHotelName(data.hotelCode);
-        console.log("The hotel name is: ", hotelName);
+        
         if (!hotelName) {
             throw new Error("Hotel not found with the given hotel code");
         }
@@ -42,7 +42,7 @@ export class RatePlanService {
          * Check for inventory type/ Room type code
          */
         const invTypeCode = await this.ratePlanRepository.checkInvTypeCode(data.invTypeCode);
-        console.log("The inventory type code is: ", invTypeCode);
+        
         if (!invTypeCode) {
             throw new Error("Inventory Type Code not found");
         }
@@ -59,13 +59,11 @@ export class RatePlanService {
             baseGuestAmounts: data.baseGuestAmounts,
             additionalGuestAmounts: data.additionalGuestAmounts
         };
-
-        
+                
 
         /**
          * After create rate plan, now push the same data to RatePlanDateWise collection
          */
-        console.log("The rate plan date wise create data", ratePlanCreateData);
         const convertDateWise = await this.ratePlanRepository.convertDateWise(ratePlanCreateData);
         if (!convertDateWise) {
             throw new Error("Failed to convert to date-wise rate plan");

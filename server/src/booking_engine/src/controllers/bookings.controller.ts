@@ -1420,20 +1420,20 @@ export const getBookingDetailsForExtranet = CatchAsyncError(async (req: CustomRe
 export const getAllHotelsByRole = CatchAsyncError(
   async (req: CustomRequest, res: Response, next: NextFunction) => {
     try {
-      console.log(`The user details ${JSON.stringify(req.user)}`);
+    
       const ownerId = req.user?.id;
       const ownerRole = req.role;
-      console.log(`The owner id is ${ownerId} and owner role is ${ownerRole}`);
+    
       if (!ownerId || !ownerRole) {
         return next(new ErrorHandler("Owner ID and ROLE not available", 400));
       }
-      console.log("Owner ID:", ownerId);
+    
       const convertedOwnerId = new Types.ObjectId(ownerId);
       const ownerDetails = await UserModel.findById(convertedOwnerId);
       if (!ownerDetails) {
         return next(new ErrorHandler("Owner not found in database", 404));
       }
-      console.log("Owner Details:", ownerDetails);
+  
       const allowedRoles = ["superAdmin", "groupManager", "hotelManager"];
       if (!allowedRoles.includes(ownerDetails.role)) {
         return next(new ErrorHandler("Unauthorized access", 403));
