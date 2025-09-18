@@ -17,7 +17,7 @@ import {
 } from './utils';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from "../../../utils/dateUtils";
-import RebookModal from '../RebookModal';
+import RebookModal from '../bookAgain/RebookModal';
 
 interface BookingCardProps {
   booking: Booking;

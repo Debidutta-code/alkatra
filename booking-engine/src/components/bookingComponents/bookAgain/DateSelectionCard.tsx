@@ -1,0 +1,159 @@
+// src/components/bookingComponents/bookAgain/DateSelectionCard.tsx
+"use client";
+import React from "react";
+import { DatePicker, Input } from "antd";
+import { Label } from "@/components/ui/label";
+import { BedDouble, CalendarIcon, Clock, Users, AlertCircle } from "lucide-react";
+import { Dayjs } from "dayjs";
+import { useTranslation } from "react-i18next";
+
+interface DateSelectionCardProps {
+  checkInDate: Dayjs | null;
+  checkOutDate: Dayjs | null;
+  rooms: number;
+  guestsCount: number;
+  onCheckInChange: (date: Dayjs | null) => void;
+  onCheckOutChange: (date: Dayjs | null) => void;
+  onRoomsChange: (rooms: number) => void;
+  disabledDate: (current: Dayjs) => boolean;
+  disabledCheckOutDate: (current: Dayjs) => boolean;
+  errors?: { [key: string]: string };
+}
+
+const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
+  checkInDate,
+  checkOutDate,
+  rooms,
+  guestsCount,
+  onCheckInChange,
+  onCheckOutChange,
+  onRoomsChange,
+  disabledDate,
+  disabledCheckOutDate,
+  errors = {}
+}) => {
+  const { t } = useTranslation();
+
+  return (
+    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-8 h-8 bg-tripswift-blue rounded-lg flex items-center justify-center">
+          <CalendarIcon className="h-4 w-4 text-white" />
+        </div>
+        <h4 className="text-lg font-bold text-gray-900">
+          {t("When do you want to stay?")}
+        </h4>
+      </div>
+      
+      {/* Show general date error if exists */}
+      {errors["dates"] && (
+        <div className="mb-4 flex items-center gap-2 text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
+          <AlertCircle className="h-4 w-4 flex-shrink-0" />
+          <span className="text-sm font-medium">{errors["dates"]}</span>
+        </div>
+      )}
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="space-y-2">
+          <Label className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+            {t("Check-in Date")}
+          </Label>
+          <div className="relative group">
+            <div className={`flex items-center bg-white rounded-xl border-2 transition-colors shadow-sm ${
+              errors["checkInDate"] 
+                ? "border-red-300 group-hover:border-red-400" 
+                : "border-gray-200 group-hover:border-tripswift-blue"
+            }`}>
+              <CalendarIcon className="h-5 w-5 text-tripswift-blue absolute left-4 z-[1]" />
+              <DatePicker
+                value={checkInDate}
+                onChange={onCheckInChange}
+                disabledDate={disabledDate}
+                format="DD MMM YYYY"
+                className="w-full pl-12 bg-transparent border-none focus:ring-0"
+                placeholder={t("Select check-in")}
+                suffixIcon={null}
+                size="large"
+              />
+            </div>
+            {errors["checkInDate"] && (
+              <div className="flex items-center gap-2 mt-2 text-red-600">
+                <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                <span className="text-sm">{errors["checkInDate"]}</span>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <Label className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+            {t("Check-out Date")}
+          </Label>
+          <div className="relative group">
+            <div className={`flex items-center bg-white rounded-xl border-2 transition-colors shadow-sm ${
+              errors["checkOutDate"] 
+                ? "border-red-300 group-hover:border-red-400" 
+                : "border-gray-200 group-hover:border-tripswift-blue"
+            }`}>
+              <CalendarIcon className="h-5 w-5 text-tripswift-blue absolute left-4 z-[1]" />
+              <DatePicker
+                value={checkOutDate}
+                onChange={onCheckOutChange}
+                disabledDate={disabledCheckOutDate}
+                format="DD MMM YYYY"
+                className="w-full pl-12 bg-transparent border-none focus:ring-0"
+                placeholder={t("Select check-out")}
+                suffixIcon={null}
+                size="large"
+              />
+            </div>
+            {errors["checkOutDate"] && (
+              <div className="flex items-center gap-2 mt-2 text-red-600">
+                <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                <span className="text-sm">{errors["checkOutDate"]}</span>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <Label className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+            {t("Number of Rooms")}
+          </Label>
+          <div className="relative group">
+            <div className="flex items-center bg-white rounded-xl border-2 border-gray-200 group-hover:border-tripswift-blue transition-colors shadow-sm">
+              <BedDouble className="h-5 w-5 text-tripswift-blue absolute left-4 z-[1]" />
+              <Input
+                type="number"
+                min="1"
+                value={rooms}
+                onChange={(e) => onRoomsChange(parseInt(e.target.value) || 1)}
+                className="w-full pl-12 h-10 bg-transparent border-none focus:ring-0"
+                size="middle"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {checkInDate && checkOutDate && (
+        <div className="mt-6 flex items-center gap-6 text-sm">
+          <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm">
+            <Clock className="h-4 w-4 text-tripswift-blue" />
+            <span className="font-semibold text-gray-700">
+              {checkOutDate.diff(checkInDate, 'day')} {t("nights")}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm">
+            <Users className="h-4 w-4 text-tripswift-blue" />
+            <span className="font-semibold text-gray-700">
+              {guestsCount} {t("guests")}
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default DateSelectionCard;
