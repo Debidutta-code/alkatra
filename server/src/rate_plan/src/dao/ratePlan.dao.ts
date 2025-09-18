@@ -165,6 +165,7 @@ class RatePlanDao {
       resultsPerPage: number;
     };
   }> {
+    console.log("The start date and end date we get here", startDate, endDate);
     try {
 
       const resultsPerPage = limit;
@@ -269,9 +270,9 @@ class RatePlanDao {
         ratePlanMatch.startDate = { $gte: startOfDay(new Date()) };
       }
 
-      if (endDate) {
-        ratePlanMatch.endDate = { $lte: endOfDay(endDate) };
-      }
+      // if (endDate) {
+      //   ratePlanMatch.endDate = { $lte: endOfDay(endDate) };
+      // }
       // else {
       //   const tomorrow = new Date();
       //   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -283,8 +284,6 @@ class RatePlanDao {
       const ratePlan = await RateAmount.aggregate([
         { $match: ratePlanMatch },
       ]);
-
-      console.log("The rate plan we get from DB is ", ratePlan);
 
       return ratePlan;
 
