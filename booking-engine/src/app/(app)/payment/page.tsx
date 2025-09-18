@@ -1,37 +1,19 @@
 "use client";
 
 import CheckAuthentication from "../../../components/checkAuthentication/CheckAuth";
-import CheckoutPage from "../../../components/Stripe/checkoutPage";
 import PayAtHotelFunction from "../../../components/paymentComponents/PayAtHotelFunction";
 import PaymentOptionSelector from "../../../components/paymentComponents/PaymentOptionSelector";
-import convertToSubcurrency from "../../../lib/convertToSubcurrency";
 import PayWithCryptoQR from "../../../components/paymentComponents/payWithCrypto/PayWithCryptoQR";
 import { formatDate, calculateNights } from "../../../utils/dateUtils";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Shield, CreditCard, CheckCircle, Clock, CalendarRange, Users, Loader2 } from "lucide-react";
 import Link from "next/link";
-import axios from "axios";
 import { RootState } from "@/Redux/store";
-
-interface UserType {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone?: string;
-  _id?: string;
-}
-
-interface Guest {
-  firstName: string;
-  lastName: string;
-  dob?: string;
-  type?: "adult" | "child" | "infant";
-}
 
 function PaymentPageContent() {
   const { t } = useTranslation();
@@ -44,34 +26,7 @@ function PaymentPageContent() {
   const [convertedAmount, setConvertedAmount] = useState<number | null>(null);
   const searchParams = useSearchParams();
   const authUser = useSelector((state: RootState) => state.auth.user);
-  const dispatch = useDispatch();
   const pmsHotelCard = useSelector((state: RootState) => state.pmsHotelCard);
-
-  // Get booking parameters from URL
-  // const amount = isNaN(parseInt(searchParams.get("amount") || "0", 10)) ? 0 : parseInt(searchParams.get("amount") || "0", 10); 
-  // const currency = searchParams.get("currency")?.toLowerCase() || "";
-  // const firstName = searchParams.get('firstName') || authUser?.firstName || '';
-  // const lastName = searchParams.get('lastName') || authUser?.lastName || '';
-  // const email = searchParams.get('email') || authUser?.email || '';
-  // const phone = searchParams.get('phone') || authUser?.phone || '';
-  // const roomId = searchParams.get('roomId') || '';
-  // const propertyId = searchParams.get('propertyId') || '';
-  // const checkIn = searchParams.get('checkIn') || '';
-  // const checkOut = searchParams.get('checkOut') || '';
-  // const userId = authUser?._id || searchParams.get('userId') || '';
-  // const hotelName = searchParams.get('hotelName');
-  // const hotelCode = searchParams.get('hotelCode');
-  // const ratePlanCode = searchParams.get('ratePlanCode')?.toUpperCase() || '';
-  // const roomType = searchParams.get('roomType') || '';
-
-  // // Get guest counts from URL parameters
-  // const rooms = parseInt(searchParams.get('rooms') || '1', 10);
-  // const adults = parseInt(searchParams.get('adults') || '1', 10);
-  // const children = parseInt(searchParams.get('children') || '0', 10);
-  // const infants = parseInt(searchParams.get('infants') || '0', 10);
-  // const amountFromRedux = useSelector((state: any) => state.pmsHotelCard.amount);
-  // console.log(`>>>>>>>>>>>>>>>>>###################The amount we get from Redux is: ${amountFromRedux}`);
-
   const guestDetails = useSelector(
     (state: RootState) => state.pmsHotelCard.guestDetails
   );
@@ -91,12 +46,6 @@ function PaymentPageContent() {
   const checkOut = pmsHotelCard.checkOutDate || "";
   const userId = authUser?._id || searchParams.get("userId") || "";
   const hotelName = pmsHotelCard?.hotelName || "";
-
-  // Get guest counts
-  console.log(
-    "?????????????????????????????????????????????currency:",
-    currency
-  );
   const amountFromRedux = useSelector(
     (state: RootState) => state.pmsHotelCard.amount || 0
   );
@@ -104,46 +53,13 @@ function PaymentPageContent() {
   const adults = guestDetails?.adults || 0;
   const children = guestDetails?.children || 0;
   const infants = guestDetails?.infants || 0;
-
-  // const amountFromRedux = useSelector((state: any) => state.pmsHotelCard.amount);
-  console.log(
-    `>>>>>>>>>>>>>>>>>###################The amount we get from Redux is: ${amountFromRedux}`
-  );
   const { i18n } = useTranslation();
   const amount = amountFromRedux ?? 0;
-  console.log(`<><><><><><><><><><><><>The amount we are Getting from amountFromRedux is: ${amount.toFixed(2)}`);
-  // const guests: Guest[] = (() => {
-  //   try {
-  //     const guestsStr = searchParams.get('guests');
-  //     if (!guestsStr) {
-  //       console.warn('No guests query parameter provided');
-  //       return [{ firstName: firstName || 'Guest', lastName: lastName || 'User', type: 'adult', dob: '' }];
-  //     }
-  //     const parsed = JSON.parse(decodeURIComponent(guestsStr));
-  //     if (!Array.isArray(parsed) || parsed.length === 0) {
-  //       console.warn('Guests query parameter is empty or not an array:', parsed);
-  //       return [{ firstName: firstName || 'Guest', lastName: lastName || 'User', type: 'adult', dob: '' }];
-  //     }
-  //     return parsed.map((guest: any) => ({
-  //       firstName: guest.firstName || '',
-  //       lastName: guest.lastName || '',
-  //       dob: guest.dob || '',
-  //       type: ['adult', 'child', 'infant'].includes(guest.type) ? guest.type : 'adult'
-  //     }));
-  //   } catch (error) {
-  //     console.error('Failed to parse guests:', error);
-  //     return [{ firstName: firstName || 'Guest', lastName: lastName || 'User', type: 'adult', dob: '' }];
-  //   }
-  // })();
   const guests = useSelector(
     (state: any) => state.pmsHotelCard.guestDetails.guests
   );
-
   const nights = calculateNights(checkIn, checkOut);
-
   const numericAmount = amount || 0;
-  // const ratePerNight = nights > 0 ? (numericAmount / nights) : 0;
-
   const bookingDetails = {
     roomId,
     propertyId,
@@ -176,23 +92,12 @@ function PaymentPageContent() {
     setError(null);
 
     try {
-      // Initialize Stripe
-      if (!stripePromise) {
+      // Initialize Stripe only for payAtHotel option
+      if (!stripePromise && option === 'payAtHotel') {
         if (process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY === undefined) {
           throw new Error("NEXT_PUBLIC_STRIPE_PUBLIC_KEY is not defined");
         }
         setStripePromise(loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY));
-      }
-
-      // For Pay Now, create a payment intent
-      if (option === 'payNow') {
-        console.log("Creating payment intent for Pay Now option");
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/payment/create-payment-intent`, {
-          amount: convertToSubcurrency(amount),
-          currency: currency
-        });
-
-        setClientSecret(response.data.clientSecret);
       }
 
       setPaymentOption(option);
@@ -343,38 +248,9 @@ function PaymentPageContent() {
                       </div>
                     )}
 
-                    {/* Payment Form - Only render when payment option is selected and not initializing */}
-                    {paymentOption && stripePromise && !isInitializing && !error && (
+                    {paymentOption && !isInitializing && !error && (
                       <div className="mt-6">
-                        {paymentOption === "payNow" && clientSecret ? (
-                          <Elements
-                            stripe={stripePromise}
-                            options={{
-                              clientSecret,
-                              appearance: {
-                                theme: "stripe",
-                              },
-                            }}
-                          >
-                            <CheckoutPage
-                              amount={amount}
-                              currency={currency}
-                              firstName={firstName}
-                              lastName={lastName}
-                              email={email}
-                              phone={phone as string}
-                              clientSecret={clientSecret}
-                              roomId={roomId}
-                              propertyId={propertyId}
-                              checkIn={checkIn}
-                              checkOut={checkOut}
-                              userId={userId}
-                              rooms={rooms}
-                              adults={adults}
-                              children={children}
-                            />
-                          </Elements>
-                        ) : paymentOption === "payAtHotel" ? (
+                        {paymentOption === "payAtHotel" && stripePromise ? (
                           <Elements
                             stripe={stripePromise}
                             options={{
@@ -388,7 +264,7 @@ function PaymentPageContent() {
                             <PayAtHotelFunction
                               bookingDetails={{
                                 ...bookingDetails,
-                                hotelName: bookingDetails.hotelName ?? undefined // Convert null to undefined
+                                hotelName: bookingDetails.hotelName ?? undefined
                               }}
                             />
                           </Elements>
@@ -420,19 +296,6 @@ function PaymentPageContent() {
                     </div>
                     <div className="p-6">
                       <div className="space-y-4">
-                        {/* <div className="flex justify-between items-center">
-
-                          <div className="text-tripswift-black/70">{t('Payment.PaymentPageContent.priceDetails.roomRate')}</div>
-                          <div className="font-tripswift-medium">{currency.toUpperCase()} {ratePerNight.toLocaleString()} {t('Payment.PaymentPageContent.priceDetails.perNight')}</div>
-
-                        </div>
-
-                        <div className="flex justify-between items-center">
-                          <div className="text-tripswift-black/70">{nights} {nights === 1 ? t('Payment.PaymentPageContent.bookingSummary.night') : t('Payment.PaymentPageContent.bookingSummary.nights')}</div>
-                          <div className="font-tripswift-medium">{currency.toUpperCase()} {ratePerNight.toLocaleString()} × {nights}</div>
-                        </div> */}
-
-                        {/* <div className="border-t border-gray-200 my-4"></div> */}
                         <div className="flex justify-between items-center">
                           <div className="font-tripswift-bold text-lg">{t('Payment.PaymentPageContent.priceDetails.total')}</div>
                           <div className="font-tripswift-bold text-xl text-tripswift-blue">

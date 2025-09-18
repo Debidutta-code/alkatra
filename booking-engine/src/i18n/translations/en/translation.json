@@ -809,7 +809,8 @@
       "rateBreakdown": "Total Amount",
       "viewBookingDetails": "View Booking Details",
       "modify": "Modify",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "bookAgain": "Book Again"
     },
     "BookingPagination": {
       "show": "Show",

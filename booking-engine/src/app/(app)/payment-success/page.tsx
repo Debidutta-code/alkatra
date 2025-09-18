@@ -13,7 +13,6 @@ import {
   Home,
   Users,
   ArrowRight,
-  Download,
   Mail,
   Phone,
 } from "lucide-react";
@@ -86,48 +85,6 @@ export default function PaymentSuccess() {
 
   useEffect(() => {
     document.body.style.overflow = "auto";
-
-    // if (reference) {
-    //   const fetchBookingByReference = async () => {
-    //     try {
-    //       setIsLoading(true);
-    //       const token = Cookies.get("accessToken");
-    //       const response = await fetch(
-    //         `${process.env.NEXT_PUBLIC_BACKEND_URL}/booking/getreservation/${reference}`,
-    //         {
-    //           headers: {
-    //             Authorization: `Bearer ${token}`,
-    //           },
-    //         }
-    //       );
-
-    //       const data = await response.json();
-    //       console.log("Booking data received:", data);
-
-    //       const bookingData = data.booking || data.data || data;
-
-    //       if (bookingData && bookingData._id) {
-    //         setBooking(bookingData);
-    //         toast.success(t("Payment.PaymentSuccess.bookingConfirmedToast"));
-    //       } else {
-    //         throw new Error(
-    //           t("Payment.PaymentSuccess.invalidBookingDataStructure")
-    //         );
-    //       }
-    //     } catch (error: any) {
-    //       console.error("Error fetching booking:", error);
-    //       setError(true);
-    //       setErrorMessage(t("Payment.PaymentSuccess.fetchBookingError"));
-    //       toast.error(t("Payment.PaymentSuccess.fetchBookingErrorToast"));
-    //     } finally {
-    //       setIsLoading(false);
-    //     }
-    //   };
-
-    //   fetchBookingByReference();
-    //   return;
-    // }
-
     if (
       !authUser ||
       !property_id ||
@@ -155,9 +112,6 @@ export default function PaymentSuccess() {
       try {
         isRequestSent.current = true;
         setIsLoading(true);
-        // const response = await makeBookingRequest(payload, token as string);
-        // setBooking(response);
-        // toast.success(t("Payment.PaymentSuccess.bookingConfirmedToast"));
       } catch (error: any) {
         console.error("Booking Error:", error);
         setError(true);
@@ -536,20 +490,6 @@ export default function PaymentSuccess() {
                           </p>
                         </div>
                       </div>
-                      {/* <div className="flex items-start">
-                        <CreditCard
-                          className="text-tripswift-blue mr-2 sm:mr-3 flex-shrink-0 mb-1"
-                          size={18}
-                        />
-                        <div>
-                          <p className="text-xs sm:text-sm text-tripswift-black/60">
-                            {t("Payment.PaymentSuccess.paymentMethodLabel")}
-                          </p>
-                          <p className="text-sm sm:text-base font-tripswift-medium">
-                            {getPaymentMethodText()}
-                          </p>
-                        </div>
-                      </div> */}
                       <div className="flex items-start">
                         <CreditCard
                           className={`text-tripswift-blue mb-1 flex-shrink-0 ${i18n.language === "ar" ? "ml-2 sm:ml-3" : "mr-2 sm:mr-3"}`}
@@ -587,7 +527,6 @@ export default function PaymentSuccess() {
                       {getPaymentMethodText() ===
                         t("Payment.PaymentSuccess.paymentMethodPayAtHotel")
                         ? t("Payment.PaymentSuccess.paymentAtHotelMessage")
-                        // : t("Payment.PaymentSuccess.paymentProcessedMessage")
                         : t("Payment.PaymentSuccess.paymentAtHotelMessage")
                       }
                     </div>
