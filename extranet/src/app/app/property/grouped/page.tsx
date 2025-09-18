@@ -41,7 +41,6 @@ const Page = () => {
   const [loadingHotelId, setLoadingHotelId] = useState<string | null>(null);
   const handleViewDetails = (hotelId: string) => {
     setLoadingHotelId(hotelId);
-    // The navigation will happen via Link, but we set loading state for UI feedback
   };
   const fetchAllProperties = async () => {
     try {
