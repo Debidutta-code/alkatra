@@ -19,6 +19,8 @@ import { PropertyInfo } from "../../../property_management/src/model/property.in
 import UserModel from "../../../user_authentication/src/Model/auth.model";
 import { MailFactory } from "../../../customer_authentication/src/services/mailFactory";
 import { BookAgainAvailabilityService, BookingService } from "../services";
+import { property } from "zod";
+import { Room } from "../../../property_management/src/model/room.model";
 
 
 const mailer = MailFactory.getMailer();
@@ -1241,8 +1243,6 @@ export const getBookingDetailsOfUser = CatchAsyncError(
             $gt: currentDate,
           };
           matchCriteria.status = { $ne: 'Cancelled' };
-          console.log("Current Date:", currentDate.toISOString());
-          console.log("Check-in Date Match Criteria:", JSON.stringify(matchCriteria.checkInDate, null, 2));
         } else if (filterData === 'completed') {
           matchCriteria.checkInDate = {
             ...matchCriteria.checkInDate,
@@ -1297,17 +1297,50 @@ export const getBookingDetailsOfUser = CatchAsyncError(
           .skip(skip)
           .limit(limit);
       }
-      bookings = bookings.map(booking => ({
-        ...booking.toObject(),
-        checkInDate: booking.checkInDate instanceof Date
-          ? booking.checkInDate.toISOString().split('T')[0]
-          : booking.checkInDate,
-        checkOutDate: booking.checkOutDate instanceof Date
-          ? booking.checkOutDate.toISOString().split('T')[0]
-          : booking.checkOutDate,
-      }));
 
-      const totalRevenue = bookings.reduce(
+      // Get all unique hotel codes and room type codes
+      const uniqueHotelCodes = [...new Set(bookings.map(booking => booking.hotelCode))];
+      const uniqueRoomTypeCodes = [...new Set(bookings.map(booking => booking.roomTypeCode))];
+
+      // Fetch property IDs and room IDs in bulk
+      const properties = await PropertyInfo.find({
+        property_code: { $in: uniqueHotelCodes }
+      }).select('property_code _id').lean();
+
+      const rooms = await Room.find({
+        room_type: { $in: uniqueRoomTypeCodes }
+      }).select('room_type _id').lean();
+
+      // Create lookup maps for faster access
+      const propertyMap = new Map();
+      properties.forEach(prop => {
+        propertyMap.set(prop.property_code, prop._id);
+      });
+
+      const roomMap = new Map();
+      rooms.forEach(room => {
+        roomMap.set(room.room_type, room._id);
+      });
+
+      // Enhance bookings with propertyId and roomId
+      const enhancedBookings = bookings.map(booking => {
+        const propertyId = propertyMap.get(booking.hotelCode);
+        const roomId = roomMap.get(booking.roomTypeCode);
+
+        return {
+          ...booking.toObject(),
+          propertyId: propertyId || null,
+          roomId: roomId || null,
+          checkInDate: booking.checkInDate instanceof Date
+            ? booking.checkInDate.toISOString().split('T')[0]
+            : booking.checkInDate,
+          checkOutDate: booking.checkOutDate instanceof Date
+            ? booking.checkOutDate.toISOString().split('T')[0]
+            : booking.checkOutDate,
+        };
+      });
+
+      const totalRevenue = enhancedBookings.reduce(
         (sum, booking) => sum + (booking.totalAmount || 0),
         0
       );
@@ -1318,7 +1351,7 @@ export const getBookingDetailsOfUser = CatchAsyncError(
         currentPage: page,
         totalPages: Math.ceil(totalBookings / limit),
         totalRevenue,
-        bookings,
+        bookings: enhancedBookings, // Return enhanced bookings with IDs
       });
     } catch (error: any) {
       console.error("Error in getBookingDetailsOfUser:", error);
