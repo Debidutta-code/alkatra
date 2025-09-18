@@ -112,7 +112,6 @@ export async function deleteProperty(propertyId: string, accessToken: string) {
 }
 
 // Property Details
-// Update a property's details
 export async function updateProperty(propertyId: string, accessToken: string, updatedData: any) {
   try {
     const response = await axios.patch(

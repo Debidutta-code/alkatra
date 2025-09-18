@@ -6,7 +6,6 @@ import { ThemeProvider } from "../components/theme-provider";
 import { Toaster } from "react-hot-toast";
 import { Providers } from "./providers";
 import { SidebarProvider } from "@src/components/ui/sidebar";
-import AppSidebar from "@src/components/Sidebar";
 
 const notoSans = Noto_Sans({
   subsets: ["latin"],
@@ -48,7 +47,6 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* <meta name="theme-color" content="#076DB3" /> */}
         <meta name="theme-color" content="#FFFDFF" />
       </head>
       <body

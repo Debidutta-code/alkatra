@@ -38,7 +38,11 @@ const Page = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filteredProperties, setFilteredProperties] = useState<GroupedHotels[]>([]);
-
+  const [loadingHotelId, setLoadingHotelId] = useState<string | null>(null);
+  const handleViewDetails = (hotelId: string) => {
+    setLoadingHotelId(hotelId);
+    // The navigation will happen via Link, but we set loading state for UI feedback
+  };
   const fetchAllProperties = async () => {
     try {
       setLoading(true);
@@ -115,7 +119,7 @@ const Page = () => {
   );
 
   const HotelCard = ({ hotel, groupName }: { hotel: Hotel; groupName: string }) => (
-    <div className="group relative bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600">
+    <div className="group relative bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-tripswift-blue dark:hover:border-tripswift-blue hover:ring-1 hover:ring-tripswift-blue/20 transform hover:-translate-y-1">
       <div className="relative overflow-hidden">
         <img
           src={hotel.image[0]}
@@ -152,10 +156,21 @@ const Page = () => {
           <Link href={`/app/property/propertyDetails?propertyId=${hotel._id}`}>
             <Button
               size="sm"
-              className="bg-tripswift-blue hover:bg-blue-700 text-white shadow-sm transition-all duration-200 hover:shadow-md"
+              onClick={() => handleViewDetails(hotel._id)}
+              disabled={loadingHotelId === hotel._id}
+              className="bg-tripswift-blue hover:bg-blue-700 text-white shadow-sm transition-all duration-200 hover:shadow-md disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-1"
             >
-              <Eye className="w-4 h-4 mr-1" />
-              View
+              {loadingHotelId === hotel._id ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Loading...</span>
+                </>
+              ) : (
+                <>
+                  <Eye className="w-4 h-4" />
+                  <span>View</span>
+                </>
+              )}
             </Button>
           </Link>
         </div>

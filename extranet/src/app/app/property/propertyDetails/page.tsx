@@ -13,12 +13,7 @@ import {
   addPropertyRoom,
   deleteProperty,
   createPropertyAmenity,
-  updatePropertyRoomAmenity,
-  createPropertyRoomAmenity,
-  updatePropertyAddress,
-  addPropertyAddress,
-  updateRatePlan,
-  addRatePlan
+  addPropertyAddress
 } from './api';
 import { useSearchParams, useRouter } from "next/navigation";
 import { DeleteSuccessModal } from '../../../../components/propertyId/DeleteSuccessModal';
@@ -27,7 +22,7 @@ import { Amenities } from '../../../../components/propertyId/amenities';
 import { Rooms } from '../../../../components/propertyId/rooms';
 import { RoomAmenities } from '../../../../components/propertyId/roomAmenities'
 import { Button } from '../../../../components/ui/button';
-import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Trash2 } from 'lucide-react';
 import { Address } from '../../../../components/propertyId/address';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
@@ -35,6 +30,7 @@ import { RootState } from '@src/redux/store';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../../../components/ui/tabs";
 import { Property } from '@src/redux/slices/propertySlice';
+import { Triangle } from "react-loader-spinner";
 
 interface RatePlanType {
   _id: string,
@@ -104,16 +100,20 @@ interface AddressData {
   country: string;
   zip_code: string;
 }
-
-// type Props = {
-//   params: {
-//     propertyId: string;
-//   };
-//   searchParams: {
-//     token: string;
-//   };
-// };
-
+const LoadingState = () => (
+  <div className="flex flex-col items-center justify-center py-24 min-h-[60vh]">
+    <Triangle
+      visible={true}
+      height={80}
+      width={80}
+      color="#076DB3"
+      ariaLabel="triangle-loading"
+    />
+    <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">
+      Loading property details...
+    </p>
+  </div>
+);
 export default function Page() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -123,7 +123,6 @@ export default function Page() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [editedProperty, setEditedProperty] = useState<any>(null);
-  const [ratePlan, setRatePlan] = useState<RatePlanType | []>([]);
   const [ratePlanList, setRatePlanList] = useState<RatePlanType[]>([]);
   const [amenity, setAmenity] = useState<any>(null);
   const [editAmenityMode, setEditAmenityMode] = useState<boolean>(false);
@@ -138,6 +137,7 @@ export default function Page() {
   const [roomType, setRoomType] = useState<string | null>(null);
   const [availableRoomTypes, setAvailableRoomTypes] = useState<string[]>([]);
   const [showDeleteSuccessModal, setShowDeleteSuccessModal] = useState<boolean>(false);
+  const [propertyStatus, setPropertyStatus] = useState<"active" | "inactive">("active");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -150,6 +150,7 @@ export default function Page() {
         setIsLoading(true);
         const propertyData = await fetchProperty(accessToken, propertyId);
         setProperty(propertyData);
+        setPropertyStatus(propertyData.data.status === "close" ? "inactive" : "active");
         setRatePlanList(propertyData.data.rate_plan);
         setEditedProperty({ ...propertyData.data });
         setAmenity(propertyData.data.property_amenities);
@@ -178,7 +179,6 @@ export default function Page() {
     fetchData();
   }, [propertyId, accessToken, router]);
 
-  // Handlers for address
   const handleAddressEditClick = () => setEditAddressMode(!editAddressMode);
 
   const handleAddressInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -193,7 +193,6 @@ export default function Page() {
         toast.error("Missing required data");
         return;
       }
-      const updateAmenityResponse = await updatePropertyAddress(propertyId, accessToken, editedAddress);
       setEditAddressMode(false);
       setAddress({ ...editedAddress });
       toast.success("Address updated successfully!");
@@ -223,7 +222,22 @@ export default function Page() {
       toast.error("Failed to add address");
     }
   };
-
+  const handleStatusChange = async (newStatus: "active" | "inactive") => {
+    try {
+      if (!accessToken || !propertyId) {
+        console.error("Access token or property ID is missing");
+        toast.error("Missing required data");
+        return;
+      }
+      const statusData = { status: newStatus === "inactive" ? "close" : "open" };
+      await updateProperty(propertyId, accessToken, statusData);
+      setPropertyStatus(newStatus);
+      toast.success(`Property ${newStatus === "active" ? "activated" : "deactivated"} successfully!`);
+    } catch (error) {
+      console.error("Error updating property status:", error);
+      toast.error("Failed to update property status");
+    }
+  };
   const handleDeleteClick = async () => {
     try {
       if (!accessToken || !propertyId) {
@@ -240,10 +254,6 @@ export default function Page() {
     }
   };
 
-  const handleCreateProperty = () => {
-    setShowDeleteSuccessModal(false);
-    router.push('/app/property/create');
-  };
   const handleGoBack = () => {
     setShowDeleteSuccessModal(false);
     router.push('/app');
@@ -256,7 +266,6 @@ export default function Page() {
         toast.error("Missing required data");
         return;
       }
-      const response = await updateProperty(propertyId, accessToken, editedProperty);
       setEditMode(false);
       setProperty({ data: { ...editedProperty } } as { data: Property });
       toast.success("Property updated successfully!");
@@ -327,16 +336,6 @@ export default function Page() {
   useEffect(() => {
   }, [rooms]);
 
-  const fetchRooms = async () => {
-    if (!accessToken || !propertyId) return;
-    try {
-      const roomsFromApi = await fetchProperty(propertyId, accessToken);
-      setRooms(roomsFromApi.data.property_room ? [roomsFromApi.data.property_room] : []);
-    } catch (err) {
-      console.error("Failed to fetch rooms:", err);
-      toast.error("Failed to fetch rooms");
-    }
-  };
 
   useEffect(() => {
     if (rooms && rooms.length > 0) {
@@ -434,78 +433,6 @@ export default function Page() {
   };
 
   const handleRoomAmenityEditClick = () => setEditRoomAmenityMode(!editRoomAmenityMode);
-  const handleRoomAmenityInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setEditedRoomAmenity({ ...editedRoomAmenity, [name]: value });
-  };
-  const handleRoomAmenitySaveClick = async () => {
-    try {
-      if (!accessToken || !propertyId) {
-        console.error("Access token or property ID is missing");
-        toast.error("Missing required data");
-        return;
-      }
-      await updatePropertyRoomAmenity(propertyId, accessToken, editedRoomAmenity);
-      setEditRoomAmenityMode(false);
-      setRoomAmenity({ ...editedRoomAmenity });
-      toast.success("Room amenities updated successfully!");
-    } catch (error) {
-      console.error("Error updating room amenity data:", error);
-      toast.error("Failed to update room amenities");
-    }
-  };
-
-  const handleCreateRoomAmenity = async (newRoomAmenity: any) => {
-    try {
-      if (!accessToken || !propertyId) {
-        console.error("Access token or property ID is missing");
-        toast.error("Missing required data");
-        return;
-      }
-      const createdRoomAmenity = await createPropertyRoomAmenity(propertyId, accessToken, newRoomAmenity);
-      setRoomAmenity(createdRoomAmenity);
-      setEditedRoomAmenity(createdRoomAmenity);
-      const updatedProperty = await fetchProperty(accessToken, propertyId);
-      setProperty(updatedProperty);
-      toast.success("Room amenity created successfully!");
-    } catch (error) {
-      console.error("Error creating room amenity:", error);
-      toast.error("Failed to create room amenity");
-    }
-  };
-
-  // Update rate plan 
-  const HandleUpdateRatePlan = async (newRatePlan: any) => {
-    try {
-      if (!accessToken || !propertyId) {
-        console.error("Access token or property ID is missing");
-        toast.error("Missing required data");
-        return;
-      }
-      const updatedRatePlan = await updateRatePlan(propertyId, accessToken, newRatePlan);
-      setRatePlan(updatedRatePlan.newList);
-      toast.success("Rate plan updated successfully!");
-    } catch (error) {
-      console.error("Error updating rate plan:", error);
-      toast.error("Failed to update rate plan");
-    }
-  };
-
-  const HandleAddRatePlan = async (newRatePlan: any) => {
-    try {
-      if (!accessToken || !propertyId) {
-        console.error("Access token or property ID is missing");
-        toast.error("Missing required data");
-        return;
-      }
-      const addedRatePlan = await addRatePlan(propertyId, accessToken, newRatePlan);
-      setRatePlanList((prev) => [...prev, addedRatePlan]);
-      toast.success("Rate plan added successfully!");
-    } catch (error) {
-      console.error("Error adding rate plan:", error);
-      toast.error("Failed to add rate plan");
-    }
-  };
 
   const handleRatePlanNavigation = () => {
     if (property?.data?.property_code) {
@@ -538,183 +465,221 @@ export default function Page() {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 gap-4">
-        <div className="relative">
-          <PropertyImageGallery
-            image={property?.data?.image || []}
-            onImagesUpdate={(updatedImages) => {
-              setEditedProperty((prev: Partial<Property> | null) => ({
-                ...prev,
-                image: updatedImages,
-              }));
-              setProperty((prev: { data: Property } | null) => ({
-                ...prev,
-                data: {
-                  ...prev!.data,
-                  image: updatedImages,
-                },
-              }));
-            }}
-            editable={true}
-            propertyId={propertyId}
-            accessToken={accessToken}
-          />
-        </div>
-        <div className="mb-8">
-          {/* Quick Actions */}
-          <Card>
+      {isLoading ? (
+        <LoadingState />
+      ) : (
+        <>
+          <div className="grid grid-cols-1 gap-4">
+            <div className="relative">
+              <PropertyImageGallery
+                image={property?.data?.image || []}
+                onImagesUpdate={(updatedImages) => {
+                  setEditedProperty((prev: Partial<Property> | null) => ({
+                    ...prev,
+                    image: updatedImages,
+                  }));
+                  setProperty((prev: { data: Property } | null) => ({
+                    ...prev,
+                    data: {
+                      ...prev!.data,
+                      image: updatedImages,
+                    },
+                  }));
+                }}
+                editable={true}
+                propertyId={propertyId}
+                accessToken={accessToken}
+              />
+            </div>
+            <div className="mb-8">
+              {/* Quick Actions */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Quick Actions</CardTitle>
+                  <CardDescription>
+                    Manage your property's rate, inventory, and tax settings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <Button
+                      variant="default"
+                      onClick={handleRatePlanNavigation}
+                      className="bg-tripswift-blue hover:bg-tripswift-blue-600 text-white"
+                    >
+                      Rate and Inventory Allotment
+                    </Button>
+                    <Button
+                      variant="default"
+                      onClick={() =>
+                        router.push(`/app/tax-service?propertyId=${propertyId}`)
+                      }
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      Tax Configuration
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            <Card className="mb-1">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center justify-between">
+                  Property Status
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${propertyStatus === "active"
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                    }`}>
+                    {propertyStatus === "active" ? "Active" : "Inactive"}
+                  </span>
+                </CardTitle>
+                <CardDescription>
+                  Control whether this property is available for bookings
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center space-x-4">
+                  <Button
+                    variant={propertyStatus === "active" ? "default" : "outline"}
+                    onClick={() => handleStatusChange("active")}
+                    className={propertyStatus === "active" ? "bg-green-600 hover:bg-green-700" : ""}
+                  >
+                    Activate Property
+                  </Button>
+                  <Button
+                    variant={propertyStatus === "inactive" ? "destructive" : "outline"}
+                    onClick={() => handleStatusChange("inactive")}
+                  >
+                    Deactivate Property
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            <Tabs className="space-y-6" defaultValue="overview">
+              <div className="overflow-x-auto">
+                <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 h-auto p-1 bg-slate-100">
+                  <TabsTrigger
+                    value="overview"
+                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
+                  >
+                    Overview
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="address"
+                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
+                  >
+                    Address
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="amenities"
+                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
+                  >
+                    Amenities
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="rooms"
+                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
+                  >
+                    Rooms
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="room-amenities"
+                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
+                  >
+                    Room Amenities
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              <div className="animate-fade-in">
+                <TabsContent value="overview" className="mt-6 space-y-6">
+                  <PropertyDetails
+                    property={property}
+                    editedProperty={editedProperty}
+                    editMode={editMode}
+                    accessToken={accessToken as string}
+                    propertyId={propertyId}
+                    setProperty={setProperty}
+                    handleInputChange={handleInputChange}
+                    handleSaveClick={handleSaveClick}
+                    handleEditClick={handleEditClick}
+                  />
+                </TabsContent>
+
+                <TabsContent value="address" className="mt-6">
+                  <Address
+                    address={address}
+                    editedAddress={editedAddress}
+                    editAddressMode={editAddressMode}
+                    handleAddressInputChange={handleAddressInputChange}
+                    handleAddressSaveClick={handleAddressSaveClick}
+                    handleAddressEditClick={handleAddressEditClick}
+                    handleAddressAddClick={handleAddressAddClick}
+                  />
+                </TabsContent>
+
+                <TabsContent value="amenities" className="mt-6">
+                  <Amenities
+                    property={property}
+                    amenity={amenity}
+                    setAmenity={setAmenity}
+                    editedAmenity={editedAmenity}
+                    editAmenityMode={editAmenityMode}
+                    handleAmenityEditClick={handleAmenityEditClick}
+                    handleAmenityInputChange={handleAmenityInputChange}
+                    handleAmenitySaveClick={handleAmenitySaveClick}
+                    handleCreateAmenity={handleCreateAmenity}
+                  />
+                </TabsContent>
+
+                <TabsContent value="rooms" className="mt-6">
+                  <Rooms
+                    rooms={rooms}
+                    onAddRoom={handleAddRoom}
+                    onEditRoom={handleEditRoom}
+                    onDeleteRoom={handleDeleteRoom}
+                    accessToken={accessToken as string}
+                  />
+                </TabsContent>
+
+                <TabsContent value="room-amenities" className="mt-6">
+                  <RoomAmenities
+                    roomAmenities={roomAmenity}
+                    editedRoomAmenity={roomAmenity}
+                    editRoomAmenityMode={editRoomAmenityMode}
+                    handleRoomAmenityEditClick={handleRoomAmenityEditClick}
+                    propertyInfoId={propertyId}
+                    accessToken={accessToken as string}
+                    availableRoomTypes={availableRoomTypes}
+                  />
+                </TabsContent>
+              </div>
+            </Tabs>
+          </div>
+          <Card className="border-red-200 bg-red-50/50 mt-8">
             <CardHeader>
-              <CardTitle className="text-lg">Quick Actions</CardTitle>
-              <CardDescription>
-                Manage your property's rate, inventory, and tax settings
+              <CardDescription className="text-red-600">
+                Deleting this property will remove all associated data permanently. This action cannot be undone.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <Button
-                  variant="default"
-                  onClick={handleRatePlanNavigation}
-                  className="bg-tripswift-blue hover:bg-tripswift-blue-600 text-white"
-                >
-                  Rate and Inventory Allotment
-                </Button>
-                <Button
-                  variant="default"
-                  onClick={() =>
-                    router.push(`/app/tax-service?propertyId=${propertyId}`)
-                  }
-                  className="bg-green-600 hover:bg-green-700 text-white"
-                >
-                  Tax Configuration
-                </Button>
-              </div>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteClick}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Property
+              </Button>
             </CardContent>
           </Card>
-        </div>
-
-        <Tabs className="space-y-6" defaultValue="overview">
-          <div className="overflow-x-auto">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 h-auto p-1 bg-slate-100">
-              <TabsTrigger
-                value="overview"
-                className="data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
-              >
-                Overview
-              </TabsTrigger>
-              <TabsTrigger
-                value="address"
-                className="data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
-              >
-                Address
-              </TabsTrigger>
-              <TabsTrigger
-                value="amenities"
-                className="data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
-              >
-                Amenities
-              </TabsTrigger>
-              <TabsTrigger
-                value="rooms"
-                className="data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
-              >
-                Rooms
-              </TabsTrigger>
-              <TabsTrigger
-                value="room-amenities"
-                className="data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
-              >
-                Room Amenities
-              </TabsTrigger>
-            </TabsList>
-          </div>
-
-          <div className="animate-fade-in">
-            <TabsContent value="overview" className="mt-6 space-y-6">
-              <PropertyDetails
-                property={property}
-                editedProperty={editedProperty}
-                editMode={editMode}
-                accessToken={accessToken as string}
-                propertyId={propertyId}
-                setProperty={setProperty}
-                handleInputChange={handleInputChange}
-                handleSaveClick={handleSaveClick}
-                handleEditClick={handleEditClick}
-              />
-            </TabsContent>
-
-            <TabsContent value="address" className="mt-6">
-              <Address
-                address={address}
-                editedAddress={editedAddress}
-                editAddressMode={editAddressMode}
-                handleAddressInputChange={handleAddressInputChange}
-                handleAddressSaveClick={handleAddressSaveClick}
-                handleAddressEditClick={handleAddressEditClick}
-                handleAddressAddClick={handleAddressAddClick}
-              />
-            </TabsContent>
-
-            <TabsContent value="amenities" className="mt-6">
-              <Amenities
-                property={property}
-                amenity={amenity}
-                setAmenity={setAmenity}
-                editedAmenity={editedAmenity}
-                editAmenityMode={editAmenityMode}
-                handleAmenityEditClick={handleAmenityEditClick}
-                handleAmenityInputChange={handleAmenityInputChange}
-                handleAmenitySaveClick={handleAmenitySaveClick}
-                handleCreateAmenity={handleCreateAmenity}
-              />
-            </TabsContent>
-
-            <TabsContent value="rooms" className="mt-6">
-              <Rooms
-                rooms={rooms}
-                onAddRoom={handleAddRoom}
-                onEditRoom={handleEditRoom}
-                onDeleteRoom={handleDeleteRoom}
-                accessToken={accessToken as string}
-              />
-            </TabsContent>
-
-            <TabsContent value="room-amenities" className="mt-6">
-              <RoomAmenities
-                roomAmenities={roomAmenity}
-                editedRoomAmenity={roomAmenity}
-                editRoomAmenityMode={editRoomAmenityMode}
-                handleRoomAmenityEditClick={handleRoomAmenityEditClick}
-                propertyInfoId={propertyId}
-                accessToken={accessToken as string}
-                availableRoomTypes={availableRoomTypes}
-              />
-            </TabsContent>
-          </div>
-        </Tabs>
-      </div>
-      <Card className="border-red-200 bg-red-50/50 mt-8">
-        <CardHeader>
-          <CardDescription className="text-red-600">
-            Deleting this property will remove all associated data permanently. This action cannot be undone.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button
-            variant="destructive"
-            onClick={handleDeleteClick}
-            className="bg-red-600 hover:bg-red-700"
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete Property
-          </Button>
-        </CardContent>
-      </Card>
-      <DeleteSuccessModal
-        isOpen={showDeleteSuccessModal}
-        // onCreateProperty={handleCreateProperty}
-        onGoBack={handleGoBack}
-      />
+          <DeleteSuccessModal
+            isOpen={showDeleteSuccessModal}
+            // onCreateProperty={handleCreateProperty}
+            onGoBack={handleGoBack}
+          />
+        </>
+      )}
     </main>
   );
 }
