@@ -165,7 +165,6 @@ class RatePlanDao {
       resultsPerPage: number;
     };
   }> {
-    console.log("The start date and end date we get here", startDate, endDate);
     try {
 
       const resultsPerPage = limit;
@@ -230,7 +229,7 @@ class RatePlanDao {
       }
 
       // inventoryMatch["availability.startDate"] = { $gte: startOfDay(new Date()) };
-      console.log("the inventory match is", inventoryMatch);
+      
       const inventory = await Inventory.aggregate([
         { $match: inventoryMatch },
       ]);
@@ -254,7 +253,6 @@ class RatePlanDao {
     endDate?: string
   ) {
     try {
-      console.log("THe hotel code is", hotelCode);
       const ratePlanMatch: any = { hotelCode };
 
       if (invTypeCode) {
@@ -280,7 +278,7 @@ class RatePlanDao {
       // }
 
       // ratePlanMatch.startDate = { $gte: startOfDay(new Date()) };
-      console.log("the rate plan match is", ratePlanMatch);
+      
       const ratePlan = await RateAmount.aggregate([
         { $match: ratePlanMatch },
       ]);

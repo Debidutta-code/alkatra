@@ -172,9 +172,9 @@ export class BookAgainRepository {
                 ratePlanMatch.startDate = { $gte: startOfDay(startDate) };
             }
 
-            if (endDate) {
-                ratePlanMatch.endDate = { $lte: endOfDay(endDate) };
-            }
+            // if (endDate) {
+            //     ratePlanMatch.endDate = { $lte: endOfDay(endDate) };
+            // }
             
             const ratePlan = await RateAmount.aggregate([
                 { $match: ratePlanMatch },
