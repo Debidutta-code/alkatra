@@ -19,9 +19,10 @@ import {
   getAllHotelsByRole
 } from "../controllers/bookings.controller";
 import { BookingController } from "../controllers/bookings.controller";
-import { BookingService } from "../services";
+import { BookAgainAvailabilityService, BookingService } from "../services";
 
 const bookingService = BookingService.getInstance();
+const bookAgainService = BookAgainAvailabilityService.getInstance();
 const bookingController = new BookingController(bookingService);
 
 
@@ -40,5 +41,6 @@ router.route("/cancel-reservation/:id").patch(authenticateCustomer as any, cance
 router.route("/count/:id").get(protect as any, getBookingDetailsForExtranet);  
 router.route("/customers/booking/details/:id").get(authenticateCustomer as any, getBookingDetailsOfUser);
 router.route("/hotelname").get(protect as any, getAllHotelsByRole);
+
 
 export default router;

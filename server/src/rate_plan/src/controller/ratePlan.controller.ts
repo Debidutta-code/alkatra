@@ -115,7 +115,7 @@ class RatePlanController {
             const { invTypeCode, ratePlanCode, startDate, endDate } = req.query;
             const page = req.query?.page ? parseInt(req.query.page as string) : 1;
             const limit = req.query?.limit ? parseInt(req.query.limit as string) : 10;
-            console.log(`The start date and end date we get ${startDate} and ${endDate}`);
+            
 
             if (isNaN(page) || page < 1) {
                 return res.status(400).json({
@@ -131,7 +131,7 @@ class RatePlanController {
                 });
             }
 
-            console.log("Entering into getRatePlanByHotel SERVICE");
+            
             const response = await RatePlanService.getRatePlanByHotel(
                 hotelCode,
                 invTypeCode as string,
@@ -240,8 +240,7 @@ class RoomPrice {
         if (!hotelCode) {
             throw new Error("Hotel code is required");
         }
-        const response = await RoomPriceService.getAllRoomTypeService(hotelCode)
-        console.log(response)
+        const response = await RoomPriceService.getAllRoomTypeService(hotelCode);
         return response
     }
 

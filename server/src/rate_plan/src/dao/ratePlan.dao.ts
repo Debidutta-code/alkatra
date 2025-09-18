@@ -271,9 +271,9 @@ class RatePlanDao {
         ratePlanMatch.startDate = { $gte: startOfDay(new Date()) };
       }
 
-      if (endDate) {
-        ratePlanMatch.endDate = { $lte: endOfDay(endDate) };
-      }
+      // if (endDate) {
+      //   ratePlanMatch.endDate = { $lte: endOfDay(endDate) };
+      // }
       // else {
       //   const tomorrow = new Date();
       //   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -383,8 +383,7 @@ class RatePlanDao {
       throw new Error(error.message)
     }
   }
-
-
+  
   public static async getRatePlanByHotelCode(hotelCode: string) {
     return await RatePlan.find(
       { propertyId: hotelCode }

@@ -53,4 +53,18 @@ export class PropertyInfoRepository {
         }
     }
 
+    /**
+     * 
+     */
+    async propertyUpdate(
+        propertInfoId: string,
+        filteredUpdates: any,
+    ) {
+        const updateProperty = await PropertyInfo.findOneAndUpdate(
+            { _id: propertInfoId },
+            { $set: filteredUpdates },
+            { new: true }
+        ).exec();
+        return updateProperty;
+    }
 }
