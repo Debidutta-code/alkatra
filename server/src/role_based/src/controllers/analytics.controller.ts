@@ -10,6 +10,7 @@ export default class AnalyticsController {
             const role = req.role;
             const userEmail = req.user.email;
             const userId = req.user.id;
+            
 
             const parsedStartDate = startDate ? new Date(startDate) : undefined;
             const parsedEndDate = endDate ? new Date(endDate) : undefined;

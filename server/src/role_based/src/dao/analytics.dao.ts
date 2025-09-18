@@ -153,7 +153,6 @@ export default class AnalyticsDAO {
                 },
             ]);
 
-            
             return statusStats;
         } catch (error) {
             throw new Error(`Error fetching reservations by status: ${error.message}`);
