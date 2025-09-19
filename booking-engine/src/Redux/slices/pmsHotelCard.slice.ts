@@ -88,6 +88,9 @@ const pmsHotelCardSlice = createSlice({
     setHotelName: (state, action: PayloadAction<string>) => {
       state.hotelName = action.payload;
     },
+    resetPmsHotelCard: (state) => {
+      return { ...initialState };
+    },
   },
 });
 
@@ -107,8 +110,8 @@ export const {
   setRoomType,
   setCurrency,
   setHotelName,
+  resetPmsHotelCard,
 } = pmsHotelCardSlice.actions;
-
 export const getUser =
   () =>
     async (dispatch: typeof store.dispatch, getState: typeof store.getState) => {

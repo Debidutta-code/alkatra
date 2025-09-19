@@ -1,2 +1,2 @@
 export { CustomerReviewApi } from "./review.api";
-export { ChatBotApi } from "./chatBot.api";
+export { ChatBotApi } from "./chatBot.";

@@ -18,7 +18,10 @@ import Auth from "../../../user_authentication/src/Model/auth.model";
 import { PropertyInfo } from "../../../property_management/src/model/property.info.model";
 import UserModel from "../../../user_authentication/src/Model/auth.model";
 import { MailFactory } from "../../../customer_authentication/src/services/mailFactory";
-import { BookingService } from "../services";
+import { BookAgainAvailabilityService, BookingService } from "../services";
+import { property } from "zod";
+import { Room } from "../../../property_management/src/model/room.model";
+
 
 const mailer = MailFactory.getMailer();
 
@@ -1240,8 +1243,6 @@ export const getBookingDetailsOfUser = CatchAsyncError(
             $gt: currentDate,
           };
           matchCriteria.status = { $ne: 'Cancelled' };
-          console.log("Current Date:", currentDate.toISOString());
-          console.log("Check-in Date Match Criteria:", JSON.stringify(matchCriteria.checkInDate, null, 2));
         } else if (filterData === 'completed') {
           matchCriteria.checkInDate = {
             ...matchCriteria.checkInDate,
@@ -1296,17 +1297,50 @@ export const getBookingDetailsOfUser = CatchAsyncError(
           .skip(skip)
           .limit(limit);
       }
-      bookings = bookings.map(booking => ({
-        ...booking.toObject(),
-        checkInDate: booking.checkInDate instanceof Date
-          ? booking.checkInDate.toISOString().split('T')[0]
-          : booking.checkInDate,
-        checkOutDate: booking.checkOutDate instanceof Date
-          ? booking.checkOutDate.toISOString().split('T')[0]
-          : booking.checkOutDate,
-      }));
 
-      const totalRevenue = bookings.reduce(
+      // Get all unique hotel codes and room type codes
+      const uniqueHotelCodes = [...new Set(bookings.map(booking => booking.hotelCode))];
+      const uniqueRoomTypeCodes = [...new Set(bookings.map(booking => booking.roomTypeCode))];
+
+      // Fetch property IDs and room IDs in bulk
+      const properties = await PropertyInfo.find({
+        property_code: { $in: uniqueHotelCodes }
+      }).select('property_code _id').lean();
+
+      const rooms = await Room.find({
+        room_type: { $in: uniqueRoomTypeCodes }
+      }).select('room_type _id').lean();
+
+      // Create lookup maps for faster access
+      const propertyMap = new Map();
+      properties.forEach(prop => {
+        propertyMap.set(prop.property_code, prop._id);
+      });
+
+      const roomMap = new Map();
+      rooms.forEach(room => {
+        roomMap.set(room.room_type, room._id);
+      });
+
+      // Enhance bookings with propertyId and roomId
+      const enhancedBookings = bookings.map(booking => {
+        const propertyId = propertyMap.get(booking.hotelCode);
+        const roomId = roomMap.get(booking.roomTypeCode);
+
+        return {
+          ...booking.toObject(),
+          propertyId: propertyId || null,
+          roomId: roomId || null,
+          checkInDate: booking.checkInDate instanceof Date
+            ? booking.checkInDate.toISOString().split('T')[0]
+            : booking.checkInDate,
+          checkOutDate: booking.checkOutDate instanceof Date
+            ? booking.checkOutDate.toISOString().split('T')[0]
+            : booking.checkOutDate,
+        };
+      });
+
+      const totalRevenue = enhancedBookings.reduce(
         (sum, booking) => sum + (booking.totalAmount || 0),
         0
       );
@@ -1317,7 +1351,7 @@ export const getBookingDetailsOfUser = CatchAsyncError(
         currentPage: page,
         totalPages: Math.ceil(totalBookings / limit),
         totalRevenue,
-        bookings,
+        bookings: enhancedBookings, // Return enhanced bookings with IDs
       });
     } catch (error: any) {
       console.error("Error in getBookingDetailsOfUser:", error);
@@ -1549,4 +1583,49 @@ export class BookingController {
     }
   }
 
+  async bookAgainCheckAvailability(req: any, res: Response, next: NextFunction) {
+    try {
+
+      /**
+       * Checking for USER 
+       */
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User ID is required" });
+      }
+
+      /**
+       * 
+       */
+      const { hotelCode, invTypeCode, startDate, endDate } = req.query;
+      if (!hotelCode || !invTypeCode || !startDate || !endDate) {
+        return res.status(404).json({
+          success: false,
+          message: "Some data are missing in body",
+        });
+      }
+
+      /**
+       * Calling the service file
+       */
+      const result = await this.bookAgainAvailabilityService.bookAgainAvailability(hotelCode, invTypeCode, startDate, endDate);
+      if (!result) {
+        return res.status(400).json({ message: "No rate plan or inventory found" })
+      }
+
+
+      return res.status(200).json({
+        success: true,
+        message: "Rooms are available"
+      });
+
+    }
+    catch (error: any) {
+      console.log("Book again process failed");
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
 }

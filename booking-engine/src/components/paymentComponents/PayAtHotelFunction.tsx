@@ -37,8 +37,8 @@ interface PayAtHotelProps {
     rooms?: number;
     adults?: number;
     children?: number;
-    // infants: number;
     currency?: string;
+    hotelCode?: string; // ✅ Add this line
     guests: Guest[];
   };
 }
@@ -69,8 +69,7 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
   // Validate booking details on component mount
   useEffect(() => {
     const requiredFields: (keyof typeof bookingDetails)[] = [
-      'firstName', 'lastName', 'email', 'phone',
-      'roomId', 'propertyId', 'checkIn', 'checkOut', 'amount'
+      'firstName', 'lastName', 'email', 'phone', 'roomId', 'propertyId', 'checkIn', 'checkOut', 'amount', 'hotelCode'
     ];
 
     const missingFields = requiredFields.filter(field => !bookingDetails[field]);
@@ -169,11 +168,10 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
         throw new Error(t('Payment.PaymentComponents.PayAtHotelFunction.cardSetupFailedError'));
       }
       console.log("Card setup successful, creating booking...");
-      const hotelCode = sessionStorage.getItem("propertyCode");
       const bookingPayload = {
         checkInDate: bookingDetails.checkIn,
         checkOutDate: bookingDetails.checkOut,
-        hotelCode: hotelCode || '',
+        hotelCode: bookingDetails.hotelCode || '',
         hotelName: bookingDetails.hotelName || " ",
         ratePlanCode: bookingDetails.ratePlanCode || " ",
         numberOfRooms: bookingDetails.rooms || 1,
