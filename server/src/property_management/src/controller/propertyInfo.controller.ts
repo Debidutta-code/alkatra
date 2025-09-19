@@ -335,6 +335,7 @@ const getPropertyInfoById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const propertyId = req.params.id;
     const property = await PropertyInfo.findById(propertyId)
+      .populate({ path: "status" })
       .populate({ path: "property_category" })
       .populate({ path: "property_address" })
       .populate({ path: "property_amenities" })
@@ -348,9 +349,9 @@ const getPropertyInfoById = catchAsync(
 
       {
         $lookup: {
-          from: 'rooms', // The collection to join
-          localField: 'applicable_room_type', // The field from the input documents
-          foreignField: '_id', // The field from the documents of the "from" collection
+          from: 'rooms', 
+          localField: 'applicable_room_type', 
+          foreignField: '_id', 
           as: 'applicable_room_type'
         }
       },
