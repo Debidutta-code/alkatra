@@ -66,12 +66,38 @@ export class CustomerReviewRepository {
         }
     };
 
-    async getReviews(filters: any) {
+    async getReviews(filters: any, skip: number = 0, limit: number = 10) {
         console.log(`The filter data we get ${JSON.stringify(filters)}`);
-        const reviewDetails = await CustomerReviewModel.find(filters).sort({ createdAt: -1 });
+        const reviewDetails = await CustomerReviewModel.find(filters)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
         console.log(`The review details we get ${JSON.stringify(reviewDetails)}`);
         return reviewDetails;
     }
+
+    async getReviewsCount(filters: any) {
+        return await CustomerReviewModel.countDocuments(filters);
+    }
+
+    // async getReviewsWithPagination(filters: any, page: number = 1, limit: number = 10) {
+    //     const skip = (page - 1) * limit;
+
+    //     const [reviews, totalCount] = await Promise.all([
+    //         CustomerReviewModel.find(filters)
+    //             .sort({ createdAt: -1 })
+    //             .skip(skip)
+    //             .limit(limit),
+    //         CustomerReviewModel.countDocuments(filters)
+    //     ]);
+
+    //     return {
+    //         reviews,
+    //         totalCount,
+    //         currentPage: page,
+    //         totalPages: Math.ceil(totalCount / limit)
+    //     };
+    // }
 
     async updateReview(reviewId: string, userId, updatedData: any) {
 
