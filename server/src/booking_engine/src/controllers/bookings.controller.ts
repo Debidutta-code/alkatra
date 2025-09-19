@@ -1518,12 +1518,14 @@ export const getAllHotelsByRole = CatchAsyncError(
 export class BookingController {
 
   private bookingService: BookingService;
+  private bookAgainService: BookAgainAvailabilityService;
 
-  constructor(bookingService: BookingService) {
-    if (!bookingService) {
-      throw new Error("BookingService is required");
+  constructor(bookingService: BookingService, bookAgainService: BookAgainAvailabilityService) {
+    if (!bookingService || !bookAgainService) {
+      throw new Error("BookingService and BookAgainAvailabilityService required");
     }
     this.bookingService = bookingService;
+    this.bookAgainService = bookAgainService;
   }
 
 
@@ -1608,7 +1610,7 @@ export class BookingController {
       /**
        * Calling the service file
        */
-      const result = await this.bookAgainAvailabilityService.bookAgainAvailability(hotelCode, invTypeCode, startDate, endDate);
+      const result = await this.bookAgainService.bookAgainAvailability(hotelCode, invTypeCode, startDate, endDate);
       if (!result) {
         return res.status(400).json({ message: "No rate plan or inventory found" })
       }

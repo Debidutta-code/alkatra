@@ -23,7 +23,7 @@ import { BookAgainAvailabilityService, BookingService } from "../services";
 
 const bookingService = BookingService.getInstance();
 const bookAgainService = BookAgainAvailabilityService.getInstance();
-const bookingController = new BookingController(bookingService);
+const bookingController = new BookingController(bookingService, bookAgainService);
 
 
 import { authenticateCustomer } from "../../../customer_authentication/src/middleware/authMiddleware";
