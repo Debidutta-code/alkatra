@@ -46,27 +46,29 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
 }) => {
     const getDefaultDateRange = () => ({ from: new Date(), to: new Date() });
 
-    const [action, setAction] = useState<'start' | 'stop'>('stop');
+    const [action, setAction] = useState<'start' | 'stop' | undefined>(undefined);
     const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>(getDefaultDateRange());
-    const [applyTo, setApplyTo] = useState<'all' | 'holidays' | 'selected'>('all');
-    const [selectedWeekdays, setSelectedWeekdays] = useState<number[]>([0, 6]);
+    const [applyTo, setApplyTo] = useState<'all' | 'holidays' | 'selected' | undefined>(undefined);
+    const [selectedWeekdays, setSelectedWeekdays] = useState<number[]>([]);
     const [roomRatePlans, setRoomRatePlans] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+
     const resetFormData = () => {
-        setAction('stop');
+        setAction(undefined);
         setDateRange(getDefaultDateRange());
-        setApplyTo('all');
-        setSelectedWeekdays([0, 6]);
+        setApplyTo(undefined);
+        setSelectedWeekdays([]);
         setRoomRatePlans([]);
     };
+
     const getUniqueRoomRatePlans = (plans: string[]): string[] => {
         return [...new Set(plans)];
     };
+
     useEffect(() => {
         if (isOpen && initialData) {
             setDateRange(initialData.dateRange || getDefaultDateRange());
-            setRoomRatePlans(getUniqueRoomRatePlans(initialData.roomRatePlans || []));
-            setSelectedWeekdays(initialData.selectedWeekdays || [0, 6]);
+            setSelectedWeekdays(initialData.selectedWeekdays || []);
         } else if (isOpen) {
             resetFormData();
         }
@@ -78,8 +80,23 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
     };
 
     const handleConfirm = async () => {
+        if (!action) {
+            toast.error('Please select an action (Start Sell or Stop Sell)');
+            return;
+        }
+
+        if (!applyTo) {
+            toast.error('Please select when to apply the changes');
+            return;
+        }
+
         if (applyTo === 'selected' && selectedWeekdays.length === 0) {
             toast.error('Please select at least one weekday');
+            return;
+        }
+
+        if (roomRatePlans.length === 0) {
+            toast.error('Please select at least one room type and rate plan combination');
             return;
         }
 
@@ -124,7 +141,7 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto px-6 py-4">
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto px-6 py-4">
                 <DialogHeader className="border-b pb-4 mb-2">
                     <DialogTitle className="text-xl font-tripswift-bold text-gray-900">
                         Bulk Update Sell Status
@@ -138,7 +155,7 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                     {/* === ACTION TYPE === */}
                     <div className="space-y-2">
                         <label className="block text-sm font-tripswift-medium text-gray-700">
-                            Action
+                            Action <span className="text-red-500">*</span>
                         </label>
                         <div className="flex space-x-3">
                             <button
@@ -169,7 +186,7 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                     {/* === DATE RANGE === */}
                     <div className="space-y-2">
                         <label className="block text-sm font-tripswift-medium text-gray-700">
-                            Date Range
+                            Date Range <span className="text-red-500">*</span>
                         </label>
                         <Popover>
                             <PopoverTrigger>
@@ -183,8 +200,8 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                                             {dateRange?.from
                                                 ? dateRange.to
                                                     ? `${format(dateRange.from, 'PPP')} – ${format(dateRange.to, 'PPP')}`
-                                                    : format(dateRange.from, 'PPP')
-                                                : 'Select date range'}
+                                                    : `${format(dateRange.from, 'PPP')} – Select end date`
+                                                : 'Select start and end date'}
                                         </span>
                                     </div>
                                     <span className="text-gray-400">▼</span>
@@ -197,6 +214,11 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                                     onSelect={(range: any) => {
                                         setDateRange(range);
                                     }}
+                                    disabled={(date) => {
+                                        const today = new Date();
+                                        today.setHours(0, 0, 0, 0);
+                                        return date < today;
+                                    }}
                                     className="p-3"
                                 />
                             </PopoverContent>
@@ -206,7 +228,7 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                     {/* === APPLY TO === */}
                     <div className="space-y-2">
                         <label className="block text-sm font-tripswift-medium text-gray-700">
-                            Apply To
+                            Apply To <span className="text-red-500">*</span>
                         </label>
                         <div className="grid grid-cols-1 gap-2">
                             {[
@@ -245,7 +267,7 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                         {applyTo === 'selected' && (
                             <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                                 <label className="block text-sm font-tripswift-medium text-gray-700 mb-3">
-                                    Select Specific Weekdays
+                                    Select Specific Weekdays <span className="text-red-500">*</span>
                                 </label>
                                 <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
                                     {[
@@ -293,7 +315,7 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                     {/* === ROOM & RATE PLAN === */}
                     <div className="space-y-2">
                         <label className="block text-sm font-tripswift-medium text-gray-700">
-                            Room Type
+                            Room Type <span className="text-red-500">*</span>
                         </label>
                         <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
                             {/* Header with Select All / Clear All */}
@@ -342,17 +364,12 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                                                 key={item}
                                                 type="button"
                                                 onClick={() => {
-                                                    // Clear existing selection if any
-                                                    if (roomRatePlans.length > 0) {
+                                                    if (roomRatePlans.includes(item)) {
                                                         setRoomRatePlans([]);
-                                                    }
-
-                                                    // Add new selection
-                                                    if (!roomRatePlans.includes(item)) {
-                                                        setRoomRatePlans([item]); // Set as single item array
+                                                    } else {
+                                                        setRoomRatePlans([item]);
                                                     }
                                                 }}
-                                                disabled={roomRatePlans.length > 0 && !roomRatePlans.includes(item)}
                                                 className={`
                                                 flex items-center justify-between px-3 py-2.5 text-left text-xs font-medium rounded-lg border transition-all
                                                 ${roomRatePlans.includes(item)
@@ -384,7 +401,7 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                     </Button>
                     <Button
                         onClick={handleConfirm}
-                        disabled={roomRatePlans.length === 0 || !dateRange.from || !dateRange.to || isLoading}
+                        disabled={!action || !applyTo || roomRatePlans.length === 0 || !dateRange.from || !dateRange.to || isLoading}
                         className="px-6 py-2 bg-tripswift-blue hover:bg-tripswift-dark-blue text-white font-medium"
                     >
                         {isLoading ? (

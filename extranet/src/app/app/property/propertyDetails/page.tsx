@@ -527,8 +527,8 @@ export default function Page() {
                 <CardTitle className="text-lg flex items-center justify-between">
                   Property Status
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${propertyStatus === "active"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
                     }`}>
                     {propertyStatus === "active" ? "Active" : "Inactive"}
                   </span>
@@ -538,20 +538,24 @@ export default function Page() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center space-x-4">
-                  <Button
-                    variant={propertyStatus === "active" ? "default" : "outline"}
-                    onClick={() => handleStatusChange("active")}
-                    className={propertyStatus === "active" ? "bg-green-600 hover:bg-green-700" : ""}
-                  >
-                    Activate Property
-                  </Button>
-                  <Button
-                    variant={propertyStatus === "inactive" ? "destructive" : "outline"}
-                    onClick={() => handleStatusChange("inactive")}
-                  >
-                    Deactivate Property
-                  </Button>
+                <div className="flex items-center">
+                  {propertyStatus === "active" ? (
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleStatusChange("inactive")}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      Deactivate Property
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="default"
+                      onClick={() => handleStatusChange("active")}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      Activate Property
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
