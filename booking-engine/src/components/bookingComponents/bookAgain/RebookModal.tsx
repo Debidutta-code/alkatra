@@ -356,6 +356,27 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
       }
     }
 
+    // Rooms validation
+    if (!rooms || rooms < 1) {
+      newErrors["rooms"] = t("At least 1 room is required");
+      isValid = false;
+    } else if (rooms > 4) {
+      newErrors["rooms"] = t("Maximum 4 rooms allowed");
+      isValid = false;
+    }
+
+    // Guest-to-room ratio validation
+    const maxGuestsPerRoom = 4;
+    const maxAllowedGuests = rooms * maxGuestsPerRoom;
+    if (guests.length > maxAllowedGuests) {
+      newErrors["guests"] = t("Maximum {{maxGuests}} guests allowed for {{rooms}} {{roomText}}", {
+        maxGuests: maxAllowedGuests,
+        rooms: rooms,
+        roomText: rooms === 1 ? t("room") : t("rooms")
+      });
+      isValid = false;
+    }
+
     // Contact validation
     if (!contactEmail.trim()) {
       newErrors["email"] = t("Please provide a contact email");

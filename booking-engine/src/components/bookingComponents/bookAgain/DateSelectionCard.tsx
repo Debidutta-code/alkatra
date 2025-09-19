@@ -1,9 +1,8 @@
-// src/components/bookingComponents/bookAgain/DateSelectionCard.tsx
 "use client";
 import React from "react";
-import { DatePicker, Input } from "antd";
+import { DatePicker } from "antd";
 import { Label } from "@/components/ui/label";
-import { BedDouble, CalendarIcon, Clock, Users, AlertCircle } from "lucide-react";
+import { CalendarIcon, Clock, Users, AlertCircle, Minus, Plus } from "lucide-react";
 import { Dayjs } from "dayjs";
 import { useTranslation } from "react-i18next";
 
@@ -26,13 +25,31 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
   rooms,
   guestsCount,
   onCheckInChange,
-  onCheckOutChange,
+  onCheckOutChange, // Fixed: was onCheckOutDate
   onRoomsChange,
   disabledDate,
   disabledCheckOutDate,
   errors = {}
 }) => {
   const { t } = useTranslation();
+
+  const handleRoomsIncrement = () => {
+    if (rooms < 4) {
+      onRoomsChange(rooms + 1);
+    }
+  };
+
+  const handleRoomsDecrement = () => {
+    if (rooms > 1) {
+      onRoomsChange(rooms - 1);
+    }
+  };
+
+  const validateGuestToRoomRatio = () => {
+    const maxGuestsPerRoom = 4;
+    const maxAllowedGuests = rooms * maxGuestsPerRoom;
+    return guestsCount <= maxAllowedGuests;
+  };
 
   return (
     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100">
@@ -50,6 +67,16 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
         <div className="mb-4 flex items-center gap-2 text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
           <AlertCircle className="h-4 w-4 flex-shrink-0" />
           <span className="text-sm font-medium">{errors["dates"]}</span>
+        </div>
+      )}
+
+      {/* Show guest-to-room ratio error */}
+      {!validateGuestToRoomRatio() && (
+        <div className="mb-4 flex items-center gap-2 text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
+          <AlertCircle className="h-4 w-4 flex-shrink-0" />
+          <span className="text-sm font-medium">
+            {t("Maximum 4 guests allowed per room. You have")} {guestsCount} {t("guests for")} {rooms} {rooms === 1 ? t("room") : t("rooms")}.
+          </span>
         </div>
       )}
       
@@ -121,16 +148,46 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
             {t("Number of Rooms")}
           </Label>
           <div className="relative group">
-            <div className="flex items-center bg-white rounded-xl border-2 border-gray-200 group-hover:border-tripswift-blue transition-colors shadow-sm">
-              <BedDouble className="h-5 w-5 text-tripswift-blue absolute left-4 z-[1]" />
-              <Input
-                type="number"
-                min="1"
-                value={rooms}
-                onChange={(e) => onRoomsChange(parseInt(e.target.value) || 1)}
-                className="w-full pl-12 h-10 bg-transparent border-none focus:ring-0"
-                size="middle"
-              />
+            <div className={`flex items-center bg-white rounded-xl border-2 transition-colors shadow-sm ${
+              errors["rooms"] 
+                ? "border-red-300 group-hover:border-red-400" 
+                : "border-gray-200 group-hover:border-tripswift-blue"
+            }`}>
+              <div className="flex items-center justify-between w-full px-4 py-1">
+                <span className="text-sm font-medium text-gray-600">{t("Rooms")}</span>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    className="w-6 h-6 rounded-full border border-gray-400 text-gray-600 flex items-center justify-center transition-colors hover:bg-tripswift-blue/10 hover:border-tripswift-blue hover:text-tripswift-blue disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:border-gray-200 disabled:hover:text-gray-600"
+                    onClick={handleRoomsDecrement}
+                    disabled={rooms <= 1}
+                    aria-label={t("Decrease rooms")}
+                  >
+                    <Minus className="h-4 w-4" />
+                  </button>
+                  <span className="w-8 text-center text-gray-700 font-semibold text-lg">
+                    {rooms}
+                  </span>
+                  <button
+                    type="button"
+                    className="w-6 h-6 rounded-full border border-gray-400 text-gray-600 flex items-center justify-center transition-colors hover:bg-tripswift-blue/10 hover:border-tripswift-blue hover:text-tripswift-blue disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:border-gray-200 disabled:hover:text-gray-600"
+                    onClick={handleRoomsIncrement}
+                    disabled={rooms >= 4}
+                    aria-label={t("Increase rooms")}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+            {errors["rooms"] && (
+              <div className="flex items-center gap-2 mt-2 text-red-600">
+                <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                <span className="text-sm">{errors["rooms"]}</span>
+              </div>
+            )}
+            <div className="mt-1 text-xs text-gray-500">
+              {t("Min: 1 room, Max: 4 rooms")}
             </div>
           </div>
         </div>
@@ -148,6 +205,11 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
             <Users className="h-4 w-4 text-tripswift-blue" />
             <span className="font-semibold text-gray-700">
               {guestsCount} {t("guests")}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm">
+            <span className="font-semibold text-gray-700">
+              {rooms} {rooms === 1 ? t("room") : t("rooms")}
             </span>
           </div>
         </div>
