@@ -17,7 +17,7 @@ export interface IGoogleAuthData {
  */
 export interface IGoogleUserData {
     token: string;
-    user: Partial<ICustomer>;    
+    user: Partial<any>;    
 }
 
 
