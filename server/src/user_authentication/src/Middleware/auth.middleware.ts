@@ -25,7 +25,7 @@ export const protect = catchAsync(
         throw formatError(ErrorMessages.INVALID_TOKEN);
       }
 
-      req.jwt = token;
+      // req.jwt = token;
       req.user = {
         id: decoded.id,
         email: decoded.email,

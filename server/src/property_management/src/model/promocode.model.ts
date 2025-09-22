@@ -1,0 +1,97 @@
+// models/Promocode.ts
+import { Schema, model, Document, Types } from "mongoose";
+
+export interface IPromocode extends Document {
+  _id: Types.ObjectId;
+  propertyId: Types.ObjectId;
+  propertyCode: string;
+  code: string;
+  description?: string;
+  discountType: "percentage" | "flat";
+  discountValue: number;
+  validFrom: Date;
+  validTo: Date;
+  minBookingAmount?: number;
+  maxDiscountAmount?: number;
+  useLimit: number;
+  usageLimitPerUser?: number;
+  applicableRoomType?: Types.ObjectId[];
+  applicableRatePlans?: Types.ObjectId[];
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const PromocodeSchema = new Schema<IPromocode>(
+  {
+    propertyId: {
+      type: Schema.Types.ObjectId,
+      ref: "PropertyInfo",
+      required: [true, "Property ID is required"],
+    },
+    code: {
+      type: String,
+      required: [true, "Promocode is Required"],
+      unique: true,
+    },
+    description: {
+      type: String
+    },
+    discountType: {
+      type: String,
+      enum: {
+        values: ["percentage", "flat"],
+        message: "Discount type must be either 'percentage' or 'flat'",
+      },
+      required: [true, "Discount type is required"],
+    },
+    discountValue: {
+      type: Number,
+      required: [true, "Discount value is required"],
+    },
+    validFrom: {
+      type: Date,
+      required: [true, "Valid from date is required"]
+    },
+    validTo: {
+      type: Date,
+      required: [true, "Valid to date is required"]
+    },
+    minBookingAmount: {
+      type: Number,
+      default: 0
+    },
+    maxDiscountAmount: {
+      type: Number
+    },
+    useLimit: {
+      type: Number,
+      required: [true, "Total usage limit is required"]
+    },
+    usageLimitPerUser: {
+      type: Number,
+      default: 1
+    },
+    applicableRoomType: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Room"
+      }
+    ],
+    applicableRatePlans: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "RatePlan"
+      }
+    ],
+    isActive: {
+      type: Boolean,
+      default: true
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+export const Promocode = model<IPromocode>("Promocode", PromocodeSchema);
