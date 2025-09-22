@@ -33,7 +33,7 @@ const router = Router();
 router.route("/customers/booking/details/:id").get(getBookingDetailsOfUser);
 router.route("/create-reservation-with-card").post(authenticateCustomer as any, createReservationWithStoredCard);
 
-router.route("/update-reservation/:id").patch(authenticateCustomer as any, bookingController.updatePayAtHotelBookings.bind(bookingController));9
+router.route("/update-reservation/:id").patch(authenticateCustomer as any, bookingController.updatePayAtHotelBookings.bind(bookingController));
 router.route("/cancel-reservation/:id").patch(authenticateCustomer as any, cancelThirdPartyReservation);
 
 
@@ -42,5 +42,7 @@ router.route("/count/:id").get(protect as any, getBookingDetailsForExtranet);
 router.route("/customers/booking/details/:id").get(authenticateCustomer as any, getBookingDetailsOfUser);
 router.route("/hotelname").get(protect as any, getAllHotelsByRole);
 
+// API for book again room availability check
+router.route("/check/availability").get(authenticateCustomer as any, bookingController.bookAgainCheckAvailability.bind(bookingController));
 
 export default router;
