@@ -72,6 +72,7 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
         if (isOpen && initialData) {
             setDateRange(initialData.dateRange || getDefaultDateRange());
             setSelectedWeekdays(initialData.selectedWeekdays || []);
+            setRoomRatePlans(initialData.roomRatePlans || []);
         } else if (isOpen) {
             resetFormData();
         }

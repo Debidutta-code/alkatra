@@ -312,16 +312,14 @@ const MapRatePlanPage: React.FC = () => {
               toast.error('Hotel code not found');
               return;
             }
-
             try {
               setIsLoading(true);
-              for (const roomRatePlan of data.roomRatePlans) {
-                await bulkUpdateSellStatus(
-                  hotelCode,
-                  roomRatePlan,
-                  data.dateStatusList
-                );
-              }
+              await bulkUpdateSellStatus(
+                hotelCode,
+                data.roomRatePlans, // ✅ This is now an array like ["One-Bedroom Apartment", "Family Two-Bedroom Suite"]
+                data.dateStatusList
+              );
+
               toast.success(`Successfully updated ${data.roomRatePlans.length} rate plans!`);
               setIsBulkModalOpen(false);
               await fetchRatePlans();
@@ -334,9 +332,7 @@ const MapRatePlanPage: React.FC = () => {
           }}
           initialData={{
             dateRange: dateRange ?? getDefaultDateRange(),
-            roomRatePlans: filteredData.length > 0
-              ? [filteredData[0].invTypeCode]
-              : []
+            roomRatePlans: [],
           }}
           availableCombinations={availableCombinations}
         />
