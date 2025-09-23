@@ -31,6 +31,7 @@ import { getAllHotelDetailsAccordingToLocation } from "../../controller/getHotel
 import { PropertyInfoController } from "../../controller/propertyInfo.controller";
 import { PropertyInfoService } from "../../service/propertyInfo.service";
 import { PropertyInfoRepository } from "../../repositories/propertyInfo.repository";
+import { PromoCodeController } from "../../controller";
 
 
 const router = Router();
@@ -38,6 +39,7 @@ const router = Router();
 const propertyInfoRepository = PropertyInfoRepository.getInstance();
 const propertyInfoService = PropertyInfoService.getInstance(propertyInfoRepository);
 const propertyInfoController = new PropertyInfoController(propertyInfoService);
+const promoCodeController = PromoCodeController.getInstance();
 
 export default (app: Router) => {
 
@@ -97,4 +99,7 @@ export default (app: Router) => {
   router.route("/:id").patch(protect as any, propertyInfoController.propertyInfoUpdate.bind(propertyInfoController));
 
   router.route("/location/:location").get(getAllHotelDetailsAccordingToLocation as any);
+
+  // Promocode API's
+  router.route("/promo/create").post(protect as any, promoCodeController.createPromoCode.bind(promoCodeController));
 };

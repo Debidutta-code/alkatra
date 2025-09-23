@@ -1,6 +1,8 @@
-import { NextFunction, Request, Response,  } from "express";
+import { NextFunction, Request, Response, } from "express";
 import { PromoCodeService } from "../service";
 import { IPromoCodeRepository } from "../repositories";
+import { auth } from "firebase-admin";
+import { success } from "zod";
 
 
 export class PromoCodeController {
@@ -33,10 +35,12 @@ export class PromoCodeController {
    * 
    */
 
-  async createPromoCode (req: any, res: Response, next: NextFunction) {
+  async createPromoCode(req: any, res: Response, next: NextFunction) {
+    
     try {
       const authData = req.user;
       
+
       if (!authData) {
         return res.status(401).json({
           success: false,
@@ -44,23 +48,30 @@ export class PromoCodeController {
         });
       }
 
-      const data: IPromoCodeRepository  = req.body.data;
+      const data  = req.body;
       if (!data) {
         return res.status(400).json({
           succsess: false,
           message: "Promocode details are required",
         })
-      }    
-      
-      const promoCreatedResponse = await this.promoCodeService.createPromoCode(data, authData._id);
-      if (!promoCreatedResponse) {
-        return res.status(200).json(promoCreatedResponse);
-      } else {
-        return res.status(404).json(promoCreatedResponse);
       }
 
+      const promoCreatedResponse = await this.promoCodeService.createPromoCode(data, authData.id);
+      if (!promoCreatedResponse) {
+        return res.status(200).json(promoCreatedResponse);
+      }
+
+      return res.status(200).json({ success: true, message: "Promocode created successfully", data: promoCreatedResponse });
+
     }
-    catch (error) {}
+    catch (error) {
+      console.log("Error occurred while creating PromoCode", error);
+      return res.status(500).json({
+        success: false,
+        message: "Error occurred while creating PromoCode",
+        error: error.message,
+      });
+    }
   }
 
 

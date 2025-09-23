@@ -29,13 +29,13 @@ export class PromoCodeService {
   }
 
 
-  async createPromoCode( promoCodeCreateRequest: IPromoCodeRepository ) {
+  async createPromoCode( promoCodeCreateRequest: IPromoCodeRepository, userId: string ) {
     
-    if (!promoCodeCreateRequest) {
-      throw new Error("Promocode details are required");
+    if (!promoCodeCreateRequest || !userId) {
+      throw new Error("Promocode details and User ID are required");
     }
 
-    const createdPromoCode = await this.promoCodeRepository.createPromoCode(promoCodeCreateRequest);
+    const createdPromoCode = await this.promoCodeRepository.createPromoCode(promoCodeCreateRequest, userId);
     return createdPromoCode;
 
   }
