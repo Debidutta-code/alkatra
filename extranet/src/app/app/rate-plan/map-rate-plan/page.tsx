@@ -287,7 +287,7 @@ const MapRatePlanPage: React.FC = () => {
         <div className="flex justify-start mt-2 px-6">
           <Button
             onClick={() => setIsBulkModalOpen(true)}
-            disabled={!selectedRoomType && !selectedRatePlan && !dateRange}
+            disabled={filteredData.length === 0}
             className={`gap-2 ${bulkAction === 'start' ? 'bg-green-600 hover:bg-green-700' : 'bg-orange-600 hover:bg-orange-700'} text-white`}
           >
             {bulkAction === 'start' ? (

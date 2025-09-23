@@ -121,7 +121,7 @@ const CreateRatePlanPage = () => {
                 onCancel={() => setActiveTab('ratePlan')}
               />
             ) : (
-              <div className="p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="p-6 border border-gray-100 rounded-lg">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1">
                     <CreateInventoryForm
