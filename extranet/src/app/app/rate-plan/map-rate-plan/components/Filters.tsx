@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { Calendar } from './Calender';
-import { Popover, PopoverTrigger } from './Popover';
+import { Popover, PopoverTrigger, PopoverContent } from './Popover';
 import { format } from '../utils/dateUtils';
 import { DateRange, RatePlanInterFace } from '../types';
 import { useRouter } from 'next/navigation';
@@ -34,7 +34,7 @@ export const Filters: React.FC<FiltersProps> = ({
   // Helper function to get unique rate plans based on selected room type
   const getUniqueRatePlans = (roomTypes: any[], selectedRoomType: string) => {
     if (!roomTypes || roomTypes.length === 0) return [];
-    
+
     if (selectedRoomType) {
       // If a room type is selected, show only its rate plans
       const selectedRoom = roomTypes.find(room => room.invTypeCode === selectedRoomType);
@@ -60,7 +60,7 @@ export const Filters: React.FC<FiltersProps> = ({
   }, [selectedRoomType, setSelectedRatePlan]);
 
   const router = useRouter();
-  
+
   return (
     <div className="bg-tripswift-off-white rounded-lg p-4 sm:px-6">
       {/* Title and Reset */}
@@ -92,15 +92,7 @@ export const Filters: React.FC<FiltersProps> = ({
           <label className="block text-sm font-tripswift-medium text-gray-700 mb-2">
             Date Range
           </label>
-          <Popover
-            content={
-              <Calendar
-                mode="range"
-                selected={dateRange}
-                onSelect={(range: any) => setDateRange(range)}
-              />
-            }
-          >
+          <Popover>
             <PopoverTrigger>
               <div className="w-full px-3 py-2 border border-gray-300 rounded-lg cursor-pointer hover:border-tripswift-blue transition-colors duration-200 bg-white">
                 {dateRange?.from ? (
@@ -114,6 +106,13 @@ export const Filters: React.FC<FiltersProps> = ({
                 )}
               </div>
             </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="range"
+                selected={dateRange}
+                onSelect={(range: any) => setDateRange(range)}
+              />
+            </PopoverContent>
           </Popover>
         </div>
 

@@ -275,6 +275,17 @@ export class StartStopWatcher {
             const { hotelCode, invTypeCode, dateStatusList } = req.body;
 
             /**
+             * Validate invTypeCode is an array
+             */
+            if (!Array.isArray(invTypeCode)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Room Type code must be an array"
+                });
+            }
+
+
+            /**
              * Validate dateStatusList is an array
              */
             if (!Array.isArray(dateStatusList)) {

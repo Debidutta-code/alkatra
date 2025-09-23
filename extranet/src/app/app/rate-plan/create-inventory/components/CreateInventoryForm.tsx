@@ -4,8 +4,8 @@
 import React, { useState } from 'react';
 import { Input } from '@src/components/ui/input';
 import { Button } from '@src/components/ui/button';
-import { Calendar } from '../../map-rate-plan/components/Calender';
-import { Popover, PopoverTrigger, PopoverContent } from '../../map-rate-plan/components/Popover';
+import { Calendar } from '../components/Calender';
+import { Popover, PopoverTrigger, PopoverContent } from '../components/Popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@src/components/ui/select';
 import { format } from '../../map-rate-plan/utils/dateUtils';
 import { Loader2 } from 'lucide-react';
@@ -36,9 +36,7 @@ export const CreateInventoryForm: React.FC<CreateInventoryFormProps> = ({
     endDate: '',
     count: '',
   });
-
   const [errors, setErrors] = useState<Record<string, string>>({});
-
   const handleDateSelect = (field: 'startDate' | 'endDate', date: Date | undefined) => {
     if (date) {
       const year = date.getFullYear();
@@ -52,7 +50,8 @@ export const CreateInventoryForm: React.FC<CreateInventoryFormProps> = ({
       }));
     }
   };
-
+  const [startDateOpen, setStartDateOpen] = useState(false);
+  const [endDateOpen, setEndDateOpen] = useState(false);
   const validate = () => {
     const newErrors: Record<string, string> = {};
 
@@ -74,7 +73,6 @@ export const CreateInventoryForm: React.FC<CreateInventoryFormProps> = ({
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -99,14 +97,13 @@ export const CreateInventoryForm: React.FC<CreateInventoryFormProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      {/* <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <p className="text-sm text-blue-800">
           ⚠️ You can set up inventory now, but we recommend creating a rate plan first for best results.
         </p>
-      </div>
+      </div> */}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Room Type Dropdown */}
         {/* Room Type Dropdown */}
         <div>
           <label className="block text-sm font-tripswift-medium text-gray-700 mb-1">
@@ -129,72 +126,88 @@ export const CreateInventoryForm: React.FC<CreateInventoryFormProps> = ({
           )}
         </div>
 
-        {/* Start Date */}
-        <div>
-          <label className="block text-sm font-tripswift-medium text-gray-700 mb-1">
-            Start Date <span className="text-red-500">*</span>
-          </label>
-          <Popover>
-            <PopoverTrigger>
-              <Button
-                variant="outline"
-                className={`w-full justify-start ${errors.startDate ? 'border-red-500' : ''}`}
-              >
-                {availability.startDate ? format(new Date(availability.startDate), 'PPP') : 'Pick start date'}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={
-                  availability.startDate
-                    ? new Date(`${availability.startDate}T00:00:00`)
-                    : undefined
-                }
-                onSelect={(date) => handleDateSelect('startDate', date as Date)}
-                disabled={(date) => date < today}
-              />
-            </PopoverContent>
-          </Popover>
-          {errors.startDate && <p className="text-xs text-red-500 mt-1">{errors.startDate}</p>}
-        </div>
+        {/* Date Range */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Start Date */}
+          <div>
+            <label className="block text-sm font-tripswift-medium text-gray-700 mb-1">
+              Start Date <span className="text-red-500">*</span>
+            </label>
+            <Popover>
+              <PopoverTrigger>
+                <input
+                  type="text"
+                  readOnly
+                  placeholder="Pick start date"
+                  value={availability.startDate ? format(new Date(availability.startDate), 'PPP') : ''}
+                  onFocus={() => setStartDateOpen(true)}
+                  className={`w-full px-3 py-2 text-left border rounded-md bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.startDate ? 'border-red-500' : 'border-gray-300'}`}
+                />
+              </PopoverTrigger>
+              {startDateOpen && (
+                <PopoverContent className="mt-2 w-auto p-0 z-[9999] bg-white border shadow-lg rounded-lg">
+                  <Calendar
+                    mode="single"
+                    selected={
+                      availability.startDate
+                        ? new Date(`${availability.startDate}T00:00:00`)
+                        : undefined
+                    }
+                    onSelect={(date) => {
+                      handleDateSelect('startDate', date as Date);
+                      setStartDateOpen(false); // Close after selection
+                    }}
+                    disabled={(date) => date < today}
+                  />
+                </PopoverContent>
+              )}
+            </Popover>
+            {errors.startDate && <p className="text-xs text-red-500 mt-1">{errors.startDate}</p>}
+          </div>
 
-        {/* End Date */}
-        <div>
-          <label className="block text-sm font-tripswift-medium text-gray-700 mb-1">
-            End Date <span className="text-red-500">*</span>
-          </label>
-          <Popover>
-            <PopoverTrigger>
-              <Button
-                variant="outline"
-                className={`w-full justify-start ${errors.endDate ? 'border-red-500' : ''}`}
-              >
-                {availability.endDate ? format(new Date(availability.endDate), 'PPP') : 'Pick end date'}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={
-                  availability.endDate
-                    ? new Date(`${availability.endDate}T00:00:00`)
-                    : undefined
-                }
-                onSelect={(date) => handleDateSelect('endDate', date as Date)}
-                disabled={(date) => {
-                  if (date < today) return true;
-                  if (availability.startDate) {
-                    const startDate = new Date(availability.startDate);
-                    return date < startDate;
-                  }
-
-                  return false;
-                }}
-              />
-            </PopoverContent>
-          </Popover>
-          {errors.endDate && <p className="text-xs text-red-500 mt-1">{errors.endDate}</p>}
+          {/* End Date */}
+          <div>
+            <label className="block text-sm font-tripswift-medium text-gray-700 mb-1">
+              End Date <span className="text-red-500">*</span>
+            </label>
+            <Popover>
+              <PopoverTrigger>
+                <input
+                  type="text"
+                  readOnly
+                  placeholder="Pick end date"
+                  value={availability.endDate ? format(new Date(availability.endDate), 'PPP') : ''}
+                  onFocus={() => setEndDateOpen(true)}
+                  className={`w-full px-3 py-2 text-left border rounded-md bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.endDate ? 'border-red-500' : 'border-gray-300'}`}
+                />
+              </PopoverTrigger>
+              {endDateOpen && (
+                <PopoverContent className="mt-2 w-auto p-0 z-[9999] bg-white border shadow-lg rounded-lg">
+                  <Calendar
+                    mode="single"
+                    selected={
+                      availability.endDate
+                        ? new Date(`${availability.endDate}T00:00:00`)
+                        : undefined
+                    }
+                    onSelect={(date) => {
+                      handleDateSelect('endDate', date as Date);
+                      setEndDateOpen(false); // Close after selection
+                    }}
+                    disabled={(date) => {
+                      if (date < today) return true;
+                      if (availability.startDate) {
+                        const startDate = new Date(availability.startDate);
+                        return date < startDate;
+                      }
+                      return false;
+                    }}
+                  />
+                </PopoverContent>
+              )}
+            </Popover>
+            {errors.endDate && <p className="text-xs text-red-500 mt-1">{errors.endDate}</p>}
+          </div>
         </div>
 
         {/* Count */}
@@ -243,7 +256,7 @@ export const CreateInventoryForm: React.FC<CreateInventoryFormProps> = ({
                 Saving Inventory...
               </>
             ) : (
-              '✅ Complete Setup'
+              'Complete Setup'
             )}
           </Button>
         </div>

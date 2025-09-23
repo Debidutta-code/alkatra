@@ -224,7 +224,7 @@ export const getAllRatePlanServices = async () => {
 
 export const bulkUpdateSellStatus = async (
   hotelCode: string,
-  roomRatePlan: string,
+  invTypeCodes: string[],
   dateStatusList: { date: string; status: "open" | "close" }[]
 ) => {
   const accessToken = Cookies.get('accessToken');
@@ -232,15 +232,10 @@ export const bulkUpdateSellStatus = async (
     throw new Error('No access token found. Please log in.');
   }
 
-  const [invTypeCode, ratePlanCode] = roomRatePlan.split(' - ');
-  if (!invTypeCode) {
-    throw new Error('Invalid room/rate plan format');
-  }
-
   return await updateSellStatus(
     {
       hotelCode,
-      invTypeCode,
+      invTypeCode: invTypeCodes,
       dateStatusList,
     },
     accessToken

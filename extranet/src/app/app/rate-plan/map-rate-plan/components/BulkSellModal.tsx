@@ -44,7 +44,10 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
     initialData,
     availableCombinations,
 }) => {
-    const getDefaultDateRange = () => ({ from: new Date(), to: new Date() });
+    const getDefaultDateRange = (): { from: Date; to: Date } => ({
+        from: new Date(),
+        to: new Date()
+    });
 
     const [action, setAction] = useState<'start' | 'stop' | undefined>(undefined);
     const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>(getDefaultDateRange());
@@ -69,6 +72,7 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
         if (isOpen && initialData) {
             setDateRange(initialData.dateRange || getDefaultDateRange());
             setSelectedWeekdays(initialData.selectedWeekdays || []);
+            setRoomRatePlans(initialData.roomRatePlans || []);
         } else if (isOpen) {
             resetFormData();
         }
@@ -91,7 +95,7 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
         }
 
         if (applyTo === 'selected' && selectedWeekdays.length === 0) {
-            toast.error('Please select at least one weekday');
+            toast.error('Please select at least one day');
             return;
         }
 
@@ -147,82 +151,143 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                         Bulk Update Sell Status
                     </DialogTitle>
                     <DialogDescription className="text-sm text-gray-600">
-                        Apply Start/Stop Sell to selected room types and rate plans over a date range.
+                        Apply Start/Stop Sell to selected room types over a date range.
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="space-y-4">
-                    {/* === ACTION TYPE === */}
-                    <div className="space-y-2">
-                        <label className="block text-sm font-tripswift-medium text-gray-700">
-                            Action <span className="text-red-500">*</span>
-                        </label>
-                        <div className="flex space-x-3">
-                            <button
-                                type="button"
-                                onClick={() => setAction('start')}
-                                className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg border transition-all ${action === 'start'
-                                    ? 'bg-green-50 border-green-500 text-green-700 shadow-sm'
-                                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-                                    }`}
-                            >
-                                <CheckCircle className="h-5 w-5" />
-                                <span className="font-medium">Start Sell</span>
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setAction('stop')}
-                                className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg border transition-all ${action === 'stop'
-                                    ? 'bg-red-50 border-red-500 text-red-700 shadow-sm'
-                                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-                                    }`}
-                            >
-                                <XCircle className="h-5 w-5" />
-                                <span className="font-medium">Stop Sell</span>
-                            </button>
-                        </div>
-                    </div>
+                <div className="space-y-2">
+                    {/* === DATE RANGE AND ACTION === */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Date Range Column */}
+                        <div className="space-y-2">
+                            <label className="block text-sm font-tripswift-medium text-gray-700">
+                                Date Range <span className="text-red-500">*</span>
+                            </label>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {/* From Date Picker */}
+                                <div className="relative">
+                                    <Popover>
+                                        <PopoverTrigger>
+                                            <button
+                                                type="button"
+                                                className="w-full flex items-center justify-between px-4 py-3 text-left border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    <CalendarIcon className="h-5 w-5 text-gray-400" />
+                                                    <span className="font-medium">
+                                                        {dateRange?.from ? format(dateRange.from, 'dd/MM/yyyy') : 'From'}
+                                                    </span>
+                                                </div>
+                                                <span className="text-gray-400">▼</span>
+                                            </button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                                            <Calendar
+                                                mode="single"
+                                                selected={dateRange.from}
+                                                defaultMonth={dateRange.from}
+                                                onSelect={(date: Date | { from: Date; to: Date } | undefined) => {
+                                                    if (date && date instanceof Date) {
+                                                        setDateRange(prev => ({
+                                                            from: date,
+                                                            to: prev.to
+                                                        }));
+                                                    } else if (date && typeof date === 'object' && 'from' in date) {
+                                                        setDateRange({
+                                                            from: date.from,
+                                                            to: date.to
+                                                        });
+                                                    }
+                                                }}
+                                                disabled={(date) => {
+                                                    const today = new Date();
+                                                    today.setHours(0, 0, 0, 0);
+                                                    return date < today;
+                                                }}
+                                                className="p-3"
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                </div>
 
-                    {/* === DATE RANGE === */}
-                    <div className="space-y-2">
-                        <label className="block text-sm font-tripswift-medium text-gray-700">
-                            Date Range <span className="text-red-500">*</span>
-                        </label>
-                        <Popover>
-                            <PopoverTrigger>
+                                {/* To Date Picker */}
+                                <div className="relative">
+                                    <Popover>
+                                        <PopoverTrigger>
+                                            <button
+                                                type="button"
+                                                className="w-full flex items-center justify-between px-4 py-3 text-left border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    <CalendarIcon className="h-5 w-5 text-gray-400" />
+                                                    <span className="font-medium">
+                                                        {dateRange?.to ? format(dateRange.to, 'dd/MM/yyyy') : 'To'}
+                                                    </span>
+                                                </div>
+                                                <span className="text-gray-400">▼</span>
+                                            </button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                                            <Calendar
+                                                mode="single"
+                                                selected={dateRange.to}
+                                                defaultMonth={dateRange.to}
+                                                onSelect={(date: Date | { from: Date; to: Date } | undefined) => {
+                                                    if (date && date instanceof Date) {
+                                                        setDateRange(prev => ({
+                                                            from: prev.from,
+                                                            to: date
+                                                        }));
+                                                    } else if (date && typeof date === 'object' && 'from' in date) {
+                                                        setDateRange({
+                                                            from: date.from,
+                                                            to: date.to
+                                                        });
+                                                    }
+                                                }}
+                                                disabled={(date) => {
+                                                    const today = new Date();
+                                                    today.setHours(0, 0, 0, 0);
+                                                    return date < today || (dateRange.from && date < dateRange.from);
+                                                }}
+                                                className="p-3"
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Action Column */}
+                        <div className="space-y-2">
+                            <label className="block text-sm font-tripswift-medium text-gray-700">
+                                Action <span className="text-red-500">*</span>
+                            </label>
+                            <div className="flex space-x-3">
                                 <button
                                     type="button"
-                                    className="w-full flex items-center justify-between px-4 py-3 text-left border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    onClick={() => setAction('start')}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg border transition-all ${action === 'start'
+                                        ? 'bg-green-50 border-green-500 text-green-700 shadow-sm'
+                                        : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                                        }`}
                                 >
-                                    <div className="flex items-center gap-2">
-                                        <CalendarIcon className="h-5 w-5 text-gray-400" />
-                                        <span className="font-medium">
-                                            {dateRange?.from
-                                                ? dateRange.to
-                                                    ? `${format(dateRange.from, 'PPP')} – ${format(dateRange.to, 'PPP')}`
-                                                    : `${format(dateRange.from, 'PPP')} – Select end date`
-                                                : 'Select start and end date'}
-                                        </span>
-                                    </div>
-                                    <span className="text-gray-400">▼</span>
+                                    <CheckCircle className="h-5 w-5" />
+                                    <span className="font-medium">Start Sell</span>
                                 </button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-2">
-                                <Calendar
-                                    mode="range"
-                                    selected={dateRange}
-                                    onSelect={(range: any) => {
-                                        setDateRange(range);
-                                    }}
-                                    disabled={(date) => {
-                                        const today = new Date();
-                                        today.setHours(0, 0, 0, 0);
-                                        return date < today;
-                                    }}
-                                    className="p-3"
-                                />
-                            </PopoverContent>
-                        </Popover>
+                                <button
+                                    type="button"
+                                    onClick={() => setAction('stop')}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg border transition-all ${action === 'stop'
+                                        ? 'bg-red-50 border-red-500 text-red-700 shadow-sm'
+                                        : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    <XCircle className="h-5 w-5" />
+                                    <span className="font-medium">Stop Sell</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     {/* === APPLY TO === */}
@@ -230,44 +295,43 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                         <label className="block text-sm font-tripswift-medium text-gray-700">
                             Apply To <span className="text-red-500">*</span>
                         </label>
-                        <div className="grid grid-cols-1 gap-2">
-                            {[
-                                { value: 'all', label: 'All Days', desc: 'Apply to every day in selected range' },
-                                { value: 'selected', label: 'Selected Days', desc: 'Choose specific weekdays to apply changes' },
-                            ].map((option) => (
-                                <label
-                                    key={option.value}
-                                    className={`p-3 border rounded-lg cursor-pointer transition-all ${applyTo === option.value
-                                        ? 'border-tripswift-blue bg-blue-50'
-                                        : 'border-gray-300 bg-white hover:bg-gray-50'
-                                        }`}
-                                >
-                                    <input
-                                        type="radio"
-                                        name="applyTo"
-                                        value={option.value}
-                                        checked={applyTo === option.value}
-                                        onChange={() => setApplyTo(option.value as any)}
-                                        className="sr-only"
-                                    />
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <div className="font-medium text-gray-900">{option.label}</div>
-                                            <div className="text-xs text-gray-500">{option.desc}</div>
-                                        </div>
-                                        {applyTo === option.value && (
-                                            <div className="w-4 h-4 rounded-full bg-tripswift-blue"></div>
-                                        )}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">                            {[
+                            { value: 'all', label: 'All Days', desc: 'Apply to every day in selected range' },
+                            { value: 'selected', label: 'Selected Days', desc: 'Choose specific days to apply changes' },
+                        ].map((option) => (
+                            <label
+                                key={option.value}
+                                className={`p-3 border rounded-lg cursor-pointer transition-all ${applyTo === option.value
+                                    ? 'border-tripswift-blue bg-blue-50'
+                                    : 'border-gray-300 bg-white hover:bg-gray-50'
+                                    }`}
+                            >
+                                <input
+                                    type="radio"
+                                    name="applyTo"
+                                    value={option.value}
+                                    checked={applyTo === option.value}
+                                    onChange={() => setApplyTo(option.value as any)}
+                                    className="sr-only"
+                                />
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <div className="font-medium text-gray-900">{option.label}</div>
+                                        <div className="text-xs text-gray-500">{option.desc}</div>
                                     </div>
-                                </label>
-                            ))}
+                                    {applyTo === option.value && (
+                                        <div className="w-4 h-4 rounded-full bg-tripswift-blue"></div>
+                                    )}
+                                </div>
+                            </label>
+                        ))}
                         </div>
 
                         {/* Weekday Selection */}
                         {applyTo === 'selected' && (
                             <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                                 <label className="block text-sm font-tripswift-medium text-gray-700 mb-3">
-                                    Select Specific Weekdays <span className="text-red-500">*</span>
+                                    Select Specific days <span className="text-red-500">*</span>
                                 </label>
                                 <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
                                     {[
@@ -306,7 +370,7 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                                     ))}
                                 </div>
                                 {selectedWeekdays.length === 0 && (
-                                    <p className="text-xs text-red-500 mt-2">Please select at least one weekday</p>
+                                    <p className="text-xs text-red-500 mt-2">Please select at least one day</p>
                                 )}
                             </div>
                         )}
@@ -325,6 +389,25 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                                         ? `${roomRatePlans.length} selected`
                                         : 'Click below to add combinations'}
                                 </p>
+                                <div className="flex gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setRoomRatePlans(availableCombinations)}
+                                        className="text-xs text-tripswift-blue hover:text-tripswift-dark-blue font-medium transition-colors"
+                                        disabled={!availableCombinations || availableCombinations.length === 0}
+                                    >
+                                        Select All
+                                    </button>
+                                    <span className="text-gray-300">|</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => setRoomRatePlans([])}
+                                        className="text-xs text-gray-500 hover:text-gray-700 font-medium transition-colors"
+                                        disabled={roomRatePlans.length === 0}
+                                    >
+                                        Clear All
+                                    </button>
+                                </div>
                             </div>
 
                             {/* Selected Tags */}
@@ -339,7 +422,7 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                                                 <span>{item}</span>
                                                 <button
                                                     type="button"
-                                                    onClick={() => setRoomRatePlans([])}
+                                                    onClick={() => setRoomRatePlans(roomRatePlans.filter(plan => plan !== item))}
                                                     className="ml-1 text-tripswift-blue hover:text-tripswift-dark-blue opacity-70 group-hover:opacity-100 transition-all"
                                                     aria-label="Remove"
                                                 >
@@ -365,18 +448,20 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                                                 type="button"
                                                 onClick={() => {
                                                     if (roomRatePlans.includes(item)) {
-                                                        setRoomRatePlans([]);
+                                                        // Remove item if already selected
+                                                        setRoomRatePlans(roomRatePlans.filter(plan => plan !== item));
                                                     } else {
-                                                        setRoomRatePlans([item]);
+                                                        // Add item to selection
+                                                        setRoomRatePlans([...roomRatePlans, item]);
                                                     }
                                                 }}
                                                 className={`
-                                                flex items-center justify-between px-3 py-2.5 text-left text-xs font-medium rounded-lg border transition-all
-                                                ${roomRatePlans.includes(item)
-                                                        ? 'bg-green-50 border-green-300 text-green-800 cursor-default'
+                                flex items-center justify-between px-3 py-2.5 text-left text-xs font-medium rounded-lg border transition-all
+                                ${roomRatePlans.includes(item)
+                                                        ? 'bg-green-50 border-green-300 text-green-800'
                                                         : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 active:scale-98'
                                                     }
-                                            `}
+                            `}
                                             >
                                                 <span className="truncate">{item}</span>
                                                 {roomRatePlans.includes(item) && (
@@ -391,7 +476,7 @@ export const BulkSellModal: React.FC<BulkSellModalProps> = ({
                     </div>
                 </div>
 
-                <DialogFooter className="mt-6 pt-4 border-t border-gray-200">
+                <DialogFooter className="mt-4 pt-2 border-t border-gray-200">
                     <Button
                         variant="outline"
                         onClick={handleClose}
