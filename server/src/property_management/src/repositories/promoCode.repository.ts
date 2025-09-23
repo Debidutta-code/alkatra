@@ -1,5 +1,6 @@
 import { IPromocode, Promocode } from "../model";
 import { ThirdPartyBooking } from "../../../wincloud/src/model/reservationModel";
+import { Types } from "mongoose";
 
 export interface IPromoCodeRepository {
   code: string;
@@ -86,7 +87,8 @@ export class PromoCodeRepository {
    */
   async getAllPromoCodes(filters: any = {}, sort: any = {}, skip: number = 0, limit: number = 10): Promise<any[]> {
     try {
-      return await Promocode.find(filters)
+      const activeFilters = { ...filters, isActive: true };
+      return await Promocode.find(activeFilters)
         .sort(sort)
         .skip(skip)
         .limit(limit)
@@ -139,7 +141,7 @@ export class PromoCodeRepository {
       }
 
 
-      const existingPromoCode = await Promocode.findById(id);
+      const existingPromoCode = await Promocode.findOne({ _id: new Types.ObjectId(id) });
       if (!existingPromoCode) {
         throw new Error("Promo code not found");
       }

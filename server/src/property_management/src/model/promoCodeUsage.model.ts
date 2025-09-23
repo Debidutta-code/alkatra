@@ -3,7 +3,7 @@ import { Schema, model, Document, Types } from "mongoose";
 export interface IPromocodeUsage extends Document {
     _id: Types.ObjectId;
     promoCodeId: Types.ObjectId;
-    userId: Types.ObjectId;
+    customerId: Types.ObjectId;
     bookingId: Types.ObjectId;
     discountType: "percentage" | "flat";
     discountValue: number;
@@ -28,7 +28,7 @@ const PromocodeUsageSchema = new Schema<IPromocodeUsage>(
             required: [true, "Promo code ID is required"],
             index: true
         },
-        userId: {
+        customerId: {
             type: Schema.Types.ObjectId,
             ref: "User",
             required: [true, "User ID is required"],

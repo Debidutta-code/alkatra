@@ -246,4 +246,6 @@ export class PromoCodeService {
       throw error;
     }
   }
+
+  async userUsageTracker () {}
 }

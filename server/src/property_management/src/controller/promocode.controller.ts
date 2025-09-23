@@ -293,6 +293,48 @@ export class PromoCodeController {
     }
   }
 
-  
+  async userUsageTracker(req: any, res: Response, next: NextFunction) {
+    try {
+      const customerAuthData = req.user;
+
+      if (!customerAuthData) {
+        return res.status(401).json({
+          success: false,
+          message: "Unauthorized",
+        });
+      }
+
+      const promoCodeId = req.params.promoId;
+      if (!promoCodeId) {
+        return res.status(400).json({
+          success: false,
+          message: "Promo code ID is required",
+        });
+      }
+
+      const userUsageDetails = await this.promoCodeService.userUsageTracker(promoCodeId, customerAuthData.id);
+      if (!userUsageDetails) {
+        return res.status(404).json({
+          success: false,
+          message: "User usage details not found",
+        })
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "User usage details fetched successfully",
+        data: userUsageDetails
+      });
+
+    }
+    catch (error: any) {
+      console.log("Error while creating user usage details");
+      return res.status(500).json({
+        success: false,
+        message: "Error while creating user usage details",
+        error: error.message,
+      });
+    }
+  }
 
 }

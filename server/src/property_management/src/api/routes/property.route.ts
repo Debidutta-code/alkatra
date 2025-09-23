@@ -32,7 +32,7 @@ import { PropertyInfoController } from "../../controller/propertyInfo.controller
 import { PropertyInfoService } from "../../service/propertyInfo.service";
 import { PropertyInfoRepository } from "../../repositories/propertyInfo.repository";
 import { PromoCodeController } from "../../controller";
-
+import { authenticateCustomer } from "../../../../customer_authentication/src/middleware";
 
 const router = Router();
 
