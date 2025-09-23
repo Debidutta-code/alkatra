@@ -39,9 +39,10 @@ export class GoogleAuthController implements IGoogleAuthController {
             const userData = await this.googleAuthService.authenticate({ provider, code, token });
             if (!userData) throw new Error("Failed to authenticate with Google");
 
-            console.log("The user data is:", userData);
-            console.log("The user ID is:", userData.user.id);
-            console.log("The referrer ID is:", referrerId);
+            if (!userData) throw new Error("Failed to authenticate with Google");
+            if (userData.user.isExist) return res.status(201).json(userData);
+
+            console.log("User proceed for referral...");
 
             if (userData.user.id.toString() === referrerId) {
                 return res.status(201).json(userData);
