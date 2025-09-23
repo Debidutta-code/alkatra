@@ -25,10 +25,9 @@ export class InventoryService {
      * @returns 
      */
 
-    async updateInventory(hotelCode: string, invTypeCode: string, dateStatusList: { date: string, status: string }[]) {
+    async updateInventory(hotelCode: string, invTypeCode: string[], dateStatusList: { date: string, status: string }[]) {
         console.log("Enter into service layer for inventory update");
-
-        // Validate dateStatusList entries
+        
         for (const item of dateStatusList) {
             if (!item.date || !item.status || !['open', 'close'].includes(item.status)) {
                 throw new Error("Each item must have a valid date and status ('open' or 'close')");
@@ -39,32 +38,14 @@ export class InventoryService {
             }
         }
 
+        if (!Array.isArray(invTypeCode) || invTypeCode.length === 0) {
+            throw new Error("Room Type code must be a non-empty array");
+        }
+
         const inventoryUpdateDaoResponse = await this.inventoryDao.inventoryUpdate(hotelCode, invTypeCode, dateStatusList);
         return inventoryUpdateDaoResponse;
     }
-    // async updateInventory(hotelCode: string, invTypeCode: string, ratePlanCode: string, startDate: string, endDate: string) {
-    //     try {
-    //         console.log("Enter into service layer for inventory update");
-    //         if (!hotelCode || !invTypeCode || !startDate || !endDate) {
-    //             throw new Error("Invalid input parameters for inventory update");
-    //         }
-
-    //         const dates = await this.generateDateRange(startDate, endDate);
-    //         if (dates.length === 0) {
-    //             throw new Error("No dates generated for the given range");
-    //         }
-    //         console.log("############## Generated dates for inventory update:", dates);
-
-    //         const inventoryUpdateDaoResponse = await this.inventoryDao.inventoryUpdate(hotelCode, invTypeCode, ratePlanCode, dates);
-    //         if (!inventoryUpdateDaoResponse) {
-    //             throw new Error("Failed to update inventory at DAO Layer");
-    //         }
-    //         return inventoryUpdateDaoResponse;
-    //     } catch (error: any) {
-    //         console.log("Failed to update inventory at Service Layer:", error);
-    //         throw new Error("Failed to update inventory at Service Layer");
-    //     }
-    // }
+    
 
     /**
      * Found the date range between two dates
