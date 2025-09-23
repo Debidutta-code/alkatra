@@ -483,7 +483,8 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         guests: guests.map(g => ({
           firstName: g.firstName,
           lastName: g.lastName,
-          dob: g.dob || ""
+          dob: g.dob || "",
+          category: getGuestType(g.dob),
         })),
       };
 
