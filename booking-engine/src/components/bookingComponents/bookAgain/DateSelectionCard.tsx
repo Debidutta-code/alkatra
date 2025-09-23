@@ -61,7 +61,7 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
           {t("When do you want to stay?")}
         </h4>
       </div>
-      
+
       {/* Show general date error if exists */}
       {errors["dates"] && (
         <div className="mb-4 flex items-center gap-2 text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
@@ -79,18 +79,17 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
           </span>
         </div>
       )}
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="space-y-2">
           <Label className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
             {t("Check-in Date")}
           </Label>
           <div className="relative group">
-            <div className={`flex items-center bg-white rounded-xl border-2 transition-colors shadow-sm ${
-              errors["checkInDate"] 
-                ? "border-red-300 group-hover:border-red-400" 
+            <div className={`flex items-center bg-white rounded-xl border-2 transition-colors shadow-sm ${errors["checkInDate"]
+                ? "border-red-300 group-hover:border-red-400"
                 : "border-gray-200 group-hover:border-tripswift-blue"
-            }`}>
+              }`}>
               <CalendarIcon className="h-5 w-5 text-tripswift-blue absolute left-4 z-[1]" />
               <DatePicker
                 value={checkInDate}
@@ -111,17 +110,16 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
             )}
           </div>
         </div>
-        
+
         <div className="space-y-2">
           <Label className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
             {t("Check-out Date")}
           </Label>
           <div className="relative group">
-            <div className={`flex items-center bg-white rounded-xl border-2 transition-colors shadow-sm ${
-              errors["checkOutDate"] 
-                ? "border-red-300 group-hover:border-red-400" 
+            <div className={`flex items-center bg-white rounded-xl border-2 transition-colors shadow-sm ${errors["checkOutDate"]
+                ? "border-red-300 group-hover:border-red-400"
                 : "border-gray-200 group-hover:border-tripswift-blue"
-            }`}>
+              }`}>
               <CalendarIcon className="h-5 w-5 text-tripswift-blue absolute left-4 z-[1]" />
               <DatePicker
                 value={checkOutDate}
@@ -142,17 +140,16 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
             )}
           </div>
         </div>
-        
+
         <div className="space-y-2">
           <Label className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
             {t("Number of Rooms")}
           </Label>
           <div className="relative group">
-            <div className={`flex items-center bg-white rounded-xl border-2 transition-colors shadow-sm ${
-              errors["rooms"] 
-                ? "border-red-300 group-hover:border-red-400" 
+            <div className={`flex items-center bg-white rounded-xl border-2 transition-colors shadow-sm ${errors["rooms"]
+                ? "border-red-300 group-hover:border-red-400"
                 : "border-gray-200 group-hover:border-tripswift-blue"
-            }`}>
+              }`}>
               <div className="flex items-center justify-between w-full px-4 py-1">
                 <span className="text-sm font-medium text-gray-600">{t("Rooms")}</span>
                 <div className="flex items-center gap-3">
@@ -192,13 +189,13 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
           </div>
         </div>
       </div>
-      
+
       {checkInDate && checkOutDate && (
         <div className="mt-6 flex items-center gap-6 text-sm">
           <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm">
             <Clock className="h-4 w-4 text-tripswift-blue" />
             <span className="font-semibold text-gray-700">
-              {checkOutDate.diff(checkInDate, 'day')} {t("nights")}
+              {checkInDate && checkOutDate ? Math.max(0, checkOutDate.startOf('day').diff(checkInDate.startOf('day'), 'day')) : 0} {t("nights")}
             </span>
           </div>
           <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm">
