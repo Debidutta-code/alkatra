@@ -99,7 +99,26 @@ export default (app: Router) => {
   router.route("/:id").patch(protect as any, propertyInfoController.propertyInfoUpdate.bind(propertyInfoController));
 
   router.route("/location/:location").get(getAllHotelDetailsAccordingToLocation as any);
+  
 
   // Promocode API's
+  /**
+   * Create promo code
+   */
   router.route("/promo/create").post(protect as any, promoCodeController.createPromoCode.bind(promoCodeController));
+
+  /**
+   * Get promo Code
+   */
+  router.route("/promo/get").get(protect as any, promoCodeController.getPromoCode.bind(promoCodeController));
+
+  /**
+   * Update promo code details
+   */
+  router.route("/promo/update/:promoId").patch(protect as any, promoCodeController.updatePromoCode.bind(promoCodeController));
+
+  /**
+   * Delete promo code
+   */
+  router.route("/promo/delete/:promoId").patch(protect as any, promoCodeController.updatePromoCode.bind(promoCodeController));
 };

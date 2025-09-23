@@ -1,4 +1,3 @@
-// models/Promocode.ts
 import { Schema, model, Document, Types } from "mongoose";
 
 export interface IPromocode extends Document {
@@ -28,6 +27,10 @@ const PromocodeSchema = new Schema<IPromocode>(
       type: Schema.Types.ObjectId,
       ref: "PropertyInfo",
       required: [true, "Property ID is required"],
+    },
+    propertyCode: {
+      type: String,
+      required: [true, "Property code is required"],
     },
     code: {
       type: String,
@@ -93,5 +96,29 @@ const PromocodeSchema = new Schema<IPromocode>(
     timestamps: true,
   }
 );
+
+PromocodeSchema.index({ propertyId: 1, isActive: 1 }); 
+PromocodeSchema.index({ propertyCode: 1, isActive: 1 });
+PromocodeSchema.index({ validFrom: 1, validTo: 1 }); 
+PromocodeSchema.index({ discountType: 1, discountValue: 1 }); 
+PromocodeSchema.index({ code: 1, isActive: 1 }); 
+PromocodeSchema.index({ propertyId: 1, code: 1 }); 
+PromocodeSchema.index({ createdAt: -1 }); 
+PromocodeSchema.index({
+  isActive: 1,
+  validFrom: 1,
+  validTo: 1
+});
+
+
+PromocodeSchema.index({
+  code: "text",
+  description: "text",
+  propertyCode: "text"
+});
+
+PromocodeSchema.index({ applicableRoomType: 1 }, { sparse: true });
+PromocodeSchema.index({ applicableRatePlans: 1 }, { sparse: true });
+
 
 export const Promocode = model<IPromocode>("Promocode", PromocodeSchema);

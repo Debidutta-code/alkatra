@@ -1,6 +1,44 @@
 import { PromoCodeRepository } from "../repositories";
-import { IPromocode } from "../model/promocode.model";
+import { IPromocode } from "../model/promoCode.model";
 import { IPromoCodeRepository } from "../repositories";
+import { generateUniquePromoCode } from "../utils";
+
+interface FilterOptions {
+  page: number;
+  limit: number;
+  filters: any;
+  sortBy: string;
+  sortOrder: 'asc' | 'desc';
+}
+
+interface PaginatedResponse {
+  data: any[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+}
+
+interface UpdatePromoCodeRequest {
+  code?: string;
+  description?: string;
+  discountType?: "percentage" | "flat";
+  discountValue?: number;
+  validFrom?: string;
+  validTo?: string;
+  minBookingAmount?: number;
+  maxDiscountAmount?: number;
+  useLimit?: number;
+  usageLimitPerUser?: number;
+  applicableRoomType?: string[];
+  applicableRatePlans?: string[];
+  isActive?: boolean;
+}
+
 
 export class PromoCodeService {
 
@@ -12,7 +50,7 @@ export class PromoCodeService {
   private promoCodeRepository = PromoCodeRepository.getInstance();
 
   /**
-   * 
+   * Private constructor to prevent direct instantiation
    */
   private constructor() {
     this.promoCodeRepository = PromoCodeRepository.getInstance();
@@ -28,314 +66,184 @@ export class PromoCodeService {
     return PromoCodeService.instance;
   }
 
+  async createPromoCode(promoCodeCreateRequest: IPromoCodeRepository, userId: string) {
+    try {
+      if (!promoCodeCreateRequest || !userId) {
+        throw new Error("Promocode details and User ID are required");
+      }
 
-  async createPromoCode( promoCodeCreateRequest: IPromoCodeRepository, userId: string ) {
-    
-    if (!promoCodeCreateRequest || !userId) {
-      throw new Error("Promocode details and User ID are required");
+      const requiredFields = ['propertyId', 'propertyCode', 'discountType', 'discountValue', 'validFrom', 'validTo', 'useLimit'];
+      for (const field of requiredFields) {
+        if (!promoCodeCreateRequest[field as keyof IPromoCodeRepository]) {
+          throw new Error(`${field} is required`);
+        }
+      }
+
+      const uniquePromoCode = await generateUniquePromoCode();
+
+      const existingCode = await this.promoCodeRepository.checkCodeAvailability(uniquePromoCode);
+      if (existingCode) {
+        const uniquePromoCode = await generateUniquePromoCode();
+      }
+
+      const promoCodeData = {
+        ...promoCodeCreateRequest,
+        code: uniquePromoCode,
+        userId: userId
+      };
+
+      const createdPromoCode = await this.promoCodeRepository.createPromoCode(promoCodeData);
+      return createdPromoCode;
+
+    } catch (error) {
+      console.error("Error in createPromoCode service:", error);
+      throw new Error(`Failed to create promo code: ${error.message}`);
     }
-
-    const createdPromoCode = await this.promoCodeRepository.createPromoCode(promoCodeCreateRequest, userId);
-    return createdPromoCode;
-
   }
 
-  async getAllPromoCode() {}
+  async getAllPromoCode(filterOptions: FilterOptions): Promise<PaginatedResponse> {
+    try {
+      const { page, limit, filters, sortBy, sortOrder } = filterOptions;
 
-  async getPromoCodeByIdOrCode() {}
+      const skip = (page - 1) * limit;
+      const sort: any = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
 
-  async getPromoCodeByPropertyIdOrCode() {}
+      const [promoCodes, totalCount] = await Promise.all([
+        this.promoCodeRepository.getAllPromoCodes(filters, sort, skip, limit),
+        this.promoCodeRepository.getPromoCodesCount(filters)
+      ]);
 
-  async updatePromoCode() {}
+      const totalPages = Math.ceil(totalCount / limit);
 
-  async deletePromoCode() {}
+      return {
+        data: promoCodes,
+        pagination: {
+          currentPage: page,
+          totalPages,
+          totalItems: totalCount,
+          itemsPerPage: limit,
+          hasNextPage: page < totalPages,
+          hasPreviousPage: page > 1
+        }
+      };
 
-  
-  // public static async createPromoCode(
-  //   data: any,
-  //   propertyId: any
-  // ) {
-  //   try {
-  //     const existing = await PromoCodeDAO.findByCode(data.code!, propertyId);
-  //     if (existing) {
-  //       return {
-  //         success: false,
-  //         message: "The Given PromoCode already exist for this Property",
-  //       };
-  //     }
-  //     if (data.validFrom && data.validTo && data.validFrom > data.validTo) {
-  //       return {
-  //         success: false,
-  //         message: "Valid From date cannot be later than Valid To date",
-  //       };
-  //     }
+    } catch (error) {
+      console.error("Error in getAllPromoCode service:", error);
+      throw new Error(`Failed to fetch promo codes: ${error.message}`);
+    }
+  }
 
-  //     const formattedData = {
-  //       ...data,
-  //       propertyId,
-  //       deviceType: Array.isArray(data.deviceType) ? data.deviceType : [data.deviceType],
-  //       validFrom: new Date(data.validFrom),
-  //       validTo: new Date(data.validTo),
-  //     };
-  //     console.log("Formatted Data:", formattedData);
+  async updatePromoCode(id: string, updateData: UpdatePromoCodeRequest, userId: string): Promise<any> {
+    try {
+      if (!id || !updateData || !userId) {
+        throw new Error("Promo code ID, update data, and user ID are required");
+      }
 
-  //     // Ensure deviceType is logged correctly
-  //     console.log("Device Type:", formattedData.deviceType);
+      this.validateUpdateData(updateData);
 
-  //     // Ensure date fields are correct
-  //     console.log("Valid From:", formattedData.validFrom);
-  //     console.log("Valid To:", formattedData.validTo);
+      const updatedPromoCode = await this.promoCodeRepository.updatePromoCode(id, updateData, userId);
 
-  //     // Attempt to create the promocode
-  //     const PromoCode = await PromoCodeDAO.create(formattedData);
-  //     if (!PromoCode) {
-  //       return {
-  //         success: false,
-  //         message: "PromoCode failed to create",
-  //       };
-  //     }
-  //     return {
-  //       success: true,
-  //       message: "PromoCode Created successfully",
-  //       data: PromoCode,
-  //     };
-  //   } catch (error: any) {
-  //     return {
-  //       success: false,
-  //       message: "failed to create Promocode",
-  //       error: error?.message
-  //     };
-  //   }
-  // }
+      if (!updatedPromoCode) {
+        throw new Error("Promo code not found");
+      }
+
+      return updatedPromoCode;
+
+    } catch (error) {
+      console.error("Error in updatePromoCode service:", error);
+      throw error;
+    }
+  }
+
+  private validateUpdateData(updateData: UpdatePromoCodeRequest): void {
+
+    if (updateData.discountType && !['percentage', 'flat'].includes(updateData.discountType)) {
+      throw new Error("Discount type must be either 'percentage' or 'flat'");
+    }
+
+    if (updateData.discountValue !== undefined) {
+      if (typeof updateData.discountValue !== 'number' || updateData.discountValue < 0) {
+        throw new Error("Discount value must be a positive number");
+      }
+
+      if (updateData.discountType === 'percentage' && updateData.discountValue > 100) {
+        throw new Error("Percentage discount cannot exceed 100%");
+      }
+    }
 
 
-  // public static async getPromoCode(id: string) {
-  //   try {
-  //     const promoCodes = await PromoCodeDAO.findById(id);
-  //     if (!promoCodes) {
-  //       return {
-  //         success: false,
-  //         message: "PromoCodes not Found ",
-  //       };
-  //     }
-  //     return {
-  //       success: true,
-  //       message: "Promocode fetched Succsessfully",
-  //       data: promoCodes,
-  //     };
-  //   } catch (error: any) {
-  //     return {
-  //       success: false,
-  //       message: "Error occurred while fetching PromoCode",
-  //       error: error?.message,
-  //     };
-  //   }
-  // }
+    if (updateData.validFrom || updateData.validTo) {
+      const validFrom = updateData.validFrom ? new Date(updateData.validFrom) : null;
+      const validTo = updateData.validTo ? new Date(updateData.validTo) : null;
 
-  // public static async getAllPromoCodes(id: string) {
-  //   try {
-  //     const response = await PromoCodeDAO.findAll(id);
-  //     if (!response) {
-  //       return {
-  //         success: false,
-  //         message: "No Promocode available in this property",
-  //       };
-  //     }
-  //     return {
-  //       success: true,
-  //       message: "Promocode fetched Successfully",
-  //       data: response,
-  //     };
-  //   } catch (error: any) {
-  //     return {
-  //       success: false,
-  //       message: "Error occurred while fetching PromoCode",
-  //       error: error?.message,
-  //     };
-  //   }
-  // }
+      if (validFrom && isNaN(validFrom.getTime())) {
+        throw new Error("Invalid validFrom date format");
+      }
 
-  // public static async updatePromoCode(id: string, data: Partial<IPromocode>) {
-  //   try {
-  //     if (!data?.code || !data?.propertyId) {
-  //       return {
-  //         success: false,
-  //         message:
-  //           "Both code and propertyId are required to check existing promocode",
-  //       };
-  //     }
-  //     const existing = await PromoCodeDAO.findByCode(
-  //       data.code,
-  //       data.propertyId
-  //     );
-  //     if (existing && existing.id.toString() !== id) {
-  //       return {
-  //         success: false,
-  //         message: "This promocode already exist in this property",
-  //       };
-  //     }
-  //     const response = await PromoCodeDAO.update(id, data);
+      if (validTo && isNaN(validTo.getTime())) {
+        throw new Error("Invalid validTo date format");
+      }
 
-  //     if (!response) {
-  //       return {
-  //         success: false,
-  //         message: "Promocode not found or could not be updated",
-  //       };
-  //     }
+      if (validFrom && validTo && validFrom >= validTo) {
+        throw new Error("validFrom must be before validTo");
+      }
+    }
 
-  //     return {
-  //       success: true,
-  //       message: "Promocode updated successfully",
-  //       data: response,
-  //     };
-  //   } catch (error: any) {
-  //     return {
-  //       success: false,
-  //       message: "Error occurred while updating the PromoCode",
-  //       error: error?.message || "Unknown error",
-  //     };
-  //   }
-  // }
 
-  // public static async deletePromoCode(id: string) {
-  //   try {
-  //     const existing = await PromoCodeDAO.findById(id);
-  //     if (!existing) {
-  //       return {
-  //         success: true,
-  //         message: "Promocode already deleted",
-  //       };
-  //     }
-  //     const response = PromoCodeDAO.delete(id);
-  //     if (!response) {
-  //       return {
-  //         success: false,
-  //         message: "Failed to delete promo code",
-  //       };
-  //     }
-  //     return {
-  //       success: true,
-  //       message: "Promocode deleted Succsessfully",
-  //     };
-  //   } catch (error: any) {
-  //     return {
-  //       success: false,
-  //       message: "Error occurred while deleting the PromoCode",
-  //       error: error?.message,
-  //     };
-  //   }
-  // }
+    const numericFields = ['minBookingAmount', 'maxDiscountAmount', 'useLimit', 'usageLimitPerUser'];
+    for (const field of numericFields) {
+      if (updateData[field as keyof UpdatePromoCodeRequest] !== undefined) {
+        const value = updateData[field as keyof UpdatePromoCodeRequest];
+        if (typeof value !== 'number' || value < 0) {
+          throw new Error(`${field} must be a positive number`);
+        }
+      }
+    }
+  }
 
-  // public static async validatePromoCode(data: any) {
-  //   try {
-  //     const promo = await PromoCodeDAO.findByCode(
-  //       data.promoCode,
-  //       data.propertyId
-  //     );
-  //     if (!promo) {
-  //       return {
-  //         success: false,
-  //         message: "Promo code not found",
-  //       };
-  //     }
-  //     if (!promo.isActive) {
-  //       return {
-  //         success: false,
-  //         message: "Promo code is inactive",
-  //       };
-  //     }
-  //     console.log("promocode", promo);
-  //     if (promo.useLimit === 0) {
-  //       return {
-  //         success: false,
-  //         message: "Promo code Limit reached",
-  //       };
-  //     }
-  //     if (!(promo.deviceType as string[]).includes(data.Devicetype)) {
-  //       return {
-  //         success: false,
-  //         message: `This Promo code is Not applicable for ${data.Devicetype} `,
-  //       };
-  //     }
-  //     const now = new Date();
-  //     const ValidTo = new Date(promo.validTo); // copy original date
-  //     ValidTo.setDate(ValidTo.getDate() + 1);
-  //     console.log("validto", ValidTo);
-  //     if (promo.validFrom > now || ValidTo < now) {
-  //       return {
-  //         success: false,
-  //         message: "Promo code expired or not yet valid",
-  //       };
-  //     }
-  //     const bookingDetails = data.bookingDetails;
-  //     const totalAmount = data.bookingDetails.finalPrice.breakdown.totalAmount;
-  //     if (!totalAmount) {
-  //       return {
-  //         success: false,
-  //         message: "bookingAmount required",
-  //       };
-  //     }
-  //     const alreadyUsedbyuser = await PromoCodeDAO.findBookingbypromocode(
-  //       data.promoCode,
-  //       data.propertyId
-  //     );
+  async deletePromoCode(id: string, userId: string): Promise<any> {
+    try {
+      if (!id || !userId) {
+        throw new Error("Promo code ID and user ID are required");
+      }
 
-  //     const usageCount = alreadyUsedbyuser.filter(
-  //       (b) => b.booking_user_email === bookingDetails.email
-  //     ).length;
-  //     console.log(usageCount);
-  //     const MaxUsePeruser = promo.usageLimitPerUser || 1;
-  //     console.log("max", MaxUsePeruser);
-  //     if (usageCount >= MaxUsePeruser) {
-  //       return {
-  //         success: false,
-  //         message: `This PromoCode is already used by the User`,
-  //       };
-  //     }
+      const deletedPromoCode = await this.promoCodeRepository.deletePromoCode(id, userId);
 
-  //     if (promo.minBookingAmount && totalAmount < promo.minBookingAmount) {
-  //       return {
-  //         success: false,
-  //         message: "Booking amount does not meet the minimum requirement",
-  //       };
-  //     }
-  //     console.log("bookingdetails", bookingDetails);
-  //     let discount = 0;
-  //     const basePricebeforePromocode =
-  //       bookingDetails.finalPrice?.breakdown?.totalBaseAmount;
-  //     if (promo.discountType === "flat") {
-  //       discount = promo.discountValue;
-  //     } else if (promo.discountType === "percentage") {
-  //       discount = (basePricebeforePromocode * promo.discountValue) / 100;
-  //     }
+      if (!deletedPromoCode) {
+        throw new Error("Promo code not found");
+      }
 
-  //     if (discount > basePricebeforePromocode) {
-  //       discount = basePricebeforePromocode;
-  //     }
-  //     if (discount > promo.maxDiscountAmount!) {
-  //       discount = promo.maxDiscountAmount!;
-  //     }
-  //     const basePriceAfterPromocode = basePricebeforePromocode - discount;
-  //     const additionalcharges =
-  //       bookingDetails.finalPrice.breakdown.totalAdditionalCharges;
-  //     const finalprice = basePriceAfterPromocode + additionalcharges;
+      return deletedPromoCode;
 
-  //     return {
-  //       success: true,
-  //       message: "Promocode validated successfully",
-  //       data: {
-  //         promo,
-  //         discount,
-  //         basePriceAfterPromocode,
-  //         finalprice,
-  //       },
-  //     };
-  //   } catch (error: any) {
-  //     return {
-  //       success: false,
-  //       message: "Error occuered while validating promocode",
-  //       error: error?.message,
-  //     };
-  //   }
-  // }
+    } catch (error) {
+      console.error("Error in deletePromoCode service:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Optional: Soft delete service method
+   * @param id 
+   * @param userId 
+   * @returns 
+   */
+  async softDeletePromoCode(id: string, userId: string): Promise<any> {
+    try {
+      if (!id || !userId) {
+        throw new Error("Promo code ID and user ID are required");
+      }
+
+      const updatedPromoCode = await this.promoCodeRepository.softDeletePromoCode(id, userId);
+
+      if (!updatedPromoCode) {
+        throw new Error("Promo code not found");
+      }
+
+      return updatedPromoCode;
+
+    } catch (error) {
+      console.error("Error in softDeletePromoCode service:", error);
+      throw error;
+    }
+  }
 }
