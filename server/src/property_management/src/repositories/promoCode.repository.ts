@@ -44,7 +44,12 @@ export class PromoCodeRepository {
    * 
    * @param promoCodeDetails 
    */
-  async createPromoCode() { }
+  async createPromoCode( promoCodeDetails: IPromoCodeRepository ) {
+    if (promoCodeDetails) {
+      const createdPromoCode = await Promocode.create(promoCodeDetails);
+      return createdPromoCode;
+    }
+  }
 
   /**
    * 

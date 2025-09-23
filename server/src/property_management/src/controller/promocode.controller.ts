@@ -50,9 +50,7 @@ export class PromoCodeController {
           succsess: false,
           message: "Promocode details are required",
         })
-      }
-
-      
+      }    
       
       const promoCreatedResponse = await this.promoCodeService.createPromoCode(data, authData._id);
       if (!promoCreatedResponse) {

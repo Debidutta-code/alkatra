@@ -1,5 +1,6 @@
 import { PromoCodeRepository } from "../repositories";
 import { IPromocode } from "../model/promocode.model";
+import { IPromoCodeRepository } from "../repositories";
 
 export class PromoCodeService {
 
@@ -28,7 +29,16 @@ export class PromoCodeService {
   }
 
 
-  async createPromoCode() {}
+  async createPromoCode( promoCodeCreateRequest: IPromoCodeRepository ) {
+    
+    if (!promoCodeCreateRequest) {
+      throw new Error("Promocode details are required");
+    }
+
+    const createdPromoCode = await this.promoCodeRepository.createPromoCode(promoCodeCreateRequest);
+    return createdPromoCode;
+
+  }
 
   async getAllPromoCode() {}
 
