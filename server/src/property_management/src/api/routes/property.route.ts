@@ -124,7 +124,7 @@ export default (app: Router) => {
    * Extranet specific
    * Delete promo code
    */
-  router.route("/promo/delete/:promoId").patch(protect as any, promoCodeController.updatePromoCode.bind(promoCodeController));
+  router.route("/promo/delete/:promoId").delete(protect as any, promoCodeController.deletePromoCode.bind(promoCodeController));
 
 
   /**
