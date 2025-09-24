@@ -175,28 +175,30 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
             }}
         >
             {/* Dark overlay for better readability */}
-            <div className="min-h-screen bg-black bg-opacity-60">
+            <div className="min-h-screen bg-white/40">
 
-                {/* Logo at top center */}
-                <div className="pt-8 px-4 flex justify-start">
-                    <img
-                        src="/assets/Alhajz.png"
-                        alt="Al-Hajz Logo"
-                        className="h-24 w-auto object-contain"
-                    />
+                {/* Logo at top left corner */}
+                <div className="pt-4 px-4 flex justify-start">
+                    <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-md border border-gray-100">
+                        <img
+                            src="/assets/Alhajz.png"
+                            alt="Al-Hajz Logo"
+                            className="h-20 w-auto object-contain"
+                        />
+                    </div>
                 </div>
 
                 {/* Review Form Section */}
                 <div className="max-w-4xl mx-auto px-4 py-13">
-                    <div className="bg-white bg-opacity-90 rounded-xl shadow-2xl overflow-hidden backdrop-blur-sm">
+                    <div className="bg-tripswift-off-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
 
                         {/* Form Header */}
-                        <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-white">
-                            <h2 className="text-2xl font-bold">Leave Your Review</h2>
-                            <p className="text-blue-100">We value your feedback</p>
+                        <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] p-4 text-tripswift-off-white">
+                            <h2 className="text-2xl font-tripswift-bold">Leave Your Review</h2>
+                            <p className="text-blue-100 mt-1">We value your feedback</p>
                         </div>
 
-                        {/* Form Content - keep this part exactly the same */}
+                        {/* Form Content */}
                         <div className="p-6 md:p-6">
                             {message && (
                                 <div className={`mb-6 p-4 rounded-lg ${message.includes('✅') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
@@ -207,27 +209,32 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 {/* Hotel Info */}
                                 <div className="space-y-2">
-                                    <label className="block text-gray-700 font-medium">Hotel</label>
+                                    <label className="block text-tripswift-black font-tripswift-medium text-xs uppercase tracking-normal">
+                                        Hotel
+                                    </label>
                                     <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                                        <p className="font-semibold">{formData.hotelName}</p>
+                                        <p className="font-tripswift-semibold text-tripswift-black">{formData.hotelName}</p>
                                     </div>
                                 </div>
 
                                 {/* Guest Email */}
                                 <div className="space-y-2">
-                                    <label className="block text-gray-700 font-medium">Your Email</label>
+                                    <label className="block text-tripswift-black font-tripswift-medium text-xs uppercase tracking-normal">
+                                        Your Email
+                                    </label>
                                     <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                                        <p className="font-medium text-gray-800">{formData.guestEmail}</p>
+                                        <p className="font-tripswift-medium text-tripswift-black">{formData.guestEmail}</p>
                                     </div>
                                 </div>
 
                                 {/* Rating */}
                                 <div className="space-y-2">
-                                    <label className="block text-gray-700 font-medium">Your Rating</label>
+                                    <label className="block text-tripswift-black font-tripswift-medium text-xs uppercase tracking-normal">
+                                        Your Rating
+                                    </label>
 
-                                    {/* Add rating error display */}
                                     {ratingError && (
-                                        <div className="p-3 bg-red-100 text-red-800 rounded-lg mb-2">
+                                        <div className="p-3 bg-red-100 text-red-800 rounded-lg text-sm font-tripswift-medium">
                                             {ratingError}
                                         </div>
                                     )}
@@ -239,28 +246,30 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
                                                 key={star}
                                                 onClick={() => {
                                                     handleStarClick(star);
-                                                    setRatingError(""); // Clear error when user selects a rating
+                                                    setRatingError("");
                                                 }}
-                                                className={`text-4xl ${formData.rating >= star ? "text-yellow-400" : "text-gray-300"}`}
+                                                className={`text-3xl md:text-4xl ${formData.rating >= star ? "text-yellow-400" : "text-gray-300"} transition-colors`}
                                                 aria-label={`Rate ${star} star${star !== 1 ? 's' : ''}`}
                                             >
                                                 ★
                                             </button>
                                         ))}
                                     </div>
-                                    <p className="text-sm text-gray-500">
-                                        {formData.rating ? `You rated ${formData.rating} star${formData.rating !== 1 ? 's' : ''}` : 'Select your rating'}
+                                    <p className="text-sm text-gray-500 font-tripswift-regular">
+                                        {formData.rating
+                                            ? `You rated ${formData.rating} star${formData.rating !== 1 ? 's' : ''}`
+                                            : 'Select your rating'}
                                     </p>
                                 </div>
 
                                 {/* Comments */}
                                 {commentError && (
-                                    <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-lg">
+                                    <div className="p-3 bg-red-100 text-red-800 rounded-lg text-sm font-tripswift-medium">
                                         {commentError}
                                     </div>
                                 )}
                                 <div className="space-y-2">
-                                    <label htmlFor="comment" className="block text-gray-700 font-medium">
+                                    <label htmlFor="comment" className="block text-tripswift-black font-tripswift-medium text-xs uppercase tracking-normal">
                                         Your Review
                                     </label>
                                     <textarea
@@ -269,17 +278,17 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
                                         placeholder="Share your experience with this hotel..."
                                         value={formData.comment}
                                         onChange={handleChange}
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tripswift-blue focus:border-tripswift-blue font-noto-sans text-sm"
                                         rows={5}
                                     />
                                 </div>
 
                                 {/* Action Buttons */}
-                                <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                                <div className="">
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center"
+                                        className="w-full bg-gradient-to-r from-tripswift-blue to-[#054B8F] hover:from-[#054B8F] hover:to-tripswift-blue text-tripswift-off-white font-tripswift-medium py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center shadow-sm"
                                     >
                                         {loading ? (
                                             <>
@@ -297,9 +306,8 @@ export default function CustomerReviewForm({ id }: CustomerReviewFormProps) {
                             </form>
                         </div>
                     </div>
-
                     {/* Additional Info */}
-                    <div className="mt-8 text-center text-white">
+                    <div className="mt-4 pb-4 text-center text-white">
                         <p>Your feedback helps us improve our services.</p>
                         <p className="mt-1">Thank you for taking the time to share your experience!</p>
                     </div>
