@@ -1,4 +1,4 @@
-import { IPromocode, Promocode } from "../model";
+import { IPromocode, Promocode, PromocodeUsage } from "../model";
 import { ThirdPartyBooking } from "../../../wincloud/src/model/reservationModel";
 import { Types } from "mongoose";
 
@@ -17,6 +17,32 @@ export interface IPromoCodeRepository {
   usageLimitPerUser?: number;
   applicableRoomType?: string[];
   applicableRatePlans?: string[];
+}
+
+export interface IPromocodeUsageData {
+  promoCodeId: Types.ObjectId;
+  customerId: Types.ObjectId;
+  bookingId: Types.ObjectId;
+  discountType: "percentage" | "flat";
+  discountValue: number;
+  originalAmount: number;
+  discountedAmount: number;
+  finalAmount: number;
+  discountApplied: number;
+  metadata?: {
+    ipAddress?: string;
+    userAgent?: string;
+    deviceType?: string;
+  };
+}
+
+export interface IUsageStats {
+  totalUsage: number;
+  successfulUsage: number;
+  cancelledUsage: number;
+  totalDiscountGiven: number;
+  averageDiscount: number;
+  utilizationRate: number;
 }
 
 export class PromoCodeRepository {
@@ -291,4 +317,282 @@ export class PromoCodeRepository {
       console.error("Error logging soft deletion activity:", error);
     }
   }
+
+  /**
+   * Track promocode usage with transaction
+   */
+  async trackPromocodeUsage(usageData: IPromocodeUsageData): Promise<any> {
+    const session = await Promocode.startSession();
+    session.startTransaction();
+
+    try {
+      const usageRecord = new PromocodeUsage({
+        ...usageData,
+        status: "applied",
+        usageDate: new Date()
+      });
+
+      const updatedPromocode = await Promocode.findByIdAndUpdate(
+        usageData.promoCodeId,
+        {
+          $inc: { currentUsage: 1 },
+          $addToSet: { usedBy: usageData.customerId },
+          $set: { lastUsedAt: new Date() }
+        },
+        { session, new: true }
+      );
+
+      if (updatedPromocode.currentUsage > updatedPromocode.useLimit) {
+        throw new Error("Promocode usage limit exceeded");
+      }
+
+      await usageRecord.save({ session });
+      await session.commitTransaction();
+
+      return { usageRecord, updatedPromocode };
+
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
+
+  /**
+  * Cancel/refund promocode usage
+  */
+  async cancelPromocodeUsage(bookingId: Types.ObjectId, reason: "cancelled" | "expired" = "cancelled"): Promise<any> {
+    const session = await Promocode.startSession();
+    session.startTransaction();
+
+    try {
+      const usageRecord = await PromocodeUsage.findOneAndUpdate(
+        { bookingId: bookingId, status: "applied" },
+        {
+          status: reason,
+          $set: {
+            updatedAt: new Date(),
+            "metadata.cancellationReason": reason
+          }
+        },
+        { session, new: true }
+      );
+
+      if (usageRecord) {
+        await Promocode.findByIdAndUpdate(
+          usageRecord.promoCodeId,
+          {
+            $inc: { currentUsage: -1 },
+            $pull: { usedBy: usageRecord.customerId }
+          },
+          { session }
+        );
+      }
+
+      await session.commitTransaction();
+      return usageRecord;
+
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
+
+  /**
+   * Get promocode usage statistics
+   */
+  async getPromocodeUsageStats(promoCodeId: Types.ObjectId): Promise<IUsageStats> {
+    const [usageStats, promocode] = await Promise.all([
+      PromocodeUsage.aggregate([
+        {
+          $match: { promoCodeId: promoCodeId }
+        },
+        {
+          $group: {
+            _id: "$status",
+            count: { $sum: 1 },
+            totalDiscount: { $sum: "$discountApplied" },
+            avgDiscount: { $avg: "$discountApplied" }
+          }
+        }
+      ]),
+      Promocode.findById(promoCodeId)
+    ]);
+
+    const statsMap = usageStats.reduce((acc, stat) => {
+      acc[stat._id] = stat;
+      return acc;
+    }, {});
+
+    const totalUsage = (statsMap.applied?.count || 0) + (statsMap.cancelled?.count || 0) + (statsMap.expired?.count || 0);
+    const successfulUsage = statsMap.applied?.count || 0;
+    const totalDiscountGiven = statsMap.applied?.totalDiscount || 0;
+
+    return {
+      totalUsage,
+      successfulUsage,
+      cancelledUsage: statsMap.cancelled?.count || 0,
+      totalDiscountGiven,
+      averageDiscount: statsMap.applied?.avgDiscount || 0,
+      utilizationRate: promocode ? (successfulUsage / promocode.useLimit) * 100 : 0
+    };
+  }
+
+  /**
+   * Get user's promocode usage history
+   */
+  async getUserPromocodeUsage(customerId: Types.ObjectId, filters: any = {}): Promise<any[]> {
+    return PromocodeUsage.find({
+      customerId: customerId,
+      ...filters
+    })
+      .populate("promoCodeId", "code description discountType discountValue")
+      .populate("bookingId", "bookingReference checkInDate checkOutDate totalAmount")
+      .sort({ usageDate: -1 })
+      .lean();
+  }
+
+  /**
+   * Check if user can use promocode
+   */
+  async canUserUsePromocode(promoCodeId: Types.ObjectId, customerId: Types.ObjectId): Promise<{ canUse: boolean; reason?: string; userUsageCount?: number }> {
+    const [promocode, userUsageCount] = await Promise.all([
+      Promocode.findById(promoCodeId),
+      PromocodeUsage.countDocuments({
+        promoCodeId: promoCodeId,
+        customerId: customerId,
+        status: "applied"
+      })
+    ]);
+
+    if (!promocode) {
+      return { canUse: false, reason: "Promocode not found" };
+    }
+
+    if (promocode.currentUsage >= promocode.useLimit) {
+      return { canUse: false, reason: "Promocode usage limit reached" };
+    }
+
+    if (promocode.usageLimitPerUser && userUsageCount >= promocode.usageLimitPerUser) {
+      return {
+        canUse: false,
+        reason: "User usage limit reached",
+        userUsageCount
+      };
+    }
+
+    return { canUse: true, userUsageCount };
+  }
+
+  /**
+   * Get recent promocode usage with pagination
+   */
+  async getRecentPromocodeUsage(promoCodeId: Types.ObjectId, page: number = 1, limit: number = 10): Promise<any> {
+    try {
+      const skip = (page - 1) * limit;
+
+      const [usageRecords, totalCount] = await Promise.all([
+        PromocodeUsage.find({ promoCodeId: promoCodeId })
+          .populate("customerId", "name email phone")
+          .populate("bookingId", "bookingReference checkInDate checkOutDate totalAmount")
+          .sort({ usageDate: -1 })
+          .skip(skip)
+          .limit(limit)
+          .lean(),
+        PromocodeUsage.countDocuments({ promoCodeId: promoCodeId })
+      ]);
+
+      return {
+        data: usageRecords,
+        pagination: {
+          currentPage: page,
+          totalPages: Math.ceil(totalCount / limit),
+          totalItems: totalCount,
+          itemsPerPage: limit,
+          hasNextPage: page < Math.ceil(totalCount / limit),
+          hasPreviousPage: page > 1
+        }
+      };
+
+    } catch (error) {
+      console.error("Error getting recent promocode usage:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get promocode analytics for property
+   */
+  async getPropertyPromocodeAnalytics(propertyId: Types.ObjectId, startDate?: Date, endDate?: Date): Promise<any[]> {
+    const matchStage: any = {
+      propertyId: propertyId
+    };
+
+    if (startDate && endDate) {
+      matchStage.createdAt = {
+        $gte: startDate,
+        $lte: endDate
+      };
+    }
+
+    return Promocode.aggregate([
+      { $match: matchStage },
+      {
+        $lookup: {
+          from: "promocodeusages",
+          localField: "_id",
+          foreignField: "promoCodeId",
+          as: "usageData"
+        }
+      },
+      {
+        $project: {
+          code: 1,
+          discountType: 1,
+          discountValue: 1,
+          currentUsage: 1,
+          useLimit: 1,
+          isActive: 1,
+          totalBookings: { $size: "$usageData" },
+          successfulUsage: {
+            $size: {
+              $filter: {
+                input: "$usageData",
+                as: "usage",
+                cond: { $eq: ["$$usage.status", "applied"] }
+              }
+            }
+          },
+          totalDiscount: {
+            $sum: {
+              $map: {
+                input: {
+                  $filter: {
+                    input: "$usageData",
+                    as: "usage",
+                    cond: { $eq: ["$$usage.status", "applied"] }
+                  }
+                },
+                as: "usage",
+                in: "$$usage.discountApplied"
+              }
+            }
+          },
+          utilizationRate: {
+            $cond: [
+              { $eq: ["$useLimit", 0] },
+              0,
+              { $multiply: [{ $divide: ["$currentUsage", "$useLimit"] }, 100] }
+            ]
+          }
+        }
+      }
+    ]);
+  }
+
+
+
 }

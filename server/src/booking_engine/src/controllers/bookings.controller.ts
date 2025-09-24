@@ -36,7 +36,7 @@ const calculateAgeCategory = (dob: string) => {
     age--;
   }
   if (age <= 2) return { age, category: "Infant", ageCode: "7" };
-  if (age <= 13) return { age, category: "Child", ageCode: "8" };
+  if (age < 12) return { age, category: "Child", ageCode: "8" };
   return { age, category: "Adult", ageCode: "10" };
 };
 

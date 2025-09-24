@@ -17,6 +17,14 @@ export interface IPromocode extends Document {
   applicableRoomType?: Types.ObjectId[];
   applicableRatePlans?: Types.ObjectId[];
   isActive: boolean;
+
+  /**
+   * Add usage tracking fields
+   */
+  currentUsage: number;
+  usedBy: Types.ObjectId[];
+  lastUsedAt?: Date;
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -91,19 +99,38 @@ const PromocodeSchema = new Schema<IPromocode>(
       type: Boolean,
       default: true
     },
+
+    /**
+     * Adding usage tracking fields
+     */
+    currentUsage: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+    usedBy: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+      }
+    ],
+    lastUsedAt: {
+      type: Date
+    }
+
   },
   {
     timestamps: true,
   }
 );
 
-PromocodeSchema.index({ propertyId: 1, isActive: 1 }); 
+PromocodeSchema.index({ propertyId: 1, isActive: 1 });
 PromocodeSchema.index({ propertyCode: 1, isActive: 1 });
-PromocodeSchema.index({ validFrom: 1, validTo: 1 }); 
-PromocodeSchema.index({ discountType: 1, discountValue: 1 }); 
-PromocodeSchema.index({ code: 1, isActive: 1 }); 
-PromocodeSchema.index({ propertyId: 1, code: 1 }); 
-PromocodeSchema.index({ createdAt: -1 }); 
+PromocodeSchema.index({ validFrom: 1, validTo: 1 });
+PromocodeSchema.index({ discountType: 1, discountValue: 1 });
+PromocodeSchema.index({ code: 1, isActive: 1 });
+PromocodeSchema.index({ propertyId: 1, code: 1 });
+PromocodeSchema.index({ createdAt: -1 });
 PromocodeSchema.index({
   isActive: 1,
   validFrom: 1,
