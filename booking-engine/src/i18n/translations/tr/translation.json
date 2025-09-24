@@ -915,6 +915,8 @@
             "refundToBeProcessed": "İade işleme alınacak",
             "refundExplanation": "Değişiklikleriniz ₹{{amount}} iade ile sonuçlanacak",
             "amendmentPolicies": "Güncelleme Politikaları",
+            "checkingAvailability": "Müsaitlik kontrol ediliyor...",
+            "loadingPrice": "Güncellenmiş fiyatlandırma yükleniyor...",
             "policies": {
                 "dateChanges": "Tarih değişiklikleri müsaitlik durumuna bağlıdır",
                 "changes72Hours": "Girişten 72 saat önceki değişiklikler ek ücrete tabi olabilir",
@@ -934,7 +936,10 @@
                 "selectRoomType": "Lütfen bir oda tipi seçin.",
                 "selectRatePlan": "Lütfen bir tarife planı seçin.",
                 "invalidDateRange": "Çıkış tarihi giriş tarihinden sonra olmalıdır.",
-                "correctFormErrors": "Göndermeden önce formdaki hataları düzeltin."
+                "correctFormErrors": "Göndermeden önce formdaki hataları düzeltin.",
+                "roomNotAvailable": "Seçilen oda, belirlenen tarihler için müsait değil.",
+                "roomNotFound": "Oda bulunamadı.",
+                "networkError": "Ağ hatası. Lütfen bağlantınızı kontrol edin ve tekrar deneyin."
             },
             "success": {
                 "reservationAmended": "Rezervasyonunuz başarıyla güncellendi.",

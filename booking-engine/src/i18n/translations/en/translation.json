@@ -916,6 +916,8 @@
       "refundToBeProcessed": "Refund to be processed",
       "refundExplanation": "Your changes will result in a refund of ₹{{amount}}",
       "amendmentPolicies": "Update Policies",
+      "checkingAvailability": "Checking availability...",
+      "loadingPrice": "Loading updated pricing...",
       "policies": {
         "dateChanges": "Date changes are subject to availability",
         "changes72Hours": "Changes within 72 hours of check-in may incur additional fees",
@@ -935,7 +937,10 @@
         "selectRoomType": "Please select a room type.",
         "selectRatePlan": "Please select a rate plan.",
         "invalidDateRange": "Check-out date must be after check-in date.",
-        "correctFormErrors": "Please correct the errors in the form before submitting."
+        "correctFormErrors": "Please correct the errors in the form before submitting.",
+        "roomNotAvailable": "The selected room is not available for the chosen dates.",
+        "roomNotFound": "The room could not be found.",
+        "networkError": "Network error. Please check your connection and try again."
       },
       "success": {
         "reservationAmended": "Your reservation has been successfully updated.",

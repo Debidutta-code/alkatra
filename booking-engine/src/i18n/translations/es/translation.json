@@ -915,6 +915,8 @@
             "refundToBeProcessed": "Reembolso a procesar",
             "refundExplanation": "Tus cambios generarán un reembolso de ₹{{amount}}",
             "amendmentPolicies": "Políticas de modificación",
+            "checkingAvailability": "Verificando disponibilidad...",
+            "loadingPrice": "Cargando precios actualizados...",
             "policies": {
                 "dateChanges": "Los cambios de fecha están sujetos a disponibilidad",
                 "changes72Hours": "Los cambios dentro de las 72 horas posteriores al check-in pueden tener cargos adicionales",
@@ -934,7 +936,10 @@
                 "selectRoomType": "Por favor, selecciona un tipo de habitación.",
                 "selectRatePlan": "Por favor, selecciona un plan de tarifa.",
                 "invalidDateRange": "La fecha de salida debe ser posterior a la fecha de entrada.",
-                "correctFormErrors": "Por favor, corrige los errores del formulario antes de enviarlo."
+                "correctFormErrors": "Por favor, corrige los errores del formulario antes de enviarlo.",
+                "roomNotAvailable": "La habitación seleccionada no está disponible para las fechas elegidas.",
+                "roomNotFound": "No se pudo encontrar la habitación.",
+                "networkError": "Error de red. Por favor, verifica tu conexión e intenta nuevamente."
             },
             "success": {
                 "reservationAmended": "Tu reserva ha sido actualizada correctamente.",
