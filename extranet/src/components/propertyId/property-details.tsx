@@ -103,7 +103,7 @@ export function PropertyDetails({
         <CardTitle className="text-primary font-semibold text-lg sm:text-xl">
           Property Details
         </CardTitle>
-        <div className="flex gap-2 mt-2 sm:mt-0">
+        <div className="flex gap-4 mt-2 sm:mt-0">
           {editMode && (
             <Button
               variant="outline"
@@ -132,7 +132,7 @@ export function PropertyDetails({
         {editMode ? (
           <div className="pt-4 space-y-6">
             {/* Responsive field layout: stacked on small screens, side-by-side on md+ */}
-            <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-2 sm:gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-4 sm:gap-12 items-center">
               <label className="text-sm text-gray-500 sm:self-start">
                 Property Name <span className="text-red-500">*</span>
               </label>
@@ -150,7 +150,7 @@ export function PropertyDetails({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-2 sm:gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-4 sm:gap-12 items-center">
               <label className="text-sm text-gray-500 sm:self-start">
                 Property Email <span className="text-red-500">*</span>
               </label>
@@ -169,8 +169,8 @@ export function PropertyDetails({
             </div>
 
 
-            <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-2 sm:gap-4 items-center">
-              <label className="text-sm text-gray-500 sm:self-start">
+            <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-4 sm:gap-12 items-center">
+              <label className="text-sm text-gray-500 sm:self-center whitespace-nowrap">
                 Property Contact <span className="text-red-500">*</span>
               </label>
               <div className="space-y-1">
@@ -238,7 +238,7 @@ export function PropertyDetails({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-2 sm:gap-4 items-start">
+            <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-4 sm:gap-12 items-start">
               <label className="text-sm text-gray-500 pt-2">
                 Description
               </label>
@@ -274,7 +274,7 @@ export function PropertyDetails({
                 <div className="py-2 flex flex-col sm:flex-row">
                   <div className="w-full sm:w-1/4 text-sm text-gray-500 mb-1 sm:mb-0">Contact</div>
                   <div className="w-full sm:w-3/4 text-sm font-medium break-words">
-                    {property.data.property_contact || 'N/A'}
+                    +{property.data.property_contact || 'N/A'}
                   </div>
                 </div>
                 <div className="py-2 flex flex-col sm:flex-row">
