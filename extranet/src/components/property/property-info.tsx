@@ -6,6 +6,8 @@ import { Label } from "./../ui/label";
 import { Input } from "./../ui/input";
 import { Button, buttonVariants } from "./../ui/button";
 import { ReloadIcon } from "@radix-ui/react-icons";
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 import {
   Dialog,
   DialogContent,
@@ -27,7 +29,6 @@ import { Textarea } from "./../ui/textarea";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@src/redux/store";
-import { AnyCnameRecord } from "dns";
 
 const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
 const createPropertySchema = z.object({
@@ -37,12 +38,6 @@ const createPropertySchema = z.object({
     .min(1, "Property email is required")
     .email("Please provide a valid email address")
     .regex(gmailRegex, "Please provide a valid email address"),
-  property_contact: z
-    .string()
-    .refine((value) => /^\d{10}$/.test(value), {
-      message: "Please provide a valid 10-digit phone number ",
-    }),
-
   star_rating: z
     .string()
     .default("1")
@@ -93,11 +88,6 @@ interface PropertyType {
   name: string;
 }
 
-property_contact: z.string()
-  .length(10, "Please provide a valid 10-digit phone number")
-  .refine((value) => /^[6-9]\d{9}$/.test(value), {
-    message: "Please provide a valid 10-digit phone number",
-  });
 
 export default function PropertyInfo({ onNext }: Props) {
   const [propertyDetails, setPropertyDetails] = useState<any>(null);
@@ -452,30 +442,119 @@ export default function PropertyInfo({ onNext }: Props) {
               <Label htmlFor="property_contact">
                 Property Contact <span className="text-destructive">*</span>
               </Label>
-              <Input
-                id="property_contact"
-                className="mt-[3px]"
-                variant={propertyContactError && "error"}
-                {...register("property_contact")}
-                type="tel"
-                inputMode="numeric"
-                pattern="[0-9]{10}"
-                maxLength={10}
-                onChange={(e) => {
-                  // Only allow numbers
-                  const value = e.target.value.replace(/\D/g, "");
-                  if (value.length <= 10) {
-                    setValue("property_contact", value, { shouldValidate: true });
-                  }
+              <PhoneInput
+                country={'in'} // Default to India
+                value={form.watch("property_contact")}
+                onChange={(phone, country) => {
+                  setValue("property_contact", phone, { shouldValidate: true });
+                }}
+
+                // Enhanced input styling for better consistency
+                inputStyle={{
+                  width: '100%',
+                  height: '40px',
+                  paddingLeft: '48px',
+                  fontSize: '14px',
+                  border: propertyContactError ? '1px solid #ef4444' : '1px solid #d1d5db',
+                  borderRadius: '0 6px 6px 0', // Only right side rounded
+                  backgroundColor: 'white',
+                  color: '#111827',
+                  outline: 'none',
+                  transition: 'border-color 0.15s ease-in-out'
+                }}
+
+                containerStyle={{
+                  width: '100%',
+                  marginTop: '3px'
+                }}
+
+                // Enhanced button styling
+                buttonStyle={{
+                  borderRadius: '6px 0 0 6px',
+                  border: propertyContactError ? '1px solid #ef4444' : '1px solid #d1d5db',
+                  backgroundColor: '#f8fafc',
+                  height: '40px',
+                  borderRight: 'none',
+                  transition: 'all 0.15s ease-in-out'
+                }}
+
+                // Enhanced dropdown with better search experience
+                dropdownStyle={{
+                  backgroundColor: 'white',
+                  color: '#111827',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                  maxHeight: '300px',
+                  overflowY: 'auto',
+                  zIndex: 9999,
+                  width: '280px'
+                }}
+
+                // Enhanced search input styling
+                searchStyle={{
+                  margin: '8px',
+                  padding: '8px 12px',
+                  fontSize: '14px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  outline: 'none',
+                  backgroundColor: '#f8fafc',
+                  width: 'calc(100% - 16px)'
+                }}
+
+                // User-friendly options
+                placeholder="Enter phone number"
+                enableSearch={true}
+                searchPlaceholder="Search countries..."
+                searchNotFound="No countries found"
+                countryCodeEditable={false}
+                disableSearchIcon={true}
+                specialLabel=""
+                autoFormat={true}
+
+                isValid={(value, country) => {
+                  if (!value) return false;
+                  const phoneRegex = /^\+\d{7,15}$/;
+                  return phoneRegex.test(value);
+                }}
+
+                // Input properties for accessibility
+                inputProps={{
+                  required: true,
+                  'aria-label': 'Phone number',
+                  'aria-describedby': propertyContactError ? 'phone-error' : undefined
                 }}
               />
+
+              {/* Enhanced error message display */}
               {propertyContactError && (
-                <p className="text-red-500 text-sm mt-1">
+                <p
+                  id="phone-error"
+                  className="text-red-500 text-xs mt-1 flex items-center gap-1"
+                >
+                  <svg
+                    className="w-3 h-3 flex-shrink-0"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
                   {propertyContactError.message}
                 </p>
               )}
-            </div>
 
+              {/* Optional: Helper text for better UX */}
+              {!propertyContactError && (
+                <p className="text-gray-500 text-xs mt-1">
+                  Include country code (e.g., +91 for India)
+                </p>
+              )}
+            </div>
             {/* Property Code */}
             <div className="w-full md:w-1/2 flex flex-col">
               <Label htmlFor="property_code">
@@ -754,23 +833,93 @@ export default function PropertyInfo({ onNext }: Props) {
               <Label htmlFor="property_contact">
                 Property Contact <span className="text-destructive">*</span>
               </Label>
-              <Input
-                id="property_contact"
-                className="mt-[3px]"
-                variant={propertyContactError && "error"}
-                {...register("property_contact")}
-                type="tel"
-                inputMode="numeric"
-                pattern="[0-9]{10}"
-                maxLength={10}
-                onChange={(e) => {
-                  // Only allow numbers
-                  const value = e.target.value.replace(/\D/g, "");
-                  if (value.length <= 10) {
-                    setValue("property_contact", value, { shouldValidate: true });
-                  }
+              <PhoneInput
+                country={'in'} // Default to India
+                value={form.watch("property_contact")}
+                onChange={(phone, country) => {
+                  // Validate the phone number format on change
+                  setValue("property_contact", phone, { shouldValidate: true });
+                }}
+
+                // Enhanced input styling for better consistency
+                inputStyle={{
+                  width: '100%',
+                  height: '40px',
+                  paddingLeft: '48px',
+                  fontSize: '14px',
+                  border: propertyContactError ? '1px solid #ef4444' : '1px solid #d1d5db',
+                  borderRadius: '0 6px 6px 0', // Only right side rounded
+                  backgroundColor: 'white',
+                  color: '#111827',
+                  outline: 'none',
+                  transition: 'border-color 0.15s ease-in-out'
+                }}
+
+                containerStyle={{
+                  width: '100%',
+                  marginTop: '3px'
+                }}
+
+                // Enhanced button styling
+                buttonStyle={{
+                  borderRadius: '6px 0 0 6px',
+                  border: propertyContactError ? '1px solid #ef4444' : '1px solid #d1d5db',
+                  backgroundColor: '#f8fafc',
+                  height: '40px',
+                  borderRight: 'none',
+                  transition: 'all 0.15s ease-in-out'
+                }}
+
+                // Enhanced dropdown with better search experience
+                dropdownStyle={{
+                  backgroundColor: 'white',
+                  color: '#111827',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                  maxHeight: '300px',
+                  overflowY: 'auto',
+                  zIndex: 9999,
+                  width: '280px'
+                }}
+
+                // Enhanced search input styling
+                searchStyle={{
+                  margin: '8px',
+                  padding: '8px 12px',
+                  fontSize: '14px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  outline: 'none',
+                  backgroundColor: '#f8fafc',
+                  width: 'calc(100% - 16px)'
+                }}
+
+                // User-friendly options
+                placeholder="Enter phone number"
+                enableSearch={true}
+                searchPlaceholder="Search countries..."
+                searchNotFound="No countries found"
+                countryCodeEditable={false}
+                disableSearchIcon={true}
+                specialLabel=""
+                autoFormat={true}
+
+                isValid={(value, country) => {
+                  if (!value) return false;
+                  // Basic validation - you can enhance this based on country-specific rules
+                  const phoneRegex = /^\+\d{7,15}$/;
+                  return phoneRegex.test(value);
+                }}
+
+                // Input properties for accessibility
+                inputProps={{
+                  required: true,
+                  'aria-label': 'Phone number',
+                  'aria-describedby': propertyContactError ? 'phone-error' : undefined
                 }}
               />
+
               {propertyContactError && (
                 <p className="text-red-500 text-sm mt-1">
                   {propertyContactError.message}

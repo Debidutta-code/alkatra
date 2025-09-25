@@ -138,12 +138,23 @@ const HotelListing: React.FC = () => {
       );
       setHotelData({ success: false, message: "", data: [] });
 
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "An unknown error occurred";
+
       if (!errorToastShown) {
-        toast.error(
-          t("HotelListing.tryModifyingSearch", {
-            defaultValue: "Try modifying your search.",
-          })
-        );
+        let toastMessage = t("HotelListing.tryModifyingSearch", {
+          defaultValue: "Try modifying your search.",
+        });
+
+        if (errorMessage.includes("No hotels found")) {
+          toastMessage = t("HotelCard.errorNoHotels", {
+            defaultValue: "No hotels available for the selected location.",
+          });
+        }
+
+        toast.error(toastMessage);
         setErrorToastShown(true);
       }
     } finally {

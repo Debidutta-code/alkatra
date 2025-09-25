@@ -6,6 +6,8 @@ import { Save, PenTool } from "lucide-react";
 import { PropertyDetailsProps } from '../../types/property_type';
 import { updateProperty } from '../../app/app/property/propertyDetails/api';
 import toast from 'react-hot-toast';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 
 export function PropertyDetails({
   property,
@@ -41,11 +43,8 @@ export function PropertyDetails({
   const validateFields = () => {
     const newErrors = {
       property_name: !editedProperty.property_name || editedProperty.property_name.trim() === '',
-      property_email: false, // Reset email error
-      property_contact:
-        !editedProperty.property_contact ||
-        editedProperty.property_contact.trim().length !== 10 ||
-        !/^\d{10}$/.test(editedProperty.property_contact.trim()),
+      property_email: false,
+      property_contact: false,
     };
 
     // Perform specific email validation
@@ -169,34 +168,72 @@ export function PropertyDetails({
               </div>
             </div>
 
+
             <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-2 sm:gap-4 items-center">
               <label className="text-sm text-gray-500 sm:self-start">
                 Property Contact <span className="text-red-500">*</span>
               </label>
               <div className="space-y-1">
-                <Input
-                  name="property_contact"
-                  value={editedProperty.property_contact || ""}
-                  maxLength={10}
-                  onChange={(e) => {
-                    const digitsOnly = e.target.value.replace(/\D/g, '');
+                <PhoneInput
+                  country={'in'}
+                  value={editedProperty.property_contact || ''}
+                  onChange={(phone) => {
                     const syntheticEvent = {
                       target: {
                         name: 'property_contact',
-                        value: digitsOnly,
+                        value: phone,
                       },
                     } as React.ChangeEvent<HTMLInputElement>;
                     handleInputChange?.(syntheticEvent);
                   }}
-                  onInput={(e) => {
-                    const target = e.target as HTMLInputElement;
-                    target.value = target.value.replace(/\D/g, '');
+                  inputStyle={{
+                    width: '100%',
+                    height: '40px',
+                    paddingLeft: '48px',
+                    fontSize: '14px',
+                    border: errors.property_contact ? '1px solid #ef4444' : '1px solid #d1d5db',
+                    borderRadius: '6px',
+                    backgroundColor: 'white',
+                    color: '#111827'
                   }}
-                  placeholder="Property Contact"
-                  className={errors.property_contact ? 'border-red-500' : ''}
+                  containerStyle={{
+                    width: '100%'
+                  }}
+                  buttonStyle={{
+                    borderRadius: '6px 0 0 6px',
+                    border: errors.property_contact ? '1px solid #ef4444' : '1px solid #d1d5db',
+                    backgroundColor: '#f9fafb'
+                  }}
+                  dropdownStyle={{
+                    backgroundColor: 'white',
+                    color: '#111827',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '6px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                    maxHeight: '200px',
+                    overflowY: 'auto'
+                  }}
+                  searchStyle={{
+                    margin: '0 8px 8px 8px',
+                    padding: '8px',
+                    fontSize: '14px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '4px',
+                    outline: 'none',
+                    backgroundColor: 'white'
+                  }}
+                  placeholder="Enter phone number"
+                  enableSearch={true}
+                  disableSearchIcon={false}
+                  searchPlaceholder="Search countries..."
+                  countryCodeEditable={false}
+                  excludeCountries={[]}
+                  onlyCountries={[]}
                 />
                 {errors.property_contact && (
-                  <p className="text-red-500 text-xs mt-1">Contact must be a valid 10-digit number</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    Contact must be a valid phone number with country code
+                  </p>
                 )}
               </div>
             </div>
