@@ -43,7 +43,7 @@ async function shutdown(signal: string): Promise<void> {
          * Start auto cancel cron job for cryto-payment
          */
         autoCancelCron.start();
-        // sendEmailCron.start();
+        sendEmailCron.start();
 
         /**
          * Graceful shutdown
