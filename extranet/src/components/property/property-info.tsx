@@ -54,6 +54,7 @@ const createPropertySchema = z.object({
   description: z.string().min(1, "Description is required"),
   property_category: z.string().min(1, "Property category is required"),
   property_type: z.string().min(1, "Property type is required"),
+  property_contact: z.string().min(1, "Property contact is required"),
 });
 
 type Inputs = {
@@ -175,8 +176,6 @@ export default function PropertyInfo({ onNext }: Props) {
     }
   }, [propertyId, editMode]);
 
-
-
   const form = useForm<Inputs>({
     defaultValues: {
       property_name: "",
@@ -190,8 +189,7 @@ export default function PropertyInfo({ onNext }: Props) {
     },
     resolver: zodResolver(createPropertySchema),
   });
-
-  const { register, handleSubmit, formState, setValue } = form;
+  const { register, handleSubmit, formState, setValue, watch } = form;
   const {
     errors: {
       property_email: propertyEmailError,
