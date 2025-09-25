@@ -187,14 +187,6 @@ function Offers() {
             <p className="text-gray-600 mb-6">
               Get started by creating your first notification.
             </p>
-            <button
-              onClick={handleCreateOffer}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-tripswift-blue text-white hover:bg-tripswift-dark-blue rounded-lg transition-colors"
-              disabled={loading}
-            >
-              <Plus className="w-4 h-4" />
-              Create Your First Notification
-            </button>
           </div>
         )}
 
