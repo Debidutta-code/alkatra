@@ -88,8 +88,7 @@ export class GoogleAuthService implements IGoogleAuthService {
             const { id, given_name, family_name, email, picture } = userData.data;
 
             let customer = await this.customerRepository.findByEmail(email);
-            customer.isExist = customer ? true : false;
-            console.log("Customer exists: ", customer.isExist);
+            let isExist = customer ? true : false;
 
             if (!customer) {
                 customer = await this.customerRepository.create({
@@ -99,6 +98,7 @@ export class GoogleAuthService implements IGoogleAuthService {
                     email: email,
                     avatar: picture,
                     provider: data.provider,
+                    isExist: false,
                 });
             }
 
@@ -113,7 +113,7 @@ export class GoogleAuthService implements IGoogleAuthService {
                     email: customer.email,
                     avatar: customer.avatar,
                     provider: customer.provider,
-                    isExist: customer.isExist
+                    isExist: isExist
                 }
             }
         }
@@ -122,7 +122,7 @@ export class GoogleAuthService implements IGoogleAuthService {
             throw error.message;
         }
     }
-    
+
 }
 
 // const googleAuthService = GoogleAuthService.getInstance();
