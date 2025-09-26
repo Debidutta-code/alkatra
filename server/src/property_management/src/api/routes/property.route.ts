@@ -126,6 +126,49 @@ export default (app: Router) => {
    */
   router.route("/promo/delete/:promoId").delete(protect as any, promoCodeController.deletePromoCode.bind(promoCodeController));
 
+  /**
+   * Extranet specific
+   * Tracking the promocode usage 
+   */
+  router.post('/promo/usage/track', protect as any, promoCodeController.trackPromocodeUsage.bind(promoCodeController));
+
+  /**
+   * Extranet specific
+   * Cancel promocode usage
+   */
+  router.post('/promo/usage/cancel', protect as any, promoCodeController.cancelPromocodeUsage.bind(promoCodeController));
+
+  /**
+   * Extranet specific
+   * Get promocode usage stats
+   */
+  router.get('/promo/usage/stats/:promoId', protect as any, promoCodeController.getPromocodeUsageStats.bind(promoCodeController));
+
+  /**
+   * Extranet specific
+   * Get recent usage for a specific promocode
+   */
+  router.get('/promo/usage/recent/:promoId', protect as any, promoCodeController.getPromocodeRecentUsage.bind(promoCodeController));
+
+  /**
+   * Extranet specific
+   * Get property promocode analytics
+   */
+  router.get('/promo/usage/analytics/property/:propertyId', protect as any, promoCodeController.getPropertyPromocodeAnalytics.bind(promoCodeController));
+
+
+  /**
+   * Extranet specific
+   * Get promocode by id
+   */
+  router.get('/promo/:promoId', protect as any, promoCodeController.getPromocodeById.bind(promoCodeController));
+
+  /**
+   * Extranet specific
+   * Search promocodes
+   */
+  router.post('/promo/search', protect as any, promoCodeController.searchPromocodes.bind(promoCodeController));
+
 
   /**
    * **************************************************************************
@@ -159,48 +202,4 @@ export default (app: Router) => {
    */
   router.get('/eligibility/:promoCodeId', authenticateCustomer as any, promoCodeController.checkUserPromocodeEligibility.bind(promoCodeController));
 
-  /**
-   * Extranet specific
-   * Tracking the promocode usage 
-   */
-  router.post('promo/usage/track', protect as any, promoCodeController.trackPromocodeUsage.bind(promoCodeController));
-
-  /**
-   * Extranet specific
-   * Cancel promocode usage
-   */
-  router.post('/usage/cancel', protect as any, promoCodeController.cancelPromocodeUsage.bind(promoCodeController));
-
-  /**
-   * Extranet specific
-   * Get promocode usage stats
-   */
-  router.get('/usage/stats/:promoId', protect as any, promoCodeController.getPromocodeUsageStats.bind(promoCodeController));
-
-
-
-  /**
-   * Extranet specific
-   * Get recent usage for a specific promocode
-   */
-  router.get('/usage/recent/:promoId', protect as any, promoCodeController.getPromocodeRecentUsage.bind(promoCodeController));
-
-  /**
-   * Extranet specific
-   * Get property promocode analytics
-   */
-  router.get('/usage/analytics/property/:propertyId', protect as any, promoCodeController.getPropertyPromocodeAnalytics.bind(promoCodeController));
-
-
-  /**
-   * Extranet specific
-   * Get promocode by id
-   */
-  router.get('/:promoId', protect as any, promoCodeController.getPromocodeById.bind(promoCodeController));
-
-  /**
-   * Extranet specific
-   * Search promocodes
-   */
-  router.post('/search', protect as any, promoCodeController.searchPromocodes.bind(promoCodeController));
 };
