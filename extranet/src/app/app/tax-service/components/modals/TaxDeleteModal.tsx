@@ -1,5 +1,6 @@
-import React from 'react';
-import { Button } from '../../../../components/ui/button';
+import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { Button } from '../../../../../components/ui/button';
 
 interface TaxDeleteModalProps {
   isOpen: boolean;
@@ -20,6 +21,19 @@ export const TaxDeleteModal: React.FC<TaxDeleteModalProps> = ({
   isLoading = false,
   groupRuleCount = 0
 }) => {
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleBackdropClick = (e: React.MouseEvent) => {
@@ -37,33 +51,34 @@ export const TaxDeleteModal: React.FC<TaxDeleteModalProps> = ({
   const isGroup = itemType === 'group';
   const itemDisplayName = isGroup ? 'Tax Group' : 'Tax Rule';
 
-  return (
-    <div 
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  const modalContent = (
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4"
       onClick={handleBackdropClick}
       onKeyDown={handleKeyDown}
       tabIndex={-1}
+      style={{ zIndex: 9999 }}
     >
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 overflow-hidden">
+      <div className="bg-white rounded-lg shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col mx-auto animate-fadeIn">
         {/* Header */}
         <div className="bg-red-500 px-6 py-4">
           <div className="flex items-center">
-            <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-3">
+            <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
               <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-white">Delete {itemDisplayName}</h3>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-lg font-semibold text-white">{itemDisplayName}</h3>
               <p className="text-red-100 text-sm">This action cannot be undone</p>
             </div>
           </div>
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-6 overflow-y-auto flex-1">
           {/* Question and Item Name */}
-          <div className="flex items-start space-x-3 mb-4">
+          <div className="flex items-start space-x-4 mb-6">
             <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {isGroup ? (
@@ -73,21 +88,21 @@ export const TaxDeleteModal: React.FC<TaxDeleteModalProps> = ({
                 )}
               </svg>
             </div>
-            <div className="flex-1">
-              <p className="text-gray-800 font-medium mb-1">
+            <div className="flex-1 min-w-0">
+              <p className="text-gray-800 font-medium text-base mb-2">
                 Are you sure you want to delete this {itemType}?
               </p>
-              <p className="text-gray-900 font-semibold text-lg">
+              <p className="text-gray-900 font-semibold text-lg break-words">
                 "{itemName}"
               </p>
               {isGroup && groupRuleCount > 0 && (
-                <p className="text-gray-600 text-sm mt-1">
+                <p className="text-gray-600 text-sm mt-2">
                   Contains {groupRuleCount} tax rule{groupRuleCount !== 1 ? 's' : ''}
                 </p>
               )}
             </div>
           </div>
-          
+
           {/* Warning Section */}
           <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-md mb-6">
             <div className="flex">
@@ -101,16 +116,16 @@ export const TaxDeleteModal: React.FC<TaxDeleteModalProps> = ({
                 <div className="text-sm text-red-700 space-y-1">
                   {isGroup ? (
                     <>
-                      <div>• This tax group will be permanently removed from your system</div>
-                      <div>• The individual tax rules within this group will remain available</div>
-                      <div>• Any existing bookings using this group will not be affected</div>
+                      <div>• This tax group will be permanently removed</div>
+                      <div>• Individual tax rules will remain available</div>
+                      <div>• Existing bookings will not be affected</div>
                       <div>• This action cannot be reversed</div>
                     </>
                   ) : (
                     <>
-                      <div>• This tax rule will be permanently removed from your system</div>
-                      <div>• Any existing bookings using this rule will not be affected</div>
-                      <div>• This rule will be removed from all tax groups that contain it</div>
+                      <div>• This tax rule will be permanently removed</div>
+                      <div>• Existing bookings will not be affected</div>
+                      <div>• Rule will be removed from all tax groups</div>
                       <div>• This action cannot be reversed</div>
                     </>
                   )}
@@ -120,12 +135,12 @@ export const TaxDeleteModal: React.FC<TaxDeleteModalProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end space-x-3">
+          <div className="flex flex-col sm:flex-row sm:justify-end gap-3">
             <Button
               variant="outline"
               onClick={onClose}
               disabled={isLoading}
-              className="px-4 py-2 text-gray-700 border-gray-300 hover:bg-gray-50"
+              className="w-full sm:w-auto px-4 py-2 text-gray-700 border-gray-300 hover:bg-gray-50 text-sm order-2 sm:order-1"
             >
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -159,4 +174,11 @@ export const TaxDeleteModal: React.FC<TaxDeleteModalProps> = ({
       </div>
     </div>
   );
+
+  // Render modal in portal if available, otherwise render normally
+  if (typeof document !== 'undefined') {
+    return createPortal(modalContent, document.body);
+  }
+
+  return modalContent;
 };
