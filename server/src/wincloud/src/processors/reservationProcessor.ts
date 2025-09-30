@@ -23,7 +23,7 @@ export class ReservationProcessor {
             reservationId,  
             paymentMethod,
         } = bookingDetails;
-        console.log("ReservationProcessor: Processing reservation input data:", bookingDetails);
+        
 
         const reservationData: ThirdPartyReservationData = {
             provider,

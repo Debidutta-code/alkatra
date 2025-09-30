@@ -1,25 +1,13 @@
-// import {protect }  from "../../../Customer-Authentication/src/middleware/authMiddleware";
 import { Router } from "express";
+import { BookingController } from "../controllers/bookings.controller";
+import { BookAgainAvailabilityService, AmendBookingService } from "../services";
 import {
-  // createReservation,
-  // getAllReservations,
-  // getReservation,
-  // updateReservation,
-  // getAllReservationsOfUser,
-  // getReservationByRoom,
-  // deleteReservation,
-  // getBookingsForDashboard,
-  // updateStatusOfBooking,
-  // getRevenueByOwner,
-  // getRevenueByProperty,
   getBookingDetailsForExtranet,
   getBookingDetailsOfUser,
-  // createReservationWithStoredCard,
+  createReservationWithStoredCard,
   cancelThirdPartyReservation,
   getAllHotelsByRole
 } from "../controllers/bookings.controller";
-import { BookingController } from "../controllers/bookings.controller";
-import { BookAgainAvailabilityService, AmendBookingService } from "../services";
 
 const amendBookingService = AmendBookingService.getInstance();
 const bookAgainService = BookAgainAvailabilityService.getInstance();
@@ -31,7 +19,7 @@ import { protect } from "../../../user_authentication/src/Middleware/auth.middle
 
 const router = Router();
 router.route("/customers/booking/details/:id").get(getBookingDetailsOfUser);
-// router.route("/create-reservation-with-card").post(authenticateCustomer as any, createReservationWithStoredCard);
+router.route("/create-reservation-with-card").post(authenticateCustomer as any, createReservationWithStoredCard);
 
 router.route("/update-reservation/:id").patch(authenticateCustomer as any, bookingController.updatePayAtHotelBookings.bind(bookingController));
 router.route("/cancel-reservation/:id").patch(authenticateCustomer as any, cancelThirdPartyReservation);
@@ -48,7 +36,7 @@ router.route("/check/availability").get(authenticateCustomer as any, bookingCont
 
 
 // Reservation API
-router.route("/create-reservation-with-card").post(authenticateCustomer as any, bookingController.reservationWithPayAtHotel.bind(bookingController));
+// router.route("/create-reservation-with-card").post(authenticateCustomer as any, bookingController.reservationWithPayAtHotel.bind(bookingController));
 
 
 export default router;
