@@ -1,4 +1,4 @@
-import { BookingRepository } from "../repository";
+import { AmendBookingRepository } from "../repository";
 import { Inventory } from "../../../wincloud/src/model/inventoryModel";
 import Handlebars from "handlebars";
 import { MailFactory } from "../../../customer_authentication/src/services/mailFactory";
@@ -50,19 +50,19 @@ interface CreateBookingInput {
 }
 
 
-export class BookingService {
-  private bookingRepository: BookingRepository;
-  private static instance: BookingService;
+export class AmendBookingService {
+  private bookingRepository: AmendBookingRepository;
+  private static instance: AmendBookingService;
   private mailer = MailFactory.getMailer();
   private constructor() {
-    this.bookingRepository = BookingRepository.getInstance();
+    this.bookingRepository = AmendBookingRepository.getInstance();
   }
 
-  static getInstance(): BookingService {
-    if (!BookingService.instance) {
-      BookingService.instance = new BookingService();
+  static getInstance(): AmendBookingService {
+    if (!AmendBookingService.instance) {
+      AmendBookingService.instance = new AmendBookingService();
     }
-    return BookingService.instance;
+    return AmendBookingService.instance;
   }
 
   async getBookings(reservationId: string) {
@@ -169,31 +169,6 @@ export class BookingService {
     }
   }
 
-  /**
-   * Helper for Booking Modification
-   * Used in : updateBooking
-   */
-  // async processGuests(guests: { firstName: string; lastName: string; category: string }[]): Promise<{
-  //     categorizedGuests: { firstName: string; lastName: string; dob: string; age: number; category: string; ageCode: string }[];
-  //     ageCodeSummary: Record<string, number>;
-  // }> {
-  //     if (!Array.isArray(guests) || guests.length === 0) {
-  //         throw new Error("Guest details are required");
-  //     }
-
-  //     const ageCodeCount: Record<string, number> = { "7": 0, "8": 0, "10": 0 };
-
-  //     const categorizedGuests = await Promise.all(
-  //         guests.map(async ({ firstName, lastName, dob }) => {
-  //             if (!dob) throw new Error(`DOB missing for ${firstName} ${lastName}`);
-  //             const { age, category, ageCode } = await this.calculateAgeCategory(dob);
-  //             ageCodeCount[ageCode] = (ageCodeCount[ageCode] || 0) + 1;
-  //             return { firstName, lastName, dob, age, category, ageCode };
-  //         })
-  //     );
-
-  //     return { categorizedGuests, ageCodeSummary: ageCodeCount };
-  // }
   async processGuests(guests: { firstName: string; lastName: string; category: string }[]): Promise<{
     categorizedGuests: { firstName: string; lastName: string; category: string; ageCode: string }[];
     ageCodeSummary: Record<string, number>;
@@ -216,35 +191,6 @@ export class BookingService {
     return { categorizedGuests, ageCodeSummary: ageCodeCount };
   }
 
-
-
-
-  /**
-   * Helper for Booking Modification
-   * Used in : processGuests
-   */
-  // async calculateAgeCategory(dob: string) {
-  //     try {
-  //         if (!dob) {
-  //             throw new Error("DOB is required");
-  //         }
-  //         const birthDate = new Date(dob);
-  //         const today = new Date();
-  //         let age = today.getFullYear() - birthDate.getFullYear();
-  //         if (
-  //             today.getMonth() < birthDate.getMonth() ||
-  //             (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())
-  //         ) {
-  //             age--;
-  //         }
-  //         if (age <= 2) return { age, category: "Infant", ageCode: "7" };
-  //         if (age <= 12) return { age, category: "Child", ageCode: "8" };
-  //         return { age, category: "Adult", ageCode: "10" };
-  //     } catch (error: any) {
-  //         console.log("Error in calculateAgeCategory", error);
-  //         throw new Error("Failed to calculate age category");
-  //     }
-  // }
   async calculateAgeCategory(category: string) {
     try {
       if (!category) {

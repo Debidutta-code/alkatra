@@ -1,4 +1,5 @@
-import { BookingRepository } from "./booking.repository";
+import { AmendBookingRepository } from "./amendBooking.repository";
 import { BookAgainRepository } from "./bookAgain.repository";
+import { ReservationRepository } from "./reservation.repository";
 
-export { BookingRepository, BookAgainRepository };
+export { AmendBookingRepository, BookAgainRepository, ReservationRepository };

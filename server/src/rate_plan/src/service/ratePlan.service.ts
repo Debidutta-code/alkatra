@@ -246,7 +246,7 @@ class RoomRentCalculationService {
 
     try {
       // Input validation
-      console.log(`The data we get in RatePlanService:${hotelcode}, ${invTypeCode}, ${startDate}, ${endDate}, ${noOfChildrens}, ${noOfAdults}, ${noOfRooms}`);
+      
       const validationResult = this.validateInputs(
         hotelcode,
         invTypeCode,
@@ -545,12 +545,7 @@ class RoomRentCalculationService {
             success: false,
             message: `No suitable rates found for the date: ${date.toDateString()}`
           };
-        }
-
-        console.log(`Selected rate for ${date.toDateString()}:`, {
-          ratePlanCode: bestRateForDay.ratePlanCode,
-          totalAmount: bestRateForDay.totalAmountForDay
-        });
+        }        
 
         // Add to daily breakdown
         dailyBreakdown.push({
@@ -571,7 +566,7 @@ class RoomRentCalculationService {
         totalAdditionalCharges += bestRateForDay.additionalGuestCharges * noOfRooms;
       }
 
-
+ 
 
       const averageBaseRate = numberOfNights > 0 ? totalBaseAmount / numberOfNights / noOfRooms : 0;
 

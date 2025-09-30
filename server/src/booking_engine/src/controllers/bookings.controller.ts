@@ -18,7 +18,7 @@ import Auth from "../../../user_authentication/src/Model/auth.model";
 import { PropertyInfo } from "../../../property_management/src/model/property.info.model";
 import UserModel from "../../../user_authentication/src/Model/auth.model";
 import { MailFactory } from "../../../customer_authentication/src/services/mailFactory";
-import { BookAgainAvailabilityService, BookingService } from "../services";
+import { BookAgainAvailabilityService, AmendBookingService, ReservationService } from "../services";
 import { property } from "zod";
 import { Room } from "../../../property_management/src/model/room.model";
 
@@ -290,374 +290,374 @@ const increaseRoomsAfterBookingCancelled = async (
 };
 
 // New controller function to create a reservation with stored card (Pay at Hotel)
-export const createReservationWithStoredCard = CatchAsyncError(
-  async (req: any, res: Response, next: NextFunction) => {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(400).json({ message: "User ID is required" });
-    }
+// export const createReservationWithStoredCard = CatchAsyncError(
+//   async (req: any, res: Response, next: NextFunction) => {
+//     const userId = req.user?.id;
+//     if (!userId) {
+//       return res.status(400).json({ message: "User ID is required" });
+//     }
 
-    const {
-      checkInDate,
-      checkOutDate,
-      hotelCode,
-      hotelName,
-      ratePlanCode,
-      numberOfRooms,
-      roomTypeCode,
-      roomTotalPrice,
-      currencyCode,
-      email,
-      phone,
-      guests,
-      paymentInfo,
-    } = req.body;
+//     const {
+//       checkInDate,
+//       checkOutDate,
+//       hotelCode,
+//       hotelName,
+//       ratePlanCode,
+//       numberOfRooms,
+//       roomTypeCode,
+//       roomTotalPrice,
+//       currencyCode,
+//       email,
+//       phone,
+//       guests,
+//       paymentInfo,
+//     } = req.body;
 
-    const requiredFields = {
-      checkInDate,
-      checkOutDate,
-      hotelCode,
-      hotelName,
-      ratePlanCode,
-      numberOfRooms,
-      roomTypeCode,
-      roomTotalPrice,
-      currencyCode,
-      email,
-      phone,
-      guests,
-      paymentInfo,
-    };
+//     const requiredFields = {
+//       checkInDate,
+//       checkOutDate,
+//       hotelCode,
+//       hotelName,
+//       ratePlanCode,
+//       numberOfRooms,
+//       roomTypeCode,
+//       roomTotalPrice,
+//       currencyCode,
+//       email,
+//       phone,
+//       guests,
+//       paymentInfo,
+//     };
 
-    const missingFields = Object.entries(requiredFields)
-      .filter(([_, value]) => value === undefined || value === null || value === "")
-      .map(([key]) => key);
+//     const missingFields = Object.entries(requiredFields)
+//       .filter(([_, value]) => value === undefined || value === null || value === "")
+//       .map(([key]) => key);
 
-    if (missingFields.length > 0) {
-      return res.status(400).json({
-        message: `Missing required fields: ${missingFields.join(", ")}`,
-      });
-    }
+//     if (missingFields.length > 0) {
+//       return res.status(400).json({
+//         message: `Missing required fields: ${missingFields.join(", ")}`,
+//       });
+//     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const checkIn = new Date(checkInDate);
-    const checkOut = new Date(checkOutDate);
+//     const today = new Date();
+//     today.setHours(0, 0, 0, 0);
+//     const checkIn = new Date(checkInDate);
+//     const checkOut = new Date(checkOutDate);
 
-    if (checkIn < today || checkOut <= checkIn) {
-      return res.status(400).json({
-        message: "Check-in date cannot be in the past or Check-out date must be after check-in date",
-      });
-    }
+//     if (checkIn < today || checkOut <= checkIn) {
+//       return res.status(400).json({
+//         message: "Check-in date cannot be in the past or Check-out date must be after check-in date",
+//       });
+//     }
 
-    if (!Array.isArray(guests) || guests.length === 0) {
-      return res.status(400).json({ message: "Guest details are required" });
-    }
+//     if (!Array.isArray(guests) || guests.length === 0) {
+//       return res.status(400).json({ message: "Guest details are required" });
+//     }
 
-    const ageCodeCount: Record<string, number> = { "7": 0, "8": 0, "10": 0 };
+//     const ageCodeCount: Record<string, number> = { "7": 0, "8": 0, "10": 0 };
 
-    const categorizedGuests = guests.map(({ firstName, lastName, dob }) => {
-      if (!dob) throw new Error(`DOB missing for ${firstName} ${lastName}`);
-      const { age, category, ageCode } = calculateAgeCategory(dob);
-      ageCodeCount[ageCode] = (ageCodeCount[ageCode] || 0) + 1;
-      return { firstName, lastName, dob, age, category, ageCode };
-    });
+//     const categorizedGuests = guests.map(({ firstName, lastName, dob }) => {
+//       if (!dob) throw new Error(`DOB missing for ${firstName} ${lastName}`);
+//       const { age, category, ageCode } = calculateAgeCategory(dob);
+//       ageCodeCount[ageCode] = (ageCodeCount[ageCode] || 0) + 1;
+//       return { firstName, lastName, dob, age, category, ageCode };
+//     });
 
-    try {
-      const customerResult = await stripeService.createOrRetrieveCustomer(
-        email,
-        `${guests[0].firstName} ${guests[0].lastName}`,
-        phone,
-        paymentInfo.paymentMethodId
-      );
+//     try {
+//       const customerResult = await stripeService.createOrRetrieveCustomer(
+//         email,
+//         `${guests[0].firstName} ${guests[0].lastName}`,
+//         phone,
+//         paymentInfo.paymentMethodId
+//       );
 
-      if (!customerResult.success) {
-        return next(new ErrorHandler(customerResult.error || "Stripe customer creation failed", 500));
-      }
-    }
+//       if (!customerResult.success) {
+//         return next(new ErrorHandler(customerResult.error || "Stripe customer creation failed", 500));
+//       }
+//     }
 
-    catch (error) {
-      return res.status(500).json({
-        message: "Error while interacting with Stripe",
-        error: error instanceof Error ? error.message : error,
-      });
-    }
+//     catch (error) {
+//       return res.status(500).json({
+//         message: "Error while interacting with Stripe",
+//         error: error instanceof Error ? error.message : error,
+//       });
+//     }
 
-    const reservationInput: ReservationInput = {
-      bookingDetails: {
-        reservationId: "",
-        paymentMethod: "payAtHotel",
-        userId,
-        checkInDate,
-        checkOutDate,
-        hotelCode,
-        hotelName,
-        ratePlanCode,
-        roomTypeCode,
-        numberOfRooms,
-        roomTotalPrice,
-        currencyCode,
-        guests,
-        email,
-        phone,
-      },
-      ageCodeSummary: ageCodeCount,
-    };
+//     const reservationInput: ReservationInput = {
+//       bookingDetails: {
+//         reservationId: "",
+//         paymentMethod: "payAtHotel",
+//         userId,
+//         checkInDate,
+//         checkOutDate,
+//         hotelCode,
+//         hotelName,
+//         ratePlanCode,
+//         roomTypeCode,
+//         numberOfRooms,
+//         roomTotalPrice,
+//         currencyCode,
+//         guests,
+//         email,
+//         phone,
+//       },
+//       ageCodeSummary: ageCodeCount,
+//     };
 
-    // console.log("Reservation Input Data:", JSON.stringify(reservationInput, null, 2));
+//     // console.log("Reservation Input Data:", JSON.stringify(reservationInput, null, 2));
 
-    try {
-      const thirdPartyService = new ThirdPartyReservationService();
-      await thirdPartyService.processThirdPartyReservation(reservationInput);
-      try {
-        const reduceRoomResult = await reduceRoomsAfterBookingConfirmed(
-          res,
-          hotelCode,
-          roomTypeCode,
-          numberOfRooms,
-          [checkIn, checkOutDate]
-        );
-        if (!reduceRoomResult) {
-          return res.status(400).json({ message: "Failed to reduce rooms" });
-        }
-      } catch (error) {
-        if (error) {
-          const errorMessage = error instanceof Error ? error.message : "Failed to reduce rooms";
-          return res.status(400).json({ message: errorMessage });
-        }
-      }
-      try {
-        const htmlContent = `<!DOCTYPE html>
-        <html lang="en">
+//     try {
+//       const thirdPartyService = new ThirdPartyReservationService();
+//       await thirdPartyService.processThirdPartyReservation(reservationInput);
+//       try {
+//         const reduceRoomResult = await reduceRoomsAfterBookingConfirmed(
+//           res,
+//           hotelCode,
+//           roomTypeCode,
+//           numberOfRooms,
+//           [checkIn, checkOutDate]
+//         );
+//         if (!reduceRoomResult) {
+//           return res.status(400).json({ message: "Failed to reduce rooms" });
+//         }
+//       } catch (error) {
+//         if (error) {
+//           const errorMessage = error instanceof Error ? error.message : "Failed to reduce rooms";
+//           return res.status(400).json({ message: errorMessage });
+//         }
+//       }
+//       try {
+//         const htmlContent = `<!DOCTYPE html>
+//         <html lang="en">
 
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              background-color: #f4f4f4;
-              margin: 0;
-              padding: 0;
-            }
+//         <head>
+//           <meta charset="UTF-8">
+//           <meta name="viewport" content="width=device-width, initial-scale=1.0">
+//           <style>
+//             body {
+//               font-family: Arial, sans-serif;
+//               background-color: #f4f4f4;
+//               margin: 0;
+//               padding: 0;
+//             }
 
-            .container {
-              max-width: 600px;
-              margin: 20px auto;
-              background-color: #ffffff;
-              border-radius: 8px;
-              overflow: hidden;
-              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            }
+//             .container {
+//               max-width: 600px;
+//               margin: 20px auto;
+//               background-color: #ffffff;
+//               border-radius: 8px;
+//               overflow: hidden;
+//               box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+//             }
 
-            .header {
-              background-color: #1a73e8;
-              color: #ffffff;
-              padding: 20px;
-              text-align: center;
-            }
+//             .header {
+//               background-color: #1a73e8;
+//               color: #ffffff;
+//               padding: 20px;
+//               text-align: center;
+//             }
 
-            .header h1 {
-              margin: 0;
-              font-size: 24px;
-            }
+//             .header h1 {
+//               margin: 0;
+//               font-size: 24px;
+//             }
 
-            .content {
-              padding: 20px;
-            }
+//             .content {
+//               padding: 20px;
+//             }
 
-            .content h2 {
-              color: #333333;
-              font-size: 20px;
-              margin-top: 0;
-            }
+//             .content h2 {
+//               color: #333333;
+//               font-size: 20px;
+//               margin-top: 0;
+//             }
 
-            .content p {
-              color: #666666;
-              line-height: 1.6;
-              margin: 10px 0;
-            }
+//             .content p {
+//               color: #666666;
+//               line-height: 1.6;
+//               margin: 10px 0;
+//             }
 
-            .details-table {
-              width: 100%;
-              border-collapse: collapse;
-              margin: 20px 0;
-            }
+//             .details-table {
+//               width: 100%;
+//               border-collapse: collapse;
+//               margin: 20px 0;
+//             }
 
-            .details-table th,
-            .details-table td {
-              padding: 10px;
-              text-align: left;
-              border-bottom: 1px solid #dddddd;
-            }
+//             .details-table th,
+//             .details-table td {
+//               padding: 10px;
+//               text-align: left;
+//               border-bottom: 1px solid #dddddd;
+//             }
 
-            .details-table th {
-              background-color: #f8f8f8;
-              color: #333333;
-              font-weight: bold;
-            }
+//             .details-table th {
+//               background-color: #f8f8f8;
+//               color: #333333;
+//               font-weight: bold;
+//             }
 
-            .footer {
-              background-color: #f4f4f4;
-              padding: 15px;
-              text-align: center;
-              color: #888888;
-              font-size: 12px;
-            }
+//             .footer {
+//               background-color: #f4f4f4;
+//               padding: 15px;
+//               text-align: center;
+//               color: #888888;
+//               font-size: 12px;
+//             }
 
-            .button {
-              display: inline-block;
-              padding: 10px 20px;
-              margin: 20px 0;
-              background-color: #1a73e8;
-              color: #ffffff;
-              text-decoration: none;
-              border-radius: 5px;
-              font-weight: bold;
-              text-color
-            }
+//             .button {
+//               display: inline-block;
+//               padding: 10px 20px;
+//               margin: 20px 0;
+//               background-color: #1a73e8;
+//               color: #ffffff;
+//               text-decoration: none;
+//               border-radius: 5px;
+//               font-weight: bold;
+//               text-color
+//             }
 
-            @media only screen and (max-width: 600px) {
-              .container {
-                width: 100%;
-                margin: 10px;
-              }
+//             @media only screen and (max-width: 600px) {
+//               .container {
+//                 width: 100%;
+//                 margin: 10px;
+//               }
 
-              .header h1 {
-                font-size: 20px;
-              }
+//               .header h1 {
+//                 font-size: 20px;
+//               }
 
-              .content h2 {
-                font-size: 18px;
-              }
-            }
-          </style>
-        </head>
+//               .content h2 {
+//                 font-size: 18px;
+//               }
+//             }
+//           </style>
+//         </head>
 
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>Booking Confirmation</h1>
-            </div>
-            <div class="content">
-              <h2>Dear {{guestName}},</h2>
-              <p>Thank you for your booking with {{hotelName}}! We are excited to confirm your booking details below.</p>
+//         <body>
+//           <div class="container">
+//             <div class="header">
+//               <h1>Booking Confirmation</h1>
+//             </div>
+//             <div class="content">
+//               <h2>Dear {{guestName}},</h2>
+//               <p>Thank you for your booking with {{hotelName}}! We are excited to confirm your booking details below.</p>
 
-              <h2>Reservation Details</h2>
-              <table class="details-table">
-                <tr>
-                  <th>Hotel Name</th>
-                  <td>{{hotelName}}</td>
-                </tr>
-                <tr>
-                  <th>Check-In Date</th>
-                  <td>{{checkInDate}}</td>
-                </tr>
-                <tr>
-                  <th>Check-Out Date</th>
-                  <td>{{checkOutDate}}</td>
-                </tr>
-                <tr>
-                  <th>Room Type</th>
-                  <td>{{roomTypeCode}}</td>
-                </tr>
-                <tr>
-                  <th>Number of Rooms</th>
-                  <td>{{numberOfRooms}}</td>
-                </tr>
-                <tr>
-                  <th>Total Price</th>
-                  <td>{{roomTotalPrice}} {{currencyCode}}</td>
-                </tr>
-                <tr>
-                  <th>Contact Email</th>
-                  <td>{{email}}</td>
-                </tr>
-                <tr>
-                  <th>Contact Phone</th>
-                  <td>+{{phone}}</td>
-                </tr>
-              </table>
+//               <h2>Reservation Details</h2>
+//               <table class="details-table">
+//                 <tr>
+//                   <th>Hotel Name</th>
+//                   <td>{{hotelName}}</td>
+//                 </tr>
+//                 <tr>
+//                   <th>Check-In Date</th>
+//                   <td>{{checkInDate}}</td>
+//                 </tr>
+//                 <tr>
+//                   <th>Check-Out Date</th>
+//                   <td>{{checkOutDate}}</td>
+//                 </tr>
+//                 <tr>
+//                   <th>Room Type</th>
+//                   <td>{{roomTypeCode}}</td>
+//                 </tr>
+//                 <tr>
+//                   <th>Number of Rooms</th>
+//                   <td>{{numberOfRooms}}</td>
+//                 </tr>
+//                 <tr>
+//                   <th>Total Price</th>
+//                   <td>{{roomTotalPrice}} {{currencyCode}}</td>
+//                 </tr>
+//                 <tr>
+//                   <th>Contact Email</th>
+//                   <td>{{email}}</td>
+//                 </tr>
+//                 <tr>
+//                   <th>Contact Phone</th>
+//                   <td>+{{phone}}</td>
+//                 </tr>
+//               </table>
 
-              <h2>Guest Details</h2>
-              <table class="details-table">
-                <tr>
-                  <th>Name</th>
-                  <th>Age Category</th>
-                </tr>
-                {{#each guests}}
-                <tr>
-                  <td>{{firstName}} {{lastName}}</td>
-                  <td>{{category}} (Age {{age}})</td>
-                </tr>
-                {{/each}}
-              </table>
+//               <h2>Guest Details</h2>
+//               <table class="details-table">
+//                 <tr>
+//                   <th>Name</th>
+//                   <th>Age Category</th>
+//                 </tr>
+//                 {{#each guests}}
+//                 <tr>
+//                   <td>{{firstName}} {{lastName}}</td>
+//                   <td>{{category}} (Age {{age}})</td>
+//                 </tr>
+//                 {{/each}}
+//               </table>
 
-              <p>For any questions or to modify your reservation, please contact us at <a
-                  href="mailto:{{supportEmail}}">{{supportEmail}}</a>.</p>
+//               <p>For any questions or to modify your reservation, please contact us at <a
+//                   href="mailto:{{supportEmail}}">{{supportEmail}}</a>.</p>
 
-              <a href="{{websiteUrl}}" class="button">View Your Booking</a>
-            </div>
-            <div class="footer">
-              <p>&copy; {{currentYear}} {{companyName}}. All rights reserved.</p>
-            </div>
-          </div>
-        </body>
+//               <a href="{{websiteUrl}}" class="button">View Your Booking</a>
+//             </div>
+//             <div class="footer">
+//               <p>&copy; {{currentYear}} {{companyName}}. All rights reserved.</p>
+//             </div>
+//           </div>
+//         </body>
 
-        </html>`;
+//         </html>`;
 
-        const templateData = {
-          guestName: `${guests[0].firstName} ${guests[0].lastName}`,
-          hotelName: hotelName,
-          checkInDate: new Date(checkInDate).toLocaleDateString(),
-          checkOutDate: new Date(checkOutDate).toLocaleDateString(),
-          roomTypeCode: roomTypeCode,
-          numberOfRooms: numberOfRooms,
-          roomTotalPrice: roomTotalPrice,
-          currencyCode: currencyCode,
-          email: email,
-          phone: phone,
-          guests: categorizedGuests,
-          supportEmail: 'business.alhajz@gmail.com',
-          // supportPhone: '+1-800-123-4567',
-          websiteUrl: 'https://alhajz.ai',
-          currentYear: new Date().getFullYear(),
-          companyName: 'Al-Hajz',
-        };
+//         const templateData = {
+//           guestName: `${guests[0].firstName} ${guests[0].lastName}`,
+//           hotelName: hotelName,
+//           checkInDate: new Date(checkInDate).toLocaleDateString(),
+//           checkOutDate: new Date(checkOutDate).toLocaleDateString(),
+//           roomTypeCode: roomTypeCode,
+//           numberOfRooms: numberOfRooms,
+//           roomTotalPrice: roomTotalPrice,
+//           currencyCode: currencyCode,
+//           email: email,
+//           phone: phone,
+//           guests: categorizedGuests,
+//           supportEmail: 'business.alhajz@gmail.com',
+//           // supportPhone: '+1-800-123-4567',
+//           websiteUrl: 'https://alhajz.ai',
+//           currentYear: new Date().getFullYear(),
+//           companyName: 'Al-Hajz',
+//         };
 
-        // Compile the Handlebars template
-        const template = Handlebars.compile(htmlContent);
+//         // Compile the Handlebars template
+//         const template = Handlebars.compile(htmlContent);
 
-        // Generate the final HTML by replacing placeholders with actual data
-        const finalHtml = template(templateData);
+//         // Generate the final HTML by replacing placeholders with actual data
+//         const finalHtml = template(templateData);
 
-        await mailer.sendMail({
-          to: email,
-          subject: `Booking Confirmation - ${hotelName}`,
-          html: finalHtml,
-          text: `Your booking has been confirmed`,
-        });
-
-
+//         await mailer.sendMail({
+//           to: email,
+//           subject: `Booking Confirmation - ${hotelName}`,
+//           html: finalHtml,
+//           text: `Your booking has been confirmed`,
+//         });
 
 
-      }
-      catch (error: any) {
-        return res.status(500).json({ message: "❌ Failed to send confirmation email" });
-      }
-    } catch (error: any) {
-      return res.status(500).json({ message: "Failed to process reservation with third-party" });
-    }
 
-    res.status(200).json({
-      message: "Reservation received",
-      numberOfRooms,
-      roomTotalPrice,
-      guests: categorizedGuests,
-      ageCodeSummary: ageCodeCount,
-    });
-  }
-);
+
+//       }
+//       catch (error: any) {
+//         return res.status(500).json({ message: "❌ Failed to send confirmation email" });
+//       }
+//     } catch (error: any) {
+//       return res.status(500).json({ message: "Failed to process reservation with third-party" });
+//     }
+
+//     res.status(200).json({
+//       message: "Reservation received",
+//       numberOfRooms,
+//       roomTotalPrice,
+//       guests: categorizedGuests,
+//       ageCodeSummary: ageCodeCount,
+//     });
+//   }
+// );
 
 export async function createReservationWithCryptoPayment(input: {
   reservationId?: string;
@@ -719,6 +719,8 @@ export async function createReservationWithCryptoPayment(input: {
 
     const reservationInput: ReservationInput = {
       bookingDetails: {
+        provider: "mobile",
+        coupon: [""],
         reservationId: reservationId ?? "",
         paymentMethod: "crypto",
         userId,
@@ -1517,14 +1519,14 @@ export const getAllHotelsByRole = CatchAsyncError(
 
 export class BookingController {
 
-  private bookingService: BookingService;
+  private amendBookingService: AmendBookingService;
   private bookAgainService: BookAgainAvailabilityService;
 
-  constructor(bookingService: BookingService, bookAgainService: BookAgainAvailabilityService) {
-    if (!bookingService || !bookAgainService) {
+  constructor(amendBookingService: AmendBookingService, bookAgainService: BookAgainAvailabilityService) {
+    if (!amendBookingService || !bookAgainService) {
       throw new Error("BookingService and BookAgainAvailabilityService required");
     }
-    this.bookingService = bookingService;
+    this.amendBookingService = amendBookingService;
     this.bookAgainService = bookAgainService;
   }
 
@@ -1557,7 +1559,7 @@ export class BookingController {
         guests,
       } = req.body;
 
-      const { categorizedGuests, ageCodeSummary } = await this.bookingService.updateBooking(userId, reservationId, {
+      const { categorizedGuests, ageCodeSummary } = await this.amendBookingService.updateBooking(userId, reservationId, {
         checkInDate,
         checkOutDate,
         hotelCode,
@@ -1630,4 +1632,122 @@ export class BookingController {
       });
     }
   }
+
+  async reservation(
+    req: any,
+    res: Response,
+    next: NextFunction
+  ) {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+
+    const {
+      provider,
+      coupon,
+      checkInDate,
+      checkOutDate,
+      hotelCode,
+      hotelName,
+      ratePlanCode,
+      numberOfRooms,
+      roomTypeCode,
+      roomTotalPrice,
+      currencyCode,
+      email,
+      phone,
+      guests,
+      paymentInfo,
+    } = req.body;
+
+    const requiredFields = {
+      provider,
+      coupon,
+      checkInDate,
+      checkOutDate,
+      hotelCode,
+      hotelName,
+      ratePlanCode,
+      numberOfRooms,
+      roomTypeCode,
+      roomTotalPrice,
+      currencyCode,
+      email,
+      phone,
+      guests,
+      paymentInfo,
+    };
+
+    const missingFields = Object.entries(requiredFields)
+      .filter(([_, value]) => value === undefined || value === null || value === '')
+      .map(([key]) => key);
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        message: `Missing required fields: ${missingFields.join(', ')}`,
+      });
+    }
+
+    if (coupon && (!Array.isArray(coupon) || coupon.some((c: any) => typeof c !== 'string'))) {
+      return res.status(400).json({
+        message: 'Coupon field must be an array of strings',
+      });
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const checkIn = new Date(checkInDate);
+    const checkOut = new Date(checkOutDate);
+
+    if (checkIn < today || checkOut <= checkIn) {
+      return res.status(400).json({
+        message: 'Check-in date cannot be in the past or Check-out date must be after check-in date',
+      });
+    }
+
+    if (!Array.isArray(guests) || guests.length === 0) {
+      return res.status(400).json({ message: 'Guest details are required' });
+    }
+
+    const reservationInput = {
+      bookingDetails: {
+        provider,
+        coupon,
+        reservationId: '',
+        paymentMethod: 'payAtHotel',
+        userId,
+        checkInDate,
+        checkOutDate,
+        hotelCode,
+        hotelName,
+        ratePlanCode,
+        roomTypeCode,
+        numberOfRooms,
+        roomTotalPrice,
+        currencyCode,
+        guests,
+        email,
+        phone,
+      },
+      ageCodeSummary: { '7': 0, '8': 0, '10': 0 },
+    };
+
+    try {
+      const reservationService = new ReservationService();
+      const result = await reservationService.createReservation(reservationInput, paymentInfo.paymentMethodId);
+      return res.status(200).json({
+        message: 'Reservation received',
+        numberOfRooms,
+        roomTotalPrice,
+        guests: result.categorizedGuests,
+        ageCodeSummary: result.ageCodeSummary,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: error.message || 'Failed to process reservation',
+      });
+    }
+  };
+
 }

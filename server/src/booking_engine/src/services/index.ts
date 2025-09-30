@@ -1,4 +1,5 @@
-import {  BookingService } from "./booking.service";
+import {  AmendBookingService } from "./booking.service";
 import { BookAgainAvailabilityService } from "./bookAgain.service";
+import { ReservationService } from "./reservation.service";
 
-export { BookingService, BookAgainAvailabilityService };
+export { AmendBookingService, BookAgainAvailabilityService, ReservationService };

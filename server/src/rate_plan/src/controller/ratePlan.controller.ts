@@ -115,7 +115,7 @@ class RatePlanController {
             const { invTypeCode, ratePlanCode, startDate, endDate } = req.query;
             const page = req.query?.page ? parseInt(req.query.page as string) : 1;
             const limit = req.query?.limit ? parseInt(req.query.limit as string) : 10;
-            
+
 
             if (isNaN(page) || page < 1) {
                 return res.status(400).json({
@@ -131,7 +131,7 @@ class RatePlanController {
                 });
             }
 
-            
+
             const response = await RatePlanService.getRatePlanByHotel(
                 hotelCode,
                 invTypeCode as string,
@@ -203,6 +203,9 @@ class RoomPrice {
         /**
          * If tax group is not assigned to the property return the response
          */
+        if (!propertyInfo.tax_group) {
+            console.log("No rate plan here");
+        };
         if (!propertyInfo.tax_group) return response;
 
         /**

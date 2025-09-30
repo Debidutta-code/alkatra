@@ -49,6 +49,7 @@ route.get("/hotelRoomPrice", async (req: Request, res: Response, next: NextFunct
   const response = await RoomPrice.getRoomPriceByHotelCode(req, res, next)
   res.status(200).json(response)
 })
+
 route.post("/getRoomRentPrice", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const response = await RoomPrice.getRoomRentController(req, res, next)
