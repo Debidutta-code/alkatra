@@ -10,7 +10,7 @@ import ErrorHandler from '../utils/errorHandler';
 const mailer = MailFactory.getMailer();
 
 export class ReservationService {
-    
+
     private static instance: ReservationService;
     private reservationRepository: ReservationRepository;
 

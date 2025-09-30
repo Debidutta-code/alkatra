@@ -660,6 +660,8 @@ const increaseRoomsAfterBookingCancelled = async (
 // );
 
 export async function createReservationWithCryptoPayment(input: {
+  provider: string;
+  coupon: string[];
   reservationId?: string;
   userId: string;
   checkInDate: string;
@@ -693,7 +695,7 @@ export async function createReservationWithCryptoPayment(input: {
       guests,
     } = input;
 
-    console.log(`BOOKING Controller, crypto booking begins ${currencyCode} ${roomTotalPrice}`)
+
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -1633,11 +1635,7 @@ export class BookingController {
     }
   }
 
-  async reservation(
-    req: any,
-    res: Response,
-    next: NextFunction
-  ) {
+  async reservationWithPayAtHotel(req: any, res: Response, next: NextFunction) {
     const userId = req.user?.id;
     if (!userId) {
       return res.status(400).json({ message: 'User ID is required' });
