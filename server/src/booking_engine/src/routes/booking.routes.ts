@@ -48,7 +48,7 @@ router.route("/check/availability").get(authenticateCustomer as any, bookingCont
 
 
 // Reservation API
-router.route("/create-reservation-with-card").post(authenticateCustomer as any, bookingController.reservation.bind(bookingController));
+router.route("/create-reservation-with-card").post(authenticateCustomer as any, bookingController.reservationWithPayAtHotel.bind(bookingController));
 
 
 export default router;
