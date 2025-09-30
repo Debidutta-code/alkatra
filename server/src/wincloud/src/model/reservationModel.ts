@@ -7,6 +7,8 @@ interface IGuestDetails {
 }
 
 interface IThirdPartyBooking extends Document {
+    provider: string;
+    coupon: string[];
     reservationId: string;
     paymentMethod: string;
     hotelCode: string;
@@ -61,6 +63,8 @@ const guestDetailsSchema = new Schema<IGuestDetails>({
 });
 
 const thirdPartyBookingSchema = new Schema<IThirdPartyBooking>({
+    provider: { type: String, required: true, enum: ['mobile', 'web']  },
+    coupon: { type: [String], required: false },
     reservationId: { type: String, required: true, unique: true },
     paymentMethod: { type: String, required: true },
     hotelCode: { type: String, required: true },
