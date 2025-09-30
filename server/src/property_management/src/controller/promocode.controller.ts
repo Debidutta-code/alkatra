@@ -307,7 +307,7 @@ export class PromoCodeController {
         });
       }
 
-      const { code, bookingAmount } = req.body;
+      const { code, bookingAmount, propertyCode, propertyId } = req.body;
 
       if (!code || !bookingAmount) {
         return res.status(400).json({
@@ -316,10 +316,18 @@ export class PromoCodeController {
         });
       }
 
+      if (!propertyCode && !propertyId) {
+        return res.status(400).json({
+          success: false,
+          message: "Either property code or property ID is required",
+        });
+      }
+
       const validationResult = await this.promoCodeService.validatePromocodeForUse(
         code,
         authData.id,
-        parseFloat(bookingAmount)
+        parseFloat(bookingAmount),
+        { propertyCode, propertyId }
       );
 
       if (!validationResult.isValid) {

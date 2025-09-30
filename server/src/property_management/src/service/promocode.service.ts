@@ -341,9 +341,14 @@ export class PromoCodeService {
   }
 
   /**
-   * Validate promocode before application
+   * Validate promocode before applyintg
    */
-  async validatePromocodeForUse(code: string, customerId: string, bookingAmount: number): Promise<{
+  async validatePromocodeForUse(
+    code: string,
+    customerId: string,
+    bookingAmount: number,
+    property: { propertyCode?: string; propertyId?: string }
+  ): Promise<{
     isValid: boolean;
     promocode?: any;
     discountAmount?: number;
@@ -351,11 +356,20 @@ export class PromoCodeService {
     message?: string;
   }> {
     try {
-      
-      const promocode = await Promocode.findOne({
+
+      const query: any = {
         code: code,
         isActive: true
-      });
+      };
+
+      if (property.propertyId) {
+        query.propertyId = new Types.ObjectId(property.propertyId);
+      } else if (property.propertyCode) {
+        query.propertyCode = property.propertyCode;
+      }
+
+
+      const promocode = await Promocode.findOne(query);
 
       if (!promocode) {
         return { isValid: false, message: "Invalid promocode" };
@@ -648,12 +662,12 @@ export class PromoCodeService {
 
       const reasons: string[] = [];
 
-      
+
       if (!promocode.isActive) {
         reasons.push("Promocode is not active");
       }
 
-      
+
       const now = new Date();
       if (now < promocode.validFrom) {
         reasons.push("Promocode is not yet valid");
@@ -663,12 +677,12 @@ export class PromoCodeService {
         reasons.push("Promocode has expired");
       }
 
-      
+
       if (promocode.currentUsage >= promocode.useLimit) {
         reasons.push("Promocode usage limit has been reached");
       }
 
-      
+
       const usageCheck = await this.promoCodeRepository.canUserUsePromocode(
         new Types.ObjectId(promoCodeId),
         new Types.ObjectId(customerId)
