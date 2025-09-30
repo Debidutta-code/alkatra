@@ -4,7 +4,7 @@ export interface IPromocode extends Document {
   _id: Types.ObjectId;
   propertyId: Types.ObjectId;
   propertyCode: string;
-  promoCodeName: string;
+  codeName: string;
   code: string;
   description?: string;
   discountType: "percentage" | "flat";
@@ -41,7 +41,7 @@ const PromocodeSchema = new Schema<IPromocode>(
       type: String,
       required: [true, "Property code is required"],
     },
-    promoCodeName: {
+    codeName: {
       type: String,
       required: [true, "Promocode name is required"],
     },
