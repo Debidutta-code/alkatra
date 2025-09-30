@@ -31,6 +31,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../../../components/ui/tabs";
 import { Property } from '@src/redux/slices/propertySlice';
 import { Triangle } from "react-loader-spinner";
+import { PromoCodesSection } from '../../../../components/propertyId/promo-codes/PromoCodesSection';
 
 interface RatePlanType {
   _id: string,
@@ -491,7 +492,7 @@ export default function Page() {
                 accessToken={accessToken}
               />
             </div>
-            <div className="mb-8">
+            <div className="mb-2">
               {/* Quick Actions */}
               <Card>
                 <CardHeader>
@@ -527,8 +528,8 @@ export default function Page() {
                 <CardTitle className="text-lg flex items-center justify-between">
                   Property Status
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${propertyStatus === "active"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
                     }`}>
                     {propertyStatus === "active" ? "Active" : "Inactive"}
                   </span>
@@ -592,11 +593,17 @@ export default function Page() {
                   >
                     Room Amenities
                   </TabsTrigger>
+                  <TabsTrigger
+                    value="promo-codes"
+                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
+                  >
+                    Promo Codes
+                  </TabsTrigger>
                 </TabsList>
               </div>
 
               <div className="animate-fade-in">
-                <TabsContent value="overview" className="mt-6 space-y-6">
+                <TabsContent value="overview" className="mt-2 space-y-6">
                   <PropertyDetails
                     property={property}
                     editedProperty={editedProperty}
@@ -610,7 +617,7 @@ export default function Page() {
                   />
                 </TabsContent>
 
-                <TabsContent value="address" className="mt-6">
+                <TabsContent value="address" className="mt-2">
                   <Address
                     address={address}
                     editedAddress={editedAddress}
@@ -622,7 +629,7 @@ export default function Page() {
                   />
                 </TabsContent>
 
-                <TabsContent value="amenities" className="mt-6">
+                <TabsContent value="amenities" className="mt-2">
                   <Amenities
                     property={property}
                     amenity={amenity}
@@ -636,7 +643,7 @@ export default function Page() {
                   />
                 </TabsContent>
 
-                <TabsContent value="rooms" className="mt-6">
+                <TabsContent value="rooms" className="mt-2">
                   <Rooms
                     rooms={rooms}
                     onAddRoom={handleAddRoom}
@@ -646,7 +653,7 @@ export default function Page() {
                   />
                 </TabsContent>
 
-                <TabsContent value="room-amenities" className="mt-6">
+                <TabsContent value="room-amenities" className="mt-2">
                   <RoomAmenities
                     roomAmenities={roomAmenity}
                     editedRoomAmenity={roomAmenity}
@@ -657,10 +664,28 @@ export default function Page() {
                     availableRoomTypes={availableRoomTypes}
                   />
                 </TabsContent>
+
+                <TabsContent value="promo-codes" className="mt-2">
+                  {property?.data?.property_code && accessToken && propertyId ? (
+                    <PromoCodesSection
+                      propertyId={propertyId}
+                      propertyCode={property.data.property_code}
+                      accessToken={accessToken}
+                    />
+                  ) : (
+                    <Card>
+                      <CardContent className="py-8 text-center text-muted-foreground">
+                        {isLoading
+                          ? 'Loading property details...'
+                          : 'Property code not available. Please ensure property is fully loaded.'}
+                      </CardContent>
+                    </Card>
+                  )}
+                </TabsContent>
               </div>
             </Tabs>
           </div>
-          <Card className="border-red-200 bg-red-50/50 mt-8">
+          <Card className="border-red-200 bg-red-50/50 mt-4">
             <CardHeader>
               <CardDescription className="text-red-600">
                 Deleting this property will remove all associated data permanently. This action cannot be undone.
