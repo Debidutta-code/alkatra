@@ -1,6 +1,6 @@
 import { IPromocode, Promocode, PromocodeUsage } from "../model";
 import { ThirdPartyBooking } from "../../../wincloud/src/model/reservationModel";
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 export interface IPromoCodeRepository {
   code: string;
@@ -363,10 +363,13 @@ export class PromoCodeRepository {
   * Cancel/refund promocode usage
   */
   async cancelPromocodeUsage(bookingId: Types.ObjectId, reason: "cancelled" | "expired" = "cancelled"): Promise<any> {
-    const session = await Promocode.startSession();
+
+    // FIX: Use mongoose.startSession() instead of Promocode.startSession()
+    const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
+      // Step 1: Find and update the usage record
       const usageRecord = await PromocodeUsage.findOneAndUpdate(
         { bookingId: bookingId, status: "applied" },
         {
@@ -379,25 +382,29 @@ export class PromoCodeRepository {
         { session, new: true }
       );
 
+      // Step 2: If record found, decrease usage counters
       if (usageRecord) {
         await Promocode.findByIdAndUpdate(
           usageRecord.promoCodeId,
           {
-            $inc: { currentUsage: -1 },
-            $pull: { usedBy: usageRecord.customerId }
+            $inc: { currentUsage: -1 }, // DECREASE USAGE COUNT
+            $pull: { usedBy: usageRecord.customerId } // REMOVE USER FROM USEDBY
           },
           { session }
         );
       }
 
+      // Step 3: Commit changes
       await session.commitTransaction();
       return usageRecord;
 
     } catch (error) {
+      // Step 4: If error, rollback
       await session.abortTransaction();
       throw error;
     } finally {
-      session.endSession();
+      // FIX: Add await
+      await session.endSession();
     }
   }
 
@@ -472,10 +479,12 @@ export class PromoCodeRepository {
       return { canUse: false, reason: "Promocode not found" };
     }
 
+    // Check global usage limit
     if (promocode.currentUsage >= promocode.useLimit) {
       return { canUse: false, reason: "Promocode usage limit reached" };
     }
 
+    // Check per user usage limit
     if (promocode.usageLimitPerUser && userUsageCount >= promocode.usageLimitPerUser) {
       return {
         canUse: false,
