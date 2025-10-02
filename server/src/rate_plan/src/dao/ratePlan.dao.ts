@@ -79,7 +79,7 @@ class RatePlanDao {
         let inventoryUpdated = null;
         let rateUpdated = null;
         if (price !== undefined && rateAmountId) {
-          console.log("rate amount", rateAmountId)
+          // console.log("rate amount", rateAmountId)
           rateUpdated = await RateAmount.findByIdAndUpdate(
             rateAmountId,
             {
