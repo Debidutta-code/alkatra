@@ -167,7 +167,7 @@ export default (app: Router) => {
    * Extranet specific
    * Search promocodes
    */
-  router.post('/promo/search', protect as any, promoCodeController.searchPromocodes.bind(promoCodeController));
+  router.post('/promo/search', authenticateCustomer ,promoCodeController.searchPromocodes.bind(promoCodeController));
 
 
   /**
