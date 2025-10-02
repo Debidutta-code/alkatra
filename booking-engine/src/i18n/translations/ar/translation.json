@@ -1065,8 +1065,13 @@
         "title": "تفاصيل السعر",
         "roomRate": "سعر الغرفة",
         "perNight": " / ليلة",
-        "total": "الإجمالي",
-        "payAtHotelInfo": "سيتم تخزين بطاقتك بشكل آمن، ولكن سيتم تحصيل الدفع في الفندق."
+        "total": "المبلغ الإجمالي",
+        "payAtHotelInfo": "سيتم تخزين بطاقتك بشكل آمن، ولكن سيتم تحصيل الدفع في الفندق.",
+        "originalPrice": "السعر الأصلي",
+        "promoApplied": "تم تطبيق رمز الترويج",
+        "removePromo": "إزالة رمز الترويج",
+        "subtotal": "المجموع الفرعي",
+        "discount": "الخصم"
       },
       "securityBadges": {
         "securePayments": "مدفوعات آمنة",
@@ -1180,7 +1185,11 @@
         "contactForChanges": "• للتعديلات أو الإلغاءات، يرجى الاتصال بنا فورًا",
         "contactInfo": "للحصول على المساعدة، يرجى الاتصال بنا على: bussines.alhajz@gmail.com",
         "thankYou": "شكرًا لاختيارك لخدمتنا. نتطلع إلى خدمتك!"
-      }
+      },
+      "hotelLabel": "فندق",
+      "roomTypeLabel": "نوع الغرفة",
+      "originalPrice": "السعر الأصلي",
+      "promoApplied": "تم تطبيق رمز الترويج"
     },
     "PaymentProgress": {
       "title": "بوابة الدفع بالعملات المشفرة",
@@ -1207,6 +1216,7 @@
       "returnHome": "العودة إلى الصفحة الرئيسية",
       "paymentSuccessful": "تم الدفع بنجاح!",
       "paymentConfirmed": "تم تأكيد دفعتك.",
+      "paymentInformation": "معلومات الدفع",
       "status": {
         "pending": "بانتظار الدفع",
         "completed": "تم تأكيد الدفع",

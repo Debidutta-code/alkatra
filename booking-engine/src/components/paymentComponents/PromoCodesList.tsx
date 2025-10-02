@@ -95,13 +95,6 @@ export default function PromoCodesList({
                     {promo.description}
                   </p>
                 )}
-
-                {/* Min booking amount */}
-                {promo.minBookingAmount && (
-                  <p className="text-xs text-tripswift-black/50 mt-1">
-                    Min. {currency.toUpperCase()} {promo.minBookingAmount}
-                  </p>
-                )}
               </div>
 
               {/* Apply Button */}
