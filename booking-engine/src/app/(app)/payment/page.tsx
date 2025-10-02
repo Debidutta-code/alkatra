@@ -135,6 +135,7 @@ function PaymentPageContent() {
           code,
           bookingAmount: amount,
           propertyId: propertyId,
+          apply: true,
         },
         accessToken
       );

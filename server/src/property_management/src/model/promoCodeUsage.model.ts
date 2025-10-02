@@ -37,7 +37,7 @@ const PromocodeUsageSchema = new Schema<IPromocodeUsage>(
         bookingId: {
             type: Schema.Types.ObjectId,
             ref: "Booking",
-            required: [true, "Booking ID is required"],
+            // required: [true, "Booking ID is required"],
             index: true
         },
         discountType: {
