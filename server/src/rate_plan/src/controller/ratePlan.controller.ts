@@ -2,7 +2,10 @@ import { NextFunction, Request, Response } from "express";
 import { RatePlanService, RoomPriceService, RoomRentCalculationService } from "../service/ratePlan.service";
 import { propertyInfoService } from "../../../property_management/src/container";
 import { container } from "../../../tax_service/container";
-import { InventoryService } from "../service/inventory.service";
+import { ReservationService, InventoryService } from "../service";
+import { ReservationDao } from "../dao";
+
+
 
 class RatePlanController {
 
@@ -60,7 +63,7 @@ class RatePlanController {
 
             return response;
         } catch (error) {
-            console;
+
             next(error);
         }
     }
@@ -87,10 +90,10 @@ class RatePlanController {
 
     public static async getRatePlanByHotelCode(req: Request, res: Response, next: NextFunction) {
         try {
-            console.log("###################### Inside getRatePlanByHotelCode controller");
+
             const { hotelCode } = req.params;
 
-            console.log("Entering into getRatePlanByHotelCode SERVICE");
+
             const response = await RatePlanService.getRatePlanByHotelCode(hotelCode);
             if (!response) {
                 throw new Error("No rate plans found for this hotel code")
@@ -156,6 +159,14 @@ class RatePlanController {
 
 class RoomPrice {
 
+    private reservationService: ReservationService;
+    private reservationDao: ReservationDao;
+
+    constructor() {
+        this.reservationDao = ReservationDao.getInstance();
+        this.reservationService = ReservationService.getInstance(this.reservationDao);
+    }
+
     public static async getRoomPriceByHotelCode(req: Request, res: Response, next: NextFunction) {
 
         const { hotelcode, invTypeCode } = req.query
@@ -163,7 +174,10 @@ class RoomPrice {
         return response
     }
 
-    public static async getRoomRentController(req: Request, res: Response, next: NextFunction) {
+    public static async getRoomRentController(req: Request, res: Response, next: NextFunction): Promise<any> {
+        const reservationDao = ReservationDao.getInstance();
+        const reservationService = ReservationService.getInstance(reservationDao);
+
         const {
             hotelCode,
             invTypeCode,
@@ -172,7 +186,14 @@ class RoomPrice {
             noOfChildrens,
             noOfAdults,
             noOfRooms
-        } = req.body
+        } = req.body;
+
+        const { reservationId } = req.query;
+
+        let discountAmount = 0;
+        if (reservationId) {
+            discountAmount = await reservationService.calculateDiscountedPrice(reservationId.toString());
+        }
 
         const response: any = await RoomRentCalculationService.getRoomRentService(
             hotelCode,
@@ -182,18 +203,23 @@ class RoomPrice {
             noOfChildrens,
             noOfAdults,
             noOfRooms
-        )
+        );
         if (response.success === false) {
-            console.error("Error in getRoomRentController:", response.message)
+            console.error("Error in getRoomRentController:", response.message);
             return response;
         }
 
-
         /**
-         * Total Price and Base Price for caculating tax
+         * Total Price and Base Price for calculating tax
          */
-        const totalPrice = response.data.totalAmount;
+        let totalPrice = response.data.totalAmount;
         const basePrice = response.data.breakdown.totalBaseAmount;
+
+        // Apply discount to totalAmount
+        if (discountAmount > 0) {
+            totalPrice = Math.max(0, totalPrice - discountAmount);
+            response.data.totalAmount = totalPrice;
+        }
 
         /**
          * Get the property info for getting property ID
@@ -205,8 +231,11 @@ class RoomPrice {
          */
         if (!propertyInfo.tax_group) {
             console.log("No rate plan here");
-        };
-        if (!propertyInfo.tax_group) return response;
+            response.data.tax = [];
+            response.data.totalTax = 0;
+            response.data.priceAfterTax = response.data.totalAmount;
+            return response;
+        }
 
         /**
          * Calculating tax
@@ -214,17 +243,17 @@ class RoomPrice {
         const taxCalculation = await container.taxGroupService.calculateTaxRulesForReservation(basePrice, totalPrice, propertyInfo.tax_group);
 
         /**
-         * If taxCalculation is empty return the response
+         * If taxCalculation is empty or null, return response without tax
          */
-        if (!taxCalculation) {
+        if (!taxCalculation || taxCalculation.length === 0) {
             response.data.tax = [];
-            // response.data.totalTax = 0;
-            // response.data.priceAfterTax = response.data.totalAmount;
+            response.data.totalTax = 0;
+            response.data.priceAfterTax = response.data.totalAmount;
             return response;
         }
 
         /**
-         * Cummilative total amount
+         * Cumulative total amount
          */
         let totalAmount = 0;
         for (let i = 0, len = taxCalculation.length; i < len; i++) {
@@ -235,7 +264,8 @@ class RoomPrice {
         response.data.totalTax = totalAmount;
         response.data.priceAfterTax = Number((response.data.totalAmount + totalAmount).toFixed(2));
 
-        return response
+        console.log("@@@@@@@@@@@@@@@@@ The final price is", response);
+        return response;
     }
 
     public static async getAllRoomTypeController(req: Request) {
