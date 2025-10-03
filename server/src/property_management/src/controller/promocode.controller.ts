@@ -296,6 +296,69 @@ export class PromoCodeController {
   /**
    * Validate and apply promocode
    */
+  // async validatePromocode(req: any, res: Response, next: NextFunction) {
+  //   try {
+  //     const authData = req.user;
+
+  //     if (!authData) {
+  //       return res.status(401).json({
+  //         success: false,
+  //         message: "Unauthorized",
+  //       });
+  //     }
+
+  //     const { code, bookingAmount, propertyCode, propertyId } = req.body;
+
+  //     if (!code || !bookingAmount) {
+  //       return res.status(400).json({
+  //         success: false,
+  //         message: "Promocode and booking amount are required",
+  //       });
+  //     }
+
+  //     if (!propertyCode && !propertyId) {
+  //       return res.status(400).json({
+  //         success: false,
+  //         message: "Either property code or property ID is required",
+  //       });
+  //     }
+
+  //     const validationResult = await this.promoCodeService.validatePromocodeForUse(
+  //       code,
+  //       authData.id,
+  //       parseFloat(bookingAmount),
+  //       { propertyCode, propertyId }
+  //     );
+
+  //     if (!validationResult.isValid) {
+  //       return res.status(200).json({
+  //         success: false,
+  //         message: validationResult.message,
+  //         isValid: false
+  //       });
+  //     }
+
+  //     return res.status(200).json({
+  //       success: true,
+  //       message: validationResult.message,
+  //       isValid: true,
+  //       data: {
+  //         promocode: validationResult.promocode,
+  //         discountAmount: validationResult.discountAmount,
+  //         finalAmount: validationResult.finalAmount
+  //       }
+  //     });
+
+  //   } catch (error: any) {
+  //     console.log("Error occurred while validating promocode", error);
+  //     return res.status(500).json({
+  //       success: false,
+  //       message: "Error occurred while validating promocode",
+  //       error: error.message,
+  //     });
+  //   }
+  // }
+
   async validatePromocode(req: any, res: Response, next: NextFunction) {
     try {
       const authData = req.user;
@@ -307,7 +370,7 @@ export class PromoCodeController {
         });
       }
 
-      const { code, bookingAmount, propertyCode, propertyId } = req.body;
+      const { code, bookingAmount, propertyCode, propertyId, apply = false } = req.body;
 
       if (!code || !bookingAmount) {
         return res.status(400).json({
@@ -321,33 +384,67 @@ export class PromoCodeController {
           success: false,
           message: "Either property code or property ID is required",
         });
-      }
+      }      
 
-      const validationResult = await this.promoCodeService.validatePromocodeForUse(
-        code,
-        authData.id,
-        parseFloat(bookingAmount),
-        { propertyCode, propertyId }
-      );
+      let result;
 
-      if (!validationResult.isValid) {
+      if (apply === true) {
+        // APPLY THE PROMOCODE (validates + increases usage)
+        result = await this.promoCodeService.applyPromocode(
+          code,
+          authData.id,
+          parseFloat(bookingAmount),
+          { propertyCode, propertyId }
+        );
+
+        if (!result.success) {
+          return res.status(200).json({
+            success: false,
+            message: result.message,
+            isValid: false
+          });
+        }
+
         return res.status(200).json({
-          success: false,
+          success: true,
+          message: result.message,
+          isValid: true,
+          applied: true,
+          data: {
+            discountAmount: result.discountAmount,
+            finalAmount: parseFloat(bookingAmount) - (result.discountAmount || 0)
+          }
+        });
+
+      } else {
+        // ONLY VALIDATE (doesn't increase usage)
+        const validationResult = await this.promoCodeService.validatePromocodeForUse(
+          code,
+          authData.id,
+          parseFloat(bookingAmount),
+          { propertyCode, propertyId }
+        );
+
+        if (!validationResult.isValid) {
+          return res.status(200).json({
+            success: false,
+            message: validationResult.message,
+            isValid: false
+          });
+        }
+
+        return res.status(200).json({
+          success: true,
           message: validationResult.message,
-          isValid: false
+          isValid: true,
+          applied: false,
+          data: {
+            promocode: validationResult.promocode,
+            discountAmount: validationResult.discountAmount,
+            finalAmount: validationResult.finalAmount
+          }
         });
       }
-
-      return res.status(200).json({
-        success: true,
-        message: validationResult.message,
-        isValid: true,
-        data: {
-          promocode: validationResult.promocode,
-          discountAmount: validationResult.discountAmount,
-          finalAmount: validationResult.finalAmount
-        }
-      });
 
     } catch (error: any) {
       console.log("Error occurred while validating promocode", error);
@@ -843,7 +940,7 @@ export class PromoCodeController {
         });
       }
 
-      const searchCriteria = req.body;
+      const searchCriteria = req.query;
 
       const promocodes = await this.promoCodeService.searchPromocodes(searchCriteria);
 
