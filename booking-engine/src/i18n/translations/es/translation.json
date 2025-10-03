@@ -915,6 +915,8 @@
             "refundToBeProcessed": "Reembolso a procesar",
             "refundExplanation": "Tus cambios generarán un reembolso de ₹{{amount}}",
             "amendmentPolicies": "Políticas de modificación",
+            "checkingAvailability": "Verificando disponibilidad...",
+            "loadingPrice": "Cargando precios actualizados...",
             "policies": {
                 "dateChanges": "Los cambios de fecha están sujetos a disponibilidad",
                 "changes72Hours": "Los cambios dentro de las 72 horas posteriores al check-in pueden tener cargos adicionales",
@@ -934,7 +936,10 @@
                 "selectRoomType": "Por favor, selecciona un tipo de habitación.",
                 "selectRatePlan": "Por favor, selecciona un plan de tarifa.",
                 "invalidDateRange": "La fecha de salida debe ser posterior a la fecha de entrada.",
-                "correctFormErrors": "Por favor, corrige los errores del formulario antes de enviarlo."
+                "correctFormErrors": "Por favor, corrige los errores del formulario antes de enviarlo.",
+                "roomNotAvailable": "La habitación seleccionada no está disponible para las fechas elegidas.",
+                "roomNotFound": "No se pudo encontrar la habitación.",
+                "networkError": "Error de red. Por favor, verifica tu conexión e intenta nuevamente."
             },
             "success": {
                 "reservationAmended": "Tu reserva ha sido actualizada correctamente.",
@@ -1060,8 +1065,13 @@
                 "title": "Detalles del precio",
                 "roomRate": "Tarifa de la habitación",
                 "perNight": " / noche",
-                "total": "Total",
-                "payAtHotelInfo": "Tu tarjeta se almacenará de forma segura, pero el pago se realizará en el hotel."
+                "total": "Importe total",
+                "payAtHotelInfo": "Tu tarjeta se guardará de forma segura, pero el pago se realizará en el hotel.",
+                "originalPrice": "Precio original",
+                "promoApplied": "Código promocional aplicado",
+                "removePromo": "Eliminar código promocional",
+                "subtotal": "Subtotal",
+                "discount": "Descuento"
             },
             "securityBadges": {
                 "securePayments": "Pagos seguros",
@@ -1146,7 +1156,11 @@
             "needHelpTitle": "¿Necesitas ayuda?",
             "customerServiceMessage": "Nuestro equipo de servicio al cliente está disponible las 24 horas para ayudarte con cualquier pregunta.",
             "contactSupportButton": "Contactar soporte",
-            "exploreMoreHotels": "Explora más opciones de hoteles"
+            "exploreMoreHotels": "Explora más opciones de hoteles",
+            "hotelLabel": "Hotel",
+            "roomTypeLabel": "Tipo de habitación",
+            "originalPrice": "Precio original",
+            "promoApplied": "Código promocional aplicado"
         },
         "PaymentProgress": {
             "title": "Puerta de pago en criptomonedas",
@@ -1173,6 +1187,7 @@
             "returnHome": "Volver al inicio",
             "paymentSuccessful": "¡Pago exitoso!",
             "paymentConfirmed": "Tu pago ha sido confirmado.",
+            "paymentInformation": "Información de pago",
             "status": {
                 "pending": "Esperando pago",
                 "completed": "Pago confirmado",

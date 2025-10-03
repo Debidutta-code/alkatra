@@ -167,7 +167,8 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
   const [ratePlanCodeFromApi, setRatePlanCodeFromApi] = useState<string>("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isNavigatingToPayment, setIsNavigatingToPayment] = useState(false);
-
+  const [taxExpanded, setTaxExpanded] = useState(false);
+  const [roomRateExpanded, setRoomRateExpanded] = useState(false);
   // Reset states when modal opens
   useEffect(() => {
     if (isOpen) {
@@ -479,7 +480,8 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
       console.error("Error during rebooking:", error);
       setMessage({
         type: 'error',
-        text: error.message || t("Something went wrong. Please try again.")
+        // text: error.message || t("Something went wrong. Please try again.")
+        text: t("No rooms are available for your selected dates. Please try different dates.")
       });
       setIsAvailable(false);
       setFinalPrice(null);
@@ -725,67 +727,164 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
                 contactPhone={contactPhone}
               />
               {/* Price Breakdown Card */}
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl overflow-hidden">
-                <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-4 text-white">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                      <CreditCard className="h-4 w-4" />
+              {priceData && (
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl overflow-hidden">
+                  <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-4 text-white">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                        <CreditCard className="h-4 w-4" />
+                      </div>
+                      <h4 className="text-lg font-bold">{t("Price Details")}</h4>
                     </div>
-                    <h4 className="text-lg font-bold">{t("Price Details")}</h4>
                   </div>
-                </div>
 
-                <div className="p-4">
-                  <div className="space-y-4">
-                    {/* Tax Breakdown */}
-                    {priceData?.tax && priceData.tax.length > 0 && (
-                      <div className="bg-white rounded-xl p-4 border border-green-200">
-                        <div className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                          <Info className="h-4 w-4" />
-                          {t("Tax & Fee Breakdown")}
+                  <div className="p-2">
+                    <div className="space-y-2">
+                      {/* Base Amount */}
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm font-medium text-gray-700">
+                            {t("Base Amount")}
+                          </span>
+                          <span className="text-sm font-semibold text-gray-800">
+                            {localCurrency} {(priceData?.breakdown?.totalBaseAmount || priceData?.totalAmount || 0).toFixed(2)}
+                          </span>
                         </div>
-                        <div className="space-y-2">
-                          {priceData.tax.map((taxItem, idx) => (
-                            <div key={idx} className="flex justify-between items-center text-sm">
-                              <span className="text-gray-600">
-                                {taxItem.name} ({taxItem.percentage}%)
+                      </div>
+                      {/* Additional Guest Charges */}
+                      {(priceData?.breakdown?.totalAdditionalCharges ?? 0) > 0 && (
+                        <div className="bg-white rounded-xl p-4 border border-gray-200">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium text-gray-700">
+                              {t("Additional Guest Charges")}
+                            </span>
+                            <span className="text-sm font-semibold text-gray-800">
+                              {localCurrency} {priceData.breakdown.totalAdditionalCharges.toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                      {/* Tax & Fee Breakdown with Dropdown */}
+                      {priceData?.tax && priceData.tax.length > 0 && (
+                        <div className="bg-white rounded-xl border border-green-200 overflow-hidden">
+                          {/* Header - Always visible */}
+                          <div
+                            className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                            onClick={() => setTaxExpanded(!taxExpanded)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Info className="h-4 w-4 text-gray-500" />
+                                <h5 className="text-sm font-semibold text-gray-700">
+                                  {t("Tax & Fee Breakdown")}
+                                </h5>
+                              </div>
+                              <div className={`transform transition-transform ${taxExpanded ? 'rotate-180' : ''}`}>
+                                <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                              </div>
+                            </div>
+                            {/* Always show Total Tax */}
+                            <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100">
+                              <span className="text-gray-700 font-semibold text-sm">
+                                {t("Total Tax")}
                               </span>
-                              <span className="font-semibold text-gray-800">
-                                {localCurrency} {taxItem.amount.toFixed(2)}
+                              <span className="font-bold text-gray-800 text-sm">
+                                {localCurrency} {priceData.totalTax?.toFixed(2) || "0.00"}
                               </span>
                             </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {/* Main Price Display */}
-                    <div className="bg-white rounded-xl p-2 border-2 border-green-200">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-md font-semibold text-gray-600 mb-1">
-                            {t("Total Amount")}
-                          </p>
-                          <p className="text-sm text-gray-500">{t("(includes all taxes & fees)")}</p>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-md font-bold text-green-600">
-                            {localCurrency} {finalPrice?.toLocaleString(i18n.language, {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2
-                            })}
                           </div>
-                          {priceData?.breakdown?.averagePerNight && (
-                            <p className="text-sm text-gray-500 mt-1">
-                              {localCurrency} {priceData.breakdown.averagePerNight.toFixed(2)} {t("per night")}
-                            </p>
+
+                          {/* Details - Conditionally visible */}
+                          {taxExpanded && (
+                            <div className="px-4 pb-4 space-y-2 border-t border-gray-100">
+                              {priceData.tax.map((taxItem, idx) => (
+                                <div key={idx} className="flex justify-between items-center text-sm py-1">
+                                  <span className="text-gray-600">
+                                    {taxItem.name} ({taxItem.percentage}%)
+                                  </span>
+                                  <span className="font-semibold text-gray-800">
+                                    {localCurrency} {taxItem.amount.toFixed(2)}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
                           )}
+                        </div>
+                      )}
+                      {/* Date-wise Room Rate with Dropdown */}
+                      {priceData?.dailyBreakdown && priceData.dailyBreakdown.length > 0 && (
+                        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                          {/* Header - Always visible */}
+                          <div
+                            className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                            onClick={() => setRoomRateExpanded(!roomRateExpanded)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <h5 className="text-sm font-semibold text-gray-700">
+                                {t("Room Rate")}
+                              </h5>
+                              <div className={`transform transition-transform ${roomRateExpanded ? 'rotate-180' : ''}`}>
+                                <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                              </div>
+                            </div>
+                            {/* Always show total for all dates */}
+                            <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100">
+                              <span className="text-gray-700 font-semibold text-sm">
+                                {t("Total for {{count}} nights", { count: priceData.dailyBreakdown.length })}
+                              </span>
+                              <span className="font-bold text-gray-800 text-sm">
+                                {localCurrency} {(priceData.dailyBreakdown.reduce((sum, day) => sum + day.totalPerRoom, 0) * rooms).toFixed(2)}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Details - Conditionally visible */}
+                          {roomRateExpanded && (
+                            <div className="px-4 pb-4 space-y-1 border-t border-gray-100">
+                              {priceData.dailyBreakdown.map((day, idx) => (
+                                <div key={idx} className="flex justify-between items-center text-sm py-1">
+                                  <span className="text-gray-600">
+                                    {dayjs(day.date).format('ddd, MMM D, YYYY')}
+                                  </span>
+                                  <span className="font-semibold text-gray-800">
+                                    {localCurrency} {day.totalPerRoom.toFixed(2)}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {/* Main Price Display */}
+                      <div className="bg-white rounded-xl p-2 border-2 border-green-200">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-md font-semibold text-gray-600 mb-1">
+                              {t("Final Amount (including tax)")}
+                            </p>
+                            {/* Better UX: Show total tax amount directly */}
+                            <p className="text-xs text-gray-500">
+                              {t("Includes")} {localCurrency} {(priceData?.totalTax || 0).toFixed(2)} {t("in taxes")}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <div className="mb-4 text-md font-bold text-green-600">
+                              {localCurrency} {finalPrice?.toLocaleString(i18n.language, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                              })}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
+              )}
               {/* Review Step Action Buttons */}
               <div className="flex flex-col-reverse sm:flex-row justify-between gap-4 pt-6 border-t border-gray-200">
                 <Button

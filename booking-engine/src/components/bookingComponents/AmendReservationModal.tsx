@@ -12,7 +12,7 @@ import GuestBox from "../hotelBox/GuestBox";
 import Cookies from "js-cookie";
 import { getDefaultDOBByType, getGuestType } from '../../utils/guestDobHelpers';
 import { useSelector } from "../../Redux/store";
-
+import { checkRoomAvailability } from '../../api/rebook';
 import {
   CalendarDays,
   Users,
@@ -27,7 +27,6 @@ import {
   CreditCard,
   AlertCircle
 } from "lucide-react";
-// import { error } from "console";
 
 interface AmendReservationModalProps {
   booking: Booking;
@@ -49,10 +48,11 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
 
   // States for form fields
   const [dateRange, setDateRange] = useState<[Dayjs, Dayjs] | null>(null);
-  const [roomTypeCode, setRoomTypeCode] = useState(booking.roomTypeCode || "STD");
-  const [specialRequests, setSpecialRequests] = useState("");
-  const [ratePlanCode, setRatePlanCode] = useState(booking.ratePlanCode || "BAR");
+  const [roomTypeCode, setRoomTypeCode] = useState(booking.roomTypeCode || "");
+  const [ratePlanCode, setRatePlanCode] = useState(booking.ratePlanCode || "");
   const [guests, setGuests] = useState<GuestDetails[]>([]);
+  const [availabilityStatus, setAvailabilityStatus] = useState<'idle' | 'checking' | 'available' | 'unavailable'>('idle');
+  const [priceStatus, setPriceStatus] = useState<'idle' | 'loading' | 'loaded' | 'error'>('idle');
   const [finalPrice, setFinalPrice] = useState<{
     totalAmount: number;
     currencyCode: string;
@@ -212,12 +212,6 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
     setGuests(newGuests);
   }, [guestBreakdown, booking.guestDetails]);
   // Guest count derived
-  const adultCount = guests.filter(
-    g => g.dob ? dayjs().diff(dayjs(g.dob), 'year') >= 12 : true
-  ).length;
-  const childCount = guests.filter(
-    g => g.dob ? dayjs().diff(dayjs(g.dob), 'year') < 12 : false
-  ).length;
 
   // Initialize with current booking values
   useEffect(() => {
@@ -261,12 +255,35 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
     };
   }, []);
 
-  // Fetch final price when dateRange, roomTypeCode, or guestBreakdown changes
   useEffect(() => {
-    const fetchFinalPrice = async () => {
-      if (!dateRange || !dateRange[0] || !dateRange[1]) return;
+    const checkAvailabilityAndPrice = async () => {
+      // Reset states
+      setAvailabilityStatus('idle');
+      setPriceStatus('idle');
+      setFinalPrice(null);
+      setAmendmentMessage(null);
+
+      // Validate required fields
+      if (!dateRange?.[0] || !dateRange?.[1] || !roomTypeCode) {
+        return;
+      }
+
+      // Step 1: Check Availability First
+      setAvailabilityStatus('checking');
 
       try {
+        await checkRoomAvailability(
+          booking.hotelCode,
+          roomTypeCode,
+          dateRange[0].format('YYYY-MM-DD'),
+          dateRange[1].format('YYYY-MM-DD')
+        );
+
+        setAvailabilityStatus('available');
+
+        // Step 2: Only fetch price if room is available
+        setPriceStatus('loading');
+
         const guestData = {
           rooms: guestBreakdown.rooms,
           guests: guestBreakdown.guests,
@@ -291,7 +308,6 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         if (response.data.success) {
           const data = response.data.data;
 
-          // Calculate final price based on available data
           let finalPriceAfterTax = data.totalAmount;
           if (data.priceAfterTax && data.priceAfterTax > 0) {
             finalPriceAfterTax = data.priceAfterTax;
@@ -307,29 +323,54 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
             priceAfterTax: finalPriceAfterTax,
             breakdown: data.breakdown
           });
+
+          setPriceStatus('loaded');
         } else {
-          setFinalPrice(null);
+          setPriceStatus('error');
           setAmendmentMessage({
             type: 'error',
             text: response.data.message || t('BookingTabs.AmendReservationModal.errors.unableToFetchPrice')
           });
         }
+
       } catch (error: any) {
+        // Always reset loading states on error
+        setAvailabilityStatus('unavailable');
+        setPriceStatus('idle');
         setFinalPrice(null);
+
+        // Parse error message to show user-friendly text
+        let userMessage = '';
+
+        if (error.response?.status === 500 || error.response?.data?.message?.includes('closed') || error.response?.data?.message?.includes('not available')) {
+          userMessage = t('BookingTabs.AmendReservationModal.errors.roomNotAvailable');
+        } else if (error.response?.status === 404) {
+          userMessage = t('BookingTabs.AmendReservationModal.errors.roomNotFound');
+        } else if (error.message?.toLowerCase().includes('network')) {
+          userMessage = t('BookingTabs.AmendReservationModal.errors.networkError');
+        } else {
+          userMessage = t('BookingTabs.AmendReservationModal.errors.roomNotAvailable');
+        }
+
         setAmendmentMessage({
           type: 'error',
-          text: error.message || t('BookingTabs.AmendReservationModal.errors.unableToFetchPrice')
+          text: userMessage
         });
+
+        console.error('Availability/Price check error:', error.response?.data || error.message);
       }
     };
 
-    fetchFinalPrice();
-  }, [dateRange, roomTypeCode, guestBreakdown, t]);
+    // Debounce the API calls to avoid excessive requests
+    const timeoutId = setTimeout(checkAvailabilityAndPrice, 500);
+    return () => clearTimeout(timeoutId);
 
-  const disabledDate = (current: Dayjs) => {
-    return current && current < dayjs().startOf('day');
-  };
+  }, [dateRange, roomTypeCode, guestBreakdown, booking.hotelCode, t]);
 
+  // Add loading states to your UI
+  const isCheckingAvailability = availabilityStatus === 'checking';
+  const isLoadingPrice = priceStatus === 'loading';
+  const canSubmit = availabilityStatus === 'available' && priceStatus === 'loaded' && finalPrice;
   // --- Guests UI handlers ---
   const handleGuestChange = (idx: number, field: keyof GuestDetails, value: string) => {
     console.log("handleGuestChange called with:", { idx, field, value });
@@ -338,15 +379,6 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
       console.log("updated guests:", updatedGuests);
       return updatedGuests;
     });
-  };
-  const handleAddGuest = () => {
-    setGuests(gs => [
-      ...gs,
-      { firstName: "", lastName: "", dob: "", type: "adult" }
-    ]);
-  };
-  const handleRemoveGuest = (idx: number) => {
-    setGuests(gs => gs.filter((_, i) => i !== idx));
   };
   console.log("guests", guests)
   const getFinalPrice = async (
@@ -483,7 +515,8 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         guests: guests.map(g => ({
           firstName: g.firstName,
           lastName: g.lastName,
-          dob: g.dob || ""
+          dob: g.dob || "",
+          category: getGuestType(g.dob),
         })),
       };
 
@@ -523,7 +556,6 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
   };
 
   // Existing reason logic - not used in backend payload, kept for UI
-  const getModificationReason = () => "";
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 font-noto-sans p-3 sm:p-5">
@@ -635,30 +667,6 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
               <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <span className="font-tripswift-medium">{t('BookingTabs.AmendReservationModal.amendmentTypes.guests')}</span>
             </button>
-            {/* <button
-              onClick={() => setAmendmentType("room")}
-              className={`
-                flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border transition-all text-xs sm:text-sm
-                ${amendmentType === "room"
-                  ? "bg-tripswift-blue text-white border-tripswift-blue"
-                  : "bg-white text-tripswift-black/70 border-gray-200 hover:border-tripswift-blue/50 hover:bg-tripswift-blue/5"}
-              `}
-            >
-              <BedDouble className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              <span className="font-tripswift-medium">{t('BookingTabs.AmendReservationModal.amendmentTypes.roomType')}</span>
-            </button> */}
-            {/* <button
-              onClick={() => setAmendmentType("requests")}
-              className={`
-                flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border transition-all text-xs sm:text-sm
-                ${amendmentType === "room"
-                  ? "bg-tripswift-blue text-white border-tripswift-blue"
-                  : "bg-white text-tripswift-black/70 border-gray-200 hover:border-tripswift-blue/50 hover:bg-tripswift-blue/5"}
-              `}
-            >
-              <ClipboardEdit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              <span className="font-tripswift-medium">{t('BookingTabs.AmendReservationModal.amendmentTypes.specialRequests')}</span>
-            </button> */}
           </div>
         </div>
 
@@ -667,6 +675,27 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
           {/* Dates Amendment Form */}
           {amendmentType === "dates" && (
             <div className="space-y-2 bg-white p-3 sm:p-4 rounded-lg border border-tripswift-blue/20">
+              {/* Add availability status messages */}
+              {availabilityStatus === 'checking' && (
+                <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 rounded-md text-sm text-blue-700 mb-2">
+                  <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                  {t('BookingTabs.AmendReservationModal.checkingAvailability')}
+                </div>
+              )}
+
+              {availabilityStatus === 'unavailable' && (
+                <div className="flex items-center gap-2 px-3 py-2 bg-red-50 rounded-md text-sm text-red-700 mb-2">
+                  <X className="h-4 w-4" />
+                  {t('BookingTabs.AmendReservationModal.errors.roomNotAvailable')}
+                </div>
+              )}
+
+              {priceStatus === 'loading' && availabilityStatus === 'available' && (
+                <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 rounded-md text-sm text-blue-700 mb-2">
+                  <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                  {t('BookingTabs.AmendReservationModal.loadingPrice')}
+                </div>
+              )}
               <div className="flex items-center gap-1">
                 <CalendarDays className="h-4 w-4 text-tripswift-blue mr-2 ml-2" />
                 <h4 className="text-base sm:text-lg font-tripswift-bold text-tripswift-black">
@@ -681,27 +710,23 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                     {t('BookingTabs.AmendReservationModal.checkInDate')}
                   </label>
                   <div className="relative mt-0.5">
-                    <div className="flex items-center bg-tripswift-off-white rounded-md p-1.5 border border-tripswift-blue/20">
-                      <Calendar className="h-3.5 w-3.5 text-tripswift-blue/70 absolute left-2.5" />
-                      <DatePicker
-                        value={dateRange?.[0]}
-                        onChange={(date) => {
-                          const newRange = [date, dateRange?.[1]];
-                          setDateRange(newRange as [Dayjs, Dayjs]);
-                          setErrors((prev) => ({ ...prev, dateRange: '' }));
-                        }}
-                        disabledDate={current => {
-                          if (!booking.checkInDate) return false;
-                          const minDate = dayjs(booking.checkInDate).startOf('day');
-                          return current && current < minDate;
-                        }}
-                        format="DD/MM/YYYY"
-                        className="w-full pl-8 bg-transparent border-none focus:ring-0 text-sm"
-                        style={{ height: '32px' }}
-                        placeholder={t('BookingTabs.AmendReservationModal.selectCheckIn')}
-                        suffixIcon={null}
-                      />
-                    </div>
+                    <Calendar className="h-3.5 w-3.5 text-tripswift-blue/70 absolute left-2.5 top-1/2 transform -translate-y-1/2 z-10 pointer-events-none" />
+                    <DatePicker
+                      value={dateRange?.[0]}
+                      onChange={(date) => {
+                        const newRange = [date, dateRange?.[1]];
+                        setDateRange(newRange as [Dayjs, Dayjs]);
+                        setErrors((prev) => ({ ...prev, dateRange: '' }));
+                      }}
+                      disabledDate={(current) => {
+                        return current && current < dayjs().add(1, 'day').startOf('day');
+                      }}
+                      format="DD/MM/YYYY"
+                      className="w-full pl-8 bg-tripswift-off-white rounded-md border border-tripswift-blue/20"
+                      style={{ height: '40px' }}
+                      placeholder={t('BookingTabs.AmendReservationModal.selectCheckIn')}
+                      suffixIcon={null}
+                    />
                   </div>
                 </div>
 
@@ -711,8 +736,10 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                     {t('BookingTabs.AmendReservationModal.checkOutDate')}
                   </label>
                   <div className="relative mt-0.5">
-                    <div className="flex items-center bg-tripswift-off-white rounded-md p-1.5 border border-tripswift-blue/20">
-                      <Calendar className="h-3.5 w-3.5 text-tripswift-blue/70 absolute left-2.5" />
+                    <div className="flex items-center bg-tripswift-off-white rounded-md border border-tripswift-blue/20 overflow-hidden">
+                      <div className="absolute left-2.5 z-10 pointer-events-none">
+                        <Calendar className="h-3.5 w-3.5 text-tripswift-blue/70" />
+                      </div>
                       <DatePicker
                         value={dateRange?.[1]}
                         onChange={(date) => {
@@ -726,7 +753,10 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                         }}
                         format="DD/MM/YYYY"
                         className="w-full pl-8 bg-transparent border-none focus:ring-0 text-sm"
-                        style={{ height: '32px' }}
+                        style={{
+                          height: '40px',
+                          backgroundColor: 'transparent'
+                        }}
                         placeholder={t('BookingTabs.AmendReservationModal.selectCheckOut')}
                         suffixIcon={null}
                       />
@@ -840,14 +870,6 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
                           )}
                         </div>
                       </div>
-                      {/* {guests.length > 1 && (
-              <button
-                onClick={() => handleRemoveGuest(idx)}
-                className="absolute top-2 right-2 text-tripswift-black/50 hover:text-tripswift-black"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )} */}
                     </div>
                   );
                 })}
@@ -871,36 +893,8 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
             </div>
           )}
 
-          {/* Special Requests Amendment Form */}
-          {/* {amendmentType === "requests" && (
-            <div className="space-y-3 sm:space-y-5">
-              <div className="flex items-center gap-2 mb-2 sm:mb-4">
-                <ClipboardEdit className="h-4 w-4 sm:h-5 sm:w-5 text-tripswift-blue" />
-                <h4 className="text-base sm:text-lg font-tripswift-bold text-tripswift-black">
-                  {t('BookingTabs.AmendReservationModal.updateSpecialRequests')}
-                </h4>
-              </div>
-              <div>
-                <label className="block text-xs sm:text-sm font-tripswift-medium text-tripswift-black/70 mb-1 sm:mb-2">
-                  {t('BookingTabs.AmendReservationModal.specialRequestsLabel')}
-                </label>
-                <TextArea
-                  value={specialRequests}
-                  onChange={e => setSpecialRequests(e.target.value)}
-                  rows={4}
-                  placeholder={t('BookingTabs.AmendReservationModal.specialRequestsPlaceholder')}
-                  className="w-full rounded-lg border-gray-200 hover:border-tripswift-blue focus:border-tripswift-blue focus:ring focus:ring-tripswift-blue/20 text-sm"
-                />
-              </div>
-              <div className="px-3 sm:px-4 py-2 sm:py-3 bg-tripswift-blue/5 rounded-lg text-xs sm:text-sm text-tripswift-blue/90 font-tripswift-medium flex items-start">
-                <Info className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 mt-0.5 flex-shrink-0" />
-                <span>{t('BookingTabs.AmendReservationModal.specialRequestsNote')}</span>
-              </div>
-            </div>
-          )} */}
-
           {/* Display Final Price */}
-          {finalPrice && (
+          {finalPrice && availabilityStatus === 'available' && priceStatus === 'loaded' && (
             <div className="mt-4 space-y-3">
               {/* Price Breakdown Section */}
               <div className="bg-gradient-to-r from-tripswift-blue/5 to-tripswift-blue/10 rounded-xl border border-tripswift-blue/20 overflow-hidden">
@@ -1080,8 +1074,11 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
           </button>
           <button
             onClick={handleSubmitAmendment}
-            disabled={loading}
-            className="px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-tripswift-blue to-[#054B8F] hover:from-[#054B8F] hover:to-tripswift-blue text-tripswift-off-white rounded-lg sm:rounded-xl font-tripswift-medium shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden flex items-center justify-center text-sm sm:text-base"
+            disabled={loading || !canSubmit}
+            className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-tripswift-medium transition-all duration-300 ${loading || !canSubmit
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : 'bg-gradient-to-r from-tripswift-blue to-[#054B8F] hover:from-[#054B8F] hover:to-tripswift-blue text-tripswift-off-white'
+              }`}
           >
             {loading ? (
               <div className="flex items-center gap-1.5 sm:gap-2">

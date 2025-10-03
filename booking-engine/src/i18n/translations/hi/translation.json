@@ -916,6 +916,8 @@
       "refundToBeProcessed": "वापसी संसाधित की जाएगी",
       "refundExplanation": "आपके परिवर्तनों के परिणामस्वरूप ₹{{amount}} की वापसी होगी।",
       "amendmentPolicies": "अपडेट नीतियाँ",
+      "checkingAvailability": "उपलब्धता की जांच की जा रही है...",
+      "loadingPrice": "अपडेटेड मूल्य निर्धारण लोड हो रहा है...",
       "policies": {
         "dateChanges": "तारीख परिवर्तन उपलब्धता के अधीन हैं",
         "changes72Hours": "चेक-इन से 72 घंटे के भीतर परिवर्तन अतिरिक्त शुल्क के अधीन हो सकते हैं",
@@ -935,7 +937,10 @@
         "selectRoomType": "कृपया कमरे का प्रकार चुनें।",
         "selectRatePlan": "कृपया दर योजना चुनें।",
         "invalidDateRange": "चेक-आउट तारीख चेक-इन तारीख के बाद होनी चाहिए।",
-        "correctFormErrors": "कृपया फॉर्म में त्रुटियों को सुधारें।"
+        "correctFormErrors": "कृपया फॉर्म में त्रुटियों को सुधारें।",
+        "roomNotAvailable": "चुनी गई तारीखों के लिए चयनित कमरा उपलब्ध नहीं है।",
+        "roomNotFound": "कमरा नहीं मिल सका।",
+        "networkError": "नेटवर्क त्रुटि। कृपया अपना कनेक्शन जांचें और पुनः प्रयास करें।"
       },
       "success": {
         "reservationAmended": "आपकी बुकिंग सफलतापूर्वक अपडेट कर दी गई है।",
@@ -1058,10 +1063,15 @@
       },
       "priceDetails": {
         "title": "मूल्य विवरण",
-        "roomRate": "कमरे का किराया",
-        "perNight": "/ रात",
-        "total": "कुल",
-        "payAtHotelInfo": "आपका कार्ड सुरक्षित रूप से संग्रहीत किया जाएगा, लेकिन भुगतान होटल में एकत्र किया जाएगा।"
+        "roomRate": "कमरे की दर",
+        "perNight": " / रात",
+        "total": "कुल राशि",
+        "payAtHotelInfo": "आपका कार्ड सुरक्षित रूप से संग्रहीत किया जाएगा, लेकिन भुगतान होटल में लिया जाएगा।",
+        "originalPrice": "मूल कीमत",
+        "promoApplied": "प्रोमो कोड लागू किया गया",
+        "removePromo": "प्रोमो कोड हटाएं",
+        "subtotal": "उप-योग",
+        "discount": "छूट"
       },
       "securityBadges": {
         "securePayments": "सुरक्षित भुगतान",
@@ -1177,7 +1187,11 @@
         "contactForChanges": "• किसी भी परिवर्तन या रद्दीकरण के लिए, तुरंत हमसे संपर्क करें",
         "contactInfo": "सहायता के लिए, हमसे संपर्क करें: bussines.alhajz@gmail.com",
         "thankYou": "हमारी सेवा का चयन करने के लिए धन्यवाद। हम आपकी सेवा करने के लिए उत्सुक हैं!"
-      }
+      },
+      "hotelLabel": "होटल",
+      "roomTypeLabel": "कमरे का प्रकार",
+      "originalPrice": "मूल कीमत",
+      "promoApplied": "प्रोमो कोड लागू किया गया"
     },
     "PaymentProgress": {
       "title": "क्रिप्टो भुगतान गेटवे",
@@ -1202,6 +1216,7 @@
       "returnHome": "घर वापस जाएं",
       "paymentSuccessful": "भुगतान सफल!",
       "paymentConfirmed": "आपका भुगतान पुष्टि हो गया है।",
+      "paymentInformation": "भुगतान की जानकारी",
       "status": {
         "pending": "भुगतान की प्रतीक्षा में",
         "completed": "भुगतान पुष्टि हुई",

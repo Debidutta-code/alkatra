@@ -1,15 +1,21 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, createContext, useContext } from 'react';
+
+interface PopoverContextType {
+  isOpen: boolean;
+  setOpen: (open: boolean) => void;
+  toggleOpen: () => void;
+}
+
+const PopoverContext = createContext<PopoverContextType | null>(null);
 
 interface PopoverProps {
   children: React.ReactNode;
-  content?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
 
 export const Popover: React.FC<PopoverProps> = ({
   children,
-  content,
   open: controlledOpen,
   onOpenChange,
 }) => {
@@ -17,7 +23,15 @@ export const Popover: React.FC<PopoverProps> = ({
   const popoverRef = useRef<HTMLDivElement>(null);
 
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
-  const setOpen = onOpenChange ?? setInternalOpen;
+  const setOpen = (open: boolean) => {
+    if (onOpenChange) {
+      onOpenChange(open);
+    } else {
+      setInternalOpen(open);
+    }
+  };
+
+  const toggleOpen = () => setOpen(!isOpen);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -33,24 +47,20 @@ export const Popover: React.FC<PopoverProps> = ({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isOpen, setOpen]);
+  }, [isOpen]);
+
+  const contextValue: PopoverContextType = {
+    isOpen,
+    setOpen,
+    toggleOpen
+  };
 
   return (
-    <div className="relative" ref={popoverRef} role="dialog" aria-hidden={!isOpen}>
-      <div onClick={() => setOpen(!isOpen)} role="button" aria-label="Toggle popover">
+    <PopoverContext.Provider value={contextValue}>
+      <div className="relative" ref={popoverRef}>
         {children}
       </div>
-
-      {isOpen && (
-        <div
-          className="absolute z-50 mt-2 bg-white border rounded-lg shadow-lg"
-          role="menu"
-          aria-label="Popover content"
-        >
-          {content}
-        </div>
-      )}
-    </div>
+    </PopoverContext.Provider>
   );
 };
 
@@ -58,9 +68,29 @@ interface PopoverTriggerProps {
   children: React.ReactNode;
 }
 
-export const PopoverTrigger: React.FC<PopoverTriggerProps> = ({ children }) => (
-  <>{children}</>
-);
+export const PopoverTrigger: React.FC<PopoverTriggerProps> = ({ children }) => {
+  const context = useContext(PopoverContext);
+  
+  if (!context) {
+    throw new Error('PopoverTrigger must be used within a Popover');
+  }
+
+  const { toggleOpen } = context;
+
+  // Clone the child element and add onClick handler
+  return React.cloneElement(children as React.ReactElement, {
+    onClick: (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleOpen();
+      // Call original onClick if it exists
+      const originalOnClick = (children as React.ReactElement).props.onClick;
+      if (originalOnClick) {
+        originalOnClick(e);
+      }
+    }
+  });
+};
 
 interface PopoverContentProps {
   children: React.ReactNode;
@@ -70,8 +100,20 @@ interface PopoverContentProps {
 export const PopoverContent: React.FC<PopoverContentProps> = ({
   children,
   className = '',
-}) => (
-  <div className={`p-4 ${className}`} role="menuitem">
-    {children}
-  </div>
-);
+}) => {
+  const context = useContext(PopoverContext);
+  
+  if (!context) {
+    throw new Error('PopoverContent must be used within a Popover');
+  }
+
+  const { isOpen } = context;
+
+  if (!isOpen) return null;
+
+  return (
+    <div className={`absolute z-50 mt-2 bg-white border rounded-lg shadow-lg ${className}`}>
+      {children}
+    </div>
+  );
+};

@@ -98,7 +98,7 @@ export const modifyRatePlans = async (ratePlans: modifiedRatePlanInterface[], ac
 export const updateSellStatus = async (
     payload: {
         hotelCode: string;
-        invTypeCode: string;
+        invTypeCode: string[];
         dateStatusList: { date: string; status: 'open' | 'close' }[];
     },
     accessToken: string

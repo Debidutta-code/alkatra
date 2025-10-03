@@ -916,6 +916,8 @@
       "refundToBeProcessed": "Refund to be processed",
       "refundExplanation": "Your changes will result in a refund of ₹{{amount}}",
       "amendmentPolicies": "Update Policies",
+      "checkingAvailability": "Checking availability...",
+      "loadingPrice": "Loading updated pricing...",
       "policies": {
         "dateChanges": "Date changes are subject to availability",
         "changes72Hours": "Changes within 72 hours of check-in may incur additional fees",
@@ -935,7 +937,10 @@
         "selectRoomType": "Please select a room type.",
         "selectRatePlan": "Please select a rate plan.",
         "invalidDateRange": "Check-out date must be after check-in date.",
-        "correctFormErrors": "Please correct the errors in the form before submitting."
+        "correctFormErrors": "Please correct the errors in the form before submitting.",
+        "roomNotAvailable": "The selected room is not available for the chosen dates.",
+        "roomNotFound": "The room could not be found.",
+        "networkError": "Network error. Please check your connection and try again."
       },
       "success": {
         "reservationAmended": "Your reservation has been successfully updated.",
@@ -1061,8 +1066,13 @@
         "title": "Price Details",
         "roomRate": "Room Rate",
         "perNight": " / night",
-        "total": "Total",
-        "payAtHotelInfo": "Your card will be securely stored, but payment will be collected at the hotel."
+        "total": "Total Amount",
+        "payAtHotelInfo": "Your card will be securely stored, but payment will be collected at the hotel.",
+        "originalPrice": "Original Price",
+        "promoApplied": "Promo Code Applied",
+        "removePromo": "Remove Promo Code",
+        "subtotal":"Subtotal",
+        "discount":"Discount"
       },
       "securityBadges": {
         "securePayments": "Secure payments",
@@ -1179,7 +1189,11 @@
         "contactForChanges": "• For any changes or cancellations, contact us immediately",
         "contactInfo": "For assistance, contact us at: bussines.alhajz@gmail.com",
         "thankYou": "Thank you for choosing our service. We look forward to serving you!"
-      }
+      },
+      "hotelLabel": "Hotel",
+      "roomTypeLabel": "Room Type",
+      "originalPrice": "Original Price",
+      "promoApplied": "Promo Code Applied"
     },
     "PaymentProgress": {
       "title": "Crypto Payment Gateway",
@@ -1206,6 +1220,7 @@
       "returnHome": "Return Home",
       "paymentSuccessful": "Payment Successful!",
       "paymentConfirmed": "Your payment has been confirmed.",
+      "paymentInformation": "Payment Information",
       "status": {
         "pending": "Waiting for Payment",
         "completed": "Payment Confirmed",
@@ -1262,6 +1277,18 @@
       "common": {
         "important": "Important"
       }
+    },
+    "promoCode": {
+      "label": "Have a promo code?",
+      "placeholder": "Enter code",
+      "apply": "Apply",
+      "applied": "Applied",
+      "success": "Promo code applied! You saved {{discount}}",
+      "invalid": "Invalid or expired promo code",
+      "genericError": "Failed to apply promo code. Please try again.",
+      "loginRequired": "Please log in to use promo codes",
+      "viewAvailable": "View available promo codes",
+      "noAvailable": "No promo codes available at this time"
     }
   },
   "GuestBox": {

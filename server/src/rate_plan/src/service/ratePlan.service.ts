@@ -78,7 +78,7 @@ class RatePlanService {
       }
     };
 
-    // console.log("finalRatePlanData", finalRatePlanData);
+    
 
     const savedRatePlan = await RatePlanDao.create(finalRatePlanData);
 
@@ -206,7 +206,7 @@ class RoomPriceService {
   ) {
     try {
       const availability = await HotelPricesDao.checkAvailabilityDao(hotelcode, invTypeCode, startDate, endDate)
-      console.log("availability", availability)
+      
       if (availability.availability.count < noOfRooms) {
         return {
           success: true,
@@ -284,28 +284,6 @@ class RoomRentCalculationService {
         endOfDay(endDate2)
       );
 
-
-      console.log('Inventory Length:', inventory?.length);
-
-      if (inventory && inventory.length > 0) {
-        inventory.forEach((item, index) => {
-          console.log(`Inventory Item ${index}:`, {
-            hotelCode: item.hotelCode,
-            invTypeCode: item.invTypeCode,
-            availability: item.inventory?.availability,
-            rateExists: !!item.rate,
-            rateDetails: item.rate ? {
-              ratePlanCode: item.rate.ratePlanCode,
-              startDate: item.rate.startDate,
-              endDate: item.rate.endDate,
-              days: item.rate.days,
-              baseByGuestAmts: item.rate.baseByGuestAmts?.length || 0,
-              additionalGuestAmounts: item.rate.additionalGuestAmounts?.length || 0
-            } : null
-          });
-        });
-      }
-
       if (!inventory || inventory.length === 0) {
         return {
           success: false,
@@ -320,12 +298,12 @@ class RoomRentCalculationService {
         }
       });
 
-      console.log('Available Rooms Array:', availableRooms);
+      
 
       let minimumRoomAvailable = 0;
       if (availableRooms.length > 0) {
         minimumRoomAvailable = Math.min(...availableRooms);
-        console.log('Minimum Room Available:', minimumRoomAvailable);
+        
 
         if (minimumRoomAvailable < noOfRooms) {
           return {
@@ -484,7 +462,7 @@ class RoomRentCalculationService {
         currentDate.setDate(currentDate.getDate() + 1);
       }
 
-      console.log(`Generated ${stayDates.length} nights:`, stayDates.map(d => d.toDateString()));
+      
 
       for (const date of stayDates) {
 
@@ -506,8 +484,8 @@ class RoomRentCalculationService {
 
           const rate = item.rate;
           const isApplicable = this.isRateApplicableForDate(rate, date, dayOfWeek);
-          console.log(`Rate ${rate.ratePlanCode} (${rate.startDate} to ${rate.endDate}):`,
-            isApplicable ? 'APPLICABLE' : 'NOT APPLICABLE');
+          
+            isApplicable ? 'APPLICABLE' : 'NOT APPLICABLE';
 
           if (!isApplicable) {
             continue;
@@ -609,26 +587,26 @@ class RoomRentCalculationService {
     rateStartDate.setHours(0, 0, 0, 0);
     checkDate.setHours(0, 0, 0, 0);
 
-    console.log(`  Date Check: Rate Start Date (${rateStartDate.toDateString()}) vs Check Date (${checkDate.toDateString()})`);
+    
 
     // Only check if the rate's start date matches the query date (ignore end date)
     if (checkDate.getTime() !== rateStartDate.getTime()) {
-      console.log(`  Date check: FAILED - Rate start date doesn't match query date`);
+      // console.log(`  Date check: FAILED - Rate start date doesn't match query date`);
       return false;
     }
-    console.log(`  Date check: PASSED - Rate start date matches query date`);
+    // console.log(`  Date check: PASSED - Rate start date matches query date`);
 
     // Check if the rate applies to this day of the week
     if (rate.days && typeof rate.days === 'object') {
       const dayApplicable = rate.days[dayOfWeek];
-      console.log(`  Day of week check: ${dayOfWeek} = ${dayApplicable}`);
+      
 
       if (dayApplicable === false) {
-        console.log(`  Day of week check: FAILED`);
+        // console.log(`  Day of week check: FAILED`);
         return false;
       }
     }
-    console.log(`  Day of week check: PASSED`);
+    // console.log(`  Day of week check: PASSED`);
 
     return true;
   }
@@ -643,9 +621,7 @@ class RoomRentCalculationService {
     try {
       const totalGuests = noOfAdults + noOfChildrens;
 
-      console.log('    === Single Rate Calculation Debug (ENHANCED) ===');
-      console.log('    Rate Plan Code:', rate.ratePlanCode);
-      console.log('    Adults:', noOfAdults, 'Children:', noOfChildrens, 'Total Guests:', totalGuests, 'Rooms:', noOfRooms);
+
 
       // Find the appropriate base rate
       const baseByGuestAmts: BaseGuestAmount[] = rate.baseByGuestAmts || [];
@@ -658,7 +634,7 @@ class RoomRentCalculationService {
         };
       }
 
-      console.log('    Available base rates:', baseByGuestAmts.map(b => `${b.numberOfGuests} guests = ${b.amountBeforeTax}`));
+      
 
       // Sort base rates by number of guests (ascending)
       const sortedBaseRates = baseByGuestAmts.sort((a, b) => a.numberOfGuests - b.numberOfGuests);
@@ -686,11 +662,7 @@ class RoomRentCalculationService {
       const baseRatePerRoom = selectedBaseRate.amountBeforeTax;
       const baseGuestsIncluded = selectedBaseRate.numberOfGuests;
 
-      console.log('    Selected Base Rate:', {
-        numberOfGuests: selectedBaseRate.numberOfGuests,
-        amount: baseRatePerRoom,
-        covers: `${baseGuestsIncluded} guests included in base rate`
-      });
+      
 
       // FIXED: Better additional charges calculation
       let additionalAdultCharges = 0;
@@ -698,14 +670,14 @@ class RoomRentCalculationService {
       let childrenChargesBreakdown: any[] = [];
 
       const additionalGuestAmounts: AdditionalGuestAmount[] = rate.additionalGuestAmounts || [];
-      console.log('    Additional guest amounts available:', additionalGuestAmounts.map(a => `Code ${a.ageQualifyingCode} = ${a.amount}`));
+      
 
       // FIXED: More accurate calculation of who pays additional charges
       if (totalGuests > baseGuestsIncluded) {
         console.log('    Total guests exceed base coverage, calculating additional charges...');
 
         const extraGuests = totalGuests - baseGuestsIncluded;
-        console.log('    Extra guests beyond base coverage:', extraGuests);
+        
 
         // Strategy: First accommodate adults in base rate, then charge for extra adults and all children
         let guestsAccountedFor = 0;
@@ -716,12 +688,12 @@ class RoomRentCalculationService {
         if (baseGuestsIncluded >= noOfAdults) {
           extraAdults = 0;
           extraChildren = Math.min(noOfChildrens, extraGuests);
-          console.log('    Base rate covers all adults. Extra children to charge:', extraChildren);
+          
         } else {
           // Base rate can't cover all adults, so some adults and all children pay extra
           extraAdults = noOfAdults - baseGuestsIncluded;
           extraChildren = noOfChildrens;
-          console.log('    Base rate cannot cover all adults. Extra adults:', extraAdults, 'Extra children:', extraChildren);
+          
         }
 
         // Calculate additional adult charges
@@ -729,7 +701,7 @@ class RoomRentCalculationService {
           const adultRate = additionalGuestAmounts.find(aga => aga.ageQualifyingCode === '10');
           if (adultRate) {
             additionalAdultCharges = extraAdults * adultRate.amount;
-            console.log(`    Additional adults: ${extraAdults} x ${adultRate.amount} = ${additionalAdultCharges}`);
+            
           } else {
             console.log('    No adult additional rate found - extra adults will be free');
           }
@@ -740,7 +712,7 @@ class RoomRentCalculationService {
           const childRate = additionalGuestAmounts.find(aga => aga.ageQualifyingCode === '8');
           if (childRate) {
             additionalChildrenCharges = extraChildren * childRate.amount;
-            console.log(`    Children charges: ${extraChildren} x ${childRate.amount} = ${additionalChildrenCharges}`);
+            
 
             // Add breakdown for charged children
             for (let i = 0; i < extraChildren; i++) {
@@ -784,7 +756,7 @@ class RoomRentCalculationService {
           }
         }
       } else {
-        console.log('    All guests covered by base rate');
+        // console.log('    All guests covered by base rate');
 
         for (let i = 0; i < noOfChildrens; i++) {
           childrenChargesBreakdown.push({
@@ -800,14 +772,7 @@ class RoomRentCalculationService {
       const totalPerRoom = baseRatePerRoom + totalAdditionalChargesPerRoom;
       const totalAmountForDay = totalPerRoom * noOfRooms;
 
-      console.log('    === FINAL CALCULATION BREAKDOWN ===');
-      console.log('    Base rate per room:', baseRatePerRoom);
-      console.log('    Additional adult charges per room:', additionalAdultCharges);
-      console.log('    Additional children charges per room:', additionalChildrenCharges);
-      console.log('    Total additional charges per room:', totalAdditionalChargesPerRoom);
-      console.log('    Total per room:', totalPerRoom);
-      console.log('    Number of rooms:', noOfRooms);
-      console.log('    Total for all rooms:', totalAmountForDay);
+
 
       return {
         success: true,

@@ -7,7 +7,6 @@ interface CalendarProps {
   className?: string;
   initialFocus?: boolean;
   disabled?: (date: Date) => boolean;
-  defaultMonth?: Date;
 }
 
 export const Calendar: React.FC<CalendarProps> = ({
@@ -15,19 +14,11 @@ export const Calendar: React.FC<CalendarProps> = ({
   selected,
   onSelect,
   className = '',
+  initialFocus = false,
   disabled,
 }) => {
-  const [currentMonth, setCurrentMonth] = useState(() => {
-    if (selected) {
-      if (mode === 'single') {
-        return new Date((selected as Date).getFullYear(), (selected as Date).getMonth(), 1);
-      } else {
-        const range = selected as { from: Date; to: Date };
-        return new Date(range.from.getFullYear(), range.from.getMonth(), 1);
-      }
-    }
-    return new Date();
-  });
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+
   const getDaysInMonth = (date: Date) => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
   };
@@ -89,18 +80,18 @@ export const Calendar: React.FC<CalendarProps> = ({
     const daysInMonth = getDaysInMonth(currentMonth);
     const firstDay = getFirstDayOfMonth(currentMonth);
     const days = [];
-
+  
     // Empty cells for days before the first day of the month
     for (let i = 0; i < firstDay; i++) {
       days.push(<div key={`empty-${i}`} className="h-8 w-8"></div>);
     }
-
+  
     // Days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
       const isSelected = isDateSelected(date);
       const isDisabled = disabled && disabled(date); // 👈 Check if disabled
-
+  
       days.push(
         <button
           key={day}
@@ -125,12 +116,12 @@ export const Calendar: React.FC<CalendarProps> = ({
         </button>
       );
     }
-
+  
     return days;
   };
 
   return (
-    <div className={`bg-white border rounded-lg p-4 shadow-sm min-w-[280px] ${className}`}>
+    <div className={`bg-white border rounded-lg p-4 shadow-sm ${className}`}>
       <div className="flex items-center justify-between mb-4">
         <button
           type="button" // ADDED: Prevent form submission
@@ -151,7 +142,7 @@ export const Calendar: React.FC<CalendarProps> = ({
         </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-2 mb-3">
+      <div className="grid grid-cols-7 gap-1 mb-2">
         {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
           <div key={day} className="h-8 w-8 text-xs text-gray-500 flex items-center justify-center">
             {day}
@@ -159,7 +150,7 @@ export const Calendar: React.FC<CalendarProps> = ({
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-2">
+      <div className="grid grid-cols-7 gap-1">
         {renderCalendarDays()}
       </div>
     </div>
