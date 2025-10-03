@@ -220,9 +220,9 @@ export class InventoryService {
 
             return { response: this.formatSuccessResponse(echoToken), echoToken };
         } catch (error: any) {
-            const echoToken = ((): string => {
+            const echoToken = await (async (): Promise<string> => {
                 try {
-                    const parsed: OTAHotelInvCountNotifRQ = parseStringPromise(xml, {
+                    const parsed: OTAHotelInvCountNotifRQ = await parseStringPromise(xml, {
                         explicitArray: false,
                         trim: true,
                         normalize: true,
