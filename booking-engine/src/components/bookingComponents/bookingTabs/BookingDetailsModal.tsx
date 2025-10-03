@@ -23,6 +23,9 @@ import {
   getStatusIcon,
   getRoomTypeStyle,
   getRoomTypeIcon,
+  calculateOriginalAmount,
+  getDiscountAmount,
+  formatDiscountBadge,
 } from "./utils";
 import { printBookingItinerary } from '../PrintBookingItinerary';
 import { Phone } from "lucide-react";
@@ -69,7 +72,6 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
     };
   }, [onClose]);
 
-  const formatCamelCase = (text: string): string => text.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase());
   const roomType = booking.roomTypeCode;
   const currency = booking.currencyCode?.toUpperCase();
   const isPastOrTodayCheckIn = new Date(booking.checkInDate).setHours(0, 0, 0, 0) <= new Date().setHours(0, 0, 0, 0);
@@ -360,14 +362,34 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                     </div>
 
                     {/* Total Amount */}
+                    {/* Total Amount with Discount */}
                     <div className="flex items-start gap-3">
                       <div>
                         <p className="text-tripswift-off-white/80 text-sm mb-1">
                           {t("BookingTabs.BookingDetailsModal.totalAmount")}
                         </p>
-                        <p className="text-tripswift-off-white font-tripswift-bold">
-                          {currency} {booking.totalAmount.toLocaleString()}
-                        </p>
+                        {booking.couponDetails && booking.couponDetails.length > 0 ? (
+                          <div className="flex flex-col gap-1">
+                            <p className="text-tripswift-off-white/60 text-sm line-through">
+                              {currency} {calculateOriginalAmount(booking).toFixed(2)}
+                            </p>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="text-tripswift-off-white font-tripswift-bold text-lg">
+                                {currency} {booking.totalAmount.toFixed(2)}
+                              </p>
+                              <span className="text-xs bg-green-400 text-white px-2 py-1 rounded-md font-tripswift-bold shadow-sm">
+                              {formatDiscountBadge(booking.couponDetails, currency)}
+                              </span>
+                            </div>
+                            <p className="text-green-300 text-xs mt-0.5 font-tripswift-medium">
+                              You saved {currency} {getDiscountAmount(booking).toFixed(2)}
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-tripswift-off-white font-tripswift-bold text-lg">
+                            {currency} {booking.totalAmount.toFixed(2)}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
