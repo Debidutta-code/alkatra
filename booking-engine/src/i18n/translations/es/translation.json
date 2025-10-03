@@ -1157,6 +1157,8 @@
             "customerServiceMessage": "Nuestro equipo de servicio al cliente está disponible las 24 horas para ayudarte con cualquier pregunta.",
             "contactSupportButton": "Contactar soporte",
             "exploreMoreHotels": "Explora más opciones de hoteles",
+            "missingBookingDetailsToast": "Faltan los detalles de la reserva. No se puede descargar la confirmación.",
+            "missingBookingDetails": "Faltan los detalles de la reserva. Por favor, contacte con soporte si el problema persiste.",
             "hotelLabel": "Hotel",
             "roomTypeLabel": "Tipo de habitación",
             "originalPrice": "Precio original",

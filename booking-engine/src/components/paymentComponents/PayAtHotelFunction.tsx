@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { Shield, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from '../../Redux/store';
-import { setGuestDetails, setFinalAmount, setPromoCode, setOriginalAmount } from '../../Redux/slices/pmsHotelCard.slice';
+import { setGuestDetails, setFinalAmount, setPromoCode, setOriginalAmount, setPromoCodeName } from '../../Redux/slices/pmsHotelCard.slice';
 import axios from 'axios';
 import { formatDate } from '../../utils/dateUtils';
 
@@ -42,6 +42,7 @@ interface PayAtHotelProps {
     hotelCode?: string;
     guests: Guest[];
     promoCode?: string | null;
+    promoCodeName?: string | null;
   };
 }
 
@@ -230,6 +231,7 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
       dispatch(setOriginalAmount(bookingDetails.originalAmount || bookingDetails.amount));
       dispatch(setFinalAmount(bookingDetails.amount));
       dispatch(setPromoCode(bookingDetails.promoCode || null));
+      dispatch(setPromoCodeName(bookingDetails.promoCodeName || null));
       dispatch(setGuestDetails({
         guests: bookingResponse?.savedBooking?.guests || bookingDetails.guests,
         rooms: bookingDetails.rooms || 1,

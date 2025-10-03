@@ -28,9 +28,10 @@ interface PayWithCryptoQRProps {
   bookingDetails: BookingDetails;
   onConvertedAmountChange?: (amount: number | null) => void;
   promoCode?: string | null;
+  promoName?: string | null;
 }
 
-const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onConvertedAmountChange, promoCode = null }) => {
+const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onConvertedAmountChange, promoCode = null, promoName = null }) => {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const [tokens, setTokens] = useState<CryptoToken[]>([]);
@@ -277,6 +278,7 @@ const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onCon
                   paymentOption: bookingDetails.paymentOption,
                   originalAmount: bookingDetails.originalAmount,
                   promoCode: promoCode,
+                  promoName: promoName,
                 };
                 dispatch(setPaymentData(updatedPaymentData));
                 router.push("/payment-progress");

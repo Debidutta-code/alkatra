@@ -1157,6 +1157,8 @@
       "contactSupportButton": "समर्थन से संपर्क करें",
       "phoneLabel": "फ़ोन नंबर",
       "exploreMoreHotels": "और होटल विकल्प एक्सप्लोर करें",
+      "missingBookingDetailsToast": "बुकिंग का विवरण गायब है। पुष्टिकरण डाउनलोड करने में असमर्थ।",
+      "missingBookingDetails": "बुकिंग का विवरण गायब है। यदि समस्या बनी रहती है, तो कृपया समर्थन से संपर्क करें।",
       "PDF": {
         "bookingConfirmation": "बुकिंग की पुष्टि",
         "reservationConfirmed": "आपका आरक्षण पुष्टि कर दिया गया है",

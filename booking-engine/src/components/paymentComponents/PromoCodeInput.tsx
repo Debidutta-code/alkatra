@@ -45,7 +45,7 @@ export default function PromoCodeInput({
     }
   }, [appliedPromoCode]);
 
-  const handleApply = async (promoCode?: string) => {
+  const handleApply = async (promoCode?: string, promoCodeName?: string) => {
     const codeToApply = promoCode || code.trim().toUpperCase();
     if (!codeToApply || isApplying) return;
 
@@ -67,17 +67,17 @@ export default function PromoCodeInput({
         }
 
         const appliedPromo = availablePromos.find(p => p.code === codeToApply);
-        const displayName = appliedPromo?.codeName || codeToApply;
+        const displayName = promoCodeName || appliedPromo?.codeName || codeToApply;
 
         setResult({
           type: "success",
           message: discountToShow > 0
             ? t("Payment.promoCode.success", {
               discount: `${currency.toUpperCase()} ${discountToShow.toFixed(2)}`
-            }) + ` (${displayName})`
+            })
             : res.message || t("Payment.promoCode.validNoDiscount")
         });
-        setCode(codeToApply);
+        setCode(displayName);
       } else {
         setResult({
           type: "error",
@@ -183,8 +183,7 @@ export default function PromoCodeInput({
               <PromoCodesList
                 promoCodes={availablePromos}
                 onSelectPromo={(selectedCode, selectedCodeName) => {
-                  setCode(selectedCodeName); // Display the friendly name
-                  handleApply(selectedCode);  // But send the actual code to backend
+                  handleApply(selectedCode, selectedCodeName);
                   setShowAvailablePromos(false);
                 }}
                 isLoading={isLoadingPromos}

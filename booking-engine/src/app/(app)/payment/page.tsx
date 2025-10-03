@@ -19,6 +19,7 @@ import PromoCodeInput from "../../../components/paymentComponents/PromoCodeInput
 
 interface AppliedPromo {
   code: string;
+  codeName?: string;
   discount: number;
   finalAmount: number;
 }
@@ -140,10 +141,12 @@ function PaymentPageContent() {
         accessToken
       );
 
-      // Check for isValid instead of valid
       if (result.success && result.isValid && result.data?.discountAmount > 0) {
+        const promoDetails = availablePromos.find(p => p.code === code);
+
         setAppliedPromo({
           code,
+          codeName: promoDetails?.codeName,
           discount: result.data.discountAmount,
           finalAmount: result.data.finalAmount,
         });
@@ -346,6 +349,7 @@ function PaymentPageContent() {
                                 ...bookingDetails,
                                 hotelName: bookingDetails.hotelName ?? undefined,
                                 promoCode: appliedPromo?.code || null,
+                                promoCodeName: appliedPromo?.codeName || null,
                                 originalAmount: amount,
                               }}
                             />
@@ -358,6 +362,7 @@ function PaymentPageContent() {
                             }}
                             onConvertedAmountChange={setConvertedAmount}
                             promoCode={appliedPromo?.code || null}
+                            promoName={appliedPromo?.codeName || null}
                           />
                         ) : paymentOption === "payWithCrypto" ? (
                           <div className="bg-tripswift-off-white p-4 rounded-lg shadow-md">
@@ -399,7 +404,7 @@ function PaymentPageContent() {
                             <div className="flex items-center gap-2">
                               <CheckCircle className="w-4 h-4" />
                               <span className="text-sm font-tripswift-medium">
-                                {t('Payment.PaymentPageContent.priceDetails.promoApplied')} ({appliedPromo.code})
+                                {t('Payment.PaymentPageContent.priceDetails.promoApplied')} ({appliedPromo.codeName || appliedPromo.code})
                               </span>
                             </div>
                             <span className="text-sm font-tripswift-medium">
