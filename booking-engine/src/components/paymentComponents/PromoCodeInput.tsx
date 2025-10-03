@@ -61,19 +61,20 @@ export default function PromoCodeInput({
         if (res.discount !== undefined) {
           discountToShow = res.discount;
         } else if (res.finalAmount !== undefined) {
-          // Calculate discount from original amount and finalAmount
           discountToShow = amount - res.finalAmount;
         } else {
-          // Fallback: assume 0 discount but still valid
           discountToShow = 0;
         }
+
+        const appliedPromo = availablePromos.find(p => p.code === codeToApply);
+        const displayName = appliedPromo?.codeName || codeToApply;
 
         setResult({
           type: "success",
           message: discountToShow > 0
             ? t("Payment.promoCode.success", {
               discount: `${currency.toUpperCase()} ${discountToShow.toFixed(2)}`
-            })
+            }) + ` (${displayName})`
             : res.message || t("Payment.promoCode.validNoDiscount")
         });
         setCode(codeToApply);
@@ -181,9 +182,9 @@ export default function PromoCodeInput({
             <div className="mt-3 p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
               <PromoCodesList
                 promoCodes={availablePromos}
-                onSelectPromo={(selectedCode) => {
-                  setCode(selectedCode);
-                  handleApply(selectedCode);
+                onSelectPromo={(selectedCode, selectedCodeName) => {
+                  setCode(selectedCodeName); // Display the friendly name
+                  handleApply(selectedCode);  // But send the actual code to backend
                   setShowAvailablePromos(false);
                 }}
                 isLoading={isLoadingPromos}
