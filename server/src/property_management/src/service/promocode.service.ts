@@ -954,10 +954,17 @@ export class PromoCodeService {
         }
       }
 
+      if (searchCriteria.isActive !== undefined) {
+        filter.isActive = searchCriteria.isActive;
+      } else {
+        filter.isActive = true;
+      }
+
       const promocodes = await Promocode.find(filter)
         .populate('propertyId', 'name code')
         .populate('applicableRoomType', 'roomType roomName')
         .populate('applicableRatePlans', 'ratePlanName code')
+        .select('propertyId propertyCode codeName code description discountType discountValue validFrom validTo minBookingAmount maxDiscountAmount applicableRoomType applicableRatePlans isActive ')
         .sort({ createdAt: -1 })
         .lean();
 
@@ -968,5 +975,4 @@ export class PromoCodeService {
       throw new Error(`Failed to search promocodes: ${error.message}`);
     }
   }
-
 }

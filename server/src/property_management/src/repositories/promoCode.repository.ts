@@ -113,7 +113,7 @@ export class PromoCodeRepository {
    */
   async getAllPromoCodes(filters: any = {}, sort: any = {}, skip: number = 0, limit: number = 10): Promise<any[]> {
     try {
-      const activeFilters = { ...filters, isActive: true };
+      const activeFilters = { ...filters };
       return await Promocode.find(activeFilters)
         .sort(sort)
         .skip(skip)

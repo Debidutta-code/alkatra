@@ -163,13 +163,7 @@ export default (app: Router) => {
    */
   router.get('/promo/:promoId', protect as any, promoCodeController.getPromocodeById.bind(promoCodeController));
 
-  /**
-   * Extranet specific
-   * Search promocodes
-   */
-  router.post('/promo/search', authenticateCustomer ,promoCodeController.searchPromocodes.bind(promoCodeController));
-
-
+  
   /**
    * **************************************************************************
    * **************************************************************************
@@ -177,6 +171,12 @@ export default (app: Router) => {
 
 
   // Promocode usage API's
+  /**
+   * Extranet specific
+   * Search promocodes
+   */
+  router.post('/promo/search', authenticateCustomer ,promoCodeController.searchPromocodes.bind(promoCodeController));
+  
   /**
    * Booking engine specific
    * Validate promocode 

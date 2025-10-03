@@ -135,7 +135,7 @@ export class PromoCodeController {
         sortOrder: sortOrder as 'asc' | 'desc'
       };
 
-      console.log("The fileter options are", filterOptions);
+    
       const result = await this.promoCodeService.getAllPromoCode(filterOptions);
 
       return res.status(200).json({
@@ -150,7 +150,7 @@ export class PromoCodeController {
       return res.status(500).json({
         success: false,
         message: "Error occurred while getting PromoCode",
-        error: error.message,
+        error: error.message, 
       });
     }
   }
