@@ -225,17 +225,13 @@ class RoomPrice {
          * Get the property info for getting property ID
          */
         const propertyInfo: any = await propertyInfoService.getPropertyByHotelCode(hotelCode);
+        
 
         /**
          * If tax group is not assigned to the property return the response
          */
-        if (!propertyInfo.tax_group) {
-            console.log("No rate plan here");
-            response.data.tax = [];
-            response.data.totalTax = 0;
-            response.data.priceAfterTax = response.data.totalAmount;
-            return response;
-        }
+        if (!propertyInfo.tax_group) return response;
+
 
         /**
          * Calculating tax
@@ -245,10 +241,10 @@ class RoomPrice {
         /**
          * If taxCalculation is empty or null, return response without tax
          */
-        if (!taxCalculation || taxCalculation.length === 0) {
+        if (!taxCalculation) {
             response.data.tax = [];
-            response.data.totalTax = 0;
-            response.data.priceAfterTax = response.data.totalAmount;
+            // response.data.totalTax = 0;
+            // response.data.priceAfterTax = response.data.totalAmount;
             return response;
         }
 
