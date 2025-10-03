@@ -211,9 +211,10 @@ export class TaxGroupService implements ITaxGroupService {
      */
     async getTaxGroupById(id: string): Promise<ITaxGroup | null> {
         try {
+            console.log("Get tax group by ID", id);
             const taxGroup = await this.taxGroupRepository.findById(id);
-            return;
-            // if (!taxGroup?._id) throw new Error("Tax group not found - 6");
+            
+            if (!taxGroup?._id) return null;
 
             return taxGroup;
         } catch (error: any) {
@@ -270,20 +271,17 @@ export class TaxGroupService implements ITaxGroupService {
              */
             const taxGroupData = await this.getTaxGroupById(taxGroupID);
             // if (!taxGroupData) throw new Error("This tax group doesn't exists.");
-            if (!taxGroupData) return [];
-
-            /**
-             * If no tax rules found, return empty array
-             */
+            if (!taxGroupData) return null;
             if (!taxGroupData.rules || taxGroupData.rules.length === 0) {
-                return [];
+                // throw new Error("No tax rules found for this tax group.");
+                return null;
             }
 
             /**
              * Check if the tax group is active
-             * If not, return empty array
+             * If not, return null
              */
-            if (taxGroupData.isActive === false) return [];
+            if (taxGroupData.isActive === false) return null;
 
             /**
              * Fetch tax rules for the reservation
