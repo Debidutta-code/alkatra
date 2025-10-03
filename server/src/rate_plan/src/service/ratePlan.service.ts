@@ -121,7 +121,6 @@ class RatePlanService {
 
   }
 
-  // public static async getRatePlanByHotel(hotelCode: string, invTypeCode?: string, startDate?: Date, endDate?: Date, page?: number) {
   public static async getRatePlanByHotel(
     hotelCode: string,
     invTypeCode?: string,
