@@ -45,7 +45,7 @@ export default function PromoCodeInput({
     }
   }, [appliedPromoCode]);
 
-  const handleApply = async (promoCode?: string) => {
+  const handleApply = async (promoCode?: string, promoCodeName?: string) => {
     const codeToApply = promoCode || code.trim().toUpperCase();
     if (!codeToApply || isApplying) return;
 
@@ -61,12 +61,13 @@ export default function PromoCodeInput({
         if (res.discount !== undefined) {
           discountToShow = res.discount;
         } else if (res.finalAmount !== undefined) {
-          // Calculate discount from original amount and finalAmount
           discountToShow = amount - res.finalAmount;
         } else {
-          // Fallback: assume 0 discount but still valid
           discountToShow = 0;
         }
+
+        const appliedPromo = availablePromos.find(p => p.code === codeToApply);
+        const displayName = promoCodeName || appliedPromo?.codeName || codeToApply;
 
         setResult({
           type: "success",
@@ -76,7 +77,7 @@ export default function PromoCodeInput({
             })
             : res.message || t("Payment.promoCode.validNoDiscount")
         });
-        setCode(codeToApply);
+        setCode(displayName);
       } else {
         setResult({
           type: "error",
@@ -181,9 +182,8 @@ export default function PromoCodeInput({
             <div className="mt-3 p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
               <PromoCodesList
                 promoCodes={availablePromos}
-                onSelectPromo={(selectedCode) => {
-                  setCode(selectedCode);
-                  handleApply(selectedCode);
+                onSelectPromo={(selectedCode, selectedCodeName) => {
+                  handleApply(selectedCode, selectedCodeName);
                   setShowAvailablePromos(false);
                 }}
                 isLoading={isLoadingPromos}

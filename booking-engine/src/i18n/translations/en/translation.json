@@ -1159,6 +1159,7 @@
       "contactSupportButton": "Contact Support",
       "exploreMoreHotels": "Explore more hotel options",
       "missingBookingDetailsToast": "Missing booking details. Unable to download confirmation.",
+      "missingBookingDetails": "Booking details are missing. Please contact support if the issue persists.",
       "PDF": {
         "bookingConfirmation": "BOOKING CONFIRMATION",
         "reservationConfirmed": "Your reservation has been confirmed",

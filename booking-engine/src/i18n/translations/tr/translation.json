@@ -1157,6 +1157,8 @@
             "customerServiceMessage": "Müşteri hizmetleri ekibimiz sorularınızda size yardımcı olmak için 7/24 hizmetinizdedir.",
             "contactSupportButton": "Destek ile İletişime Geçin",
             "exploreMoreHotels": "Daha fazla otel seçeneği keşfedin",
+            "missingBookingDetailsToast": "Rezervasyon bilgileri eksik. Onay indirilemiyor.",
+            "missingBookingDetails": "Rezervasyon bilgileri eksik. Sorun devam ederse lütfen destek ile iletişime geçin.",
             "PDF": {
                 "bookingConfirmation": "REZERVASYON ONAYI",
                 "reservationConfirmed": "Rezervasyonunuz onaylandı",

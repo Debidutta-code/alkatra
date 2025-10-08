@@ -28,6 +28,7 @@ export default function PaymentSuccess() {
     finalAmount,
     originalAmount,
     promoCode,
+    promoCodeName,
     currency,
     checkInDate,
     checkOutDate,
@@ -360,7 +361,7 @@ export default function PaymentSuccess() {
                     </div>
                     <div className="flex justify-between items-center text-green-600 mb-2">
                       <span className="text-xs sm:text-sm font-tripswift-medium">
-                        {t("Payment.PaymentSuccess.promoApplied")} ({promoCode})
+                        {t("Payment.PaymentSuccess.promoApplied")} ({promoCodeName || promoCode})
                       </span>
                       <span className="text-xs sm:text-sm font-tripswift-medium">
                         -{currency?.toUpperCase()} {(originalAmount - finalAmount).toFixed(2)}

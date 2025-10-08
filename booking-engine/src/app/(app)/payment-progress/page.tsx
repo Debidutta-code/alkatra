@@ -302,7 +302,7 @@ const PaymentProgressPage: React.FC = () => {
                                             {paymentData.promoCode && (
                                                 <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg border border-green-200">
                                                     <span className="text-sm font-tripswift-medium text-green-700">
-                                                        {t('Payment.PaymentPageContent.priceDetails.promoApplied')} ({paymentData.promoCode})
+                                                        {t('Payment.PaymentPageContent.priceDetails.promoApplied')} ({paymentData.promoName || paymentData.promoCode})
                                                     </span>
                                                     {paymentData.originalAmount !== undefined && (
                                                         <span className="text-sm font-tripswift-bold text-green-700">

@@ -7,6 +7,7 @@ interface PaymentData {
   amount: number;
   originalAmount?: number;
   promoCode?: string | null;
+  promoName?: string | null;
   status: string;
   payment_id: string;
   address?: string;

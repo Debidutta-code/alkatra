@@ -1155,6 +1155,8 @@
       "contactSupportButton": "اتصل بالدعم",
       "exploreMoreHotels": "استكشاف المزيد من خيارات الفنادق",
       "phoneLabel": "رقم الهاتف",
+      "missingBookingDetailsToast": "تفاصيل الحجز مفقودة. غير قادر على تنزيل التأكيد.",
+      "missingBookingDetails": "تفاصيل الحجز مفقودة. يُرجى التواصل مع الدعم إذا استمرت المشكلة.",
       "PDF": {
         "bookingConfirmation": "تأكيد الحجز",
         "reservationConfirmed": "تم تأكيد حجزك",

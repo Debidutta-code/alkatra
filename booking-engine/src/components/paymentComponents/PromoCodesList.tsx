@@ -21,7 +21,7 @@ export interface PromoCode {
 
 interface PromoCodesListProps {
   promoCodes: PromoCode[];
-  onSelectPromo: (code: string) => void;
+  onSelectPromo: (code: string, codeName: string) => void;
   isLoading: boolean;
   currency: string;
 }
@@ -35,10 +35,10 @@ export default function PromoCodesList({
   const { t } = useTranslation();
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
-  const handleCopyAndApply = (code: string) => {
+  const handleCopyAndApply = (code: string, codeName: string) => {
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2000);
-    onSelectPromo(code);
+    onSelectPromo(code, codeName);
   };
 
   if (isLoading) {
@@ -69,7 +69,7 @@ export default function PromoCodesList({
               ? 'border-gray-200 hover:border-tripswift-blue hover:shadow-sm'
               : 'border-gray-100 opacity-60'
               }`}
-            onClick={() => isValidNow && handleCopyAndApply(promo.code)}
+            onClick={() => isValidNow && handleCopyAndApply(promo.code, promo.codeName)}
           >
             <div className="flex items-center justify-between gap-3">
               <div className="flex-1 min-w-0">
@@ -78,7 +78,7 @@ export default function PromoCodesList({
                   <div className="flex items-center gap-1.5 min-w-0">
                     <Tag className="w-3.5 h-3.5 text-tripswift-blue flex-shrink-0" />
                     <span className="font-tripswift-bold text-sm text-tripswift-black truncate">
-                      {promo.code}
+                      {promo.codeName}
                     </span>
                   </div>
                   <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-tripswift-bold bg-green-100 text-green-700 flex-shrink-0">
@@ -101,7 +101,7 @@ export default function PromoCodesList({
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  isValidNow && handleCopyAndApply(promo.code);
+                  isValidNow && handleCopyAndApply(promo.code, promo.codeName);
                 }}
                 disabled={!isValidNow}
                 className={`flex items-center gap-1 px-3 py-1.5 text-xs font-tripswift-medium rounded-md transition-all flex-shrink-0 ${copiedCode === promo.code

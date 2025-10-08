@@ -292,7 +292,7 @@ const AmendReservationModal: React.FC<AmendReservationModalProps> = ({
         };
 
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomRentPrice`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/rate-plan/getRoomRentPrice?reservationId=${booking.reservationId}`,
           {
             hotelCode: booking.hotelCode,
             invTypeCode: roomTypeCode,
