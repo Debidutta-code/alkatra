@@ -21,7 +21,7 @@ export class ReservationDao {
     async getReservationCouponDetails(reservationId: string) {
         if (reservationId) {
             const couponData = await ThirdPartyBooking.findOne({ reservationId: reservationId }).select('coupon');
-            console.log("############ \nThe coupon details we get", couponData);
+            
             if (couponData) {
                 return couponData;
             }

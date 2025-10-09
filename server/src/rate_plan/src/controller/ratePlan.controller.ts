@@ -4,6 +4,8 @@ import { propertyInfoService } from "../../../property_management/src/container"
 import { container } from "../../../tax_service/container";
 import { ReservationService, InventoryService } from "../service";
 import { ReservationDao } from "../dao";
+import { Promocode } from "../../../property_management/src/model";
+import couponModel from "../../../coupon_management/model/couponModel";
 
 
 
@@ -192,6 +194,7 @@ class RoomPrice {
 
         let discountAmount = 0;
         let reservationTaxValue: number | null = null;
+        let couponDetailsMap = new Map();
 
         if (reservationId) {
             const reservationData = await reservationService.getReservationById(reservationId.toString());
@@ -205,6 +208,37 @@ class RoomPrice {
             }
 
             discountAmount = await reservationService.calculateDiscountedPrice(reservationId.toString());
+
+            // Process coupons from reservation
+            if (reservationData.coupon && reservationData.coupon.length > 0) {
+                const uniqueCouponCodes = [...new Set(reservationData.coupon)];
+
+                if (uniqueCouponCodes.length > 0) {
+                    const [promoCodes, couponModels] = await Promise.all([
+                        Promocode.find({ code: { $in: uniqueCouponCodes } })
+                            .select('code discountType discountValue minBookingAmount maxDiscountAmount'),
+                        couponModel.find({ code: { $in: uniqueCouponCodes } })
+                            .select('code discountPercentage')
+                    ]);
+
+                    promoCodes.forEach(coupon => {
+                        couponDetailsMap.set(coupon.code, {
+                            discountType: coupon.discountType,
+                            discountValue: coupon.discountValue,
+                            minBookingAmount: coupon.minBookingAmount,
+                            maxDiscountAmount: coupon.maxDiscountAmount,
+                            source: 'promocode'
+                        });
+                    });
+
+                    couponModels.forEach(coupon => {
+                        couponDetailsMap.set(coupon.code, {
+                            discountPercentage: coupon.discountPercentage,
+                            source: 'couponModel'
+                        });
+                    });
+                }
+            }
         }
 
         const response: any = await RoomRentCalculationService.getRoomRentService(
@@ -249,43 +283,34 @@ class RoomPrice {
             }];
             response.data.totalTax = reservationTaxValue;
             response.data.priceAfterTax = Number((totalPrice + reservationTaxValue).toFixed(2));
-
-            return response;
         }
 
         /**
          * Default tax calculation (only if no reservation tax value or reservation tax value is negative)
          */
+        if (reservationTaxValue === null) {
+            if (propertyInfo.tax_group) {
+                const taxCalculation = await container.taxGroupService.calculateTaxRulesForReservation(basePrice, totalPrice, propertyInfo.tax_group);
 
-        /**
-         * If tax group is not assigned to the property return the response
-         */
-        if (!propertyInfo.tax_group) return response;
+                if (taxCalculation) {
+                    let totalAmount = 0;
+                    for (let i = 0, len = taxCalculation.length; i < len; i++) {
+                        totalAmount += taxCalculation[i].amount;
+                    }
 
-        /**
-         * Calculating tax using default tax rules
-         */
-        const taxCalculation = await container.taxGroupService.calculateTaxRulesForReservation(basePrice, totalPrice, propertyInfo.tax_group);
-
-        /**
-         * If taxCalculation is empty or null, return response without tax
-         */
-        if (!taxCalculation) {
-            response.data.tax = [];
-            return response;
+                    response.data.tax = taxCalculation;
+                    response.data.totalTax = totalAmount;
+                    response.data.priceAfterTax = Number((response.data.totalAmount + totalAmount).toFixed(2));
+                } else {
+                    response.data.tax = [];
+                }
+            }
         }
 
-        /**
-         * Cumulative total amount
-         */
-        let totalAmount = 0;
-        for (let i = 0, len = taxCalculation.length; i < len; i++) {
-            totalAmount += taxCalculation[i].amount;
+        // Add coupon details to response
+        if (couponDetailsMap.size > 0) {
+            response.data.couponDetails = Object.fromEntries(couponDetailsMap);
         }
-
-        response.data.tax = taxCalculation;
-        response.data.totalTax = totalAmount;
-        response.data.priceAfterTax = Number((response.data.totalAmount + totalAmount).toFixed(2));
 
         return response;
     }

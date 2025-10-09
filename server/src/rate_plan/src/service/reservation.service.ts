@@ -50,8 +50,6 @@ export class ReservationService {
             couponIds.map(couponId => this.ratePlanRepository.getCouponDetailsFromAnySource(couponId))
         );
 
-        console.log("The coupon discount result:", discountResults);
-
         let totalDiscount = 0;
         for (const result of discountResults) {
             if (!result) continue;
