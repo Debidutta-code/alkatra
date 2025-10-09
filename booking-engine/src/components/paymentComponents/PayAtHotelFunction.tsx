@@ -31,6 +31,7 @@ interface PayAtHotelProps {
     checkOut: string;
     amount: number;
     originalAmount?: number;
+    totalTax?: number;
     userId?: string;
     hotelName?: string;
     ratePlanCode?: string;
@@ -180,6 +181,7 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
         numberOfRooms: bookingDetails.rooms || 1,
         roomTypeCode: bookingDetails.roomType || "",
         roomTotalPrice: bookingDetails.amount,
+        totalTax: bookingDetails.totalTax,
         currencyCode: bookingDetails.currency?.toUpperCase() || " ",
         email: bookingDetails.email,
         phone: bookingDetails.phone,

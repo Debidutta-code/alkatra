@@ -5,7 +5,6 @@ export const validatePromoCode = async (
     code: string;
     bookingAmount: number;
     propertyId?: string;
-    apply: boolean;
   },
   token: string
 ) => {

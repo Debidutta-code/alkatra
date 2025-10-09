@@ -72,6 +72,7 @@ function PaymentPageContent() {
   const [appliedPromo, setAppliedPromo] = useState<AppliedPromo | null>(null);
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const finalAmount = appliedPromo?.finalAmount ?? numericAmount;
+  const totalTax = useSelector((state: RootState) => state.pmsHotelCard.totalTax);
   const bookingDetails = {
     roomId,
     propertyId,
@@ -94,6 +95,7 @@ function PaymentPageContent() {
     infants,
     guests,
     paymentOption,
+    totalTax: totalTax ?? undefined,
     originalAmount: amount,
     discountAmount: appliedPromo?.discount || 0,
     promoCode: appliedPromo?.code || null,
@@ -136,7 +138,6 @@ function PaymentPageContent() {
           code,
           bookingAmount: amount,
           propertyId: propertyId,
-          apply: true,
         },
         accessToken
       );

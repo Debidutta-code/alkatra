@@ -20,6 +20,7 @@ interface CryptoToken {
 interface BookingDetails {
   amount: number;
   originalAmount?: number;
+  totalTax?: number;
   currency: string;
   [key: string]: any;
 }
@@ -197,6 +198,7 @@ const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onCon
           amount: convertedAmount,
           provider: "web",
           coupon: promoCode ? [promoCode] : [],
+          totalTax: bookingDetails.totalTax,
         },
         {
           headers: {

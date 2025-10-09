@@ -381,7 +381,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
 
                 {/* Total Amount Card */}
                 <div className="bg-tripswift-off-white/10 backdrop-blur-sm rounded-xl p-5 border border-tripswift-off-white/20">
-                  <p className="text-tripswift-off-white text-sm font-tripswift-bold uppercase tracking-wide mb-3">
+                  <p className="text-tripswift-off-white text-sm font-tripswift-bold uppercase tracking-wide mb-1">
                     {t("BookingTabs.BookingDetailsModal.totalAmount")}
                   </p>
 
@@ -403,7 +403,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                       </p>
                     </div>
                   ) : (
-                    <p className="text-tripswift-off-white font-tripswift-bold text-3xl">
+                    <p className="text-tripswift-off-white font-tripswift-bold text-xl">
                       {currency} {booking.totalAmount.toFixed(2)}
                     </p>
                   )}
