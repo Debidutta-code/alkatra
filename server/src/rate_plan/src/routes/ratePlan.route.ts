@@ -25,7 +25,8 @@ route.get(
     const response = await RatePlanController.getRatePlanByHotelCode(req, res, next);
     res.status(200).json(response);
   }
-)
+);
+
 route.post(
   "/create",
   protect as any,

@@ -191,7 +191,19 @@ class RoomPrice {
         const { reservationId } = req.query;
 
         let discountAmount = 0;
+        let reservationTaxValue: number | null = null;
+
         if (reservationId) {
+            const reservationData = await reservationService.getReservationById(reservationId.toString());
+            if (!reservationData) {
+                throw new Error("Reservation not found for the provided ID");
+            }
+
+            // Get tax value from reservation if available (apply whatever value exists as long as not negative)
+            if (reservationData.taxValue !== undefined && reservationData.taxValue !== null && Number(reservationData.taxValue) >= 0) {
+                reservationTaxValue = Number(reservationData.taxValue);
+            }
+
             discountAmount = await reservationService.calculateDiscountedPrice(reservationId.toString());
         }
 
@@ -225,16 +237,33 @@ class RoomPrice {
          * Get the property info for getting property ID
          */
         const propertyInfo: any = await propertyInfoService.getPropertyByHotelCode(hotelCode);
-        
+
+        /**
+         * If reservation has tax value (and it's not negative), use it instead of default tax calculation
+         */
+        if (reservationTaxValue !== null) {
+            response.data.tax = [{
+                name: 'Reservation Tax',
+                amount: reservationTaxValue,
+                type: 'fixed'
+            }];
+            response.data.totalTax = reservationTaxValue;
+            response.data.priceAfterTax = Number((totalPrice + reservationTaxValue).toFixed(2));
+
+            return response;
+        }
+
+        /**
+         * Default tax calculation (only if no reservation tax value or reservation tax value is negative)
+         */
 
         /**
          * If tax group is not assigned to the property return the response
          */
         if (!propertyInfo.tax_group) return response;
 
-
         /**
-         * Calculating tax
+         * Calculating tax using default tax rules
          */
         const taxCalculation = await container.taxGroupService.calculateTaxRulesForReservation(basePrice, totalPrice, propertyInfo.tax_group);
 
@@ -243,8 +272,6 @@ class RoomPrice {
          */
         if (!taxCalculation) {
             response.data.tax = [];
-            // response.data.totalTax = 0;
-            // response.data.priceAfterTax = response.data.totalAmount;
             return response;
         }
 
@@ -260,7 +287,6 @@ class RoomPrice {
         response.data.totalTax = totalAmount;
         response.data.priceAfterTax = Number((response.data.totalAmount + totalAmount).toFixed(2));
 
-        console.log("@@@@@@@@@@@@@@@@@ The final price is", response);
         return response;
     }
 

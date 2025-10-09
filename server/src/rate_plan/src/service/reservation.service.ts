@@ -29,7 +29,12 @@ export class ReservationService {
         return ReservationService.instance;
     }
 
+    async getReservationById(reservationId: string): Promise<any> {
+        return this.ratePlanRepository.getReservationDetails(reservationId);
+    };
+
     async calculateDiscountedPrice(reservationId: string): Promise<number> {
+
         if (!reservationId) {
             throw new Error("SERVICE: Reservation id not found to get reservation details");
         }

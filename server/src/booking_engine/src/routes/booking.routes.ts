@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { BookingController } from "../controllers/bookings.controller";
 import { BookAgainAvailabilityService, AmendBookingService } from "../services";
+import { PromoCodeService } from "../../../property_management/src/service";
 import {
   getBookingDetailsForExtranet,
   getBookingDetailsOfUser,
@@ -11,7 +12,8 @@ import {
 
 const amendBookingService = AmendBookingService.getInstance();
 const bookAgainService = BookAgainAvailabilityService.getInstance();
-const bookingController = new BookingController(amendBookingService, bookAgainService);
+const promoCodeService = PromoCodeService.getInstance();
+const bookingController = new BookingController(amendBookingService, bookAgainService, promoCodeService);
 
 
 import { authenticateCustomer } from "../../../customer_authentication/src/middleware/authMiddleware";

@@ -6,8 +6,16 @@ import { AuthenticatedRequest } from "../../../customer_authentication/src/types
 import CryptoPaymentDetails, { CryptoPaymentLog } from "../models/cryptoPayment.model";
 import { v4 as uuidv4 } from "uuid";
 import { CryptoGuestDetails } from "../models/cryptoUserPaymentInitialStage.model";
-import { createReservationWithCryptoPayment } from "./bookings.controller";
+import { BookingController } from "./bookings.controller";
 import { NotificationService } from "../../../notification/src/service/notification.service";
+import { BookAgainAvailabilityService, AmendBookingService } from "../services";
+import { PromoCodeService } from "../../../property_management/src/service";
+
+
+const amendBookingService = AmendBookingService.getInstance();
+const bookAgainService = BookAgainAvailabilityService.getInstance();
+const promoCodeService = PromoCodeService.getInstance();
+const bookingController = new BookingController(amendBookingService, bookAgainService, promoCodeService);
 
 let convertedAmount: number;
 
@@ -156,7 +164,7 @@ export const cryptoPaymentInitiate = CatchAsyncError(async (req: AuthenticatedRe
       return res.status(401).json({ message: "User ID not found in token" });
     }
 
-    const { token, blockchain, currency, amount, provider, coupon } = req.body;
+    const { token, blockchain, currency, amount, provider, coupon, taxValue } = req.body;
     const requiredFields = { token, blockchain, currency, amount, userId };
 
     const missingFields = Object.entries(requiredFields)
@@ -203,6 +211,7 @@ export const cryptoPaymentInitiate = CatchAsyncError(async (req: AuthenticatedRe
       customer_id: new Types.ObjectId(userId),
       provider,
       coupon,
+      taxValue: taxValue || 0,
       token,
       blockchain,
       payment_id: uuidv4(),
@@ -404,7 +413,7 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
     await guestDetails.save();
     console.log("Payment and guest details updated successfully");
 
-    const cryptoPaymentDetails = await createReservationWithCryptoPayment({
+    const cryptoPaymentDetails = await bookingController.createReservationWithCryptoPayment({
       provider: payment.provider,
       coupon: payment.coupon,
       reservationId: guestDetails.reservationId,

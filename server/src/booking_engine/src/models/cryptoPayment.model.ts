@@ -4,6 +4,7 @@ export interface ICryptoPayment extends Document {
   customer_id: ObjectId;
   provider: string;
   coupon: string[];
+  taxValue?: number;
   token: string;
   blockchain: string;
   payment_id: string;
@@ -42,6 +43,11 @@ const cryptoPaymentSchema = new mongoose.Schema({
   coupon: {
     type: [String],
     required: false,
+  },
+  taxValue: {
+    type: Number,
+    required: false,
+    default: 0
   },
   token: {
     type: String,

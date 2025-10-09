@@ -9,6 +9,7 @@ export interface ReservationInput {
     bookingDetails: {
         provider: string;
         coupon: string[];
+        taxValue?: number;
         reservationId: string;
         paymentMethod: string;
         userId: string;
@@ -32,6 +33,7 @@ export interface ReservationInput {
 export interface ThirdPartyReservationData {
     provider: string;
     coupon: string[];
+    taxValue?: number;
     paymentMethod: string;
     hotelCode: string;
     hotelName?: string;

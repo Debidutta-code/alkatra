@@ -14,6 +14,10 @@ export class ReservationDao {
         return ReservationDao.instance;
     }
 
+    async getReservationDetails(reservationId: string) {
+        return ThirdPartyBooking.findOne({ reservationId: reservationId }).lean();
+    }
+
     async getReservationCouponDetails(reservationId: string) {
         if (reservationId) {
             const couponData = await ThirdPartyBooking.findOne({ reservationId: reservationId }).select('coupon');

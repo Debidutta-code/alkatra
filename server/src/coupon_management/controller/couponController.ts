@@ -37,9 +37,9 @@ export const getCouponDetails = async (req: AuthenticatedRequest, res: Response)
 // });
 
 export const validateCouponCode = async (req: AuthenticatedRequest, res: Response) => {
-  const { code, bookingAmount } = req.body;
+  const { code, bookingAmount, isUsed } = req.body;
   const userId = req.user?._id;
-  const result = await promoService.validateCouponCode(code, userId!, bookingAmount);
+  const result = await promoService.validateCouponCode(code, userId!, bookingAmount, isUsed);
   res.status(200).json({ success: true, data: result });
 };
 // export const validateCouponCode = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {

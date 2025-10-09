@@ -11,6 +11,7 @@ export class ThirdPartyReservationRepository {
     const booking = new ThirdPartyBooking({
       provider: data.provider,
       coupon: data.coupon,
+      taxValue: data.taxValue || 0,
       userId: data.userId,
       guestDetails: data.guests,
       email: data.email,

@@ -24,6 +24,6 @@ export const getCouponDetailService = async (code: string) => {
   };
 };
 
-export const validateCouponCode = async (code: string, userId: string, bookingAmount: number) => {
-  return await validateCouponCodeRepo(code, userId, bookingAmount);
+export const validateCouponCode = async (code: string, userId: string, bookingAmount: number, isUsed?: string) => {
+  return await validateCouponCodeRepo(code, userId, bookingAmount, isUsed);
 };
