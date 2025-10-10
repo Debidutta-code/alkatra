@@ -44,8 +44,8 @@ export const PromoCodeForm: React.FC<PromoCodeFormProps> = ({
         validTo: '',
         minBookingAmount: 0,
         maxDiscountAmount: 0,
-        useLimit: 1,
-        usageLimitPerUser: 1,
+        // useLimit: 1,
+        // usageLimitPerUser: 1,
         isActive: true,
     });
 
@@ -64,8 +64,8 @@ export const PromoCodeForm: React.FC<PromoCodeFormProps> = ({
                 validTo: initialData.validTo.split('T')[0],
                 minBookingAmount: initialData.minBookingAmount,
                 maxDiscountAmount: initialData.maxDiscountAmount,
-                useLimit: initialData.useLimit,
-                usageLimitPerUser: initialData.usageLimitPerUser,
+                // useLimit: initialData.useLimit,
+                // usageLimitPerUser: initialData.usageLimitPerUser,
                 isActive: initialData.isActive ?? true,
             });
         } else {
@@ -84,8 +84,8 @@ export const PromoCodeForm: React.FC<PromoCodeFormProps> = ({
                 validTo: oneMonthLater,
                 minBookingAmount: 0,
                 maxDiscountAmount: 0,
-                useLimit: 100,
-                usageLimitPerUser: 1,
+                // useLimit: 100,
+                // usageLimitPerUser: 1,
                 isActive: true,
             });
         }
@@ -157,15 +157,15 @@ export const PromoCodeForm: React.FC<PromoCodeFormProps> = ({
         }
 
         // Usage limits validation
-        if (formData.useLimit < 1) {
-            newErrors.useLimit = 'Must be at least 1';
-        }
-        if (formData.usageLimitPerUser < 1) {
-            newErrors.usageLimitPerUser = 'Must be at least 1';
-        }
-        if (formData.usageLimitPerUser > formData.useLimit) {
-            newErrors.usageLimitPerUser = 'Cannot exceed total usage limit';
-        }
+        // if (formData.useLimit < 1) {
+        //     newErrors.useLimit = 'Must be at least 1';
+        // }
+        // if (formData.usageLimitPerUser < 1) {
+        //     newErrors.usageLimitPerUser = 'Must be at least 1';
+        // }
+        // if (formData.usageLimitPerUser > formData.useLimit) {
+        //     newErrors.usageLimitPerUser = 'Cannot exceed total usage limit';
+        // }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -388,7 +388,7 @@ export const PromoCodeForm: React.FC<PromoCodeFormProps> = ({
                         </div>
 
                         {/* Total Usage Limit */}
-                        <div className="space-y-2">
+                        {/* <div className="space-y-2">
                             <Label htmlFor="useLimit" className="text-tripswift-black font-tripswift-medium">
                                 Total Usage Limit <span className="text-red-500">*</span>
                             </Label>
@@ -409,10 +409,10 @@ export const PromoCodeForm: React.FC<PromoCodeFormProps> = ({
                             <p className="text-xs text-muted-foreground">
                                 Maximum number of times this promo code can be used in total
                             </p>
-                        </div>
+                        </div> */}
 
                         {/* Usage Limit Per User */}
-                        <div className="space-y-2">
+                        {/* <div className="space-y-2">
                             <Label htmlFor="usageLimitPerUser" className="text-tripswift-black font-tripswift-medium">
                                 Usage Limit Per User <span className="text-red-500">*</span>
                             </Label>
@@ -433,7 +433,7 @@ export const PromoCodeForm: React.FC<PromoCodeFormProps> = ({
                             <p className="text-xs text-muted-foreground">
                                 How many times each user can use this promo code
                             </p>
-                        </div>
+                        </div> */}
 
                         {/* Description */}
                         <div className="space-y-2 md:col-span-2">
