@@ -403,8 +403,14 @@ export class PromoCodeService {
         return { isValid: false, message: usageCheck.reason };
       }
 
+      console.log("The booking amount received is: ", bookingAmount);
+      console.log("The promocode details are: ", promocode);
+
       const discountAmount = this.calculateDiscount(promocode, bookingAmount);
+      console.log("The calculated discount amount is: ", discountAmount);
+
       const finalAmount = bookingAmount - discountAmount;
+      console.log("The final amount after discount is: ", finalAmount);
 
       return {
         isValid: true,

@@ -370,7 +370,10 @@ export class PromoCodeController {
         });
       }
 
+      console.log("&&&&&&&&&&&& Request body for validatePromocode:", req.body);
+
       const { code, bookingAmount, propertyCode, propertyId, apply = false } = req.body;
+      console.log('The booking amount received is: ', bookingAmount);
 
       if (!code || !bookingAmount) {
         return res.status(400).json({
@@ -386,7 +389,7 @@ export class PromoCodeController {
         });
       }      
 
-      let result;
+      let result: any;
 
       if (apply === true) {
         // APPLY THE PROMOCODE (validates + increases usage)
@@ -432,6 +435,12 @@ export class PromoCodeController {
             isValid: false
           });
         }
+
+        console.log("The response result: ", {
+            promocode: validationResult.promocode,
+            discountAmount: validationResult.discountAmount,
+            finalAmount: validationResult.finalAmount
+          });
 
         return res.status(200).json({
           success: true,

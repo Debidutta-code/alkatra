@@ -1910,6 +1910,9 @@ export class BookingController {
       guests,
       paymentInfo,
     } = req.body;
+    
+    console.log("The room total price we get is: ", roomTotalPrice);
+    console.log("THe tAx value we get is: ", taxValue);
 
     const requiredFields = {
       provider,

@@ -172,7 +172,7 @@ export default (app: Router) => {
 
   // Promocode usage API's
   /**
-   * Extranet specific
+   * Booking engine specific
    * Search promocodes
    */
   router.post('/promo/search', authenticateCustomer ,promoCodeController.searchPromocodes.bind(promoCodeController));
