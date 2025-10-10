@@ -7,6 +7,7 @@ export class ReservationProcessor {
         const {
             provider,
             coupon,
+            taxValue,
             userId,
             checkInDate,
             checkOutDate,
@@ -28,6 +29,7 @@ export class ReservationProcessor {
         const reservationData: ThirdPartyReservationData = {
             provider,
             coupon,
+            taxValue,
             userId,
             hotelCode,
             hotelName,

@@ -22,6 +22,7 @@ export class ThirdPartyReservationService {
     async processThirdPartyReservation(data: ReservationInput): Promise<string> {
         try {
             console.log('Starting third-party reservation processing...');
+            console.log("The tax value we get in service is: ", data.bookingDetails.taxValue);
 
             const reservationData: ThirdPartyReservationData = await this.processor.processReservationInput(data);
 
