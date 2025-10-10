@@ -169,8 +169,8 @@ export const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
                         {[
                             { label: 'Valid From', value: formatDate(promo.validFrom), icon: Calendar },
                             { label: 'Valid To', value: formatDate(promo.validTo), icon: Calendar },
-                            { label: 'Total Uses', value: `${promo.useLimit} times`, icon: Users },
-                            { label: 'Per User', value: `${promo.usageLimitPerUser} ${promo.usageLimitPerUser === 1 ? 'time' : 'times'}`, icon: Tag },
+                            // { label: 'Total Uses', value: `${promo.useLimit} times`, icon: Users },
+                            // { label: 'Per User', value: `${promo.usageLimitPerUser} ${promo.usageLimitPerUser === 1 ? 'time' : 'times'}`, icon: Tag },
                         ].map((item, idx) => (
                             <div
                                 key={idx}
@@ -228,8 +228,8 @@ export const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
                                 {promo.discountValue}
                                 {promo.discountType === 'percentage' ? '%' : ''} OFF
                             </Badge>
-                            <span>•</span>
-                            <span>{promo.useLimit} total uses</span>
+                            {/* <span>•</span> */}
+                            {/* <span>{promo.useLimit} total uses</span> */}
                         </div>
                     </div>
 

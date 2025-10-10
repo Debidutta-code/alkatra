@@ -66,7 +66,6 @@ export const PromoCodesSection: React.FC<PromoCodesSectionProps> = ({
     };
 
     const handleDelete = async (promoId: string) => {
-        if (!confirm('Are you sure? This action cannot be undone.')) return;
         try {
             await deletePromoCode(accessToken, promoId);
             setPromoCodes((prev) => prev.filter((p) => p._id !== promoId));

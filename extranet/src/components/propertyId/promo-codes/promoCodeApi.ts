@@ -14,8 +14,8 @@ export interface PromoCode {
   validTo: string;
   minBookingAmount: number;
   maxDiscountAmount: number;
-  useLimit: number;
-  usageLimitPerUser: number;
+  // useLimit: number;
+  // usageLimitPerUser: number;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -32,8 +32,8 @@ export interface CreatePromoCodePayload {
   validTo: string;
   minBookingAmount: number;
   maxDiscountAmount: number;
-  useLimit: number;
-  usageLimitPerUser: number;
+  // useLimit: number;
+  // usageLimitPerUser: number;
   isActive: boolean;
 }
 
