@@ -346,7 +346,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             <div className="bg-gradient-to-br from-tripswift-blue via-[#054B8F] to-[#043A73] rounded-2xl p-5 shadow-xl">
               <div className="space-y-3">
                 {/* Payment Info Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 bg-gray-700 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0">
                       <FaRegCalendarCheck className="text-tripswift-off-white text-base" />
@@ -377,6 +377,24 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                       </p>
                     </div>
                   </div>
+                  {/* Tax Information */}
+                  {booking.taxValue !== undefined && (
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 bg-gray-700 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg className="w-5 h-5 text-tripswift-off-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-tripswift-off-white text-xs font-tripswift-bold uppercase tracking-wide mb-1">
+                          {t("BookingTabs.BookingDetailsModal.taxAmount")}
+                        </p>
+                        <p className="text-tripswift-off-white font-tripswift-bold">
+                          {currency} {booking.taxValue.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Total Amount Card */}

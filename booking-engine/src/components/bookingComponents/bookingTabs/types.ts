@@ -52,6 +52,7 @@ export interface Booking {
   __v?: number;
   coupon?: string[];
   couponDetails?: CouponDetails[];
+  taxValue?: number;
 }
 
 export interface PaginationResponse {

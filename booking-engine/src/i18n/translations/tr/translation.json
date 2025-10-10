@@ -1031,7 +1031,8 @@
             "dob": "Doğum Tarihi",
             "guest": "Misafir",
             "printFooter": "Rezervasyonunuz için teşekkürler. Sorularınız için lütfen müşteri hizmetlerimizle iletişime geçin.",
-            "printTitle": "Rezervasyon Onayı"
+            "printTitle": "Rezervasyon Onayı",
+            "taxAmount": "Vergi Tutarı"
         }
     },
     "Payment": {

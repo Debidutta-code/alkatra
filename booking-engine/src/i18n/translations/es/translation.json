@@ -1031,7 +1031,8 @@
             "dob": "Fecha de nacimiento",
             "guest": "Huésped",
             "printFooter": "Gracias por tu reserva. Para cualquier pregunta, por favor contacta a nuestro servicio al cliente.",
-            "printTitle": "Confirmación de reserva"
+            "printTitle": "Confirmación de reserva",
+            "taxAmount": "Monto de impuestos"
         }
     },
     "Payment": {

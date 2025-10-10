@@ -1032,7 +1032,8 @@
       "dob": "Date Of Birth",
       "guest": "Guest",
       "printFooter": "Thank you for your booking. For any questions, please contact our customer service.",
-      "printTitle": "Booking Confirmation"
+      "printTitle": "Booking Confirmation",
+      "taxAmount": "Tax Amount"
     }
   },
   "Payment": {
@@ -1071,8 +1072,8 @@
         "originalPrice": "Original Price",
         "promoApplied": "Promo Code Applied",
         "removePromo": "Remove Promo Code",
-        "subtotal":"Subtotal",
-        "discount":"Discount"
+        "subtotal": "Subtotal",
+        "discount": "Discount"
       },
       "securityBadges": {
         "securePayments": "Secure payments",
