@@ -7,13 +7,22 @@ import PayWithCryptoQR from "../../../components/paymentComponents/payWithCrypto
 import { formatDate, calculateNights } from "../../../utils/dateUtils";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Shield, CreditCard, CheckCircle, Clock, CalendarRange, Users, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { RootState } from "@/Redux/store";
+import { getAvailablePromoCodes, validatePromoCode } from "@/api/promo";
+import PromoCodeInput from "../../../components/paymentComponents/PromoCodeInput";
+
+interface AppliedPromo {
+  code: string;
+  codeName?: string;
+  discount: number;
+  finalAmount: number;
+}
 
 function PaymentPageContent() {
   const { t } = useTranslation();
@@ -34,12 +43,10 @@ function PaymentPageContent() {
   const lastName = guestDetails?.guests?.[0]?.lastName || "";
   const email = guestDetails?.email || "";
   const phone = guestDetails?.phone || "";
-
   const currency = (pmsHotelCard?.currency || "").toLowerCase();
   const hotelCode = pmsHotelCard?.hotelCode || "";
   const ratePlanCode = pmsHotelCard?.ratePlanCode || "";
   const roomType = pmsHotelCard?.roomType || "";
-
   const roomId = pmsHotelCard.room_id || "";
   const propertyId = pmsHotelCard.property_id || "";
   const checkIn = pmsHotelCard.checkInDate || "";
@@ -60,10 +67,15 @@ function PaymentPageContent() {
   );
   const nights = calculateNights(checkIn, checkOut);
   const numericAmount = amount || 0;
+  const [availablePromos, setAvailablePromos] = useState<any[]>([]);
+  const [isLoadingPromos, setIsLoadingPromos] = useState(false);
+  const [appliedPromo, setAppliedPromo] = useState<AppliedPromo | null>(null);
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+  const finalAmount = appliedPromo?.finalAmount ?? numericAmount;
   const bookingDetails = {
     roomId,
     propertyId,
-    amount,
+    amount: finalAmount,
     currency,
     checkIn,
     checkOut,
@@ -81,11 +93,82 @@ function PaymentPageContent() {
     children,
     infants,
     guests,
-    paymentOption
-
+    paymentOption,
+    originalAmount: amount,
+    discountAmount: appliedPromo?.discount || 0,
+    promoCode: appliedPromo?.code || null,
   };
   console.log("Booking details:", JSON.stringify(bookingDetails, null, 2));
 
+  useEffect(() => {
+    const fetchPromoCodes = async () => {
+      if (!propertyId || !accessToken) return;
+
+      setIsLoadingPromos(true);
+      try {
+        const response = await getAvailablePromoCodes(propertyId, accessToken);
+
+        // Handle the response structure
+        if (response.success && response.data) {
+          setAvailablePromos(response.data);
+        } else {
+          setAvailablePromos([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch promo codes:", error);
+        setAvailablePromos([]);
+      } finally {
+        setIsLoadingPromos(false);
+      }
+    };
+
+    fetchPromoCodes();
+  }, [propertyId, accessToken]);
+
+  const handlePromoApply = async (code: string) => {
+    if (!accessToken) {
+      return { success: false, error: t("Payment.promoCode.loginRequired") };
+    }
+
+    try {
+      const result = await validatePromoCode(
+        {
+          code,
+          bookingAmount: amount,
+          propertyId: propertyId,
+          apply: true,
+        },
+        accessToken
+      );
+
+      if (result.success && result.isValid && result.data?.discountAmount > 0) {
+        const promoDetails = availablePromos.find(p => p.code === code);
+
+        setAppliedPromo({
+          code,
+          codeName: promoDetails?.codeName,
+          discount: result.data.discountAmount,
+          finalAmount: result.data.finalAmount,
+        });
+        return {
+          success: true,
+          discount: result.data.discountAmount,
+          finalAmount: result.data.finalAmount,
+          message: result.message
+        };
+      } else {
+        return {
+          success: false,
+          error: result.message || t("Payment.promoCode.invalid")
+        };
+      }
+    } catch (err: any) {
+      return {
+        success: false,
+        error: err.message || t("Payment.promoCode.genericError")
+      };
+    }
+  };
   // Initialize payment when payment method is selected
   const handleInitializePayment = async (option: string) => {
     setIsInitializing(true);
@@ -264,14 +347,22 @@ function PaymentPageContent() {
                             <PayAtHotelFunction
                               bookingDetails={{
                                 ...bookingDetails,
-                                hotelName: bookingDetails.hotelName ?? undefined
+                                hotelName: bookingDetails.hotelName ?? undefined,
+                                promoCode: appliedPromo?.code || null,
+                                promoCodeName: appliedPromo?.codeName || null,
+                                originalAmount: amount,
                               }}
                             />
                           </Elements>
                         ) : paymentOption === "payWithCrypto-payWithQR" ? (
                           <PayWithCryptoQR
-                            bookingDetails={bookingDetails}
+                            bookingDetails={{
+                              ...bookingDetails,
+                              originalAmount: amount,
+                            }}
                             onConvertedAmountChange={setConvertedAmount}
+                            promoCode={appliedPromo?.code || null}
+                            promoName={appliedPromo?.codeName || null}
                           />
                         ) : paymentOption === "payWithCrypto" ? (
                           <div className="bg-tripswift-off-white p-4 rounded-lg shadow-md">
@@ -294,22 +385,77 @@ function PaymentPageContent() {
                     <div className="bg-tripswift-blue p-4 text-tripswift-off-white">
                       <h2 className="font-tripswift-medium text-lg">{t('Payment.PaymentPageContent.priceDetails.title')}</h2>
                     </div>
+
                     <div className="p-6">
                       <div className="space-y-4">
+                        {/* Original Amount (only show if promo applied) */}
+                        {appliedPromo && (
+                          <div className="flex justify-between items-center text-tripswift-black/60">
+                            <span className="text-sm">{t('Payment.PaymentPageContent.priceDetails.originalPrice')}</span>
+                            <span className="text-sm line-through">
+                              {currency.toUpperCase()} {numericAmount.toFixed(2)}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Discount Applied */}
+                        {appliedPromo && (
+                          <div className="flex justify-between items-center text-green-600">
+                            <div className="flex items-center gap-2">
+                              <CheckCircle className="w-4 h-4" />
+                              <span className="text-sm font-tripswift-medium">
+                                {t('Payment.PaymentPageContent.priceDetails.promoApplied')} ({appliedPromo.codeName || appliedPromo.code})
+                              </span>
+                            </div>
+                            <span className="text-sm font-tripswift-medium">
+                              -{currency.toUpperCase()} {appliedPromo.discount.toFixed(2)}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Separator line if promo applied */}
+                        {appliedPromo && (
+                          <div className="border-t border-gray-200"></div>
+                        )}
+
+                        {/* Final Total */}
                         <div className="flex justify-between items-center">
                           <div className="font-tripswift-bold text-lg">{t('Payment.PaymentPageContent.priceDetails.total')}</div>
                           <div className="font-tripswift-bold text-xl text-tripswift-blue">
                             {(paymentOption === "payWithCrypto-payWithQR" || paymentOption === "payWithCrypto-payWithWallet") && convertedAmount !== null
                               ? `USD ${convertedAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 })}`
-                              : `${currency.toUpperCase()} ${numericAmount.toFixed(2)}`
+                              : `${currency.toUpperCase()} ${finalAmount.toFixed(2)}`
                             }
                           </div>
                         </div>
 
+                        {/* Promo Code Input - Always visible */}
+                        <div className="pt-4 border-t border-gray-200">
+                          <PromoCodeInput
+                            onApply={handlePromoApply}
+                            disabled={!!appliedPromo}
+                            availablePromos={availablePromos}
+                            isLoadingPromos={isLoadingPromos}
+                            currency={currency}
+                            appliedPromoCode={appliedPromo?.code}
+                            amount={amount}
+                          />
+                        </div>
+
+                        {/* Remove Promo Button */}
+                        {appliedPromo && (
+                          <button
+                            onClick={() => setAppliedPromo(null)}
+                            className="w-full py-2 px-4 text-sm text-red-600 hover:bg-red-50 rounded-lg border border-red-200 transition-colors"
+                          >
+                            {t('Payment.PaymentPageContent.priceDetails.removePromo')}
+                          </button>
+                        )}
+
                         {paymentOption === 'payAtHotel' && (
                           <div className="bg-blue-50 p-3 rounded-lg mt-4">
                             <div className="flex items-start">
-                              <Clock className={`text-tripswift-blue flex-shrink-0 mt-0.5  ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} size={16} />
+                              <Clock className={`text-tripswift-blue flex-shrink-0 mt-0.5 ${i18n.language === "ar" ? "ml-2" : "mr-2"}`} size={16} />
                               <p className="text-sm text-tripswift-black/70">
                                 {t('Payment.PaymentPageContent.priceDetails.payAtHotelInfo')}
                               </p>

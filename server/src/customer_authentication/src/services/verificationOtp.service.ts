@@ -26,7 +26,7 @@ class OTPService {
         console.log(`The created data we get ${userData}`);
         return userData;
       } else {
-        console.log(`The email already verified ${userEmail}`);
+        // console.log(`The email already verified ${userEmail}`);
         return userEmail;
       }
     } catch (error) {

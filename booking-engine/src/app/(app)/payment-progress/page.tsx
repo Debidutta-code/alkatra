@@ -4,16 +4,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { format, differenceInYears, set } from "date-fns";
-import axios from "axios";
-import Cookies from "js-cookie";
-// import { onMessage } from 'firebase/messaging';
-// import { messaging } from '../../../utils/firebase.config';
-// import toast from "react-hot-toast";
+import { differenceInYears } from "date-fns";
 import {
     CheckCircle,
     Clock,
-    Copy,
     ArrowLeft,
     QrCode,
     Wallet,
@@ -21,17 +15,14 @@ import {
     Shield,
     ExternalLink,
     RefreshCw,
-    Loader2,
-    Loader
+    Loader2
 } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useWalletClient, useChainId } from "wagmi";
-import { sendToken } from "./metamaskServices";
 import toast from "react-hot-toast";
 import { messaging } from "../../../utils/firebase.config";
 import { onMessage } from "firebase/messaging";
-import { useDispatch, useSelector, UseSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setPaymentData, clearPaymentData } from "../../../Redux/slices/payment.slice";
 import { RootState } from "../../../Redux/store";
 
@@ -57,7 +48,7 @@ interface PaymentData {
 }
 
 const PaymentProgressPage: React.FC = () => {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const router = useRouter();
     const [error, setError] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
@@ -67,14 +58,11 @@ const PaymentProgressPage: React.FC = () => {
     const [hasPaymentWithWallet, setHasPaymentWithWallet] = useState(false);
     const [selectedChainId, setSelectedChainId] = useState<number>(0);
     const [contaractAddress, setContractAddress] = useState<string | null>(null);
-    const [walletPaymentProgressStatus, setWalletPaymentProgressStatus] = useState(false);
     const [showWalletTransactionPopup, setShowWalletTransactionPopup] = useState(false);
     const dispatch = useDispatch();
     const paymentData = useSelector((state: RootState) => state.payment.paymentData);
     // payment notify
     useEffect(() => {
-
-        console.log('🔔 useFCM hook initialized----------pppppp-------------------');
         if (messaging) {
             onMessage(messaging, (payload) => {
                 const data = payload.data;
@@ -96,32 +84,27 @@ const PaymentProgressPage: React.FC = () => {
                     return;
                 }
 
-                // fallback for other notifications
                 toast(`🔔 ${payload.notification?.title}`);
             });
         }
     }, []);
 
-
-
-    // Timer for tracking payment time
     useEffect(() => {
-        const initialDuration = 600; // 40 minutes in seconds
-        setTimeElapsed(initialDuration); // Initialize with starting value
+        const initialDuration = 600;
+        setTimeElapsed(initialDuration);
         const timer = setInterval(() => {
             setTimeElapsed((prev) => {
                 if (prev <= 0) {
-                    clearInterval(timer); // Stop the timer at 0
+                    clearInterval(timer);
                     return 0;
                 }
-                return prev - 1; // Decrease by 1 second
+                return prev - 1;
             });
         }, 1000);
 
         return () => clearInterval(timer);
     }, []);
-    
-    // Inside the useEffect for retrieving payment data for QR
+
     useEffect(() => {
         const timer = setTimeout(() => {
             const storedData = paymentData;
@@ -135,7 +118,6 @@ const PaymentProgressPage: React.FC = () => {
                         parsedData.amount &&
                         parsedData.status
                     ) {
-                        //    dispatch( setPaymentData(parsedData));
                         if (parsedData.paymentOption && parsedData.paymentOption === "payWithCrypto-payWithWallet") {
                             setHasPaymentWithWallet(true);
                         } else {
@@ -159,8 +141,6 @@ const PaymentProgressPage: React.FC = () => {
     useEffect(() => {
         const storedChainId = localStorage.getItem("selectedChainId");
         const storedContractAddress = localStorage.getItem("contractAddress");
-        // console.log("Stored value:", storedChainId);
-
         if (storedChainId) {
             setSelectedChainId(Number(storedChainId));
         }
@@ -172,122 +152,7 @@ const PaymentProgressPage: React.FC = () => {
 
     const successTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Add this useEffect hook after the existing useEffect block
-    // useEffect(() => {
-    //     let intervalId: NodeJS.Timeout;
-    //     const checkPaymentStatus = async () => {
-    //         if (!paymentData?.payment_id || paymentData.status === "completed") return;
 
-    //         try {
-    //             const token = Cookies.get("accessToken");
-    //             if (!token) {
-    //                 setError(t("PayWithCryptoQR.errors.noAuthToken"));
-    //                 return;
-    //             }
-
-    //             const response = await axios.get(
-    //                 `${process.env.NEXT_PUBLIC_BACKEND_URL}/crypto/get-payment-status?paymentId=${paymentData.payment_id}&amount=${paymentData.amount}`,
-    //                 {
-    //                     headers: {
-    //                         Authorization: `Bearer ${token}`,
-    //                         "Content-Type": "application/json",
-    //                     },
-    //                 }
-    //             );
-
-    //             if (response.status === 200 && response.data.message === "Payment confirmed successfully") {
-    //                 if (paymentData) {
-    //                     dispatch(setPaymentData({ ...paymentData, status: "completed" }));
-    //                   }
-                      
-    //                 setShowSuccessModal(true);
-    //                 clearInterval(intervalId);
-
-    //                 // Clear any existing timeout
-    //                 if (successTimeoutRef.current) {
-    //                     clearTimeout(successTimeoutRef.current);
-    //                 }
-
-    //                 // Set new timeout
-    //                 successTimeoutRef.current = setTimeout(() => {
-    //                     console.log("Executing redirect to /my-trip");
-    //                     dispatch(clearPaymentData());
-    //                     router.replace("/my-trip"); // Using replace instead of push
-    //                 }, 3000);
-    //             }
-    //         } catch (err) {
-    //             console.error("Payment status check failed:", err);
-    //         }
-    //     };
-
-    //     if (paymentData?.status !== "completed") {
-    //         checkPaymentStatus();
-    //         intervalId = setInterval(checkPaymentStatus, 10000);
-    //     }
-
-    //     return () => {
-    //         clearInterval(intervalId);
-    //         if (successTimeoutRef.current) {
-    //             clearTimeout(successTimeoutRef.current);
-    //         }
-    //     };
-    // }, [paymentData?.payment_id, paymentData?.amount, paymentData?.status, t, router]);
-
-
-    // api call for paymment status in wallet payment section
-    // const checkPaymentStatus = async () => {
-    //     if (!paymentData?.payment_id || paymentData.status === "completed") return;
-
-    //     try {
-    //         const token = Cookies.get("accessToken");
-    //         if (!token) {
-    //             setError(t("PayWithCryptoQR.errors.noAuthToken"));
-    //             return;
-    //         }
-    //         const response = await axios.get(
-    //             `${process.env.NEXT_PUBLIC_BACKEND_URL}/crypto/get-payment-status?paymentId=${paymentData.payment_id}&amount=${paymentData.amount}`,
-    //             {
-    //                 headers: {
-    //                     Authorization: `Bearer ${token}`,
-    //                     "Content-Type": "application/json",
-    //                 },
-    //             }
-    //         );
-
-    //         if (response.status === 200 && response.data.message === "Payment confirmed successfully") {
-    //             if (paymentData) {
-    //                 dispatch(setPaymentData({ ...paymentData, status: "completed" }));
-    //             }
-    //             setShowWalletTransactionPopup(false);
-    //             setShowSuccessModal(true);
-
-    //             // Set new timeout
-    //             successTimeoutRef.current = setTimeout(() => {
-    //                 console.log("Executing redirect to /my-trip");
-    //                 dispatch(clearPaymentData());
-    //                 router.replace("/my-trip");
-    //             }, 3000);
-    //             return;
-    //         }
-    //     } catch (err) {
-    //         console.error("Payment status check failed:", err);
-    //     }
-    //     setTimeout(checkPaymentStatus, 10000);
-    // };
-
-
-    const handleCopyAddress = async () => {
-        if (!paymentData?.address) return;
-        try {
-            await navigator.clipboard.writeText(paymentData.address);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        } catch (err) {
-            console.error("Failed to copy address");
-        }
-    };
-
-    // Handle navigation back to payment page
     const checkBooking = () => {
         dispatch(clearPaymentData());
         router.push("/my-trip");
@@ -301,16 +166,13 @@ const PaymentProgressPage: React.FC = () => {
         router.replace("/");
     };
 
-    // Handle refresh payment status
     const handleRefresh = () => {
         setLoading(true);
         setTimeout(() => {
             setLoading(false);
-            // Here you would typically call an API to check payment status
         }, 1000);
     };
 
-    // Get status configuration with TripSwift colors
     const getStatusConfig = (status: string) => {
         switch (status.toLowerCase()) {
             case 'pending':
@@ -372,56 +234,6 @@ const PaymentProgressPage: React.FC = () => {
         );
     }
 
-    // const handleNetworkSelect = (chainId: number) => {
-
-    //     switchChain({ chainId: Number(chainId) });
-    // };
-
-
-    // const payWithWallet = async () => {
-    //     if (!walletClient) {
-    //         toast.error("Please connect your wallet first.");
-    //         return;
-    //     }
-
-    //     if (
-    //         paymentData &&
-    //         paymentData.blockchain &&
-    //         paymentData.token &&
-    //         paymentData.amount &&
-    //         paymentData.address &&
-    //         contaractAddress
-    //     ) {
-    //         try {
-    //             setWalletPaymentProgressStatus(true);
-    //             const receipt = await sendToken(
-    //                 walletClient,
-    //                 paymentData.blockchain,
-    //                 paymentData.token,
-    //                 paymentData.amount,
-    //                 paymentData.address,
-    //                 chainId,
-    //                 selectedChainId,
-    //                 contaractAddress
-    //             );
-    //             console.log("Transaction receipt:", receipt);
-    //             if (receipt) {
-    //                 checkPaymentStatus();
-    //                 setShowWalletTransactionPopup(true);
-
-    //             }
-    //             return receipt;
-    //         } catch (error) {
-
-    //         } finally {
-    //             setWalletPaymentProgressStatus(false);
-    //         }
-    //     } else {
-    //         toast.error("Missing required payment details.");
-    //     }
-    // };
-
-
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8] font-noto-sans">
             <div className="container mx-auto px-4 py-4">
@@ -452,26 +264,59 @@ const PaymentProgressPage: React.FC = () => {
                                 {/* Existing payment and QR code columns */}
                                 <div className="lg:col-span-1 space-y-6 xs:w-fit sm:w-fit md:w-auto">
                                     {/* Payment Details Card */}
-                                    <div className="bg-tripswift-off-white rounded-xl shadow-md overflow-hidden ">
+                                    <div className="bg-tripswift-off-white rounded-xl shadow-md overflow-hidden">
                                         <div className="bg-tripswift-blue p-4 text-tripswift-off-white">
                                             <h2 className="font-tripswift-medium text-lg flex items-center gap-2">
                                                 <Wallet className="w-5 h-5" />
-                                                Payment Information
+                                                {t('Payment.PaymentProgress.paymentInformation')}
                                             </h2>
                                         </div>
                                         <div className="p-4 space-y-3">
+                                            {/* Token */}
                                             <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                                                 <span className="text-sm text-tripswift-black/70 font-tripswift-medium">Token</span>
                                                 <span className="text-sm font-tripswift-bold text-tripswift-black bg-tripswift-blue/10 py-1 rounded-md">
                                                     {paymentData.token}
                                                 </span>
                                             </div>
+
+                                            {/* Network */}
                                             <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                                                 <span className="text-sm text-tripswift-black/70 font-tripswift-medium">Network</span>
                                                 <span className="text-sm font-tripswift-bold text-tripswift-black">{paymentData.blockchain}</span>
                                             </div>
+
+                                            {/* Original Amount (if promo applied) */}
+                                            {paymentData.originalAmount !== undefined && paymentData.originalAmount > paymentData.amount && (
+                                                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                                    <span className="text-sm text-tripswift-black/70 font-tripswift-medium">
+                                                        {t('Payment.PaymentPageContent.priceDetails.originalPrice')}
+                                                    </span>
+                                                    <span className="text-sm text-tripswift-black line-through">
+                                                        ${paymentData.originalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                    </span>
+                                                </div>
+                                            )}
+
+                                            {/* Promo Code (if applied) */}
+                                            {paymentData.promoCode && (
+                                                <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg border border-green-200">
+                                                    <span className="text-sm font-tripswift-medium text-green-700">
+                                                        {t('Payment.PaymentPageContent.priceDetails.promoApplied')} ({paymentData.promoName || paymentData.promoCode})
+                                                    </span>
+                                                    {paymentData.originalAmount !== undefined && (
+                                                        <span className="text-sm font-tripswift-bold text-green-700">
+                                                            -${(paymentData.originalAmount - paymentData.amount).toFixed(2)}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            {/* Final Amount */}
                                             <div className="flex justify-between items-center p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
-                                                <span className="text-sm text-tripswift-black/70 font-tripswift-medium">Amount</span>
+                                                <span className="text-sm text-tripswift-black/70 font-tripswift-medium">
+                                                    {t('Payment.PaymentPageContent.priceDetails.total')}
+                                                </span>
                                                 <span className="font-tripswift-bold text-lg text-green-700">
                                                     ${paymentData.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                 </span>
@@ -678,30 +523,6 @@ const PaymentProgressPage: React.FC = () => {
                                                             Send {paymentData.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {paymentData.token} on {paymentData.blockchain} to {paymentData?.address || "Loading address..."}
                                                         </span>
 
-                                                        {/* Pay button */}
-                                                        {/* <div className=" flex justify-start text-center">
-                                                            <button
-                                                                onClick={() => {
-                                                                    if (chainId !== selectedChainId) {
-                                                                        handleNetworkSelect(selectedChainId);
-                                                                        console.log("switching")
-                                                                    } else {
-                                                                        payWithWallet();
-                                                                    }
-                                                                }}
-                                                                type="button"
-                                                                disabled={walletPaymentProgressStatus}
-                                                                className={`w-full sm:w-auto text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center transition 
-                                                                        ${walletPaymentProgressStatus ? 'bg-gray-400 cursor-not-allowed' : 'bg-tripswift-blue hover:bg-tripswift-blue/90'}`}
-                                                            >
-                                                                {walletPaymentProgressStatus
-                                                                    ? "Processing..."
-                                                                    : chainId !== selectedChainId
-                                                                        ? "Switch Chain"
-                                                                        : "Click to pay"}
-                                                            </button>
-                                                        </div> */}
-
                                                         {/* Popup */}
                                                         {showWalletTransactionPopup && (
                                                             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 transition-opacity duration-300">
@@ -852,26 +673,6 @@ const PaymentProgressPage: React.FC = () => {
 
                                                     {/* Address & Instructions */}
                                                     <div className="space-y-4">
-                                                        {/* <div className="p-4 bg-gray-50 rounded-xl">
-                                                            <label className="text-tripswift-black/70 font-tripswift-medium block mb-2">Wallet Address</label>
-                                                            <div className="flex items-center gap-2">
-                                                                <code className="flex-1 text-sm text-tripswift-black/80 bg-tripswift-off-white px-3 py-2 rounded-lg font-mono break-all border">
-                                                                    {paymentData?.address || "Loading address..."}
-                                                                </code>
-                                                                <button
-                                                                    onClick={handleCopyAddress}
-                                                                    className={`p-2 rounded-lg transition-all ${copied ? "bg-green-100 text-green-600" : "bg-gray-200 text-tripswift-black/60 hover:bg-gray-300"
-                                                                        }`}
-                                                                    title="Copy address"
-                                                                >
-                                                                    {copied ? <CheckCircle className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
-                                                                </button>
-                                                            </div>
-                                                            {copied && (
-                                                                <p className="text-green-600 text-sm mt-2 font-tripswift-medium">✓ Address copied to clipboard!</p>
-                                                            )}
-                                                        </div> */}
-
                                                         {/* Instructions */}
                                                         <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
                                                             <h3 className="font-tripswift-bold text-blue-800 mb-3 flex items-center gap-2">

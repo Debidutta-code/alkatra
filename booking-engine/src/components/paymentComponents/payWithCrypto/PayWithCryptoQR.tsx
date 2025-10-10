@@ -19,6 +19,7 @@ interface CryptoToken {
 
 interface BookingDetails {
   amount: number;
+  originalAmount?: number;
   currency: string;
   [key: string]: any;
 }
@@ -26,9 +27,11 @@ interface BookingDetails {
 interface PayWithCryptoQRProps {
   bookingDetails: BookingDetails;
   onConvertedAmountChange?: (amount: number | null) => void;
+  promoCode?: string | null;
+  promoName?: string | null;
 }
 
-const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onConvertedAmountChange }) => {
+const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onConvertedAmountChange, promoCode = null, promoName = null }) => {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const [tokens, setTokens] = useState<CryptoToken[]>([]);
@@ -42,8 +45,8 @@ const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onCon
   const [paymentInitiated, setPaymentInitiated] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const hotelCode = useSelector((state: any) => state.pmsHotelCard.hotelCode);
-  const dispatch=useDispatch();
- 
+  const dispatch = useDispatch();
+
   // Fetch crypto token list from API
   useEffect(() => {
     const fetchCryptoTokens = async () => {
@@ -192,6 +195,8 @@ const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onCon
           blockchain: selectedNetwork,
           currency: bookingDetails.currency,
           amount: convertedAmount,
+          provider: "web",
+          coupon: promoCode ? [promoCode] : [],
         },
         {
           headers: {
@@ -261,7 +266,7 @@ const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onCon
                   address: walletData.address[0].wallet_address,
                   checkInDate: bookingDetails.checkIn,
                   checkOutDate: bookingDetails.checkOut,
-                  hotelCode: bookingDetails.hotelCode || "WINCLOUD",
+                  hotelCode: bookingDetails.hotelCode,
                   hotelName: bookingDetails.hotelName,
                   ratePlanCode: bookingDetails.ratePlanCode,
                   numberOfRooms: bookingDetails.rooms,
@@ -270,7 +275,10 @@ const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onCon
                   email: bookingDetails.email,
                   phone: bookingDetails.phone,
                   guests: bookingDetails.guests,
-                  paymentOption:bookingDetails.paymentOption
+                  paymentOption: bookingDetails.paymentOption,
+                  originalAmount: bookingDetails.originalAmount,
+                  promoCode: promoCode,
+                  promoName: promoName,
                 };
                 dispatch(setPaymentData(updatedPaymentData));
                 router.push("/payment-progress");
@@ -351,8 +359,8 @@ const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onCon
                   onClick={() => handleTokenSelect(token.name)}
                   disabled={paymentInitiated}
                   className={`flex flex-col items-center p-3 rounded-lg transition-all border ${selectedToken === token.name
-                      ? "border-tripswift-blue bg-tripswift-blue/10 shadow-sm"
-                      : "border-gray-200 hover:bg-gray-50"
+                    ? "border-tripswift-blue bg-tripswift-blue/10 shadow-sm"
+                    : "border-gray-200 hover:bg-gray-50"
                     }`}
                 >
                   <div className="relative w-8 h-8 mb-2">
@@ -392,8 +400,8 @@ const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onCon
                       onClick={() => handleNetworkSelect(network.name)}
                       disabled={paymentInitiated}
                       className={`flex flex-col items-center p-3 rounded-lg transition-all border ${selectedNetwork === network.name
-                          ? "border-tripswift-blue bg-tripswift-blue/10 shadow-sm"
-                          : "border-gray-200 hover:bg-gray-50"
+                        ? "border-tripswift-blue bg-tripswift-blue/10 shadow-sm"
+                        : "border-gray-200 hover:bg-gray-50"
                         }`}
                     >
                       <div className="relative w-8 h-8 mb-2">
@@ -438,8 +446,8 @@ const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onCon
               onClick={initiatePayment}
               disabled={isProcessing}
               className={`w-full py-3 px-4 rounded-lg font-medium transition-all ${isProcessing
-                  ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                  : 'bg-tripswift-blue text-white hover:bg-tripswift-blue-dark shadow-sm hover:shadow-md'
+                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                : 'bg-tripswift-blue text-white hover:bg-tripswift-blue-dark shadow-sm hover:shadow-md'
                 }`}
             >
               {isProcessing ? (

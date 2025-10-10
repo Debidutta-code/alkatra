@@ -1063,10 +1063,15 @@
       },
       "priceDetails": {
         "title": "मूल्य विवरण",
-        "roomRate": "कमरे का किराया",
-        "perNight": "/ रात",
-        "total": "कुल",
-        "payAtHotelInfo": "आपका कार्ड सुरक्षित रूप से संग्रहीत किया जाएगा, लेकिन भुगतान होटल में एकत्र किया जाएगा।"
+        "roomRate": "कमरे की दर",
+        "perNight": " / रात",
+        "total": "कुल राशि",
+        "payAtHotelInfo": "आपका कार्ड सुरक्षित रूप से संग्रहीत किया जाएगा, लेकिन भुगतान होटल में लिया जाएगा।",
+        "originalPrice": "मूल कीमत",
+        "promoApplied": "प्रोमो कोड लागू किया गया",
+        "removePromo": "प्रोमो कोड हटाएं",
+        "subtotal": "उप-योग",
+        "discount": "छूट"
       },
       "securityBadges": {
         "securePayments": "सुरक्षित भुगतान",
@@ -1152,6 +1157,8 @@
       "contactSupportButton": "समर्थन से संपर्क करें",
       "phoneLabel": "फ़ोन नंबर",
       "exploreMoreHotels": "और होटल विकल्प एक्सप्लोर करें",
+      "missingBookingDetailsToast": "बुकिंग का विवरण गायब है। पुष्टिकरण डाउनलोड करने में असमर्थ।",
+      "missingBookingDetails": "बुकिंग का विवरण गायब है। यदि समस्या बनी रहती है, तो कृपया समर्थन से संपर्क करें।",
       "PDF": {
         "bookingConfirmation": "बुकिंग की पुष्टि",
         "reservationConfirmed": "आपका आरक्षण पुष्टि कर दिया गया है",
@@ -1182,7 +1189,11 @@
         "contactForChanges": "• किसी भी परिवर्तन या रद्दीकरण के लिए, तुरंत हमसे संपर्क करें",
         "contactInfo": "सहायता के लिए, हमसे संपर्क करें: bussines.alhajz@gmail.com",
         "thankYou": "हमारी सेवा का चयन करने के लिए धन्यवाद। हम आपकी सेवा करने के लिए उत्सुक हैं!"
-      }
+      },
+      "hotelLabel": "होटल",
+      "roomTypeLabel": "कमरे का प्रकार",
+      "originalPrice": "मूल कीमत",
+      "promoApplied": "प्रोमो कोड लागू किया गया"
     },
     "PaymentProgress": {
       "title": "क्रिप्टो भुगतान गेटवे",
@@ -1207,6 +1218,7 @@
       "returnHome": "घर वापस जाएं",
       "paymentSuccessful": "भुगतान सफल!",
       "paymentConfirmed": "आपका भुगतान पुष्टि हो गया है।",
+      "paymentInformation": "भुगतान की जानकारी",
       "status": {
         "pending": "भुगतान की प्रतीक्षा में",
         "completed": "भुगतान पुष्टि हुई",

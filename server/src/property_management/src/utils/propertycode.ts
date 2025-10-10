@@ -1,4 +1,4 @@
-import { PropertyInfo } from "../model/property.info.model"; // adjust the path if needed
+import { PropertyInfo } from "../model/property.info.model"; 
 
 export default async function generateUniquePropertyCode(): Promise<string> {
   const generateCode = (): string => {

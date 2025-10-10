@@ -18,9 +18,11 @@ import Auth from "../../../user_authentication/src/Model/auth.model";
 import { PropertyInfo } from "../../../property_management/src/model/property.info.model";
 import UserModel from "../../../user_authentication/src/Model/auth.model";
 import { MailFactory } from "../../../customer_authentication/src/services/mailFactory";
-import { BookAgainAvailabilityService, BookingService } from "../services";
+import { BookAgainAvailabilityService, AmendBookingService, ReservationService } from "../services";
 import { property } from "zod";
 import { Room } from "../../../property_management/src/model/room.model";
+import { Promocode } from "../../../property_management/src/model";
+import couponModel from "../../../coupon_management/model/couponModel";
 
 
 const mailer = MailFactory.getMailer();
@@ -36,7 +38,7 @@ const calculateAgeCategory = (dob: string) => {
     age--;
   }
   if (age <= 2) return { age, category: "Infant", ageCode: "7" };
-  if (age <= 13) return { age, category: "Child", ageCode: "8" };
+  if (age < 12) return { age, category: "Child", ageCode: "8" };
   return { age, category: "Adult", ageCode: "10" };
 };
 
@@ -298,6 +300,8 @@ export const createReservationWithStoredCard = CatchAsyncError(
     }
 
     const {
+      provider,
+      coupon,
       checkInDate,
       checkOutDate,
       hotelCode,
@@ -314,6 +318,10 @@ export const createReservationWithStoredCard = CatchAsyncError(
     } = req.body;
 
     const requiredFields = {
+      // provider,
+      // coupon,
+      provider: 'web',
+      coupon: ["OQ43KZ1T970X", "IJKWRI1SL"],
       checkInDate,
       checkOutDate,
       hotelCode,
@@ -385,6 +393,8 @@ export const createReservationWithStoredCard = CatchAsyncError(
 
     const reservationInput: ReservationInput = {
       bookingDetails: {
+        provider: 'web',
+        coupon: ["OQ43KZ1T970X", "IJKWRI1SL"],
         reservationId: "",
         paymentMethod: "payAtHotel",
         userId,
@@ -660,6 +670,8 @@ export const createReservationWithStoredCard = CatchAsyncError(
 );
 
 export async function createReservationWithCryptoPayment(input: {
+  provider: string;
+  coupon: string[];
   reservationId?: string;
   userId: string;
   checkInDate: string;
@@ -693,7 +705,7 @@ export async function createReservationWithCryptoPayment(input: {
       guests,
     } = input;
 
-    console.log(`BOOKING Controller, crypto booking begins ${currencyCode} ${roomTotalPrice}`)
+
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -719,6 +731,8 @@ export async function createReservationWithCryptoPayment(input: {
 
     const reservationInput: ReservationInput = {
       bookingDetails: {
+        provider: "mobile",
+        coupon: [""],
         reservationId: reservationId ?? "",
         paymentMethod: "crypto",
         userId,
@@ -1192,6 +1206,174 @@ export const cancelThirdPartyReservation = CatchAsyncError(
 );
 
 
+// export const getBookingDetailsOfUser = CatchAsyncError(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const userId = req.params.id;
+//       const { filterData, startDate, endDate, guestName } = req.query;
+//       const page = req.query.page ? parseInt(req.query.page as string) : 1;
+//       const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+//       const skip = (page - 1) * limit;
+
+//       const matchCriteria: any = {
+//         userId,
+//       };
+//       if (startDate || endDate) {
+//         if (!startDate || !endDate) {
+//           return res.status(400).json({
+//             success: false,
+//             message: "Both startDate and endDate are required for date filtering",
+//           });
+//         }
+
+//         matchCriteria.checkInDate = {
+//           $gte: new Date(startDate as string),
+//           $lte: new Date(endDate as string),
+//         };
+//       }
+//       if (guestName) {
+//         matchCriteria.guestDetails = {
+//           $elemMatch: {
+//             firstName: { $regex: guestName as string, $options: "i" },
+//           },
+//         };
+//       }
+
+//       if (filterData && filterData !== 'null' && filterData !== '') {
+//         const validFilters = ['upcoming', 'completed', 'cancelled', 'processing'];
+//         if (!validFilters.includes(filterData as string)) {
+//           return res.status(400).json({
+//             success: false,
+//             message: "Invalid filterData. Must be one of: upcoming, completed, cancelled, processing",
+//           });
+//         }
+
+//         const currentDate = new Date();
+//         currentDate.setHours(0, 0, 0, 0);
+
+//         if (filterData === 'upcoming') {
+//           matchCriteria.checkInDate = {
+//             ...matchCriteria.checkInDate,
+//             $gt: currentDate,
+//           };
+//           matchCriteria.status = { $ne: 'Cancelled' };
+//         } else if (filterData === 'completed') {
+//           matchCriteria.checkInDate = {
+//             ...matchCriteria.checkInDate,
+//             $lte: currentDate,
+//           };
+//           matchCriteria.status = { $in: ['Confirmed'] };
+//         } else if (filterData === 'cancelled') {
+//           matchCriteria.status = 'Cancelled';
+//         } else if (filterData === 'Processing') {
+
+//           delete matchCriteria.status;
+
+//           if (matchCriteria.checkInDate) {
+//             matchCriteria.checkInDate = {
+//               $gte: matchCriteria.checkInDate.$gte?.toISOString().split('T')[0],
+//               $lte: matchCriteria.checkInDate.$lte?.toISOString().split('T')[0],
+//             };
+//           }
+//         }
+//       }
+
+//       let bookings;
+//       let totalBookings;
+//       if (filterData === 'processing') {
+//         totalBookings = await CryptoGuestDetails.countDocuments({
+//           ...matchCriteria,
+//           status: 'Processing',
+//         });
+//         if (totalBookings === 0) {
+//           return res.status(404).json({
+//             success: false,
+//             message: "No bookings found for the given user ID",
+//           });
+//         }
+//         bookings = await CryptoGuestDetails.find({
+//           ...matchCriteria,
+//           status: 'Processing',
+//         })
+//           .sort({ createdAt: -1 })
+//           .skip(skip)
+//           .limit(limit);
+//       } else {
+//         totalBookings = await ThirdPartyBooking.countDocuments(matchCriteria);
+//         if (totalBookings === 0) {
+//           return res.status(404).json({
+//             success: false,
+//             message: "No bookings found for the given user ID",
+//           });
+//         }
+//         bookings = await ThirdPartyBooking.find(matchCriteria)
+//           .sort({ createdAt: -1 })
+//           .skip(skip)
+//           .limit(limit);
+//       }
+
+//       // Get all unique hotel codes and room type codes
+//       const uniqueHotelCodes = [...new Set(bookings.map(booking => booking.hotelCode))];
+//       const uniqueRoomTypeCodes = [...new Set(bookings.map(booking => booking.roomTypeCode))];
+
+//       // Fetch property IDs and room IDs in bulk
+//       const properties = await PropertyInfo.find({
+//         property_code: { $in: uniqueHotelCodes }
+//       }).select('property_code _id').lean();
+
+//       const rooms = await Room.find({
+//         room_type: { $in: uniqueRoomTypeCodes }
+//       }).select('room_type _id').lean();
+
+//       // Create lookup maps for faster access
+//       const propertyMap = new Map();
+//       properties.forEach(prop => {
+//         propertyMap.set(prop.property_code, prop._id);
+//       });
+
+//       const roomMap = new Map();
+//       rooms.forEach(room => {
+//         roomMap.set(room.room_type, room._id);
+//       });
+
+//       // Enhance bookings with propertyId and roomId
+//       const enhancedBookings = bookings.map(booking => {
+//         const propertyId = propertyMap.get(booking.hotelCode);
+//         const roomId = roomMap.get(booking.roomTypeCode);
+
+//         return {
+//           ...booking.toObject(),
+//           propertyId: propertyId || null,
+//           roomId: roomId || null,
+//           checkInDate: booking.checkInDate instanceof Date
+//             ? booking.checkInDate.toISOString().split('T')[0]
+//             : booking.checkInDate,
+//           checkOutDate: booking.checkOutDate instanceof Date
+//             ? booking.checkOutDate.toISOString().split('T')[0]
+//             : booking.checkOutDate,
+//         };
+//       });
+
+//       const totalRevenue = enhancedBookings.reduce(
+//         (sum, booking) => sum + (booking.totalAmount || 0),
+//         0
+//       );
+
+//       return res.status(200).json({
+//         success: true,
+//         totalBookings,
+//         currentPage: page,
+//         totalPages: Math.ceil(totalBookings / limit),
+//         totalRevenue,
+//         bookings: enhancedBookings, // Return enhanced bookings with IDs
+//       });
+//     } catch (error: any) {
+//       console.error("Error in getBookingDetailsOfUser:", error);
+//       return next(new ErrorHandler(error.message || "Internal Server Error", 500));
+//     }
+//   }
+// );
+
 export const getBookingDetailsOfUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -1204,6 +1386,7 @@ export const getBookingDetailsOfUser = CatchAsyncError(
       const matchCriteria: any = {
         userId,
       };
+      
       if (startDate || endDate) {
         if (!startDate || !endDate) {
           return res.status(400).json({
@@ -1217,6 +1400,7 @@ export const getBookingDetailsOfUser = CatchAsyncError(
           $lte: new Date(endDate as string),
         };
       }
+
       if (guestName) {
         matchCriteria.guestDetails = {
           $elemMatch: {
@@ -1252,9 +1436,7 @@ export const getBookingDetailsOfUser = CatchAsyncError(
         } else if (filterData === 'cancelled') {
           matchCriteria.status = 'Cancelled';
         } else if (filterData === 'Processing') {
-
           delete matchCriteria.status;
-
           if (matchCriteria.checkInDate) {
             matchCriteria.checkInDate = {
               $gte: matchCriteria.checkInDate.$gte?.toISOString().split('T')[0],
@@ -1266,6 +1448,7 @@ export const getBookingDetailsOfUser = CatchAsyncError(
 
       let bookings;
       let totalBookings;
+
       if (filterData === 'processing') {
         totalBookings = await CryptoGuestDetails.countDocuments({
           ...matchCriteria,
@@ -1298,20 +1481,18 @@ export const getBookingDetailsOfUser = CatchAsyncError(
           .limit(limit);
       }
 
-      // Get all unique hotel codes and room type codes
       const uniqueHotelCodes = [...new Set(bookings.map(booking => booking.hotelCode))];
       const uniqueRoomTypeCodes = [...new Set(bookings.map(booking => booking.roomTypeCode))];
 
-      // Fetch property IDs and room IDs in bulk
-      const properties = await PropertyInfo.find({
-        property_code: { $in: uniqueHotelCodes }
-      }).select('property_code _id').lean();
+      const [properties, rooms] = await Promise.all([
+        PropertyInfo.find({
+          property_code: { $in: uniqueHotelCodes }
+        }).select('property_code _id').lean(),
+        Room.find({
+          room_type: { $in: uniqueRoomTypeCodes }
+        }).select('room_type _id').lean()
+      ]);
 
-      const rooms = await Room.find({
-        room_type: { $in: uniqueRoomTypeCodes }
-      }).select('room_type _id').lean();
-
-      // Create lookup maps for faster access
       const propertyMap = new Map();
       properties.forEach(prop => {
         propertyMap.set(prop.property_code, prop._id);
@@ -1322,15 +1503,74 @@ export const getBookingDetailsOfUser = CatchAsyncError(
         roomMap.set(room.room_type, room._id);
       });
 
-      // Enhance bookings with propertyId and roomId
-      const enhancedBookings = bookings.map(booking => {
+      const extractCouponCodes = (couponField: any): string[] => {
+        if (!couponField) return [];
+        if (Array.isArray(couponField)) {
+          return couponField
+            .filter(code => code && typeof code === 'string' && code.trim() !== '')
+            .map(code => code.trim());
+        }
+        if (typeof couponField === 'string' && couponField.trim() !== '') {
+          return [couponField.trim()];
+        }
+        return [];
+      };
+
+      const allCouponCodes: string[] = [];
+      bookings.forEach((booking) => {
+        const codes = extractCouponCodes(booking.coupon);
+        allCouponCodes.push(...codes);
+      });
+
+      const uniqueCouponCodes = [...new Set(allCouponCodes)];
+
+      const couponDetailsMap = new Map();
+      if (uniqueCouponCodes.length > 0) {
+        const [promoCodes, couponModels] = await Promise.all([
+          Promocode.find({ code: { $in: uniqueCouponCodes } })
+            .select('code discountType discountValue minBookingAmount maxDiscountAmount'),
+          couponModel.find({ code: { $in: uniqueCouponCodes } })
+            .select('code discountPercentage')
+        ]);
+
+        promoCodes.forEach(coupon => {
+          couponDetailsMap.set(coupon.code, {
+            discountType: coupon.discountType,
+            discountValue: coupon.discountValue,
+            minBookingAmount: coupon.minBookingAmount,
+            maxDiscountAmount: coupon.maxDiscountAmount,
+            source: 'promocode'
+          });
+        });
+
+        couponModels.forEach(coupon => {
+          couponDetailsMap.set(coupon.code, {
+            discountPercentage: coupon.discountPercentage,
+            source: 'couponModel'
+          });
+        });
+      }
+
+      const enhancedBookings = bookings.map((booking) => {
         const propertyId = propertyMap.get(booking.hotelCode);
         const roomId = roomMap.get(booking.roomTypeCode);
+        const bookingCouponCodes = extractCouponCodes(booking.coupon);
 
-        return {
+        const couponDetails = bookingCouponCodes.length > 0
+          ? bookingCouponCodes.map(code => {
+            const details = couponDetailsMap.get(code);
+            return {
+              code: code,
+              details: details || null
+            };
+          }).filter(item => item.details !== null)
+          : null;
+
+        const enhancedBooking = {
           ...booking.toObject(),
           propertyId: propertyId || null,
           roomId: roomId || null,
+          couponDetails: couponDetails && couponDetails.length > 0 ? couponDetails : null,
           checkInDate: booking.checkInDate instanceof Date
             ? booking.checkInDate.toISOString().split('T')[0]
             : booking.checkInDate,
@@ -1338,6 +1578,8 @@ export const getBookingDetailsOfUser = CatchAsyncError(
             ? booking.checkOutDate.toISOString().split('T')[0]
             : booking.checkOutDate,
         };
+
+        return enhancedBooking;
       });
 
       const totalRevenue = enhancedBookings.reduce(
@@ -1351,7 +1593,7 @@ export const getBookingDetailsOfUser = CatchAsyncError(
         currentPage: page,
         totalPages: Math.ceil(totalBookings / limit),
         totalRevenue,
-        bookings: enhancedBookings, // Return enhanced bookings with IDs
+        bookings: enhancedBookings,
       });
     } catch (error: any) {
       console.error("Error in getBookingDetailsOfUser:", error);
@@ -1359,6 +1601,7 @@ export const getBookingDetailsOfUser = CatchAsyncError(
     }
   }
 );
+
 
 const validatePagination = (page: number, limit: number): void => {
   if (isNaN(page) || page < 1) {
@@ -1517,14 +1760,14 @@ export const getAllHotelsByRole = CatchAsyncError(
 
 export class BookingController {
 
-  private bookingService: BookingService;
+  private amendBookingService: AmendBookingService;
   private bookAgainService: BookAgainAvailabilityService;
 
-  constructor(bookingService: BookingService, bookAgainService: BookAgainAvailabilityService) {
-    if (!bookingService || !bookAgainService) {
+  constructor(amendBookingService: AmendBookingService, bookAgainService: BookAgainAvailabilityService) {
+    if (!amendBookingService || !bookAgainService) {
       throw new Error("BookingService and BookAgainAvailabilityService required");
     }
-    this.bookingService = bookingService;
+    this.amendBookingService = amendBookingService;
     this.bookAgainService = bookAgainService;
   }
 
@@ -1557,7 +1800,7 @@ export class BookingController {
         guests,
       } = req.body;
 
-      const { categorizedGuests, ageCodeSummary } = await this.bookingService.updateBooking(userId, reservationId, {
+      const { categorizedGuests, ageCodeSummary } = await this.amendBookingService.updateBooking(userId, reservationId, {
         checkInDate,
         checkOutDate,
         hotelCode,
@@ -1630,4 +1873,118 @@ export class BookingController {
       });
     }
   }
+
+  async reservationWithPayAtHotel(req: any, res: Response, next: NextFunction) {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+
+    const {
+      provider,
+      coupon,
+      checkInDate,
+      checkOutDate,
+      hotelCode,
+      hotelName,
+      ratePlanCode,
+      numberOfRooms,
+      roomTypeCode,
+      roomTotalPrice,
+      currencyCode,
+      email,
+      phone,
+      guests,
+      paymentInfo,
+    } = req.body;
+
+    const requiredFields = {
+      provider,
+      coupon,
+      checkInDate,
+      checkOutDate,
+      hotelCode,
+      hotelName,
+      ratePlanCode,
+      numberOfRooms,
+      roomTypeCode,
+      roomTotalPrice,
+      currencyCode,
+      email,
+      phone,
+      guests,
+      paymentInfo,
+    };
+
+    const missingFields = Object.entries(requiredFields)
+      .filter(([_, value]) => value === undefined || value === null || value === '')
+      .map(([key]) => key);
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        message: `Missing required fields: ${missingFields.join(', ')}`,
+      });
+    }
+
+    if (coupon && (!Array.isArray(coupon) || coupon.some((c: any) => typeof c !== 'string'))) {
+      return res.status(400).json({
+        message: 'Coupon field must be an array of strings',
+      });
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const checkIn = new Date(checkInDate);
+    const checkOut = new Date(checkOutDate);
+
+    if (checkIn < today || checkOut <= checkIn) {
+      return res.status(400).json({
+        message: 'Check-in date cannot be in the past or Check-out date must be after check-in date',
+      });
+    }
+
+    if (!Array.isArray(guests) || guests.length === 0) {
+      return res.status(400).json({ message: 'Guest details are required' });
+    }
+
+    const reservationInput = {
+      bookingDetails: {
+        provider,
+        coupon,
+        reservationId: '',
+        paymentMethod: 'payAtHotel',
+        userId,
+        checkInDate,
+        checkOutDate,
+        hotelCode,
+        hotelName,
+        ratePlanCode,
+        roomTypeCode,
+        numberOfRooms,
+        roomTotalPrice,
+        currencyCode,
+        guests,
+        email,
+        phone,
+      },
+      ageCodeSummary: { '7': 0, '8': 0, '10': 0 },
+    };
+
+    try {
+      const reservationService = new ReservationService();
+      const result = await reservationService.createReservation(reservationInput, paymentInfo.paymentMethodId);
+      return res.status(200).json({
+        message: 'Reservation received',
+        numberOfRooms,
+        roomTotalPrice,
+        guests: result.categorizedGuests,
+        ageCodeSummary: result.ageCodeSummary,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: error.message || 'Failed to process reservation',
+      });
+    }
+  };
+
 }

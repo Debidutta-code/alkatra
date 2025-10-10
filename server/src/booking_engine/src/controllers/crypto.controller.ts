@@ -51,58 +51,57 @@ export const getPaymentSuccessResponse = CatchAsyncError(async (req: Authenticat
 });
 
 
-export const getCryptoDetails = CatchAsyncError( async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-      const collection = mongoose.connection.collection("CryptoDetails");
-      const { token } = req.query;
+export const getCryptoDetails = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const collection = mongoose.connection.collection("CryptoDetails");
+    const { token } = req.query;
 
-      if (token) {
-        const tokenDoc = await collection.findOne(
-          { name: token },
-          {
-            projection: {
-              _id: 0,
-              "networks.name": 1,
-              "networks.imageUrl": 1,
-              "networks.contractAddress": 1,
-              "networks.chainId": 1
-            },
-          }
-        );
-
-        if (!tokenDoc) {
-          return res.status(404).json({
-            message: `Token '${token}' not found`,
-          });
+    if (token) {
+      const tokenDoc = await collection.findOne(
+        { name: token },
+        {
+          projection: {
+            _id: 0,
+            "networks.name": 1,
+            "networks.imageUrl": 1,
+            "networks.contractAddress": 1,
+            "networks.chainId": 1
+          },
         }
+      );
 
-        return res.status(200).json({
-          message: "Network details fetched successfully",
-          data: tokenDoc.networks,
+      if (!tokenDoc) {
+        return res.status(404).json({
+          message: `Token '${token}' not found`,
         });
       }
 
-      const allTokens = await collection
-        .find({}, { projection: { _id: 0, name: 1, imageUrl: 1 } })
-        .toArray();
-
       return res.status(200).json({
-        success: true,
-        message: "Token list fetched successfully",
-        data: allTokens,
+        message: "Network details fetched successfully",
+        data: tokenDoc.networks,
       });
-    } catch (error) {
-      return next(new ErrorHandler("Internal server error", 500));
     }
+
+    const allTokens = await collection
+      .find({}, { projection: { _id: 0, name: 1, imageUrl: 1 } })
+      .toArray();
+
+    return res.status(200).json({
+      success: true,
+      message: "Token list fetched successfully",
+      data: allTokens,
+    });
+  } catch (error) {
+    return next(new ErrorHandler("Internal server error", 500));
   }
+}
 );
 
 
 export const currencyConversion = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  console.log("Entered in CURRENCY CONVERSION controller");
   try {
     const { currency, amount } = req.body;
-    console.log(`The data get from UI for currency conversion is:\n#################### ${JSON.stringify(req.body)}`);
+
     const requiredFields = { currency, amount };
 
     const missingFields = Object.entries(requiredFields)
@@ -119,12 +118,12 @@ export const currencyConversion = CatchAsyncError(async (req: AuthenticatedReque
       convertedAmount = amount || 0;
       console.log(`The currency is ${currency} and amount is ${amount}`);
       return res.status(200).json({
-      message: "Currency conversion successful",
-      data: {
-        convertedAmount : amount,
-        conversionRate: 0,
-      },
-    });
+        message: "Currency conversion successful",
+        data: {
+          convertedAmount: amount,
+          conversionRate: 0,
+        },
+      });
     }
 
     let conversionRate = parseFloat(process.env.CURRENCY_CONVERSION_BASE_RATE || "0");
@@ -136,7 +135,6 @@ export const currencyConversion = CatchAsyncError(async (req: AuthenticatedReque
     }
 
     convertedAmount = parseFloat((parseFloat(amount) / conversionRate).toFixed(2));
-    console.log(`The converted amount is ${convertedAmount} and conversion rate is ${conversionRate}`);
 
     return res.status(200).json({
       message: "Currency conversion successful",
@@ -158,7 +156,7 @@ export const cryptoPaymentInitiate = CatchAsyncError(async (req: AuthenticatedRe
       return res.status(401).json({ message: "User ID not found in token" });
     }
 
-    const { token, blockchain, currency, amount } = req.body;
+    const { token, blockchain, currency, amount, provider, coupon } = req.body;
     const requiredFields = { token, blockchain, currency, amount, userId };
 
     const missingFields = Object.entries(requiredFields)
@@ -203,6 +201,8 @@ export const cryptoPaymentInitiate = CatchAsyncError(async (req: AuthenticatedRe
 
     const cryptoPaymentDetails = new CryptoPaymentDetails({
       customer_id: new Types.ObjectId(userId),
+      provider,
+      coupon,
       token,
       blockchain,
       payment_id: uuidv4(),
@@ -242,7 +242,7 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
     phone,
     guests
   } = req.body;
-  console.log(`The guest details we get is:\n#################### ${JSON.stringify(req.body)}`);
+
   const requiredFields = {
     checkInDate,
     checkOutDate,
@@ -267,7 +267,7 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
       message: `Missing required fields: ${missingFields.join(", ")}`,
     });
   }
-  console.log(`The amount in crypto guest details storage is ${roomTotalPrice}`);
+
   if (roomTotalPrice !== convertedAmount) {
     return res.status(400).json({
       message: "Amount not matched in guest details initialize",
@@ -313,7 +313,7 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
       ageCodeSummary: ageCodeCount,
       numberOfRooms,
       totalAmount: roomTotalPrice,
-      // currencyCode: currencyCode.toUpperCase() || "USD",
+      currencyCode: currencyCode.toUpperCase() || "USD",
       userId,
       status: "Processing",
       createdAt: new Date(),
@@ -342,7 +342,7 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
 export const pushCryptoPaymentDetails = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const { senderWalletAddress, token, blockChain, amount, txHash } = req.body;
-    console.log("Received data:", { token, blockChain, amount, txHash });
+
     const requiredFields = { token, blockChain, amount, txHash };
 
     const missingFields = Object.entries(requiredFields)
@@ -361,8 +361,6 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
       txHash,
       senderWalletAddress,
     });
-   
-    console.log(">>>>>>>> CryptoPaymentLog:", cryptoPaymentLog,"parsedamount is ", parseFloat(amount));
 
     await cryptoPaymentLog.save();
 
@@ -374,7 +372,6 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
     });
 
     if (payment) {
-      // await notification.sendCryptoPaymentNotification(payment.customer_id.toString(), parseFloat(amount), txHash)
       console.log(`The payment details we get is ${payment}`);
       console.log("----------11111111111111111111-------------------------")
     }
@@ -408,6 +405,8 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
     console.log("Payment and guest details updated successfully");
 
     const cryptoPaymentDetails = await createReservationWithCryptoPayment({
+      provider: payment.provider,
+      coupon: payment.coupon,
       reservationId: guestDetails.reservationId,
       userId: guestDetails?.userId ?? "",
       checkInDate: guestDetails.checkInDate,
@@ -423,9 +422,9 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
       phone: guestDetails.phone,
       guests: guestDetails.guestDetails ?? [],
     });
+
     if (cryptoPaymentDetails) {
-      await notification.sendCryptoPaymentNotification(payment.customer_id.toString(), parseFloat(amount), txHash)
-      console.log("----------11111111111111111111-------------------------")
+      const notificationSend = notification.sendCryptoPaymentNotification(payment.customer_id.toString(), parseFloat(amount), txHash);
     }
 
     return res.status(200).json({

@@ -107,7 +107,7 @@ export class TaxGroupController implements ITaxGroupController {
             return res.status(200).json({ success: true, data: taxGroup });
         } catch (error: any) {
             console.error("Failed to fetch tax group by ID at Controller Layer:", error);
-            if (error.message === "Tax group not found") {
+            if (error.message === "Tax group not found - 1") {
                 return res.status(404).json({ error: error.message });
             }
             return res.status(500).json({ success: false, message: "Unable to fetch tax group at this momment." });
@@ -156,7 +156,7 @@ export class TaxGroupController implements ITaxGroupController {
             if (
                 error.message === "Update payload cannot be empty." ||
                 error.message === "Hotel ID is required." ||
-                error.message === "Tax group not found" ||
+                error.message === "Tax group not found - 2" ||
                 error.message === "You are not the owner of this hotel." ||
                 error.message === "One or more tax rules do not belong to the specified hotel." ||
                 error.message === "Tax group name cannot be the same."
@@ -190,7 +190,7 @@ export class TaxGroupController implements ITaxGroupController {
         } 
         catch (error: any) {
             console.error("Failed to delete tax group at Controller Layer:", error);
-            if (error.message === "Tax group not found") {
+            if (error.message === "Tax group not found - 3") {
                 return res.status(404).json({ error: error.message });
             }
             return res.status(500).json({ error: "Unable to delete tax group at this momment." });

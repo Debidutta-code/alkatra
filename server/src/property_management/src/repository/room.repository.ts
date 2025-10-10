@@ -24,7 +24,7 @@ export class RoomRepository {
         endDate: Date,
         numberOfRooms: number
     ) {
-        console.log("The data we get from SERVICE", { hotelCode, roomTypes, startDate, endDate, numberOfRooms });
+        
 
         return Inventory.find({
             hotelCode,

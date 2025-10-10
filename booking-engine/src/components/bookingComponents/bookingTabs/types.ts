@@ -14,6 +14,19 @@ export interface GuestDetails {
   dob?: string;
 }
 
+// Coupon details interface
+export interface CouponDetails {
+  code: string;
+  details: {
+    discountType?: 'percentage' | 'fixed';
+    discountValue?: number;
+    minBookingAmount?: number;
+    maxDiscountAmount?: number;
+    discountPercentage?: number;
+    source?: string;
+  };
+}
+
 // Matches backend response!
 export interface Booking {
   paymentType: string;
@@ -37,6 +50,8 @@ export interface Booking {
   createdAt: string;
   status?: string;
   __v?: number;
+  coupon?: string[];
+  couponDetails?: CouponDetails[];
 }
 
 export interface PaginationResponse {

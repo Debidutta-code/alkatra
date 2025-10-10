@@ -1066,8 +1066,13 @@
         "title": "Price Details",
         "roomRate": "Room Rate",
         "perNight": " / night",
-        "total": "Total",
-        "payAtHotelInfo": "Your card will be securely stored, but payment will be collected at the hotel."
+        "total": "Total Amount",
+        "payAtHotelInfo": "Your card will be securely stored, but payment will be collected at the hotel.",
+        "originalPrice": "Original Price",
+        "promoApplied": "Promo Code Applied",
+        "removePromo": "Remove Promo Code",
+        "subtotal":"Subtotal",
+        "discount":"Discount"
       },
       "securityBadges": {
         "securePayments": "Secure payments",
@@ -1154,6 +1159,7 @@
       "contactSupportButton": "Contact Support",
       "exploreMoreHotels": "Explore more hotel options",
       "missingBookingDetailsToast": "Missing booking details. Unable to download confirmation.",
+      "missingBookingDetails": "Booking details are missing. Please contact support if the issue persists.",
       "PDF": {
         "bookingConfirmation": "BOOKING CONFIRMATION",
         "reservationConfirmed": "Your reservation has been confirmed",
@@ -1184,7 +1190,11 @@
         "contactForChanges": "• For any changes or cancellations, contact us immediately",
         "contactInfo": "For assistance, contact us at: bussines.alhajz@gmail.com",
         "thankYou": "Thank you for choosing our service. We look forward to serving you!"
-      }
+      },
+      "hotelLabel": "Hotel",
+      "roomTypeLabel": "Room Type",
+      "originalPrice": "Original Price",
+      "promoApplied": "Promo Code Applied"
     },
     "PaymentProgress": {
       "title": "Crypto Payment Gateway",
@@ -1211,6 +1221,7 @@
       "returnHome": "Return Home",
       "paymentSuccessful": "Payment Successful!",
       "paymentConfirmed": "Your payment has been confirmed.",
+      "paymentInformation": "Payment Information",
       "status": {
         "pending": "Waiting for Payment",
         "completed": "Payment Confirmed",
@@ -1267,6 +1278,18 @@
       "common": {
         "important": "Important"
       }
+    },
+    "promoCode": {
+      "label": "Have a promo code?",
+      "placeholder": "Enter code",
+      "apply": "Apply",
+      "applied": "Applied",
+      "success": "Promo code applied! You saved {{discount}}",
+      "invalid": "Invalid or expired promo code",
+      "genericError": "Failed to apply promo code. Please try again.",
+      "loginRequired": "Please log in to use promo codes",
+      "viewAvailable": "View available promo codes",
+      "noAvailable": "No promo codes available at this time"
     }
   },
   "GuestBox": {
