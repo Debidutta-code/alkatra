@@ -24,6 +24,7 @@ export function PropertyDetails({
     property_contact: false,
   });
   const [emailErrorMessage, setEmailErrorMessage] = useState('');
+  const [phoneErrorMessage, setPhoneErrorMessage] = useState('');
 
   // Email validation function
   const validateEmail = (email: string): { isValid: boolean, errorMessage: string } => {
@@ -35,6 +36,21 @@ export function PropertyDetails({
     const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email)) {
       return { isValid: false, errorMessage: 'Please enter a valid email address' };
+    }
+
+    return { isValid: true, errorMessage: '' };
+  };
+
+  // Phone validation function
+  const validatePhone = (phone: string): { isValid: boolean, errorMessage: string } => {
+    if (!phone || phone.trim() === '') {
+      return { isValid: false, errorMessage: 'Phone number is required' };
+    }
+
+    const digitsOnly = phone.replace(/\D/g, '');
+
+    if (digitsOnly.length < 10) {
+      return { isValid: false, errorMessage: 'Please enter a valid phone number' };
     }
 
     return { isValid: true, errorMessage: '' };
@@ -54,6 +70,15 @@ export function PropertyDetails({
       setEmailErrorMessage(emailValidation.errorMessage);
     } else {
       setEmailErrorMessage('');
+    }
+
+    // Perform specific phone validation
+    const phoneValidation = validatePhone(editedProperty.property_contact);
+    if (!phoneValidation.isValid) {
+      newErrors.property_contact = true;
+      setPhoneErrorMessage(phoneValidation.errorMessage);
+    } else {
+      setPhoneErrorMessage('');
     }
 
     setErrors(newErrors);
@@ -97,6 +122,17 @@ export function PropertyDetails({
     handleInputChange?.(syntheticEvent);
   };
 
+  // Handler for phone input changes
+  const handlePhoneChange = (phone: string) => {
+    const syntheticEvent = {
+      target: {
+        name: 'property_contact',
+        value: phone
+      }
+    } as React.ChangeEvent<HTMLInputElement>;
+    handleInputChange?.(syntheticEvent);
+  };
+
   return (
     <Card className="w-full shadow-sm hover:shadow-md transition-shadow duration-300">
       <CardHeader className="flex flex-row items-center justify-between border-b pb-3">
@@ -131,7 +167,7 @@ export function PropertyDetails({
       <CardContent className="pt-0">
         {editMode ? (
           <div className="pt-4 space-y-6">
-            {/* Responsive field layout: stacked on small screens, side-by-side on md+ */}
+            {/* Property Name Field */}
             <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-4 sm:gap-12 items-center">
               <label className="text-sm text-gray-500 sm:self-start">
                 Property Name <span className="text-red-500">*</span>
@@ -150,6 +186,7 @@ export function PropertyDetails({
               </div>
             </div>
 
+            {/* Property Email Field */}
             <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-4 sm:gap-12 items-center">
               <label className="text-sm text-gray-500 sm:self-start">
                 Property Email <span className="text-red-500">*</span>
@@ -168,7 +205,7 @@ export function PropertyDetails({
               </div>
             </div>
 
-
+            {/* Property Contact Field */}
             <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-4 sm:gap-12 items-center">
               <label className="text-sm text-gray-500 sm:self-center whitespace-nowrap">
                 Property Contact <span className="text-red-500">*</span>
@@ -176,16 +213,12 @@ export function PropertyDetails({
               <div className="space-y-1">
                 <PhoneInput
                   country={'in'}
-                  value={editedProperty.property_contact || ''}
-                  onChange={(phone) => {
-                    const syntheticEvent = {
-                      target: {
-                        name: 'property_contact',
-                        value: phone,
-                      },
-                    } as React.ChangeEvent<HTMLInputElement>;
-                    handleInputChange?.(syntheticEvent);
-                  }}
+                  value={editedProperty.property_contact || ""}
+                  onChange={handlePhoneChange}
+                  placeholder="Enter phone number"
+                  enableSearch={true}
+                  searchPlaceholder="Search countries..."
+                  searchNotFound="No countries found"
                   inputStyle={{
                     width: '100%',
                     height: '40px',
@@ -193,11 +226,6 @@ export function PropertyDetails({
                     fontSize: '14px',
                     border: errors.property_contact ? '1px solid #ef4444' : '1px solid #d1d5db',
                     borderRadius: '6px',
-                    backgroundColor: 'white',
-                    color: '#111827'
-                  }}
-                  containerStyle={{
-                    width: '100%'
                   }}
                   buttonStyle={{
                     borderRadius: '6px 0 0 6px',
@@ -205,39 +233,21 @@ export function PropertyDetails({
                     backgroundColor: '#f9fafb'
                   }}
                   dropdownStyle={{
-                    backgroundColor: 'white',
-                    color: '#111827',
-                    border: '1px solid #d1d5db',
                     borderRadius: '6px',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                    maxHeight: '200px',
-                    overflowY: 'auto'
-                  }}
-                  searchStyle={{
-                    margin: '0 8px 8px 8px',
-                    padding: '8px',
-                    fontSize: '14px',
                     border: '1px solid #d1d5db',
-                    borderRadius: '4px',
-                    outline: 'none',
-                    backgroundColor: 'white'
                   }}
-                  placeholder="Enter phone number"
-                  enableSearch={true}
-                  disableSearchIcon={false}
-                  searchPlaceholder="Search countries..."
-                  countryCodeEditable={false}
-                  excludeCountries={[]}
-                  onlyCountries={[]}
+                  containerStyle={{
+                    width: '100%',
+                  }}
+                  specialLabel=""
                 />
                 {errors.property_contact && (
-                  <p className="text-red-500 text-xs mt-1">
-                    Contact must be a valid phone number with country code
-                  </p>
+                  <p className="text-red-500 text-xs mt-1">{phoneErrorMessage}</p>
                 )}
               </div>
             </div>
 
+            {/* Description Field */}
             <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-4 sm:gap-12 items-start">
               <label className="text-sm text-gray-500 pt-2">
                 Description
