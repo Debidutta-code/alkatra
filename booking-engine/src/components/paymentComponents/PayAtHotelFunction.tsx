@@ -181,7 +181,7 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
         numberOfRooms: bookingDetails.rooms || 1,
         roomTypeCode: bookingDetails.roomType || "",
         roomTotalPrice: bookingDetails.amount,
-        totalTax: bookingDetails.totalTax,
+        taxValue: bookingDetails.totalTax,
         currencyCode: bookingDetails.currency?.toUpperCase() || " ",
         email: bookingDetails.email,
         phone: bookingDetails.phone,

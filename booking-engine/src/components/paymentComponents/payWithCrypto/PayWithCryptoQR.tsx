@@ -198,7 +198,7 @@ const PayWithCryptoQR: React.FC<PayWithCryptoQRProps> = ({ bookingDetails, onCon
           amount: convertedAmount,
           provider: "web",
           coupon: promoCode ? [promoCode] : [],
-          totalTax: bookingDetails.totalTax,
+          taxValue: bookingDetails.totalTax,
         },
         {
           headers: {
