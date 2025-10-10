@@ -73,7 +73,7 @@ export class PromoCodeService {
         throw new Error("Promocode details and User ID are required");
       }
 
-      const requiredFields = ['propertyId', 'propertyCode', 'discountType', 'discountValue', 'validFrom', 'validTo', 'useLimit'];
+      const requiredFields = ['propertyId', 'propertyCode', 'discountType', 'discountValue', 'validFrom', 'validTo'];
       for (const field of requiredFields) {
         if (!promoCodeCreateRequest[field as keyof IPromoCodeRepository]) {
           throw new Error(`${field} is required`);
@@ -390,27 +390,29 @@ export class PromoCodeService {
       }
 
       // Check usage limits
-      if (promocode.currentUsage >= promocode.useLimit) {
-        return { isValid: false, message: "Promocode usage limit reached" };
-      }
 
-      const usageCheck = await this.promoCodeRepository.canUserUsePromocode(
-        promocode._id,
-        new Types.ObjectId(customerId)
-      );
+      /**
+       * This part is usesd to check if the promocode has reached its overall usage limit
+       * Due to Asish sir's request, we are NOT checking this here
+       * So I(SADASIBA) am commenting this part of code
+       */
 
-      if (!usageCheck.canUse) {
-        return { isValid: false, message: usageCheck.reason };
-      }
+      // if (promocode.currentUsage >= promocode.useLimit) {
+      //   return { isValid: false, message: "Promocode usage limit reached" };
+      // }
 
-      console.log("The booking amount received is: ", bookingAmount);
-      console.log("The promocode details are: ", promocode);
+      // const usageCheck = await this.promoCodeRepository.canUserUsePromocode(
+      //   promocode._id,
+      //   new Types.ObjectId(customerId)
+      // );
+
+      // if (!usageCheck.canUse) {
+      //   return { isValid: false, message: usageCheck.reason };
+      // }
 
       const discountAmount = this.calculateDiscount(promocode, bookingAmount);
-      console.log("The calculated discount amount is: ", discountAmount);
 
       const finalAmount = bookingAmount - discountAmount;
-      console.log("The final amount after discount is: ", finalAmount);
 
       return {
         isValid: true,
@@ -522,7 +524,7 @@ export class PromoCodeService {
         property
       );
 
-      console.log("The validation details:", validationResult);
+      
 
       if (!validationResult.isValid || !validationResult.promocode) {
         await session.abortTransaction();
@@ -532,7 +534,7 @@ export class PromoCodeService {
       const promocode = validationResult.promocode;
       const discountAmount = validationResult.discountAmount || 0;
 
-      console.log(`Applying promocode ${code}. Current usage: ${promocode.currentUsage}`);
+      
 
       // Update promocode usage - THIS INCREASES THE COUNTER
       const updatedPromocode = await Promocode.findByIdAndUpdate(
@@ -550,7 +552,7 @@ export class PromoCodeService {
         return { success: false, message: "Failed to update promocode usage" };
       }
 
-      console.log(`Promocode usage updated to: ${updatedPromocode.currentUsage}`);
+      
 
       // Create promocode usage record
       const promocodeUsage = new PromocodeUsage({

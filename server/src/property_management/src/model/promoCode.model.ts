@@ -82,9 +82,10 @@ const PromocodeSchema = new Schema<IPromocode>(
     },
     useLimit: {
       type: Number,
-      required: [true, "Total usage limit is required"]
+      required: [false, "Total usage limit is required"]
     },
     usageLimitPerUser: {
+      required: false,
       type: Number,
       default: 1
     },
