@@ -124,13 +124,25 @@ export const PromoCodeForm: React.FC<PromoCodeFormProps> = ({
         }
 
         // Date validation
+        const today = new Date().toISOString().split('T')[0];
+
+        const formatDate = (dateStr: string) => {
+            const [year, month, day] = dateStr.split('-');
+            return `${day}/${month}/${year}`;
+        };
+
         if (!formData.validFrom) {
             newErrors.validFrom = 'Start date is required';
+        } else if (formData.validFrom < today) {
+            newErrors.validFrom = `Value must be ${formatDate(today)} or later`;
         }
+
         if (!formData.validTo) {
             newErrors.validTo = 'End date is required';
-        }
-        if (formData.validFrom && formData.validTo && formData.validFrom >= formData.validTo) {
+        } else if (formData.validTo < (formData.validFrom || today)) {
+            const minDate = formData.validFrom || today;
+            newErrors.validTo = `Value must be ${formatDate(minDate)} or later`;
+        } else if (formData.validFrom && formData.validTo && formData.validFrom >= formData.validTo) {
             newErrors.validTo = 'End date must be after start date';
         }
 
@@ -290,7 +302,7 @@ export const PromoCodeForm: React.FC<PromoCodeFormProps> = ({
                                 <p className="text-xs text-red-500">{errors.discountValue}</p>
                             )}
                         </div>
-                        
+
                         {/* Min Booking Amount */}
                         <div className="space-y-2">
                             <Label htmlFor="minBookingAmount" className="text-tripswift-black font-tripswift-medium">
@@ -351,7 +363,6 @@ export const PromoCodeForm: React.FC<PromoCodeFormProps> = ({
                                 value={formData.validFrom}
                                 onChange={handleChange}
                                 className={`border-border focus:border-tripswift-blue focus:ring-tripswift-blue [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-3 [&::-webkit-calendar-picker-indicator]:cursor-pointer ${errors.validFrom ? 'border-red-500' : ''}`}
-                                min={new Date().toISOString().split('T')[0]}
                             />
                             {errors.validFrom && (
                                 <p className="text-xs text-red-500">{errors.validFrom}</p>
@@ -370,7 +381,6 @@ export const PromoCodeForm: React.FC<PromoCodeFormProps> = ({
                                 value={formData.validTo}
                                 onChange={handleChange}
                                 className={`border-border focus:border-tripswift-blue focus:ring-tripswift-blue [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-3 [&::-webkit-calendar-picker-indicator]:cursor-pointer ${errors.validTo ? 'border-red-500' : ''}`}
-                                min={formData.validFrom || new Date().toISOString().split('T')[0]}
                             />
                             {errors.validTo && (
                                 <p className="text-xs text-red-500">{errors.validTo}</p>
@@ -397,7 +407,7 @@ export const PromoCodeForm: React.FC<PromoCodeFormProps> = ({
                                 <p className="text-xs text-red-500">{errors.useLimit}</p>
                             )}
                             <p className="text-xs text-muted-foreground">
-                                Maximum number of times this promo can be used in total
+                                Maximum number of times this promo code can be used in total
                             </p>
                         </div>
 
