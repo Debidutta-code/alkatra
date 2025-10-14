@@ -10,6 +10,8 @@ import { BookingController } from "./bookings.controller";
 import { NotificationService } from "../../../notification/src/service/notification.service";
 import { BookAgainAvailabilityService, AmendBookingService } from "../services";
 import { PromoCodeService } from "../../../property_management/src/service";
+import { Promocode } from "../../../property_management/src/model";
+import CouponModel from "../../../coupon_management/model/couponModel";
 
 
 const amendBookingService = AmendBookingService.getInstance();
@@ -156,7 +158,6 @@ export const currencyConversion = CatchAsyncError(async (req: AuthenticatedReque
   }
 });
 
-
 export const cryptoPaymentInitiate = CatchAsyncError(async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id;
@@ -177,10 +178,17 @@ export const cryptoPaymentInitiate = CatchAsyncError(async (req: AuthenticatedRe
       });
     }
 
-    if (amount !== convertedAmount) {
-      return res.status(400).json({
-        message: "Amount not matched in crypto payment initiation",
-      });
+    let couponCodes: string[] = [];
+    let couponDetails: any[] = [];
+
+    // Only extract and check coupons if coupon field is provided
+    if (coupon !== undefined && coupon !== null && coupon !== '') {
+      couponCodes = extractCouponCodes(coupon);
+
+      // Only get coupon details if we have valid coupon codes
+      if (couponCodes.length > 0) {
+        couponDetails = await getCouponDetails(couponCodes);
+      }
     }
 
     const baseAmount = parseFloat(amount);
@@ -210,7 +218,7 @@ export const cryptoPaymentInitiate = CatchAsyncError(async (req: AuthenticatedRe
     const cryptoPaymentDetails = new CryptoPaymentDetails({
       customer_id: new Types.ObjectId(userId),
       provider,
-      coupon,
+      coupon: couponCodes, // Store extracted coupon codes (empty array if no coupons)
       taxValue: taxValue || 0,
       token,
       blockchain,
@@ -220,16 +228,22 @@ export const cryptoPaymentInitiate = CatchAsyncError(async (req: AuthenticatedRe
     });
 
     await cryptoPaymentDetails.save();
-    convertedAmount = finalAmount;
+
+    // Convert to plain object to add extra field
+    const paymentResponse = cryptoPaymentDetails.toObject() as typeof cryptoPaymentDetails & { couponDetails?: any[] };
+
+    // Add couponDetails field to the response
+    paymentResponse.couponDetails = couponDetails;
 
     return res.status(200).json({
       message: "Crypto payment initiated successfully",
-      data: cryptoPaymentDetails,
+      data: paymentResponse
     });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error", error });
   }
 });
+
 
 export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   const userId = req.user?.id;
@@ -505,3 +519,75 @@ export const getInitiatedPaymentDetails = CatchAsyncError(async (req: Authentica
     });
   }
 });
+
+
+
+/**
+ * Helper function to extract coupon codes
+ */
+
+/**
+ * Helper function to extract coupon codes
+ */
+const extractCouponCodes = (couponField: any): string[] => {
+  if (!couponField) return [];
+  if (Array.isArray(couponField)) {
+    return couponField
+      .filter(code => code && typeof code === 'string' && code.trim() !== '')
+      .map(code => code.trim());
+  }
+  if (typeof couponField === 'string' && couponField.trim() !== '') {
+    return [couponField.trim()];
+  }
+  return [];
+};
+
+/**
+ * Helper function to get coupon details from both models
+ * @param couponCodes 
+ * @returns 
+ */
+const getCouponDetails = async (couponCodes: string[]) => {
+  if (couponCodes.length === 0) return [];
+
+  const uniqueCouponCodes = [...new Set(couponCodes)];
+
+  // Search in both Promocode and CouponModel collections
+  const [promoCodes, couponModels] = await Promise.all([
+    Promocode.find({
+      code: { $in: uniqueCouponCodes }
+    }).select('code discountType discountValue minBookingAmount maxDiscountAmount validFrom validTo isActive'),
+
+    CouponModel.find({
+      code: { $in: uniqueCouponCodes }
+    }).select('code discountPercentage')
+  ]);
+
+  const couponDetails = [];
+
+  // Add promocodes to results
+  promoCodes.forEach(coupon => {
+    couponDetails.push({
+      code: coupon.code,
+      discountType: coupon.discountType,
+      discountValue: coupon.discountValue,
+      minBookingAmount: coupon.minBookingAmount,
+      maxDiscountAmount: coupon.maxDiscountAmount,
+      validFrom: coupon.validFrom,
+      validTo: coupon.validTo,
+      isActive: coupon.isActive,
+      source: 'promocode'
+    });
+  });
+
+  // Add coupon models to results
+  couponModels.forEach(coupon => {
+    couponDetails.push({
+      code: coupon.code,
+      discountPercentage: coupon.discountPercentage,
+      source: 'couponModel'
+    });
+  });
+
+  return couponDetails;
+};
