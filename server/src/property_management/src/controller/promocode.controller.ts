@@ -370,12 +370,12 @@ export class PromoCodeController {
         });
       }
 
-      console.log("&&&&&&&&&&&& Request body for validatePromocode:", req.body);
+      
 
       const { code, bookingAmount, propertyCode, propertyId, apply = false } = req.body;
-      console.log('The booking amount received is: ', bookingAmount);
+      const codeName = code;
 
-      if (!code || !bookingAmount) {
+      if (!codeName || !bookingAmount) {
         return res.status(400).json({
           success: false,
           message: "Promocode and booking amount are required",
@@ -394,7 +394,7 @@ export class PromoCodeController {
       if (apply === true) {
         // APPLY THE PROMOCODE (validates + increases usage)
         result = await this.promoCodeService.applyPromocode(
-          code,
+          codeName,
           authData.id,
           parseFloat(bookingAmount),
           { propertyCode, propertyId }
@@ -422,7 +422,7 @@ export class PromoCodeController {
       } else {
         // ONLY VALIDATE (doesn't increase usage)
         const validationResult = await this.promoCodeService.validatePromocodeForUse(
-          code,
+          codeName,
           authData.id,
           parseFloat(bookingAmount),
           { propertyCode, propertyId }

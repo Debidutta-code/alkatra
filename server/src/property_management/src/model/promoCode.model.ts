@@ -43,6 +43,7 @@ const PromocodeSchema = new Schema<IPromocode>(
     },
     codeName: {
       type: String,
+      unique: true,
       required: [true, "Promocode name is required"],
     },
     code: {
