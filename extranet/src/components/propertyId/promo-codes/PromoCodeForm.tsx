@@ -295,6 +295,11 @@ export const PromoCodeForm: React.FC<PromoCodeFormProps> = ({
                                 max={formData.discountType === 'percentage' ? '100' : undefined}
                                 value={formData.discountValue || ''}
                                 onChange={handleChange}
+                                onKeyDown={(e) => {
+                                    if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                                        e.preventDefault();
+                                    }
+                                }}
                                 className={`border-border focus:border-tripswift-blue focus:ring-tripswift-blue ${errors.discountValue ? 'border-red-500' : ''}`}
                                 placeholder={formData.discountType === 'percentage' ? '10' : '200'}
                             />
@@ -317,6 +322,11 @@ export const PromoCodeForm: React.FC<PromoCodeFormProps> = ({
                                 step="1"
                                 value={formData.minBookingAmount || ''}
                                 onChange={handleChange}
+                                onKeyDown={(e) => {
+                                    if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                                        e.preventDefault();
+                                    }
+                                }}
                                 className={`border-border focus:border-tripswift-blue focus:ring-tripswift-blue ${errors.minBookingAmount ? 'border-red-500' : ''}`}
                                 placeholder="0"
                             />
@@ -339,6 +349,11 @@ export const PromoCodeForm: React.FC<PromoCodeFormProps> = ({
                                     step="1"
                                     value={formData.maxDiscountAmount || ''}
                                     onChange={handleChange}
+                                    onKeyDown={(e) => {
+                                        if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                                            e.preventDefault();
+                                        }
+                                    }}
                                     className={`border-border focus:border-tripswift-blue focus:ring-tripswift-blue ${errors.maxDiscountAmount ? 'border-red-500' : ''}`}
                                     placeholder="500"
                                 />
