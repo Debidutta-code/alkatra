@@ -209,8 +209,16 @@ export const PromoCodeForm: React.FC<PromoCodeFormProps> = ({
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={handleClose}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-tripswift-off-white">
+        <Dialog open={isOpen} onOpenChange={(open) => {
+            if (!open) {
+                handleClose();
+            }
+        }}>
+            <DialogContent
+                className="max-w-2xl max-h-[90vh] overflow-y-auto bg-tripswift-off-white"
+                onPointerDownOutside={(e) => e.preventDefault()}
+                onEscapeKeyDown={(e) => e.preventDefault()}
+            >
                 <DialogHeader className="border-b border-border pb-4">
                     <DialogTitle className="text-tripswift-black font-tripswift-semibold text-xl">
                         {initialData ? 'Edit Promo Code' : 'Create New Promo Code'}
@@ -377,6 +385,7 @@ export const PromoCodeForm: React.FC<PromoCodeFormProps> = ({
                                 type="date"
                                 value={formData.validFrom}
                                 onChange={handleChange}
+                                min={new Date().toISOString().split('T')[0]}
                                 className={`border-border focus:border-tripswift-blue focus:ring-tripswift-blue [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-3 [&::-webkit-calendar-picker-indicator]:cursor-pointer ${errors.validFrom ? 'border-red-500' : ''}`}
                             />
                             {errors.validFrom && (
@@ -395,6 +404,7 @@ export const PromoCodeForm: React.FC<PromoCodeFormProps> = ({
                                 type="date"
                                 value={formData.validTo}
                                 onChange={handleChange}
+                                min={formData.validFrom || new Date().toISOString().split('T')[0]}
                                 className={`border-border focus:border-tripswift-blue focus:ring-tripswift-blue [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-3 [&::-webkit-calendar-picker-indicator]:cursor-pointer ${errors.validTo ? 'border-red-500' : ''}`}
                             />
                             {errors.validTo && (
