@@ -529,6 +529,94 @@ export class PromoCodeService {
     }
   }
 
+
+  /**
+   * promocode status update
+   * new function to update promocode status
+   * After reservation is confirmed, we will update the status to 'confirmed'
+   */
+  async updatePromocodeStatus(promo: string, customerId: string): Promise<{ success: boolean; message: string }> {
+    try {
+      // Validate input parameters
+      if (!promo) {
+        return { success: false, message: "Promocode is required" };
+      }
+
+      if (!customerId) {
+        return { success: false, message: "Customer ID is required" };
+      }
+
+      // Build query to find promocode by code or codeName using $or
+      const query: any = {
+        isActive: true,
+        $or: [
+          { codeName: promo },
+          { code: promo }
+        ]
+      };
+
+      // Find the promocode
+      const promocode = await Promocode.findOne(query);
+
+      if (!promocode) {
+        return { success: false, message: "Promo code not found or inactive" };
+      }
+
+      // Check if promocode is still valid (date validation)
+      const now = new Date();
+      if (now < promocode.validFrom) {
+        return { success: false, message: "Promo code is not yet valid" };
+      }
+
+      if (now > promocode.validTo) {
+        return { success: false, message: "Promo code has expired" };
+      }
+
+      // Update promocode usage - increase counter and mark as used by customer
+      const updatedPromocode = await Promocode.findByIdAndUpdate(
+        promocode._id,
+        {
+          $inc: { currentUsage: 1 }, // Increase usage counter
+          $addToSet: { usedBy: new Types.ObjectId(customerId) },
+          $set: { lastUsedAt: new Date() }
+        },
+        { new: true }
+      );
+
+      if (!updatedPromocode) {
+        return { success: false, message: "Failed to update Promo code usage" };
+      }
+
+      // Update promocode usage record status to 'confirmed'
+      const latestUsage = await PromocodeUsage.findOne({
+        promoCodeId: promocode._id,
+        customerId: new Types.ObjectId(customerId)
+      }).sort({ usageDate: -1 }); // Get the most recent usage
+
+      if (latestUsage) {
+        await PromocodeUsage.findByIdAndUpdate(
+          latestUsage._id,
+          {
+            $set: {
+              status: "confirmed",
+              confirmedAt: new Date()
+            }
+          }
+        );
+      }
+
+      console.log(`✅ Promo code ${promocode.codeName} STATUS UPDATED to confirmed. New usage: ${updatedPromocode.currentUsage}`);
+
+      return {
+        success: true,
+        message: "Promo code status updated to confirmed successfully"
+      };
+
+    } catch (error: any) {
+      console.error("❌ Error updating Promo code status:", error);
+      return { success: false, message: "Error updating Promo code status: " + error.message };
+    }
+  }
   /**
    * Calculate discount amount
    */
