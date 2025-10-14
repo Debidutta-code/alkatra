@@ -33,8 +33,7 @@ export class ReservationService {
         return this.ratePlanRepository.getReservationDetails(reservationId);
     };
 
-    async calculateDiscountedPrice(reservationId: string): Promise<number> {
-
+    async calculateDiscountedPrice(reservationId: string, basePrice: number): Promise<number> {
         if (!reservationId) {
             throw new Error("SERVICE: Reservation id not found to get reservation details");
         }
@@ -54,25 +53,33 @@ export class ReservationService {
         for (const result of discountResults) {
             if (!result) continue;
 
-            
             if ('discountPercentage' in result) {
-                
-                totalDiscount += (result as ICouponCode).discountPercentage;
+                // Calculate percentage discount from couponModel
+                const discountPercentage = (result as ICouponCode).discountPercentage;
+                totalDiscount += (basePrice * discountPercentage) / 100;
             } else if ('discountType' in result) {
-                
                 const promo = result as IPromocode;
                 if (promo.discountType === 'percentage' && promo.discountValue) {
-                    if (!promo.minBookingAmount || promo.minBookingAmount <= 0) {
-                        totalDiscount += promo.discountValue;
+                    // Calculate percentage discount from promocode
+                    if (!promo.minBookingAmount || basePrice >= promo.minBookingAmount) {
+                        let discount = (basePrice * promo.discountValue) / 100;
+                        // Apply max discount limit if specified
+                        if (promo.maxDiscountAmount && discount > promo.maxDiscountAmount) {
+                            discount = promo.maxDiscountAmount;
+                        }
+                        totalDiscount += discount;
                     }
-                    
                 } else if (promo.discountType === 'flat' && promo.discountValue) {
-                    const discount = Math.min(promo.discountValue, promo.maxDiscountAmount || promo.discountValue);
+                    // Apply flat discount
+                    const discount = promo.maxDiscountAmount
+                        ? Math.min(promo.discountValue, promo.maxDiscountAmount)
+                        : promo.discountValue;
                     totalDiscount += discount;
                 }
             }
         }
 
-        return totalDiscount;
+        // Ensure discount doesn't exceed base price
+        return Math.min(totalDiscount, basePrice);
     }
 }

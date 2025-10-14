@@ -202,12 +202,10 @@ class RoomPrice {
                 throw new Error("Reservation not found for the provided ID");
             }
 
-            // Get tax value from reservation if available (apply whatever value exists as long as not negative)
+            // Get tax value from reservation if available
             if (reservationData.taxValue !== undefined && reservationData.taxValue !== null && Number(reservationData.taxValue) >= 0) {
                 reservationTaxValue = Number(reservationData.taxValue);
             }
-
-            discountAmount = await reservationService.calculateDiscountedPrice(reservationId.toString());
 
             // Process coupons from reservation
             if (reservationData.coupon && reservationData.coupon.length > 0) {
@@ -259,18 +257,52 @@ class RoomPrice {
          * Total Price and Base Price for calculating tax
          */
         let totalPrice = response.data.totalAmount;
-        const basePrice = response.data.breakdown.totalBaseAmount;
+        const originalBasePrice = response.data.breakdown.totalBaseAmount;
 
-        // Apply discount to totalAmount
-        if (discountAmount > 0) {
-            totalPrice = Math.max(0, totalPrice - discountAmount);
-            response.data.totalAmount = totalPrice;
+        // Calculate discount amount based on coupon details
+        if (couponDetailsMap.size > 0) {
+            discountAmount = await reservationService.calculateDiscountedPrice(reservationId.toString(), originalBasePrice);
+
+            if (discountAmount > 0) {
+                // Add promo discount amount to response
+                response.data.promoDiscount = Number(discountAmount.toFixed(2));
+
+                // Apply discount to totalAmount (base price before tax)
+                totalPrice = Math.max(0, originalBasePrice - discountAmount);
+                response.data.totalAmount = Number(totalPrice.toFixed(2));
+
+                // Update breakdown amounts
+                response.data.breakdown.totalBaseAmount = Number(totalPrice.toFixed(2));
+                response.data.breakdown.totalAmount = Number(totalPrice.toFixed(2));
+                response.data.breakdown.averagePerNight = Number((totalPrice / response.data.breakdown.numberOfNights).toFixed(2));
+
+                // Update daily breakdown
+                if (response.data.dailyBreakdown && response.data.dailyBreakdown.length > 0) {
+                    const discountPerRoomPerNight = discountAmount / (response.data.requestedRooms * response.data.numberOfNights);
+
+                    response.data.dailyBreakdown.forEach(day => {
+                        const discountedBaseRate = Math.max(0, day.baseRate - discountPerRoomPerNight);
+                        const discountedTotalPerRoom = Math.max(0, day.totalPerRoom - discountPerRoomPerNight);
+                        const discountedTotalForAllRooms = Math.max(0, day.totalForAllRooms - (discountPerRoomPerNight * response.data.requestedRooms));
+
+                        day.baseRate = Number(discountedBaseRate.toFixed(2));
+                        day.totalPerRoom = Number(discountedTotalPerRoom.toFixed(2));
+                        day.totalForAllRooms = Number(discountedTotalForAllRooms.toFixed(2));
+                    });
+                }
+            }
         }
 
         /**
          * Get the property info for getting property ID
          */
         const propertyInfo: any = await propertyInfoService.getPropertyByHotelCode(hotelCode);
+
+        /**
+         * Calculate tax and final price
+         */
+        let totalTax = 0;
+        let priceAfterTax = totalPrice;
 
         /**
          * If reservation has tax value (and it's not negative), use it instead of default tax calculation
@@ -281,8 +313,8 @@ class RoomPrice {
                 amount: reservationTaxValue,
                 type: 'fixed'
             }];
-            response.data.totalTax = reservationTaxValue;
-            response.data.priceAfterTax = Number((totalPrice + reservationTaxValue).toFixed(2));
+            totalTax = reservationTaxValue;
+            priceAfterTax = Number((totalPrice + totalTax).toFixed(2));
         }
 
         /**
@@ -290,7 +322,7 @@ class RoomPrice {
          */
         if (reservationTaxValue === null) {
             if (propertyInfo.tax_group) {
-                const taxCalculation = await container.taxGroupService.calculateTaxRulesForReservation(basePrice, totalPrice, propertyInfo.tax_group);
+                const taxCalculation = await container.taxGroupService.calculateTaxRulesForReservation(totalPrice, totalPrice, propertyInfo.tax_group);
 
                 if (taxCalculation) {
                     let totalAmount = 0;
@@ -299,13 +331,17 @@ class RoomPrice {
                     }
 
                     response.data.tax = taxCalculation;
-                    response.data.totalTax = totalAmount;
-                    response.data.priceAfterTax = Number((response.data.totalAmount + totalAmount).toFixed(2));
+                    totalTax = totalAmount;
+                    priceAfterTax = Number((totalPrice + totalTax).toFixed(2));
                 } else {
                     response.data.tax = [];
                 }
             }
         }
+
+        // Apply the final calculated values
+        response.data.totalTax = totalTax;
+        response.data.priceAfterTax = priceAfterTax;
 
         // Add coupon details to response
         if (couponDetailsMap.size > 0) {
@@ -314,6 +350,8 @@ class RoomPrice {
 
         return response;
     }
+
+
 
     public static async getAllRoomTypeController(req: Request) {
         const hotelCode = req.query.hotelCode as string;
