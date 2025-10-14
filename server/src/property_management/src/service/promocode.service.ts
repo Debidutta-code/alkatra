@@ -3,6 +3,7 @@ import { IPromocode, Promocode, PromocodeUsage } from "../model";
 import { IPromoCodeRepository } from "../repositories";
 import { generateUniquePromoCode } from "../utils";
 import mongoose, { Types } from "mongoose";
+import { fi } from "zod/v4/locales";
 
 interface FilterOptions {
   page: number;
@@ -70,7 +71,7 @@ export class PromoCodeService {
   async createPromoCode(promoCodeCreateRequest: IPromoCodeRepository, userId: string) {
     try {
       if (!promoCodeCreateRequest || !userId) {
-        throw new Error("Promocode details and User ID are required");
+        throw new Error("Promo code details and User ID are required");
       }
 
       const requiredFields = ['propertyId', 'propertyCode', 'discountType', 'discountValue', 'validFrom', 'validTo'];
@@ -78,6 +79,15 @@ export class PromoCodeService {
         if (!promoCodeCreateRequest[field as keyof IPromoCodeRepository]) {
           throw new Error(`${field} is required`);
         }
+      }
+
+      const findPromoCode = await this.promoCodeRepository.findPromoCode(
+        promoCodeCreateRequest.propertyId,
+        promoCodeCreateRequest.propertyCode,
+        promoCodeCreateRequest.codeName
+      );
+      if (findPromoCode) {
+        throw new Error("A promocode already exists. Only one promocode is allowed at a time.");
       }
 
       const uniquePromoCode = await generateUniquePromoCode();
@@ -277,7 +287,7 @@ export class PromoCodeService {
       const result = await this.promoCodeRepository.trackPromocodeUsage(usageDataWithObjectIds);
 
 
-      console.log(`Promocode usage tracked: ${usageData.promoCodeId} for booking ${usageData.bookingId}`);
+      console.log(`Promo code usage tracked: ${usageData.promoCodeId} for booking ${usageData.bookingId}`);
 
       return result;
 
@@ -330,7 +340,7 @@ export class PromoCodeService {
         throw new Error("No promocode usage found for this booking");
       }
 
-      console.log(`Promocode usage cancelled for booking: ${bookingId}, reason: ${reason}`);
+      console.log(`Promo code usage cancelled for booking: ${bookingId}, reason: ${reason}`);
 
       return result;
 
@@ -344,7 +354,7 @@ export class PromoCodeService {
    * Validate promocode before applyintg
    */
   async validatePromocodeForUse(
-    code: string,
+    codeName: string,
     customerId: string,
     bookingAmount: number,
     property: { propertyCode?: string; propertyId?: string }
@@ -357,7 +367,6 @@ export class PromoCodeService {
   }> {
     try {
       const query: any = {
-        code: code,
         isActive: true
       };
 
@@ -367,19 +376,28 @@ export class PromoCodeService {
         query.propertyCode = property.propertyCode;
       }
 
+      if (codeName) {
+        query.$or = [
+          { codeName: codeName },
+          { code: codeName }
+        ];
+      }
+
+      console.log("Validating Promo code with query:", query);
+
       const promocode = await Promocode.findOne(query);
 
       if (!promocode) {
-        return { isValid: false, message: "Invalid promocode" };
+        return { isValid: false, message: "Invalid Promo code" };
       }
 
       const now = new Date();
       if (now < promocode.validFrom) {
-        return { isValid: false, message: "Promocode is not yet valid" };
+        return { isValid: false, message: "Promo code is not yet valid" };
       }
 
       if (now > promocode.validTo) {
-        return { isValid: false, message: "Promocode has expired" };
+        return { isValid: false, message: "Promo code has expired" };
       }
 
       if (promocode.minBookingAmount && bookingAmount < promocode.minBookingAmount) {
@@ -398,7 +416,7 @@ export class PromoCodeService {
        */
 
       // if (promocode.currentUsage >= promocode.useLimit) {
-      //   return { isValid: false, message: "Promocode usage limit reached" };
+      //   return { isValid: false, message: "Promo code usage limit reached" };
       // }
 
       // const usageCheck = await this.promoCodeRepository.canUserUsePromocode(
@@ -419,94 +437,18 @@ export class PromoCodeService {
         promocode,
         discountAmount,
         finalAmount,
-        message: "Promocode is valid"
+        message: "Promo code is valid"
       };
 
     } catch (error) {
-      console.error("Error validating promocode:", error);
-      return { isValid: false, message: "Error validating promocode" };
+      console.error("Error validating Promo code:", error);
+      return { isValid: false, message: "Error validating Promo code" };
     }
   }
 
-  // Add this method to your service for applying promocode
-  // async applyPromocode(
-  //   code: string,
-  //   customerId: string,
-  //   bookingId: string,
-  //   bookingAmount: number,
-  //   property: { propertyCode?: string; propertyId?: string }
-  // ): Promise<{ success: boolean; message: string; discountAmount?: number }> {
-  //   const session = await mongoose.startSession();
-  //   session.startTransaction();
-
-  //   try {
-  //     // First validate the promocode
-  //     const validationResult = await this.validatePromocodeForUse(
-  //       code,
-  //       customerId,
-  //       bookingAmount,
-  //       property
-  //     );
-
-  //     if (!validationResult.isValid || !validationResult.promocode) {
-  //       return { success: false, message: validationResult.message || "Invalid promocode" };
-  //     }
-
-  //     const promocode = validationResult.promocode;
-  //     const discountAmount = validationResult.discountAmount || 0;
-
-  //     // Update promocode usage
-  //     const updatedPromocode = await Promocode.findByIdAndUpdate(
-  //       promocode._id,
-  //       {
-  //         $inc: { currentUsage: 1 },
-  //         $addToSet: { usedBy: new Types.ObjectId(customerId) },
-  //         $set: { lastUsedAt: new Date() }
-  //       },
-  //       { session, new: true }
-  //     );
-
-  //     if (!updatedPromocode) {
-  //       await session.abortTransaction();
-  //       return { success: false, message: "Failed to update promocode usage" };
-  //     }
-
-  //     // Create promocode usage record
-  //     const promocodeUsage = new PromocodeUsage({
-  //       promoCodeId: promocode._id,
-  //       customerId: new Types.ObjectId(customerId),
-  //       bookingId: new Types.ObjectId(bookingId),
-  //       discountType: promocode.discountType,
-  //       discountValue: promocode.discountValue,
-  //       originalAmount: bookingAmount,
-  //       discountedAmount: bookingAmount - discountAmount,
-  //       finalAmount: bookingAmount - discountAmount,
-  //       discountApplied: discountAmount,
-  //       usageDate: new Date(),
-  //       status: "applied"
-  //     });
-
-  //     await promocodeUsage.save({ session });
-
-  //     await session.commitTransaction();
-
-  //     return {
-  //       success: true,
-  //       message: "Promocode applied successfully",
-  //       discountAmount
-  //     };
-
-  //   } catch (error) {
-  //     await session.abortTransaction();
-  //     console.error("Error applying promocode:", error);
-  //     return { success: false, message: "Error applying promocode" };
-  //   } finally {
-  //     await session.endSession();
-  //   }
-  // }
 
   async applyPromocode(
-    code: string,
+    codeName: string,
     customerId: string,
     bookingAmount: number,
     property: { propertyCode?: string; propertyId?: string }
@@ -518,23 +460,21 @@ export class PromoCodeService {
 
       // First validate the promocode
       const validationResult = await this.validatePromocodeForUse(
-        code,
+        codeName,
         customerId,
         bookingAmount,
         property
       );
 
-      
-
       if (!validationResult.isValid || !validationResult.promocode) {
         await session.abortTransaction();
-        return { success: false, message: validationResult.message || "Invalid promocode" };
+        return { success: false, message: validationResult.message || "Invalid Promo code" };
       }
 
       const promocode = validationResult.promocode;
       const discountAmount = validationResult.discountAmount || 0;
 
-      
+
 
       // Update promocode usage - THIS INCREASES THE COUNTER
       const updatedPromocode = await Promocode.findByIdAndUpdate(
@@ -549,10 +489,10 @@ export class PromoCodeService {
 
       if (!updatedPromocode) {
         await session.abortTransaction();
-        return { success: false, message: "Failed to update promocode usage" };
+        return { success: false, message: "Failed to update Promo code usage" };
       }
 
-      
+
 
       // Create promocode usage record
       const promocodeUsage = new PromocodeUsage({
@@ -572,18 +512,18 @@ export class PromoCodeService {
 
       await session.commitTransaction();
 
-      console.log(`✅ Promocode ${code} APPLIED successfully. New usage: ${updatedPromocode.currentUsage}`);
+      console.log(`✅ Promo code ${codeName} APPLIED successfully. New usage: ${updatedPromocode.currentUsage}`);
 
       return {
         success: true,
-        message: "Promocode applied successfully",
+        message: "Promo code applied successfully",
         discountAmount
       };
 
     } catch (error: any) {
       await session.abortTransaction();
-      console.error("❌ Error applying promocode:", error);
-      return { success: false, message: "Error applying promocode: " + error.message };
+      console.error("❌ Error applying Promo code:", error);
+      return { success: false, message: "Error applying Promo code: " + error.message };
     } finally {
       await session.endSession();
     }
@@ -615,7 +555,7 @@ export class PromoCodeService {
   async getPromocodeUsageStats(promoCodeId: string): Promise<any> {
     try {
       if (!promoCodeId) {
-        throw new Error("Promocode ID is required");
+        throw new Error("Promo code ID is required");
       }
 
       return await this.promoCodeRepository.getPromocodeUsageStats(
@@ -758,7 +698,7 @@ export class PromoCodeService {
   async getPromocodeById(promoCodeId: string): Promise<any> {
     try {
       if (!promoCodeId) {
-        throw new Error("Promocode ID is required");
+        throw new Error("Promo code ID is required");
       }
 
       const promocode = await Promocode.findById(promoCodeId)
@@ -768,7 +708,7 @@ export class PromoCodeService {
         .lean();
 
       if (!promocode) {
-        throw new Error("Promocode not found");
+        throw new Error("Promo code not found");
       }
 
       return promocode;
@@ -785,7 +725,7 @@ export class PromoCodeService {
   async getPromocodeRecentUsage(promoCodeId: string, page: number = 1, limit: number = 10): Promise<any> {
     try {
       if (!promoCodeId) {
-        throw new Error("Promocode ID is required");
+        throw new Error("Promo code ID is required");
       }
 
       const result = await this.promoCodeRepository.getRecentPromocodeUsage(
@@ -819,14 +759,14 @@ export class PromoCodeService {
   }> {
     try {
       if (!promoCodeId || !customerId) {
-        throw new Error("Promocode ID and customer ID are required");
+        throw new Error("Promo code ID and customer ID are required");
       }
 
       const promocode = await this.getPromocodeById(promoCodeId);
       if (!promocode) {
         return {
           eligible: false,
-          reasons: ["Promocode not found"],
+          reasons: ["Promo code not found"],
         };
       }
 
@@ -834,22 +774,22 @@ export class PromoCodeService {
 
 
       if (!promocode.isActive) {
-        reasons.push("Promocode is not active");
+        reasons.push("Promo code is not active");
       }
 
 
       const now = new Date();
       if (now < promocode.validFrom) {
-        reasons.push("Promocode is not yet valid");
+        reasons.push("Promo code is not yet valid");
       }
 
       if (now > promocode.validTo) {
-        reasons.push("Promocode has expired");
+        reasons.push("Promo code has expired");
       }
 
 
       if (promocode.currentUsage >= promocode.useLimit) {
-        reasons.push("Promocode usage limit has been reached");
+        reasons.push("Promo code usage limit has been reached");
       }
 
 
@@ -915,6 +855,7 @@ export class PromoCodeService {
    */
   async searchPromocodes(searchCriteria: {
     propertyId?: string;
+    codeName?: string;
     code?: string;
     discountType?: "percentage" | "flat";
     isActive?: boolean;
@@ -929,6 +870,9 @@ export class PromoCodeService {
       if (searchCriteria.propertyId) {
         filter.propertyId = new Types.ObjectId(searchCriteria.propertyId);
       }
+      if (searchCriteria.codeName) {
+        filter.codeName = { $regex: searchCriteria.codeName, $options: 'i' };
+      }
 
       if (searchCriteria.code) {
         filter.code = { $regex: searchCriteria.code, $options: 'i' };
@@ -936,10 +880,6 @@ export class PromoCodeService {
 
       if (searchCriteria.discountType) {
         filter.discountType = searchCriteria.discountType;
-      }
-
-      if (searchCriteria.isActive !== undefined) {
-        filter.isActive = searchCriteria.isActive;
       }
 
       if (searchCriteria.minDiscountValue !== undefined || searchCriteria.maxDiscountValue !== undefined) {
@@ -952,15 +892,17 @@ export class PromoCodeService {
         }
       }
 
-      if (searchCriteria.validAfter || searchCriteria.validBefore) {
-        filter.validFrom = {};
-        if (searchCriteria.validAfter) {
-          filter.validFrom.$gte = searchCriteria.validAfter;
-        }
-        if (searchCriteria.validBefore) {
-          filter.validTo = { $lte: searchCriteria.validBefore };
-        }
+      if (searchCriteria.validAfter) {
+        filter.validFrom = { $gte: searchCriteria.validAfter };
       }
+
+      if (searchCriteria.validBefore) {
+        filter.validTo = { $lte: searchCriteria.validBefore };
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      filter.validTo = { $gte: today };
 
       if (searchCriteria.isActive !== undefined) {
         filter.isActive = searchCriteria.isActive;

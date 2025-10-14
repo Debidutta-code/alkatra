@@ -1,11 +1,13 @@
 import { IPromocode, Promocode, PromocodeUsage } from "../model";
 import { ThirdPartyBooking } from "../../../wincloud/src/model/reservationModel";
 import mongoose, { Types } from "mongoose";
+import { property } from "zod";
 
 export interface IPromoCodeRepository {
   code: string;
   propertyId: string;
   propertyCode: string;
+  codeName: string;
   description?: string;
   discountType: "percentage" | "flat";
   discountValue: number;
@@ -90,6 +92,12 @@ export class PromoCodeRepository {
       }
       console.error("Error in createPromoCode repository:", error);
       throw error;
+    }
+  }
+
+  async findPromoCode (propertyId: string, propertyCode: string, codeName: string) {
+    if (propertyId && propertyCode && codeName) {
+      return Promocode.findOne({ propertyId: propertyId, codeName: codeName, propertyCode: propertyCode });
     }
   }
 
