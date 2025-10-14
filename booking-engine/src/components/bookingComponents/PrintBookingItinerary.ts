@@ -275,7 +275,7 @@ export const generatePrintContent = (
         ? `
                     <div class="detail-item">
                       <div class="label">${t("BookingTabs.BookingDetailsModal.totalAmount")}</div>
-                      <div class="value" dir="ltr">${currency} ${booking.totalAmount.toLocaleString()}</div>
+                      <div class="value" dir="ltr">${currency} ${booking.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                     </div>
                   `
         : ""
@@ -285,7 +285,7 @@ export const generatePrintContent = (
         ? `
                   <div class="total-amount">
                     ${t("BookingTabs.BookingDetailsModal.totalAmount")}: 
-                    <span dir="ltr">${currency} ${booking.totalAmount.toLocaleString()}</span>
+                    <span dir="ltr">${currency} ${booking.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                 `
         : ""

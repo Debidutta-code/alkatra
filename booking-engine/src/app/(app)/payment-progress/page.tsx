@@ -32,6 +32,7 @@ interface PaymentData {
     amount: number;
     status: string;
     payment_id: string;
+    initiatedTime?: string;
     address?: string;
     checkInDate?: string;
     checkOutDate?: string;
@@ -90,20 +91,32 @@ const PaymentProgressPage: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        const initialDuration = 600;
-        setTimeElapsed(initialDuration);
+        if (!paymentData?.initiatedTime) return;
+
+        const calculateTimeRemaining = () => {
+            const initiatedTime = paymentData.initiatedTime ? new Date(paymentData.initiatedTime).getTime() : 0;
+            const currentTime = new Date().getTime();
+            const expiryTime = initiatedTime + (10 * 60 * 1000); // 10 minutes in milliseconds
+            const timeRemaining = Math.floor((expiryTime - currentTime) / 1000); // Convert to seconds
+
+            return timeRemaining > 0 ? timeRemaining : 0;
+        };
+
+        // Set initial time
+        setTimeElapsed(calculateTimeRemaining());
+
+        // Update every second
         const timer = setInterval(() => {
-            setTimeElapsed((prev) => {
-                if (prev <= 0) {
-                    clearInterval(timer);
-                    return 0;
-                }
-                return prev - 1;
-            });
+            const remaining = calculateTimeRemaining();
+            setTimeElapsed(remaining);
+
+            if (remaining <= 0) {
+                clearInterval(timer);
+            }
         }, 1000);
 
         return () => clearInterval(timer);
-    }, []);
+    }, [paymentData?.initiatedTime]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -636,6 +649,11 @@ const PaymentProgressPage: React.FC = () => {
                                                                     <p className="text-xs text-tripswift-black/60">
                                                                         {timeElapsed <= 0 ? "Maximum time reached" : "Time remaining"}
                                                                     </p>
+                                                                    {paymentData?.initiatedTime && timeElapsed > 0 && (
+                                                                        <p className="text-xs text-tripswift-black/50 mt-1">
+                                                                            Expires at {new Date(new Date(paymentData.initiatedTime).getTime() + 10 * 60 * 1000).toLocaleTimeString()}
+                                                                        </p>
+                                                                    )}
                                                                 </div>
 
                                                                 {/* Quick Actions */}
