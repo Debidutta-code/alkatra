@@ -317,15 +317,22 @@ class RoomPrice {
             // STEP 3: Apply discount on tax-added price
             let finalPrice = priceWithTax;
             if (discountAmount > 0) {
-                // FIXED: Calculate the discount percentage first, then apply to taxed amount
-                const discountPercentage = (discountAmount / originalBasePrice) * 100;
-                const discountOnTaxedPrice = priceWithTax * (discountPercentage / 100);
-                finalPrice = Math.max(0, priceWithTax - discountOnTaxedPrice);
-                response.data.promoDiscount = Number(discountOnTaxedPrice.toFixed(2));
+                let discountOnTaxedPrice = discountAmount;
 
-                console.log(`Price Calculation: Base(${originalBasePrice}) + Tax(${totalTax}) = ${priceWithTax} - Discount(${discountOnTaxedPrice.toFixed(2)}) = ${finalPrice}`);
-            } else {
-                console.log('No discount applied - discountAmount is 0');
+                // Check if it's a percentage discount (from couponDetailsMap)
+                const couponDetails = Array.from(couponDetailsMap.values())[0]; // Get first coupon
+                if (couponDetails && couponDetails.discountType === 'percentage') {
+                    // For percentage discounts, apply percentage to taxed amount
+                    const discountOnTaxedPrice = priceWithTax * (couponDetails.discountValue / 100);
+                    finalPrice = Math.max(0, priceWithTax - discountOnTaxedPrice);
+                    response.data.promoDiscount = Number(discountOnTaxedPrice.toFixed(2));
+                } else {
+                    // For flat discounts, use the discountAmount directly
+                    finalPrice = Math.max(0, priceWithTax - discountAmount);
+                    response.data.promoDiscount = Number(discountAmount.toFixed(2));
+                }
+
+                console.log(`Price Calculation: Base(${originalBasePrice}) + Tax(${totalTax}) = ${priceWithTax} - Discount(${response.data.promoDiscount}) = ${finalPrice}`);
             }
 
             // STEP 4: Update the response with final calculated values
@@ -335,8 +342,8 @@ class RoomPrice {
                 type: 'fixed'
             }];
             response.data.totalTax = totalTax;
-            response.data.priceAfterTax = Number(finalPrice.toFixed(2));  
-            response.data.totalAmount = Number(finalPrice.toFixed(2));    
+            response.data.priceAfterTax = Number(finalPrice.toFixed(2));
+            response.data.totalAmount = Number(finalPrice.toFixed(2));
 
             // Also update breakdown accordingly
             response.data.breakdown.totalBaseAmount = Number(originalBasePrice.toFixed(2));
