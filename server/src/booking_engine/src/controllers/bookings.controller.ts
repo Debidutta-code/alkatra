@@ -2206,7 +2206,7 @@ export class BookingController {
         bookingDetails: {
           provider,
           coupon,
-          taxValue: taxValue || 0,
+          taxValue: taxValue,
           reservationId: reservationId ?? "",
           paymentMethod: "crypto",
           userId,
