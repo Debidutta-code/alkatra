@@ -1535,20 +1535,32 @@ export const getBookingDetailsOfUser = CatchAsyncError(
       const couponDetailsMap = new Map();
       if (uniqueCouponCodes.length > 0) {
         const [promoCodes, couponModels] = await Promise.all([
-          Promocode.find({ code: { $in: uniqueCouponCodes } })
-            .select('code discountType discountValue minBookingAmount maxDiscountAmount'),
+          Promocode.find({
+            $or: [
+              { code: { $in: uniqueCouponCodes } },
+              { codeName: { $in: uniqueCouponCodes } }
+            ]
+          })
+            .select('code codeName discountType discountValue minBookingAmount maxDiscountAmount'),
           couponModel.find({ code: { $in: uniqueCouponCodes } })
             .select('code discountPercentage')
         ]);
 
         promoCodes.forEach(coupon => {
-          couponDetailsMap.set(coupon.code, {
+          const couponData = {
             discountType: coupon.discountType,
             discountValue: coupon.discountValue,
             minBookingAmount: coupon.minBookingAmount,
             maxDiscountAmount: coupon.maxDiscountAmount,
             source: 'promocode'
-          });
+          };
+
+          if (coupon.code) {
+            couponDetailsMap.set(coupon.code, couponData);
+          }
+          if (coupon.codeName) {
+            couponDetailsMap.set(coupon.codeName, couponData);
+          }
         });
 
         couponModels.forEach(coupon => {

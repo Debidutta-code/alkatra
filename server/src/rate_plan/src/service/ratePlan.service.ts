@@ -236,8 +236,8 @@ class RoomRentCalculationService {
   public static async getRoomRentService(
     hotelcode: string,
     invTypeCode: string,
-    startDate: Date,
-    endDate: Date,
+    startDate: string,
+    endDate: string,
     noOfChildrens: number,
     noOfAdults: number,
     noOfRooms: number
@@ -353,8 +353,8 @@ class RoomRentCalculationService {
   private static validateInputs(
     hotelcode: string,
     invTypeCode: string,
-    startDate: Date,
-    endDate: Date,
+    startDate: string,
+    endDate: string,
     noOfChildrens: number,
     noOfAdults: number,
     noOfRooms: number

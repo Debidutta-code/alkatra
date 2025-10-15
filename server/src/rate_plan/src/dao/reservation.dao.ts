@@ -21,7 +21,7 @@ export class ReservationDao {
     async getReservationCouponDetails(reservationId: string) {
         if (reservationId) {
             const couponData = await ThirdPartyBooking.findOne({ reservationId: reservationId }).select('coupon');
-            
+
             if (couponData) {
                 return couponData;
             }
@@ -30,7 +30,13 @@ export class ReservationDao {
 
     async getCouponDetailsFromPromoCode(coupon: string) {
         if (coupon) {
-            const couponDetails = await Promocode.findOne({ code: coupon }).select('discountType discountValue minBookingAmount maxDiscountAmount');
+            const couponDetails = await Promocode.findOne({
+                $or: [
+                    { code: coupon },
+                    { codeName: coupon }
+                ]
+            }).select('discountType discountValue minBookingAmount maxDiscountAmount code codeName');
+
             if (couponDetails) {
                 return couponDetails;
             }
@@ -50,9 +56,28 @@ export class ReservationDao {
         if (!coupon) return null;
 
         const [promoCodeDetails, couponModelDetails] = await Promise.all([
-            Promocode.findOne({ code: coupon }).select('discountType discountValue minBookingAmount maxDiscountAmount'),
-            couponModel.findOne({ code: coupon }).select('discountPercentage')
+            // Search Promocode by both code and codeName
+            Promocode.findOne({
+                $or: [
+                    { code: coupon },
+                    { codeName: coupon }
+                ]
+            }).select('discountType discountValue minBookingAmount maxDiscountAmount code codeName'),
+
+            
+            couponModel.findOne({
+                $or: [
+                    { code: coupon },
+                    { codeName: coupon } 
+                ]
+            }).select('discountPercentage code codeName') 
         ]);
+
+        console.log('Coupon search results:', {
+            coupon,
+            promoCodeDetails,
+            couponModelDetails
+        });
 
         return promoCodeDetails || couponModelDetails || null;
     }

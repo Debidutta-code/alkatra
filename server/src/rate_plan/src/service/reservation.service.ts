@@ -34,52 +34,129 @@ export class ReservationService {
     };
 
     async calculateDiscountedPrice(reservationId: string, basePrice: number): Promise<number> {
+        console.log('=== calculateDiscountedPrice Debug Start ===');
+        console.log('Input:', { reservationId, basePrice });
+
         if (!reservationId) {
             throw new Error("SERVICE: Reservation id not found to get reservation details");
         }
 
         const couponDetails = await this.ratePlanRepository.getReservationCouponDetails(reservationId);
+        console.log('Coupon Details from reservation:', couponDetails);
+
         if (!couponDetails) {
             throw new Error("SERVICE: Does Not found reservation details");
         }
 
         const couponIds = couponDetails.coupon || [];
+        console.log('Coupon IDs from reservation:', couponIds);
 
         const discountResults = await Promise.all(
             couponIds.map(couponId => this.ratePlanRepository.getCouponDetailsFromAnySource(couponId))
         );
 
+        console.log('Discount results from repository:', discountResults);
+
         let totalDiscount = 0;
         for (const result of discountResults) {
+            console.log('Processing discount result:', result);
             if (!result) continue;
 
             if ('discountPercentage' in result) {
                 // Calculate percentage discount from couponModel
                 const discountPercentage = (result as ICouponCode).discountPercentage;
-                totalDiscount += (basePrice * discountPercentage) / 100;
+                const discount = (basePrice * discountPercentage) / 100;
+                console.log(`CouponModel discount: ${discountPercentage}% of ${basePrice} = ${discount}`);
+                totalDiscount += discount;
             } else if ('discountType' in result) {
                 const promo = result as IPromocode;
+                console.log('Promocode details:', promo);
+
                 if (promo.discountType === 'percentage' && promo.discountValue) {
                     // Calculate percentage discount from promocode
+                    console.log(`Min booking amount check: ${basePrice} >= ${promo.minBookingAmount} = ${!promo.minBookingAmount || basePrice >= promo.minBookingAmount}`);
+
                     if (!promo.minBookingAmount || basePrice >= promo.minBookingAmount) {
                         let discount = (basePrice * promo.discountValue) / 100;
+                        console.log(`Percentage discount: ${promo.discountValue}% of ${basePrice} = ${discount}`);
+
                         // Apply max discount limit if specified
                         if (promo.maxDiscountAmount && discount > promo.maxDiscountAmount) {
+                            console.log(`Applying max discount limit: ${discount} -> ${promo.maxDiscountAmount}`);
                             discount = promo.maxDiscountAmount;
                         }
                         totalDiscount += discount;
+                    } else {
+                        console.log('Minimum booking amount not met');
                     }
                 } else if (promo.discountType === 'flat' && promo.discountValue) {
                     // Apply flat discount
                     const discount = promo.maxDiscountAmount
                         ? Math.min(promo.discountValue, promo.maxDiscountAmount)
                         : promo.discountValue;
+                    console.log(`Flat discount: ${discount}`);
                     totalDiscount += discount;
                 }
             }
         }
 
+        console.log('Total discount calculated:', totalDiscount);
+
         // Ensure discount doesn't exceed base price
-        return Math.min(totalDiscount, basePrice);
+        const finalDiscount = Math.min(totalDiscount, basePrice);
+        console.log('Final discount after limits:', finalDiscount);
+        console.log('=== calculateDiscountedPrice Debug End ===');
+
+        return finalDiscount;
     }
+
+    // async calculateDiscountedPrice(reservationId: string, basePrice: number): Promise<number> {
+    //     if (!reservationId) {
+    //         throw new Error("SERVICE: Reservation id not found to get reservation details");
+    //     }
+
+    //     const couponDetails = await this.ratePlanRepository.getReservationCouponDetails(reservationId);
+    //     if (!couponDetails) {
+    //         throw new Error("SERVICE: Does Not found reservation details");
+    //     }
+
+    //     const couponIds = couponDetails.coupon || [];
+
+    //     const discountResults = await Promise.all(
+    //         couponIds.map(couponId => this.ratePlanRepository.getCouponDetailsFromAnySource(couponId))
+    //     );
+
+    //     let totalDiscount = 0;
+    //     for (const result of discountResults) {
+    //         if (!result) continue;
+
+    //         if ('discountPercentage' in result) {
+    //             // Calculate percentage discount from couponModel
+    //             const discountPercentage = (result as ICouponCode).discountPercentage;
+    //             totalDiscount += (basePrice * discountPercentage) / 100;
+    //         } else if ('discountType' in result) {
+    //             const promo = result as IPromocode;
+    //             if (promo.discountType === 'percentage' && promo.discountValue) {
+    //                 // Calculate percentage discount from promocode
+    //                 if (!promo.minBookingAmount || basePrice >= promo.minBookingAmount) {
+    //                     let discount = (basePrice * promo.discountValue) / 100;
+    //                     // Apply max discount limit if specified
+    //                     if (promo.maxDiscountAmount && discount > promo.maxDiscountAmount) {
+    //                         discount = promo.maxDiscountAmount;
+    //                     }
+    //                     totalDiscount += discount;
+    //                 }
+    //             } else if (promo.discountType === 'flat' && promo.discountValue) {
+    //                 // Apply flat discount
+    //                 const discount = promo.maxDiscountAmount
+    //                     ? Math.min(promo.discountValue, promo.maxDiscountAmount)
+    //                     : promo.discountValue;
+    //                 totalDiscount += discount;
+    //             }
+    //         }
+    //     }
+
+    //     // Ensure discount doesn't exceed base price
+    //     return Math.min(totalDiscount, basePrice);
+    // }
 }
