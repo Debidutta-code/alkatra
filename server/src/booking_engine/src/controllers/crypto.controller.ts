@@ -166,6 +166,8 @@ export const cryptoPaymentInitiate = CatchAsyncError(async (req: AuthenticatedRe
     }
 
     const { token, blockchain, currency, amount, provider, coupon, taxValue } = req.body;
+    console.log("The tax value we get", taxValue);
+
     const requiredFields = { token, blockchain, currency, amount, userId };
 
     const missingFields = Object.entries(requiredFields)
