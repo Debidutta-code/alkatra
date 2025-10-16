@@ -55,12 +55,17 @@ export const createPromoCode = async (
     },
     body: JSON.stringify(payload),
   });
-  
+
   if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: 'Failed to create promo code' }));
-    throw new Error(error.message || 'Failed to create promo code');
+    const errorData = await res.json().catch(() => ({
+      message: 'Failed to create promo code'
+    }));
+    // Create a custom error object with response property
+    const error: any = new Error(errorData.error || errorData.message || 'Failed to create promo code');
+    error.response = { data: errorData };
+    throw error;
   }
-  
+
   const response: ApiResponse<PromoCode> = await res.json();
   return response.data;
 };
@@ -72,12 +77,12 @@ export const getPromoCodesByProperty = async (
   const res = await fetch(`${API_BASE_URL}/get?propertyId=${propertyId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  
+
   if (!res.ok) {
     const error = await res.json().catch(() => ({ message: 'Failed to fetch promo codes' }));
     throw new Error(error.message || 'Failed to fetch promo codes');
   }
-  
+
   const response: ApiResponse<PromoCode[]> = await res.json();
   return response.data;
 };
@@ -89,12 +94,12 @@ export const getPromoCodeById = async (
   const res = await fetch(`${API_BASE_URL}/${promoId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  
+
   if (!res.ok) {
     const error = await res.json().catch(() => ({ message: 'Failed to fetch promo code' }));
     throw new Error(error.message || 'Failed to fetch promo code');
   }
-  
+
   const response: ApiResponse<PromoCode> = await res.json();
   return response.data;
 };
@@ -112,12 +117,16 @@ export const updatePromoCode = async (
     },
     body: JSON.stringify(payload),
   });
-  
+
   if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: 'Failed to update promo code' }));
-    throw new Error(error.message || 'Failed to update promo code');
+    const errorData = await res.json().catch(() => ({
+      message: 'Failed to update promo code'
+    }));
+    const error: any = new Error(errorData.error || errorData.message || 'Failed to update promo code');
+    error.response = { data: errorData };
+    throw error;
   }
-  
+
   const response: ApiResponse<PromoCode> = await res.json();
   return response.data;
 };
@@ -130,9 +139,13 @@ export const deletePromoCode = async (
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` },
   });
-  
+
   if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: 'Failed to delete promo code' }));
-    throw new Error(error.message || 'Failed to delete promo code');
+    const errorData = await res.json().catch(() => ({
+      message: 'Failed to delete promo code'
+    }));
+    const error: any = new Error(errorData.error || errorData.message || 'Failed to delete promo code');
+    error.response = { data: errorData };
+    throw error;
   }
 };
