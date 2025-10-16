@@ -87,7 +87,7 @@ export class PromoCodeService {
         promoCodeCreateRequest.codeName
       );
       if (findPromoCode) {
-        throw new Error("Promo Code with the same codeName already exists for this property");
+        throw new Error("Promo code with the same code name already exists for this property");
       }
 
       const uniquePromoCode = await generateUniquePromoCode();
