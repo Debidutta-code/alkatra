@@ -126,7 +126,7 @@ export const currencyConversion = CatchAsyncError(async (req: AuthenticatedReque
 
     if (currency.toUpperCase() === "USD") {
       convertedAmount = amount || 0;
-      console.log(`The currency is ${currency} and amount is ${amount}`);
+      console.log(`CURRENCY CONVERSION: The currency is ${currency} and amount is ${amount}`);
       return res.status(200).json({
         message: "Currency conversion successful",
         data: {
@@ -166,6 +166,8 @@ export const cryptoPaymentInitiate = CatchAsyncError(async (req: AuthenticatedRe
     }
 
     const { token, blockchain, currency, amount, provider, coupon, taxValue } = req.body;
+    console.log("The tax value we get: ", taxValue);
+
     const requiredFields = { token, blockchain, currency, amount, userId };
 
     const missingFields = Object.entries(requiredFields)
@@ -215,11 +217,13 @@ export const cryptoPaymentInitiate = CatchAsyncError(async (req: AuthenticatedRe
       return res.status(500).json({ message: "All amount variations are already used. Try again later." });
     }
 
+    convertedAmount = finalAmount;
+
     const cryptoPaymentDetails = new CryptoPaymentDetails({
       customer_id: new Types.ObjectId(userId),
       provider,
-      coupon: couponCodes, // Store extracted coupon codes (empty array if no coupons)
-      taxValue: taxValue || 0,
+      coupon: couponCodes, 
+      taxValue: taxValue ,
       token,
       blockchain,
       payment_id: uuidv4(),
@@ -430,6 +434,7 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
     const cryptoPaymentDetails = await bookingController.createReservationWithCryptoPayment({
       provider: payment.provider,
       coupon: payment.coupon,
+      taxValue: payment.taxValue,
       reservationId: guestDetails.reservationId,
       userId: guestDetails?.userId ?? "",
       checkInDate: guestDetails.checkInDate,

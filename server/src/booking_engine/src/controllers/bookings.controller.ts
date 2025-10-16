@@ -1535,20 +1535,32 @@ export const getBookingDetailsOfUser = CatchAsyncError(
       const couponDetailsMap = new Map();
       if (uniqueCouponCodes.length > 0) {
         const [promoCodes, couponModels] = await Promise.all([
-          Promocode.find({ code: { $in: uniqueCouponCodes } })
-            .select('code discountType discountValue minBookingAmount maxDiscountAmount'),
+          Promocode.find({
+            $or: [
+              { code: { $in: uniqueCouponCodes } },
+              { codeName: { $in: uniqueCouponCodes } }
+            ]
+          })
+            .select('code codeName discountType discountValue minBookingAmount maxDiscountAmount'),
           couponModel.find({ code: { $in: uniqueCouponCodes } })
             .select('code discountPercentage')
         ]);
 
         promoCodes.forEach(coupon => {
-          couponDetailsMap.set(coupon.code, {
+          const couponData = {
             discountType: coupon.discountType,
             discountValue: coupon.discountValue,
             minBookingAmount: coupon.minBookingAmount,
             maxDiscountAmount: coupon.maxDiscountAmount,
             source: 'promocode'
-          });
+          };
+
+          if (coupon.code) {
+            couponDetailsMap.set(coupon.code, couponData);
+          }
+          if (coupon.codeName) {
+            couponDetailsMap.set(coupon.codeName, couponData);
+          }
         });
 
         couponModels.forEach(coupon => {
@@ -2003,498 +2015,514 @@ export class BookingController {
             try {
               const result = await this.promoCodeService.updatePromocodeStatus(
                 promo.code,
-                userId 
+                userId
               );
-              if(!result) {
+              if (!result) {
                 return res.status(400).json({ message: `Failed to apply promo code ${promo.code}` });
               }
-                
-              } catch (error) {
-                console.error(`Failed to apply promo code ${promo.code}:`, error.message);
-              }
-            }
-        }
 
-          // Process coupon models
-          if (couponCheckResult.categorizedCoupons.couponModels.length > 0) {
-            for (const couponModel of couponCheckResult.categorizedCoupons.couponModels) {
-              try {
-                const result = await validateCouponCode(
-                  couponModel.code,
-                  userId,
-                  parseFloat(roomTotalPrice),
-                  'true',
-                );
-                if(!result) {
-                  return res.status(400).json({ message: `Failed to apply coupon code ${couponModel.code}` });
-                }
-                appliedCoupons.push({ code: couponModel.code, type: 'coupon', discount: roomTotalPrice });
-              } catch (error) {
-                console.error(`Failed to apply coupon code ${couponModel.code}:`, error.message);
-              }
+            } catch (error) {
+              console.error(`Failed to apply promo code ${promo.code}:`, error.message);
             }
-          }
-
-          // Update room total price with discount
-          if (totalDiscount > 0) {
-            reservationInput.bookingDetails.roomTotalPrice = Math.max(0, roomTotalPrice - totalDiscount);
           }
         }
 
-        // Create reservation with updated price
-        const result = await reservationService.createReservation(reservationInput, paymentInfo.paymentMethodId);
+        // Process coupon models
+        if (couponCheckResult.categorizedCoupons.couponModels.length > 0) {
+          for (const couponModel of couponCheckResult.categorizedCoupons.couponModels) {
+            try {
+              const result = await validateCouponCode(
+                couponModel.code,
+                userId,
+                parseFloat(roomTotalPrice),
+                'true',
+              );
+              if (!result) {
+                return res.status(400).json({ message: `Failed to apply coupon code ${couponModel.code}` });
+              }
+              appliedCoupons.push({ code: couponModel.code, type: 'coupon', discount: roomTotalPrice });
+            } catch (error) {
+              console.error(`Failed to apply coupon code ${couponModel.code}:`, error.message);
+            }
+          }
+        }
 
-        return res.status(200).json({
-          message: 'Reservation received',
-          numberOfRooms,
-          roomTotalPrice: reservationInput.bookingDetails.roomTotalPrice, // Return discounted price
-          originalRoomTotalPrice: roomTotalPrice, // Include original price for reference
-          totalDiscount,
-          appliedCoupons,
-          guests: result.categorizedGuests,
-          ageCodeSummary: result.ageCodeSummary,
-        });
-      } catch (error: any) {
-        return res.status(500).json({
-          message: error.message || 'Failed to process reservation',
-        });
+        // Update room total price with discount
+        if (totalDiscount > 0) {
+          reservationInput.bookingDetails.roomTotalPrice = Math.max(0, roomTotalPrice - totalDiscount);
+        }
       }
+
+      // Create reservation with updated price
+      const result = await reservationService.createReservation(reservationInput, paymentInfo.paymentMethodId);
+
+      return res.status(200).json({
+        message: 'Reservation received',
+        numberOfRooms,
+        roomTotalPrice: reservationInput.bookingDetails.roomTotalPrice, // Return discounted price
+        originalRoomTotalPrice: roomTotalPrice, // Include original price for reference
+        totalDiscount,
+        appliedCoupons,
+        guests: result.categorizedGuests,
+        ageCodeSummary: result.ageCodeSummary,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: error.message || 'Failed to process reservation',
+      });
     }
+  }
 
   async createReservationWithCryptoPayment(input: {
-      provider: string;
-      coupon: string[];
-      taxValue?: number;
-      reservationId?: string;
-      userId: string;
-      checkInDate: string;
-      checkOutDate: string;
-      hotelCode: string;
-      hotelName: string;
-      ratePlanCode: string;
-      numberOfRooms: number;
-      roomTypeCode: string;
-      roomTotalPrice: number;
-      currencyCode: string;
-      email: string;
-      phone: string;
-      guests: { firstName: string; lastName: string; dob: string }[];
-    }) {
+    provider: string;
+    coupon: string[];
+    taxValue?: number;
+    reservationId?: string;
+    userId: string;
+    checkInDate: string;
+    checkOutDate: string;
+    hotelCode: string;
+    hotelName: string;
+    ratePlanCode: string;
+    numberOfRooms: number;
+    roomTypeCode: string;
+    roomTotalPrice: number;
+    currencyCode: string;
+    email: string;
+    phone: string;
+    guests: { firstName: string; lastName: string; dob: string }[];
+  }) {
+    try {
+      const {
+        provider,
+        coupon,
+        taxValue,
+        reservationId,
+        userId,
+        checkInDate,
+        checkOutDate,
+        hotelCode,
+        hotelName,
+        ratePlanCode,
+        numberOfRooms,
+        roomTypeCode,
+        roomTotalPrice,
+        currencyCode,
+        email,
+        phone,
+        guests,
+      } = input;
 
-      try {
-        const {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const checkIn = new Date(checkInDate);
+      const checkOut = new Date(checkOutDate);
+
+      if (checkIn < today || checkOut <= checkIn) {
+        throw new Error("Check-in date cannot be in the past or Check-out date must be after check-in date");
+      }
+
+      if (!Array.isArray(guests) || guests.length === 0) {
+        throw new Error("Guest details are required");
+      }
+
+      const ageCodeCount: Record<string, number> = { "7": 0, "8": 0, "10": 0 };
+
+      const categorizedGuests = guests.map(({ firstName, lastName, dob }) => {
+        if (!dob) throw new Error(`DOB missing for ${firstName} ${lastName}`);
+        const { age, category, ageCode } = calculateAgeCategory(dob);
+        ageCodeCount[ageCode] = (ageCodeCount[ageCode] || 0) + 1;
+        return { firstName, lastName, dob, age, category, ageCode };
+      });
+
+      let finalRoomTotalPrice = roomTotalPrice;
+      let totalDiscount = 0;
+      let appliedCoupons = [];
+
+      // Process coupons if available - UPDATED LOGIC
+      if (coupon && coupon.length > 0) {
+        const couponCheckResult = await this.couponCheck(coupon);
+
+        // Process promocodes - UPDATED to match reservationWithPayAtHotel
+        if (couponCheckResult.categorizedCoupons.promoCodes.length > 0) {
+          for (const promo of couponCheckResult.categorizedCoupons.promoCodes) {
+            try {
+              const result = await this.promoCodeService.updatePromocodeStatus(
+                promo.code,
+                userId
+              );
+              if (!result) {
+                throw new Error(`Failed to apply promo code ${promo.code}`);
+              }
+              // Note: In reservationWithPayAtHotel, promocodes don't directly affect price calculation
+              // They're just validated and status updated
+            } catch (error) {
+              console.error(`Failed to apply promo code ${promo.code}:`, error.message);
+              throw new Error(`Failed to apply promo code ${promo.code}`);
+            }
+          }
+        }
+
+        // Process coupon models - UPDATED to match reservationWithPayAtHotel
+        if (couponCheckResult.categorizedCoupons.couponModels.length > 0) {
+          for (const couponModel of couponCheckResult.categorizedCoupons.couponModels) {
+            try {
+              const result = await validateCouponCode(
+                couponModel.code,
+                userId,
+                parseFloat(finalRoomTotalPrice.toString()),
+                'true', // isUsed should be true
+              );
+              if (!result) {
+                throw new Error(`Failed to apply coupon code ${couponModel.code}`);
+              }
+              appliedCoupons.push({
+                code: couponModel.code,
+                type: 'coupon',
+                discount: finalRoomTotalPrice // Using roomTotalPrice as in reservationWithPayAtHotel
+              });
+            } catch (error) {
+              console.error(`Failed to apply coupon code ${couponModel.code}:`, error.message);
+              throw new Error(`Failed to apply coupon code ${couponModel.code}`);
+            }
+          }
+        }
+
+        // Update room total price with discount - UPDATED LOGIC
+        // Note: In reservationWithPayAtHotel, only coupon models affect the price calculation
+        // and the discount is set to roomTotalPrice for each coupon
+        if (appliedCoupons.length > 0) {
+          // Calculate total discount based on applied coupons
+          totalDiscount = appliedCoupons.reduce((sum, coupon) => {
+            return sum + (coupon.discount || 0);
+          }, 0);
+
+          finalRoomTotalPrice = Math.max(0, roomTotalPrice - totalDiscount);
+        }
+      }
+
+      // Update the reservation input with discounted price
+      const reservationInput: ReservationInput = {
+        bookingDetails: {
           provider,
           coupon,
-          taxValue,
-          reservationId,
+          taxValue: taxValue,
+          reservationId: reservationId ?? "",
+          paymentMethod: "crypto",
           userId,
           checkInDate,
           checkOutDate,
           hotelCode,
           hotelName,
           ratePlanCode,
-          numberOfRooms,
           roomTypeCode,
-          roomTotalPrice,
+          numberOfRooms,
+          roomTotalPrice: finalRoomTotalPrice,
           currencyCode,
+          guests,
           email,
           phone,
-          guests,
-        } = input;
+        },
+        ageCodeSummary: ageCodeCount,
+      };
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const checkIn = new Date(checkInDate);
-        const checkOut = new Date(checkOutDate);
+      const thirdPartyService = new ThirdPartyReservationService();
+      await thirdPartyService.processThirdPartyReservation(reservationInput);
+      await reduceRoomsAfterBookingConfirmedCrypto(
+        hotelCode,
+        roomTypeCode,
+        numberOfRooms,
+        [checkIn, checkOut]
+      );
 
-        if (checkIn < today || checkOut <= checkIn) {
-          throw new Error("Check-in date cannot be in the past or Check-out date must be after check-in date");
-        }
+      const htmlContent = `<!DOCTYPE html>
+      <html lang="en">
 
-        if (!Array.isArray(guests) || guests.length === 0) {
-          throw new Error("Guest details are required");
-        }
-
-        const ageCodeCount: Record<string, number> = { "7": 0, "8": 0, "10": 0 };
-
-        const categorizedGuests = guests.map(({ firstName, lastName, dob }) => {
-          if (!dob) throw new Error(`DOB missing for ${firstName} ${lastName}`);
-          const { age, category, ageCode } = calculateAgeCategory(dob);
-          ageCodeCount[ageCode] = (ageCodeCount[ageCode] || 0) + 1;
-          return { firstName, lastName, dob, age, category, ageCode };
-        });
-
-        let finalRoomTotalPrice = roomTotalPrice;
-        let totalDiscount = 0;
-        let appliedCoupons = [];
-
-        // Process coupons if available
-        if (coupon && coupon.length > 0) {
-          const couponCheckResult = await this.couponCheck(coupon);
-
-          // Process promocodes
-          if (couponCheckResult.categorizedCoupons.promoCodes.length > 0) {
-            for (const promo of couponCheckResult.categorizedCoupons.promoCodes) {
-              try {
-                const result = await this.promoCodeService.applyPromocode(
-                  promo.code,
-                  userId,
-                  parseFloat(finalRoomTotalPrice.toString()),
-                  { propertyCode: hotelCode, propertyId: '' }
-                );
-                totalDiscount += result.discountAmount || 0;
-                appliedCoupons.push({ code: promo.code, type: 'promo', discount: result.discountAmount });
-              } catch (error) {
-                console.error(`Failed to apply promo code ${promo.code}:`, error.message);
-              }
-            }
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
           }
 
-          // Process coupon models
-          if (couponCheckResult.categorizedCoupons.couponModels.length > 0) {
-            for (const couponModel of couponCheckResult.categorizedCoupons.couponModels) {
-              try {
-                const result = await validateCouponCode(
-                  couponModel.code,
-                  userId,
-                  parseFloat(finalRoomTotalPrice.toString()),
-                  'true' // isUsed should be true
-                );
-                totalDiscount += result.discountAmount || 0;
-                appliedCoupons.push({ code: couponModel.code, type: 'coupon', discount: result.discountAmount });
-              } catch (error) {
-                console.error(`Failed to apply coupon code ${couponModel.code}:`, error.message);
-              }
-            }
+          .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
           }
 
-          // Update room total price with discount
-          if (totalDiscount > 0) {
-            finalRoomTotalPrice = Math.max(0, roomTotalPrice - totalDiscount);
+          .header {
+            background-color: #1a73e8;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
           }
-        }
 
-        // Update the reservation input with discounted price
-        const reservationInput: ReservationInput = {
-          bookingDetails: {
-            provider,
-            coupon,
-            taxValue: taxValue || 0,
-            reservationId: reservationId ?? "",
-            paymentMethod: "crypto",
-            userId,
-            checkInDate,
-            checkOutDate,
-            hotelCode,
-            hotelName,
-            ratePlanCode,
-            roomTypeCode,
-            numberOfRooms,
-            roomTotalPrice: finalRoomTotalPrice,
-            currencyCode,
-            guests,
-            email,
-            phone,
-          },
-          ageCodeSummary: ageCodeCount,
-        };
+          .header h1 {
+            margin: 0;
+            font-size: 24px;
+          }
 
+          .content {
+            padding: 20px;
+          }
 
+          .content h2 {
+            color: #333333;
+            font-size: 20px;
+            margin-top: 0;
+          }
 
-        const thirdPartyService = new ThirdPartyReservationService();
-        await thirdPartyService.processThirdPartyReservation(reservationInput);
-        await reduceRoomsAfterBookingConfirmedCrypto(
-          hotelCode,
-          roomTypeCode,
-          numberOfRooms,
-          [checkIn, checkOut]
-        );
+          .content p {
+            color: #666666;
+            line-height: 1.6;
+            margin: 10px 0;
+          }
 
-        const htmlContent = `<!DOCTYPE html>
-        <html lang="en">
+          .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+          }
 
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              background-color: #f4f4f4;
-              margin: 0;
-              padding: 0;
-            }
+          .details-table th,
+          .details-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #dddddd;
+          }
 
+          .details-table th {
+            background-color: #f8f8f8;
+            color: #333333;
+            font-weight: bold;
+          }
+
+          .footer {
+            background-color: #f4f4f4;
+            padding: 15px;
+            text-align: center;
+            color: #888888;
+            font-size: 12px;
+          }
+
+          .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 20px 0;
+            background-color: #1a73e8;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+          }
+
+          @media only screen and (max-width: 600px) {
             .container {
-              max-width: 600px;
-              margin: 20px auto;
-              background-color: #ffffff;
-              border-radius: 8px;
-              overflow: hidden;
-              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            }
-
-            .header {
-              background-color: #1a73e8;
-              color: #ffffff;
-              padding: 20px;
-              text-align: center;
+              width: 100%;
+              margin: 10px;
             }
 
             .header h1 {
-              margin: 0;
-              font-size: 24px;
-            }
-
-            .content {
-              padding: 20px;
+              font-size: 20px;
             }
 
             .content h2 {
-              color: #333333;
-              font-size: 20px;
-              margin-top: 0;
+              font-size: 18px;
             }
+          }
+        </style>
+      </head>
 
-            .content p {
-              color: #666666;
-              line-height: 1.6;
-              margin: 10px 0;
-            }
-
-            .details-table {
-              width: 100%;
-              border-collapse: collapse;
-              margin: 20px 0;
-            }
-
-            .details-table th,
-            .details-table td {
-              padding: 10px;
-              text-align: left;
-              border-bottom: 1px solid #dddddd;
-            }
-
-            .details-table th {
-              background-color: #f8f8f8;
-              color: #333333;
-              font-weight: bold;
-            }
-
-            .footer {
-              background-color: #f4f4f4;
-              padding: 15px;
-              text-align: center;
-              color: #888888;
-              font-size: 12px;
-            }
-
-            .button {
-              display: inline-block;
-              padding: 10px 20px;
-              margin: 20px 0;
-              background-color: #1a73e8;
-              color: #ffffff;
-              text-decoration: none;
-              border-radius: 5px;
-              font-weight: bold;
-            }
-
-            @media only screen and (max-width: 600px) {
-              .container {
-                width: 100%;
-                margin: 10px;
-              }
-
-              .header h1 {
-                font-size: 20px;
-              }
-
-              .content h2 {
-                font-size: 18px;
-              }
-            }
-          </style>
-        </head>
-
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>Booking Confirmation</h1>
-            </div>
-            <div class="content">
-              <h2>Dear {{guestName}},</h2>
-              <p>Thank you for your booking with {{hotelName}}! We are excited to confirm your booking details below.</p>
-
-              <h2>Reservation Details</h2>
-              <table class="details-table">
-                <tr>
-                  <th>Hotel Name</th>
-                  <td>{{hotelName}}</td>
-                </tr>
-                <tr>
-                  <th>Check-In Date</th>
-                  <td>{{checkInDate}}</td>
-                </tr>
-                <tr>
-                  <th>Check-Out Date</th>
-                  <td>{{checkOutDate}}</td>
-                </tr>
-                <tr>
-                  <th>Room Type</th>
-                  <td>{{roomTypeCode}}</td>
-                </tr>
-                <tr>
-                  <th>Number of Rooms</th>
-                  <td>{{numberOfRooms}}</td>
-                </tr>
-                <tr>
-                  <th>Total Price</th>
-                  <td>{{roomTotalPrice}} {{currencyCode}}</td>
-                </tr>
-                <tr>
-                  <th>Contact Email</th>
-                  <td>{{email}}</td>
-                </tr>
-                <tr>
-                  <th>Contact Phone</th>
-                  <td>+{{phone}}</td>
-                </tr>
-              </table>
-
-              <h2>Guest Details</h2>
-              <table class="details-table">
-                <tr>
-                  <th>Name</th>
-                  <th>Age Category</th>
-                </tr>
-                {{#each guests}}
-                <tr>
-                  <td>{{firstName}} {{lastName}}</td>
-                  <td>{{category}} (Age {{age}})</td>
-                </tr>
-                {{/each}}
-              </table>
-
-              <p>For any questions or to modify your reservation, please contact us at <a
-                  href="mailto:{{supportEmail}}">{{supportEmail}}</a>.</p>
-
-              <a href="{{websiteUrl}}" class="button">View Your Booking</a>
-            </div>
-            <div class="footer">
-              <p>&copy; {{currentYear}} {{companyName}}. All rights reserved.</p>
-            </div>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Booking Confirmation</h1>
           </div>
-        </body>
+          <div class="content">
+            <h2>Dear {{guestName}},</h2>
+            <p>Thank you for your booking with {{hotelName}}! We are excited to confirm your booking details below.</p>
 
-        </html>`;
+            <h2>Reservation Details</h2>
+            <table class="details-table">
+              <tr>
+                <th>Hotel Name</th>
+                <td>{{hotelName}}</td>
+              </tr>
+              <tr>
+                <th>Check-In Date</th>
+                <td>{{checkInDate}}</td>
+              </tr>
+              <tr>
+                <th>Check-Out Date</th>
+                <td>{{checkOutDate}}</td>
+              </tr>
+              <tr>
+                <th>Room Type</th>
+                <td>{{roomTypeCode}}</td>
+              </tr>
+              <tr>
+                <th>Number of Rooms</th>
+                <td>{{numberOfRooms}}</td>
+              </tr>
+              <tr>
+                <th>Total Price</th>
+                <td>{{roomTotalPrice}} {{currencyCode}}</td>
+              </tr>
+              <tr>
+                <th>Contact Email</th>
+                <td>{{email}}</td>
+              </tr>
+              <tr>
+                <th>Contact Phone</th>
+                <td>+{{phone}}</td>
+              </tr>
+            </table>
 
-        const templateData = {
-          guestName: `${guests[0].firstName} ${guests[0].lastName}`,
-          hotelName,
-          checkInDate: new Date(checkInDate).toLocaleDateString(),
-          checkOutDate: new Date(checkOutDate).toLocaleDateString(),
-          roomTypeCode,
-          numberOfRooms,
-          roomTotalPrice,
-          currencyCode,
-          email,
-          phone,
-          guests: categorizedGuests,
-          supportEmail: 'business.alhajz@gmail.com',
-          // supportPhone: '+1-800-123-4567',
-          websiteUrl: 'https://alhajz.ai',
-          currentYear: new Date().getFullYear(),
-          companyName: 'Al-Hajz',
-        };
+            <h2>Guest Details</h2>
+            <table class="details-table">
+              <tr>
+                <th>Name</th>
+                <th>Age Category</th>
+              </tr>
+              {{#each guests}}
+              <tr>
+                <td>{{firstName}} {{lastName}}</td>
+                <td>{{category}} (Age {{age}})</td>
+              </tr>
+              {{/each}}
+            </table>
 
-        const template = Handlebars.compile(htmlContent);
-        const finalHtml = template(templateData);
+            <p>For any questions or to modify your reservation, please contact us at <a
+                href="mailto:{{supportEmail}}">{{supportEmail}}</a>.</p>
 
-        await mailer.sendMail({
-          to: email,
-          subject: `Booking Confirmation - ${hotelName}`,
-          html: finalHtml,
-          text: `Your booking has been confirmed`,
-        });
+            <a href="{{websiteUrl}}" class="button">View Your Booking</a>
+          </div>
+          <div class="footer">
+            <p>&copy; {{currentYear}} {{companyName}}. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
 
-        return {
-          message: "Reservation with crypto confirmed",
-          guests: categorizedGuests,
-          ageCodeSummary: ageCodeCount,
-        };
+      </html>`;
 
-      } catch (error: any) {
-        console.error("❌ Error creating reservation with crypto:", error.message || error);
-        throw new Error(`Failed to create reservation: ${error.message || "Unknown error"}`);
-      }
-    };
-
-  async couponCheck(couponCodes: string[]) {
-      if (!couponCodes || couponCodes.length === 0) {
-        throw new Error('Coupon codes are required');
-      }
-
-      // Extract and clean coupon codes
-      const extractCouponCodes = (couponField: any): string[] => {
-        if (!couponField) return [];
-        if (Array.isArray(couponField)) {
-          return couponField
-            .filter(code => code && typeof code === 'string' && code.trim() !== '')
-            .map(code => code.trim());
-        }
-        if (typeof couponField === 'string' && couponField.trim() !== '') {
-          return [couponField.trim()];
-        }
-        return [];
+      const templateData = {
+        guestName: `${guests[0].firstName} ${guests[0].lastName}`,
+        hotelName,
+        checkInDate: new Date(checkInDate).toLocaleDateString(),
+        checkOutDate: new Date(checkOutDate).toLocaleDateString(),
+        roomTypeCode,
+        numberOfRooms,
+        roomTotalPrice: finalRoomTotalPrice, // Use discounted price
+        currencyCode,
+        email,
+        phone,
+        guests: categorizedGuests,
+        supportEmail: 'business.alhajz@gmail.com',
+        websiteUrl: 'https://alhajz.ai',
+        currentYear: new Date().getFullYear(),
+        companyName: 'Al-Hajz',
       };
 
-      // Extract and get unique coupon codes
-      const allCouponCodes: string[] = extractCouponCodes(couponCodes);
-      const uniqueCouponCodes = [...new Set(allCouponCodes)];
+      const template = Handlebars.compile(htmlContent);
+      const finalHtml = template(templateData);
 
-      if (uniqueCouponCodes.length === 0) {
-        throw new Error('No valid coupon codes found');
-      }
-
-      // Fetch coupon details from both collections
-      const [promoCodes, couponModels] = await Promise.all([
-        Promocode.find({ code: { $in: uniqueCouponCodes } })
-          .select('code discountType discountValue minBookingAmount maxDiscountAmount'),
-        couponModel.find({ code: { $in: uniqueCouponCodes } })
-          .select('code discountPercentage')
-      ]);
-
-      // Create maps for easy lookup
-      const promoCodesMap = new Map(promoCodes.map(promo => [promo.code, promo]));
-      const couponModelsMap = new Map(couponModels.map(coupon => [coupon.code, coupon]));
-
-      // Categorize coupon codes by collection
-      const categorizedCoupons = {
-        promoCodes: [] as any[],
-        couponModels: [] as any[],
-        notFound: [] as string[]
-      };
-
-      uniqueCouponCodes.forEach(code => {
-        if (promoCodesMap.has(code)) {
-          categorizedCoupons.promoCodes.push(promoCodesMap.get(code));
-        } else if (couponModelsMap.has(code)) {
-          categorizedCoupons.couponModels.push(couponModelsMap.get(code));
-        } else {
-          categorizedCoupons.notFound.push(code);
-        }
+      await mailer.sendMail({
+        to: email,
+        subject: `Booking Confirmation - ${hotelName}`,
+        html: finalHtml,
+        text: `Your booking has been confirmed`,
       });
 
       return {
-        uniqueCouponCodes,
-        categorizedCoupons,
-        summary: {
-          totalUniqueCodes: uniqueCouponCodes.length,
-          promoCodesCount: categorizedCoupons.promoCodes.length,
-          couponModelsCount: categorizedCoupons.couponModels.length,
-          notFoundCount: categorizedCoupons.notFound.length
-        }
+        message: "Reservation with crypto confirmed",
+        guests: categorizedGuests,
+        ageCodeSummary: ageCodeCount,
+        roomTotalPrice: finalRoomTotalPrice, // Return discounted price
+        originalRoomTotalPrice: roomTotalPrice, // Include original price for reference
+        totalDiscount,
+        appliedCoupons,
       };
+
+    } catch (error: any) {
+      console.error("❌ Error creating reservation with crypto:", error.message || error);
+      throw new Error(`Failed to create reservation: ${error.message || "Unknown error"}`);
+    }
+  };
+
+  async couponCheck(couponCodes: string[]) {
+    if (!couponCodes || couponCodes.length === 0) {
+      throw new Error('Coupon codes are required');
     }
 
+    // Extract and clean coupon codes
+    const extractCouponCodes = (couponField: any): string[] => {
+      if (!couponField) return [];
+      if (Array.isArray(couponField)) {
+        return couponField
+          .filter(code => code && typeof code === 'string' && code.trim() !== '')
+          .map(code => code.trim());
+      }
+      if (typeof couponField === 'string' && couponField.trim() !== '') {
+        return [couponField.trim()];
+      }
+      return [];
+    };
+
+    // Extract and get unique coupon codes
+    const allCouponCodes: string[] = extractCouponCodes(couponCodes);
+    const uniqueCouponCodes = [...new Set(allCouponCodes)];
+
+    if (uniqueCouponCodes.length === 0) {
+      throw new Error('No valid coupon codes found');
+    }
+
+    // Fetch coupon details from both collections
+    const [promoCodes, couponModels] = await Promise.all([
+      Promocode.find({ code: { $in: uniqueCouponCodes } })
+        .select('code discountType discountValue minBookingAmount maxDiscountAmount'),
+      couponModel.find({ code: { $in: uniqueCouponCodes } })
+        .select('code discountPercentage')
+    ]);
+
+    // Create maps for easy lookup
+    const promoCodesMap = new Map(promoCodes.map(promo => [promo.code, promo]));
+    const couponModelsMap = new Map(couponModels.map(coupon => [coupon.code, coupon]));
+
+    // Categorize coupon codes by collection
+    const categorizedCoupons = {
+      promoCodes: [] as any[],
+      couponModels: [] as any[],
+      notFound: [] as string[]
+    };
+
+    uniqueCouponCodes.forEach(code => {
+      if (promoCodesMap.has(code)) {
+        categorizedCoupons.promoCodes.push(promoCodesMap.get(code));
+      } else if (couponModelsMap.has(code)) {
+        categorizedCoupons.couponModels.push(couponModelsMap.get(code));
+      } else {
+        categorizedCoupons.notFound.push(code);
+      }
+    });
+
+    return {
+      uniqueCouponCodes,
+      categorizedCoupons,
+      summary: {
+        totalUniqueCodes: uniqueCouponCodes.length,
+        promoCodesCount: categorizedCoupons.promoCodes.length,
+        couponModelsCount: categorizedCoupons.couponModels.length,
+        notFoundCount: categorizedCoupons.notFound.length
+      }
+    };
   }
+
+}

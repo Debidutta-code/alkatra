@@ -176,6 +176,15 @@ class RoomPrice {
         return response
     }
 
+
+    /**
+     * 
+     * @param req 
+     * @param res 
+     * @param next 
+     * @returns 
+     */
+
     public static async getRoomRentController(req: Request, res: Response, next: NextFunction): Promise<any> {
         const reservationDao = ReservationDao.getInstance();
         const reservationService = ReservationService.getInstance(reservationDao);
@@ -196,51 +205,7 @@ class RoomPrice {
         let reservationTaxValue: number | null = null;
         let couponDetailsMap = new Map();
 
-        if (reservationId) {
-            const reservationData = await reservationService.getReservationById(reservationId.toString());
-            if (!reservationData) {
-                throw new Error("Reservation not found for the provided ID");
-            }
-
-            // Get tax value from reservation if available (apply whatever value exists as long as not negative)
-            if (reservationData.taxValue !== undefined && reservationData.taxValue !== null && Number(reservationData.taxValue) >= 0) {
-                reservationTaxValue = Number(reservationData.taxValue);
-            }
-
-            discountAmount = await reservationService.calculateDiscountedPrice(reservationId.toString());
-
-            // Process coupons from reservation
-            if (reservationData.coupon && reservationData.coupon.length > 0) {
-                const uniqueCouponCodes = [...new Set(reservationData.coupon)];
-
-                if (uniqueCouponCodes.length > 0) {
-                    const [promoCodes, couponModels] = await Promise.all([
-                        Promocode.find({ code: { $in: uniqueCouponCodes } })
-                            .select('code discountType discountValue minBookingAmount maxDiscountAmount'),
-                        couponModel.find({ code: { $in: uniqueCouponCodes } })
-                            .select('code discountPercentage')
-                    ]);
-
-                    promoCodes.forEach(coupon => {
-                        couponDetailsMap.set(coupon.code, {
-                            discountType: coupon.discountType,
-                            discountValue: coupon.discountValue,
-                            minBookingAmount: coupon.minBookingAmount,
-                            maxDiscountAmount: coupon.maxDiscountAmount,
-                            source: 'promocode'
-                        });
-                    });
-
-                    couponModels.forEach(coupon => {
-                        couponDetailsMap.set(coupon.code, {
-                            discountPercentage: coupon.discountPercentage,
-                            source: 'couponModel'
-                        });
-                    });
-                }
-            }
-        }
-
+        // First get the room rent calculation
         const response: any = await RoomRentCalculationService.getRoomRentService(
             hotelCode,
             invTypeCode,
@@ -259,12 +224,72 @@ class RoomPrice {
          * Total Price and Base Price for calculating tax
          */
         let totalPrice = response.data.totalAmount;
-        const basePrice = response.data.breakdown.totalBaseAmount;
+        const originalBasePrice = response.data.breakdown.totalBaseAmount;
 
-        // Apply discount to totalAmount
-        if (discountAmount > 0) {
-            totalPrice = Math.max(0, totalPrice - discountAmount);
-            response.data.totalAmount = totalPrice;
+        // Store original values before any modifications
+        const originalTotalAmount = response.data.totalAmount;
+        const originalBreakdown = { ...response.data.breakdown };
+        const originalDailyBreakdown = response.data.dailyBreakdown ? [...response.data.dailyBreakdown] : [];
+
+        if (reservationId) {
+            const reservationData = await reservationService.getReservationById(reservationId.toString());
+            if (!reservationData) {
+                throw new Error("Reservation not found for the provided ID");
+            }
+
+            // Get tax value from reservation if available
+            if (reservationData.taxValue !== undefined && reservationData.taxValue !== null && Number(reservationData.taxValue) >= 0) {
+                reservationTaxValue = Number(reservationData.taxValue);
+            }
+
+            // Process coupons from reservation
+            if (reservationData.coupon && reservationData.coupon.length > 0) {
+                const uniqueCouponCodes = [...new Set(reservationData.coupon)];
+
+                if (uniqueCouponCodes.length > 0) {
+                    const [promoCodes, couponModels] = await Promise.all([
+                        Promocode.find({
+                            $or: [
+                                { code: { $in: uniqueCouponCodes } },
+                                { codeName: { $in: uniqueCouponCodes } }
+                            ]
+                        })
+                            .select('code codeName discountType discountValue minBookingAmount maxDiscountAmount'),
+                        couponModel.find({ code: { $in: uniqueCouponCodes } })
+                            .select('code discountPercentage')
+                    ]);
+
+                    promoCodes.forEach(coupon => {
+                        const couponData = {
+                            discountType: coupon.discountType,
+                            discountValue: coupon.discountValue,
+                            minBookingAmount: coupon.minBookingAmount,
+                            maxDiscountAmount: coupon.maxDiscountAmount,
+                            source: 'promocode',
+                            code: coupon.code,
+                            codeName: coupon.codeName
+                        };
+
+                        // Store only once using the actual coupon code from reservation
+                        if (uniqueCouponCodes.includes(coupon.code)) {
+                            couponDetailsMap.set(coupon.code, couponData);
+                        } else if (uniqueCouponCodes.includes(coupon.codeName)) {
+                            couponDetailsMap.set(coupon.codeName, couponData);
+                        }
+                    });
+
+                    couponModels.forEach(coupon => {
+                        couponDetailsMap.set(coupon.code, {
+                            discountPercentage: coupon.discountPercentage,
+                            source: 'couponModel',
+                            code: coupon.code
+                        });
+                    });
+
+                    // Calculate discount amount using the service method
+                    discountAmount = await reservationService.calculateDiscountedPrice(reservationId.toString(), originalBasePrice);
+                }
+            }
         }
 
         /**
@@ -273,24 +298,79 @@ class RoomPrice {
         const propertyInfo: any = await propertyInfoService.getPropertyByHotelCode(hotelCode);
 
         /**
+         * Calculate tax and final price - CORRECTED FLOW
+         */
+        let totalTax = 0;
+        let priceAfterTax = totalPrice;
+
+        /**
          * If reservation has tax value (and it's not negative), use it instead of default tax calculation
          */
         if (reservationTaxValue !== null) {
+            // STEP 1: Start from base price
+            totalPrice = originalBasePrice;
+
+            // STEP 2: Add tax to base price
+            totalTax = reservationTaxValue;
+            const priceWithTax = totalPrice + totalTax;
+
+            // STEP 3: Apply discount on tax-added price
+            let finalPrice = priceWithTax;
+            if (discountAmount > 0) {
+                let discountOnTaxedPrice = discountAmount;
+
+                // Check if it's a percentage discount (from couponDetailsMap)
+                const couponDetails = Array.from(couponDetailsMap.values())[0]; // Get first coupon
+                if (couponDetails && couponDetails.discountType === 'percentage') {
+                    // For percentage discounts, apply percentage to taxed amount
+                    const discountOnTaxedPrice = priceWithTax * (couponDetails.discountValue / 100);
+                    finalPrice = Math.max(0, priceWithTax - discountOnTaxedPrice);
+                    response.data.promoDiscount = Number(discountOnTaxedPrice.toFixed(2));
+                } else {
+                    // For flat discounts, use the discountAmount directly
+                    finalPrice = Math.max(0, priceWithTax - discountAmount);
+                    response.data.promoDiscount = Number(discountAmount.toFixed(2));
+                }
+
+                console.log(`Price Calculation: Base(${originalBasePrice}) + Tax(${totalTax}) = ${priceWithTax} - Discount(${response.data.promoDiscount}) = ${finalPrice}`);
+            }
+
+            // STEP 4: Update the response with final calculated values
             response.data.tax = [{
                 name: 'Reservation Tax',
-                amount: reservationTaxValue,
+                amount: totalTax,
                 type: 'fixed'
             }];
-            response.data.totalTax = reservationTaxValue;
-            response.data.priceAfterTax = Number((totalPrice + reservationTaxValue).toFixed(2));
-        }
+            response.data.totalTax = totalTax;
+            response.data.priceAfterTax = Number(finalPrice.toFixed(2));
+            response.data.totalAmount = Number(finalPrice.toFixed(2));
 
-        /**
-         * Default tax calculation (only if no reservation tax value or reservation tax value is negative)
-         */
-        if (reservationTaxValue === null) {
+            // Also update breakdown accordingly
+            response.data.breakdown.totalBaseAmount = Number(originalBasePrice.toFixed(2));
+            response.data.breakdown.totalAmount = Number(finalPrice.toFixed(2));
+            response.data.breakdown.averagePerNight = Number((finalPrice / response.data.breakdown.numberOfNights).toFixed(2));
+
+            // Update daily breakdown to reflect the final amounts
+            if (response.data.dailyBreakdown && response.data.dailyBreakdown.length > 0) {
+                const totalOriginalDailyAmount = originalDailyBreakdown.reduce((sum, day) => sum + day.totalForAllRooms, 0);
+                const discountRatio = totalOriginalDailyAmount > 0 ? (discountAmount / totalOriginalDailyAmount) : 0;
+
+                response.data.dailyBreakdown.forEach((day, index) => {
+                    const originalDayAmount = originalDailyBreakdown[index]?.totalForAllRooms || 0;
+                    const dayDiscount = originalDayAmount * discountRatio;
+                    const dayTax = originalDayAmount > 0 ? (totalTax * (originalDayAmount / totalOriginalDailyAmount)) : 0;
+
+                    const finalDayAmount = Math.max(0, originalDayAmount + dayTax - dayDiscount);
+                    day.totalForAllRooms = Number(finalDayAmount.toFixed(2));
+                });
+            }
+
+        } else {
+            /**
+             * Default tax calculation (only if no reservation tax value or reservation tax value is negative)
+             */
             if (propertyInfo.tax_group) {
-                const taxCalculation = await container.taxGroupService.calculateTaxRulesForReservation(basePrice, totalPrice, propertyInfo.tax_group);
+                const taxCalculation = await container.taxGroupService.calculateTaxRulesForReservation(totalPrice, totalPrice, propertyInfo.tax_group);
 
                 if (taxCalculation) {
                     let totalAmount = 0;
@@ -299,21 +379,70 @@ class RoomPrice {
                     }
 
                     response.data.tax = taxCalculation;
-                    response.data.totalTax = totalAmount;
-                    response.data.priceAfterTax = Number((response.data.totalAmount + totalAmount).toFixed(2));
+                    totalTax = totalAmount;
+
+                    // For default tax calculation: Apply tax first, then discount
+                    let priceWithTax = totalPrice + totalTax;
+                    if (discountAmount > 0) {
+                        priceWithTax = Math.max(0, priceWithTax - discountAmount);
+                        response.data.promoDiscount = Number(discountAmount.toFixed(2));
+                    }
+
+                    priceAfterTax = Number(priceWithTax.toFixed(2));
+                    response.data.totalAmount = priceAfterTax;
+
+                    // Update breakdown
+                    response.data.breakdown.totalAmount = priceAfterTax;
+                    response.data.breakdown.averagePerNight = Number((priceAfterTax / response.data.breakdown.numberOfNights).toFixed(2));
                 } else {
                     response.data.tax = [];
+                    // Apply discount even if no tax
+                    if (discountAmount > 0) {
+                        priceAfterTax = Math.max(0, totalPrice - discountAmount);
+                        response.data.promoDiscount = Number(discountAmount.toFixed(2));
+                        response.data.totalAmount = priceAfterTax;
+                        response.data.breakdown.totalAmount = priceAfterTax;
+                        response.data.breakdown.averagePerNight = Number((priceAfterTax / response.data.breakdown.numberOfNights).toFixed(2));
+                    }
+                }
+            } else {
+                // No tax group - just apply discount if any
+                if (discountAmount > 0) {
+                    priceAfterTax = Math.max(0, totalPrice - discountAmount);
+                    response.data.promoDiscount = Number(discountAmount.toFixed(2));
+                    response.data.totalAmount = priceAfterTax;
+                    response.data.breakdown.totalAmount = priceAfterTax;
+                    response.data.breakdown.averagePerNight = Number((priceAfterTax / response.data.breakdown.numberOfNights).toFixed(2));
                 }
             }
+
+            // Apply the final calculated values for default tax case
+            response.data.totalTax = totalTax;
+            response.data.priceAfterTax = priceAfterTax;
         }
 
-        // Add coupon details to response
+        // Add coupon details to response (remove duplicates)
         if (couponDetailsMap.size > 0) {
-            response.data.couponDetails = Object.fromEntries(couponDetailsMap);
+            const uniqueCouponDetails = {};
+            const processedCodes = new Set();
+
+            couponDetailsMap.forEach((value, key) => {
+                // Only add if not already added (avoid code/codeName duplicates)
+                const codeToCheck = value.code || value.codeName;
+                if (codeToCheck && !processedCodes.has(codeToCheck)) {
+                    uniqueCouponDetails[key] = value;
+                    processedCodes.add(codeToCheck);
+                }
+            });
+            response.data.couponDetails = uniqueCouponDetails;
         }
 
         return response;
     }
+
+    /**
+     * 
+     */
 
     public static async getAllRoomTypeController(req: Request) {
         const hotelCode = req.query.hotelCode as string;
