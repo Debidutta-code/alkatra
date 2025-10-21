@@ -124,12 +124,12 @@ class HotelPricesDao {
         ];
 
         try {
-            console.log(`The pipeline is ${JSON.stringify(pipeline)}`);
+            
             const results = await Inventory.aggregate(pipeline).exec();
-            results.map((item) => {
-                console.log(item)
-                console.log(item.rate) 
-            })
+            // results.map((item) => {
+            //     console.log(item)
+            //     console.log(item.rate) 
+            // })
         
             return results
         } catch (error) {

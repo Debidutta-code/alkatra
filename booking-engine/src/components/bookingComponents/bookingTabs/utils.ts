@@ -1,17 +1,15 @@
 import React from 'react';
 import { format, parseISO, differenceInDays } from "date-fns";
-import { Booking } from "./types";
 import { 
   FaRegCalendarCheck, 
   FaRegClock, 
   FaRegTimesCircle, 
   FaRegCalendarAlt, 
-  FaMoneyBillWave, 
-  FaCreditCard,
   FaBed,
   FaConciergeBell,
   FaStar
 } from "react-icons/fa";
+import { Booking, CouponDetails } from './types';
 
 export const formatDateString = (dateString: string): string => {
   try {
@@ -28,7 +26,7 @@ export const calculateNights = (checkIn: string, checkOut: string): number => {
     const endDate = parseISO(checkOut);
     return differenceInDays(endDate, startDate);
   } catch (error) {
-    return 1; // Default to 1 night if calculation fails
+    return 1;
   }
 };
 
@@ -40,23 +38,25 @@ export const getStatusClass = (status: string): string => {
       return "bg-yellow-100 text-yellow-800 border-yellow-300";
     case "Cancelled":
       return "bg-red-100 text-red-800 border-red-300";
+    case "Modified":
+      return "bg-blue-100 text-blue-800 border-blue-300";
     default:
       return "bg-gray-100 text-gray-800 border-gray-300";
   }
 };
 
-export const getStatusIcon = (status: string , lang : string ="eg"): React.ReactElement => {
-      const directionClass = lang === "ar" ? "ml-1.5" : "mr-1.5";
-    switch (status) {
-      case "Confirmed":
-        return React.createElement(FaRegCalendarCheck, { className: ` text-green-600 ${directionClass}` });
-      case "Pending":
-        return React.createElement(FaRegClock, { className: ` text-yellow-600 ${directionClass}` });
-      case "Cancelled":
-        return React.createElement(FaRegTimesCircle, { className: ` text-red-600 ${directionClass}` });
-      default:
-        return React.createElement(FaRegCalendarAlt, { className: ` text-gray-600 ${directionClass}` });
-    }
+export const getStatusIcon = (status: string, lang: string = "en"): React.ReactElement => {
+  const directionClass = lang === "ar" ? "ml-1.5" : "mr-1.5";
+  switch (status) {
+    case "Confirmed":
+      return React.createElement(FaRegCalendarCheck, { className: `text-green-600 ${directionClass}` });
+    case "Pending":
+      return React.createElement(FaRegClock, { className: `text-yellow-600 ${directionClass}` });
+    case "Cancelled":
+      return React.createElement(FaRegTimesCircle, { className: `text-red-600 ${directionClass}` });
+    default:
+      return React.createElement(FaRegCalendarAlt, { className: `text-gray-600 ${directionClass}` });
+  }
 };
 
 export const getRoomTypeStyle = (roomType: string = ""): string => {
@@ -72,18 +72,98 @@ export const getRoomTypeStyle = (roomType: string = ""): string => {
     return "bg-tripswift-blue/5 text-tripswift-blue border border-tripswift-blue/20";
   }
 };
-// Added the missing getRoomTypeIcon function
+
 export const getRoomTypeIcon = (roomType: string = "", lang: string = "en"): React.ReactElement => {
   const type = roomType?.toLowerCase() || "";
-    const directionClass = lang === "ar" ? "ml-1.5" : "mr-1.5";
+  const directionClass = lang === "ar" ? "ml-1.5" : "mr-1.5";
 
   if (type.includes("deluxe") || type.includes("premium")) {
-    return React.createElement(FaConciergeBell, { className: ` text-tripswift-blue ${directionClass}`});
+    return React.createElement(FaConciergeBell, { className: `text-tripswift-blue ${directionClass}`});
   } else if (type.includes("suite")) {
-    return React.createElement(FaStar, { className:  ` text-tripswift-blue ${directionClass}` });
+    return React.createElement(FaStar, { className: `text-tripswift-blue ${directionClass}` });
   } else {
-    return React.createElement(FaBed, { className:  ` text-tripswift-blue ${directionClass}` });
+    return React.createElement(FaBed, { className: `text-tripswift-blue ${directionClass}` });
   }
+};
+
+// Coupon calculation utilities
+const getDiscountInfo = (coupon: CouponDetails): { type: 'percentage' | 'fixed', value: number, maxCap?: number } => {
+  // Handle couponModel format (discountPercentage)
+  if (coupon.details.discountPercentage !== undefined) {
+    return {
+      type: 'percentage',
+      value: coupon.details.discountPercentage,
+    };
+  }
+  
+  // Handle promocode format (discountType + discountValue)
+  if (coupon.details.discountType && coupon.details.discountValue !== undefined) {
+    return {
+      type: coupon.details.discountType,
+      value: coupon.details.discountValue,
+      maxCap: coupon.details.maxDiscountAmount,
+    };
+  }
+  
+  return { type: 'percentage', value: 0 };
+};
+
+export const calculateOriginalAmount = (booking: Booking): number => {
+  if (!booking.couponDetails || booking.couponDetails.length === 0) {
+    return booking.totalAmount;
+  }
+
+  let totalOriginal = booking.totalAmount;
+
+  // Apply all coupons in reverse
+  for (let i = booking.couponDetails.length - 1; i >= 0; i--) {
+    const discountInfo = getDiscountInfo(booking.couponDetails[i]);
+    
+    if (discountInfo.type === 'percentage') {
+      // Reverse calculate percentage discount
+      totalOriginal = totalOriginal / (1 - discountInfo.value / 100);
+      
+      // Apply max discount cap if exists
+      if (discountInfo.maxCap) {
+        const calculatedDiscount = totalOriginal - totalOriginal * (1 - discountInfo.value / 100);
+        if (calculatedDiscount > discountInfo.maxCap) {
+          totalOriginal = booking.totalAmount + discountInfo.maxCap;
+        }
+      }
+    } else if (discountInfo.type === 'fixed' || discountInfo.type === 'flat') {
+      // ✅ FIX: Handle both 'fixed' and 'flat' types
+      totalOriginal = totalOriginal + discountInfo.value;
+    }
+  }
+
+  return totalOriginal;
+};
+
+export const getDiscountAmount = (booking: Booking): number => {
+  return calculateOriginalAmount(booking) - booking.totalAmount;
+};
+
+export const formatDiscountBadge = (couponDetails: CouponDetails[], currency: string): string => {
+  if (!couponDetails || couponDetails.length === 0) return '';
+  
+  // Calculate total discount percentage or show multiple coupons
+  const totalDiscount = couponDetails.reduce((total, coupon) => {
+    const info = getDiscountInfo(coupon);
+    if (info.type === 'percentage') {
+      return total + info.value;
+    }
+    return total;
+  }, 0);
+  
+  if (couponDetails.length > 1) {
+    return `${totalDiscount}% OFF (${couponDetails.length} coupons)`;
+  }
+  
+  const info = getDiscountInfo(couponDetails[0]);
+  if (info.type === 'percentage') {
+    return `${info.value}% OFF`;
+  }
+  return `${currency} ${info.value} OFF`;
 };
 
 // export const getPaymentMethodText = (booking: Booking): string => {

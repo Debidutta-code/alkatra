@@ -9,6 +9,9 @@ export class ThirdPartyReservationRepository {
     apiResponse: string
   ): Promise<void> {
     const booking = new ThirdPartyBooking({
+      provider: data.provider,
+      coupon: data.coupon,
+      taxValue: data.taxValue || 0,
       userId: data.userId,
       guestDetails: data.guests,
       email: data.email,

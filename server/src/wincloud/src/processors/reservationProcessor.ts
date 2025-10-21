@@ -4,7 +4,11 @@ import { v4 as uuidv4 } from "uuid";
 export class ReservationProcessor {
     async processReservationInput(data: ReservationInput): Promise<ThirdPartyReservationData> {
         const { bookingDetails, ageCodeSummary } = data;
-        const {userId,
+        const {
+            provider,
+            coupon,
+            taxValue,
+            userId,
             checkInDate,
             checkOutDate,
             hotelCode,
@@ -20,9 +24,12 @@ export class ReservationProcessor {
             reservationId,  
             paymentMethod,
         } = bookingDetails;
-        console.log("ReservationProcessor: Processing reservation input data:", bookingDetails);
+        
 
         const reservationData: ThirdPartyReservationData = {
+            provider,
+            coupon,
+            taxValue,
             userId,
             hotelCode,
             hotelName,

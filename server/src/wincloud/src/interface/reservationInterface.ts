@@ -6,53 +6,59 @@ export interface GuestDetails {
 }
 
 export interface ReservationInput {
-  bookingDetails: {
-    reservationId: string;
-    paymentMethod: string;
-    userId: string;
-    checkInDate: string;
-    checkOutDate: string;
-    hotelCode: string;
-    hotelName: string;
-    ratePlanCode: string;
-    roomTypeCode: string;
-    numberOfRooms: number;
-    roomTotalPrice: number;
-    currencyCode: string;
-    guests: any[];
-    email: string;
-    phone: string;
-  };
-  ageCodeSummary: Record<string, number>;
+    bookingDetails: {
+        provider: string;
+        coupon: string[];
+        taxValue?: number;
+        reservationId: string;
+        paymentMethod: string;
+        userId: string;
+        checkInDate: string;
+        checkOutDate: string;
+        hotelCode: string;
+        hotelName: string;
+        ratePlanCode: string;
+        roomTypeCode: string;
+        numberOfRooms: number;
+        roomTotalPrice: number;
+        currencyCode: string;
+        guests: any[];
+        email: string;
+        phone: string;
+    };
+    ageCodeSummary: Record<string, number>;
 }
 
 
 export interface ThirdPartyReservationData {
-  paymentMethod: string;
-  hotelCode: string;
-  hotelName?: string;
-  ratePlanCode: string;
-  ratePlanName?: string;
-  roomTypeCode: string;
-  numberOfRooms: number;
-  guests: any[];
-  email: string;
-  phone: string;
-  checkInDate: Date;
-  checkOutDate: Date;
-  // guestDetails: GuestDetails[];
-  amountBeforeTax: number;
-  currencyCode: string;
-  userId: string;
-//   propertyId: string;
-//   roomIds: string[];
-//   status: string;
-  reservationId: string;
-//   thirdPartyReservationIdType8?: string;
-//   thirdPartyReservationIdType3?: string;
+    provider: string;
+    coupon: string[];
+    taxValue?: number;
+    paymentMethod: string;
+    hotelCode: string;
+    hotelName?: string;
+    ratePlanCode: string;
+    ratePlanName?: string;
+    roomTypeCode: string;
+    numberOfRooms: number;
+    guests: any[];
+    email: string;
+    phone: string;
+    checkInDate: Date;
+    checkOutDate: Date;
+    // guestDetails: GuestDetails[];
+    amountBeforeTax: number;
+    currencyCode: string;
+    userId: string;
+    //   propertyId: string;
+    //   roomIds: string[];
+    //   status: string;
+    reservationId: string;
+    //   thirdPartyReservationIdType8?: string;
+    //   thirdPartyReservationIdType3?: string;
 
-  ageCodeSummary: Record<string, number>;
-  roomTotalPrice?: number;
+    ageCodeSummary: Record<string, number>;
+    roomTotalPrice?: number;
 }
 
 

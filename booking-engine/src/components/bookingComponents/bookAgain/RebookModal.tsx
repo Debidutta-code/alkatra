@@ -32,7 +32,8 @@ import {
   setRatePlanCode,
   resetPmsHotelCard,
   setRoomId,
-  setPropertyId
+  setPropertyId,
+  setTotalTax
 } from "@/Redux/slices/pmsHotelCard.slice";
 import { checkRoomAvailability, getRoomPrice } from "../../../api/rebook";
 import { useRouter } from "next/navigation";
@@ -517,6 +518,7 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
       dispatch(setCheckInDate(checkInDate.format("YYYY-MM-DD")));
       dispatch(setCheckOutDate(checkOutDate.format("YYYY-MM-DD")));
       dispatch(setAmount(finalPrice));
+      dispatch(setTotalTax(priceData?.totalTax ?? null));
       dispatch(setCurrency(localCurrency));
       dispatch(setRequestedRooms(rooms.toString()));
       dispatch(setRoomId(roomId));

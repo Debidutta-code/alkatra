@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { Shield, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from '../../Redux/store';
-import { setGuestDetails } from '../../Redux/slices/pmsHotelCard.slice';
+import { setGuestDetails, setFinalAmount, setPromoCode, setOriginalAmount, setPromoCodeName } from '../../Redux/slices/pmsHotelCard.slice';
 import axios from 'axios';
 import { formatDate } from '../../utils/dateUtils';
 
@@ -30,6 +30,8 @@ interface PayAtHotelProps {
     checkIn: string;
     checkOut: string;
     amount: number;
+    originalAmount?: number;
+    totalTax?: number;
     userId?: string;
     hotelName?: string;
     ratePlanCode?: string;
@@ -38,8 +40,10 @@ interface PayAtHotelProps {
     adults?: number;
     children?: number;
     currency?: string;
-    hotelCode?: string; // ✅ Add this line
+    hotelCode?: string;
     guests: Guest[];
+    promoCode?: string | null;
+    promoCodeName?: string | null;
   };
 }
 
@@ -177,9 +181,12 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
         numberOfRooms: bookingDetails.rooms || 1,
         roomTypeCode: bookingDetails.roomType || "",
         roomTotalPrice: bookingDetails.amount,
+        taxValue: bookingDetails.totalTax,
         currencyCode: bookingDetails.currency?.toUpperCase() || " ",
         email: bookingDetails.email,
         phone: bookingDetails.phone,
+        provider: "web",
+        coupon: bookingDetails.promoCode ? [bookingDetails.promoCode] : [],
         guests: bookingDetails.guests.map((guest: Guest) => ({
           firstName: guest.firstName || '',
           lastName: guest.lastName || '',
@@ -223,8 +230,10 @@ const PayAtHotelFunction: React.FC<PayAtHotelProps> = ({ bookingDetails }) => {
         }
       } catch (smsError: any) {
       }
-
-      // Dispatch guest details to Redux
+      dispatch(setOriginalAmount(bookingDetails.originalAmount || bookingDetails.amount));
+      dispatch(setFinalAmount(bookingDetails.amount));
+      dispatch(setPromoCode(bookingDetails.promoCode || null));
+      dispatch(setPromoCodeName(bookingDetails.promoCodeName || null));
       dispatch(setGuestDetails({
         guests: bookingResponse?.savedBooking?.guests || bookingDetails.guests,
         rooms: bookingDetails.rooms || 1,

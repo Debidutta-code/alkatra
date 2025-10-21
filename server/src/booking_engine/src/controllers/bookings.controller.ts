@@ -18,9 +18,15 @@ import Auth from "../../../user_authentication/src/Model/auth.model";
 import { PropertyInfo } from "../../../property_management/src/model/property.info.model";
 import UserModel from "../../../user_authentication/src/Model/auth.model";
 import { MailFactory } from "../../../customer_authentication/src/services/mailFactory";
-import { BookAgainAvailabilityService, BookingService } from "../services";
+import { BookAgainAvailabilityService, AmendBookingService, ReservationService } from "../services";
 import { property } from "zod";
 import { Room } from "../../../property_management/src/model/room.model";
+import { Promocode } from "../../../property_management/src/model";
+import couponModel from "../../../coupon_management/model/couponModel";
+import { PromoCodeService } from "../../../property_management/src/service";
+import { validateCouponCode } from "../../../coupon_management/services/couponService";
+
+
 
 
 const mailer = MailFactory.getMailer();
@@ -36,7 +42,7 @@ const calculateAgeCategory = (dob: string) => {
     age--;
   }
   if (age <= 2) return { age, category: "Infant", ageCode: "7" };
-  if (age <= 13) return { age, category: "Child", ageCode: "8" };
+  if (age < 12) return { age, category: "Child", ageCode: "8" };
   return { age, category: "Adult", ageCode: "10" };
 };
 
@@ -298,6 +304,8 @@ export const createReservationWithStoredCard = CatchAsyncError(
     }
 
     const {
+      provider,
+      coupon,
       checkInDate,
       checkOutDate,
       hotelCode,
@@ -314,6 +322,10 @@ export const createReservationWithStoredCard = CatchAsyncError(
     } = req.body;
 
     const requiredFields = {
+      // provider,
+      // coupon,
+      provider: 'web',
+      coupon: ["OQ43KZ1T970X", "IJKWRI1SL"],
       checkInDate,
       checkOutDate,
       hotelCode,
@@ -385,6 +397,8 @@ export const createReservationWithStoredCard = CatchAsyncError(
 
     const reservationInput: ReservationInput = {
       bookingDetails: {
+        provider: 'web',
+        coupon: ["OQ43KZ1T970X", "IJKWRI1SL"],
         reservationId: "",
         paymentMethod: "payAtHotel",
         userId,
@@ -659,311 +673,319 @@ export const createReservationWithStoredCard = CatchAsyncError(
   }
 );
 
-export async function createReservationWithCryptoPayment(input: {
-  reservationId?: string;
-  userId: string;
-  checkInDate: string;
-  checkOutDate: string;
-  hotelCode: string;
-  hotelName: string;
-  ratePlanCode: string;
-  numberOfRooms: number;
-  roomTypeCode: string;
-  roomTotalPrice: number;
-  currencyCode: string;
-  email: string;
-  phone: string;
-  guests: { firstName: string; lastName: string; dob: string }[];
-}) {
-  try {
-    const {
-      reservationId,
-      userId,
-      checkInDate,
-      checkOutDate,
-      hotelCode,
-      hotelName,
-      ratePlanCode,
-      numberOfRooms,
-      roomTypeCode,
-      roomTotalPrice,
-      currencyCode,
-      email,
-      phone,
-      guests,
-    } = input;
+// export async function createReservationWithCryptoPayment(input: {
+//   provider: string;
+//   coupon: string[];
+//   taxValue?: number;
+//   reservationId?: string;
+//   userId: string;
+//   checkInDate: string;
+//   checkOutDate: string;
+//   hotelCode: string;
+//   hotelName: string;
+//   ratePlanCode: string;
+//   numberOfRooms: number;
+//   roomTypeCode: string;
+//   roomTotalPrice: number;
+//   currencyCode: string;
+//   email: string;
+//   phone: string;
+//   guests: { firstName: string; lastName: string; dob: string }[];
+// }) {
+//   try {
+//     const {
+//       provider,
+//       coupon,
+//       taxValue,
+//       reservationId,
+//       userId,
+//       checkInDate,
+//       checkOutDate,
+//       hotelCode,
+//       hotelName,
+//       ratePlanCode,
+//       numberOfRooms,
+//       roomTypeCode,
+//       roomTotalPrice,
+//       currencyCode,
+//       email,
+//       phone,
+//       guests,
+//     } = input;
 
-    console.log(`BOOKING Controller, crypto booking begins ${currencyCode} ${roomTotalPrice}`)
+//     const today = new Date();
+//     today.setHours(0, 0, 0, 0);
+//     const checkIn = new Date(checkInDate);
+//     const checkOut = new Date(checkOutDate);
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const checkIn = new Date(checkInDate);
-    const checkOut = new Date(checkOutDate);
+//     if (checkIn < today || checkOut <= checkIn) {
+//       throw new Error("Check-in date cannot be in the past or Check-out date must be after check-in date");
+//     }
 
-    if (checkIn < today || checkOut <= checkIn) {
-      throw new Error("Check-in date cannot be in the past or Check-out date must be after check-in date");
-    }
+//     if (!Array.isArray(guests) || guests.length === 0) {
+//       throw new Error("Guest details are required");
+//     }
 
-    if (!Array.isArray(guests) || guests.length === 0) {
-      throw new Error("Guest details are required");
-    }
+//     const ageCodeCount: Record<string, number> = { "7": 0, "8": 0, "10": 0 };
 
-    const ageCodeCount: Record<string, number> = { "7": 0, "8": 0, "10": 0 };
+//     const categorizedGuests = guests.map(({ firstName, lastName, dob }) => {
+//       if (!dob) throw new Error(`DOB missing for ${firstName} ${lastName}`);
+//       const { age, category, ageCode } = calculateAgeCategory(dob);
+//       ageCodeCount[ageCode] = (ageCodeCount[ageCode] || 0) + 1;
+//       return { firstName, lastName, dob, age, category, ageCode };
+//     });
 
-    const categorizedGuests = guests.map(({ firstName, lastName, dob }) => {
-      if (!dob) throw new Error(`DOB missing for ${firstName} ${lastName}`);
-      const { age, category, ageCode } = calculateAgeCategory(dob);
-      ageCodeCount[ageCode] = (ageCodeCount[ageCode] || 0) + 1;
-      return { firstName, lastName, dob, age, category, ageCode };
-    });
+//     const reservationInput: ReservationInput = {
+//       bookingDetails: {
+//         provider,
+//         coupon,
+//         taxValue: taxValue || 0,
+//         reservationId: reservationId ?? "",
+//         paymentMethod: "crypto",
+//         userId,
+//         checkInDate,
+//         checkOutDate,
+//         hotelCode,
+//         hotelName,
+//         ratePlanCode,
+//         roomTypeCode,
+//         numberOfRooms,
+//         roomTotalPrice,
+//         currencyCode,
+//         guests,
+//         email,
+//         phone,
+//       },
+//       ageCodeSummary: ageCodeCount,
+//     };
 
-    const reservationInput: ReservationInput = {
-      bookingDetails: {
-        reservationId: reservationId ?? "",
-        paymentMethod: "crypto",
-        userId,
-        checkInDate,
-        checkOutDate,
-        hotelCode,
-        hotelName,
-        ratePlanCode,
-        roomTypeCode,
-        numberOfRooms,
-        roomTotalPrice,
-        currencyCode,
-        guests,
-        email,
-        phone,
-      },
-      ageCodeSummary: ageCodeCount,
-    };
+//     const thirdPartyService = new ThirdPartyReservationService();
+//     await thirdPartyService.processThirdPartyReservation(reservationInput);
+//     await reduceRoomsAfterBookingConfirmedCrypto(
+//       hotelCode,
+//       roomTypeCode,
+//       numberOfRooms,
+//       [checkIn, checkOut]
+//     );
+//     await couponCheck(coupon);
 
-    const thirdPartyService = new ThirdPartyReservationService();
-    await thirdPartyService.processThirdPartyReservation(reservationInput);
-    await reduceRoomsAfterBookingConfirmedCrypto(
-      hotelCode,
-      roomTypeCode,
-      numberOfRooms,
-      [checkIn, checkOut]
-    );
+//     const htmlContent = `<!DOCTYPE html>
+//         <html lang="en">
 
-    const htmlContent = `<!DOCTYPE html>
-        <html lang="en">
+//         <head>
+//           <meta charset="UTF-8">
+//           <meta name="viewport" content="width=device-width, initial-scale=1.0">
+//           <style>
+//             body {
+//               font-family: Arial, sans-serif;
+//               background-color: #f4f4f4;
+//               margin: 0;
+//               padding: 0;
+//             }
 
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              background-color: #f4f4f4;
-              margin: 0;
-              padding: 0;
-            }
+//             .container {
+//               max-width: 600px;
+//               margin: 20px auto;
+//               background-color: #ffffff;
+//               border-radius: 8px;
+//               overflow: hidden;
+//               box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+//             }
 
-            .container {
-              max-width: 600px;
-              margin: 20px auto;
-              background-color: #ffffff;
-              border-radius: 8px;
-              overflow: hidden;
-              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            }
+//             .header {
+//               background-color: #1a73e8;
+//               color: #ffffff;
+//               padding: 20px;
+//               text-align: center;
+//             }
 
-            .header {
-              background-color: #1a73e8;
-              color: #ffffff;
-              padding: 20px;
-              text-align: center;
-            }
+//             .header h1 {
+//               margin: 0;
+//               font-size: 24px;
+//             }
 
-            .header h1 {
-              margin: 0;
-              font-size: 24px;
-            }
+//             .content {
+//               padding: 20px;
+//             }
 
-            .content {
-              padding: 20px;
-            }
+//             .content h2 {
+//               color: #333333;
+//               font-size: 20px;
+//               margin-top: 0;
+//             }
 
-            .content h2 {
-              color: #333333;
-              font-size: 20px;
-              margin-top: 0;
-            }
+//             .content p {
+//               color: #666666;
+//               line-height: 1.6;
+//               margin: 10px 0;
+//             }
 
-            .content p {
-              color: #666666;
-              line-height: 1.6;
-              margin: 10px 0;
-            }
+//             .details-table {
+//               width: 100%;
+//               border-collapse: collapse;
+//               margin: 20px 0;
+//             }
 
-            .details-table {
-              width: 100%;
-              border-collapse: collapse;
-              margin: 20px 0;
-            }
+//             .details-table th,
+//             .details-table td {
+//               padding: 10px;
+//               text-align: left;
+//               border-bottom: 1px solid #dddddd;
+//             }
 
-            .details-table th,
-            .details-table td {
-              padding: 10px;
-              text-align: left;
-              border-bottom: 1px solid #dddddd;
-            }
+//             .details-table th {
+//               background-color: #f8f8f8;
+//               color: #333333;
+//               font-weight: bold;
+//             }
 
-            .details-table th {
-              background-color: #f8f8f8;
-              color: #333333;
-              font-weight: bold;
-            }
+//             .footer {
+//               background-color: #f4f4f4;
+//               padding: 15px;
+//               text-align: center;
+//               color: #888888;
+//               font-size: 12px;
+//             }
 
-            .footer {
-              background-color: #f4f4f4;
-              padding: 15px;
-              text-align: center;
-              color: #888888;
-              font-size: 12px;
-            }
+//             .button {
+//               display: inline-block;
+//               padding: 10px 20px;
+//               margin: 20px 0;
+//               background-color: #1a73e8;
+//               color: #ffffff;
+//               text-decoration: none;
+//               border-radius: 5px;
+//               font-weight: bold;
+//             }
 
-            .button {
-              display: inline-block;
-              padding: 10px 20px;
-              margin: 20px 0;
-              background-color: #1a73e8;
-              color: #ffffff;
-              text-decoration: none;
-              border-radius: 5px;
-              font-weight: bold;
-            }
+//             @media only screen and (max-width: 600px) {
+//               .container {
+//                 width: 100%;
+//                 margin: 10px;
+//               }
 
-            @media only screen and (max-width: 600px) {
-              .container {
-                width: 100%;
-                margin: 10px;
-              }
+//               .header h1 {
+//                 font-size: 20px;
+//               }
 
-              .header h1 {
-                font-size: 20px;
-              }
+//               .content h2 {
+//                 font-size: 18px;
+//               }
+//             }
+//           </style>
+//         </head>
 
-              .content h2 {
-                font-size: 18px;
-              }
-            }
-          </style>
-        </head>
+//         <body>
+//           <div class="container">
+//             <div class="header">
+//               <h1>Booking Confirmation</h1>
+//             </div>
+//             <div class="content">
+//               <h2>Dear {{guestName}},</h2>
+//               <p>Thank you for your booking with {{hotelName}}! We are excited to confirm your booking details below.</p>
 
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>Booking Confirmation</h1>
-            </div>
-            <div class="content">
-              <h2>Dear {{guestName}},</h2>
-              <p>Thank you for your booking with {{hotelName}}! We are excited to confirm your booking details below.</p>
+//               <h2>Reservation Details</h2>
+//               <table class="details-table">
+//                 <tr>
+//                   <th>Hotel Name</th>
+//                   <td>{{hotelName}}</td>
+//                 </tr>
+//                 <tr>
+//                   <th>Check-In Date</th>
+//                   <td>{{checkInDate}}</td>
+//                 </tr>
+//                 <tr>
+//                   <th>Check-Out Date</th>
+//                   <td>{{checkOutDate}}</td>
+//                 </tr>
+//                 <tr>
+//                   <th>Room Type</th>
+//                   <td>{{roomTypeCode}}</td>
+//                 </tr>
+//                 <tr>
+//                   <th>Number of Rooms</th>
+//                   <td>{{numberOfRooms}}</td>
+//                 </tr>
+//                 <tr>
+//                   <th>Total Price</th>
+//                   <td>{{roomTotalPrice}} {{currencyCode}}</td>
+//                 </tr>
+//                 <tr>
+//                   <th>Contact Email</th>
+//                   <td>{{email}}</td>
+//                 </tr>
+//                 <tr>
+//                   <th>Contact Phone</th>
+//                   <td>+{{phone}}</td>
+//                 </tr>
+//               </table>
 
-              <h2>Reservation Details</h2>
-              <table class="details-table">
-                <tr>
-                  <th>Hotel Name</th>
-                  <td>{{hotelName}}</td>
-                </tr>
-                <tr>
-                  <th>Check-In Date</th>
-                  <td>{{checkInDate}}</td>
-                </tr>
-                <tr>
-                  <th>Check-Out Date</th>
-                  <td>{{checkOutDate}}</td>
-                </tr>
-                <tr>
-                  <th>Room Type</th>
-                  <td>{{roomTypeCode}}</td>
-                </tr>
-                <tr>
-                  <th>Number of Rooms</th>
-                  <td>{{numberOfRooms}}</td>
-                </tr>
-                <tr>
-                  <th>Total Price</th>
-                  <td>{{roomTotalPrice}} {{currencyCode}}</td>
-                </tr>
-                <tr>
-                  <th>Contact Email</th>
-                  <td>{{email}}</td>
-                </tr>
-                <tr>
-                  <th>Contact Phone</th>
-                  <td>+{{phone}}</td>
-                </tr>
-              </table>
+//               <h2>Guest Details</h2>
+//               <table class="details-table">
+//                 <tr>
+//                   <th>Name</th>
+//                   <th>Age Category</th>
+//                 </tr>
+//                 {{#each guests}}
+//                 <tr>
+//                   <td>{{firstName}} {{lastName}}</td>
+//                   <td>{{category}} (Age {{age}})</td>
+//                 </tr>
+//                 {{/each}}
+//               </table>
 
-              <h2>Guest Details</h2>
-              <table class="details-table">
-                <tr>
-                  <th>Name</th>
-                  <th>Age Category</th>
-                </tr>
-                {{#each guests}}
-                <tr>
-                  <td>{{firstName}} {{lastName}}</td>
-                  <td>{{category}} (Age {{age}})</td>
-                </tr>
-                {{/each}}
-              </table>
+//               <p>For any questions or to modify your reservation, please contact us at <a
+//                   href="mailto:{{supportEmail}}">{{supportEmail}}</a>.</p>
 
-              <p>For any questions or to modify your reservation, please contact us at <a
-                  href="mailto:{{supportEmail}}">{{supportEmail}}</a>.</p>
+//               <a href="{{websiteUrl}}" class="button">View Your Booking</a>
+//             </div>
+//             <div class="footer">
+//               <p>&copy; {{currentYear}} {{companyName}}. All rights reserved.</p>
+//             </div>
+//           </div>
+//         </body>
 
-              <a href="{{websiteUrl}}" class="button">View Your Booking</a>
-            </div>
-            <div class="footer">
-              <p>&copy; {{currentYear}} {{companyName}}. All rights reserved.</p>
-            </div>
-          </div>
-        </body>
+//         </html>`;
+//     const templateData = {
+//       guestName: `${guests[0].firstName} ${guests[0].lastName}`,
+//       hotelName,
+//       checkInDate: new Date(checkInDate).toLocaleDateString(),
+//       checkOutDate: new Date(checkOutDate).toLocaleDateString(),
+//       roomTypeCode,
+//       numberOfRooms,
+//       roomTotalPrice,
+//       currencyCode,
+//       email,
+//       phone,
+//       guests: categorizedGuests,
+//       supportEmail: 'business.alhajz@gmail.com',
+//       // supportPhone: '+1-800-123-4567',
+//       websiteUrl: 'https://alhajz.ai',
+//       currentYear: new Date().getFullYear(),
+//       companyName: 'Al-Hajz',
+//     };
 
-        </html>`;
-    const templateData = {
-      guestName: `${guests[0].firstName} ${guests[0].lastName}`,
-      hotelName,
-      checkInDate: new Date(checkInDate).toLocaleDateString(),
-      checkOutDate: new Date(checkOutDate).toLocaleDateString(),
-      roomTypeCode,
-      numberOfRooms,
-      roomTotalPrice,
-      currencyCode,
-      email,
-      phone,
-      guests: categorizedGuests,
-      supportEmail: 'business.alhajz@gmail.com',
-      // supportPhone: '+1-800-123-4567',
-      websiteUrl: 'https://alhajz.ai',
-      currentYear: new Date().getFullYear(),
-      companyName: 'Al-Hajz',
-    };
+//     const template = Handlebars.compile(htmlContent);
+//     const finalHtml = template(templateData);
 
-    const template = Handlebars.compile(htmlContent);
-    const finalHtml = template(templateData);
+//     await mailer.sendMail({
+//       to: email,
+//       subject: `Booking Confirmation - ${hotelName}`,
+//       html: finalHtml,
+//       text: `Your booking has been confirmed`,
+//     });
 
-    await mailer.sendMail({
-      to: email,
-      subject: `Booking Confirmation - ${hotelName}`,
-      html: finalHtml,
-      text: `Your booking has been confirmed`,
-    });
+//     return {
+//       message: "Reservation with crypto confirmed",
+//       guests: categorizedGuests,
+//       ageCodeSummary: ageCodeCount,
+//     };
 
-    return {
-      message: "Reservation with crypto confirmed",
-      guests: categorizedGuests,
-      ageCodeSummary: ageCodeCount,
-    };
-
-  } catch (error: any) {
-    console.error("❌ Error creating reservation with crypto:", error.message || error);
-    throw new Error(`Failed to create reservation: ${error.message || "Unknown error"}`);
-  }
-};
+//   } catch (error: any) {
+//     console.error("❌ Error creating reservation with crypto:", error.message || error);
+//     throw new Error(`Failed to create reservation: ${error.message || "Unknown error"}`);
+//   }
+// };
 
 export const cancelThirdPartyReservation = CatchAsyncError(
   async (req: any, res: Response, next: NextFunction) => {
@@ -1192,6 +1214,174 @@ export const cancelThirdPartyReservation = CatchAsyncError(
 );
 
 
+// export const getBookingDetailsOfUser = CatchAsyncError(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const userId = req.params.id;
+//       const { filterData, startDate, endDate, guestName } = req.query;
+//       const page = req.query.page ? parseInt(req.query.page as string) : 1;
+//       const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+//       const skip = (page - 1) * limit;
+
+//       const matchCriteria: any = {
+//         userId,
+//       };
+//       if (startDate || endDate) {
+//         if (!startDate || !endDate) {
+//           return res.status(400).json({
+//             success: false,
+//             message: "Both startDate and endDate are required for date filtering",
+//           });
+//         }
+
+//         matchCriteria.checkInDate = {
+//           $gte: new Date(startDate as string),
+//           $lte: new Date(endDate as string),
+//         };
+//       }
+//       if (guestName) {
+//         matchCriteria.guestDetails = {
+//           $elemMatch: {
+//             firstName: { $regex: guestName as string, $options: "i" },
+//           },
+//         };
+//       }
+
+//       if (filterData && filterData !== 'null' && filterData !== '') {
+//         const validFilters = ['upcoming', 'completed', 'cancelled', 'processing'];
+//         if (!validFilters.includes(filterData as string)) {
+//           return res.status(400).json({
+//             success: false,
+//             message: "Invalid filterData. Must be one of: upcoming, completed, cancelled, processing",
+//           });
+//         }
+
+//         const currentDate = new Date();
+//         currentDate.setHours(0, 0, 0, 0);
+
+//         if (filterData === 'upcoming') {
+//           matchCriteria.checkInDate = {
+//             ...matchCriteria.checkInDate,
+//             $gt: currentDate,
+//           };
+//           matchCriteria.status = { $ne: 'Cancelled' };
+//         } else if (filterData === 'completed') {
+//           matchCriteria.checkInDate = {
+//             ...matchCriteria.checkInDate,
+//             $lte: currentDate,
+//           };
+//           matchCriteria.status = { $in: ['Confirmed'] };
+//         } else if (filterData === 'cancelled') {
+//           matchCriteria.status = 'Cancelled';
+//         } else if (filterData === 'Processing') {
+
+//           delete matchCriteria.status;
+
+//           if (matchCriteria.checkInDate) {
+//             matchCriteria.checkInDate = {
+//               $gte: matchCriteria.checkInDate.$gte?.toISOString().split('T')[0],
+//               $lte: matchCriteria.checkInDate.$lte?.toISOString().split('T')[0],
+//             };
+//           }
+//         }
+//       }
+
+//       let bookings;
+//       let totalBookings;
+//       if (filterData === 'processing') {
+//         totalBookings = await CryptoGuestDetails.countDocuments({
+//           ...matchCriteria,
+//           status: 'Processing',
+//         });
+//         if (totalBookings === 0) {
+//           return res.status(404).json({
+//             success: false,
+//             message: "No bookings found for the given user ID",
+//           });
+//         }
+//         bookings = await CryptoGuestDetails.find({
+//           ...matchCriteria,
+//           status: 'Processing',
+//         })
+//           .sort({ createdAt: -1 })
+//           .skip(skip)
+//           .limit(limit);
+//       } else {
+//         totalBookings = await ThirdPartyBooking.countDocuments(matchCriteria);
+//         if (totalBookings === 0) {
+//           return res.status(404).json({
+//             success: false,
+//             message: "No bookings found for the given user ID",
+//           });
+//         }
+//         bookings = await ThirdPartyBooking.find(matchCriteria)
+//           .sort({ createdAt: -1 })
+//           .skip(skip)
+//           .limit(limit);
+//       }
+
+//       // Get all unique hotel codes and room type codes
+//       const uniqueHotelCodes = [...new Set(bookings.map(booking => booking.hotelCode))];
+//       const uniqueRoomTypeCodes = [...new Set(bookings.map(booking => booking.roomTypeCode))];
+
+//       // Fetch property IDs and room IDs in bulk
+//       const properties = await PropertyInfo.find({
+//         property_code: { $in: uniqueHotelCodes }
+//       }).select('property_code _id').lean();
+
+//       const rooms = await Room.find({
+//         room_type: { $in: uniqueRoomTypeCodes }
+//       }).select('room_type _id').lean();
+
+//       // Create lookup maps for faster access
+//       const propertyMap = new Map();
+//       properties.forEach(prop => {
+//         propertyMap.set(prop.property_code, prop._id);
+//       });
+
+//       const roomMap = new Map();
+//       rooms.forEach(room => {
+//         roomMap.set(room.room_type, room._id);
+//       });
+
+//       // Enhance bookings with propertyId and roomId
+//       const enhancedBookings = bookings.map(booking => {
+//         const propertyId = propertyMap.get(booking.hotelCode);
+//         const roomId = roomMap.get(booking.roomTypeCode);
+
+//         return {
+//           ...booking.toObject(),
+//           propertyId: propertyId || null,
+//           roomId: roomId || null,
+//           checkInDate: booking.checkInDate instanceof Date
+//             ? booking.checkInDate.toISOString().split('T')[0]
+//             : booking.checkInDate,
+//           checkOutDate: booking.checkOutDate instanceof Date
+//             ? booking.checkOutDate.toISOString().split('T')[0]
+//             : booking.checkOutDate,
+//         };
+//       });
+
+//       const totalRevenue = enhancedBookings.reduce(
+//         (sum, booking) => sum + (booking.totalAmount || 0),
+//         0
+//       );
+
+//       return res.status(200).json({
+//         success: true,
+//         totalBookings,
+//         currentPage: page,
+//         totalPages: Math.ceil(totalBookings / limit),
+//         totalRevenue,
+//         bookings: enhancedBookings, // Return enhanced bookings with IDs
+//       });
+//     } catch (error: any) {
+//       console.error("Error in getBookingDetailsOfUser:", error);
+//       return next(new ErrorHandler(error.message || "Internal Server Error", 500));
+//     }
+//   }
+// );
+
 export const getBookingDetailsOfUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -1204,6 +1394,7 @@ export const getBookingDetailsOfUser = CatchAsyncError(
       const matchCriteria: any = {
         userId,
       };
+
       if (startDate || endDate) {
         if (!startDate || !endDate) {
           return res.status(400).json({
@@ -1217,6 +1408,7 @@ export const getBookingDetailsOfUser = CatchAsyncError(
           $lte: new Date(endDate as string),
         };
       }
+
       if (guestName) {
         matchCriteria.guestDetails = {
           $elemMatch: {
@@ -1252,9 +1444,7 @@ export const getBookingDetailsOfUser = CatchAsyncError(
         } else if (filterData === 'cancelled') {
           matchCriteria.status = 'Cancelled';
         } else if (filterData === 'Processing') {
-
           delete matchCriteria.status;
-
           if (matchCriteria.checkInDate) {
             matchCriteria.checkInDate = {
               $gte: matchCriteria.checkInDate.$gte?.toISOString().split('T')[0],
@@ -1266,6 +1456,7 @@ export const getBookingDetailsOfUser = CatchAsyncError(
 
       let bookings;
       let totalBookings;
+
       if (filterData === 'processing') {
         totalBookings = await CryptoGuestDetails.countDocuments({
           ...matchCriteria,
@@ -1298,20 +1489,18 @@ export const getBookingDetailsOfUser = CatchAsyncError(
           .limit(limit);
       }
 
-      // Get all unique hotel codes and room type codes
       const uniqueHotelCodes = [...new Set(bookings.map(booking => booking.hotelCode))];
       const uniqueRoomTypeCodes = [...new Set(bookings.map(booking => booking.roomTypeCode))];
 
-      // Fetch property IDs and room IDs in bulk
-      const properties = await PropertyInfo.find({
-        property_code: { $in: uniqueHotelCodes }
-      }).select('property_code _id').lean();
+      const [properties, rooms] = await Promise.all([
+        PropertyInfo.find({
+          property_code: { $in: uniqueHotelCodes }
+        }).select('property_code _id').lean(),
+        Room.find({
+          room_type: { $in: uniqueRoomTypeCodes }
+        }).select('room_type _id').lean()
+      ]);
 
-      const rooms = await Room.find({
-        room_type: { $in: uniqueRoomTypeCodes }
-      }).select('room_type _id').lean();
-
-      // Create lookup maps for faster access
       const propertyMap = new Map();
       properties.forEach(prop => {
         propertyMap.set(prop.property_code, prop._id);
@@ -1322,15 +1511,86 @@ export const getBookingDetailsOfUser = CatchAsyncError(
         roomMap.set(room.room_type, room._id);
       });
 
-      // Enhance bookings with propertyId and roomId
-      const enhancedBookings = bookings.map(booking => {
+      const extractCouponCodes = (couponField: any): string[] => {
+        if (!couponField) return [];
+        if (Array.isArray(couponField)) {
+          return couponField
+            .filter(code => code && typeof code === 'string' && code.trim() !== '')
+            .map(code => code.trim());
+        }
+        if (typeof couponField === 'string' && couponField.trim() !== '') {
+          return [couponField.trim()];
+        }
+        return [];
+      };
+
+      const allCouponCodes: string[] = [];
+      bookings.forEach((booking) => {
+        const codes = extractCouponCodes(booking.coupon);
+        allCouponCodes.push(...codes);
+      });
+
+      const uniqueCouponCodes = [...new Set(allCouponCodes)];
+
+      const couponDetailsMap = new Map();
+      if (uniqueCouponCodes.length > 0) {
+        const [promoCodes, couponModels] = await Promise.all([
+          Promocode.find({
+            $or: [
+              { code: { $in: uniqueCouponCodes } },
+              { codeName: { $in: uniqueCouponCodes } }
+            ]
+          })
+            .select('code codeName discountType discountValue minBookingAmount maxDiscountAmount'),
+          couponModel.find({ code: { $in: uniqueCouponCodes } })
+            .select('code discountPercentage')
+        ]);
+
+        promoCodes.forEach(coupon => {
+          const couponData = {
+            discountType: coupon.discountType,
+            discountValue: coupon.discountValue,
+            minBookingAmount: coupon.minBookingAmount,
+            maxDiscountAmount: coupon.maxDiscountAmount,
+            source: 'promocode'
+          };
+
+          if (coupon.code) {
+            couponDetailsMap.set(coupon.code, couponData);
+          }
+          if (coupon.codeName) {
+            couponDetailsMap.set(coupon.codeName, couponData);
+          }
+        });
+
+        couponModels.forEach(coupon => {
+          couponDetailsMap.set(coupon.code, {
+            discountPercentage: coupon.discountPercentage,
+            source: 'couponModel'
+          });
+        });
+      }
+
+      const enhancedBookings = bookings.map((booking) => {
         const propertyId = propertyMap.get(booking.hotelCode);
         const roomId = roomMap.get(booking.roomTypeCode);
+        const bookingCouponCodes = extractCouponCodes(booking.coupon);
 
-        return {
+        const couponDetails = bookingCouponCodes.length > 0
+          ? bookingCouponCodes.map(code => {
+            const details = couponDetailsMap.get(code);
+            return {
+              code: code,
+              details: details || null
+            };
+          }).filter(item => item.details !== null)
+          : null;
+
+        const enhancedBooking = {
           ...booking.toObject(),
           propertyId: propertyId || null,
           roomId: roomId || null,
+          couponDetails: couponDetails && couponDetails.length > 0 ? couponDetails : null,
           checkInDate: booking.checkInDate instanceof Date
             ? booking.checkInDate.toISOString().split('T')[0]
             : booking.checkInDate,
@@ -1338,6 +1598,8 @@ export const getBookingDetailsOfUser = CatchAsyncError(
             ? booking.checkOutDate.toISOString().split('T')[0]
             : booking.checkOutDate,
         };
+
+        return enhancedBooking;
       });
 
       const totalRevenue = enhancedBookings.reduce(
@@ -1351,7 +1613,7 @@ export const getBookingDetailsOfUser = CatchAsyncError(
         currentPage: page,
         totalPages: Math.ceil(totalBookings / limit),
         totalRevenue,
-        bookings: enhancedBookings, // Return enhanced bookings with IDs
+        bookings: enhancedBookings,
       });
     } catch (error: any) {
       console.error("Error in getBookingDetailsOfUser:", error);
@@ -1359,6 +1621,7 @@ export const getBookingDetailsOfUser = CatchAsyncError(
     }
   }
 );
+
 
 const validatePagination = (page: number, limit: number): void => {
   if (isNaN(page) || page < 1) {
@@ -1517,14 +1780,18 @@ export const getAllHotelsByRole = CatchAsyncError(
 
 export class BookingController {
 
-  private bookingService: BookingService;
+  private amendBookingService: AmendBookingService;
   private bookAgainService: BookAgainAvailabilityService;
+  private promoCodeService = PromoCodeService.getInstance();
 
-  constructor(bookingService: BookingService, bookAgainService: BookAgainAvailabilityService) {
-    if (!bookingService || !bookAgainService) {
-      throw new Error("BookingService and BookAgainAvailabilityService required");
+  /**
+   * 
+   */
+  constructor(amendBookingService: AmendBookingService, bookAgainService: BookAgainAvailabilityService, promoCodeService: PromoCodeService) {
+    if (!amendBookingService || !bookAgainService || !promoCodeService) {
+      throw new Error("BookingService, BookAgainAvailabilityService, and PromoCodeService are required");
     }
-    this.bookingService = bookingService;
+    this.amendBookingService = amendBookingService;
     this.bookAgainService = bookAgainService;
   }
 
@@ -1557,7 +1824,7 @@ export class BookingController {
         guests,
       } = req.body;
 
-      const { categorizedGuests, ageCodeSummary } = await this.bookingService.updateBooking(userId, reservationId, {
+      const { categorizedGuests, ageCodeSummary } = await this.amendBookingService.updateBooking(userId, reservationId, {
         checkInDate,
         checkOutDate,
         hotelCode,
@@ -1630,4 +1897,632 @@ export class BookingController {
       });
     }
   }
+
+  async reservationWithPayAtHotel(req: any, res: Response, next: NextFunction) {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+
+    const {
+      provider,
+      coupon,
+      taxValue,
+      checkInDate,
+      checkOutDate,
+      hotelCode,
+      hotelName,
+      ratePlanCode,
+      numberOfRooms,
+      roomTypeCode,
+      roomTotalPrice,
+      currencyCode,
+      email,
+      phone,
+      guests,
+      paymentInfo,
+    } = req.body;
+
+    console.log("The room total price we get is: ", roomTotalPrice);
+    console.log("THe tAx value we get is: ", taxValue);
+
+    const requiredFields = {
+      provider,
+      coupon,
+      checkInDate,
+      checkOutDate,
+      hotelCode,
+      hotelName,
+      ratePlanCode,
+      numberOfRooms,
+      roomTypeCode,
+      roomTotalPrice,
+      currencyCode,
+      email,
+      phone,
+      guests,
+      paymentInfo,
+    };
+
+    const missingFields = Object.entries(requiredFields)
+      .filter(([_, value]) => value === undefined || value === null || value === '')
+      .map(([key]) => key);
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        message: `Missing required fields: ${missingFields.join(', ')}`,
+      });
+    }
+
+    if (coupon && (!Array.isArray(coupon) || coupon.some((c: any) => typeof c !== 'string'))) {
+      return res.status(400).json({
+        message: 'Coupon field must be an array of strings',
+      });
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const checkIn = new Date(checkInDate);
+    const checkOut = new Date(checkOutDate);
+
+    if (checkIn < today || checkOut <= checkIn) {
+      return res.status(400).json({
+        message: 'Check-in date cannot be in the past or Check-out date must be after check-in date',
+      });
+    }
+
+    if (!Array.isArray(guests) || guests.length === 0) {
+      return res.status(400).json({ message: 'Guest details are required' });
+    }
+
+    const reservationInput = {
+      bookingDetails: {
+        provider,
+        coupon,
+        taxValue,
+        reservationId: '',
+        paymentMethod: 'payAtHotel',
+        userId,
+        checkInDate,
+        checkOutDate,
+        hotelCode,
+        hotelName,
+        ratePlanCode,
+        roomTypeCode,
+        numberOfRooms,
+        roomTotalPrice,
+        currencyCode,
+        guests,
+        email,
+        phone,
+      },
+      ageCodeSummary: { '7': 0, '8': 0, '10': 0 },
+    };
+
+    try {
+      const reservationService = new ReservationService();
+
+      let totalDiscount = 0;
+      let appliedCoupons = [];
+
+      // Process coupons if available
+      if (coupon && coupon.length > 0) {
+        const couponCheckResult = await this.couponCheck(coupon);
+
+        // Process promocodes
+        if (couponCheckResult.categorizedCoupons.promoCodes.length > 0) {
+          for (const promo of couponCheckResult.categorizedCoupons.promoCodes) {
+            try {
+              const result = await this.promoCodeService.updatePromocodeStatus(
+                promo.code,
+                userId
+              );
+              if (!result) {
+                return res.status(400).json({ message: `Failed to apply promo code ${promo.code}` });
+              }
+
+            } catch (error) {
+              console.error(`Failed to apply promo code ${promo.code}:`, error.message);
+            }
+          }
+        }
+
+        // Process coupon models
+        if (couponCheckResult.categorizedCoupons.couponModels.length > 0) {
+          for (const couponModel of couponCheckResult.categorizedCoupons.couponModels) {
+            try {
+              const result = await validateCouponCode(
+                couponModel.code,
+                userId,
+                parseFloat(roomTotalPrice),
+                'true',
+              );
+              if (!result) {
+                return res.status(400).json({ message: `Failed to apply coupon code ${couponModel.code}` });
+              }
+              appliedCoupons.push({ code: couponModel.code, type: 'coupon', discount: roomTotalPrice });
+            } catch (error) {
+              console.error(`Failed to apply coupon code ${couponModel.code}:`, error.message);
+            }
+          }
+        }
+
+        // Update room total price with discount
+        if (totalDiscount > 0) {
+          reservationInput.bookingDetails.roomTotalPrice = Math.max(0, roomTotalPrice - totalDiscount);
+        }
+      }
+
+      // Create reservation with updated price
+      const result = await reservationService.createReservation(reservationInput, paymentInfo.paymentMethodId);
+
+      return res.status(200).json({
+        message: 'Reservation received',
+        numberOfRooms,
+        roomTotalPrice: reservationInput.bookingDetails.roomTotalPrice, // Return discounted price
+        originalRoomTotalPrice: roomTotalPrice, // Include original price for reference
+        totalDiscount,
+        appliedCoupons,
+        guests: result.categorizedGuests,
+        ageCodeSummary: result.ageCodeSummary,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: error.message || 'Failed to process reservation',
+      });
+    }
+  }
+
+  async createReservationWithCryptoPayment(input: {
+    provider: string;
+    coupon: string[];
+    taxValue?: number;
+    reservationId?: string;
+    userId: string;
+    checkInDate: string;
+    checkOutDate: string;
+    hotelCode: string;
+    hotelName: string;
+    ratePlanCode: string;
+    numberOfRooms: number;
+    roomTypeCode: string;
+    roomTotalPrice: number;
+    currencyCode: string;
+    email: string;
+    phone: string;
+    guests: { firstName: string; lastName: string; dob: string }[];
+  }) {
+    try {
+      const {
+        provider,
+        coupon,
+        taxValue,
+        reservationId,
+        userId,
+        checkInDate,
+        checkOutDate,
+        hotelCode,
+        hotelName,
+        ratePlanCode,
+        numberOfRooms,
+        roomTypeCode,
+        roomTotalPrice,
+        currencyCode,
+        email,
+        phone,
+        guests,
+      } = input;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const checkIn = new Date(checkInDate);
+      const checkOut = new Date(checkOutDate);
+
+      if (checkIn < today || checkOut <= checkIn) {
+        throw new Error("Check-in date cannot be in the past or Check-out date must be after check-in date");
+      }
+
+      if (!Array.isArray(guests) || guests.length === 0) {
+        throw new Error("Guest details are required");
+      }
+
+      const ageCodeCount: Record<string, number> = { "7": 0, "8": 0, "10": 0 };
+
+      const categorizedGuests = guests.map(({ firstName, lastName, dob }) => {
+        if (!dob) throw new Error(`DOB missing for ${firstName} ${lastName}`);
+        const { age, category, ageCode } = calculateAgeCategory(dob);
+        ageCodeCount[ageCode] = (ageCodeCount[ageCode] || 0) + 1;
+        return { firstName, lastName, dob, age, category, ageCode };
+      });
+
+      let finalRoomTotalPrice = roomTotalPrice;
+      let totalDiscount = 0;
+      let appliedCoupons = [];
+
+      // Process coupons if available - UPDATED LOGIC
+      if (coupon && coupon.length > 0) {
+        const couponCheckResult = await this.couponCheck(coupon);
+
+        // Process promocodes - UPDATED to match reservationWithPayAtHotel
+        if (couponCheckResult.categorizedCoupons.promoCodes.length > 0) {
+          for (const promo of couponCheckResult.categorizedCoupons.promoCodes) {
+            try {
+              const result = await this.promoCodeService.updatePromocodeStatus(
+                promo.code,
+                userId
+              );
+              if (!result) {
+                throw new Error(`Failed to apply promo code ${promo.code}`);
+              }
+              // Note: In reservationWithPayAtHotel, promocodes don't directly affect price calculation
+              // They're just validated and status updated
+            } catch (error) {
+              console.error(`Failed to apply promo code ${promo.code}:`, error.message);
+              throw new Error(`Failed to apply promo code ${promo.code}`);
+            }
+          }
+        }
+
+        // Process coupon models - UPDATED to match reservationWithPayAtHotel
+        if (couponCheckResult.categorizedCoupons.couponModels.length > 0) {
+          for (const couponModel of couponCheckResult.categorizedCoupons.couponModels) {
+            try {
+              const result = await validateCouponCode(
+                couponModel.code,
+                userId,
+                parseFloat(finalRoomTotalPrice.toString()),
+                'true', // isUsed should be true
+              );
+              if (!result) {
+                throw new Error(`Failed to apply coupon code ${couponModel.code}`);
+              }
+              appliedCoupons.push({
+                code: couponModel.code,
+                type: 'coupon',
+                discount: finalRoomTotalPrice // Using roomTotalPrice as in reservationWithPayAtHotel
+              });
+            } catch (error) {
+              console.error(`Failed to apply coupon code ${couponModel.code}:`, error.message);
+              throw new Error(`Failed to apply coupon code ${couponModel.code}`);
+            }
+          }
+        }
+
+        // Update room total price with discount - UPDATED LOGIC
+        // Note: In reservationWithPayAtHotel, only coupon models affect the price calculation
+        // and the discount is set to roomTotalPrice for each coupon
+        if (appliedCoupons.length > 0) {
+          // Calculate total discount based on applied coupons
+          totalDiscount = appliedCoupons.reduce((sum, coupon) => {
+            return sum + (coupon.discount || 0);
+          }, 0);
+
+          finalRoomTotalPrice = Math.max(0, roomTotalPrice - totalDiscount);
+        }
+      }
+
+      // Update the reservation input with discounted price
+      const reservationInput: ReservationInput = {
+        bookingDetails: {
+          provider,
+          coupon,
+          taxValue: taxValue,
+          reservationId: reservationId ?? "",
+          paymentMethod: "crypto",
+          userId,
+          checkInDate,
+          checkOutDate,
+          hotelCode,
+          hotelName,
+          ratePlanCode,
+          roomTypeCode,
+          numberOfRooms,
+          roomTotalPrice: finalRoomTotalPrice,
+          currencyCode,
+          guests,
+          email,
+          phone,
+        },
+        ageCodeSummary: ageCodeCount,
+      };
+
+      const thirdPartyService = new ThirdPartyReservationService();
+      await thirdPartyService.processThirdPartyReservation(reservationInput);
+      await reduceRoomsAfterBookingConfirmedCrypto(
+        hotelCode,
+        roomTypeCode,
+        numberOfRooms,
+        [checkIn, checkOut]
+      );
+
+      const htmlContent = `<!DOCTYPE html>
+      <html lang="en">
+
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+          }
+
+          .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          }
+
+          .header {
+            background-color: #1a73e8;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+          }
+
+          .header h1 {
+            margin: 0;
+            font-size: 24px;
+          }
+
+          .content {
+            padding: 20px;
+          }
+
+          .content h2 {
+            color: #333333;
+            font-size: 20px;
+            margin-top: 0;
+          }
+
+          .content p {
+            color: #666666;
+            line-height: 1.6;
+            margin: 10px 0;
+          }
+
+          .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+          }
+
+          .details-table th,
+          .details-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #dddddd;
+          }
+
+          .details-table th {
+            background-color: #f8f8f8;
+            color: #333333;
+            font-weight: bold;
+          }
+
+          .footer {
+            background-color: #f4f4f4;
+            padding: 15px;
+            text-align: center;
+            color: #888888;
+            font-size: 12px;
+          }
+
+          .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 20px 0;
+            background-color: #1a73e8;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+          }
+
+          @media only screen and (max-width: 600px) {
+            .container {
+              width: 100%;
+              margin: 10px;
+            }
+
+            .header h1 {
+              font-size: 20px;
+            }
+
+            .content h2 {
+              font-size: 18px;
+            }
+          }
+        </style>
+      </head>
+
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Booking Confirmation</h1>
+          </div>
+          <div class="content">
+            <h2>Dear {{guestName}},</h2>
+            <p>Thank you for your booking with {{hotelName}}! We are excited to confirm your booking details below.</p>
+
+            <h2>Reservation Details</h2>
+            <table class="details-table">
+              <tr>
+                <th>Hotel Name</th>
+                <td>{{hotelName}}</td>
+              </tr>
+              <tr>
+                <th>Check-In Date</th>
+                <td>{{checkInDate}}</td>
+              </tr>
+              <tr>
+                <th>Check-Out Date</th>
+                <td>{{checkOutDate}}</td>
+              </tr>
+              <tr>
+                <th>Room Type</th>
+                <td>{{roomTypeCode}}</td>
+              </tr>
+              <tr>
+                <th>Number of Rooms</th>
+                <td>{{numberOfRooms}}</td>
+              </tr>
+              <tr>
+                <th>Total Price</th>
+                <td>{{roomTotalPrice}} {{currencyCode}}</td>
+              </tr>
+              <tr>
+                <th>Contact Email</th>
+                <td>{{email}}</td>
+              </tr>
+              <tr>
+                <th>Contact Phone</th>
+                <td>+{{phone}}</td>
+              </tr>
+            </table>
+
+            <h2>Guest Details</h2>
+            <table class="details-table">
+              <tr>
+                <th>Name</th>
+                <th>Age Category</th>
+              </tr>
+              {{#each guests}}
+              <tr>
+                <td>{{firstName}} {{lastName}}</td>
+                <td>{{category}} (Age {{age}})</td>
+              </tr>
+              {{/each}}
+            </table>
+
+            <p>For any questions or to modify your reservation, please contact us at <a
+                href="mailto:{{supportEmail}}">{{supportEmail}}</a>.</p>
+
+            <a href="{{websiteUrl}}" class="button">View Your Booking</a>
+          </div>
+          <div class="footer">
+            <p>&copy; {{currentYear}} {{companyName}}. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+
+      </html>`;
+
+      const templateData = {
+        guestName: `${guests[0].firstName} ${guests[0].lastName}`,
+        hotelName,
+        checkInDate: new Date(checkInDate).toLocaleDateString(),
+        checkOutDate: new Date(checkOutDate).toLocaleDateString(),
+        roomTypeCode,
+        numberOfRooms,
+        roomTotalPrice: finalRoomTotalPrice, // Use discounted price
+        currencyCode,
+        email,
+        phone,
+        guests: categorizedGuests,
+        supportEmail: 'business.alhajz@gmail.com',
+        websiteUrl: 'https://alhajz.ai',
+        currentYear: new Date().getFullYear(),
+        companyName: 'Al-Hajz',
+      };
+
+      const template = Handlebars.compile(htmlContent);
+      const finalHtml = template(templateData);
+
+      await mailer.sendMail({
+        to: email,
+        subject: `Booking Confirmation - ${hotelName}`,
+        html: finalHtml,
+        text: `Your booking has been confirmed`,
+      });
+
+      return {
+        message: "Reservation with crypto confirmed",
+        guests: categorizedGuests,
+        ageCodeSummary: ageCodeCount,
+        roomTotalPrice: finalRoomTotalPrice, // Return discounted price
+        originalRoomTotalPrice: roomTotalPrice, // Include original price for reference
+        totalDiscount,
+        appliedCoupons,
+      };
+
+    } catch (error: any) {
+      console.error("❌ Error creating reservation with crypto:", error.message || error);
+      throw new Error(`Failed to create reservation: ${error.message || "Unknown error"}`);
+    }
+  };
+
+  async couponCheck(couponCodes: string[]) {
+    if (!couponCodes || couponCodes.length === 0) {
+      throw new Error('Coupon codes are required');
+    }
+
+    // Extract and clean coupon codes
+    const extractCouponCodes = (couponField: any): string[] => {
+      if (!couponField) return [];
+      if (Array.isArray(couponField)) {
+        return couponField
+          .filter(code => code && typeof code === 'string' && code.trim() !== '')
+          .map(code => code.trim());
+      }
+      if (typeof couponField === 'string' && couponField.trim() !== '') {
+        return [couponField.trim()];
+      }
+      return [];
+    };
+
+    // Extract and get unique coupon codes
+    const allCouponCodes: string[] = extractCouponCodes(couponCodes);
+    const uniqueCouponCodes = [...new Set(allCouponCodes)];
+
+    if (uniqueCouponCodes.length === 0) {
+      throw new Error('No valid coupon codes found');
+    }
+
+    // Fetch coupon details from both collections
+    const [promoCodes, couponModels] = await Promise.all([
+      Promocode.find({ code: { $in: uniqueCouponCodes } })
+        .select('code discountType discountValue minBookingAmount maxDiscountAmount'),
+      couponModel.find({ code: { $in: uniqueCouponCodes } })
+        .select('code discountPercentage')
+    ]);
+
+    // Create maps for easy lookup
+    const promoCodesMap = new Map(promoCodes.map(promo => [promo.code, promo]));
+    const couponModelsMap = new Map(couponModels.map(coupon => [coupon.code, coupon]));
+
+    // Categorize coupon codes by collection
+    const categorizedCoupons = {
+      promoCodes: [] as any[],
+      couponModels: [] as any[],
+      notFound: [] as string[]
+    };
+
+    uniqueCouponCodes.forEach(code => {
+      if (promoCodesMap.has(code)) {
+        categorizedCoupons.promoCodes.push(promoCodesMap.get(code));
+      } else if (couponModelsMap.has(code)) {
+        categorizedCoupons.couponModels.push(couponModelsMap.get(code));
+      } else {
+        categorizedCoupons.notFound.push(code);
+      }
+    });
+
+    return {
+      uniqueCouponCodes,
+      categorizedCoupons,
+      summary: {
+        totalUniqueCodes: uniqueCouponCodes.length,
+        promoCodesCount: categorizedCoupons.promoCodes.length,
+        couponModelsCount: categorizedCoupons.couponModels.length,
+        notFoundCount: categorizedCoupons.notFound.length
+      }
+    };
+  }
+
 }

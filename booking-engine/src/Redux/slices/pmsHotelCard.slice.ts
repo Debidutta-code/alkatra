@@ -19,6 +19,11 @@ interface PmsHotelCardState {
   roomType: string | null;
   currency: string | null;
   hotelName: string | null;
+  finalAmount?: number;
+  promoCode?: string | null;
+  promoCodeName?: string | null;
+  originalAmount?: number;
+  totalTax?: number | null;
 }
 
 const initialState: PmsHotelCardState = {
@@ -37,6 +42,11 @@ const initialState: PmsHotelCardState = {
   roomType: null,
   currency: null,
   hotelName: null,
+  finalAmount: undefined,
+  promoCode: null,
+  promoCodeName: null,
+  originalAmount: undefined,
+  totalTax: null,
 };
 
 const pmsHotelCardSlice = createSlice({
@@ -88,6 +98,21 @@ const pmsHotelCardSlice = createSlice({
     setHotelName: (state, action: PayloadAction<string>) => {
       state.hotelName = action.payload;
     },
+    setFinalAmount: (state, action: PayloadAction<number>) => {
+      state.finalAmount = action.payload;
+    },
+    setPromoCode: (state, action: PayloadAction<string | null>) => {
+      state.promoCode = action.payload;
+    },
+    setPromoCodeName: (state, action: PayloadAction<string | null>) => {
+      state.promoCodeName = action.payload;
+    },
+    setOriginalAmount: (state, action: PayloadAction<number>) => {
+      state.originalAmount = action.payload;
+    },
+    setTotalTax: (state, action: PayloadAction<number | null>) => {
+      state.totalTax = action.payload;
+    },
     resetPmsHotelCard: (state) => {
       return { ...initialState };
     },
@@ -110,6 +135,11 @@ export const {
   setRoomType,
   setCurrency,
   setHotelName,
+  setFinalAmount,
+  setPromoCode,
+  setPromoCodeName,
+  setOriginalAmount,
+  setTotalTax,
   resetPmsHotelCard,
 } = pmsHotelCardSlice.actions;
 export const getUser =

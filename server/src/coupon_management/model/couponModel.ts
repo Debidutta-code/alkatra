@@ -4,7 +4,7 @@ export interface ICouponCode extends Document {
   customerId: mongoose.Types.ObjectId;
   code: string;
   discountPercentage: number;
-  isUsed: boolean;
+  isUsed: string;
   createdAt: Date;
 }
 
@@ -12,7 +12,7 @@ const couponCodeSchema = new Schema<ICouponCode>({
   customerId: { type: Schema.Types.ObjectId, ref: 'CustomerModel', required: false },
   code: { type: String, required: true, unique: true },
   discountPercentage: { type: Number, required: true },
-  isUsed: { type: Boolean, default: false },
+  isUsed: { type: String, default: 'false', enum: ['true', 'false', 'available'] },
   createdAt: { type: Date, default: Date.now },
 });
 

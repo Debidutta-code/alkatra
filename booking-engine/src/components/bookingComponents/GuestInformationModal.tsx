@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { useDispatch, useSelector } from "react-redux";
-import { setGuestDetails, setAmount } from "../../Redux/slices/pmsHotelCard.slice";
+import { setGuestDetails, setAmount, setTotalTax } from "../../Redux/slices/pmsHotelCard.slice";
 import { User, Mail, Phone, Calendar, CreditCard, X, Loader2 } from "lucide-react";
 import { formatDate, calculateNights } from "../../utils/dateUtils";
 import { useTranslation } from "react-i18next";
@@ -578,13 +578,10 @@ const GuestInformationModal: React.FC<GuestInformationModalProps> = ({
         toast.error(t("BookingComponents.GuestInformationModal.priceFetchError"));
         return;
       }
-
       const totalPrice = parseFloat((finalPrice.priceAfterTax ?? finalPrice.totalAmount ?? 0).toFixed(2));
-
-      // ✅ Dispatch number to Redux
       dispatch(setAmount(totalPrice));
-
-      // ✅ Pass number to onConfirmBooking
+      dispatch(setTotalTax(finalPrice.totalTax ?? null));
+      
       setIsLoading(true);
       try {
         const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 500));

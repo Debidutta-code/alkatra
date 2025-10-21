@@ -157,7 +157,7 @@ export class TaxGroupService implements ITaxGroupService {
             delete data.hotelId;
 
             const taxGroup = await this.taxGroupRepository.findById(id);
-            if (!taxGroup?._id) throw new Error("Tax group not found");
+            if (!taxGroup?._id) throw new Error("Tax group not found - 4");
 
             /**
              * This below code is for checking if the tax rules belong to this hotel
@@ -192,7 +192,7 @@ export class TaxGroupService implements ITaxGroupService {
     async deleteTaxGroup(id: string): Promise<void> {
         try {
             const taxGroup = await this.taxGroupRepository.findById(id);
-            if (!taxGroup?._id) throw new Error("Tax group not found");
+            if (!taxGroup?._id) throw new Error("Tax group not found - 5");
 
             const deleted = await this.taxGroupRepository.delete(id);
             if (!deleted) throw new Error("Unable to delete tax group at this moment.");
@@ -211,8 +211,10 @@ export class TaxGroupService implements ITaxGroupService {
      */
     async getTaxGroupById(id: string): Promise<ITaxGroup | null> {
         try {
+            console.log("Get tax group by ID", id);
             const taxGroup = await this.taxGroupRepository.findById(id);
-            if (!taxGroup?._id) throw new Error("Tax group not found");
+            
+            if (!taxGroup?._id) return null;
 
             return taxGroup;
         } catch (error: any) {
@@ -251,13 +253,15 @@ export class TaxGroupService implements ITaxGroupService {
      *      ]
      * }
      */
+
+
     async calculateTaxRulesForReservation(basePrice: number, totalPrice: number, taxGroupID: string): Promise<any> {
         try {
             /**
              * Check amount and hotel ID are provided
              */
             if (!basePrice || !totalPrice || !taxGroupID) throw new Error("Missing basePrice, totalPrice or taxGroupID.");
-            
+
             Validator.validateAmount(basePrice);
             Validator.validateAmount(totalPrice);
             Validator.validateID(taxGroupID);
@@ -266,9 +270,11 @@ export class TaxGroupService implements ITaxGroupService {
              * Get all tax rules for the hotel
              */
             const taxGroupData = await this.getTaxGroupById(taxGroupID);
-            if (!taxGroupData) throw new Error("This tax group doesn't exists.");
+            // if (!taxGroupData) throw new Error("This tax group doesn't exists.");
+            if (!taxGroupData) return null;
             if (!taxGroupData.rules || taxGroupData.rules.length === 0) {
-                throw new Error("No tax rules found for this tax group.");
+                // throw new Error("No tax rules found for this tax group.");
+                return null;
             }
 
             /**

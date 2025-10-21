@@ -1031,7 +1031,8 @@
             "dob": "Fecha de nacimiento",
             "guest": "Huésped",
             "printFooter": "Gracias por tu reserva. Para cualquier pregunta, por favor contacta a nuestro servicio al cliente.",
-            "printTitle": "Confirmación de reserva"
+            "printTitle": "Confirmación de reserva",
+            "taxAmount": "Monto de impuestos"
         }
     },
     "Payment": {
@@ -1065,8 +1066,13 @@
                 "title": "Detalles del precio",
                 "roomRate": "Tarifa de la habitación",
                 "perNight": " / noche",
-                "total": "Total",
-                "payAtHotelInfo": "Tu tarjeta se almacenará de forma segura, pero el pago se realizará en el hotel."
+                "total": "Importe total",
+                "payAtHotelInfo": "Tu tarjeta se guardará de forma segura, pero el pago se realizará en el hotel.",
+                "originalPrice": "Precio original",
+                "promoApplied": "Código promocional aplicado",
+                "removePromo": "Eliminar código promocional",
+                "subtotal": "Subtotal",
+                "discount": "Descuento"
             },
             "securityBadges": {
                 "securePayments": "Pagos seguros",
@@ -1151,7 +1157,13 @@
             "needHelpTitle": "¿Necesitas ayuda?",
             "customerServiceMessage": "Nuestro equipo de servicio al cliente está disponible las 24 horas para ayudarte con cualquier pregunta.",
             "contactSupportButton": "Contactar soporte",
-            "exploreMoreHotels": "Explora más opciones de hoteles"
+            "exploreMoreHotels": "Explora más opciones de hoteles",
+            "missingBookingDetailsToast": "Faltan los detalles de la reserva. No se puede descargar la confirmación.",
+            "missingBookingDetails": "Faltan los detalles de la reserva. Por favor, contacte con soporte si el problema persiste.",
+            "hotelLabel": "Hotel",
+            "roomTypeLabel": "Tipo de habitación",
+            "originalPrice": "Precio original",
+            "promoApplied": "Código promocional aplicado"
         },
         "PaymentProgress": {
             "title": "Puerta de pago en criptomonedas",
@@ -1178,6 +1190,7 @@
             "returnHome": "Volver al inicio",
             "paymentSuccessful": "¡Pago exitoso!",
             "paymentConfirmed": "Tu pago ha sido confirmado.",
+            "paymentInformation": "Información de pago",
             "status": {
                 "pending": "Esperando pago",
                 "completed": "Pago confirmado",

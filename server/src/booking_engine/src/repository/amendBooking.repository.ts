@@ -1,20 +1,20 @@
 import { ThirdPartyBooking } from "../../../wincloud/src/model/reservationModel";
 
-export class BookingRepository {
+export class AmendBookingRepository {
 
     /**
      * Singleton pattern
      */
-    private static instance: BookingRepository;
+    private static instance: AmendBookingRepository;
 
     /**
      * Generating instance of BookingRepository
      */
-    static getInstance(): BookingRepository {
-        if (!BookingRepository.instance) {
-            BookingRepository.instance = new BookingRepository();
+    static getInstance(): AmendBookingRepository {
+        if (!AmendBookingRepository.instance) {
+            AmendBookingRepository.instance = new AmendBookingRepository();
         }
-        return BookingRepository.instance;
+        return AmendBookingRepository.instance;
     }
 
     async getBookingDetailsByReservationId(reservationId: String) {

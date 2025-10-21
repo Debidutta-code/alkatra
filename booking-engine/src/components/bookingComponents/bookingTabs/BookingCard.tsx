@@ -13,7 +13,9 @@ import {
   getStatusClass,
   getStatusIcon,
   getRoomTypeStyle,
-  getRoomTypeIcon
+  getRoomTypeIcon,
+  calculateOriginalAmount,
+  formatDiscountBadge,
 } from './utils';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from "../../../utils/dateUtils";
@@ -128,9 +130,27 @@ const BookingCard: React.FC<BookingCardProps> = ({
           </div>
           <div>
             <p className="text-xs text-gray-500 mb-1">{t('BookingTabs.BookingCard.rateBreakdown')}</p>
-            <p className="flex items-center text-tripswift-black font-tripswift-medium text-sm">
-              <span className="text-base sm:text-lg font-tripswift-bold text-tripswift-blue">{currency} {booking.totalAmount.toLocaleString()}</span>
-            </p>
+            {booking.couponDetails && booking.couponDetails.length > 0 ? (
+              <div className="flex flex-col gap-1">
+                <p className="text-gray-400 text-xs line-through">
+                  {currency} {calculateOriginalAmount(booking).toFixed(2)}
+                </p>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-base sm:text-lg font-tripswift-bold text-green-600">
+                    {currency} {booking.totalAmount.toFixed(2)}
+                  </span>
+                  <span className="text-[10px] sm:text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-md font-tripswift-bold border border-green-300">
+                  {formatDiscountBadge(booking.couponDetails, currency)}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <p className="flex items-center text-tripswift-black font-tripswift-medium text-sm">
+                <span className="text-base sm:text-lg font-tripswift-bold text-tripswift-blue">
+                  {currency} {booking.totalAmount.toFixed(2)}
+                </span>
+              </p>
+            )}
           </div>
         </div>
       </div>

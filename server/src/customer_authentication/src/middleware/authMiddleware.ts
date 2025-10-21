@@ -4,6 +4,7 @@ import { AuthenticatedRequest } from "../types/custom";
 
 export const authenticateCustomer = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const token = req.header("Authorization")?.split(" ")[1];
+    
 
     if (!token) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -11,6 +12,10 @@ export const authenticateCustomer = (req: AuthenticatedRequest, res: Response, n
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY || "your-secret-key") as { id: string };
+        
+        if (!decoded) {
+            return res.status(401).json({ message: "Invalid token" });
+        }
         req.user = decoded; 
         next();
     } catch (error) {

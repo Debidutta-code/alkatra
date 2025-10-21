@@ -6,8 +6,18 @@ import { AuthenticatedRequest } from "../../../customer_authentication/src/types
 import CryptoPaymentDetails, { CryptoPaymentLog } from "../models/cryptoPayment.model";
 import { v4 as uuidv4 } from "uuid";
 import { CryptoGuestDetails } from "../models/cryptoUserPaymentInitialStage.model";
-import { createReservationWithCryptoPayment } from "./bookings.controller";
+import { BookingController } from "./bookings.controller";
 import { NotificationService } from "../../../notification/src/service/notification.service";
+import { BookAgainAvailabilityService, AmendBookingService } from "../services";
+import { PromoCodeService } from "../../../property_management/src/service";
+import { Promocode } from "../../../property_management/src/model";
+import CouponModel from "../../../coupon_management/model/couponModel";
+
+
+const amendBookingService = AmendBookingService.getInstance();
+const bookAgainService = BookAgainAvailabilityService.getInstance();
+const promoCodeService = PromoCodeService.getInstance();
+const bookingController = new BookingController(amendBookingService, bookAgainService, promoCodeService);
 
 let convertedAmount: number;
 
@@ -51,58 +61,57 @@ export const getPaymentSuccessResponse = CatchAsyncError(async (req: Authenticat
 });
 
 
-export const getCryptoDetails = CatchAsyncError( async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-      const collection = mongoose.connection.collection("CryptoDetails");
-      const { token } = req.query;
+export const getCryptoDetails = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const collection = mongoose.connection.collection("CryptoDetails");
+    const { token } = req.query;
 
-      if (token) {
-        const tokenDoc = await collection.findOne(
-          { name: token },
-          {
-            projection: {
-              _id: 0,
-              "networks.name": 1,
-              "networks.imageUrl": 1,
-              "networks.contractAddress": 1,
-              "networks.chainId": 1
-            },
-          }
-        );
-
-        if (!tokenDoc) {
-          return res.status(404).json({
-            message: `Token '${token}' not found`,
-          });
+    if (token) {
+      const tokenDoc = await collection.findOne(
+        { name: token },
+        {
+          projection: {
+            _id: 0,
+            "networks.name": 1,
+            "networks.imageUrl": 1,
+            "networks.contractAddress": 1,
+            "networks.chainId": 1
+          },
         }
+      );
 
-        return res.status(200).json({
-          message: "Network details fetched successfully",
-          data: tokenDoc.networks,
+      if (!tokenDoc) {
+        return res.status(404).json({
+          message: `Token '${token}' not found`,
         });
       }
 
-      const allTokens = await collection
-        .find({}, { projection: { _id: 0, name: 1, imageUrl: 1 } })
-        .toArray();
-
       return res.status(200).json({
-        success: true,
-        message: "Token list fetched successfully",
-        data: allTokens,
+        message: "Network details fetched successfully",
+        data: tokenDoc.networks,
       });
-    } catch (error) {
-      return next(new ErrorHandler("Internal server error", 500));
     }
+
+    const allTokens = await collection
+      .find({}, { projection: { _id: 0, name: 1, imageUrl: 1 } })
+      .toArray();
+
+    return res.status(200).json({
+      success: true,
+      message: "Token list fetched successfully",
+      data: allTokens,
+    });
+  } catch (error) {
+    return next(new ErrorHandler("Internal server error", 500));
   }
+}
 );
 
 
 export const currencyConversion = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  console.log("Entered in CURRENCY CONVERSION controller");
   try {
     const { currency, amount } = req.body;
-    console.log(`The data get from UI for currency conversion is:\n#################### ${JSON.stringify(req.body)}`);
+
     const requiredFields = { currency, amount };
 
     const missingFields = Object.entries(requiredFields)
@@ -117,14 +126,14 @@ export const currencyConversion = CatchAsyncError(async (req: AuthenticatedReque
 
     if (currency.toUpperCase() === "USD") {
       convertedAmount = amount || 0;
-      console.log(`The currency is ${currency} and amount is ${amount}`);
+      console.log(`CURRENCY CONVERSION: The currency is ${currency} and amount is ${amount}`);
       return res.status(200).json({
-      message: "Currency conversion successful",
-      data: {
-        convertedAmount : amount,
-        conversionRate: 0,
-      },
-    });
+        message: "Currency conversion successful",
+        data: {
+          convertedAmount: amount,
+          conversionRate: 0,
+        },
+      });
     }
 
     let conversionRate = parseFloat(process.env.CURRENCY_CONVERSION_BASE_RATE || "0");
@@ -136,7 +145,6 @@ export const currencyConversion = CatchAsyncError(async (req: AuthenticatedReque
     }
 
     convertedAmount = parseFloat((parseFloat(amount) / conversionRate).toFixed(2));
-    console.log(`The converted amount is ${convertedAmount} and conversion rate is ${conversionRate}`);
 
     return res.status(200).json({
       message: "Currency conversion successful",
@@ -150,7 +158,6 @@ export const currencyConversion = CatchAsyncError(async (req: AuthenticatedReque
   }
 });
 
-
 export const cryptoPaymentInitiate = CatchAsyncError(async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id;
@@ -158,7 +165,9 @@ export const cryptoPaymentInitiate = CatchAsyncError(async (req: AuthenticatedRe
       return res.status(401).json({ message: "User ID not found in token" });
     }
 
-    const { token, blockchain, currency, amount } = req.body;
+    const { token, blockchain, currency, amount, provider, coupon, taxValue } = req.body;
+    console.log("The tax value we get: ", taxValue);
+
     const requiredFields = { token, blockchain, currency, amount, userId };
 
     const missingFields = Object.entries(requiredFields)
@@ -171,10 +180,17 @@ export const cryptoPaymentInitiate = CatchAsyncError(async (req: AuthenticatedRe
       });
     }
 
-    if (amount !== convertedAmount) {
-      return res.status(400).json({
-        message: "Amount not matched in crypto payment initiation",
-      });
+    let couponCodes: string[] = [];
+    let couponDetails: any[] = [];
+
+    // Only extract and check coupons if coupon field is provided
+    if (coupon !== undefined && coupon !== null && coupon !== '') {
+      couponCodes = extractCouponCodes(coupon);
+
+      // Only get coupon details if we have valid coupon codes
+      if (couponCodes.length > 0) {
+        couponDetails = await getCouponDetails(couponCodes);
+      }
     }
 
     const baseAmount = parseFloat(amount);
@@ -201,8 +217,13 @@ export const cryptoPaymentInitiate = CatchAsyncError(async (req: AuthenticatedRe
       return res.status(500).json({ message: "All amount variations are already used. Try again later." });
     }
 
+    convertedAmount = finalAmount;
+
     const cryptoPaymentDetails = new CryptoPaymentDetails({
       customer_id: new Types.ObjectId(userId),
+      provider,
+      coupon: couponCodes, 
+      taxValue: taxValue ,
       token,
       blockchain,
       payment_id: uuidv4(),
@@ -211,16 +232,22 @@ export const cryptoPaymentInitiate = CatchAsyncError(async (req: AuthenticatedRe
     });
 
     await cryptoPaymentDetails.save();
-    convertedAmount = finalAmount;
+
+    // Convert to plain object to add extra field
+    const paymentResponse = cryptoPaymentDetails.toObject() as typeof cryptoPaymentDetails & { couponDetails?: any[] };
+
+    // Add couponDetails field to the response
+    paymentResponse.couponDetails = couponDetails;
 
     return res.status(200).json({
       message: "Crypto payment initiated successfully",
-      data: cryptoPaymentDetails,
+      data: paymentResponse
     });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error", error });
   }
 });
+
 
 export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   const userId = req.user?.id;
@@ -242,7 +269,7 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
     phone,
     guests
   } = req.body;
-  console.log(`The guest details we get is:\n#################### ${JSON.stringify(req.body)}`);
+
   const requiredFields = {
     checkInDate,
     checkOutDate,
@@ -267,7 +294,7 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
       message: `Missing required fields: ${missingFields.join(", ")}`,
     });
   }
-  console.log(`The amount in crypto guest details storage is ${roomTotalPrice}`);
+
   if (roomTotalPrice !== convertedAmount) {
     return res.status(400).json({
       message: "Amount not matched in guest details initialize",
@@ -313,7 +340,7 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
       ageCodeSummary: ageCodeCount,
       numberOfRooms,
       totalAmount: roomTotalPrice,
-      // currencyCode: currencyCode.toUpperCase() || "USD",
+      currencyCode: currencyCode.toUpperCase() || "USD",
       userId,
       status: "Processing",
       createdAt: new Date(),
@@ -342,7 +369,7 @@ export const storeGuestDetailsForCryptoPayment = CatchAsyncError(async (req: Aut
 export const pushCryptoPaymentDetails = CatchAsyncError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const { senderWalletAddress, token, blockChain, amount, txHash } = req.body;
-    console.log("Received data:", { token, blockChain, amount, txHash });
+
     const requiredFields = { token, blockChain, amount, txHash };
 
     const missingFields = Object.entries(requiredFields)
@@ -361,8 +388,6 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
       txHash,
       senderWalletAddress,
     });
-   
-    console.log(">>>>>>>> CryptoPaymentLog:", cryptoPaymentLog,"parsedamount is ", parseFloat(amount));
 
     await cryptoPaymentLog.save();
 
@@ -374,7 +399,6 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
     });
 
     if (payment) {
-      // await notification.sendCryptoPaymentNotification(payment.customer_id.toString(), parseFloat(amount), txHash)
       console.log(`The payment details we get is ${payment}`);
       console.log("----------11111111111111111111-------------------------")
     }
@@ -407,7 +431,10 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
     await guestDetails.save();
     console.log("Payment and guest details updated successfully");
 
-    const cryptoPaymentDetails = await createReservationWithCryptoPayment({
+    const cryptoPaymentDetails = await bookingController.createReservationWithCryptoPayment({
+      provider: payment.provider,
+      coupon: payment.coupon,
+      taxValue: payment.taxValue,
       reservationId: guestDetails.reservationId,
       userId: guestDetails?.userId ?? "",
       checkInDate: guestDetails.checkInDate,
@@ -423,9 +450,9 @@ export const pushCryptoPaymentDetails = CatchAsyncError(async (req: Authenticate
       phone: guestDetails.phone,
       guests: guestDetails.guestDetails ?? [],
     });
+
     if (cryptoPaymentDetails) {
-      await notification.sendCryptoPaymentNotification(payment.customer_id.toString(), parseFloat(amount), txHash)
-      console.log("----------11111111111111111111-------------------------")
+      const notificationSend = notification.sendCryptoPaymentNotification(payment.customer_id.toString(), parseFloat(amount), txHash);
     }
 
     return res.status(200).json({
@@ -497,3 +524,75 @@ export const getInitiatedPaymentDetails = CatchAsyncError(async (req: Authentica
     });
   }
 });
+
+
+
+/**
+ * Helper function to extract coupon codes
+ */
+
+/**
+ * Helper function to extract coupon codes
+ */
+const extractCouponCodes = (couponField: any): string[] => {
+  if (!couponField) return [];
+  if (Array.isArray(couponField)) {
+    return couponField
+      .filter(code => code && typeof code === 'string' && code.trim() !== '')
+      .map(code => code.trim());
+  }
+  if (typeof couponField === 'string' && couponField.trim() !== '') {
+    return [couponField.trim()];
+  }
+  return [];
+};
+
+/**
+ * Helper function to get coupon details from both models
+ * @param couponCodes 
+ * @returns 
+ */
+const getCouponDetails = async (couponCodes: string[]) => {
+  if (couponCodes.length === 0) return [];
+
+  const uniqueCouponCodes = [...new Set(couponCodes)];
+
+  // Search in both Promocode and CouponModel collections
+  const [promoCodes, couponModels] = await Promise.all([
+    Promocode.find({
+      code: { $in: uniqueCouponCodes }
+    }).select('code discountType discountValue minBookingAmount maxDiscountAmount validFrom validTo isActive'),
+
+    CouponModel.find({
+      code: { $in: uniqueCouponCodes }
+    }).select('code discountPercentage')
+  ]);
+
+  const couponDetails = [];
+
+  // Add promocodes to results
+  promoCodes.forEach(coupon => {
+    couponDetails.push({
+      code: coupon.code,
+      discountType: coupon.discountType,
+      discountValue: coupon.discountValue,
+      minBookingAmount: coupon.minBookingAmount,
+      maxDiscountAmount: coupon.maxDiscountAmount,
+      validFrom: coupon.validFrom,
+      validTo: coupon.validTo,
+      isActive: coupon.isActive,
+      source: 'promocode'
+    });
+  });
+
+  // Add coupon models to results
+  couponModels.forEach(coupon => {
+    couponDetails.push({
+      code: coupon.code,
+      discountPercentage: coupon.discountPercentage,
+      source: 'couponModel'
+    });
+  });
+
+  return couponDetails;
+};
