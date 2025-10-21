@@ -192,16 +192,17 @@ class RoomPrice {
         const {
             hotelCode,
             invTypeCode,
+            // ratePlanCode,
             startDate,
             endDate,
-            noOfChildrens,
+            noOfChildren,
             noOfAdults,
             noOfRooms
         } = req.body;
 
         const { reservationId } = req.query;
 
-        let discountAmount = 0;
+        let discountAmount = 0;``
         let reservationTaxValue: number | null = null;
         let couponDetailsMap = new Map();
 
@@ -209,9 +210,10 @@ class RoomPrice {
         const response: any = await RoomRentCalculationService.getRoomRentService(
             hotelCode,
             invTypeCode,
+            // ratePlanCode,
             startDate,
             endDate,
-            noOfChildrens,
+            noOfChildren,
             noOfAdults,
             noOfRooms
         );
@@ -544,4 +546,5 @@ export class StartStopWatcher {
         }
     }
 }
+
 export { RatePlanController, RoomPrice };   
