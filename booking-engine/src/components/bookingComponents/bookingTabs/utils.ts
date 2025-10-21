@@ -125,12 +125,13 @@ export const calculateOriginalAmount = (booking: Booking): number => {
       
       // Apply max discount cap if exists
       if (discountInfo.maxCap) {
-        const calculatedDiscount = totalOriginal - booking.totalAmount;
+        const calculatedDiscount = totalOriginal - totalOriginal * (1 - discountInfo.value / 100);
         if (calculatedDiscount > discountInfo.maxCap) {
           totalOriginal = booking.totalAmount + discountInfo.maxCap;
         }
       }
-    } else if (discountInfo.type === 'fixed') {
+    } else if (discountInfo.type === 'fixed' || discountInfo.type === 'flat') {
+      // ✅ FIX: Handle both 'fixed' and 'flat' types
       totalOriginal = totalOriginal + discountInfo.value;
     }
   }

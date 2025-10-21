@@ -102,10 +102,10 @@ export default function PaymentSuccess() {
   };
 
   const getGuestCountDisplay = () => {
-    const displayRooms = rooms || 1;
-    const displayAdults = adults || 1;
-    const displayChildren = children || 0;
-    const displayInfants = infants || 0;
+    const displayRooms = guestDetails?.rooms || rooms || 1;
+    const displayAdults = guestDetails?.adults || adults || 1;
+    const displayChildren = guestDetails?.children || children || 0;
+    const displayInfants = guestDetails?.infants || infants || 0;
 
     let display = `${displayRooms} ${displayRooms === 1
       ? t("Payment.PaymentPageContent.bookingSummary.room")

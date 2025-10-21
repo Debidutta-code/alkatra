@@ -15,7 +15,6 @@ import {
   getRoomTypeStyle,
   getRoomTypeIcon,
   calculateOriginalAmount,
-  getDiscountAmount,
   formatDiscountBadge,
 } from './utils';
 import { useTranslation } from 'react-i18next';

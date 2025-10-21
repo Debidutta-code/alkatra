@@ -46,9 +46,9 @@ export const PromoCodesSection: React.FC<PromoCodesSectionProps> = ({
             setPromoCodes((prev) => [...prev, newPromo]);
             setIsFormOpen(false);
             toast.success('Promo code created!');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Create error:', error);
-            toast.error('Failed to create promo code');
+            toast.error(error?.response?.data?.error || error?.response?.data?.message || 'Failed to create promo code');
         }
     };
 
@@ -59,9 +59,9 @@ export const PromoCodesSection: React.FC<PromoCodesSectionProps> = ({
             setEditingPromo(null);
             setIsFormOpen(false);
             toast.success('Promo code updated!');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Update error:', error);
-            toast.error('Failed to update promo code');
+            toast.error(error?.response?.data?.error || error?.response?.data?.message || 'Failed to update promo code');
         }
     };
 
@@ -70,9 +70,9 @@ export const PromoCodesSection: React.FC<PromoCodesSectionProps> = ({
             await deletePromoCode(accessToken, promoId);
             setPromoCodes((prev) => prev.filter((p) => p._id !== promoId));
             toast.success('Promo code deleted!');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Delete error:', error);
-            toast.error('Failed to delete promo code');
+            toast.error(error?.response?.data?.error || error?.response?.data?.message || 'Failed to delete promo code');
         }
     };
 
