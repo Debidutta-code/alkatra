@@ -34,7 +34,7 @@ export const validateCouponCodeRepo = async (
     return { isValid: false, discountAmount: 0, message: 'Coupon not found' };
   }
 
-  if (promoCode.isUsed) {
+  if (promoCode.isUsed == 'true') {
     return { isValid: false, discountAmount: 0, message: 'Coupon invalid' };
   }
 
