@@ -23,6 +23,3 @@ export default (app: Router) => {
     // .post(createAmeniteCategory as any)
     // .get(getAllAmeniteCategoriesAndAllAmeniteDetails as any);
 };
-
-
-

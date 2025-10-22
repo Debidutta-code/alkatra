@@ -171,9 +171,12 @@
     "timeTracker": "समय ट्रैकर",
     "timeSchedule": "समय अनुसूची",
     "leadGeneration": "लीड जनरेशन",
+    "description": "निर्बाध बुकिंग और अविस्मरणीय अनुभवों के लिए आपका विश्वसनीय यात्रा साथी।",
+    "newsletterTitle": "अपडेट रहें",
+    "newsletterDescription": "विशेष ऑफ़र और अपडेट प्राप्त करने के लिए सब्सक्राइब करें",
     "emailPlaceholder": "अपना ईमेल दर्ज करें",
-    "subscribeButton": "सदस्यता लें",
-    "copyright": "{year} ट्रिपस्विफ्ट - सर्वाधिकार सुरक्षित"
+    "subscribeButton": "सब्सक्राइब करें",
+    "copyright": "© {year} अल-हज्ज़। सर्वाधिकार सुरक्षित।"
   },
   "Profile": {
     "editProfile": "प्रोफ़ाइल संपादित करें",

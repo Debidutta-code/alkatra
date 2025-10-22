@@ -430,7 +430,7 @@ const UserProfile: React.FC = () => {
                 </Button>
               </div>
             </Card>
-            <Card className="p-4 sm:p-6">
+            {/* <Card className="p-4 sm:p-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 space-y-3 sm:space-y-0">
                 <div>
                   <h3 className="text-base sm:text-lg font-semibold text-[var(--color-secondary-black)]">
@@ -444,7 +444,7 @@ const UserProfile: React.FC = () => {
                   {t('Profile.enable2FA', { defaultValue: 'Enable 2FA' })}
                 </Button>
               </div>
-            </Card>
+            </Card> */}
           </div>
         );
       case 'help':

@@ -8,7 +8,7 @@ import { Destination } from '../Sections/Destination'
 const HomeSection = () => {
   return (
     <div>
-      <div className="mt-8">
+      <div className="mt-2">
       <Destination/>
         {/* <FeaturedOffers />
         <PopularHotels />

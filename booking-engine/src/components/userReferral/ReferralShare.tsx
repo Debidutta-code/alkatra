@@ -195,7 +195,7 @@ export default function ReferralShare() {
   }
 
   return (
-    <div className="space-y-6 w-full max-w-3xl mx-auto px-4">
+    <div className="space-y-6 w-full max-w-7xl">
       <h2 className="text-2xl font-bold text-gray-800 text-center">
         {t("Referral.shareYourLink")}
       </h2>
@@ -204,7 +204,7 @@ export default function ReferralShare() {
       </p>
 
       {/* Main Card */}
-      <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-6">
+      <div className="bg-tripswift-off-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-6">
         {/* Generate Button (Only if not generated) */}
         {!isGenerated && !referralLink && (
           <div className="text-center">

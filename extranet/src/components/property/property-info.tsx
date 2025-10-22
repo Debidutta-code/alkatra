@@ -93,14 +93,6 @@ interface PropertyType {
 export default function PropertyInfo({ onNext }: Props) {
   const [propertyDetails, setPropertyDetails] = useState<any>(null);
   const [openDialog, setOpenDialog] = useState(false);
-  const [currenStep, setCurrentStep] = useState(0);
-  // const [propertyImageUrls, setPropertyImageUrls] = useState<
-  //   {
-  //     public_id: string;
-  //     url: string;
-  //     secure_url: string;
-  //   }[]
-  // >([]);
   const [propertyImageUrls, setPropertyImageUrls] = useState<Array<any>>([]);
   const [editMode, setEditMode] = useState(false);
   const [propertyCategories, setPropertyCategories] = useState<
@@ -112,6 +104,7 @@ export default function PropertyInfo({ onNext }: Props) {
     useState(false);
   const [files, setFiles] = useState<IFileWithPreview[]>([]);
   const [rejected, setRejected] = useState<FileRejection[]>([]);
+  const [uploadLoading, setUploadLoading] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [formLoading, setFormLoading] = useState<boolean>(false);
   const [propertyData, setPropertyData] = useState({
@@ -213,15 +206,15 @@ export default function PropertyInfo({ onNext }: Props) {
       setValue("property_category", propertyDetails?.property_category?._id || "");
       setValue("property_type", propertyDetails?.property_type || "");
       setValue("star_rating", propertyDetails.star_rating || "1");
-      // Add null check for image
-      if (propertyDetails.image && propertyDetails.image.length > 0) {
-        setPropertyImageUrls(propertyDetails.image);
-      } else {
-        setPropertyImageUrls([]); // Set empty array if no images
-      }
     }
-  }, [propertyDetails]);
-  // console.log("property details",propertyDetails?.property_category)
+  }, [propertyDetails, setValue]);
+
+  useEffect(() => {
+    if (propertyDetails?.image && propertyDetails.image.length > 0) {
+      setPropertyImageUrls(propertyDetails.image);
+    }
+  }, [propertyDetails?._id]);
+
   useEffect(() => {
     const storedData = localStorage.getItem("propertyData");
     if (storedData) {
@@ -230,20 +223,14 @@ export default function PropertyInfo({ onNext }: Props) {
         setPropertyData(parsedData);
       } catch (error) {
         console.error("Error parsing JSON:", error);
-        // Handle parsing error if necessary
       }
     }
   }, []);
 
   // In the onSubmit function where you create a new property
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    // const imageUrls = propertyImageUrls.map(
-    //   (propertyImage) => propertyImage.url
-    // );
-
     console.log("Property image URLs:", propertyImageUrls);
-    const imageUrls = propertyImageUrls;
-
+    const imageUrls = propertyImageUrls.map((img) => img.url);
     const propertyCreateBody = {
       ...data,
       image: imageUrls,
@@ -296,7 +283,7 @@ export default function PropertyInfo({ onNext }: Props) {
   const handlePropertyImageUpload = async () => {
     try {
       if (files.length) {
-        setLoading(true);
+        setUploadLoading(true); // Use uploadLoading instead of loading
         const data = packFiles(files);
         console.log("Uploading files:", files);
 
@@ -312,17 +299,42 @@ export default function PropertyInfo({ onNext }: Props) {
 
         console.log("Upload response:", response.data.data.urls);
         const urls = response.data.data.urls;
-        setOpenDialog(false);
-        setPropertyImageUrls(urls);
 
-        // Add success toast for image upload
+        // Store current form values before ANY state updates
+        const currentCategory = watch("property_category");
+        const currentType = watch("property_type");
+
+        // Convert URL strings to objects matching the expected structure
+        const formattedUrls = urls.map((url: string) => ({
+          public_id: url.split('/').pop() || '',
+          url: url,
+          secure_url: url
+        }));
+
+        // Update states
+        setPropertyImageUrls(formattedUrls);
+        setFiles([]); // Clear uploaded files
+        setUploadLoading(false); // Stop upload loading
+
+        // Close dialog AFTER setting loading to false
+        setOpenDialog(false);
+
+        // Use requestAnimationFrame for better timing
+        requestAnimationFrame(() => {
+          if (currentCategory) {
+            setValue("property_category", currentCategory, { shouldValidate: false });
+          }
+          if (currentType) {
+            setValue("property_type", currentType, { shouldValidate: false });
+          }
+        });
+
         toast.success("Images uploaded successfully!");
       }
     } catch (error) {
       console.error("Error uploading property images:", error);
       toast.error("Failed to upload images. Please try again.");
-    } finally {
-      setLoading(false);
+      setUploadLoading(false);
     }
   };
 
@@ -755,8 +767,8 @@ export default function PropertyInfo({ onNext }: Props) {
                       files={files}
                       setFiles={setFiles}
                       rejected={rejected}
-                      loading={loading}
-                      setLoading={setLoading}
+                      loading={uploadLoading}
+                      setLoading={setUploadLoading}
                       setRejected={setRejected}
                       open={openDialog}
                       setOpen={setOpenDialog}

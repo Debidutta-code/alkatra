@@ -163,7 +163,7 @@ export function Destination() {
 
   return (
     <section className="py-8 md:py-12 bg-tripswift-off-white font-noto-sans">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-2 sm:py-4 lg:py-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
           <h2 className="text-2xl md:text-3xl font-tripswift-bold text-tripswift-black mb-4 sm:mb-0">

@@ -558,7 +558,7 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 font-noto-sans p-3 sm:p-5">
-      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[95vh] overflow-y-auto shadow-2xl">
+      <div className="bg-tripswift-off-white rounded-xl shadow-xl w-full max-w-2xl max-h-[95vh] overflow-y-auto relative">
 
         {/* Enhanced Header with Progress Indicator */}
         <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6 rounded-t-2xl z-10">

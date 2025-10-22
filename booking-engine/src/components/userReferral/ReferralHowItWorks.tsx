@@ -26,7 +26,7 @@ export default function ReferralHowItWorks() {
   ];
 
   return (
-    <div className="space-y-8 bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100 max-w-6xl mx-auto">
+    <div className="space-y-8 bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100  max-w-7xl">
       {/* Title */}
       <div className="text-center space-y-3">
         <h2 className="text-2xl font-bold text-gray-800">

@@ -179,7 +179,7 @@ const HelpCenterTab: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 px-4 sm:px-6">
+    <div className="space-y-8">
       {/* Hero Section */}
       <div className="text-center bg-gradient-to-r from-blue-50 to-indigo-50 py-4 sm:py-6 rounded-2xl">
         <div className="max-w-2xl mx-auto">

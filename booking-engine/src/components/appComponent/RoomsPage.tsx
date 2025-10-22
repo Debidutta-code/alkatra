@@ -576,7 +576,7 @@ const RoomsPage: React.FC = () => {
       )}
 
       <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] text-tripswift-off-white">
-        <div className="container mx-auto px-4 py-5">
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-2 sm:py-4 lg:py-6">
           <div className="flex flex-col md:flex-row items-start  md:items-center gap-4">
             <button
               onClick={() => router.back()}
@@ -668,7 +668,7 @@ const RoomsPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-4">
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-2 sm:py-4 lg:py-6">
         {isPropertyLoading ? (
           <LoadingSkeleton type="property" count={1} />
         ) : (
@@ -1142,7 +1142,7 @@ const RoomsPage: React.FC = () => {
       </div>
 
       {/* Main content */}
-      <div className="container mx-auto px-4">
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-2 sm:py-4 lg:py-6">
         {/* Filter and Search Section */}
         <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6 mt-4">
           <div className="flex flex-col md:flex-row gap-4 justify-between">
