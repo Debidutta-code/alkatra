@@ -171,9 +171,12 @@
     "timeTracker": "Time Tracker",
     "timeSchedule": "Time Schedule",
     "leadGeneration": "Lead Generation",
+    "description": "Your trusted travel companion for seamless bookings and unforgettable experiences.",
+    "newsletterTitle": "Stay Updated",
+    "newsletterDescription": "Subscribe to get special offers and updates",
     "emailPlaceholder": "Enter your email",
     "subscribeButton": "Subscribe",
-    "copyright": "{year} Al Hajz - All rights reserved"
+    "copyright": "© {year} Al-Hajz. All rights reserved."
   },
   "Profile": {
     "editProfile": "Edit Profile",

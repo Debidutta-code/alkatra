@@ -34,7 +34,7 @@ const GuestForm: React.FC<GuestFormProps> = ({
       {totalGuests > 1 && (
         <button
           onClick={() => onRemove(guest.id)}
-          className="absolute top-4 right-4 p-2 text-red-500 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+          className="absolute top-4 right-4 p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"
         >
           <Trash2 className="h-4 w-4" />
         </button>
@@ -55,7 +55,7 @@ const GuestForm: React.FC<GuestFormProps> = ({
           <Input
             value={guest.firstName}
             onChange={(e) => onUpdate(guest.id, 'firstName', e.target.value)}
-            placeholder={t("Enter first name")}
+            placeholder={t("First name")}
             className={`h-11 border-2 ${errors[`${guest.id}-firstName`] ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:border-purple-500 transition-colors`}
             size="middle"
           />
@@ -70,7 +70,7 @@ const GuestForm: React.FC<GuestFormProps> = ({
           <Input
             value={guest.lastName}
             onChange={(e) => onUpdate(guest.id, 'lastName', e.target.value)}
-            placeholder={t("Enter last name")}
+            placeholder={t("Last name")}
             className={`h-11 border-2 ${errors[`${guest.id}-lastName`] ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:border-purple-500 transition-colors`}
             size="middle"
           />
@@ -85,9 +85,8 @@ const GuestForm: React.FC<GuestFormProps> = ({
           <select
             value={guest.type}
             onChange={(e) => onUpdate(guest.id, 'type', e.target.value as 'adult' | 'child' | 'infant')}
-            className={`w-full h-11 px-4 border-2 ${
-              errors[`${guest.id}-type`] ? 'border-red-500' : 'border-gray-200'
-            } rounded-xl bg-white text-gray-900 font-medium focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-300 transition-colors appearance-none cursor-pointer`}
+            className={`w-full h-11 px-4 border-2 ${errors[`${guest.id}-type`] ? 'border-red-500' : 'border-gray-200'
+              } rounded-xl bg-white text-gray-900 font-medium focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-300 transition-colors appearance-none cursor-pointer`}
             style={{
               backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
               backgroundPosition: 'right 0.75rem center',
@@ -114,7 +113,7 @@ const GuestForm: React.FC<GuestFormProps> = ({
                 onChange={(date) => onUpdate(guest.id, 'dob', date ? date.format("YYYY-MM-DD") : null)}
                 disabledDate={(current) => disabledDateForDOB(current, guest.type)}
                 format="DD/MM/YYYY"
-                className="w-full pl-10 bg-transparent border-none focus:ring-0"
+                className="w-full pl-3 bg-transparent border-none focus:ring-0"
                 placeholder={t("Select DOB")}
                 suffixIcon={null}
                 size="large"

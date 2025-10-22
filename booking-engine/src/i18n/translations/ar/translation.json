@@ -171,9 +171,12 @@
     "timeTracker": "متتبع الوقت",
     "timeSchedule": "جدول الوقت",
     "leadGeneration": "توليد العملاء المحتملين",
+    "description": "رفيقك الموثوق في السفر للحجوزات السلسة والتجارب التي لا تُنسى.",
+    "newsletterTitle": "ابق على اطلاع",
+    "newsletterDescription": "اشترك للحصول على العروض الخاصة والتحديثات",
     "emailPlaceholder": "أدخل بريدك الإلكتروني",
     "subscribeButton": "اشترك",
-    "copyright": "{year} تريبسويفت - جميع الحقوق محفوظة"
+    "copyright": "© {year} الحجز. جميع الحقوق محفوظة."
   },
   "Profile": {
     "editProfile": "تعديل الملف الشخصي",

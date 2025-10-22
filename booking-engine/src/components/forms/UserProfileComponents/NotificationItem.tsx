@@ -91,12 +91,12 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
             </div>
             <div className="flex items-center gap-1">
               {!notification.isRead && <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />}
-              <button
+              {/* <button
                 onClick={() => onRemove(notification.id)}
                 className="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <X className="h-3 w-3" />
-              </button>
+              </button> */}
             </div>
           </div>
           {!notification.isRead && (

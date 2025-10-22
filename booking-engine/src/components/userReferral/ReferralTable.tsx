@@ -68,9 +68,9 @@ export default function ReferralTable() {
   }, [accessToken, currentPage, itemsPerPage, showReferrals]);
 
   return (
-    <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden max-w-6xl mx-auto">
+    <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden max-w-7xl">
       {/* Header Toggle */}
-      <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <div className="border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50">
         <button
           onClick={toggleShowReferrals}
           className="flex items-center justify-between w-full text-tripswift-blue text-lg font-medium hover:bg-blue-100 p-4 rounded-xl transition-all group"
@@ -99,7 +99,7 @@ export default function ReferralTable() {
 
       {/* Content */}
       {showReferrals && (
-        <div className="p-6 space-y-6">
+        <div className="p-4 space-y-6">
           {/* Stats Bar */}
           <div className="text-center">
             <p className="text-gray-700 text-sm">
@@ -207,10 +207,10 @@ export default function ReferralTable() {
             </>
           ) : (
             /* Empty State */
-            <div className="text-center py-4 px-6">
-              <div className="mx-auto w-24 h-24 flex items-center justify-center bg-blue-50 rounded-full mb-6">
+            <div className="text-center py-2 px-6">
+              <div className="mx-auto w-20 h-20 flex items-center justify-center bg-blue-50 rounded-full mb-6">
                 <svg
-                  className="h-12 w-12 text-tripswift-blue"
+                  className="h-10 w-10 text-tripswift-blue"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"

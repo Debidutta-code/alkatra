@@ -21,7 +21,6 @@ export default function Property({ searchParams }: Props) {
   const { draftProperties, allProperties, teamProperties, loading, error } =useSelector((state: RootState) => state.propertyReducer);
   const { user } = useSelector((state: RootState) => state.auth);
   const [displayedProperties, setDisplayedProperties] = useState<any[]>([]);
-  const [noOfProperties, setNoOfProperties] = useState<number>(0)
   const fetchProperty = async () => {
     await dispatch(getProperties());
   };

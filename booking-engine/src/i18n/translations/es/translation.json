@@ -171,9 +171,12 @@
         "timeTracker": "Control de tiempo",
         "timeSchedule": "Horario",
         "leadGeneration": "Generación de leads",
+        "description": "Tu compañero de viaje confiable para reservas sin problemas y experiencias inolvidables.",
+        "newsletterTitle": "Mantente Actualizado",
+        "newsletterDescription": "Suscríbete para recibir ofertas especiales y actualizaciones",
         "emailPlaceholder": "Ingresa tu correo electrónico",
         "subscribeButton": "Suscribirse",
-        "copyright": "{year} Al Hajz - Todos los derechos reservados"
+        "copyright": "© {year} Al-Hajz. Todos los derechos reservados."
     },
     "Profile": {
         "editProfile": "Editar perfil",

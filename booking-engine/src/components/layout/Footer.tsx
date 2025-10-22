@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import React from "react";
-import img from "../assets/Alhajz.png";
 import { usePathname } from "next/navigation";
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -19,133 +18,146 @@ const Footer = (props: Props) => {
   return (
     <>
       {isFooterVisible && (
-        <div className="flex flex-col mt-10 bg-gray-100 w-full py-6 px-6 md:px-12 text-tripswift-black font-noto-sans">
-          <header className="flex flex-col md:flex-row justify-between items-start gap-6">
-            {/* Logo Section */}
-            <div className="flex items-start">
-              <Image
-                src="/assets/Alhajz.png"
-                width={170}
-                height={20}
-                alt="TripSwift - Redefines Hospitality Technology"
-                className="object-contain"
-                unoptimized
-              />
-            </div>
-
-            {/* Navigation Sections */}
-            <div className="flex flex-col md:flex-row md:space-x-10 md:items-start">
-              {/* Company Section */}
-              <div className="flex flex-col p-2">
-                <header className="text-lg font-tripswift-extrabold mb-4">{t('Footer.companyTitle')}</header>
-                <span className="text-base mb-2 text-tripswift-off-white/80 font-tripswift-regular pointer-events-none">
-                  {t('Footer.aboutUs')}
-                </span>
-                <span className="text-base mb-2 text-tripswift-off-white/80 font-tripswift-regular pointer-events-none">
-                  {t('Footer.whyChooseUs')}
-                </span>
-                <span className="text-base mb-2 text-tripswift-off-white/80 font-tripswift-regular pointer-events-none">
-                  {t('Footer.pricing')}
-                </span>
-                <span className="text-base mb-2 text-tripswift-off-white/80 font-tripswift-regular pointer-events-none">
-                  {t('Footer.testimonials')}
-                </span>
+        <div className="flex flex-col bg-gray-100 w-full border-t border-tripswift-black/10 font-noto-sans">
+          {/* Main Footer Content */}
+          <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+            {/* Top Section: Logo & Navigation */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12">
+              {/* Logo & Description Section */}
+              <div className="lg:col-span-1">
+                <div className="flex items-start mb-4">
+                  <Image
+                    src="/assets/Alhajz.png"
+                    width={120}
+                    height={20}
+                    alt="Alhajz"
+                    className="object-contain"
+                    unoptimized
+                  />
+                </div>
+                <p className="text-sm text-tripswift-black/70 leading-relaxed max-w-xs font-tripswift-regular">
+                  {t('Footer.description') || 'Your trusted travel companion for seamless bookings and unforgettable experiences.'}
+                </p>
               </div>
 
-              {/* Resources Section */}
-              <div className="flex flex-col p-2">
-                <header className="text-lg font-tripswift-extrabold mb-4">{t('Footer.resourcesTitle')}</header>
-                <span className="text-base mb-2 text-tripswift-off-white/80 font-tripswift-regular pointer-events-none">
-                  {t('Footer.privacyPolicy')}
-                </span>
-                <span className="text-base mb-2 text-tripswift-off-white/80 font-tripswift-regular pointer-events-none">
-                  {t('Footer.termsAndConditions')}
-                </span>
-                <span className="text-base mb-2 text-tripswift-off-white/80 font-tripswift-regular pointer-events-none">
-                  {t('Footer.blog')}
-                </span>
-                <span className="text-base mb-2 text-tripswift-off-white/80 font-tripswift-regular pointer-events-none">
-                  {t('Footer.contactUs')}
-                </span>
-              </div>
+              {/* Navigation Sections */}
+              <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
+                {/* Company Section */}
+                <div className="flex flex-col">
+                  <h3 className="text-base font-tripswift-bold mb-3 sm:mb-4 text-tripswift-black">
+                    {t('Footer.companyTitle')}
+                  </h3>
+                  <div className="flex flex-col space-y-2">
+                    <span className="text-sm text-tripswift-black/80 hover:text-tripswift-blue cursor-pointer transition-colors duration-200 font-tripswift-regular">
+                      {t('Footer.aboutUs')}
+                    </span>
+                    <span className="text-sm text-tripswift-black/80 hover:text-tripswift-blue cursor-pointer transition-colors duration-200 font-tripswift-regular">
+                      {t('Footer.whyChooseUs')}
+                    </span>
+                    <span className="text-sm text-tripswift-black/80 hover:text-tripswift-blue cursor-pointer transition-colors duration-200 font-tripswift-regular">
+                      {t('Footer.pricing')}
+                    </span>
+                    <span className="text-sm text-tripswift-black/80 hover:text-tripswift-blue cursor-pointer transition-colors duration-200 font-tripswift-regular">
+                      {t('Footer.testimonials')}
+                    </span>
+                  </div>
+                </div>
 
-              {/* Product Section */}
-              <div className="flex flex-col p-2">
-                <header className="text-lg font-tripswift-extrabold mb-4">{t('Footer.productTitle')}</header>
-                <span className="text-base mb-2 text-tripswift-off-white/80 font-tripswift-regular pointer-events-none">
-                  {t('Footer.projectManagement')}
-                </span>
-                <span className="text-base mb-2 text-tripswift-off-white/80 font-tripswift-regular pointer-events-none">
-                  {t('Footer.timeTracker')}
-                </span>
-                <span className="text-base mb-2 text-tripswift-off-white/80 font-tripswift-regular pointer-events-none">
-                  {t('Footer.timeSchedule')}
-                </span>
-                <span className="text-base mb-2 text-tripswift-off-white/80 font-tripswift-regular pointer-events-none">
-                  {t('Footer.leadGeneration')}
-                </span>
-              </div>
-            </div>
-          </header>
+                {/* Resources Section */}
+                <div className="flex flex-col">
+                  <h3 className="text-base font-tripswift-bold mb-3 sm:mb-4 text-tripswift-black">
+                    {t('Footer.resourcesTitle')}
+                  </h3>
+                  <div className="flex flex-col space-y-2">
+                    <span className="text-sm text-tripswift-black/80 hover:text-tripswift-blue cursor-pointer transition-colors duration-200 font-tripswift-regular">
+                      {t('Footer.privacyPolicy')}
+                    </span>
+                    <span className="text-sm text-tripswift-black/80 hover:text-tripswift-blue cursor-pointer transition-colors duration-200 font-tripswift-regular">
+                      {t('Footer.termsAndConditions')}
+                    </span>
+                    <span className="text-sm text-tripswift-black/80 hover:text-tripswift-blue cursor-pointer transition-colors duration-200 font-tripswift-regular">
+                      {t('Footer.blog')}
+                    </span>
+                    <span className="text-sm text-tripswift-black/80 hover:text-tripswift-blue cursor-pointer transition-colors duration-200 font-tripswift-regular">
+                      {t('Footer.contactUs')}
+                    </span>
+                  </div>
+                </div>
 
-          {/* Subscription Section */}
-          {/* <div className="flex flex-col md:flex-row md:items-center mt-6 md:mt-6 w-full md:w-auto">
-            <div className="flex flex-col md:flex-row w-full md:w-auto items-center gap-2">
-              <div className="relative w-full md:w-64">
-                <input
-                  type="email"
-                  placeholder={t('Footer.emailPlaceholder')}
-                  className="border border-tripswift-off-white/30 bg-tripswift-black/20 rounded-lg px-4 py-2 w-full text-tripswift-off-white placeholder-tripswift-off-white/50 focus:outline-none focus:border-tripswift-blue font-tripswift-regular"
-                  disabled // Disable input to make it non-interactive
-                />
+                {/* Product Section */}
+                <div className="flex flex-col">
+                  <h3 className="text-base font-tripswift-bold mb-3 sm:mb-4 text-tripswift-black">
+                    {t('Footer.productTitle')}
+                  </h3>
+                  <div className="flex flex-col space-y-2">
+                    <span className="text-sm text-tripswift-black/80 hover:text-tripswift-blue cursor-pointer transition-colors duration-200 font-tripswift-regular">
+                      {t('Footer.projectManagement')}
+                    </span>
+                    <span className="text-sm text-tripswift-black/80 hover:text-tripswift-blue cursor-pointer transition-colors duration-200 font-tripswift-regular">
+                      {t('Footer.timeTracker')}
+                    </span>
+                    <span className="text-sm text-tripswift-black/80 hover:text-tripswift-blue cursor-pointer transition-colors duration-200 font-tripswift-regular">
+                      {t('Footer.timeSchedule')}
+                    </span>
+                    <span className="text-sm text-tripswift-black/80 hover:text-tripswift-blue cursor-pointer transition-colors duration-200 font-tripswift-regular">
+                      {t('Footer.leadGeneration')}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <button
-                className="w-full md:w-auto btn-tripswift-primary py-2 px-4 rounded-lg font-tripswift-medium transition-all duration-300 hover:shadow-md"
-                disabled // Disable button to make it non-interactive
-              >
-                {t('Footer.subscribeButton')}
-              </button>
             </div>
-          </div> */}
-          {/* Subscription Section */}
-          <div className="flex flex-col md:flex-row md:items-center mt-6 md:mt-6 w-full md:w-auto">
-            <div className="flex flex-col md:flex-row w-full md:w-auto items-center gap-2">
-              <div className="relative w-full md:w-64">
-                <input
-                  type="email"
-                  placeholder={t('Footer.emailPlaceholder')}
-                  className="border border-tripswift-black/30 bg-gray-100/20 rounded-lg px-4 py-2 w-full text-tripswift-black placeholder-tripswift-black/50 focus:outline-none focus:border-tripswift-blue font-tripswift-regular"
-                />
+
+            {/* Newsletter Subscription Section */}
+            {/* <div className="mt-8 sm:mt-10 lg:mt-12 pt-8 border-t border-tripswift-black/10">
+              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+                <div className="lg:w-[400px] lg:flex-shrink-0">
+                  <h3 className="text-base font-tripswift-bold text-tripswift-black mb-2 leading-tight">
+                    {t('Footer.newsletterTitle') || 'Stay Updated'}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-tripswift-black/70 leading-relaxed font-tripswift-regular">
+                    {t('Footer.newsletterDescription') || 'Subscribe to get special offers and updates'}
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full lg:w-auto">
+                  <input
+                    type="email"
+                    placeholder={t('Footer.emailPlaceholder')}
+                    className="w-full sm:w-[240px] lg:w-[260px] h-[42px] border border-tripswift-black/30 bg-tripswift-off-white rounded-lg px-4 text-sm text-tripswift-black placeholder-tripswift-black/50 focus:outline-none focus:border-tripswift-blue focus:ring-1 focus:ring-tripswift-blue transition-colors duration-200 font-tripswift-regular"
+                  />
+                  <button className="w-full sm:w-auto h-[42px] bg-gradient-to-r from-tripswift-blue to-[#054B8F] text-tripswift-off-white px-6 rounded-lg text-sm font-tripswift-medium transition-all duration-300 hover:shadow-md hover:from-[#054B8F] hover:to-tripswift-blue whitespace-nowrap flex-shrink-0">
+                    {t('Footer.subscribeButton')}
+                  </button>
+                </div>
               </div>
-              <button className="w-full md:w-auto btn-tripswift-primary py-2 px-4 rounded-lg font-tripswift-medium transition-all duration-300 hover:shadow-md">
-                {t('Footer.subscribeButton')}
-              </button>
-            </div>
+            </div> */}
           </div>
 
-          {/* Footer Bottom */}
-          <div className="flex flex-col md:flex-row items-center justify-between mt-8 space-y-4 md:space-y-0">
-            <div className="hidden md:block w-full md:w-auto border-t border-tripswift-black/20 flex-grow"></div>
-            <div className="text-center text-sm mt-2 md:mt-0 w-full md:w-auto text-tripswift-black/80 font-tripswift-regular">
-              © {currentYear} {t('Footer.copyright').replace('{year}', '')}
-            </div>
-            <div className="hidden md:block w-full md:w-auto border-t border-tripswift-black/20 flex-grow"></div>
-          </div>
+          {/* Bottom Bar: Copyright & Social */}
+          <div className="border-t border-tripswift-black/10 bg-tripswift-off-white/30">
+            <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                {/* Copyright */}
+                <div className="text-xs sm:text-sm text-tripswift-black/70 text-center sm:text-left order-2 sm:order-1 font-tripswift-regular">
+                  © {currentYear} {t('Footer.copyright').replace('{year}', '')}
+                </div>
 
-          {/* Social Media Icons */}
-          <div className="flex justify-center mt-4 space-x-4">
-            <span className="text-tripswift-black/70 transition-colors duration-300 pointer-events-none">
-              <Facebook size={20} />
-            </span>
-            <span className="text-tripswift-black/70 transition-colors duration-300 pointer-events-none">
-              <Twitter size={20} />
-            </span>
-            <span className="text-tripswift-black/70 transition-colors duration-300 pointer-events-none">
-              <Instagram size={20} />
-            </span>
-            <span className="text-tripswift-black/70 transition-colors duration-300 pointer-events-none">
-              <Linkedin size={20} />
-            </span>
+                {/* Social Media Icons */}
+                <div className="flex items-center gap-4 order-1 sm:order-2">
+                  <span className="text-tripswift-black/60 hover:text-tripswift-blue transition-colors duration-300 cursor-pointer hover:scale-110 transform">
+                    <Facebook size={18} />
+                  </span>
+                  <span className="text-tripswift-black/60 hover:text-tripswift-blue transition-colors duration-300 cursor-pointer hover:scale-110 transform">
+                    <Twitter size={18} />
+                  </span>
+                  <span className="text-tripswift-black/60 hover:text-tripswift-blue transition-colors duration-300 cursor-pointer hover:scale-110 transform">
+                    <Instagram size={18} />
+                  </span>
+                  <span className="text-tripswift-black/60 hover:text-tripswift-blue transition-colors duration-300 cursor-pointer hover:scale-110 transform">
+                    <Linkedin size={18} />
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -13,7 +13,8 @@ import {
   addPropertyRoom,
   deleteProperty,
   createPropertyAmenity,
-  addPropertyAddress
+  addPropertyAddress,
+  updatePropertyAddress
 } from './api';
 import { useSearchParams, useRouter } from "next/navigation";
 import { DeleteSuccessModal } from '../../../../components/propertyId/DeleteSuccessModal';
@@ -187,21 +188,28 @@ export default function Page() {
     setEditedAddress(prev => prev ? { ...prev, [name]: value } : null);
   };
 
-  const handleAddressSaveClick = async () => {
-    try {
-      if (!accessToken || !editedAddress || !propertyId) {
-        console.error("Access token, property ID, or editedAddress is missing");
-        toast.error("Missing required data");
-        return;
-      }
-      setEditAddressMode(false);
-      setAddress({ ...editedAddress });
-      toast.success("Address updated successfully!");
-    } catch (error) {
-      console.error("Error updating address data:", error);
-      toast.error("Failed to update address");
+const handleAddressSaveClick = async () => {
+  try {
+    if (!accessToken || !editedAddress || !propertyId) {
+      console.error("Access token, property ID, or editedAddress is missing");
+      toast.error("Missing required data");
+      return;
     }
-  };
+    
+    const response = await updatePropertyAddress(
+      propertyId, 
+      accessToken, 
+      editedAddress
+    );
+    
+    setEditAddressMode(false);
+    setAddress(response.data || editedAddress); // Use response data
+    toast.success("Address updated successfully!");
+  } catch (error) {
+    console.error("Error updating address data:", error);
+    toast.error("Failed to update address");
+  }
+};
 
   const handleAddressAddClick = async () => {
     try {

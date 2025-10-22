@@ -46,9 +46,9 @@ export default function Referral() {
 
   return (
     <div className="min-h-screen bg-tripswift-off-white flex justify-center w-screen">
-      <div className="w-screen overflow-hidden">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
-        {/* <div className="flex flex-col justify-center bg-tripswift-blue p-4 text-center h-[30vh] relative overflow-hidden">
+        <div className="flex flex-col justify-center bg-tripswift-blue p-8 text-center rounded-xl mb-6 mt-4 relative overflow-hidden shadow-lg">
           <div className="absolute inset-0 bg-gradient-to-b from-blue-600/10 to-blue-700/30"></div>
           <h1 className="text-4xl font-bold text-white relative z-10">
             {t("Referral.heroTitle")}
@@ -56,12 +56,12 @@ export default function Referral() {
           <p className="mt-4 text-blue-100 text-sm relative z-10 max-w-md mx-auto">
             {t("Referral.heroSubtitle")}
           </p>
-        </div> */}
+        </div>
 
         {/* Main Content */}
-        <div className="space-y-4 mt-2">
+        <div className="space-y-6 mb-8">
           {/* Two Columns (Share & Wallet) - Responsive */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
             <div className="w-full">
               <ReferralShare />
             </div>

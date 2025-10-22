@@ -52,7 +52,7 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100">
+    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100 mb-4">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-8 h-8 bg-tripswift-blue rounded-lg flex items-center justify-center">
           <CalendarIcon className="h-4 w-4 text-white" />
@@ -97,7 +97,7 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
                 disabledDate={disabledDate}
                 format="DD MMM YYYY"
                 className="w-full pl-12 bg-transparent border-none focus:ring-0"
-                placeholder={t("Select check-in")}
+                placeholder={t("Check-in")}
                 suffixIcon={null}
                 size="large"
               />
@@ -127,7 +127,7 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
                 disabledDate={disabledCheckOutDate}
                 format="DD MMM YYYY"
                 className="w-full pl-12 bg-transparent border-none focus:ring-0"
-                placeholder={t("Select check-out")}
+                placeholder={t("Check-out")}
                 suffixIcon={null}
                 size="large"
               />
@@ -152,7 +152,7 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
               }`}>
               <div className="flex items-center justify-between w-full px-4 py-1">
                 <span className="text-sm font-medium text-gray-600">{t("Rooms")}</span>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center">
                   <button
                     type="button"
                     className="w-6 h-6 rounded-full border border-gray-400 text-gray-600 flex items-center justify-center transition-colors hover:bg-tripswift-blue/10 hover:border-tripswift-blue hover:text-tripswift-blue disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:border-gray-200 disabled:hover:text-gray-600"

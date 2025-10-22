@@ -217,8 +217,8 @@ function PaymentPageContent() {
   return (
     <CheckAuthentication setLoading={setLoading}>
       <div className="min-h-screen bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8] relative font-noto-sans">
-        <div className="container mx-auto px-4 py-10 relative z-10">
-          <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+          <div className="">
             <div className="grid md:grid-cols-5 gap-8">
               {/* Payment Form - 3 columns */}
               <div className="md:col-span-3 space-y-6">
