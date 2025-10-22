@@ -40,8 +40,8 @@ export const validateCouponCodeRepo = async (
 
   promoCode.customerId = new mongoose.Types.ObjectId(userId);
   
-  if (isUsed) {
-    promoCode.isUsed = isUsed;
+  if (isUsed == 'false') {
+    promoCode.isUsed = 'false';
   } else {
     promoCode.isUsed = 'available';
   }
