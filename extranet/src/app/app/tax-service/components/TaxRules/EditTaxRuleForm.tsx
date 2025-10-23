@@ -8,7 +8,7 @@ type EditFormState = {
     type: string;
     value: string;
     applicableOn: string;
-    country: string;
+    // country: string;
     description: string;
     validFrom: string;
     isInclusive: boolean;
@@ -168,7 +168,7 @@ export const EditTaxRuleForm = ({
                     </Button>
                     <Button
                         onClick={onSave}
-                        disabled={updateLoading || !form.name.trim() || !form.country.trim() || !form.value}
+                        disabled={updateLoading || !form.name.trim() || !form.value}
                         size="sm"
                         className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
                     >

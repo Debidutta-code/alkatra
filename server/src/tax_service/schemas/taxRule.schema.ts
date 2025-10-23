@@ -9,11 +9,11 @@ const createTaxRuleSchema = z.object({
     type: z.enum(["PERCENTAGE", "FIXED"]),
     value: z.number().nonnegative("Value must be >= 0"),
     applicableOn: z.enum(["ROOM_RATE", "TOTAL_AMOUNT"]),
-    region: z.object({
-        country: z.string().min(1, "Country is required"),
-        state: z.string().optional(),
-        city: z.string().optional(),
-    }),
+    // region: z.object({
+    //     country: z.string().min(1, "Country is required"),
+    //     state: z.string().optional(),
+    //     city: z.string().optional(),
+    // }),
     description: z.string().optional(),
     validFrom: z
         .string()

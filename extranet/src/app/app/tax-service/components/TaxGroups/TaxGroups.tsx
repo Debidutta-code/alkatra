@@ -407,7 +407,7 @@ export const TaxGroups = ({
                                                                 {ruleData && (
                                                                     <div className="text-xs text-gray-500 mt-1 space-y-1">
                                                                         <div>{ruleData.type === "PERCENTAGE" ? `${ruleData.value}%` : `$${ruleData.value.toFixed(2)}`} • {ruleData.type}</div>
-                                                                        <div className="truncate">{ruleData.region?.country}</div>
+                                                                        {/* <div className="truncate">{ruleData.region?.country}</div> */}
                                                                         <div>
                                                                             Applied on: <span className="font-medium">{ruleData.applicableOn.replace('_', ' ')}</span>
                                                                         </div>

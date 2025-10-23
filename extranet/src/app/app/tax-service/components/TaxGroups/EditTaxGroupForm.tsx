@@ -81,7 +81,7 @@ export const EditTaxGroupForm = ({
                                         <div className="text-xs text-gray-500 line-clamp-1">
                                             {rule.type === "PERCENTAGE"
                                                 ? `${rule.value}%`
-                                                : `$${rule.value.toFixed(2)}`} • {rule.region?.country} • {rule.type}
+                                                : `$${rule.value.toFixed(2)}`} • {rule.type}
                                         </div>
                                     </div>
                                 </label>

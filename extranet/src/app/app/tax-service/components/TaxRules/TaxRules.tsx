@@ -59,7 +59,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
         type: string;
         value: string;
         applicableOn: string;
-        country: string;
+        // country: string;
         description: string;
         validFrom: string;
         isInclusive: boolean;
@@ -69,7 +69,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
         type: "PERCENTAGE",
         value: "",
         applicableOn: "ROOM_RATE",
-        country: "",
+        // country: "",
         description: "",
         validFrom: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
         isInclusive: false,
@@ -111,7 +111,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
             type: rule.type,
             value: rule.value.toString(),
             applicableOn: rule.applicableOn,
-            country: rule.region?.country || "",
+            // country: rule.region?.country || "",
             description: rule.description || "",
             validFrom: rule.validFrom ? new Date(rule.validFrom).toISOString().slice(0, 10) : "",
             isInclusive: rule.isInclusive,
@@ -140,17 +140,17 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
             return;
         }
 
-        if (!editForm.name.trim() || !editForm.country.trim()) {
-            toast.error("Name and Country are required");
-            return;
-        }
+        // if (!editForm.name.trim() || !editForm.country.trim()) {
+        //     toast.error("Name and Country are required");
+        //     return;
+        // }
 
         await handleUpdate(editingRule, {
             name: editForm.name.trim(),
             type: editForm.type as "PERCENTAGE" | "FIXED",
             value: numValue,
             applicableOn: editForm.applicableOn as "TOTAL_AMOUNT" | "ROOM_RATE",
-            region: { country: editForm.country.trim() },
+            // region: { country: editForm.country.trim() },
             description: editForm.description || "",
             validFrom: editForm.validFrom ? convertDateToUTC(editForm.validFrom) : undefined,
             isInclusive: editForm.isInclusive,
@@ -166,7 +166,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
             type: "PERCENTAGE",
             value: "",
             applicableOn: "ROOM_RATE",
-            country: "",
+            // country: "",
             description: "",
             validFrom: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
             isInclusive: false,
@@ -175,8 +175,8 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
     };
 
     const handleCreate = async () => {
-        if (!createForm.name.trim() || !createForm.country.trim() || !createForm.value) {
-            toast.error("Name, Country, and Value are required");
+        if (!createForm.name.trim() || !createForm.value) {
+            toast.error("Name and Value are required");
             return;
         }
 
@@ -196,7 +196,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
             type: createForm.type,
             value: numValue,
             applicableOn: createForm.applicableOn,
-            region: { country: createForm.country.trim() },
+            // region: { country: createForm.country.trim() },
             description: createForm.description || undefined,
             validFrom: createForm.validFrom ? convertDateToUTC(createForm.validFrom) : undefined,
             isInclusive: createForm.isInclusive,
@@ -341,7 +341,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
     const filteredRules = rules.filter((rule) => {
         const matchesSearch =
             rule.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            rule.region?.country.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            // rule.region?.country.toLowerCase().includes(searchTerm.toLowerCase()) ||
             rule.description?.toLowerCase().includes(searchTerm.toLowerCase());
 
         const matchesFilter =

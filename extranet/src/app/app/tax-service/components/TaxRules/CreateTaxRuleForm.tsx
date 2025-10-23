@@ -8,7 +8,7 @@ type FormState = {
     type: string;
     value: string;
     applicableOn: string;
-    country: string;
+    // country: string;
     description: string;
     validFrom: string;
     isInclusive: boolean;
@@ -182,7 +182,7 @@ export const CreateTaxRuleForm = ({
                     </Button>
                     <Button
                         onClick={handleCreate}
-                        disabled={createLoading || !form.name.trim() || !form.country.trim() || !form.value}
+                        disabled={createLoading || !form.name.trim() || !form.value}
                         className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-8 shadow-lg"
                     >
                         {createLoading ? (
