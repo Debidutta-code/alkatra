@@ -55,14 +55,17 @@ const notificationSlice = createSlice({
       state.notifications = [];
       state.unreadCount = 0;
       state.error = null;
+    },
+    resetNotifications(state) {
+      return initialState;
     }
   },
 });
 
 const isValidMongoId = (id: string) => /^[0-9a-fA-F]{24}$/.test(id);
 
-// Thunks
 export const fetchNotifications = (userId: string): AppThunk => async (dispatch) => {
+  dispatch(clearNotifications());
   dispatch(setLoading(true));
 
   if (!isValidMongoId(userId)) {
@@ -85,7 +88,9 @@ export const fetchNotifications = (userId: string): AppThunk => async (dispatch)
       }
     );
 
-    const notifications = response.data.notifications.map(notification => ({
+    const notificationsData = response.data.notifications || [];
+
+    const notifications = notificationsData.map(notification => ({
       id: notification._id,
       title: notification.title,
       body: notification.body,
@@ -105,6 +110,7 @@ export const fetchNotifications = (userId: string): AppThunk => async (dispatch)
       error.message ||
       'Failed to fetch notifications';
     dispatch(setError(errorMessage));
+    dispatch(setNotifications([]));
   } finally {
     dispatch(setLoading(false));
   }
@@ -172,7 +178,8 @@ export const {
   clearNotifications,
   setLoading,
   setNotifications,
-  setError
+  setError,
+  resetNotifications
 } = notificationSlice.actions;
 
 export default notificationSlice.reducer;

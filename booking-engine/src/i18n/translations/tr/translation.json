@@ -1475,7 +1475,12 @@
         "filtersAndSort": "Filtreler ve Sıralama",
         "reviewScores": "İnceleme puanları",
         "timeOfYear": "Yılın zamanı",
-        "sortReviewsBy": "İncelemeleri sırala göre"
+        "sortReviewsBy": "İncelemeleri sırala göre",
+        "show": "Göster",
+        "perPage": "sayfa başına",
+        "showing": "Gösteriliyor",
+        "of": "toplam",
+        "noReviewsToShow": "Gösterilecek değerlendirme yok"
     },
     "NetworkStatus": {
         "offline": "Çevrimdışısınız. Lütfen internet bağlantınızı kontrol edin.",

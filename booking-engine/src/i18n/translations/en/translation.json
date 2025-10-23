@@ -1488,7 +1488,12 @@
     "filtersAndSort": "Filters & Sort",
     "reviewScores": "Review scores",
     "timeOfYear": "Time of year",
-    "sortReviewsBy": "Sort reviews by"
+    "sortReviewsBy": "Sort reviews by",
+    "show": "Show",
+    "perPage": "per page",
+    "showing": "Showing",
+    "of": "of",
+    "noReviewsToShow": "No reviews to show"
   },
   "NetworkStatus": {
     "offline": "You are offline. Please check your internet connection.",

@@ -1444,7 +1444,12 @@
         "filtersAndSort": "Filtros y orden",
         "reviewScores": "Puntuaciones de reseñas",
         "timeOfYear": "Época del año",
-        "sortReviewsBy": "Ordenar opiniones por"
+        "sortReviewsBy": "Ordenar opiniones por",
+        "show": "Mostrar",
+        "perPage": "por página",
+        "showing": "Mostrando",
+        "of": "de",
+        "noReviewsToShow": "No hay reseñas para mostrar"
     },
     "NetworkStatus": {
         "offline": "Estás desconectado. Por favor verifica tu conexión a internet.",
