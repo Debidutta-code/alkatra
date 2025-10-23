@@ -427,7 +427,7 @@ export const TaxRules = ({ propertyId, accessToken, initialRules, onUpdate }: Ta
                             </p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {filteredRules.map((rule) => (
                                 <div key={rule._id} className="bg-white border border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
                                     {editingRule === rule._id ? (

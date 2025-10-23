@@ -213,102 +213,111 @@ export async function getBookings(page: number = 1, itemsPerPage: number = 10, a
   }
 }
 
-export async function getBookingById(bookingId: string) {
+export async function getBookingDetails(bookingId: string) {
   try {
     console.log(`Fetching booking details for ID: ${bookingId}`);
-    const accessToken = Cookies.get("accessToken") || "undefined";
-    const ownerId = Cookies.get("ownerId");
-
-    if (!ownerId || !accessToken) {
-      console.error("Owner ID or Access Token not found for booking details!");
+    const accessToken = Cookies.get("accessToken");
+    
+    if (!accessToken) {
+      console.error("Access Token not found for booking details!");
       return null;
     }
 
-    // First, try to find the booking in our transformed data
-    const result = await getBookings(1, 100, accessToken);
-
-    if (!result || !result.bookingDetails || result.bookingDetails.length === 0) {
-      console.log("No bookings found in initial fetch");
-      return null;
-    }
-
-    const booking = result.bookingDetails.find((b) => b.id === bookingId);
-    console.log(`Looking for booking ID: ${bookingId} in ${result.bookingDetails.length} bookings`);
-
-    if (!booking) {
-      console.log("Booking not found in results");
-      return null;
-    }
-
-    // Fetch raw booking data to get complete guest details
-    try {
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-      const response = await axios.get(
-        `${backendUrl}/booking/count/${ownerId}?page=1&limit=100`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const data: ApiResponse = response.data;
-      const rawBooking = data.bookingDetails.find((b: ApiBooking) => b._id === bookingId);
-
-      if (rawBooking) {
-        // Helper function to calculate age from date of birth
-        const calculateAge = (dob: string): number => {
-          const birthDate = new Date(dob);
-          const today = new Date();
-          let age = today.getFullYear() - birthDate.getFullYear();
-          const monthDiff = today.getMonth() - birthDate.getMonth();
-
-          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-          }
-
-          return age;
-        };
-
-        // Process guests with age calculation
-        const processedGuests = rawBooking.guestDetails.map(guest => ({
-          ...guest,
-          age: calculateAge(guest.dob)
-        }));
-
-        // Return enhanced booking with complete guest details
-        return {
-          ...booking,
-          guests: processedGuests,
-          primaryGuest: processedGuests[0] || null,
-          guestCount: processedGuests.length,
-          roomDetails: `${rawBooking.roomTypeCode} - ${rawBooking.ratePlanCode}`,
-          userDetails: {
-            email: rawBooking.email || "N/A",
-            phone: rawBooking.phone || "N/A",
-          },
-          reservationId: rawBooking.reservationId,
-          paymentMethod: rawBooking.paymentMethod,
-          numberOfRooms: rawBooking.numberOfRooms,
-        };
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+    
+    // Call the specific booking details endpoint
+    const response = await axios.get(
+      `${backendUrl}/booking/extranet/booking/details/${bookingId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
       }
-    } catch (error) {
-      console.error("Failed to fetch raw booking data:", error);
+    );
+
+    const apiData = response.data;
+    
+    if (!apiData.success || !apiData.data) {
+      console.error("Failed to fetch booking details");
+      return null;
     }
 
-    // Return basic booking data if raw data fetch fails
-    return {
-      ...booking,
-      roomDetails: booking.roomType || `Room ${booking.id.slice(-4)}`,
-      userDetails: {
-        email: booking.email || "N/A",
-        phone: booking.phone || "N/A",
-      },
+    const booking = apiData.data;
+    
+    // Helper function to calculate age from date of birth
+    const calculateAge = (dob: string): number => {
+      const birthDate = new Date(dob);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+
+      return age;
     };
 
-  } catch (error) {
-    console.error("Error fetching booking by ID:", error);
+    // Process guests with age calculation
+    const processedGuests = booking.guestDetails.map((guest: any) => ({
+      ...guest,
+      age: guest.dob && guest.dob !== 'invalid' ? calculateAge(guest.dob) : null
+    }));
+
+    // Transform the API response to match your component's expected format
+    return {
+      id: booking._id,
+      reservationId: booking.reservationId,
+      guestName: booking.guestDetails.length > 0
+        ? `${booking.guestDetails[0].firstName} ${booking.guestDetails[0].lastName}`.trim()
+        : "N/A",
+      guests: processedGuests,
+      primaryGuest: processedGuests[0] || null,
+      guestCount: processedGuests.length,
+      checkIn: new Date(booking.checkInDate).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      }),
+      checkOut: new Date(booking.checkOutDate).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      }),
+      status: booking.status,
+      property: {
+        id: booking._id,
+        name: booking.hotelName,
+        code: booking.hotelCode,
+      },
+      roomDetails: `${booking.roomTypeCode} - ${booking.ratePlanCode}`,
+      roomType: booking.roomTypeCode,
+      numberOfRooms: booking.numberOfRooms,
+      amount: booking.totalAmount,
+      totalAmount: booking.totalAmount,
+      currency: booking.currencyCode,
+      paymentMethod: booking.paymentMethod,
+      email: booking.email,
+      phone: booking.phone,
+      userDetails: {
+        email: booking.email,
+        phone: booking.phone,
+      },
+      taxValue: booking.taxValue,
+      coupon: booking.coupon || [],
+      provider: booking.provider,
+    };
+
+  } catch (error: any) {
+    console.error("Error fetching booking details:", error);
+    
+    if (error.response?.status === 401) {
+      console.error("Unauthorized access - token may be expired");
+    } else if (error.response?.status === 404) {
+      console.error("Booking not found");
+    }
+    
     return null;
   }
 }

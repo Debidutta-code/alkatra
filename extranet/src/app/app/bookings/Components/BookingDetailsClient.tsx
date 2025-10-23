@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getBookingById } from "../api";
+import { getBookingDetails } from "../api";
 import { Calendar, MapPin, Mail, Phone, BedDouble, ChevronLeft, CreditCard, CheckCircle, Clock, AlertCircle, XCircle, BookOpen, Building2, Users, Baby, User, UserCheck } from "lucide-react";
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card";
@@ -119,7 +119,7 @@ export default function BookingDetailsClient({ bookingId }: BookingDetailsClient
                 setError("");
                 setLoading(true);
 
-                const data = await getBookingById(bookingId);
+                const data = await getBookingDetails(bookingId);
                 console.log("^^^^^^^^^^^^^^^^^^^^^^^^\n", bookingId);
                 console.log("Booking data received:", data);
 
