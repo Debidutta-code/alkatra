@@ -40,5 +40,11 @@ router.route("/check/availability").get(authenticateCustomer as any, bookingCont
 // Reservation API
 router.route("/create-reservation-with-card").post(authenticateCustomer as any, bookingController.reservationWithPayAtHotel.bind(bookingController));
 
+// Extranet API
+/**
+ * Get reservation details for extranet
+ */
+router.route("/extranet/booking/details/:id").get(protect as any, bookingController.getBookingDetailsForExtranet.bind(bookingController));
+
 
 export default router;

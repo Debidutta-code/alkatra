@@ -1784,6 +1784,7 @@ export class BookingController {
   private bookAgainService: BookAgainAvailabilityService;
   private promoCodeService = PromoCodeService.getInstance();
 
+
   /**
    * 
    */
@@ -2523,6 +2524,37 @@ export class BookingController {
         notFoundCount: categorizedCoupons.notFound.length
       }
     };
+  }
+
+  async getBookingDetailsForExtranet(req: any, res: Response, next: NextFunction) {
+    const reservationService = ReservationService.getInstance();
+    try {
+
+      const bookingId = req.params.id;
+      if (!bookingId) {
+        return res.status(400).json({ message: "Booking ID is required" });
+      }
+
+      if (!mongoose.Types.ObjectId.isValid(bookingId)) {
+        return res.status(400).json({ message: "Invalid Booking ID format" });
+      }
+
+      const bookingDetails = await reservationService.getReservationDetails(bookingId);
+      if (!bookingDetails) {
+        return res.status(404).json({ message: "No booking details found" });
+      }
+      res.status(200).json({
+        success: true,
+        message: "Booking details fetched successfully",
+        data: bookingDetails,
+      });
+
+      return true;
+
+    } catch (error: any) {
+      console.log("Error while getting booking details for extranet:", error);
+      return res.status(500).json({ message: "Error while getting booking details for extranet" });
+    }
   }
 
 }
