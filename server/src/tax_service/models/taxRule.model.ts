@@ -9,11 +9,11 @@ export interface ITaxRule extends Document {
     type: "PERCENTAGE" | "FIXED";
     value: number;
     applicableOn: "ROOM_RATE" | "TOTAL_AMOUNT";
-    region: {
-        country: string;
-        state?: string;
-        city?: string;
-    };
+    // region: {
+    //     country: string;
+    //     state?: string;
+    //     city?: string;
+    // };
     description?: string;
     validFrom: Date;
     validTo?: Date;
@@ -39,11 +39,11 @@ const TaxRuleSchema: Schema<ITaxRule> = new Schema(
             enum: ["ROOM_RATE", "TOTAL_AMOUNT"],
             required: true,
         },
-        region: {
-            country: { type: String, required: true },
-            state: { type: String },
-            city: { type: String },
-        },
+        // region: {
+        //     country: { type: String, required: true },
+        //     state: { type: String },
+        //     city: { type: String },
+        // },
         description: { type: String },
         validFrom: { type: Date, required: true },
         validTo: { type: Date },
