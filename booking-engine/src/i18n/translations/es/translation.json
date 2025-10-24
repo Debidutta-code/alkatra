@@ -812,7 +812,8 @@
             "rateBreakdown": "Desglose de tarifa",
             "viewBookingDetails": "Ver detalles de la reserva",
             "modify": "Modificar",
-            "cancel": "Cancelar"
+            "cancel": "Cancelar",
+            "bookAgain": "Reservar de nuevo"
         },
         "BookingPagination": {
             "show": "Mostrar",
@@ -1250,6 +1251,18 @@
             "common": {
                 "important": "Importante"
             }
+        },
+        "promoCode": {
+            "label": "¿Tienes un código promocional?",
+            "placeholder": "Ingresa el código",
+            "apply": "Aplicar",
+            "applied": "Aplicado",
+            "success": "¡Código promocional aplicado! Ahorraste {{discount}}",
+            "invalid": "Código promocional inválido o expirado",
+            "genericError": "Error al aplicar el código promocional. Por favor, inténtalo de nuevo.",
+            "loginRequired": "Por favor, inicia sesión para usar códigos promocionales",
+            "viewAvailable": "Ver códigos promocionales disponibles",
+            "noAvailable": "No hay códigos promocionales disponibles en este momento"
         }
     },
     "GuestBox": {
@@ -1454,5 +1467,126 @@
     "NetworkStatus": {
         "offline": "Estás desconectado. Por favor verifica tu conexión a internet.",
         "online": "¡Estás de vuelta en línea!"
+    },
+    "rebookModal": {
+        "bookAgain": "Reservar de nuevo",
+        "updateDetails": "Actualizar detalles",
+        "reviewAndBook": "Revisar y reservar",
+        "checkingAvailability": "Verificando disponibilidad...",
+        "continueToReview": "Continuar a revisión",
+        "cancel": "Cancelar",
+        "greatNews": "¡Excelentes noticias!",
+        "datesAvailableMessage": "Las fechas seleccionadas están disponibles para reservar",
+        "priceDetails": "Detalles del precio",
+        "baseAmount": "Monto base",
+        "additionalGuestCharges": "Cargos adicionales por huéspedes",
+        "taxAndFeeBreakdown": "Desglose de impuestos y tarifas",
+        "totalTax": "Impuesto total",
+        "roomRate": "Tarifa de habitación",
+        "totalForNights": "Total por {{count}} noches",
+        "totalForNights_one": "Total por {{count}} noche",
+        "totalForNights_other": "Total por {{count}} noches",
+        "finalAmount": "Monto final (impuestos incluidos)",
+        "includesTaxes": "Incluye",
+        "inTaxes": "en impuestos",
+        "backToDetails": "Volver a detalles",
+        "proceedToPayment": "Proceder al pago",
+        "redirectingToPayment": "Redirigiendo al pago...",
+        "errors": {
+            "atLeastOneGuest": "Se requiere al menos un huésped",
+            "selectCheckInDate": "Por favor, selecciona una fecha de entrada",
+            "selectCheckOutDate": "Por favor, selecciona una fecha de salida",
+            "checkOutAfterCheckIn": "La fecha de salida debe ser posterior a la fecha de entrada",
+            "atLeastOneRoom": "Se requiere al menos 1 habitación",
+            "maxRoomsAllowed": "Máximo 4 habitaciones permitidas",
+            "maxGuestsForRooms": "Máximo {{maxGuests}} huéspedes permitidos para {{rooms}} {{roomText}}",
+            "room": "habitación",
+            "rooms": "habitaciones",
+            "provideEmail": "Por favor, proporciona un correo electrónico de contacto",
+            "validEmail": "Por favor, proporciona una dirección de correo electrónico válida",
+            "firstNameRequired": "El nombre es obligatorio",
+            "firstNameLetters": "El nombre solo debe contener letras",
+            "lastNameRequired": "El apellido es obligatorio",
+            "lastNameLetters": "El apellido solo debe contener letras",
+            "dobRequired": "La fecha de nacimiento es obligatoria",
+            "dobMismatch": "La fecha de nacimiento no coincide con el tipo de huésped",
+            "correctErrors": "Por favor, corrige los errores anteriores",
+            "noRoomsAvailable": "No hay habitaciones disponibles para las fechas seleccionadas. Por favor, intenta con fechas diferentes.",
+            "somethingWrong": "Algo salió mal. Por favor, inténtalo de nuevo.",
+            "completeFields": "Por favor, completa todos los campos requeridos antes de continuar"
+        },
+        "success": {
+            "datesAvailable": "¡Genial! Tus nuevas fechas están disponibles."
+        }
+    },
+    "dateSelectionCard": {
+        "title": "¿Cuándo quieres alojarte?",
+        "checkInDate": "Fecha de entrada",
+        "checkOutDate": "Fecha de salida",
+        "numberOfRooms": "Número de habitaciones",
+        "checkInPlaceholder": "Entrada",
+        "checkOutPlaceholder": "Salida",
+        "roomsLabel": "Habitaciones",
+        "room": "habitación",
+        "rooms": "habitaciones",
+        "decreaseRooms": "Disminuir habitaciones",
+        "increaseRooms": "Aumentar habitaciones",
+        "roomsRange": "Mín: 1 habitación, Máx: 4 habitaciones",
+        "guestRatioError": "Máximo 4 huéspedes permitidos por habitación. Tienes {{guestsCount}} huéspedes para {{rooms}} {{roomText}}.",
+        "nightsCount": "{{count}} noches",
+        "nightsCount_one": "{{count}} noche",
+        "nightsCount_other": "{{count}} noches",
+        "guestsCount": "{{count}} huéspedes",
+        "guestsCount_one": "{{count}} huésped",
+        "guestsCount_other": "{{count}} huéspedes",
+        "roomsCount": "{{count}} habitaciones",
+        "roomsCount_one": "{{count}} habitación",
+        "roomsCount_other": "{{count}} habitaciones"
+    },
+    "contactInfoCard": {
+        "title": "Información de contacto",
+        "emailAddress": "Dirección de correo electrónico",
+        "phoneNumber": "Número de teléfono",
+        "notProvided": "No proporcionado"
+    },
+    "guestForm": {
+        "removeGuest": "Eliminar huésped",
+        "guestNumber": "Huésped {{number}}",
+        "firstName": "Nombre",
+        "lastName": "Apellido",
+        "guestType": "Tipo de huésped",
+        "dateOfBirth": "Fecha de nacimiento",
+        "firstNamePlaceholder": "Nombre",
+        "lastNamePlaceholder": "Apellido",
+        "selectDOB": "Seleccionar fecha de nacimiento",
+        "adult": "Adulto",
+        "child": "Niño",
+        "infant": "Bebé"
+    },
+    "guestManagementCard": {
+        "title": "Detalles de huéspedes",
+        "addGuest": "Agregar huésped"
+    },
+    "reviewSummaryCard": {
+        "title": "Resumen de reserva",
+        "hotel": "Hotel",
+        "roomType": "Tipo de habitación",
+        "checkIn": "Entrada",
+        "checkOut": "Salida",
+        "nights": "Noches",
+        "guests": "Huéspedes",
+        "rooms": "Habitaciones",
+        "contactInformation": "Información de contacto",
+        "guestDetails": "Detalles de huéspedes",
+        "guestTypes": {
+            "adult": "Adulto",
+            "child": "Niño",
+            "infant": "Bebé"
+        }
+    },
+    "roomInfoCard": {
+        "title": "Detalles de la habitación",
+        "roomType": "Tipo de habitación",
+        "sameRoomType": "Mismo tipo de habitación que tu reserva original"
     }
 }

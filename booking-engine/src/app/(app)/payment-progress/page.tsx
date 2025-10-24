@@ -249,8 +249,8 @@ const PaymentProgressPage: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#F0F4F8] to-[#EAF2F8] font-noto-sans">
-            <div className="container mx-auto px-4 py-4">
-                <div className="max-w-6xl mx-auto">
+            <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+                <div className="">
                     {/* Header */}
                     <div className="text-center mb-4">
                         <h1 className="text-2xl font-tripswift-bold text-tripswift-black mb-1">

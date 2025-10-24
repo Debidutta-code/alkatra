@@ -813,7 +813,8 @@
       "rateBreakdown": "المبلغ الإجمالي",
       "viewBookingDetails": "عرض تفاصيل الحجز",
       "modify": "تعديل",
-      "cancel": "إلغاء"
+      "cancel": "إلغاء",
+      "bookAgain": "احجز مرة أخرى"
     },
     "BookingPagination": {
       "show": "عرض",
@@ -1279,6 +1280,18 @@
       "common": {
         "important": "مهم"
       }
+    },
+    "promoCode": {
+      "label": "هل لديك رمز ترويجي؟",
+      "placeholder": "أدخل الرمز",
+      "apply": "تطبيق",
+      "applied": "مُطبق",
+      "success": "تم تطبيق الرمز الترويجي! لقد وفرت {{discount}}",
+      "invalid": "رمز ترويجي غير صالح أو منتهي الصلاحية",
+      "genericError": "فشل تطبيق الرمز الترويجي. يرجى المحاولة مرة أخرى.",
+      "loginRequired": "يرجى تسجيل الدخول لاستخدام الرموز الترويجية",
+      "viewAvailable": "عرض الرموز الترويجية المتاحة",
+      "noAvailable": "لا توجد رموز ترويجية متاحة في الوقت الحالي"
     }
   },
   "GuestBox": {
@@ -1483,5 +1496,126 @@
   "NetworkStatus": {
     "offline": "أنت غير متصل بالإنترنت. يرجى التحقق من اتصالك.",
     "online": "لقد عدت إلى الإنترنت!"
+  },
+  "rebookModal": {
+    "bookAgain": "احجز مرة أخرى",
+    "updateDetails": "تحديث التفاصيل",
+    "reviewAndBook": "المراجعة والحجز",
+    "checkingAvailability": "جارٍ التحقق من التوفر...",
+    "continueToReview": "المتابعة للمراجعة",
+    "cancel": "إلغاء",
+    "greatNews": "أخبار رائعة!",
+    "datesAvailableMessage": "التواريخ المحددة متاحة للحجز",
+    "priceDetails": "تفاصيل السعر",
+    "baseAmount": "المبلغ الأساسي",
+    "additionalGuestCharges": "رسوم الضيوف الإضافية",
+    "taxAndFeeBreakdown": "تفصيل الضرائب والرسوم",
+    "totalTax": "إجمالي الضريبة",
+    "roomRate": "سعر الغرفة",
+    "totalForNights": "الإجمالي لـ {{count}} ليالٍ",
+    "totalForNights_one": "الإجمالي لـ {{count}} ليلة",
+    "totalForNights_other": "الإجمالي لـ {{count}} ليالٍ",
+    "finalAmount": "المبلغ النهائي (شامل الضريبة)",
+    "includesTaxes": "يشمل",
+    "inTaxes": "من الضرائب",
+    "backToDetails": "العودة إلى التفاصيل",
+    "proceedToPayment": "المتابعة للدفع",
+    "redirectingToPayment": "جارٍ التوجيه للدفع...",
+    "errors": {
+      "atLeastOneGuest": "مطلوب ضيف واحد على الأقل",
+      "selectCheckInDate": "يرجى تحديد تاريخ تسجيل الوصول",
+      "selectCheckOutDate": "يرجى تحديد تاريخ المغادرة",
+      "checkOutAfterCheckIn": "يجب أن يكون تاريخ المغادرة بعد تاريخ تسجيل الوصول",
+      "atLeastOneRoom": "مطلوب غرفة واحدة على الأقل",
+      "maxRoomsAllowed": "الحد الأقصى 4 غرف مسموح به",
+      "maxGuestsForRooms": "الحد الأقصى {{maxGuests}} ضيف مسموح به لـ {{rooms}} {{roomText}}",
+      "room": "غرفة",
+      "rooms": "غرف",
+      "provideEmail": "يرجى تقديم بريد إلكتروني للاتصال",
+      "validEmail": "يرجى تقديم عنوان بريد إلكتروني صالح",
+      "firstNameRequired": "الاسم الأول مطلوب",
+      "firstNameLetters": "يجب أن يحتوي الاسم الأول على أحرف فقط",
+      "lastNameRequired": "اسم العائلة مطلوب",
+      "lastNameLetters": "يجب أن يحتوي اسم العائلة على أحرف فقط",
+      "dobRequired": "تاريخ الميلاد مطلوب",
+      "dobMismatch": "تاريخ الميلاد لا يتطابق مع نوع الضيف",
+      "correctErrors": "يرجى تصحيح الأخطاء أعلاه",
+      "noRoomsAvailable": "لا توجد غرف متاحة للتواريخ المحددة. يرجى تجربة تواريخ مختلفة.",
+      "somethingWrong": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+      "completeFields": "يرجى إكمال جميع الحقول المطلوبة قبل المتابعة"
+    },
+    "success": {
+      "datesAvailable": "رائع! تواريخك الجديدة متاحة."
+    }
+  },
+  "dateSelectionCard": {
+    "title": "متى تريد الإقامة؟",
+    "checkInDate": "تاريخ تسجيل الوصول",
+    "checkOutDate": "تاريخ المغادرة",
+    "numberOfRooms": "عدد الغرف",
+    "checkInPlaceholder": "تسجيل الوصول",
+    "checkOutPlaceholder": "المغادرة",
+    "roomsLabel": "الغرف",
+    "room": "غرفة",
+    "rooms": "غرف",
+    "decreaseRooms": "تقليل الغرف",
+    "increaseRooms": "زيادة الغرف",
+    "roomsRange": "الحد الأدنى: غرفة واحدة، الحد الأقصى: 4 غرف",
+    "guestRatioError": "الحد الأقصى 4 ضيوف مسموح به لكل غرفة. لديك {{guestsCount}} ضيف لـ {{rooms}} {{roomText}}.",
+    "nightsCount": "{{count}} ليالٍ",
+    "nightsCount_one": "{{count}} ليلة",
+    "nightsCount_other": "{{count}} ليالٍ",
+    "guestsCount": "{{count}} ضيوف",
+    "guestsCount_one": "{{count}} ضيف",
+    "guestsCount_other": "{{count}} ضيوف",
+    "roomsCount": "{{count}} غرف",
+    "roomsCount_one": "{{count}} غرفة",
+    "roomsCount_other": "{{count}} غرف"
+  },
+  "contactInfoCard": {
+    "title": "معلومات الاتصال",
+    "emailAddress": "عنوان البريد الإلكتروني",
+    "phoneNumber": "رقم الهاتف",
+    "notProvided": "غير متوفر"
+  },
+  "guestForm": {
+    "removeGuest": "إزالة الضيف",
+    "guestNumber": "الضيف {{number}}",
+    "firstName": "الاسم الأول",
+    "lastName": "اسم العائلة",
+    "guestType": "نوع الضيف",
+    "dateOfBirth": "تاريخ الميلاد",
+    "firstNamePlaceholder": "الاسم الأول",
+    "lastNamePlaceholder": "اسم العائلة",
+    "selectDOB": "اختر تاريخ الميلاد",
+    "adult": "بالغ",
+    "child": "طفل",
+    "infant": "رضيع"
+  },
+  "guestManagementCard": {
+    "title": "تفاصيل الضيوف",
+    "addGuest": "إضافة ضيف"
+  },
+  "reviewSummaryCard": {
+    "title": "ملخص الحجز",
+    "hotel": "الفندق",
+    "roomType": "نوع الغرفة",
+    "checkIn": "تسجيل الوصول",
+    "checkOut": "المغادرة",
+    "nights": "الليالي",
+    "guests": "الضيوف",
+    "rooms": "الغرف",
+    "contactInformation": "معلومات الاتصال",
+    "guestDetails": "تفاصيل الضيوف",
+    "guestTypes": {
+      "adult": "بالغ",
+      "child": "طفل",
+      "infant": "رضيع"
+    }
+  },
+  "roomInfoCard": {
+    "title": "تفاصيل الغرفة",
+    "roomType": "نوع الغرفة",
+    "sameRoomType": "نفس نوع الغرفة كحجزك الأصلي"
   }
 }

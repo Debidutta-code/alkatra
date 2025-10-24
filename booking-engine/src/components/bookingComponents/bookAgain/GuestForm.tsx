@@ -35,6 +35,7 @@ const GuestForm: React.FC<GuestFormProps> = ({
         <button
           onClick={() => onRemove(guest.id)}
           className="absolute top-4 right-4 p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"
+          aria-label={t("guestForm.removeGuest")}
         >
           <Trash2 className="h-4 w-4" />
         </button>
@@ -44,18 +45,18 @@ const GuestForm: React.FC<GuestFormProps> = ({
           {index + 1}
         </div>
         <span className="font-semibold text-gray-900">
-          {t("Guest")} {index + 1}
+          {t("guestForm.guestNumber", { number: index + 1 })}
         </span>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="space-y-2">
           <Label className="text-xs font-bold text-gray-600 uppercase tracking-wide">
-            {t("First Name")}
+            {t("guestForm.firstName")}
           </Label>
           <Input
             value={guest.firstName}
             onChange={(e) => onUpdate(guest.id, 'firstName', e.target.value)}
-            placeholder={t("First name")}
+            placeholder={t("guestForm.firstNamePlaceholder")}
             className={`h-11 border-2 ${errors[`${guest.id}-firstName`] ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:border-purple-500 transition-colors`}
             size="middle"
           />
@@ -65,12 +66,12 @@ const GuestForm: React.FC<GuestFormProps> = ({
         </div>
         <div className="space-y-2">
           <Label className="text-xs font-bold text-gray-600 uppercase tracking-wide">
-            {t("Last Name")}
+            {t("guestForm.lastName")}
           </Label>
           <Input
             value={guest.lastName}
             onChange={(e) => onUpdate(guest.id, 'lastName', e.target.value)}
-            placeholder={t("Last name")}
+            placeholder={t("guestForm.lastNamePlaceholder")}
             className={`h-11 border-2 ${errors[`${guest.id}-lastName`] ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:border-purple-500 transition-colors`}
             size="middle"
           />
@@ -80,7 +81,7 @@ const GuestForm: React.FC<GuestFormProps> = ({
         </div>
         <div className="space-y-2">
           <Label className="text-xs font-bold text-gray-600 uppercase tracking-wide">
-            {t("Guest Type")}
+            {t("guestForm.guestType")}
           </Label>
           <select
             value={guest.type}
@@ -94,9 +95,9 @@ const GuestForm: React.FC<GuestFormProps> = ({
               backgroundSize: '1.25rem 1.25rem'
             }}
           >
-            <option value="adult">{t("Adult")}</option>
-            <option value="child">{t("Child")}</option>
-            <option value="infant">{t("Infant")}</option>
+            <option value="adult">{t("guestForm.adult")}</option>
+            <option value="child">{t("guestForm.child")}</option>
+            <option value="infant">{t("guestForm.infant")}</option>
           </select>
           {errors[`${guest.id}-type`] && (
             <p className="text-red-500 text-xs mt-1">{errors[`${guest.id}-type`]}</p>
@@ -104,7 +105,7 @@ const GuestForm: React.FC<GuestFormProps> = ({
         </div>
         <div className="space-y-2">
           <Label className="text-xs font-bold text-gray-600 uppercase tracking-wide">
-            {t("Date of Birth")}
+            {t("guestForm.dateOfBirth")}
           </Label>
           <div className="relative group">
             <div className="flex items-center bg-white rounded-xl border-2 border-gray-200 group-hover:border-purple-500 transition-colors">
@@ -114,7 +115,7 @@ const GuestForm: React.FC<GuestFormProps> = ({
                 disabledDate={(current) => disabledDateForDOB(current, guest.type)}
                 format="DD/MM/YYYY"
                 className="w-full pl-3 bg-transparent border-none focus:ring-0"
-                placeholder={t("Select DOB")}
+                placeholder={t("guestForm.selectDOB")}
                 suffixIcon={null}
                 size="large"
               />

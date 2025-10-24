@@ -813,7 +813,8 @@
       "rateBreakdown": "कुल राशि",
       "viewBookingDetails": "बुकिंग विवरण देखें",
       "modify": "संशोधित करें",
-      "cancel": "रद्द करें"
+      "cancel": "रद्द करें",
+      "bookAgain": "फिर से बुक करें"
     },
     "BookingPagination": {
       "show": "दिखाएँ",
@@ -1279,6 +1280,18 @@
       "common": {
         "important": "महत्वपूर्ण"
       }
+    },
+    "promoCode": {
+      "label": "क्या आपके पास प्रोमो कोड है?",
+      "placeholder": "कोड दर्ज करें",
+      "apply": "लागू करें",
+      "applied": "लागू किया गया",
+      "success": "प्रोमो कोड लागू हो गया! आपने {{discount}} बचाया",
+      "invalid": "अमान्य या समाप्त प्रोमो कोड",
+      "genericError": "प्रोमो कोड लागू करने में विफल। कृपया पुनः प्रयास करें।",
+      "loginRequired": "प्रोमो कोड उपयोग करने के लिए कृपया लॉग इन करें",
+      "viewAvailable": "उपलब्ध प्रोमो कोड देखें",
+      "noAvailable": "इस समय कोई प्रोमो कोड उपलब्ध नहीं है"
     }
   },
   "GuestBox": {
@@ -1483,5 +1496,126 @@
   "NetworkStatus": {
     "offline": "आप ऑफ़लाइन हैं। कृपया अपने इंटरनेट कनेक्शन की जाँच करें।",
     "online": "आप फिर से ऑनलाइन हैं!"
+  },
+  "rebookModal": {
+    "bookAgain": "फिर से बुक करें",
+    "updateDetails": "विवरण अपडेट करें",
+    "reviewAndBook": "समीक्षा करें और बुक करें",
+    "checkingAvailability": "उपलब्धता जांच रहे हैं...",
+    "continueToReview": "समीक्षा के लिए जारी रखें",
+    "cancel": "रद्द करें",
+    "greatNews": "बढ़िया खबर!",
+    "datesAvailableMessage": "आपकी चुनी गई तारीखें बुकिंग के लिए उपलब्ध हैं",
+    "priceDetails": "मूल्य विवरण",
+    "baseAmount": "आधार राशि",
+    "additionalGuestCharges": "अतिरिक्त मेहमान शुल्क",
+    "taxAndFeeBreakdown": "कर और शुल्क विवरण",
+    "totalTax": "कुल कर",
+    "roomRate": "कमरे की दर",
+    "totalForNights": "{{count}} रातों के लिए कुल",
+    "totalForNights_one": "{{count}} रात के लिए कुल",
+    "totalForNights_other": "{{count}} रातों के लिए कुल",
+    "finalAmount": "अंतिम राशि (कर सहित)",
+    "includesTaxes": "शामिल है",
+    "inTaxes": "करों में",
+    "backToDetails": "विवरण पर वापस जाएं",
+    "proceedToPayment": "भुगतान के लिए आगे बढ़ें",
+    "redirectingToPayment": "भुगतान पर रीडायरेक्ट कर रहे हैं...",
+    "errors": {
+      "atLeastOneGuest": "कम से कम एक मेहमान आवश्यक है",
+      "selectCheckInDate": "कृपया चेक-इन तारीख चुनें",
+      "selectCheckOutDate": "कृपया चेक-आउट तारीख चुनें",
+      "checkOutAfterCheckIn": "चेक-आउट तारीख चेक-इन तारीख के बाद होनी चाहिए",
+      "atLeastOneRoom": "कम से कम 1 कमरा आवश्यक है",
+      "maxRoomsAllowed": "अधिकतम 4 कमरे की अनुमति है",
+      "maxGuestsForRooms": "{{rooms}} {{roomText}} के लिए अधिकतम {{maxGuests}} मेहमान की अनुमति है",
+      "room": "कमरे",
+      "rooms": "कमरों",
+      "provideEmail": "कृपया संपर्क ईमेल प्रदान करें",
+      "validEmail": "कृपया एक वैध ईमेल पता प्रदान करें",
+      "firstNameRequired": "पहला नाम आवश्यक है",
+      "firstNameLetters": "पहले नाम में केवल अक्षर होने चाहिए",
+      "lastNameRequired": "अंतिम नाम आवश्यक है",
+      "lastNameLetters": "अंतिम नाम में केवल अक्षर होने चाहिए",
+      "dobRequired": "जन्म तिथि आवश्यक है",
+      "dobMismatch": "जन्म तिथि मेहमान प्रकार से मेल नहीं खाती",
+      "correctErrors": "कृपया ऊपर दी गई त्रुटियों को सुधारें",
+      "noRoomsAvailable": "आपकी चुनी गई तारीखों के लिए कोई कमरा उपलब्ध नहीं है। कृपया अलग तारीखें आजमाएं।",
+      "somethingWrong": "कुछ गलत हो गया। कृपया पुनः प्रयास करें।",
+      "completeFields": "आगे बढ़ने से पहले कृपया सभी आवश्यक फ़ील्ड भरें"
+    },
+    "success": {
+      "datesAvailable": "बढ़िया! आपकी नई तारीखें उपलब्ध हैं।"
+    }
+  },
+  "dateSelectionCard": {
+    "title": "आप कब ठहरना चाहते हैं?",
+    "checkInDate": "चेक-इन तारीख",
+    "checkOutDate": "चेक-आउट तारीख",
+    "numberOfRooms": "कमरों की संख्या",
+    "checkInPlaceholder": "चेक-इन",
+    "checkOutPlaceholder": "चेक-आउट",
+    "roomsLabel": "कमरे",
+    "room": "कमरा",
+    "rooms": "कमरे",
+    "decreaseRooms": "कमरे कम करें",
+    "increaseRooms": "कमरे बढ़ाएं",
+    "roomsRange": "न्यूनतम: 1 कमरा, अधिकतम: 4 कमरे",
+    "guestRatioError": "प्रति कमरे अधिकतम 4 मेहमानों की अनुमति है। आपके पास {{rooms}} {{roomText}} के लिए {{guestsCount}} मेहमान हैं।",
+    "nightsCount": "{{count}} रातें",
+    "nightsCount_one": "{{count}} रात",
+    "nightsCount_other": "{{count}} रातें",
+    "guestsCount": "{{count}} मेहमान",
+    "guestsCount_one": "{{count}} मेहमान",
+    "guestsCount_other": "{{count}} मेहमान",
+    "roomsCount": "{{count}} कमरे",
+    "roomsCount_one": "{{count}} कमरा",
+    "roomsCount_other": "{{count}} कमरे"
+  },
+  "contactInfoCard": {
+    "title": "संपर्क जानकारी",
+    "emailAddress": "ईमेल पता",
+    "phoneNumber": "फ़ोन नंबर",
+    "notProvided": "प्रदान नहीं किया गया"
+  },
+  "guestForm": {
+    "removeGuest": "मेहमान हटाएं",
+    "guestNumber": "मेहमान {{number}}",
+    "firstName": "पहला नाम",
+    "lastName": "अंतिम नाम",
+    "guestType": "मेहमान प्रकार",
+    "dateOfBirth": "जन्म तिथि",
+    "firstNamePlaceholder": "पहला नाम",
+    "lastNamePlaceholder": "अंतिम नाम",
+    "selectDOB": "जन्म तिथि चुनें",
+    "adult": "वयस्क",
+    "child": "बच्चा",
+    "infant": "शिशु"
+  },
+  "guestManagementCard": {
+    "title": "मेहमान विवरण",
+    "addGuest": "मेहमान जोड़ें"
+  },
+  "reviewSummaryCard": {
+    "title": "बुकिंग सारांश",
+    "hotel": "होटल",
+    "roomType": "कमरे का प्रकार",
+    "checkIn": "चेक-इन",
+    "checkOut": "चेक-आउट",
+    "nights": "रातें",
+    "guests": "मेहमान",
+    "rooms": "कमरे",
+    "contactInformation": "संपर्क जानकारी",
+    "guestDetails": "मेहमान विवरण",
+    "guestTypes": {
+      "adult": "वयस्क",
+      "child": "बच्चा",
+      "infant": "शिशु"
+    }
+  },
+  "roomInfoCard": {
+    "title": "कमरे का विवरण",
+    "roomType": "कमरे का प्रकार",
+    "sameRoomType": "आपकी मूल बुकिंग के समान कमरे का प्रकार"
   }
 }

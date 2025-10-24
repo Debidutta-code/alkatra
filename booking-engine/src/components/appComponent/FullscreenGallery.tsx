@@ -491,13 +491,13 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
       )}
 
       {/* Keyboard shortcuts hint */}
-      <div className="hidden lg:block absolute bottom-4 left-4 text-gray-600 text-xs z-10">
+      {/* <div className="hidden lg:block absolute bottom-4 left-4 text-gray-600 text-xs z-10">
         <div className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg p-3 space-y-1 shadow-sm">
           <div>Press <kbd className="bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded text-xs font-mono">Esc</kbd> to close</div>
           <div>Press <kbd className="bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded text-xs font-mono">G</kbd> for grid view</div>
           <div>Use <kbd className="bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded text-xs font-mono">←</kbd> <kbd className="bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded text-xs font-mono">→</kbd> to navigate</div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
