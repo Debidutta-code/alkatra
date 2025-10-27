@@ -65,4 +65,37 @@ export class TaxGroupRepository implements ITaxGroupRepository {
         }
     }
 
+    async deactivateAllExcept(hotelId: string, exceptId?: string): Promise<void> {
+        try {
+            const filter: any = {
+                hotelId: hotelId,
+                isActive: true
+            };
+
+            if (exceptId) {
+                filter._id = { $ne: exceptId };
+            }
+
+            await TaxGroupModel.updateMany(
+                filter,
+                { $set: { isActive: false } }
+            ).exec();
+        } catch (error: any) {
+            console.error("Failed to deactivate tax groups at Repository Layer:", error);
+            throw error;
+        }
+    }
+
+    async findActiveByHotel(hotelId: string): Promise<ITaxGroup | null> {
+        try {
+            return await TaxGroupModel.findOne({
+                hotelId: hotelId,
+                isActive: true
+            }).exec();
+        } catch (error: any) {
+            console.error("Failed to find active tax group at Repository Layer:", error);
+            throw error;
+        }
+    }
+
 }

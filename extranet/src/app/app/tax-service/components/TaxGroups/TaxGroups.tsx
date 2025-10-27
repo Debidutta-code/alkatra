@@ -28,13 +28,13 @@ export const TaxGroups = ({
     const [createLoading, setCreateLoading] = useState(false);
     const [editLoading, setEditLoading] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
-    const [toggleLoading, setToggleLoading] = useState(false);
+    const [toggleLoadingId, setToggleLoadingId] = useState<string | null>(null);
     const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
     const [form, setForm] = useState({
         name: "",
         selectedRules: [] as string[],
-        isActive: true,
+        isActive: false,
     });
 
     const [editingGroup, setEditingGroup] = useState<string | null>(null);
@@ -127,19 +127,19 @@ export const TaxGroups = ({
             if (res.status >= 200 && res.status < 300) {
                 await refetchGroups();
                 toast.success("Tax group created successfully!");
-                setForm({ name: "", selectedRules: [], isActive: true });
+                setForm({ name: "", selectedRules: [], isActive: false });
             }
         } catch (err: any) {
             console.error("Error creating tax group:", err);
             if (err.response) {
-                toast.error(`Failed: ${err.response.data?.message || "Unknown error"}`);
+                toast.error(err.response.data?.error || err.response.data?.message || "Unknown error");
             } else if (err.request) {
                 toast.error("Network error: Could not connect to server");
             } else {
                 toast.error("An unexpected error occurred");
             }
         } finally {
-            setCreateLoading(false)
+            setCreateLoading(false);
         }
     };
 
@@ -205,7 +205,7 @@ export const TaxGroups = ({
         } catch (err: any) {
             console.error("Error updating tax group:", err);
             if (err.response) {
-                toast.error(`Failed: ${err.response.data?.message || "Unknown error"}`);
+                toast.error(err.response.data?.error || err.response.data?.message || "Unknown error");
             } else if (err.request) {
                 toast.error("Network error");
             } else {
@@ -237,7 +237,7 @@ export const TaxGroups = ({
         } catch (err: any) {
             console.error("Error deleting tax group:", err);
             if (err.response) {
-                toast.error(`Failed: ${err.response.data?.message || "Unknown error"}`);
+                toast.error(err.response.data?.error || err.response.data?.message || "Unknown error");
             } else {
                 toast.error("Delete failed");
             }
@@ -257,7 +257,7 @@ export const TaxGroups = ({
             hotelId: propertyId,
         };
 
-        setToggleLoading(true);
+        setToggleLoadingId(groupId); // ✅ Start loading for THIS group only
         try {
             const res = await axios.put(`${TAX_API_BASE}/tax-group/${groupId}`, payload, {
                 headers: {
@@ -276,7 +276,7 @@ export const TaxGroups = ({
                 toast.error("Network error");
             }
         } finally {
-            setToggleLoading(false);
+            setToggleLoadingId(null); // ✅ Stop loading
         }
     };
 
@@ -365,7 +365,7 @@ export const TaxGroups = ({
                                                         variant="outline"
                                                         size="sm"
                                                         onClick={() => startEdit(group)}
-                                                        disabled={editLoading || deleteLoading || toggleLoading}
+                                                        disabled={editLoading || deleteLoading || toggleLoadingId === group._id}
                                                         className="text-xs whitespace-nowrap"
                                                     >
                                                         Edit
@@ -374,10 +374,10 @@ export const TaxGroups = ({
                                                         variant="outline"
                                                         size="sm"
                                                         onClick={() => handleToggleActive(group._id, group.isActive)}
-                                                        disabled={toggleLoading}
+                                                        disabled={toggleLoadingId === group._id}
                                                         className={`text-xs whitespace-nowrap ${group.isActive ? 'text-orange-600 border-orange-200 hover:border-orange-300' : 'text-green-600 border-green-200 hover:border-green-300'}`}
                                                     >
-                                                        {toggleLoading ? 'Loading...' : group.isActive ? 'Deactivate' : 'Activate'}
+                                                        {toggleLoadingId === group._id ? 'Loading...' : group.isActive ? 'Deactivate' : 'Activate'}
                                                     </Button>
                                                     <Button
                                                         variant="destructive"

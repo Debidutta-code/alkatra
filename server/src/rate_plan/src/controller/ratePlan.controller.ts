@@ -202,7 +202,7 @@ class RoomPrice {
 
         const { reservationId } = req.query;
 
-        let discountAmount = 0;``
+        let discountAmount = 0;
         let reservationTaxValue: number | null = null;
         let couponDetailsMap = new Map();
 
