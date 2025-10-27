@@ -1210,6 +1210,7 @@
       "token": "टोकन",
       "network": "नेटवर्क",
       "amount": "राशि",
+      "guestInformation": "अतिथि जानकारी",
       "hotel": "होटल",
       "checkIn": "चेक-इन",
       "checkOut": "चेक-आउट",

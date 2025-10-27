@@ -210,7 +210,7 @@ const PaymentProgressPage: React.FC = () => {
                     bgColor: 'bg-blue-50',
                     borderColor: 'border-blue-200',
                     icon: <RefreshCw className="w-5 h-5 animate-spin" />,
-                    text: 'Processing Payment'
+                    text: t('Payment.PaymentProgress.status.processing')
                 };
             default:
                 return {
@@ -287,7 +287,7 @@ const PaymentProgressPage: React.FC = () => {
                                         <div className="p-4 space-y-3">
                                             {/* Token */}
                                             <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                                <span className="text-sm text-tripswift-black/70 font-tripswift-medium">Token</span>
+                                                <span className="text-sm text-tripswift-black/70 font-tripswift-medium">{t('Payment.PaymentProgress.token')}</span>
                                                 <span className="text-sm font-tripswift-bold text-tripswift-black bg-tripswift-blue/10 py-1 rounded-md">
                                                     {paymentData.token}
                                                 </span>
@@ -295,7 +295,7 @@ const PaymentProgressPage: React.FC = () => {
 
                                             {/* Network */}
                                             <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                                <span className="text-sm text-tripswift-black/70 font-tripswift-medium">Network</span>
+                                                <span className="text-sm text-tripswift-black/70 font-tripswift-medium">{t('Payment.PaymentProgress.network')}</span>
                                                 <span className="text-sm font-tripswift-bold text-tripswift-black">{paymentData.blockchain}</span>
                                             </div>
 
@@ -356,7 +356,7 @@ const PaymentProgressPage: React.FC = () => {
                                                     <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
                                                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                                                 </svg>
-                                                Guest Information
+                                                {t('Payment.PaymentProgress.guestInformation')}
                                             </h2>
                                         </div>
                                         <div className="p-4 space-y-3">
@@ -376,8 +376,7 @@ const PaymentProgressPage: React.FC = () => {
                                                     <polyline points="9 22 9 12 15 12 15 22"></polyline>
                                                 </svg>
                                                 <div className="flex-1">
-                                                    <p className="text-xs font-tripswift-medium text-tripswift-black/70 mb-1">Hotel</p>
-                                                    <p className="text-sm font-tripswift-bold text-tripswift-black">{paymentData.hotelName || "N/A"}</p>
+                                                    <p className="text-xs font-tripswift-medium text-tripswift-black/70 mb-1">{t('Payment.PaymentProgress.hotel')}</p>                                                    <p className="text-sm font-tripswift-bold text-tripswift-black">{paymentData.hotelName || "N/A"}</p>
                                                 </div>
                                             </div>
 
@@ -400,7 +399,7 @@ const PaymentProgressPage: React.FC = () => {
                                                         <line x1="3" y1="10" x2="21" y2="10"></line>
                                                     </svg>
                                                     <div>
-                                                        <p className="text-xs font-tripswift-medium text-tripswift-black/70 mb-1">Check-In</p>
+                                                        <p className="text-xs font-tripswift-medium text-tripswift-black/70 mb-1">{t('Payment.PaymentProgress.checkIn')}</p>
                                                         <p className="text-sm font-tripswift-bold text-tripswift-black">{paymentData.checkInDate || "N/A"}</p>
                                                     </div>
                                                 </div>
@@ -422,7 +421,7 @@ const PaymentProgressPage: React.FC = () => {
                                                         <line x1="3" y1="10" x2="21" y2="10"></line>
                                                     </svg>
                                                     <div>
-                                                        <p className="text-xs font-tripswift-medium text-tripswift-black/70 mb-1">Check-Out</p>
+                                                        <p className="text-xs font-tripswift-medium text-tripswift-black/70 mb-1">{t('Payment.PaymentProgress.checkOut')}</p>
                                                         <p className="text-sm font-tripswift-bold text-tripswift-black">{paymentData.checkOutDate || "N/A"}</p>
                                                     </div>
                                                 </div>
@@ -444,7 +443,7 @@ const PaymentProgressPage: React.FC = () => {
                                                     <polyline points="22,6 12,13 2,6"></polyline>
                                                 </svg>
                                                 <div className="flex-1">
-                                                    <p className="text-xs font-tripswift-medium text-tripswift-black/70 mb-1">Email</p>
+                                                    <p className="text-xs font-tripswift-medium text-tripswift-black/70 mb-1">{t('Payment.PaymentProgress.email')}</p>
                                                     <p className="text-sm font-tripswift-bold text-tripswift-black break-all">{paymentData.email || "N/A"}</p>
                                                 </div>
                                             </div>
@@ -463,7 +462,7 @@ const PaymentProgressPage: React.FC = () => {
                                                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                                                 </svg>
                                                 <div className="flex-1">
-                                                    <p className="text-xs font-tripswift-medium text-tripswift-black/70 mb-1">Phone</p>
+                                                    <p className="text-xs font-tripswift-medium text-tripswift-black/70 mb-1">{t('Payment.PaymentProgress.phone')}</p>
                                                     <p className="text-sm font-tripswift-bold text-tripswift-black">{paymentData.phone || "N/A"}</p>
                                                 </div>
                                             </div>
@@ -486,7 +485,7 @@ const PaymentProgressPage: React.FC = () => {
                                                         <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                                                         <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                                                     </svg>
-                                                    <span className="text-sm font-tripswift-medium text-tripswift-black/70">Guests</span>
+                                                    <span className="text-sm font-tripswift-medium text-tripswift-black/70">{t('Payment.PaymentProgress.guests')}</span>
                                                 </div>
                                                 {paymentData.guests && Array.isArray(paymentData.guests) ? (
                                                     <ul className="space-y-2">
@@ -502,7 +501,7 @@ const PaymentProgressPage: React.FC = () => {
                                                                     </p>
                                                                     {guest.dob && (
                                                                         <p className="text-xs text-tripswift-black/60 mt-0.5">
-                                                                            Age: {differenceInYears(new Date(), new Date(guest.dob))} years
+                                                                            {t('Payment.PaymentProgress.age')}: {differenceInYears(new Date(), new Date(guest.dob))} {t('Payment.PaymentProgress.years')}
                                                                         </p>
                                                                     )}
                                                                 </div>
@@ -524,7 +523,7 @@ const PaymentProgressPage: React.FC = () => {
                                             <div className="bg-tripswift-blue p-4 text-tripswift-off-white">
                                                 <h2 className="font-tripswift-medium text-lg flex items-center gap-2">
                                                     <Wallet className="w-5 h-5" />
-                                                    Pay through Wallet
+                                                    {t('Payment.PaymentProgress.payThroughWallet')}
                                                 </h2>
                                             </div>
                                             <div className="p-4 sm:p-6">
@@ -533,8 +532,12 @@ const PaymentProgressPage: React.FC = () => {
                                                     {/* Address and pay button */}
                                                     <div className="space-y-4">
                                                         <span className="text-tripswift-black/70 text-sm sm:text-xs md:text-base block mb-2">
-                                                            Send {paymentData.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {paymentData.token} on {paymentData.blockchain} to {paymentData?.address || "Loading address..."}
-                                                        </span>
+                                                            {t('Payment.PaymentProgress.wallet.sendInstruction', {
+                                                                amount: paymentData.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                                                token: paymentData.token,
+                                                                network: paymentData.blockchain,
+                                                                address: paymentData?.address || t('Payment.PaymentProgress.wallet.loadingAddress')
+                                                            })}                                                        </span>
 
                                                         {/* Popup */}
                                                         {showWalletTransactionPopup && (
@@ -552,11 +555,11 @@ const PaymentProgressPage: React.FC = () => {
                                                                         <div className=" text-blue-600 p-2 rounded-full">
                                                                             <img src="/icon/obstacle.gif" alt="Running animation" className="w-24 h-18 rounded-2xl" />
                                                                         </div>
-                                                                        <h2 className="text-lg sm:text-xl font-semibold text-gray-800">Waiting for booking confirmation</h2>
+                                                                        <h2 className="text-lg sm:text-xl font-semibold text-gray-800">{t('Payment.PaymentProgress.modal.waitingConfirmation')}</h2>
                                                                     </div>
 
                                                                     <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
-                                                                        Wait while we confirming your payment. This may take upto 2-3 minutes. Please do not close this window.
+                                                                        {t('Payment.PaymentProgress.modal.confirmationMessage')}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -573,7 +576,7 @@ const PaymentProgressPage: React.FC = () => {
                                                     className="flex-1 min-w-[200px] flex items-center justify-center gap-2 py-2.5 px-4 bg-tripswift-blue text-tripswift-off-white rounded-lg hover:bg-tripswift-blue/90 transition-all duration-300 font-tripswift-medium shadow-sm hover:shadow-md"
                                                 >
                                                     <ExternalLink className="w-4 h-4" />
-                                                    View My Bookings
+                                                    {t('Payment.PaymentProgress.viewBookings')}
                                                 </button>
 
                                                 <button
@@ -581,7 +584,7 @@ const PaymentProgressPage: React.FC = () => {
                                                     className="flex-1 min-w-[200px] flex items-center justify-center gap-2 py-2.5 px-4 bg-tripswift-off-white text-tripswift-black/80 rounded-lg hover:bg-gray-100 transition-all duration-300 font-tripswift-medium border border-gray-200 shadow-sm hover:shadow-md"
                                                 >
                                                     <ArrowLeft className="w-4 h-4" />
-                                                    Return Home
+                                                    {t('Payment.PaymentProgress.returnHome')}
                                                 </button>
                                             </div>
                                         </div>
@@ -594,8 +597,7 @@ const PaymentProgressPage: React.FC = () => {
                                             <div className="bg-tripswift-blue p-4 text-tripswift-off-white">
                                                 <h2 className="font-tripswift-medium text-lg flex items-center gap-2">
                                                     <QrCode className="w-5 h-5" />
-                                                    Scan & Pay
-                                                </h2>
+                                                    {t('Payment.PaymentProgress.scanAndPay')}                                                </h2>
                                             </div>
                                             <div className="p-6">
                                                 <div className="grid md:grid-cols-2 gap-8">
@@ -613,7 +615,7 @@ const PaymentProgressPage: React.FC = () => {
                                                                     includeMargin={true}
                                                                 />
                                                             </div>
-                                                            <p className="text-xs text-tripswift-black/60 mt-2">Scan with your crypto wallet</p>
+                                                            <p className="text-xs text-tripswift-black/60 mt-2">{t('Payment.PaymentProgress.scanInstructions')}</p>
                                                         </div>
 
                                                         <div className="bg-tripswift-off-white rounded-xl shadow-md overflow-hidden sticky top-6">
@@ -632,7 +634,7 @@ const PaymentProgressPage: React.FC = () => {
                                                                         <span
                                                                             className={`font-tripswift-bold ${timeElapsed <= 0 ? "text-red-600" : getStatusConfig(paymentData.status).color}`}
                                                                         >
-                                                                            {timeElapsed <= 0 ? "Payment Expired" : getStatusConfig(paymentData.status).text}
+                                                                            {timeElapsed <= 0 ? t('Payment.PaymentProgress.status.expired') : getStatusConfig(paymentData.status).text}
                                                                         </span>
                                                                     </div>
                                                                 </div>
@@ -641,17 +643,18 @@ const PaymentProgressPage: React.FC = () => {
                                                                 <div className="text-center">
                                                                     <div className={`text-xl font-tripswift-bold ${timeElapsed <= 0 ? "text-red-600" : "text-tripswift-black"}`}>
                                                                         {formatTime(timeElapsed)}
-                                                                        {timeElapsed <= 0 && <span className="text-xs block mt-1">(Session expired)</span>}
+                                                                        {timeElapsed <= 0 && <span className="text-xs block mt-1">({t('Payment.PaymentProgress.status.sessionExpired')}
+                                                                            )</span>}
                                                                         {timeElapsed <= 100 && timeElapsed > 0 && (
-                                                                            <span className="text-xs block mt-1 text-yellow-600">(Expiring soon)</span>
+                                                                            <span className="text-xs block mt-1 text-yellow-600">({t('Payment.PaymentProgress.status.expiringSoon')})</span>
                                                                         )}
                                                                     </div>
                                                                     <p className="text-xs text-tripswift-black/60">
-                                                                        {timeElapsed <= 0 ? "Maximum time reached" : "Time remaining"}
+                                                                        {timeElapsed <= 0 ? t('Payment.PaymentProgress.status.maxTimeReached') : t('Payment.PaymentProgress.status.timeRemaining')}
                                                                     </p>
                                                                     {paymentData?.initiatedTime && timeElapsed > 0 && (
                                                                         <p className="text-xs text-tripswift-black/50 mt-1">
-                                                                            Expires at {new Date(new Date(paymentData.initiatedTime).getTime() + 10 * 60 * 1000).toLocaleTimeString()}
+                                                                            {t('Payment.PaymentProgress.expiresAt')} {new Date(new Date(paymentData.initiatedTime).getTime() + 10 * 60 * 1000).toLocaleTimeString()}
                                                                         </p>
                                                                     )}
                                                                 </div>
@@ -665,7 +668,7 @@ const PaymentProgressPage: React.FC = () => {
                                                                             aria-label="Check payment status"
                                                                         >
                                                                             <RefreshCw className="w-3 h-3" />
-                                                                            Check Status
+                                                                            {t('Payment.PaymentProgress.actions.checkStatus')}
                                                                         </button>
                                                                     ) : (
                                                                         <button
@@ -674,14 +677,14 @@ const PaymentProgressPage: React.FC = () => {
                                                                             aria-label="Check booking details"
                                                                         >
                                                                             <ArrowLeft className="w-3 h-3" />
-                                                                            Check Booking
+                                                                            {t('Payment.PaymentProgress.actions.checkBooking')}
                                                                         </button>
                                                                     )}
 
                                                                     <div className="flex items-center gap-1 p-2 bg-green-50 border border-green-200 rounded-lg text-sm">
                                                                         <Shield className="w-3 h-3 text-green-600" />
                                                                         <span className="text-green-700 font-tripswift-medium">
-                                                                            {timeElapsed <= 0 ? "Session expired" : "Secure Payment"}
+                                                                            {timeElapsed <= 0 ? t('Payment.PaymentProgress.status.sessionExpired') : t('Payment.PaymentProgress.status.securePayment')}
                                                                         </span>
                                                                     </div>
                                                                 </div>
@@ -695,24 +698,33 @@ const PaymentProgressPage: React.FC = () => {
                                                         <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
                                                             <h3 className="font-tripswift-bold text-blue-800 mb-3 flex items-center gap-2">
                                                                 <AlertCircle className="w-4 h-4" />
-                                                                Payment Instructions
+                                                                {t('Payment.PaymentProgress.paymentInstructions')}
                                                             </h3>
                                                             <ul className="text-blue-700 text-sm space-y-2">
                                                                 <li className="flex items-start gap-2">
                                                                     <span className="font-tripswift-bold">1.</span>
-                                                                    <span>Send exactly <strong>${paymentData.amount}</strong> worth of <strong>{paymentData.token}</strong></span>
+                                                                    <span dangerouslySetInnerHTML={{
+                                                                        __html: t('Payment.PaymentProgress.instructions.sendAmount', {
+                                                                            amount: paymentData.amount,
+                                                                            token: paymentData.token
+                                                                        })
+                                                                    }} />
                                                                 </li>
                                                                 <li className="flex items-start gap-2">
                                                                     <span className="font-tripswift-bold">2.</span>
-                                                                    <span>Use the <strong>{paymentData.blockchain}</strong> network only</span>
+                                                                    <span dangerouslySetInnerHTML={{
+                                                                        __html: t('Payment.PaymentProgress.instructions.useNetwork', {
+                                                                            network: paymentData.blockchain
+                                                                        })
+                                                                    }} />
                                                                 </li>
                                                                 <li className="flex items-start gap-2">
                                                                     <span className="font-tripswift-bold">3.</span>
-                                                                    <span>Double-check the wallet address before sending</span>
+                                                                    <span>{t('Payment.PaymentProgress.instructions.doubleCheck')}</span>
                                                                 </li>
                                                                 <li className="flex items-start gap-2">
                                                                     <span className="font-tripswift-bold">4.</span>
-                                                                    <span>Payment confirmation is automatic (5-15 minutes)</span>
+                                                                    <span>{t('Payment.PaymentProgress.instructions.confirmationTime')}</span>
                                                                 </li>
                                                             </ul>
                                                         </div>
@@ -720,7 +732,10 @@ const PaymentProgressPage: React.FC = () => {
                                                         {/* Warning */}
                                                         <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                                                             <p className="text-yellow-800 text-sm">
-                                                                <strong>Important:</strong> Only send {paymentData.token} on {paymentData.blockchain} network. Sending other tokens or using wrong network will result in loss of funds.
+                                                                <strong>{t('Payment.PaymentProgress.common.important')}:</strong> {t('Payment.PaymentProgress.warning', {
+                                                                    token: paymentData.token,
+                                                                    network: paymentData.blockchain
+                                                                })}
                                                             </p>
                                                         </div>
                                                     </div>
@@ -734,7 +749,7 @@ const PaymentProgressPage: React.FC = () => {
                                                     className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-tripswift-blue text-tripswift-off-white rounded-lg hover:bg-tripswift-blue/90 transition-all duration-300 font-tripswift-medium shadow-sm hover:shadow-md"
                                                 >
                                                     <ExternalLink className="w-4 h-4" />
-                                                    View My Bookings
+                                                    {t('Payment.PaymentProgress.viewBookings')}
                                                 </button>
 
                                                 <button
@@ -742,7 +757,7 @@ const PaymentProgressPage: React.FC = () => {
                                                     className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-tripswift-off-white text-tripswift-black/80 rounded-lg hover:bg-gray-100 transition-all duration-300 font-tripswift-medium border border-gray-200 shadow-sm hover:shadow-md"
                                                 >
                                                     <ArrowLeft className="w-4 h-4" />
-                                                    Return Home
+                                                    {t('Payment.PaymentProgress.returnHome')}
                                                 </button>
                                             </div>
                                         </div>

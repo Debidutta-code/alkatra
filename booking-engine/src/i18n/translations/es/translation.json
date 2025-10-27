@@ -1179,6 +1179,7 @@
             "token": "Token",
             "network": "Red",
             "amount": "Monto",
+            "guestInformation": "Información del huésped",
             "hotel": "Hotel",
             "checkIn": "Entrada",
             "checkOut": "Salida",

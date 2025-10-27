@@ -1210,6 +1210,7 @@
       "token": "Token",
       "network": "Network",
       "amount": "Amount",
+      "guestInformation": "Guest Information",
       "hotel": "Hotel",
       "checkIn": "Check-In",
       "checkOut": "Check-Out",

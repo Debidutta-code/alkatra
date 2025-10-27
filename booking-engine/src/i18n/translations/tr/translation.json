@@ -1210,6 +1210,7 @@
             "token": "Token",
             "network": "Ağ",
             "amount": "Tutar",
+            "guestInformation": "Misafir Bilgileri",
             "hotel": "Otel",
             "checkIn": "Giriş",
             "checkOut": "Çıkış",

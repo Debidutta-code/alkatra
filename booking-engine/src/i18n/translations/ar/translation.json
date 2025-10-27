@@ -1208,6 +1208,7 @@
       "token": "الرمز",
       "network": "الشبكة",
       "amount": "المبلغ",
+      "guestInformation": "معلومات الضيف",
       "hotel": "الفندق",
       "checkIn": "تسجيل الوصول",
       "checkOut": "تسجيل الخروج",

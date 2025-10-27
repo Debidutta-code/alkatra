@@ -31,7 +31,7 @@ const GuestForm: React.FC<GuestFormProps> = ({
 
   return (
     <div key={guest.id} className="bg-gray-50 rounded-2xl p-4 border border-gray-200 relative group hover:shadow-md transition-all duration-200">
-      {totalGuests > 1 && (
+      {totalGuests > 1 && index > 0 && (
         <button
           onClick={() => onRemove(guest.id)}
           className="absolute top-4 right-4 p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"
