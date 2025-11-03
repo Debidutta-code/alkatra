@@ -6,7 +6,6 @@ import {
   CardTitle,
 } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
 import {
   PenTool,
@@ -31,14 +30,6 @@ import {
 } from "lucide-react";
 import { Checkbox } from "../../components/ui/checkbox";
 import { useForm } from "react-hook-form";
-import { Label } from "../../components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -50,9 +41,6 @@ import { Skeleton } from "../../components/ui/skeleton";
 import toast from "react-hot-toast";
 
 interface AmenityData {
-  destination_type: string;
-  property_type: string;
-  no_of_rooms_available: number;
   amenities: {
     wifi?: boolean;
     swimming_pool?: boolean;
@@ -114,8 +102,6 @@ const AmenityData: AmenityKeys[] = [
   "facilities_for_disabled_guests",
   "family_rooms",
 ];
-const destinationTypes = ["RESORT", "VACATION RENTAL"];
-const propertyTypes = ["COMMERCIAL PROPERTY", "INDUSTRIAL PROPERTY"];
 const amenityIcons: Record<string, React.ReactNode> = {
   wifi: <Wifi className="h-3.5 w-3.5 mr-1" />,
   swimming_pool: <Droplets className="h-3.5 w-3.5 mr-1" />,
@@ -154,7 +140,7 @@ const formatAmenityLabel = (amenityKey: string): string => {
     facilities_for_disabled_guests: "Facilities for Disabled Guests",
     family_rooms: "Family Rooms",
   };
-  
+
   return labelMap[amenityKey] || amenityKey
     .split("_")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -182,13 +168,10 @@ export function Amenities({
     useState<string>("");
   const [selectedPropertyType, setSelectedPropertyType] = useState<string>("");
   const {
-    register,
     handleSubmit,
-    formState: { errors },
     reset,
     setValue,
     watch,
-    clearErrors,
   } = useForm<EditedAmenity>({
     defaultValues: editedAmenity,
     mode: "onChange",
@@ -196,11 +179,6 @@ export function Amenities({
 
   useEffect(() => {
     if (editAmenityMode && amenity) {
-      setValue("destination_type", amenity.destination_type);
-      setValue("property_type", amenity.property_type);
-      setValue("no_of_rooms_available", amenity.no_of_rooms_available);
-      setSelectedDestinationType(amenity.destination_type);
-      setSelectedPropertyType(amenity.property_type);
       AmenityData.forEach((key) => {
         setValue(`amenities.${key}`, amenity.amenities[key] || false);
       });
@@ -230,9 +208,6 @@ export function Amenities({
       }
       setAmenityError(null);
       const newData = {
-        destination_type: selectedDestinationType || data.destination_type,
-        property_type: selectedPropertyType || data.property_type,
-        no_of_rooms_available: data.no_of_rooms_available,
         amenities: { ...selectedAmenities },
       };
       await handleCreateAmenity(newData);
@@ -263,9 +238,6 @@ export function Amenities({
       }
       setAmenityError(null);
       const newData = {
-        destination_type: selectedDestinationType || data.destination_type,
-        property_type: selectedPropertyType || data.property_type,
-        no_of_rooms_available: data.no_of_rooms_available,
         amenities: {
           ...selectedAmenities,
         },
@@ -274,7 +246,6 @@ export function Amenities({
       handleAmenityEditClick();
       reset();
       setAmenity(newData);
-      toast.success("Property Amenities updated successfully!");
     } catch (error) {
       console.error("Error editing amenities:", error);
       toast.error("Failed to update amenities. Please try again.");
@@ -282,12 +253,6 @@ export function Amenities({
       setIsSubmitting(false);
     }
   };
-  const getPropertyDetail = (label: string, value: string | number) => (
-    <div className="flex flex-col space-y-1 mb-3">
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <span className="text-sm font-medium">{value}</span>
-    </div>
-  );
   const renderAmenityForm = (
     onSubmitHandler: (data: EditedAmenity) => Promise<void>,
     formTitle: string,
@@ -295,96 +260,8 @@ export function Amenities({
   ) => (
     <div className="max-h-[90vh] overflow-y-auto px-4">
       <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-4">
-        <div className="grid grid-cols-1 gap-2 ">
-          <div className="space-y-1.5">
-            <Label htmlFor="destination_type">Destination Type</Label>
-            <Select
-              {...register("destination_type")}
-              onValueChange={(value) => {
-                setSelectedDestinationType(value);
-                setValue("destination_type", value);
-                clearErrors("destination_type");
-              }}
-              value={selectedDestinationType}
-              defaultValue={amenity?.destination_type}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Destination Type" />
-              </SelectTrigger>
-              <SelectContent>
-                {destinationTypes.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.destination_type && (
-              <p className="text-destructive text-sm mt-1">
-                {errors.destination_type.message}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="property_type">
-              Property Type <span className="text-destructive">*</span>
-            </Label>
-            <Select
-              {...register("property_type", {
-                required: "Property type is required",
-              })}
-              onValueChange={(value) => {
-                setSelectedPropertyType(value);
-                setValue("property_type", value);
-                clearErrors("property_type");
-              }}
-              value={selectedPropertyType}
-              defaultValue={amenity?.property_type}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Property Type" />
-              </SelectTrigger>
-              <SelectContent>
-                {propertyTypes.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.property_type && (
-              <p className="text-destructive text-sm mt-1">
-                {errors.property_type.message}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="no_of_rooms_available">
-              Rooms Available <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="no_of_rooms_available"
-              {...register("no_of_rooms_available", {
-                required: "Rooms Available is required",
-                valueAsNumber: true,
-              })}
-              type="number"
-              min={0}
-              placeholder="Total No. of Rooms Available"
-              defaultValue={amenity?.no_of_rooms_available}
-            />
-            {errors.no_of_rooms_available && (
-              <p className="text-destructive text-sm mt-1">
-                {errors.no_of_rooms_available.message}
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div>
-          <h3 className="text-base font-medium mb-3">Available Amenities</h3>
+        <div className="space-y-2">
+          <h3 className="text-base font-medium mb-4">Available Amenities</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {AmenityData.map((amenity) => (
               <div key={amenity} className="flex items-center space-x-2">
@@ -506,7 +383,7 @@ export function Amenities({
             onPointerDownOutside={(e) => e.preventDefault()}
           >
             <DialogHeader>
-              <DialogTitle>Edit Amenities</DialogTitle>
+              <DialogTitle>Edit Property Amenities</DialogTitle>
             </DialogHeader>
             {renderAmenityForm(onEditSubmit, "Edit Amenities", "Update")}
           </DialogContent>
@@ -522,16 +399,7 @@ export function Amenities({
         ) : (
           <div className="space-y-6">
             {amenity ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {getPropertyDetail(
-                  "Destination Type",
-                  amenity.destination_type
-                )}
-                {getPropertyDetail("Property Type", amenity.property_type)}
-                {getPropertyDetail(
-                  "Rooms Available",
-                  amenity.no_of_rooms_available
-                )}
+              <div className="">
               </div>
             ) : (
               <div className="bg-muted/50 rounded-lg p-6 text-center">
@@ -547,7 +415,7 @@ export function Amenities({
         {amenity?.amenities &&
           !editAmenityMode &&
           Object.values(amenity.amenities).some((value) => value) && (
-            <div className="mt-8 pt-6 border-t">
+            <div className="">
               <h4 className="text-sm font-medium mb-4">Available Amenities</h4>
               <div className="flex flex-wrap gap-2">
                 {Object.entries(amenity.amenities).map(

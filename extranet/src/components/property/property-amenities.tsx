@@ -1,54 +1,26 @@
 "use client";
 
 import React, {
-  MouseEventHandler,
-  useCallback,
   useEffect,
   useState,
 } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "./../ui/card";
-import { Label } from "./../ui/label";
-import { Input } from "./../ui/input";
 import { Button } from "./../ui/button";
-// import { ReloadIcon } from "@radix-ui/react-icons";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./../ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./../ui/dialog";
 import { Checkbox } from "./../ui/checkbox";
-import axios, { Axios, AxiosError } from "axios";
-import { boolean, number, z } from "zod";
+import axios from "axios";
+import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
-import { BookOpen, MapPinned, ShowerHead } from "lucide-react";
-import { cn } from "./../../lib/utils";
-import { Textarea } from "./../ui/textarea";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { RootState, useSelector } from "../../redux/store";
 
 const createPropertyAmenitiesSchema = z.object({
-  destination_type: z.string().optional(),
-  property_type: z.string().min(1, "Property type is required"),
-  no_of_rooms_available: z.string().min(1, "No of rooms is required"),
   wifi: z.boolean(),
   swimming_pool: z.boolean(),
   fitness_center: z.boolean(),
@@ -68,9 +40,6 @@ const createPropertyAmenitiesSchema = z.object({
 });
 
 type Inputs = {
-  destination_type: string;
-  property_type: string;
-  no_of_rooms_available: string;
   wifi: boolean;
   swimming_pool: boolean;
   fitness_center: boolean;
@@ -95,7 +64,6 @@ type Props = {
 };
 
 export default function PropertyAddress({ onNext, onPrevious }: Props) {
-  const [openDialog, setOpenDialog] = useState(false);
   const [propertyAminity, setPropertyAminity] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [formLoading, setFormLoading] = useState<boolean>(false);
@@ -103,12 +71,8 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
 
   const { accessToken } = useSelector((state: RootState) => state.auth);
   const property_id = useSearchParams().get("property_id");
-  const router = useRouter();
   const form = useForm<Inputs>({
     defaultValues: {
-      destination_type: "",
-      property_type: "",
-      no_of_rooms_available: "1",
       wifi: false,
       swimming_pool: false,
       fitness_center: false,
@@ -131,28 +95,16 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
 
   const {
     register,
-    control,
     handleSubmit,
     setValue,
     formState,
     getValues,
-    formState: { errors, isSubmitting },
   } = form;
   const {
     errors: {
-      destination_type: destinationTypeError,
-      property_type: propertyTypeError,
-      no_of_rooms_available: noOfRoomsAvailableError,
     },
   } = formState;
 
-  console.log("-----#########_______", errors);
-
-  // useEffect(() => {
-  //   destinationTypeError && toast.error(destinationTypeError.message!);
-  //   propertyTypeError && toast.error(propertyTypeError.message!);
-  //   noOfRoomsAvailableError && toast.error(noOfRoomsAvailableError.message!);
-  // }, [destinationTypeError, propertyTypeError, noOfRoomsAvailableError]);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     console.log("on submit called");
@@ -175,8 +127,6 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
       family_rooms: !!data.family_rooms,
     };
 
-    console.log("_____+_+_+_+_+_+_+_+_+_+_+_+_+_+_", amenities);
-
     setFormLoading(true);
 
     try {
@@ -186,7 +136,6 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
         const updatedProperty = {
           ...propertyAminity,
           ...data,
-          no_of_rooms_available: data.no_of_rooms_available,
           amenities,
         };
         const {
@@ -201,16 +150,11 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
           }
         );
         propertyAmenitiesCreateResponse = updatedPropertyResponse;
-        console.log(
-          "propertyAmenitiesCreateResponse ========",
-          propertyAmenitiesCreateResponse
-        );
         toast.success("Property Amenities updated successfully!");
       } else {
         const propertyCreateBody = {
           ...data,
           propertyInfo_id: property_id,
-          no_of_rooms_available: data.no_of_rooms_available,
           amenities,
         };
 
@@ -250,20 +194,7 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/${property_id}`
       );
-      console.log(
-        "Featching  From PropertyAminity",
-        response.data.data.property_amenities
-      );
-      console.log(
-        "~~~~~~~~~~~~~~~~~~~~~~",
-        response.data.data.property_amenities
-      );
-      console.log(
-        "!response.data.data.property_amenities._id",
-        !response.data.data?.property_amenities
-      );
       if (!response.data.data.property_amenities) {
-        console.log("new called_)_)_)_)_)_)___)_)_)_)_)_)__)_))_");
         setnewPropertyAminity(true);
       }
       setPropertyAminity(response.data.data.property_amenities);
@@ -281,18 +212,8 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
     }
   }, []);
 
-  console.log("form value", getValues());
-  console.log("propertyAminity details", propertyAminity);
-
   useEffect(() => {
     if (propertyAminity) {
-      console.log("set values %^%^%^%^%^%^%^%^%^%^%^5");
-      setValue("destination_type", propertyAminity.destination_type || "");
-      setValue("property_type", propertyAminity.property_type || "");
-      setValue(
-        "no_of_rooms_available",
-        propertyAminity?.no_of_rooms_available?.toString() || "1"
-      );
       setValue("wifi", propertyAminity?.amenities?.wifi || false);
       setValue(
         "swimming_pool",
@@ -354,122 +275,9 @@ export default function PropertyAddress({ onNext, onPrevious }: Props) {
     <>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-2 ">
         <CardTitle>Property Amenities</CardTitle>
-        <div className="items-center flex flex-col md:flex-row md:gap-4 ">
-          {/* Destination Type Select */}
-          <div className=" inline self-end w-full md:w-1/2 relative">
-            <Label htmlFor="destination_type">
-              Destination Type
-            </Label>
-            <div className="inline-block relative w-full mt-1">
-              <select
-                {...register("destination_type")}
-                onChange={(e) =>
-                  setPropertyAminity((prev: any) => ({
-                    ...prev,
-                    destination_type: e.target.value,
-                  }))
-                }
-                className={`block appearance-none w-full bg-background border ${destinationTypeError ? "border-red-500" : "border-input"
-                  } py-2 px-3 h-10  rounded-md text-sm leading-tight focus:outline-none focus:border-blue-500`}
-              >
-                <option value="">
-                  Select Destination Type
-                </option>
-                <option value="RESORT">RESORT</option>
-                <option value="VACATION RENTAL">VACATION RENTAL</option>
-              </select>
-              {destinationTypeError && (
-                <p className="text-red-500 text-sm mt-1">
-                  {destinationTypeError.message}
-                </p>
-              )}
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground">
-                <svg
-                  className="fill-current h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5.293 7.293a1 1 0 0 1 1.414-1.414L10 8.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4z"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          {/* Property Type Select */}
-          <div className="self-end w-full md:w-1/2 relative">
-            <Label htmlFor="property_type">
-              Property Type <span className="text-destructive">*</span>
-            </Label>
-            <div className="inline-block relative w-full  mt-1">
-              <select
-                {...register("property_type")}
-                onChange={(e) =>
-                  setPropertyAminity((prev: any) => ({
-                    ...prev,
-                    property_type: e.target.value,
-                  }))
-                }
-                className={`block appearance-none w-full bg-background border ${propertyTypeError ? "border-red-500" : "border-input"
-                  } py-2 px-3 h-10 rounded-md text-sm leading-tight focus:outline-none focus:border-blue-500`}
-              >
-                <option value="" disabled>
-                  Select Property Type
-                </option>
-                <option value="COMMERCIAL PROPERTY">COMMERCIAL PROPERTY</option>
-                <option value="INDUSTRIAL PROPERTY">INDUSTRIAL PROPERTY</option>
-              </select>
-              {propertyTypeError && (
-                <p className="text-red-500 text-sm mt-1">
-                  {propertyTypeError.message}
-                </p>
-              )}
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground">
-                <svg
-                  className="fill-current h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5.293 7.293a1 1 0 0 1 1.414-1.414L10 8.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4z"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-4 pr-4">
-          <div className="min-w-max">
-            <Label htmlFor="no_of_rooms_available">
-              No. Of Rooms Available <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="no_of_rooms_available"
-              type="number"
-              min={1}
-              variant={noOfRoomsAvailableError && "error"}
-              {...register("no_of_rooms_available")}
-              value={propertyAminity?.no_of_rooms_available}
-              onChange={(e) =>
-                setPropertyAminity((prev: any) => ({
-                  ...propertyAminity,
-                  no_of_rooms_available: e.target.value.toString(),
-                }))
-              }
-            />
-            {noOfRoomsAvailableError && (
-              <p className="text-red-500 text-sm mt-1">
-                {noOfRoomsAvailableError.message}
-              </p>
-            )}
-          </div>
-        </div>
         <Card className="">
           <CardHeader>
-            <CardTitle>Other Amenities</CardTitle>
+            <CardTitle>Guest’s favorites</CardTitle>
           </CardHeader>
           <CardContent className="flex lg:gap-4 gap-2 flex-wrap">
             <div className="flex items-center space-x-2">

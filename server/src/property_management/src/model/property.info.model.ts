@@ -1,9 +1,9 @@
 import mongoose, { Document, Schema, Types } from "mongoose";
 import { PropertyAddressType } from "./property.address.model";
 import { RoomType } from "./room.model";
-import { Category, PropertyCategory } from "./propertycategory.model";
+import { PropertyCategory } from "./propertycategory.model";
 import { PropertyAmenitiesType } from "./propertyamenite.model";
-import { RoomAminity, RoomAminityType } from "./room.amenite.model";
+import { RoomAminityType } from "./room.amenite.model";
 
 interface PropertyInfoType extends Document {
   user_id: Types.ObjectId ;

@@ -19,7 +19,8 @@ const getAllPropertyCategories = catchAsync(
               $project: {
                 name: 1,
                 _id: 1,
-                key: 1,
+                code: 1,
+                typeCategory: 1,
               },
             },
           ],
@@ -29,7 +30,22 @@ const getAllPropertyCategories = catchAsync(
         $project: {
           _id: 1,
           category: 1,
-          types: 1,
+          description: 1,
+          // Group types by typeCategory (Most common vs Others)
+          mostCommonTypes: {
+            $filter: {
+              input: "$types",
+              as: "type",
+              cond: { $eq: ["$$type.typeCategory", "Most common"] },
+            },
+          },
+          otherTypes: {
+            $filter: {
+              input: "$types",
+              as: "type",
+              cond: { $eq: ["$$type.typeCategory", "Others"] },
+            },
+          },
           createdAt: 1,
           updatedAt: 1,
         },
@@ -52,6 +68,10 @@ const getPropertyCategory = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const propertyCategoryID = req.params.propertyCategoryID;
 
+    if (!mongoose.Types.ObjectId.isValid(propertyCategoryID)) {
+      return next(new AppError("Invalid property category ID", 400));
+    }
+
     const propertyCategory = await PropertyCategory.aggregate([
       {
         $match: {
@@ -69,7 +89,8 @@ const getPropertyCategory = catchAsync(
               $project: {
                 name: 1,
                 _id: 1,
-                key: 1,
+                code: 1,
+                typeCategory: 1,
               },
             },
           ],
@@ -79,12 +100,30 @@ const getPropertyCategory = catchAsync(
         $project: {
           _id: 1,
           category: 1,
-          types: 1,
+          description: 1,
+          mostCommonTypes: {
+            $filter: {
+              input: "$types",
+              as: "type",
+              cond: { $eq: ["$$type.typeCategory", "Most common"] },
+            },
+          },
+          otherTypes: {
+            $filter: {
+              input: "$types",
+              as: "type",
+              cond: { $eq: ["$$type.typeCategory", "Others"] },
+            },
+          },
           createdAt: 1,
           updatedAt: 1,
         },
       },
     ]);
+
+    if (!propertyCategory || propertyCategory.length === 0) {
+      return next(new AppError("Property category not found", 404));
+    }
 
     return res.status(200).json({
       status: "success",
@@ -99,26 +138,29 @@ const getPropertyCategory = catchAsync(
 
 const createPropertyCategory = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user;
-    const Role = req.role;
-
     if (req.role !== "superadmin") {
       return next(
-        new AppError("You'r not authorized to perform this operation", 401)
+        new AppError("You're not authorized to perform this operation", 401)
       );
     }
-    const category = req.body.category as string;
+
+    const { category, description } = req.body;
+
     if (!category) {
-      return next(
-        new AppError("Please provide the category you want to add", 400)
-      );
+      return next(new AppError("Please provide the category", 400));
+    }
+
+    const existingCategory = await PropertyCategory.findOne({ category });
+    if (existingCategory) {
+      return next(new AppError("Category already exists", 400));
     }
 
     const propertyCategory = new PropertyCategory({
-      category: category.toUpperCase(),
+      category,
+      description,
     });
 
-    const newpropertyinfo = await propertyCategory.save();
+    await propertyCategory.save();
 
     return res.status(201).json({
       status: "success",
@@ -131,8 +173,4 @@ const createPropertyCategory = catchAsync(
   }
 );
 
-export {
-  createPropertyCategory,
-  getAllPropertyCategories,
-  getPropertyCategory,
-};
+export { createPropertyCategory, getAllPropertyCategories, getPropertyCategory };

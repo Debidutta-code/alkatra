@@ -2,9 +2,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { Badge } from "../ui/badge";
-import { Edit, Save } from "lucide-react";
 import { Checkbox } from "../ui/checkbox";
 import { useForm } from "react-hook-form";
 import { EditedAmenity } from '../../app/app/property/propertyDetails/page';
@@ -29,9 +26,6 @@ const CreateAmenity = (handleCreateAmenity: any, requestType: any) => {
             );
 
             const newData = {
-                destination_type: data.destination_type,
-                property_type: data.property_type,
-                no_of_rooms_available: data.no_of_rooms_available,
                 amenities: {
                     ...selectedAmenities
                 }
@@ -56,23 +50,9 @@ const CreateAmenity = (handleCreateAmenity: any, requestType: any) => {
                 <div className="bg-black p-6 rounded-lg">
                     <h2 className="text-xl font-bold mb-4">{requestType}</h2>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                        <Input
-                            id='destination_type'
-                            {...register("destination_type", { required: true })}
-                            placeholder="Destination Type"
-                        />
-                        <Input
-                            {...register("property_type", { required: true })}
-                            placeholder="Property Type"
-                        />
-                        <Input
-                            {...register("no_of_rooms_available", { required: true, valueAsNumber: true })}
-                            type="number"
-                            placeholder="Total No. of Rooms Available"
-                        />
                         <Card className="w-[600px]">
                             <CardHeader>
-                                <CardTitle>Other Amenities</CardTitle>
+                                <CardTitle>Guest’s favorites</CardTitle>
                             </CardHeader>
                             <CardContent className="flex gap-4 flex-wrap">
                                 {AmenityData.map((amenity: any) => (

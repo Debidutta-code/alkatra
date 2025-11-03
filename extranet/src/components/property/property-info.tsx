@@ -80,15 +80,19 @@ interface PropertyCategory {
   _id: string;
   category: string;
   createdAt: string;
-  types: any[];
+  mostCommonTypes: PropertyType[];
+  otherTypes: PropertyType[];
+  types: PropertyType[];
   updatedAt: string;
 }
 
 interface PropertyType {
   _id: string;
   name: string;
+  code: string;
+  typeCategory: string;
+  propertyCategory?: string;
 }
-
 
 export default function PropertyInfo({ onNext }: Props) {
   const [propertyDetails, setPropertyDetails] = useState<any>(null);
@@ -198,17 +202,38 @@ export default function PropertyInfo({ onNext }: Props) {
 
   useEffect(() => {
     if (propertyDetails) {
+      const categoryId = typeof propertyDetails.property_category === 'object'
+        ? propertyDetails.property_category?._id
+        : propertyDetails.property_category;
+
+      const propertyTypeId = typeof propertyDetails.property_type === 'object'
+        ? propertyDetails.property_type?._id
+        : propertyDetails.property_type;
+
       setValue("property_name", propertyDetails.property_name || "");
       setValue("property_email", propertyDetails.property_email || "");
       setValue("property_contact", propertyDetails.property_contact || "");
       setValue("property_code", propertyDetails.property_code || "");
       setValue("description", propertyDetails.description || "");
-      setValue("property_category", propertyDetails?.property_category?._id || "");
-      setValue("property_type", propertyDetails?.property_type || "");
+      setValue("property_category", categoryId || "");
+      setValue("property_type", propertyTypeId || "");
       setValue("star_rating", propertyDetails.star_rating || "1");
     }
   }, [propertyDetails, setValue]);
 
+  const selectedCategory = watch("property_category");
+  useEffect(() => {
+    if (selectedCategory) {
+      const currentPropertyType = watch("property_type");
+      fetchPropertyTypes(selectedCategory).then(() => {
+        if (currentPropertyType) {
+          setValue("property_type", currentPropertyType, { shouldValidate: false });
+        }
+      });
+    } else {
+      fetchPropertyTypes();
+    }
+  }, [selectedCategory]);
   useEffect(() => {
     if (propertyDetails?.image && propertyDetails.image.length > 0) {
       setPropertyImageUrls(propertyDetails.image);
@@ -227,7 +252,6 @@ export default function PropertyInfo({ onNext }: Props) {
     }
   }, []);
 
-  // In the onSubmit function where you create a new property
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     console.log("Property image URLs:", propertyImageUrls);
     const imageUrls = propertyImageUrls.map((img) => img.url);
@@ -254,8 +278,6 @@ export default function PropertyInfo({ onNext }: Props) {
       localStorage.setItem("propertyData", JSON.stringify(data));
       router.push(`${pathname}?property_id=${newPropertyInfo.property?._id}`);
       setFormLoading(false);
-
-      // Add success toast message
       toast.success("Property created successfully!");
 
       onNext();
@@ -283,7 +305,20 @@ export default function PropertyInfo({ onNext }: Props) {
   const handlePropertyImageUpload = async () => {
     try {
       if (files.length) {
-        setUploadLoading(true); // Use uploadLoading instead of loading
+        setUploadLoading(true);
+
+        // Store current form values BEFORE upload
+        const currentFormValues = {
+          property_category: watch("property_category"),
+          property_type: watch("property_type"),
+          property_name: watch("property_name"),
+          property_email: watch("property_email"),
+          property_contact: watch("property_contact"),
+          property_code: watch("property_code"),
+          description: watch("description"),
+          star_rating: watch("star_rating"),
+        };
+
         const data = packFiles(files);
         console.log("Uploading files:", files);
 
@@ -296,38 +331,30 @@ export default function PropertyInfo({ onNext }: Props) {
             },
           }
         );
-
-        console.log("Upload response:", response.data.data.urls);
         const urls = response.data.data.urls;
 
-        // Store current form values before ANY state updates
-        const currentCategory = watch("property_category");
-        const currentType = watch("property_type");
-
-        // Convert URL strings to objects matching the expected structure
         const formattedUrls = urls.map((url: string) => ({
           public_id: url.split('/').pop() || '',
           url: url,
           secure_url: url
         }));
 
-        // Update states
         setPropertyImageUrls(formattedUrls);
-        setFiles([]); // Clear uploaded files
-        setUploadLoading(false); // Stop upload loading
-
-        // Close dialog AFTER setting loading to false
+        setFiles([]);
+        setUploadLoading(false);
         setOpenDialog(false);
 
-        // Use requestAnimationFrame for better timing
-        requestAnimationFrame(() => {
-          if (currentCategory) {
-            setValue("property_category", currentCategory, { shouldValidate: false });
-          }
-          if (currentType) {
-            setValue("property_type", currentType, { shouldValidate: false });
-          }
-        });
+        // Restore form values AFTER state update
+        setTimeout(() => {
+          Object.entries(currentFormValues).forEach(([key, value]) => {
+            if (value) {
+              setValue(key as keyof Inputs, value, {
+                shouldValidate: false,
+                shouldDirty: false
+              });
+            }
+          });
+        }, 0);
 
         toast.success("Images uploaded successfully!");
       }
@@ -335,6 +362,23 @@ export default function PropertyInfo({ onNext }: Props) {
       console.error("Error uploading property images:", error);
       toast.error("Failed to upload images. Please try again.");
       setUploadLoading(false);
+    }
+  };
+
+  const fetchPropertyTypes = async (categoryId?: string): Promise<void> => {
+    try {
+      setLoading(true);
+      const url = categoryId
+        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/type?categoryId=${categoryId}`
+        : `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/type`;
+
+      const response = await axios.get(url);
+      setPropertyTypes(response.data.data.propertyTypes);
+      setLoading(false);
+      setError(null);
+    } catch (error: any) {
+      setError(error.message);
+      setLoading(false);
     }
   };
 
@@ -352,7 +396,6 @@ export default function PropertyInfo({ onNext }: Props) {
         if (!response) {
           throw new Error("Failed to fetch property categories");
         }
-        // console.log(response.data.error)
         const data = await response.data;
         setPropertyCategories(data.data.categories);
         setLoading(false);
@@ -363,26 +406,14 @@ export default function PropertyInfo({ onNext }: Props) {
         setLoading(false);
       }
     };
-    const fetchPropertyTypes = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/pms/property/type`
-        );
-        setPropertyTypes(response.data.data.propertyTypes);
-        setLoading(false);
-        setError(null);
-      } catch (error: any) {
-        setError(error.message);
-        setLoading(false);
-      }
-    };
-
-    fetchPropertyTypes();
 
     fetchPropertyCategories();
+
+    if (!watch("property_category")) {
+      fetchPropertyTypes();
+    }
   }, []);
 
-  // In the handleFormSubmit function where you update a property
   const handleFormSubmit: SubmitHandler<Inputs> = async () => {
     try {
       router.push(`${pathname}?property_id=${propertyId}`);
@@ -453,20 +484,19 @@ export default function PropertyInfo({ onNext }: Props) {
                 Property Contact <span className="text-destructive">*</span>
               </Label>
               <PhoneInput
-                country={'in'} // Default to India
+                country={'in'}
                 value={form.watch("property_contact")}
                 onChange={(phone, country) => {
                   setValue("property_contact", phone, { shouldValidate: true });
                 }}
 
-                // Enhanced input styling for better consistency
                 inputStyle={{
                   width: '100%',
                   height: '40px',
                   paddingLeft: '48px',
                   fontSize: '14px',
                   border: propertyContactError ? '1px solid #ef4444' : '1px solid #d1d5db',
-                  borderRadius: '0 6px 6px 0', // Only right side rounded
+                  borderRadius: '0 6px 6px 0',
                   backgroundColor: 'white',
                   color: '#111827',
                   outline: 'none',
@@ -617,6 +647,7 @@ export default function PropertyInfo({ onNext }: Props) {
               <div className="inline-block mt-[3px] relative w-full ">
                 <select
                   {...register("property_category")}
+                  value={watch("property_category")}
                   className={`block appearance-none w-full  border ${propertyCategoryError
                     ? "border-red-500"
                     : "border-gray-300 dark:border-gray-600"
@@ -672,23 +703,24 @@ export default function PropertyInfo({ onNext }: Props) {
               </div>
             </div>
 
-            <div className=" w-full relative mt-1">
-              <Label htmlFor="property_type ">
-                Property Type{" "}
-                <span className="text-destructive">
-                  <span className="text-destructive">*</span>
-                </span>
+            <div className="w-full relative mt-1">
+              <Label htmlFor="property_type">
+                Property Type <span className="text-destructive">*</span>
               </Label>
               <div className="inline-block mt-[3px] relative w-full">
                 <select
                   {...register("property_type")}
+                  value={watch("property_type")}
+                  disabled={!watch("property_category")}
                   className={`block appearance-none w-full border ${propertyTypeError
                     ? "border-red-500"
                     : "border-gray-300 dark:border-gray-600"
-                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 rounded-md leading-tight focus:outline-none focus:border-blue-500`}
+                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 rounded-md text-sm leading-tight focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   <option value="" disabled>
-                    Select Property Type
+                    {!watch("property_category")
+                      ? "Select Property Category First"
+                      : "Select Property Type"}
                   </option>
 
                   {loading ? (
@@ -706,15 +738,49 @@ export default function PropertyInfo({ onNext }: Props) {
                       Error: {error}
                     </option>
                   ) : (
-                    propertyTypes?.map((type) => (
-                      <option
-                        key={type._id}
-                        value={type._id}
-                        className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                      >
-                        {type.name}
-                      </option>
-                    ))
+                    <>
+                      {propertyTypes.filter(type => type.typeCategory === "Most common").length > 0 && (
+                        <optgroup label="Most Common" className="font-semibold">
+                          {propertyTypes
+                            .filter(type => type.typeCategory === "Most common")
+                            .map((type) => (
+                              <option
+                                key={type._id}
+                                value={type._id}
+                                className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                              >
+                                {type.name}
+                              </option>
+                            ))}
+                        </optgroup>
+                      )}
+
+                      {propertyTypes.filter(type => type.typeCategory === "Others").length > 0 && (
+                        <optgroup label="Others" className="font-semibold">
+                          {propertyTypes
+                            .filter(type => type.typeCategory === "Others")
+                            .map((type) => (
+                              <option
+                                key={type._id}
+                                value={type._id}
+                                className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                              >
+                                {type.name}
+                              </option>
+                            ))}
+                        </optgroup>
+                      )}
+
+                      {propertyTypes.filter(type => !type.typeCategory).map((type) => (
+                        <option
+                          key={type._id}
+                          value={type._id}
+                          className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                        >
+                          {type.name}
+                        </option>
+                      ))}
+                    </>
                   )}
                 </select>
                 {propertyTypeError && (
@@ -989,6 +1055,7 @@ export default function PropertyInfo({ onNext }: Props) {
               <div className="inline-block mt-[3px] relative w-full ">
                 <select
                   {...register("property_category")}
+                  value={watch("property_category")}
                   className={`block appearance-none w-full  border ${propertyCategoryError
                     ? "border-red-500"
                     : "border-gray-300 dark:border-gray-600"
@@ -1044,23 +1111,24 @@ export default function PropertyInfo({ onNext }: Props) {
               </div>
             </div>
 
-            <div className=" w-full relative mt-1">
-              <Label htmlFor="property_type ">
-                Property Type{" "}
-                <span className="text-destructive">
-                  <span className="text-destructive">*</span>
-                </span>
+            <div className="w-full relative mt-1">
+              <Label htmlFor="property_type">
+                Property Type <span className="text-destructive">*</span>
               </Label>
               <div className="inline-block mt-[3px] relative w-full">
                 <select
                   {...register("property_type")}
+                  value={watch("property_type")}
+                  disabled={!watch("property_category")}
                   className={`block appearance-none w-full border ${propertyTypeError
                     ? "border-red-500"
                     : "border-gray-300 dark:border-gray-600"
-                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 rounded-md text-sm leading-tight focus:outline-none focus:border-blue-500`}
+                    } bg-white dark:bg-gray-900 text-gray-900 dark:text-white h-10 px-3 rounded-md text-sm leading-tight focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   <option value="" disabled>
-                    Select Property Type
+                    {!watch("property_category")
+                      ? "Select Property Category First"
+                      : "Select Property Type"}
                   </option>
 
                   {loading ? (
@@ -1078,15 +1146,51 @@ export default function PropertyInfo({ onNext }: Props) {
                       Error: {error}
                     </option>
                   ) : (
-                    propertyTypes?.map((type) => (
-                      <option
-                        key={type._id}
-                        value={type._id}
-                        className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                      >
-                        {type.name}
-                      </option>
-                    ))
+                    <>
+                      {/* Group by typeCategory if available */}
+                      {propertyTypes.filter(type => type.typeCategory === "Most common").length > 0 && (
+                        <optgroup label="Most Common" className="font-semibold">
+                          {propertyTypes
+                            .filter(type => type.typeCategory === "Most common")
+                            .map((type) => (
+                              <option
+                                key={type._id}
+                                value={type._id}
+                                className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                              >
+                                {type.name}
+                              </option>
+                            ))}
+                        </optgroup>
+                      )}
+
+                      {propertyTypes.filter(type => type.typeCategory === "Others").length > 0 && (
+                        <optgroup label="Others" className="font-semibold">
+                          {propertyTypes
+                            .filter(type => type.typeCategory === "Others")
+                            .map((type) => (
+                              <option
+                                key={type._id}
+                                value={type._id}
+                                className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                              >
+                                {type.name}
+                              </option>
+                            ))}
+                        </optgroup>
+                      )}
+
+                      {/* Fallback for types without typeCategory */}
+                      {propertyTypes.filter(type => !type.typeCategory).map((type) => (
+                        <option
+                          key={type._id}
+                          value={type._id}
+                          className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                        >
+                          {type.name}
+                        </option>
+                      ))}
+                    </>
                   )}
                 </select>
                 {propertyTypeError && (

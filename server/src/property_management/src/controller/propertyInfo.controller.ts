@@ -3,26 +3,26 @@ import { AppError } from "../utils/appError";
 import { Request, catchAsync } from "../utils/catchAsync";
 import { PropertyInfo } from "../model/property.info.model";
 import { decodeToken } from "../utils/jwtHelper";
-import { Category } from "../model/propertycategory.model";
+import { CategoryType } from "../model/propertycategory.model";
 import { PropertyAddress } from "../model/property.address.model";
 import { propertyAminity } from "../model/propertyamenite.model";
 import { RoomAminity } from "../model/room.amenite.model";
 import PropertyPrice from "../model/ratePlan.model";
 import PropertyRatePlan from "../model/ratePlan.model";
 import mongoose, { Types } from "mongoose";
-import UserModel from "../../../user_authentication/src/Model/auth.model"
+import UserModel from "../../../user_authentication/src/Model/auth.model";
 import { PropertyInfoService } from "../service";
 
 interface hotels {
-  _id: string,
-  name: string,
-  image: []
+  _id: string;
+  name: string;
+  image: [];
 }
 
 interface Test {
   groupManagerName: string;
   _id: string;
-  hotels: hotels[]
+  hotels: hotels[];
 }
 
 const createpropertyInfo = catchAsync(
@@ -62,26 +62,40 @@ const createpropertyInfo = catchAsync(
       property_type
     );
 
-    const propertyCategory = property_category as Category;
-
-    if (propertyCategory === Category.HOTEL) isHotelFlow = true;
-    if (propertyCategory === Category.HOMESTAY) isHomestayFlow = true;
-
-    if (!req.body) {
+    // Validate required fields
+    if (!property_name || !property_email || !property_contact || !property_code || !property_category || !property_type) {
       return next(new AppError("Please fill all the required fields", 400));
     }
 
-    let brandId: Types.ObjectId | null = null;
+    // Validate property_category ObjectId
+    if (!mongoose.Types.ObjectId.isValid(property_category)) {
+      return next(new AppError("Invalid property category ID", 400));
+    }
 
-    const property = await PropertyInfo.findOne({ property_email });
+    // Validate property_type ObjectId
+    if (!mongoose.Types.ObjectId.isValid(property_type)) {
+      return next(new AppError("Invalid property type ID", 400));
+    }
 
-    if (property) {
+    // Check if property with this email already exists
+    const existingProperty = await PropertyInfo.findOne({ property_email });
+    if (existingProperty) {
       return next(
         new AppError("A property already exists with this email", 400)
       );
     }
-    // const propertyCode = await generateUniquePropertyCode();
 
+    // Check if property with this code already exists
+    const existingPropertyCode = await PropertyInfo.findOne({ property_code });
+    if (existingPropertyCode) {
+      return next(
+        new AppError("A property already exists with this code", 400)
+      );
+    }
+
+    let brandId: Types.ObjectId | null = null;
+
+    // Create new property
     const newProperty = new PropertyInfo({
       user_id: user.id,
       property_name,
@@ -97,7 +111,26 @@ const createpropertyInfo = catchAsync(
     });
 
     await newProperty.save();
-    console.log("create Property ", newProperty);
+
+    // Populate the property to get category details for flow logic
+    const populatedProperty = await PropertyInfo.findById(newProperty._id)
+      .populate("property_category")
+      .populate("property_type");
+
+    // Check category type for flow logic
+    const categoryData = populatedProperty?.property_category as any;
+    if (categoryData?.category) {
+      const categoryType = categoryData.category;
+      
+      if (categoryType === CategoryType.HOTEL) {
+        isHotelFlow = true;
+      } else if (categoryType === CategoryType.HOME) {
+        isHomestayFlow = true;
+      }
+    }
+
+    console.log("create Property ", populatedProperty);
+    
     res.status(201).json({
       status: "success",
       error: false,
@@ -105,7 +138,7 @@ const createpropertyInfo = catchAsync(
       data: {
         isHomestayFlow,
         isHotelFlow,
-        property: newProperty,
+        property: populatedProperty,
       },
     });
   }
@@ -114,8 +147,12 @@ const createpropertyInfo = catchAsync(
 const getMyProperties = catchAsync(
   async (req: any, res: Response, next: NextFunction) => {
     const user = req.user.id;
-    const properties = await PropertyInfo.find({ user_id: user, isDraft: false });
-    const draftProperties = await PropertyInfo.find({ user_id: user, isDraft: true });
+    const properties = await PropertyInfo.find({ user_id: user, isDraft: false })
+      .populate("property_category")
+      .populate("property_type");
+    const draftProperties = await PropertyInfo.find({ user_id: user, isDraft: true })
+      .populate("property_category")
+      .populate("property_type");
 
     res.status(200).json({
       status: "success",
@@ -132,28 +169,27 @@ const getMyProperties = catchAsync(
 const getAdminProperties = catchAsync(
   async (req: any, res: Response, next: NextFunction) => {
     try {
-
       const userId = req.user?.id;
 
       // Validate userId exists
       if (!userId) {
-        return next(new AppError('User ID not found in request', 401));
+        return next(new AppError("User ID not found in request", 401));
       }
 
       // Validate userId is a valid ObjectId format
       if (!mongoose.Types.ObjectId.isValid(userId)) {
-        return next(new AppError('Invalid user ID format', 400));
+        return next(new AppError("Invalid user ID format", 400));
       }
 
       const actualUser = await UserModel.findById(userId);
 
       if (!actualUser) {
-        return next(new AppError('User not found', 404));
+        return next(new AppError("User not found", 404));
       }
 
       const userRole = actualUser.role;
       let responseData: any = {};
-      console.log(userRole)
+      console.log(userRole);
 
       switch (userRole) {
         case "superAdmin":
@@ -162,19 +198,19 @@ const getAdminProperties = catchAsync(
           // 1. Get direct hotel managers created by superAdmin
           const directHotelManagers = await UserModel.find({
             role: "hotelManager",
-            createdBy: userEmail
+            createdBy: userEmail,
           });
 
           // 2. Get group managers created by superAdmin
           const groupManagers = await UserModel.find({
             role: "groupManager",
-            createdBy: userEmail
+            createdBy: userEmail,
           });
 
           // 3. Get properties for direct hotel managers
-          const directHotelManagerIds = directHotelManagers.map(hm => hm._id);
+          const directHotelManagerIds = directHotelManagers.map((hm) => hm._id);
           const directProperties = await PropertyInfo.find({
-            user_id: { $in: directHotelManagerIds }
+            user_id: { $in: directHotelManagerIds },
           }).select("_id image property_name");
 
           // 4. Process grouped hotels by group manager
@@ -184,35 +220,37 @@ const getAdminProperties = catchAsync(
             // Get hotel managers under this group manager
             const hotelManagersUnderGroup = await UserModel.find({
               role: "hotelManager",
-              createdBy: groupManager.email
+              createdBy: groupManager.email,
             });
 
             // Get properties for these hotel managers
-            const hotelManagerIds = hotelManagersUnderGroup.map(hm => hm._id);
+            const hotelManagerIds = hotelManagersUnderGroup.map((hm) => hm._id);
             const propertiesUnderGroup = await PropertyInfo.find({
-              user_id: { $in: hotelManagerIds }
+              user_id: { $in: hotelManagerIds },
             }).select("_id image property_name");
 
             // Format hotels array
-            const hotels = propertiesUnderGroup.map(property => ({
+            const hotels = propertiesUnderGroup.map((property) => ({
               _id: property._id,
               name: property.property_name,
-              image: property.image || []
+              image: property.image || [],
             }));
 
             // Add to grouped results
             groupedResults.push({
-              groupManagerName: `${groupManager.firstName} ${groupManager.lastName}` || groupManager.email,
+              groupManagerName:
+                `${groupManager.firstName} ${groupManager.lastName}` ||
+                groupManager.email,
               id: groupManager._id.toString(),
-              hotels: hotels
+              hotels: hotels,
             });
           }
 
           // Format direct properties
-          const directHotels = directProperties.map(property => ({
+          const directHotels = directProperties.map((property) => ({
             _id: property._id,
             name: property.property_name,
-            image: property.image || []
+            image: property.image || [],
           }));
 
           responseData = {
@@ -225,31 +263,30 @@ const getAdminProperties = catchAsync(
           // Get hotel managers created by this group manager
           const managedHotelManagers = await UserModel.find({
             role: "hotelManager",
-            createdBy: actualUser.email
+            createdBy: actualUser.email,
           });
 
           if (managedHotelManagers.length === 0) {
-            console.log('No hotel managers found for this group manager');
+            console.log("No hotel managers found for this group manager");
             responseData = {
               properties: [],
-              draftProperties: []
+              draftProperties: [],
             };
             break;
           }
 
-          const managedHotelManagerIds = managedHotelManagers.map(hm => hm._id);
-          console.log('Managed hotel manager IDs:', managedHotelManagerIds);
+          const managedHotelManagerIds = managedHotelManagers.map((hm) => hm._id);
+          console.log("Managed hotel manager IDs:", managedHotelManagerIds);
 
           // Fetch all properties for these hotel managers
           const allProperties = await PropertyInfo.find({
-            user_id: { $in: managedHotelManagerIds }
+            user_id: { $in: managedHotelManagerIds },
           }).select("_id image property_name");
 
-          // console.log('All properties found:', allProperties.length);
-          const allHotels = allProperties.map(property => ({
+          const allHotels = allProperties.map((property) => ({
             _id: property._id,
             name: property.property_name,
-            image: property.image || []
+            image: property.image || [],
           }));
 
           responseData = {
@@ -258,20 +295,19 @@ const getAdminProperties = catchAsync(
           break;
 
         default:
-          return next(new AppError('Invalid user role', 400));
+          return next(new AppError("Invalid user role", 400));
       }
 
       res.status(200).json({
         status: "success",
         error: false,
         message: "Data fetched successfully",
-        data: responseData
+        data: responseData,
       });
-
     } catch (error: any) {
-      console.log('Error in getAdminProperties:', error.message);
-      console.log('Full error:', error);
-      return next(new AppError('Internal server error', 500));
+      console.log("Error in getAdminProperties:", error.message);
+      console.log("Full error:", error);
+      return next(new AppError("Internal server error", 500));
     }
   }
 );
@@ -283,8 +319,6 @@ const updatePropertyInfo = catchAsync(
       property_name,
       property_email,
       property_contact,
-      // star_rating,
-      // property_code,
       image,
       description,
       status,
@@ -301,7 +335,9 @@ const updatePropertyInfo = catchAsync(
     if (property_email && property_email !== property.property_email) {
       const existingEmail = await PropertyInfo.findOne({ property_email });
       if (existingEmail) {
-        return next(new AppError("A property already exists with this email", 400));
+        return next(
+          new AppError("A property already exists with this email", 400)
+        );
       }
     }
 
@@ -312,15 +348,15 @@ const updatePropertyInfo = catchAsync(
           property_name,
           property_email,
           property_contact,
-          // star_rating,
-          // property_code,
           image,
           description,
           status,
-        }
+        },
       },
       { new: true }
-    );
+    )
+      .populate("property_category")
+      .populate("property_type");
 
     return res.status(200).json({
       status: "success",
@@ -337,6 +373,7 @@ const getPropertyInfoById = catchAsync(
     const property = await PropertyInfo.findById(propertyId)
       .populate({ path: "status" })
       .populate({ path: "property_category" })
+      .populate({ path: "property_type" })
       .populate({ path: "property_address" })
       .populate({ path: "property_amenities" })
       .populate({ path: "property_room" })
@@ -346,22 +383,20 @@ const getPropertyInfoById = catchAsync(
 
     const rateplan = await PropertyRatePlan.aggregate([
       { $match: { property_id: new mongoose.Types.ObjectId(propertyId) } },
-
       {
         $lookup: {
-          from: 'rooms', 
-          localField: 'applicable_room_type', 
-          foreignField: '_id', 
-          as: 'applicable_room_type'
-        }
+          from: "rooms",
+          localField: "applicable_room_type",
+          foreignField: "_id",
+          as: "applicable_room_type",
+        },
       },
-      { $unwind: '$applicable_room_type' },
-
+      { $unwind: "$applicable_room_type" },
       {
         $project: {
-          applicable_room: '$applicable_room_type.room_name',
-          applicable_room_type: '$applicable_room_type.room_type',
-          propertyInfo_id: '$applicable_room_type.propertyInfo_id',
+          applicable_room: "$applicable_room_type.room_name",
+          applicable_room_type: "$applicable_room_type.room_type",
+          propertyInfo_id: "$applicable_room_type.propertyInfo_id",
           _id: 1,
           meal_plan: 1,
           room_price: 1,
@@ -371,16 +406,16 @@ const getPropertyInfoById = catchAsync(
           max_length_stay: 1,
           min_book_advance: 1,
           max_book_advance: 1,
-        }
-      }
-    ])
+        },
+      },
+    ]);
 
     const properties = {
       ...property,
-      rate_plan: rateplan
-    }
+      rate_plan: rateplan,
+    };
 
-    if (!properties) {
+    if (!properties || !property) {
       return next(
         new AppError(`No property found with this id ${propertyId}`, 404)
       );
@@ -403,7 +438,9 @@ const getAllProperty = catchAsync(async (req: Request, res: Response) => {
     process.env.JWT_SECRET_KEY as any
   );
 
-  const properties = await PropertyInfo.find({ user_Id: deToken.id });
+  const properties = await PropertyInfo.find({ user_Id: deToken.id })
+    .populate("property_category")
+    .populate("property_type");
 
   res.status(200).json({
     status: "success",
@@ -416,7 +453,9 @@ const getAllProperty = catchAsync(async (req: Request, res: Response) => {
 
 const getProperties = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const property = await PropertyInfo.find();
+    const property = await PropertyInfo.find()
+      .populate("property_category")
+      .populate("property_type");
 
     if (!property) {
       return next(new AppError(`No property found with this id `, 404));
@@ -432,29 +471,32 @@ const getProperties = catchAsync(
   }
 );
 
-const deleteProperty = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const propertyInfoId = req.params.id;
+const deleteProperty = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const propertyInfoId = req.params.id;
 
-  const property = await PropertyInfo.findById(propertyInfoId);
-  if (!property) {
-    return next(new AppError(`No property found with this id ${property}`, 404));
+    const property = await PropertyInfo.findById(propertyInfoId);
+    if (!property) {
+      return next(
+        new AppError(`No property found with this id ${propertyInfoId}`, 404)
+      );
+    }
+
+    await Promise.all([
+      PropertyAddress.findByIdAndDelete(property?.property_address),
+      propertyAminity.findByIdAndDelete(property?.property_amenities),
+      RoomAminity.findByIdAndDelete(property?.room_Aminity),
+      PropertyPrice.findByIdAndDelete(property?.rate_plan),
+    ]);
+    await PropertyInfo.findByIdAndDelete(propertyInfoId);
+
+    res.status(200).json({
+      status: "success",
+      error: false,
+      message: "Property deleted successfully",
+      data: null,
+    });
   }
-
-  await Promise.all([
-    PropertyAddress.findByIdAndDelete(property?.property_address),
-    propertyAminity.findByIdAndDelete(property?.property_amenities),
-    RoomAminity.findByIdAndDelete(property?.room_Aminity),
-    PropertyPrice.findByIdAndDelete(property?.rate_plan),
-  ]);
-  await PropertyInfo.findByIdAndDelete(propertyInfoId);
-
-  res.status(200).json({
-    status: "success",
-    error: false,
-    message: "Property deleted successfully",
-    data: null,
-  });
-}
 );
 
 export {
@@ -468,9 +510,7 @@ export {
   getAdminProperties,
 };
 
-
 export class PropertyInfoController {
-
   private propertyInfoService: PropertyInfoService;
 
   constructor(propertyInfoService: PropertyInfoService) {
@@ -511,10 +551,11 @@ export class PropertyInfoController {
         message: "Property updated successfully",
         data: updatedPropertyInfo,
       });
-    }
-    catch (error: any) {
+    } catch (error: any) {
       console.log("Error updating property:", error);
-      return res.status(500).json({ message: error.message || "Error updating property" });
+      return res
+        .status(500)
+        .json({ message: error.message || "Error updating property" });
     }
   }
 }

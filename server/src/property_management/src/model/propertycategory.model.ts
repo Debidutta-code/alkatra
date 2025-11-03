@@ -1,23 +1,19 @@
-import mongoose, {
-  HydratedDocument,
-  Model,
-  QueryWithHelpers,
-  Types,
-} from "mongoose"; 
+import mongoose, { Model } from "mongoose";
 
-export enum Category {
-  HOTEL = "HOTEL",
-  HOMESTAY = "HOMESTAY",
-  WildlifeSafari = "WILDLIFE SAFARI",
-  BeachResort = "BEACH RESORT",
-  MountainRetreat = "MOUNTAIN RETREAT",
-  AdventureDestination = "ADVENTURE DESTINATION",
-  CulturalCity = "CULTURAL CITY",
-  Traking = "TRAKING",
+export enum CategoryType {
+  HOME = "Home-type property",
+  HOTEL = "Hotel-type property",
+  UNIQUE = "Unique-type property",
+}
+
+export enum PropertyTypeCategory {
+  MOST_COMMON = "Most common",
+  OTHERS = "Others",
 }
 
 export type PropertyCategory = {
-  category: Category;
+  category: CategoryType;
+  description?: string;
 };
 
 type PropertyCategoryModelType = Model<PropertyCategory>;
@@ -26,9 +22,12 @@ const propertyCategorySchema = new mongoose.Schema<PropertyCategory>(
   {
     category: {
       type: String,
-      enum: Object.values(Category),
-      default: Category.HOTEL,
+      enum: Object.values(CategoryType),
       required: true,
+      unique: true,
+    },
+    description: {
+      type: String,
     },
   },
   {
@@ -36,15 +35,9 @@ const propertyCategorySchema = new mongoose.Schema<PropertyCategory>(
   }
 );
 
-propertyCategorySchema.pre("save", async function (next) {
-  this.category = this.category.toUpperCase() as Category;
-
-  next();
-});
-
-const PropertyCategory = mongoose.model<
-  PropertyCategory,
-  PropertyCategoryModelType
->("PropertyCategory", propertyCategorySchema);
+const PropertyCategory = mongoose.model<PropertyCategory, PropertyCategoryModelType>(
+  "PropertyCategory",
+  propertyCategorySchema
+);
 
 export default PropertyCategory;

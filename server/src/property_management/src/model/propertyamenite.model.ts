@@ -22,17 +22,11 @@ type OtherAmenity = {
 
 interface PropertyAmenitiesType extends Document {
   propertyInfo_id: Types.ObjectId | PropertyInfoType;
-  destination_type: string;
-  property_type: string;
-  no_of_rooms_available: number;
   amenities: OtherAmenity;
 }
 
 const propertyAmenitiesSchema = new Schema<PropertyAmenitiesType>({
   propertyInfo_id: { type: Schema.Types.ObjectId, ref: 'PropertyInfo', required: true },
-  destination_type: { type: String, required: false },
-  property_type: { type: String, required: true },
-  no_of_rooms_available: { type: Number, required: true },
   amenities: {
     wifi: { type: Boolean, default: false },
     swimming_pool: { type: Boolean, default: false },

@@ -72,9 +72,6 @@ export interface RoomType {
 }
 
 export interface EditedAmenity {
-  destination_type: string;
-  property_type: string;
-  no_of_rooms_available: number;
   amenities: {
     wifi?: boolean;
     swimming_pool?: boolean;
@@ -311,7 +308,7 @@ const handleAddressSaveClick = async () => {
         ...prev,
         property_amenities: updateAmenityResponse.data,
       }));
-      toast.success("Amenities updated successfully!");
+      toast.success("Property Amenities updated successfully!");
     } catch (error) {
       console.error("Error updating amenity data:", error);
       toast.error("Failed to update amenities");

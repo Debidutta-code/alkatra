@@ -8,21 +8,15 @@ const createPropertyAminity = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const {
       propertyInfo_id,
-      destination_type,
-      property_type,
-      no_of_rooms_available,
       amenities,
     } = req.body;
 
-    if (!propertyInfo_id || !property_type || no_of_rooms_available === undefined || !amenities) {
+    if (!propertyInfo_id || !amenities) {
       return next(new AppError("Please fill all the required fields", 400));
     }
 
     const newAminity = await propertyAminity.create({
       propertyInfo_id,
-      destination_type,
-      property_type,
-      no_of_rooms_available,
       amenities,
     });
 
@@ -46,7 +40,7 @@ const createPropertyAminity = catchAsync(
 const updatePropertyAmenity = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const propertyId = req.params.id;
-    const { destination_type, property_type, no_of_rooms_available, amenities } = req.body;
+    const {amenities } = req.body;
 
     if (!req.body) {
       return next(new AppError("Please provide all the required details", 400));
@@ -59,9 +53,6 @@ const updatePropertyAmenity = catchAsync(
 
     const isEmpty = Object.keys(amenities).length === 0;
     const updateFields: any = {};
-    if (destination_type !== "") updateFields.destination_type = destination_type;
-    if (property_type !== "") updateFields.property_type = property_type;
-    if (no_of_rooms_available !== null) updateFields.no_of_rooms_available = no_of_rooms_available;
     if (!isEmpty) updateFields.amenities = amenities;
 
     const updatedAmenity = await propertyAminity.findByIdAndUpdate(
