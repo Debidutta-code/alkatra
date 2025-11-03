@@ -42,7 +42,7 @@ const ReviewSummaryCard: React.FC<ReviewSummaryCardProps> = ({
       <div className="bg-gradient-to-r from-tripswift-blue to-blue-600 p-4 text-white">
         <h3 className="text-xl font-bold flex items-center gap-2">
           <Calendar className="h-5 w-5" />
-          {t("Booking Summary")}
+          {t("reviewSummaryCard.title")}
         </h3>
       </div>
       <div className="p-6 space-y-4">
@@ -51,13 +51,13 @@ const ReviewSummaryCard: React.FC<ReviewSummaryCardProps> = ({
           <div className="space-y-4">
             <div>
               <div className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">
-                {t("Hotel")}
+                {t("reviewSummaryCard.hotel")}
               </div>
               <div className="font-bold text-lg text-gray-900">{hotelName}</div>
             </div>
             <div>
               <div className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">
-                {t("Room Type")}
+                {t("reviewSummaryCard.roomType")}
               </div>
               <div className="font-semibold text-gray-800 flex items-center gap-2">
                 <BedDouble className="h-4 w-4 text-tripswift-blue" />
@@ -69,7 +69,7 @@ const ReviewSummaryCard: React.FC<ReviewSummaryCardProps> = ({
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <div className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">
-                  {t("Check-in")}
+                  {t("reviewSummaryCard.checkIn")}
                 </div>
                 <div className="font-semibold text-gray-800">
                   {checkInDate?.format("DD MMM YYYY")}
@@ -77,7 +77,7 @@ const ReviewSummaryCard: React.FC<ReviewSummaryCardProps> = ({
               </div>
               <div>
                 <div className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">
-                  {t("Check-out")}
+                  {t("reviewSummaryCard.checkOut")}
                 </div>
                 <div className="font-semibold text-gray-800">
                   {checkOutDate?.format("DD MMM YYYY")}
@@ -85,7 +85,7 @@ const ReviewSummaryCard: React.FC<ReviewSummaryCardProps> = ({
               </div>
               <div>
                 <div className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">
-                  {t("Nights")}
+                  {t("reviewSummaryCard.nights")}
                 </div>
                 <div className="font-semibold text-gray-800 flex items-center gap-1">
                   <Clock className="h-4 w-4 text-tripswift-blue" />
@@ -96,7 +96,7 @@ const ReviewSummaryCard: React.FC<ReviewSummaryCardProps> = ({
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <div className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">
-                  {t("Guests")}
+                  {t("reviewSummaryCard.guests")}
                 </div>
                 <div className="font-semibold text-gray-800 flex items-center gap-1">
                   <Users className="h-4 w-4 text-tripswift-blue" />
@@ -105,7 +105,7 @@ const ReviewSummaryCard: React.FC<ReviewSummaryCardProps> = ({
               </div>
               <div>
                 <div className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">
-                  {t("Rooms")}
+                  {t("reviewSummaryCard.rooms")}
                 </div>
                 <div className="font-semibold text-gray-800 flex items-center gap-1">
                   <BedDouble className="h-4 w-4 text-tripswift-blue" />
@@ -119,7 +119,7 @@ const ReviewSummaryCard: React.FC<ReviewSummaryCardProps> = ({
         {/* Contact Information */}
         <div className="border-t border-gray-200 pt-6">
           <div className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">
-            {t("Contact Information")}
+            {t("reviewSummaryCard.contactInformation")}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-3">
@@ -137,7 +137,7 @@ const ReviewSummaryCard: React.FC<ReviewSummaryCardProps> = ({
         {/* Guest List */}
         <div className="border-t border-gray-200 pt-6">
           <div className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">
-            {t("Guest Details")}
+            {t("reviewSummaryCard.guestDetails")}
           </div>
           <div className="space-y-2">
             {guests.map((guest, index) => (
@@ -155,7 +155,7 @@ const ReviewSummaryCard: React.FC<ReviewSummaryCardProps> = ({
                       ? 'bg-green-100 text-green-700' 
                       : 'bg-purple-100 text-purple-700'
                 }`}>
-                  {t(guest.type.charAt(0).toUpperCase() + guest.type.slice(1))}
+                  {t(`reviewSummaryCard.guestTypes.${guest.type}`)}
                 </span>
               </div>
             ))}

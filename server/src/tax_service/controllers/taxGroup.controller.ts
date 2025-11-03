@@ -25,7 +25,7 @@ export class TaxGroupController implements ITaxGroupController {
              * Validate createdBy user ID
              */
             Validator.validateID(createdBy);
-           
+
             /**
              * Sanitize and validate tax group data
              */
@@ -45,7 +45,7 @@ export class TaxGroupController implements ITaxGroupController {
             }
 
             return res.status(201).json({ success: true, data: taxGroup });
-        } 
+        }
         catch (error: any) {
             console.error("Failed to create tax group at Controller Layer:", error);
             if (
@@ -54,7 +54,8 @@ export class TaxGroupController implements ITaxGroupController {
                 error.message === "You are not the owner of this hotel." ||
                 error.message === "One or more tax rules do not belong to the specified hotel." ||
                 error.message === "Tax group already exists with this name." ||
-                error.message === "Failed to assign tax group to property"
+                error.message === "Failed to assign tax group to property" ||
+                error.message.includes("Cannot create active tax group")
             ) {
                 return res.status(409).json({ error: error.message });
             }
@@ -78,7 +79,7 @@ export class TaxGroupController implements ITaxGroupController {
 
             const taxGroups = await this.taxGroupService.getAllTaxGroups(hotelId);
             return res.status(200).json({ success: true, data: taxGroups });
-        } 
+        }
         catch (error: any) {
             console.error("Failed to fetch tax groups at Controller Layer:", error);
             return res.status(500).json({ success: false, message: "Unable to fetch tax groups at this momment." });
@@ -150,7 +151,7 @@ export class TaxGroupController implements ITaxGroupController {
             const taxGroup = await this.taxGroupService.updateTaxGroup(id, sanitizedData);
 
             return res.status(200).json({ success: true, data: taxGroup });
-        } 
+        }
         catch (error: any) {
             console.error("Failed to update tax group at Controller Layer:", error);
             if (
@@ -159,7 +160,8 @@ export class TaxGroupController implements ITaxGroupController {
                 error.message === "Tax group not found - 2" ||
                 error.message === "You are not the owner of this hotel." ||
                 error.message === "One or more tax rules do not belong to the specified hotel." ||
-                error.message === "Tax group name cannot be the same."
+                error.message === "Tax group name cannot be the same." ||
+                error.message.includes("Cannot activate this tax group")
             ) {
                 return res.status(404).json({ error: error.message });
             }
@@ -187,7 +189,7 @@ export class TaxGroupController implements ITaxGroupController {
             await this.taxGroupService.deleteTaxGroup(id);
 
             return res.status(200).json({ success: true, message: "Tax group deleted successfully" });
-        } 
+        }
         catch (error: any) {
             console.error("Failed to delete tax group at Controller Layer:", error);
             if (error.message === "Tax group not found - 3") {

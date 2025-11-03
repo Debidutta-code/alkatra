@@ -5,6 +5,7 @@ import { MailFactory } from "../../../customer_authentication/src/services/mailF
 import Handlebars from 'handlebars';
 import { calculateAgeCategory } from '../utils/ageCategory';
 import ErrorHandler from '../utils/errorHandler';
+import mongoose from 'mongoose';
 
 
 const mailer = MailFactory.getMailer();
@@ -272,5 +273,22 @@ export class ReservationService {
             html: finalHtml,
             text: `Your booking has been confirmed`,
         });
+    }
+
+    async getReservationDetails(bookingId: string) {
+        
+        if (!bookingId) {
+            throw new Error('Booking ID is required');
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(bookingId)) {
+            throw new Error('Invalid Booking ID format');
+        }
+
+        const bookingDetails = await this.reservationRepository.getReservationDetails(bookingId);
+        if (!bookingDetails) {
+            throw new Error('No booking details found');
+        }
+        return bookingDetails;
     }
 }

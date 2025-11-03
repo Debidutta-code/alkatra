@@ -172,7 +172,7 @@ const HotelCardItem: React.FC<HotelCardItemProps> = ({
                     <div className="flex items-end justify-between mt-2 pt-3 border-t border-gray-100">
                         <div>
                             <div className="text-xs text-tripswift-black/50">{t('HotelListing.HotelCardItem.contactLabel')}</div>
-                            <div className="text-sm text-tripswift-black/80 font-tripswift-medium">{hotel.property_contact}</div>
+                            <div className="text-sm text-tripswift-black/80 font-tripswift-medium">+{hotel.property_contact}</div>
                         </div>
 
                         <button

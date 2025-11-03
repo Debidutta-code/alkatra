@@ -112,6 +112,17 @@ export class TaxGroupService implements ITaxGroupService {
                 throw new Error("Tax group already exists with this name.");
             }
 
+            /**
+ * Check if user is trying to create an active tax group
+ * when another active tax group already exists
+ */
+            if (data.isActive === true) {
+                const activeGroup = await this.taxGroupRepository.findActiveByHotel(String(data.hotelId));
+                if (activeGroup) {
+                    throw new Error(`Cannot create active tax group. Tax group "${activeGroup.name}" is already active. Please deactivate it first.`);
+                }
+            }
+
             return await this.taxGroupRepository.create(data);
         } catch (error: any) {
             console.error("Failed to create tax group at Service Layer:", error);
@@ -176,6 +187,17 @@ export class TaxGroupService implements ITaxGroupService {
              */
             // if (data.name === taxGroup.name) throw new Error("Tax group name cannot be the same.");
 
+            /**
+             * Check if user is trying to activate this tax group
+             * when another tax group is already active
+             */
+            if (data.isActive === true && taxGroup.isActive === false) {
+                const activeGroup = await this.taxGroupRepository.findActiveByHotel(String(taxGroup.hotelId));
+                if (activeGroup && activeGroup._id.toString() !== id) {
+                    throw new Error(`Cannot activate this tax group. Tax group "${activeGroup.name}" is already active. Please deactivate it first.`);
+                }
+            }
+
             return await this.taxGroupRepository.update(id, data);
         } catch (error: any) {
             console.error("Failed to update tax group at Service Layer:", error);
@@ -213,7 +235,7 @@ export class TaxGroupService implements ITaxGroupService {
         try {
             console.log("Get tax group by ID", id);
             const taxGroup = await this.taxGroupRepository.findById(id);
-            
+
             if (!taxGroup?._id) return null;
 
             return taxGroup;
@@ -269,7 +291,9 @@ export class TaxGroupService implements ITaxGroupService {
             /**
              * Get all tax rules for the hotel
              */
+            console.log("Fetching Tax Group Data for reservation tax calculation. Tax Group ID:", taxGroupID);
             const taxGroupData = await this.getTaxGroupById(taxGroupID);
+            console.log("Tax Group Data fetched for reservation tax calculation:", taxGroupData);
             // if (!taxGroupData) throw new Error("This tax group doesn't exists.");
             if (!taxGroupData) return null;
             if (!taxGroupData.rules || taxGroupData.rules.length === 0) {

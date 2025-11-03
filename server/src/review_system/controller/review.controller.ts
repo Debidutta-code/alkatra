@@ -24,13 +24,13 @@ export class CustomerReviewController {
 
     async getCustomerReview(req: Request, res: Response) {
         try {
-            const reviews = await customerReviewService.getAllReviews(req.query);
+            const { page = 1, limit = 5, ...filters } = req.query;
+            const reviews = await customerReviewService.getAllReviews(filters, parseInt(page as string), parseInt(limit as string));
             res.status(200).json({
                 success: true,
                 data: reviews
             });
-        }
-        catch (error: any) {
+        } catch (error: any) {
             res.status(500).json({
                 success: false,
                 message: error.message

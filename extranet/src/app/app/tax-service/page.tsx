@@ -2,9 +2,9 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../../../components/ui/card";
+import { Card, CardTitle, CardContent } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
-import { ArrowLeft, RefreshCw, AlertCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, RefreshCw, AlertCircle } from "lucide-react";
 import { TaxServiceTabs } from "./components/TaxServiceTabs";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
@@ -111,12 +111,8 @@ export default function TaxServicePage() {
 
             {/* Header */}
             <Card className="border-none shadow-lg rounded-xl overflow-hidden">
-                <div className="bg-gradient-to-r from-tripswift-blue to-tripswift-dark-blue px-6 py-8 text-white">
+                <div className="bg-gradient-to-r from-tripswift-blue to-tripswift-dark-blue p-6 text-white">
                     <CardTitle className="text-xl md:text-2xl font-bold">Tax Configuration</CardTitle>
-                    {/* <CardDescription className="text-blue-100 mt-2">
-                        Manage tax rules and groups for property:{" "}
-                        <span className="font-mono font-semibold bg-white/20 px-2 py-1 rounded">{propertyId}</span>
-                    </CardDescription> */}
                 </div>
 
                 <CardContent className="p-6">

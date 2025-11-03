@@ -4,6 +4,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Star, ChevronDown, Filter } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import ReviewPagination from './ReviewPagination';
 
 interface Review {
   _id: string;
@@ -19,10 +20,20 @@ interface Review {
   __v: number;
 }
 
+interface Pagination {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
 interface ReviewData {
   averageRating: number;
   totalReviews: number;
   customerReview: Review[];
+  pagination: Pagination;
 }
 
 interface ApiResponse {
@@ -36,40 +47,55 @@ interface HotelReviewsProps {
 
 const useReviewFilters = (hotelCode: string) => {
   const [rawData, setRawData] = useState<ReviewData | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
   const [filters, setFilters] = useState({
     rating: "",
     category: "",
     dateRange: null as { startDate: string; endDate: string } | null,
   });
-  const [sortBy, setSortBy] = useState<
-    "relevant" | "newest" | "oldest" | "highest" | "lowest"
-  >("relevant");
+  const [sortBy, setSortBy] = useState<"relevant" | "newest" | "oldest" | "highest" | "lowest">("newest");
   const [loading, setLoading] = useState(true);
 
-  // Fetch all reviews for stats and filtering
+  // Fetch reviews with pagination
   useEffect(() => {
     if (!hotelCode) return;
     setLoading(true);
 
     const fetchReviews = async () => {
       try {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/review/get?hotelCode=${hotelCode}`;
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/review/get?hotelCode=${hotelCode}&page=${currentPage}&limit=${itemsPerPage}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error("Failed to fetch reviews");
 
         const data: ApiResponse = await res.json();
-        if (data.success) setRawData(data.data);
+        if (data.success) {
+          setRawData(data.data);
+        }
       } catch (error) {
         console.error("[HotelReviews] Fetch failed:", error);
-        setRawData({ averageRating: 0, totalReviews: 0, customerReview: [] });
+        setRawData({
+          averageRating: 0,
+          totalReviews: 0,
+          customerReview: [],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            totalItems: 0,
+            itemsPerPage: 5,
+            hasNext: false,
+            hasPrev: false
+          }
+        });
       } finally {
         setLoading(false);
       }
     };
 
     fetchReviews();
-  }, [hotelCode]);
+  }, [hotelCode, currentPage, itemsPerPage]);
 
+  // Client-side filtering
   const filteredReviews = useMemo(() => {
     if (!rawData) return [];
 
@@ -92,18 +118,20 @@ const useReviewFilters = (hotelCode: string) => {
     });
   }, [rawData, filters]);
 
+  // Client-side sorting
   const sortedReviews = useMemo(() => {
     const reviews = [...filteredReviews];
 
     return reviews.sort((a, b) => {
       switch (sortBy) {
         case "relevant":
+          // First by rating (highest first), then by date (newest first)
           if (a.rating !== b.rating) return b.rating - a.rating;
-          return b.createdAt.localeCompare(a.createdAt);
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         case "newest":
-          return b.createdAt.localeCompare(a.createdAt);
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         case "oldest":
-          return a.createdAt.localeCompare(b.createdAt);
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
         case "highest":
           return b.rating - a.rating;
         case "lowest":
@@ -142,18 +170,23 @@ const useReviewFilters = (hotelCode: string) => {
     reviews: sortedReviews,
     stats,
     timePeriodStats,
+    pagination: rawData?.pagination,
     filters,
     setFilters,
     sortBy,
     setSortBy,
     loading,
+    currentPage,
+    setCurrentPage,
+    itemsPerPage,
+    setItemsPerPage,
   };
 };
 
 // Utility Functions
 const categorizeRating = (rating: number): "Poor" | "Good" | "Superb" => {
   if (rating <= 2) return "Poor";
-  if (rating <= 3) return "Good"; // Changed from < 4 to <= 3
+  if (rating <= 3) return "Good";
   return "Superb";
 };
 
@@ -200,7 +233,7 @@ const FilterSelect = ({
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none pr-10"
+          className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm bg-tripswift-off-white focus:outline-none focus:ring-2 focus:ring-tripswift-blue focus:border-tripswift-blue appearance-none pr-10"
         >
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -222,7 +255,7 @@ const ReviewCard = ({ review }: { review: Review }) => {
   return (
     <div key={review._id} className="border-b border-gray-100 pb-4 last:border-b-0">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 bg-tripswift-blue text-white rounded-full flex items-center justify-center font-semibold text-sm flex-shrink-0">
+        <div className="w-10 h-10 bg-tripswift-blue text-tripswift-off-white rounded-full flex items-center justify-center font-semibold text-sm flex-shrink-0">
           {review.guestEmail.charAt(0).toUpperCase()}
         </div>
 
@@ -244,7 +277,7 @@ const ReviewCard = ({ review }: { review: Review }) => {
             </div>
             <div className="text-right flex-shrink-0">
               <div className="flex items-center justify-end gap-1 mb-1">
-                <div className="w-6 h-6 bg-tripswift-blue text-white rounded text-xs font-semibold flex items-center justify-center">
+                <div className="w-6 h-6 bg-tripswift-blue text-tripswift-off-white rounded text-xs font-semibold flex items-center justify-center">
                   {review.rating}
                 </div>
               </div>
@@ -324,15 +357,31 @@ const HotelReviewsSliding: React.FC<HotelReviewsProps> = ({ hotelCode }) => {
     reviews,
     stats,
     timePeriodStats,
+    pagination,
     filters,
     setFilters,
     sortBy,
     setSortBy,
     loading,
+    currentPage,
+    setCurrentPage,
+    itemsPerPage,
+    setItemsPerPage,
   } = useReviewFilters(hotelCode);
 
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+    // Scroll to top of reviews section
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setItemsPerPage(Number(e.target.value));
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
+
   if (loading) return <LoadingState />;
-  if (reviews.length === 0) return <EmptyState />;
+  if (!pagination || reviews.length === 0) return <EmptyState />;
 
   // Create options for review scores filter
   const reviewScoreOptions = [
@@ -364,7 +413,8 @@ const HotelReviewsSliding: React.FC<HotelReviewsProps> = ({ hotelCode }) => {
 
   return (
     <div className="space-y-4 sm:space-y-6 p-4 sm:p-0">
-      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
+      {/* Filters Section */}
+      <div className="bg-tripswift-off-white border border-gray-200 rounded-lg p-4 sm:p-6">
         <div className="flex items-center gap-2 mb-4">
           <Filter className="h-5 w-5 text-gray-600 flex-shrink-0" />
           <h4 className="font-semibold text-gray-900 truncate">
@@ -427,8 +477,8 @@ const HotelReviewsSliding: React.FC<HotelReviewsProps> = ({ hotelCode }) => {
               setSortBy(value as "relevant" | "newest" | "oldest" | "highest" | "lowest")
             }
             options={[
-              { value: "relevant", label: t("Reviews.mostRelevant") || "Most relevant" },
               { value: "newest", label: t("Reviews.newestFirst") || "Newest first" },
+              { value: "relevant", label: t("Reviews.mostRelevant") || "Most relevant" },
               { value: "oldest", label: t("Reviews.oldestFirst") || "Oldest first" },
               { value: "highest", label: t("Reviews.highestRated") || "Highest rated" },
               { value: "lowest", label: t("Reviews.lowestRated") || "Lowest rated" },
@@ -475,7 +525,8 @@ const HotelReviewsSliding: React.FC<HotelReviewsProps> = ({ hotelCode }) => {
       {/* Reviews List */}
       <div className="space-y-4">
         <h4 className="font-semibold text-gray-900">
-          {t("Reviews.guestReviews", { count: reviews.length }) || `Guest reviews (${reviews.length})`}
+          {t("Reviews.guestReviews", { count: pagination.totalItems }) ||
+            `Guest reviews (${pagination.totalItems})`}
         </h4>
         <div className="space-y-4">
           {reviews.map((review) => (
@@ -483,6 +534,18 @@ const HotelReviewsSliding: React.FC<HotelReviewsProps> = ({ hotelCode }) => {
           ))}
         </div>
       </div>
+
+      {/* Pagination Component */}
+      {pagination && pagination.totalPages > 1 && (
+        <ReviewPagination
+          currentPage={currentPage}
+          totalPages={pagination.totalPages}
+          itemsPerPage={itemsPerPage}
+          totalReviews={pagination.totalItems}
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
+      )}
     </div>
   );
 };

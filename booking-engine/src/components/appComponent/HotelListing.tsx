@@ -313,7 +313,7 @@ const HotelListing: React.FC = () => {
         <div className="absolute inset-0 opacity-10">
           <div className="h-full w-full bg-pattern-dots"></div>
         </div>
-        <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-2 sm:py-4 lg:py-6">
           <div className="text-tripswift-off-white mb-6 flex-col items-center">
             <h1 className="text-2xl md:text-3xl font-tripswift-bold text-tripswift-off-white">
               {t("HotelListing.heroTitle", {
@@ -340,7 +340,7 @@ const HotelListing: React.FC = () => {
       </div>
 
       {/* Main content */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-2 sm:py-4 lg:py-6">
         <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between ml-2">
           <div>
             <div className="flex items-center">

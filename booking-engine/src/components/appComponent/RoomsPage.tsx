@@ -576,7 +576,7 @@ const RoomsPage: React.FC = () => {
       )}
 
       <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] text-tripswift-off-white">
-        <div className="container mx-auto px-4 py-5">
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-2 sm:py-4 lg:py-6">
           <div className="flex flex-col md:flex-row items-start  md:items-center gap-4">
             <button
               onClick={() => router.back()}
@@ -668,7 +668,7 @@ const RoomsPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-4">
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-2 sm:py-4 lg:py-6">
         {isPropertyLoading ? (
           <LoadingSkeleton type="property" count={1} />
         ) : (
@@ -1103,7 +1103,7 @@ const RoomsPage: React.FC = () => {
                                 d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
                               />
                             </svg>
-                            <span className="break-all">{propertyDetails.property_contact}</span>
+                            <span className="break-all">+{propertyDetails.property_contact}</span>
                           </div>
                         )}
                         {propertyDetails?.property_email && (
@@ -1142,7 +1142,7 @@ const RoomsPage: React.FC = () => {
       </div>
 
       {/* Main content */}
-      <div className="container mx-auto px-4">
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-2 sm:py-4 lg:py-6">
         {/* Filter and Search Section */}
         <div className="bg-tripswift-off-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6 mt-4">
           <div className="flex flex-col md:flex-row gap-4 justify-between">

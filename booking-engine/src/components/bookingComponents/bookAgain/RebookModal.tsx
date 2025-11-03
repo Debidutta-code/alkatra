@@ -558,7 +558,7 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 font-noto-sans p-3 sm:p-5">
-      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[95vh] overflow-y-auto shadow-2xl">
+      <div className="bg-tripswift-off-white rounded-xl shadow-xl w-full max-w-2xl max-h-[95vh] overflow-y-auto relative">
 
         {/* Enhanced Header with Progress Indicator */}
         <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6 rounded-t-2xl z-10">
@@ -569,7 +569,7 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
               </div>
               <div>
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
-                  {t("Book Again")}
+                  {t("rebookModal.bookAgain")}
                 </h3>
                 <p className="text-sm text-gray-600 flex items-center gap-1">
                   <MapPin className="h-3 w-3" />
@@ -601,7 +601,7 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
                 2
               </div>
               <span className={`text-sm font-medium ${currentStep === 'review' ? 'text-gray-700' : 'text-gray-400'}`}>
-                {t("Review & Book")}
+                {t("rebookModal.reviewAndBook")}
               </span>
             </div>
           </div>
@@ -678,7 +678,7 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
                   disabled={isChecking}
                   className="px-8 py-3 h-12 border-2 border-gray-300 hover:border-gray-400 rounded-xl font-semibold"
                 >
-                  {t("Cancel")}
+                  {t("rebookModal.cancel")}
                 </Button>
 
                 <Button
@@ -689,11 +689,11 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
                   {isChecking ? (
                     <div className="flex items-center gap-3">
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      <span>{t("Checking Availability...")}</span>
+                      <span>{t("rebookModal.checkingAvailability")}</span>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <span>{t("Continue to Review")}</span>
+                      <span>{t("rebookModal.continueToReview")}</span>
                       <ChevronRight className="h-4 w-4" />
                     </div>
                   )}
@@ -713,8 +713,8 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
                     <Check className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold mb-1">{t("Great News!")}</h3>
-                    <p className="text-green-100">{t("Your selected dates are available for booking")}</p>
+                    <h3 className="text-xl font-bold mb-1">{t("rebookModal.greatNews")}</h3>
+                    <p className="text-green-100">{t("rebookModal.datesAvailableMessage")}</p>
                   </div>
                 </div>
               </div>
@@ -736,7 +736,7 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
                       <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
                         <CreditCard className="h-4 w-4" />
                       </div>
-                      <h4 className="text-lg font-bold">{t("Price Details")}</h4>
+                      <h4 className="text-lg font-bold">{t("rebookModal.priceDetails")}</h4>
                     </div>
                   </div>
 
@@ -746,7 +746,7 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
                       <div className="bg-white rounded-xl p-4 border border-gray-200">
                         <div className="flex justify-between items-center">
                           <span className="text-sm font-medium text-gray-700">
-                            {t("Base Amount")}
+                            {t("rebookModal.baseAmount")}
                           </span>
                           <span className="text-sm font-semibold text-gray-800">
                             {localCurrency} {(priceData?.breakdown?.totalBaseAmount || priceData?.totalAmount || 0).toFixed(2)}
@@ -758,7 +758,7 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
                         <div className="bg-white rounded-xl p-4 border border-gray-200">
                           <div className="flex justify-between items-center">
                             <span className="text-sm font-medium text-gray-700">
-                              {t("Additional Guest Charges")}
+                              {t("rebookModal.additionalGuestCharges")}
                             </span>
                             <span className="text-sm font-semibold text-gray-800">
                               {localCurrency} {priceData.breakdown.totalAdditionalCharges.toFixed(2)}
@@ -778,7 +778,7 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
                               <div className="flex items-center gap-2">
                                 <Info className="h-4 w-4 text-gray-500" />
                                 <h5 className="text-sm font-semibold text-gray-700">
-                                  {t("Tax & Fee Breakdown")}
+                                  {t("rebookModal.taxAndFeeBreakdown")}
                                 </h5>
                               </div>
                               <div className={`transform transition-transform ${taxExpanded ? 'rotate-180' : ''}`}>
@@ -790,7 +790,7 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
                             {/* Always show Total Tax */}
                             <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100">
                               <span className="text-gray-700 font-semibold text-sm">
-                                {t("Total Tax")}
+                                {t("rebookModal.totalTax")}
                               </span>
                               <span className="font-bold text-gray-800 text-sm">
                                 {localCurrency} {priceData.totalTax?.toFixed(2) || "0.00"}
@@ -825,7 +825,7 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
                           >
                             <div className="flex items-center justify-between">
                               <h5 className="text-sm font-semibold text-gray-700">
-                                {t("Room Rate")}
+                                {t("rebookModal.roomRate")}
                               </h5>
                               <div className={`transform transition-transform ${roomRateExpanded ? 'rotate-180' : ''}`}>
                                 <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -836,7 +836,7 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
                             {/* Always show total for all dates */}
                             <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100">
                               <span className="text-gray-700 font-semibold text-sm">
-                                {t("Total for {{count}} nights", { count: priceData.dailyBreakdown.length })}
+                                {t("rebookModal.totalForNights", { count: priceData.dailyBreakdown.length })}
                               </span>
                               <span className="font-bold text-gray-800 text-sm">
                                 {localCurrency} {(priceData.dailyBreakdown.reduce((sum, day) => sum + day.totalPerRoom, 0) * rooms).toFixed(2)}
@@ -866,11 +866,11 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-md font-semibold text-gray-600 mb-1">
-                              {t("Final Amount (including tax)")}
+                              {t("rebookModal.finalAmount")}
                             </p>
                             {/* Better UX: Show total tax amount directly */}
                             <p className="text-xs text-gray-500">
-                              {t("Includes")} {localCurrency} {(priceData?.totalTax || 0).toFixed(2)} {t("in taxes")}
+                              {t("rebookModal.includesTaxes")} {localCurrency} {(priceData?.totalTax || 0).toFixed(2)} {t("in taxes")}
                             </p>
                           </div>
                           <div className="text-right">
@@ -895,7 +895,7 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
                   className="px-8 py-3 h-12 border-2 border-gray-300 hover:border-gray-400 rounded-xl font-semibold flex items-center gap-2"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  {t("Back to Details")}
+                  {t("rebookModal.backToDetails")}
                 </Button>
 
                 <Button
@@ -906,12 +906,12 @@ const RebookModal: React.FC<RebookModalProps> = ({ isOpen, onClose, booking }) =
                   {isNavigatingToPayment ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      <span>{t("Redirecting to Payment...")}</span>
+                      <span>{t("rebookModal.redirectingToPayment")}</span>
                     </>
                   ) : (
                     <>
                       <Check className="h-5 w-5" />
-                      <span>{t("Proceed to Payment")}</span>
+                      <span>{t("rebookModal.proceedToPayment")}</span>
                     </>
                   )}
                 </Button>

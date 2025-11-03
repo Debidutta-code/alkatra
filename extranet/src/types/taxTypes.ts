@@ -5,9 +5,9 @@ export type TaxRule = {
   type: "PERCENTAGE" | "FIXED";
   value: number;
   applicableOn: "TOTAL_AMOUNT" | "ROOM_RATE";
-  region: {
-    country: string;
-  };
+  // region: {
+  //   country: string;
+  // };
   description?: string;
   validFrom: string;
   isInclusive: boolean;

@@ -171,9 +171,12 @@
     "timeTracker": "Time Tracker",
     "timeSchedule": "Time Schedule",
     "leadGeneration": "Lead Generation",
+    "description": "Your trusted travel companion for seamless bookings and unforgettable experiences.",
+    "newsletterTitle": "Stay Updated",
+    "newsletterDescription": "Subscribe to get special offers and updates",
     "emailPlaceholder": "Enter your email",
     "subscribeButton": "Subscribe",
-    "copyright": "{year} Al Hajz - All rights reserved"
+    "copyright": "© {year} Al-Hajz. All rights reserved."
   },
   "Profile": {
     "editProfile": "Edit Profile",
@@ -1207,6 +1210,7 @@
       "token": "Token",
       "network": "Network",
       "amount": "Amount",
+      "guestInformation": "Guest Information",
       "hotel": "Hotel",
       "checkIn": "Check-In",
       "checkOut": "Check-Out",
@@ -1485,10 +1489,136 @@
     "filtersAndSort": "Filters & Sort",
     "reviewScores": "Review scores",
     "timeOfYear": "Time of year",
-    "sortReviewsBy": "Sort reviews by"
+    "sortReviewsBy": "Sort reviews by",
+    "show": "Show",
+    "perPage": "per page",
+    "showing": "Showing",
+    "of": "of",
+    "noReviewsToShow": "No reviews to show"
   },
   "NetworkStatus": {
     "offline": "You are offline. Please check your internet connection.",
     "online": "You are back online!"
+  },
+  "rebookModal": {
+    "bookAgain": "Book Again",
+    "updateDetails": "Update Details",
+    "reviewAndBook": "Review & Book",
+    "checkingAvailability": "Checking Availability...",
+    "continueToReview": "Continue to Review",
+    "cancel": "Cancel",
+    "greatNews": "Great News!",
+    "datesAvailableMessage": "Your selected dates are available for booking",
+    "priceDetails": "Price Details",
+    "baseAmount": "Base Amount",
+    "additionalGuestCharges": "Additional Guest Charges",
+    "taxAndFeeBreakdown": "Tax & Fee Breakdown",
+    "totalTax": "Total Tax",
+    "roomRate": "Room Rate",
+    "totalForNights": "Total for {{count}} nights",
+    "totalForNights_one": "Total for {{count}} night",
+    "totalForNights_other": "Total for {{count}} nights",
+    "finalAmount": "Final Amount (including tax)",
+    "includesTaxes": "Includes",
+    "inTaxes": "in taxes",
+    "backToDetails": "Back to Details",
+    "proceedToPayment": "Proceed to Payment",
+    "redirectingToPayment": "Redirecting to Payment...",
+    "errors": {
+      "atLeastOneGuest": "At least one guest is required",
+      "selectCheckInDate": "Please select a check-in date",
+      "selectCheckOutDate": "Please select a check-out date",
+      "checkOutAfterCheckIn": "Check-out date must be after check-in date",
+      "atLeastOneRoom": "At least 1 room is required",
+      "maxRoomsAllowed": "Maximum 4 rooms allowed",
+      "maxGuestsForRooms": "Maximum {{maxGuests}} guests allowed for {{rooms}} {{roomText}}",
+      "room": "room",
+      "rooms": "rooms",
+      "provideEmail": "Please provide a contact email",
+      "validEmail": "Please provide a valid email address",
+      "firstNameRequired": "First name is required",
+      "firstNameLetters": "First name should only contain letters",
+      "lastNameRequired": "Last name is required",
+      "lastNameLetters": "Last name should only contain letters",
+      "dobRequired": "Date of birth is required",
+      "dobMismatch": "Date of birth doesn't match guest type",
+      "correctErrors": "Please correct the errors above",
+      "noRoomsAvailable": "No rooms are available for your selected dates. Please try different dates.",
+      "somethingWrong": "Something went wrong. Please try again.",
+      "completeFields": "Please complete all required fields before proceeding"
+    },
+    "success": {
+      "datesAvailable": "Great! Your new dates are available."
+    }
+  },
+  "dateSelectionCard": {
+    "title": "When do you want to stay?",
+    "checkInDate": "Check-in Date",
+    "checkOutDate": "Check-out Date",
+    "numberOfRooms": "Number of Rooms",
+    "checkInPlaceholder": "Check-in",
+    "checkOutPlaceholder": "Check-out",
+    "roomsLabel": "Rooms",
+    "room": "room",
+    "rooms": "rooms",
+    "decreaseRooms": "Decrease rooms",
+    "increaseRooms": "Increase rooms",
+    "roomsRange": "Min: 1 room, Max: 4 rooms",
+    "guestRatioError": "Maximum 4 guests allowed per room. You have {{guestsCount}} guests for {{rooms}} {{roomText}}.",
+    "nightsCount": "{{count}} nights",
+    "nightsCount_one": "{{count}} night",
+    "nightsCount_other": "{{count}} nights",
+    "guestsCount": "{{count}} guests",
+    "guestsCount_one": "{{count}} guest",
+    "guestsCount_other": "{{count}} guests",
+    "roomsCount": "{{count}} rooms",
+    "roomsCount_one": "{{count}} room",
+    "roomsCount_other": "{{count}} rooms"
+  },
+  "contactInfoCard": {
+    "title": "Contact Information",
+    "emailAddress": "Email Address",
+    "phoneNumber": "Phone Number",
+    "notProvided": "Not provided"
+  },
+  "guestForm": {
+    "removeGuest": "Remove guest",
+    "guestNumber": "Guest {{number}}",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "guestType": "Guest Type",
+    "dateOfBirth": "Date of Birth",
+    "firstNamePlaceholder": "First name",
+    "lastNamePlaceholder": "Last name",
+    "selectDOB": "Select DOB",
+    "adult": "Adult",
+    "child": "Child",
+    "infant": "Infant"
+  },
+  "guestManagementCard": {
+    "title": "Guest Details",
+    "addGuest": "Add Guest"
+  },
+  "reviewSummaryCard": {
+    "title": "Booking Summary",
+    "hotel": "Hotel",
+    "roomType": "Room Type",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "nights": "Nights",
+    "guests": "Guests",
+    "rooms": "Rooms",
+    "contactInformation": "Contact Information",
+    "guestDetails": "Guest Details",
+    "guestTypes": {
+      "adult": "Adult",
+      "child": "Child",
+      "infant": "Infant"
+    }
+  },
+  "roomInfoCard": {
+    "title": "Room Details",
+    "roomType": "Room Type",
+    "sameRoomType": "Same room type as your original booking"
   }
 }

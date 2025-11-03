@@ -20,24 +20,24 @@ const ContactInfoCard: React.FC<ContactInfoCardProps> = ({ email, phone }) => {
           <Mail className="h-4 w-4 text-white" />
         </div>
         <h4 className="text-lg font-bold text-gray-900">
-          {t("Contact Information")}
+          {t("contactInfoCard.title")}
         </h4>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-3">
           <Label className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-            {t("Email Address")}
+            {t("contactInfoCard.emailAddress")}
           </Label>
           <div className="px-4 py-3 bg-white border-2 border-amber-200 rounded-xl text-gray-800 font-medium">
-            {email || t("Not provided")}
+            {email || t("contactInfoCard.notProvided")}
           </div>
         </div>
         <div className="space-y-3">
           <Label className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-            {t("Phone Number")}
+            {t("contactInfoCard.phoneNumber")}
           </Label>
           <div className="px-4 py-3 bg-white border-2 border-amber-200 rounded-xl text-gray-800 font-medium">
-            +{phone || t("Not provided")}
+            {phone ? `+${phone}` : t("contactInfoCard.notProvided")}
           </div>
         </div>
       </div>

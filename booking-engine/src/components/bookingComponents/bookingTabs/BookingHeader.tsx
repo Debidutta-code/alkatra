@@ -15,7 +15,7 @@ const BookingHeader: React.FC = () => {
 
   return (
     <div className="bg-gradient-to-r from-tripswift-blue to-[#054B8F] text-tripswift-off-white font-noto-sans">
-      <div className="container mx-auto px-4 pt-4">
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-2 sm:py-4 lg:py-6">
         {/* Compact Back Button */}
         <div className="flex items-start justify-between mb-4">
           <button
@@ -54,7 +54,7 @@ const BookingHeader: React.FC = () => {
       </div>
       
       {/* Compact header content */}
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 pb-6">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-2xl md:text-3xl font-tripswift-bold mb-2 text-tripswift-off-white leading-snug">
             {t('BookingTabs.BookingHeader.yourBookings')}

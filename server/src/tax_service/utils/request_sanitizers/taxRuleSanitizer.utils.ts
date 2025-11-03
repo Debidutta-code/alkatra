@@ -26,11 +26,11 @@ export class TaxRuleSanitizer {
             type: type,
             value: Number(value),
             applicableOn: applicableOn,
-            region: {
-                country: String(region?.country).trim(),
-                state: region?.state?.trim(),
-                city: region?.city?.trim(),
-            },
+            // region: {
+            //     country: String(region?.country).trim(),
+            //     state: region?.state?.trim(),
+            //     city: region?.city?.trim(),
+            // },
             description: description ? String(description).trim() : undefined,
             validFrom: new Date(validFrom),
             validTo: validTo ? new Date(validTo) : undefined,
@@ -67,13 +67,13 @@ export class TaxRuleSanitizer {
         if (value !== undefined) sanitized.value = Number(value);
         if (applicableOn !== undefined) sanitized.applicableOn = applicableOn;
 
-        if (region) {
-            sanitized.region = {
-                country: String(region?.country).trim(),
-                state: region?.state?.trim(),
-                city: region?.city?.trim(),
-            };
-        }
+        // if (region) {
+        //     sanitized.region = {
+        //         country: String(region?.country).trim(),
+        //         state: region?.state?.trim(),
+        //         city: region?.city?.trim(),
+        //     };
+        // }
 
         if (description !== undefined) sanitized.description = description ? String(description).trim() : undefined;
         if (validFrom !== undefined) sanitized.validFrom = new Date(validFrom);

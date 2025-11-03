@@ -80,13 +80,13 @@ export const TaxServiceTabs = ({
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
             Combine multiple tax rules into groups (e.g., "Standard Rate", "Luxury Tax").
           </p>
-            <TaxGroups
-              propertyId={propertyId}
-              accessToken={accessToken}
-              initialGroups={initialTaxGroups}
-              availableRules={initialTaxRules}
-              onUpdate={onTaxGroupUpdate}
-            />
+          <TaxGroups
+            propertyId={propertyId}
+            accessToken={accessToken}
+            initialGroups={initialTaxGroups}
+            availableRules={initialTaxRules}
+            onUpdate={onTaxGroupUpdate}
+          />
         </div>
       </TabsContent>
     </Tabs>

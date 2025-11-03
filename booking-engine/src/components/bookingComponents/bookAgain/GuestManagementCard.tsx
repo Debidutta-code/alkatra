@@ -36,7 +36,7 @@ const GuestManagementCard: React.FC<GuestManagementCardProps> = ({
               <Users className="h-4 w-4 text-white" />
             </div>
             <h4 className="text-lg font-bold text-gray-900">
-              {t("Guest Details")}
+              {t("guestManagementCard.title")}
             </h4>
           </div>
           <Button
@@ -45,7 +45,7 @@ const GuestManagementCard: React.FC<GuestManagementCardProps> = ({
             size="sm"
           >
             <Plus className="h-4 w-4" />
-            {t("Add Guest")}
+            {t("guestManagementCard.addGuest")}
           </Button>
         </div>
       </div>

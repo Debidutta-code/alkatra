@@ -25,7 +25,7 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
   rooms,
   guestsCount,
   onCheckInChange,
-  onCheckOutChange, // Fixed: was onCheckOutDate
+  onCheckOutChange,
   onRoomsChange,
   disabledDate,
   disabledCheckOutDate,
@@ -52,13 +52,13 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100">
+    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100 mb-4">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-8 h-8 bg-tripswift-blue rounded-lg flex items-center justify-center">
           <CalendarIcon className="h-4 w-4 text-white" />
         </div>
         <h4 className="text-lg font-bold text-gray-900">
-          {t("When do you want to stay?")}
+          {t("dateSelectionCard.title")}
         </h4>
       </div>
 
@@ -75,7 +75,11 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
         <div className="mb-4 flex items-center gap-2 text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
           <AlertCircle className="h-4 w-4 flex-shrink-0" />
           <span className="text-sm font-medium">
-            {t("Maximum 4 guests allowed per room. You have")} {guestsCount} {t("guests for")} {rooms} {rooms === 1 ? t("room") : t("rooms")}.
+            {t("dateSelectionCard.guestRatioError", {
+              guestsCount,
+              rooms,
+              roomText: rooms === 1 ? t("dateSelectionCard.room") : t("dateSelectionCard.rooms")
+            })}
           </span>
         </div>
       )}
@@ -83,7 +87,7 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="space-y-2">
           <Label className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-            {t("Check-in Date")}
+            {t("dateSelectionCard.checkInDate")}
           </Label>
           <div className="relative group">
             <div className={`flex items-center bg-white rounded-xl border-2 transition-colors shadow-sm ${errors["checkInDate"]
@@ -97,7 +101,7 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
                 disabledDate={disabledDate}
                 format="DD MMM YYYY"
                 className="w-full pl-12 bg-transparent border-none focus:ring-0"
-                placeholder={t("Select check-in")}
+                placeholder={t("dateSelectionCard.checkInPlaceholder")}
                 suffixIcon={null}
                 size="large"
               />
@@ -113,7 +117,7 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
 
         <div className="space-y-2">
           <Label className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-            {t("Check-out Date")}
+            {t("dateSelectionCard.checkOutDate")}
           </Label>
           <div className="relative group">
             <div className={`flex items-center bg-white rounded-xl border-2 transition-colors shadow-sm ${errors["checkOutDate"]
@@ -127,7 +131,7 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
                 disabledDate={disabledCheckOutDate}
                 format="DD MMM YYYY"
                 className="w-full pl-12 bg-transparent border-none focus:ring-0"
-                placeholder={t("Select check-out")}
+                placeholder={t("dateSelectionCard.checkOutPlaceholder")}
                 suffixIcon={null}
                 size="large"
               />
@@ -143,7 +147,7 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
 
         <div className="space-y-2">
           <Label className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-            {t("Number of Rooms")}
+            {t("dateSelectionCard.numberOfRooms")}
           </Label>
           <div className="relative group">
             <div className={`flex items-center bg-white rounded-xl border-2 transition-colors shadow-sm ${errors["rooms"]
@@ -151,14 +155,14 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
                 : "border-gray-200 group-hover:border-tripswift-blue"
               }`}>
               <div className="flex items-center justify-between w-full px-4 py-1">
-                <span className="text-sm font-medium text-gray-600">{t("Rooms")}</span>
-                <div className="flex items-center gap-3">
+                <span className="text-sm font-medium text-gray-600">{t("dateSelectionCard.roomsLabel")}</span>
+                <div className="flex items-center">
                   <button
                     type="button"
                     className="w-6 h-6 rounded-full border border-gray-400 text-gray-600 flex items-center justify-center transition-colors hover:bg-tripswift-blue/10 hover:border-tripswift-blue hover:text-tripswift-blue disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:border-gray-200 disabled:hover:text-gray-600"
                     onClick={handleRoomsDecrement}
                     disabled={rooms <= 1}
-                    aria-label={t("Decrease rooms")}
+                    aria-label={t("dateSelectionCard.decreaseRooms")}
                   >
                     <Minus className="h-4 w-4" />
                   </button>
@@ -170,7 +174,7 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
                     className="w-6 h-6 rounded-full border border-gray-400 text-gray-600 flex items-center justify-center transition-colors hover:bg-tripswift-blue/10 hover:border-tripswift-blue hover:text-tripswift-blue disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:border-gray-200 disabled:hover:text-gray-600"
                     onClick={handleRoomsIncrement}
                     disabled={rooms >= 4}
-                    aria-label={t("Increase rooms")}
+                    aria-label={t("dateSelectionCard.increaseRooms")}
                   >
                     <Plus className="h-4 w-4" />
                   </button>
@@ -184,7 +188,7 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
               </div>
             )}
             <div className="mt-1 text-xs text-gray-500">
-              {t("Min: 1 room, Max: 4 rooms")}
+              {t("dateSelectionCard.roomsRange")}
             </div>
           </div>
         </div>
@@ -195,18 +199,20 @@ const DateSelectionCard: React.FC<DateSelectionCardProps> = ({
           <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm">
             <Clock className="h-4 w-4 text-tripswift-blue" />
             <span className="font-semibold text-gray-700">
-              {checkInDate && checkOutDate ? Math.max(0, checkOutDate.startOf('day').diff(checkInDate.startOf('day'), 'day')) : 0} {t("nights")}
+              {t("dateSelectionCard.nightsCount", {
+                count: checkInDate && checkOutDate ? Math.max(0, checkOutDate.startOf('day').diff(checkInDate.startOf('day'), 'day')) : 0
+              })}
             </span>
           </div>
           <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm">
             <Users className="h-4 w-4 text-tripswift-blue" />
             <span className="font-semibold text-gray-700">
-              {guestsCount} {t("guests")}
+              {t("dateSelectionCard.guestsCount", { count: guestsCount })}
             </span>
           </div>
           <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm">
             <span className="font-semibold text-gray-700">
-              {rooms} {rooms === 1 ? t("room") : t("rooms")}
+              {t("dateSelectionCard.roomsCount", { count: rooms })}
             </span>
           </div>
         </div>

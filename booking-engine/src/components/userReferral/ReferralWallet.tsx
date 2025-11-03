@@ -152,7 +152,7 @@ export default function ReferralWallet() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-7xl py-8">
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-tripswift-blue/10 to-blue-50 px-6 py-5 border-b border-gray-100">

@@ -62,8 +62,8 @@ export class CustomerReviewService {
     };
 
 
-    async getAllReviews(query: any) {
-        console.log(`The query we get ${JSON.stringify(query)}`);
+    async getAllReviews(query: any, page: number = 1, limit: number = 5) {
+        
 
         const filters: any = {};
 
@@ -89,6 +89,9 @@ export class CustomerReviewService {
 
         console.log(`The filters we built: ${JSON.stringify(filters)}`);
 
+        // Calculate skip for pagination
+        const skip = (page - 1) * limit;
+
         // Get reviews for average calculation (only by hotelCode)
         let averageRating = null;
         let totalReviews = 0;
@@ -105,14 +108,23 @@ export class CustomerReviewService {
             }
         }
 
-        // Log filters before calling getReviews for filtered reviews
-        console.log(`Filters before calling getReviews: ${JSON.stringify(filters)}`);
+        // Get total count for pagination
+        const totalCount = await this.customerReviewRepository.getReviewsCount(filters);
 
-        // Get filtered reviews
-        const customerReview = await this.customerReviewRepository.getReviews(filters);
+        // Get paginated reviews
+        const customerReview = await this.customerReviewRepository.getReviews(filters, skip, limit);
+
         return {
             averageRating: averageRating,
             totalReviews: totalReviews,
+            pagination: {
+                currentPage: page,
+                totalPages: Math.ceil(totalCount / limit),
+                totalItems: totalCount,
+                itemsPerPage: limit,
+                hasNext: page < Math.ceil(totalCount / limit),
+                hasPrev: page > 1
+            },
             customerReview: customerReview || []
         };
     }

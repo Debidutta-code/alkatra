@@ -235,12 +235,7 @@ export function Address({
 
   const handleSaveWithValidation = async () => {
     if (validateAllFields()) {
-      try {
-        await handleAddressSaveClick();
-        toast.success("Address updated successfully");
-      } catch (error) {
-        toast.error("Failed to update address");
-      }
+      await handleAddressSaveClick();
     }
   };
 

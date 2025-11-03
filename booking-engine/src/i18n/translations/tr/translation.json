@@ -171,9 +171,12 @@
         "timeTracker": "Zaman Takipçisi",
         "timeSchedule": "Zaman Programı",
         "leadGeneration": "Müşteri Adayı Oluşturma",
-        "emailPlaceholder": "E-posta adresinizi girin",
+        "description": "Sorunsuz rezervasyonlar ve unutulmaz deneyimler için güvenilir seyahat arkadaşınız.",
+        "newsletterTitle": "Güncel Kalın",
+        "newsletterDescription": "Özel teklifler ve güncellemeler almak için abone olun",
+        "emailPlaceholder": "E-postanızı girin",
         "subscribeButton": "Abone Ol",
-        "copyright": "{year} Al Hajz - Tüm hakları saklıdır"
+        "copyright": "© {year} Al-Hajz. Tüm hakları saklıdır."
     },
     "Profile": {
         "editProfile": "Profili Düzenle",
@@ -809,7 +812,8 @@
             "rateBreakdown": "Toplam Tutar",
             "viewBookingDetails": "Rezervasyon Detaylarını Görüntüle",
             "modify": "Değiştir",
-            "cancel": "İptal Et"
+            "cancel": "İptal Et",
+            "bookAgain": "Tekrar Rezervasyon Yap"
         },
         "BookingPagination": {
             "show": "Göster",
@@ -1206,6 +1210,7 @@
             "token": "Token",
             "network": "Ağ",
             "amount": "Tutar",
+            "guestInformation": "Misafir Bilgileri",
             "hotel": "Otel",
             "checkIn": "Giriş",
             "checkOut": "Çıkış",
@@ -1278,6 +1283,18 @@
             "common": {
                 "important": "Önemli"
             }
+        },
+        "promoCode": {
+            "label": "Promosyon kodunuz var mı?",
+            "placeholder": "Kodu girin",
+            "apply": "Uygula",
+            "applied": "Uygulandı",
+            "success": "Promosyon kodu uygulandı! {{discount}} tasarruf ettiniz",
+            "invalid": "Geçersiz veya süresi dolmuş promosyon kodu",
+            "genericError": "Promosyon kodu uygulanamadı. Lütfen tekrar deneyin.",
+            "loginRequired": "Promosyon kodlarını kullanmak için lütfen giriş yapın",
+            "viewAvailable": "Mevcut promosyon kodlarını görüntüle",
+            "noAvailable": "Şu anda mevcut promosyon kodu yok"
         }
     },
     "GuestBox": {
@@ -1472,10 +1489,136 @@
         "filtersAndSort": "Filtreler ve Sıralama",
         "reviewScores": "İnceleme puanları",
         "timeOfYear": "Yılın zamanı",
-        "sortReviewsBy": "İncelemeleri sırala göre"
+        "sortReviewsBy": "İncelemeleri sırala göre",
+        "show": "Göster",
+        "perPage": "sayfa başına",
+        "showing": "Gösteriliyor",
+        "of": "toplam",
+        "noReviewsToShow": "Gösterilecek değerlendirme yok"
     },
     "NetworkStatus": {
         "offline": "Çevrimdışısınız. Lütfen internet bağlantınızı kontrol edin.",
         "online": "Yeniden çevrimiçi oldunuz!"
+    },
+    "rebookModal": {
+        "bookAgain": "Tekrar Rezervasyon Yap",
+        "updateDetails": "Detayları Güncelle",
+        "reviewAndBook": "İncele ve Rezervasyon Yap",
+        "checkingAvailability": "Müsaitlik kontrol ediliyor...",
+        "continueToReview": "İncelemeye devam et",
+        "cancel": "İptal",
+        "greatNews": "Harika Haber!",
+        "datesAvailableMessage": "Seçtiğiniz tarihler rezervasyon için uygun",
+        "priceDetails": "Fiyat Detayları",
+        "baseAmount": "Temel Tutar",
+        "additionalGuestCharges": "Ek Misafir Ücretleri",
+        "taxAndFeeBreakdown": "Vergi ve Ücret Dökümü",
+        "totalTax": "Toplam Vergi",
+        "roomRate": "Oda Ücreti",
+        "totalForNights": "{{count}} gece için toplam",
+        "totalForNights_one": "{{count}} gece için toplam",
+        "totalForNights_other": "{{count}} gece için toplam",
+        "finalAmount": "Nihai Tutar (vergi dahil)",
+        "includesTaxes": "İçerir",
+        "inTaxes": "vergi olarak",
+        "backToDetails": "Detaylara Dön",
+        "proceedToPayment": "Ödemeye Geç",
+        "redirectingToPayment": "Ödemeye yönlendiriliyor...",
+        "errors": {
+            "atLeastOneGuest": "En az bir misafir gereklidir",
+            "selectCheckInDate": "Lütfen giriş tarihi seçin",
+            "selectCheckOutDate": "Lütfen çıkış tarihi seçin",
+            "checkOutAfterCheckIn": "Çıkış tarihi giriş tarihinden sonra olmalıdır",
+            "atLeastOneRoom": "En az 1 oda gereklidir",
+            "maxRoomsAllowed": "Maksimum 4 oda izin verilir",
+            "maxGuestsForRooms": "{{rooms}} {{roomText}} için maksimum {{maxGuests}} misafire izin verilir",
+            "room": "oda",
+            "rooms": "oda",
+            "provideEmail": "Lütfen iletişim e-postası sağlayın",
+            "validEmail": "Lütfen geçerli bir e-posta adresi sağlayın",
+            "firstNameRequired": "Ad gereklidir",
+            "firstNameLetters": "Ad yalnızca harf içermelidir",
+            "lastNameRequired": "Soyad gereklidir",
+            "lastNameLetters": "Soyad yalnızca harf içermelidir",
+            "dobRequired": "Doğum tarihi gereklidir",
+            "dobMismatch": "Doğum tarihi misafir türüyle eşleşmiyor",
+            "correctErrors": "Lütfen yukarıdaki hataları düzeltin",
+            "noRoomsAvailable": "Seçtiğiniz tarihler için oda bulunmamaktadır. Lütfen farklı tarihler deneyin.",
+            "somethingWrong": "Bir şeyler yanlış gitti. Lütfen tekrar deneyin.",
+            "completeFields": "Devam etmeden önce lütfen tüm gerekli alanları doldurun"
+        },
+        "success": {
+            "datesAvailable": "Harika! Yeni tarihleriniz uygun."
+        }
+    },
+    "dateSelectionCard": {
+        "title": "Ne zaman kalmak istiyorsunuz?",
+        "checkInDate": "Giriş Tarihi",
+        "checkOutDate": "Çıkış Tarihi",
+        "numberOfRooms": "Oda Sayısı",
+        "checkInPlaceholder": "Giriş",
+        "checkOutPlaceholder": "Çıkış",
+        "roomsLabel": "Odalar",
+        "room": "oda",
+        "rooms": "oda",
+        "decreaseRooms": "Odaları azalt",
+        "increaseRooms": "Odaları artır",
+        "roomsRange": "Min: 1 oda, Maks: 4 oda",
+        "guestRatioError": "Oda başına maksimum 4 misafire izin verilir. {{rooms}} {{roomText}} için {{guestsCount}} misafiriniz var.",
+        "nightsCount": "{{count}} gece",
+        "nightsCount_one": "{{count}} gece",
+        "nightsCount_other": "{{count}} gece",
+        "guestsCount": "{{count}} misafir",
+        "guestsCount_one": "{{count}} misafir",
+        "guestsCount_other": "{{count}} misafir",
+        "roomsCount": "{{count}} oda",
+        "roomsCount_one": "{{count}} oda",
+        "roomsCount_other": "{{count}} oda"
+    },
+    "contactInfoCard": {
+        "title": "İletişim Bilgileri",
+        "emailAddress": "E-posta Adresi",
+        "phoneNumber": "Telefon Numarası",
+        "notProvided": "Belirtilmedi"
+    },
+    "guestForm": {
+        "removeGuest": "Misafiri kaldır",
+        "guestNumber": "Misafir {{number}}",
+        "firstName": "Ad",
+        "lastName": "Soyad",
+        "guestType": "Misafir Türü",
+        "dateOfBirth": "Doğum Tarihi",
+        "firstNamePlaceholder": "Ad",
+        "lastNamePlaceholder": "Soyad",
+        "selectDOB": "Doğum tarihi seçin",
+        "adult": "Yetişkin",
+        "child": "Çocuk",
+        "infant": "Bebek"
+    },
+    "guestManagementCard": {
+        "title": "Misafir Detayları",
+        "addGuest": "Misafir Ekle"
+    },
+    "reviewSummaryCard": {
+        "title": "Rezervasyon Özeti",
+        "hotel": "Otel",
+        "roomType": "Oda Türü",
+        "checkIn": "Giriş",
+        "checkOut": "Çıkış",
+        "nights": "Geceler",
+        "guests": "Misafirler",
+        "rooms": "Odalar",
+        "contactInformation": "İletişim Bilgileri",
+        "guestDetails": "Misafir Detayları",
+        "guestTypes": {
+            "adult": "Yetişkin",
+            "child": "Çocuk",
+            "infant": "Bebek"
+        }
+    },
+    "roomInfoCard": {
+        "title": "Oda Detayları",
+        "roomType": "Oda Türü",
+        "sameRoomType": "Orijinal rezervasyonunuzla aynı oda türü"
     }
 }

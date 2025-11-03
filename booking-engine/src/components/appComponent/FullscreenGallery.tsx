@@ -328,11 +328,10 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
                 <button
                   key={index}
                   onClick={() => goToImage(index)}
-                  className={`relative aspect-square rounded-xl overflow-hidden group transition-all duration-200 border-2 ${
-                    currentIndex === index
-                      ? 'border-blue-500 shadow-lg scale-105'
-                      : 'border-gray-200 hover:border-gray-300 hover:shadow-md hover:scale-102'
-                  }`}
+                  className={`relative aspect-square rounded-xl overflow-hidden group transition-all duration-200 border-2 ${currentIndex === index
+                    ? 'border-blue-500 shadow-lg scale-105'
+                    : 'border-gray-200 hover:border-gray-300 hover:shadow-md hover:scale-102'
+                    }`}
                 >
                   {!imageError[index] ? (
                     <img
@@ -386,11 +385,9 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
                   ref={imageRef}
                   src={images[currentIndex]}
                   alt={`${propertyName} - Image ${currentIndex + 1}`}
-                  className={`max-w-full max-h-full object-contain bg-white rounded-2xl shadow-2xl transition-all duration-300 ${
-                    zoom > 1 ? 'cursor-grab' : 'cursor-default'
-                  } ${isDragging ? 'cursor-grabbing' : ''} ${
-                    isLoading ? 'opacity-50 scale-95' : 'opacity-100 scale-100'
-                  }`}
+                  className={`max-w-full max-h-full object-contain bg-white rounded-2xl shadow-2xl transition-all duration-300 ${zoom > 1 ? 'cursor-grab' : 'cursor-default'
+                    } ${isDragging ? 'cursor-grabbing' : ''} ${isLoading ? 'opacity-50 scale-95' : 'opacity-100 scale-100'
+                    }`}
                   style={{
                     transform: `scale(${zoom}) translate(${imagePosition.x / zoom}px, ${imagePosition.y / zoom}px)`,
                     transformOrigin: 'center'
@@ -462,11 +459,10 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
                   <button
                     key={index}
                     onClick={() => goToImage(index)}
-                    className={`relative flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden transition-all duration-200 border-2 ${
-                      currentIndex === index
-                        ? 'border-blue-500 scale-105 shadow-md'
-                        : 'border-gray-200 opacity-70 hover:opacity-100 hover:scale-105 hover:border-gray-300'
-                    }`}
+                    className={`relative flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden transition-all duration-200 border-2 ${currentIndex === index
+                      ? 'border-blue-500 scale-105 shadow-md'
+                      : 'border-gray-200 opacity-70 hover:opacity-100 hover:scale-105 hover:border-gray-300'
+                      }`}
                   >
                     {!imageError[index] ? (
                       <img
@@ -495,13 +491,13 @@ const FullscreenGallery: React.FC<FullscreenGalleryProps> = ({
       )}
 
       {/* Keyboard shortcuts hint */}
-      <div className="absolute bottom-4 left-4 text-gray-600 text-xs z-10">
+      {/* <div className="hidden lg:block absolute bottom-4 left-4 text-gray-600 text-xs z-10">
         <div className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg p-3 space-y-1 shadow-sm">
           <div>Press <kbd className="bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded text-xs font-mono">Esc</kbd> to close</div>
           <div>Press <kbd className="bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded text-xs font-mono">G</kbd> for grid view</div>
           <div>Use <kbd className="bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded text-xs font-mono">←</kbd> <kbd className="bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded text-xs font-mono">→</kbd> to navigate</div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
