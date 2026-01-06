@@ -7,6 +7,7 @@
 import { createPropertyType, getPropertyTypes } from "../../controller";
 import { createPropertyCategory, getAllPropertyCategories, getPropertyCategory, } from "../../controller/propertycategory.controller";
 import { updatePropertyAmenity, createPropertyAminity } from "../../controller/propertyamenity.controller";
+import { getDataSourceProviders, getDataSourceTypes } from "../../controller/dataSourceProvider.controller";
 import { Router } from "express";
 import {
   createpropertyInfo,

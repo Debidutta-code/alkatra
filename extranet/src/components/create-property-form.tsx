@@ -2,8 +2,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { BookOpen, DoorOpen, MapPinned, ShowerHead, DollarSign } from "lucide-react";
+import { BookOpen, DoorOpen, MapPinned, Settings, ShowerHead, DollarSign } from "lucide-react";
 import PropertyInfo from "./property/property-info";
+import PropertyConfiguration from "./property/property-configuration";
 import PropertyAddress from "./property/property-address";
 import PropertyAmenities from "./property/property-amenities";
 import Rooms from "./property/room";
@@ -16,37 +17,43 @@ type Props = {};
 const steps = [
   {
     id: 1,
+    icon: <Settings size={20} />,
+    name: "Property Configuration",
+    description: "Select PMS, CM, or Internal configuration",
+  },
+  {
+    id: 2,
     icon: <BookOpen size={20} />,
     name: "Property Information",
     description: "General property information",
   },
   {
-    id: 2,
+    id: 3,
     icon: <MapPinned size={20} />,
     name: "Property Address",
     description: "Location of property",
   },
   {
-    id: 3,
+    id: 4,
     icon: <ShowerHead size={20} />,
     name: "Property Amenities",
     description: "Available room types and their facilities",
   },
   {
-    id: 4,
+    id: 5,
     icon: <DoorOpen size={20} />,
     name: "Room",
     description: "Amenities availabilty",
   },
   {
-    id: 5,
+    id: 6,
     icon: <ShowerHead size={20} />,
     name: "Room Amenities",
     description: "Room Amenities availabilty",
   },
 ];
 
-export default function CreatePropertyForm({}: Props) {
+export default function CreatePropertyForm({ }: Props) {
   const [openDialog, setOpenDialog] = useState(false);
   const [currenStep, setCurrentStep] = useState(0);
 
@@ -70,21 +77,24 @@ export default function CreatePropertyForm({}: Props) {
     let Component: React.ReactNode = <>Not Step</>;
     switch (currenStep) {
       case 0:
-        Component = <PropertyInfo onNext={next} />;
+        Component = <PropertyConfiguration onNext={next} />;
         break;
       case 1:
-        Component = <PropertyAddress onNext={next} onPrevious={previous} />;
+        Component = <PropertyInfo onNext={next} />;
         break;
       case 2:
-        Component = <PropertyAmenities onNext={next} onPrevious={previous} />;
+        Component = <PropertyAddress onNext={next} onPrevious={previous} />;
         break;
       case 3:
+        Component = <PropertyAmenities onNext={next} onPrevious={previous} />;
+        break;
+      case 4:
         Component = <Rooms onNext={next} onPrevious={previous} />;
         break
-      case 4:
+      case 5:
         Component = <RoomAminity onNext={next} onPrevious={previous} />;
         break
-      // case 5:
+      // case 6:
       //   Component = <RatePlan onPrevious={previous} />;
       default:
         break;
@@ -95,13 +105,13 @@ export default function CreatePropertyForm({}: Props) {
 
   return (
     // <div className="grid place-content-center">
-      // <div className="w-max flex justify-center gap-20">
-        <div className="w-full flex justify-center h-screen gap-10">
-        <CreateFormSteps currentStep={currenStep} step={steps} />
-        <div className="w-full sm:w-1/2 ">
+    // <div className="w-max flex justify-center gap-20">
+    <div className="w-full flex justify-center h-screen gap-10">
+      <CreateFormSteps currentStep={currenStep} step={steps} />
+      <div className="w-full sm:w-1/2 ">
         {/* <div className="w-[60%]"> */}
-          {renderStepContent()}</div>
-      </div>
+        {renderStepContent()}</div>
+    </div>
     /* </div> */
   );
 }
@@ -114,7 +124,7 @@ function CreateFormSteps({
   currentStep: number;
 }) {
   function checkIfStepIsCompleted(step: number) {
-    return step > currentStep;
+    return (step - 1) > currentStep;
   }
 
   return (

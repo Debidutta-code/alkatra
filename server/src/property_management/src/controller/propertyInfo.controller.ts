@@ -47,6 +47,7 @@ const createpropertyInfo = catchAsync(
       description,
       property_category,
       property_type,
+      dataSource,
     } = req.body;
 
     console.log(
@@ -63,7 +64,7 @@ const createpropertyInfo = catchAsync(
     );
 
     // Validate required fields
-    if (!property_name || !property_email || !property_contact || !property_code || !property_category || !property_type) {
+    if (!property_name || !property_email || !property_contact || !property_code || !property_category || !property_type || !dataSource) {
       return next(new AppError("Please fill all the required fields", 400));
     }
 
@@ -75,6 +76,11 @@ const createpropertyInfo = catchAsync(
     // Validate property_type ObjectId
     if (!mongoose.Types.ObjectId.isValid(property_type)) {
       return next(new AppError("Invalid property type ID", 400));
+    }
+
+    // Validate dataSource ObjectId
+    if (!mongoose.Types.ObjectId.isValid(dataSource)) {
+      return next(new AppError("Invalid data source ID", 400));
     }
 
     // Check if property with this email already exists
@@ -108,6 +114,7 @@ const createpropertyInfo = catchAsync(
       property_type,
       description,
       brand: brandId,
+      dataSource,
     });
 
     await newProperty.save();

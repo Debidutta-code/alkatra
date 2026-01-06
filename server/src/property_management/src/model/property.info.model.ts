@@ -24,6 +24,7 @@ interface PropertyInfoType extends Document {
   rate_plan: Types.ObjectId;
   tax_group?: Types.ObjectId;
   status: string;
+  dataSource: Types.ObjectId; // Reference to DataSourceProvider
 }
 
 const propertyInfoSchema = new Schema<PropertyInfoType>({
@@ -45,6 +46,7 @@ const propertyInfoSchema = new Schema<PropertyInfoType>({
   rate_plan: [{ type: Schema.Types.ObjectId }],
   tax_group: { type: Schema.Types.ObjectId, ref: "TaxGroup", sparse: true },
   status: { type: String, enum: ["open", "close"], required: false },
+  dataSource: { type: Schema.Types.ObjectId, ref: "DataSourceProvider", required: true },
 },{
   timestamps: true,
 });

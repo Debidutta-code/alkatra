@@ -255,9 +255,18 @@ export default function PropertyInfo({ onNext }: Props) {
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     console.log("Property image URLs:", propertyImageUrls);
     const imageUrls = propertyImageUrls.map((img) => img.url);
+    const selectedDataSourceStr = localStorage.getItem('selectedPropertyDataSource');
+    let dataSource: string | null = null;
+
+    if (selectedDataSourceStr) {
+      const parsed = JSON.parse(selectedDataSourceStr);
+      dataSource = parsed.providerId || null;
+    }
+
     const propertyCreateBody = {
       ...data,
       image: imageUrls,
+      dataSource,
     };
 
     setFormLoading(true);
