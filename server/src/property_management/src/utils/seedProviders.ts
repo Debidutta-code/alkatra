@@ -14,14 +14,23 @@ const seedProviders = async () => {
     // Clear existing providers
     await DataSourceProvider.deleteMany({});
 
-    // Seed PMS providers
+        // Seed PMS providers
     const pmsProviders = [
       {
         name: 'Wincloud',
         type: 'PMS',
+        format: 'XML',
         isActive: true,
         apiEndpoint: process.env.WINCLOUD_TEST_API,
-        description: 'Integrated PMS for property management'
+        description: 'XML-based PMS for property management'
+      },
+      {
+        name: 'QuotusPMS',
+        type: 'PMS',
+        format: 'JSON',
+        isActive: true,
+        apiEndpoint: process.env.QUOTUS_PMS_API || 'http://localhost:9000/api/reservations',
+        description: 'JSON-based PMS for property management'
       }
     ];
 

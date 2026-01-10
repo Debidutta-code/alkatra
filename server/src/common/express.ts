@@ -26,6 +26,9 @@ import { ReferralRouter } from "../referral_system/routes";
 // Tax service routes
 import { TaxRuleRouter, TaxGroupRouter } from "../tax_service/routes";
 
+// QuotusPMS routes
+import quotusPMSRouter from "../quotusPMS/src/api/routes";
+
 export async function initializeExpressRoutes({ app }: { app: Express }) {
   app.head("/status", (_, res: Response) => res.status(200).end());
 
@@ -43,6 +46,9 @@ export async function initializeExpressRoutes({ app }: { app: Express }) {
   app.use("/api/v1/pms", pmsRoutes());
   // amadeus hotel routes
   app.use("/api/v1/room", inventoryRouter);
+  
+  // QuotusPMS routes
+  app.use("/api/v1/quotus-pms", quotusPMSRouter);
 
   app.use("/api/v1/booking", bookingRouter);
   app.use("/api/v1/payment", paymentRouter);
