@@ -12,6 +12,9 @@ export interface IInventory extends Document {
   invTypeCode: string;
   availability: Availability;
   status: string;
+  dataSource?: string; // Track which PMS this data came from
+  sold?: number; // Track sold count from PMS
+  blocked?: number; // Track blocked count from PMS
   // createdAtIST: Date;
   // updatedAtIST: Date;
 }
@@ -34,7 +37,10 @@ const inventorySchema = new Schema<IInventory>(
     hotelName: { type: String, required: true },
     invTypeCode: { type: String, required: true },
     availability: { type: availabilitySchema, required: true },
-    status: { type: String }
+    status: { type: String },
+    dataSource: { type: String, required: false }, // Track data source: Internal, Wincloud, QuotusPMS
+    sold: { type: Number, required: false }, // Sold count from PMS
+    blocked: { type: Number, required: false }, // Blocked count from PMS
     // createdAtIST: { type: Date, default: getISTTime },
     // updatedAtIST: { type: Date, default: getISTTime },
   },

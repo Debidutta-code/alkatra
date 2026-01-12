@@ -1,8 +1,14 @@
 import { Router } from 'express';
 import { QuotusPMSReservationController } from '../controllers/reservation.controller';
+import { ARIController } from '../controllers/ari.controller';
 
 const router = Router();
 const reservationController = new QuotusPMSReservationController();
+const ariController = new ARIController();
+
+// ========================================
+// Reservation Routes
+// ========================================
 
 // Create reservation
 router.post(
@@ -20,6 +26,22 @@ router.get(
 router.get(
   '/properties/:propertyId/reservations',
   reservationController.getPropertyReservations.bind(reservationController)
+);
+
+// ========================================
+// ARI (Availability, Rates, Inventory) Routes
+// ========================================
+
+// Webhook endpoint for QuotusPMS to push ARI data
+router.post(
+  '/ari',
+  ariController.handleARIUpdate.bind(ariController)
+);
+
+// Get ARI data for a property (debugging/testing)
+router.get(
+  '/ari/:propertyCode',
+  ariController.getPropertyARIData.bind(ariController)
 );
 
 export default router;

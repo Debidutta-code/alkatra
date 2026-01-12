@@ -25,6 +25,8 @@ export interface IRateAmountDateWise extends Document {
         ageQualifyingCode: string;
         amount: number;
     }>;
+    dataSource?: string; // Track which PMS this data came from (Internal, Wincloud, QuotusPMS)
+    restrictions?: any; // Store rate plan restrictions
     createdAt: Date;
 }
 
@@ -53,6 +55,8 @@ const rateAmountSchema = new Schema<IRateAmountDateWise>({
         ageQualifyingCode: { type: String, required: true, enum: ['10', '8', '7'] },
         amount: { type: Number, required: true },
     }],
+    dataSource: { type: String, required: false }, // Track data source: Internal, Wincloud, QuotusPMS
+    restrictions: { type: Schema.Types.Mixed, required: false }, // Store rate plan restrictions
     createdAt: { type: Date, default: Date.now },
 });
 

@@ -6,6 +6,7 @@ import Handlebars from 'handlebars';
 import { calculateAgeCategory } from '../utils/ageCategory';
 import ErrorHandler from '../utils/errorHandler';
 import mongoose from 'mongoose';
+import { PropertyInfo } from '../../../property_management/src/model';
 
 
 const mailer = MailFactory.getMailer();
@@ -53,22 +54,44 @@ export class ReservationService {
             throw new ErrorHandler(customerResult.error || 'Stripe customer creation failed', 500);
         }
 
-        // Process third-party reservation
+                // Process third-party reservation
         await this.reservationRepository.processThirdPartyReservation({
             ...reservationInput,
             ageCodeSummary,
         });
 
-        // Reduce room inventory
-        const reduceRoomResult = await this.reservationRepository.reduceRooms(
-            bookingDetails.hotelCode,
-            bookingDetails.roomTypeCode,
-            bookingDetails.numberOfRooms,
-            [new Date(checkInDate), new Date(checkOutDate)]
-        );
+        // Check if property uses external PMS
+        const property = await PropertyInfo.findOne({ 
+            property_code: bookingDetails.hotelCode 
+        }).populate('dataSource');
 
-        if (!reduceRoomResult) {
-            throw new Error('Failed to reduce rooms');
+        const dataSource = property?.dataSource as any;
+        const usesExternalPMS = dataSource && dataSource.type === 'PMS' && dataSource.isActive;
+
+        console.log(`Property PMS Configuration:`, {
+            propertyCode: bookingDetails.hotelCode,
+            dataSourceType: dataSource?.type || 'None',
+            dataSourceName: dataSource?.name || 'None',
+            usesExternalPMS
+        });
+
+        // Only reduce inventory if NOT using external PMS
+        // External PMS will send ARI updates automatically
+        if (!usesExternalPMS) {
+            console.log('📦 Reducing inventory manually (Internal/No PMS)');
+            const reduceRoomResult = await this.reservationRepository.reduceRooms(
+                bookingDetails.hotelCode,
+                bookingDetails.roomTypeCode,
+                bookingDetails.numberOfRooms,
+                [new Date(checkInDate), new Date(checkOutDate)]
+            );
+
+            if (!reduceRoomResult) {
+                throw new Error('Failed to reduce rooms');
+            }
+        } else {
+            console.log('🔗 Skipping manual inventory reduction (External PMS will send ARI update)');
+            console.log(`   PMS: ${dataSource.name}`);
         }
 
         // Send confirmation email
