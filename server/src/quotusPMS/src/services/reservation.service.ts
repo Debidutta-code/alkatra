@@ -8,10 +8,10 @@ export class QuotusPMSReservationService {
   private repository: QuotusPMSReservationRepository;
   private apiClient: QuotusPMSApiClient;
 
-  constructor(apiEndpoint?: string) {
+  constructor(apiEndpoint?: string, accessToken?: string) {
     this.formatter = new QuotusPMSFormatter();
     this.repository = new QuotusPMSReservationRepository();
-    this.apiClient = new QuotusPMSApiClient(apiEndpoint);
+    this.apiClient = new QuotusPMSApiClient(apiEndpoint, accessToken);
     console.log('QuotusPMSReservationService initialized');
   }
 

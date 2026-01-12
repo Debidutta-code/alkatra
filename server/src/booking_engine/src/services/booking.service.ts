@@ -1,10 +1,11 @@
 import { AmendBookingRepository } from "../repository";
 import { Inventory } from "../../../wincloud/src/model/inventoryModel";
+import { PropertyInfo } from "../../../property_management/src/model/property.info.model";
 import Handlebars from "handlebars";
 import { MailFactory } from "../../../customer_authentication/src/services/mailFactory";
 import { ThirdPartyAmendReservationService } from '../../../wincloud/src/controller/amendReservationController';
 import { ThirdPartyReservationService } from "../../../wincloud/src/service/reservationService";
-
+import { PMSOrchestrator } from "../../../common/pmsOrchestrator";
 
 interface AmendReservationInput {
   bookingDetails: {
@@ -624,23 +625,40 @@ export class AmendBookingService {
     }
   }
 
-  private async requestForThirdPartyReservation(bookDetails: any) {
+    private async requestForThirdPartyReservation(bookDetails: any) {
     try {
       if (!bookDetails) {
         throw new Error("No booking details found to request for third party reservation");
       }
       console.log("Requesting for third party reservation with details:", bookDetails);
+      
       /**
-       * Process third party reservation
+       * Step 1: Get property ID from hotel code
        */
-      const thirdPartyReservationService = new ThirdPartyReservationService();
-      /**
-       * Call processThirdPartyReservation to handle the reservation logic
-       */
-      await thirdPartyReservationService.processThirdPartyReservation(bookDetails);
+      const property = await PropertyInfo.findOne({ property_code: bookDetails.hotelCode });
+      
+      if (!property) {
+        throw new Error(`Property not found with code: ${bookDetails.hotelCode}`);
+      }
+
+      const propertyId = property._id.toString();
+      console.log(`Property found: ${property.property_name} (ID: ${propertyId})`);
 
       /**
-       * Reduce room counts after booking confirmed
+       * Step 2: Process reservation through PMS Orchestrator
+       * This will route to the correct PMS based on property configuration
+       */
+      try {
+        await PMSOrchestrator.processReservation(propertyId, bookDetails);
+        console.log('✅ Reservation successfully sent to PMS');
+      } catch (pmsError: any) {
+        console.error('❌ PMS integration failed:', pmsError.message);
+        // Log error but continue - we still want to update inventory and send email
+        console.warn('⚠️ Continuing with local reservation processing despite PMS failure');
+      }
+
+      /**
+       * Step 3: Reduce room counts after booking confirmed
        */
       await this.reduceRoomsAfterBookingConfirmed(
         bookDetails.hotelCode,
@@ -649,6 +667,9 @@ export class AmendBookingService {
         [bookDetails.checkInDate, bookDetails.checkOutDate],
       );
 
+      /**
+       * Step 4: Send booking confirmation email
+       */
       const htmlContent = `<!DOCTYPE html>
                     <html lang="en">
             

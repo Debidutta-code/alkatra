@@ -72,6 +72,13 @@ export const config = {
         clientId: env.GOOGLE_CLIENT_ID as string,
         clientSecret: env.GOOGLE_CLIENT_SECRET as string,
         frontedCallbackUrl: env.GOOGLE_FRONTEND_CALLBACK_URL as string,
+    },
+
+    // PMS Integration
+    pmsIntegration: {
+        wincloudApiUrl: env.WINCLOUD_TEST_API as string,
+        quotusPmsApiUrl: env.QUOTUS_PMS_API as string,
+        quotusPmsToken: env.QUOTUS_PMS_TOKEN as string,
     }
     
 }

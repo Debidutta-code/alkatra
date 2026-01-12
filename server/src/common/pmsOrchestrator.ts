@@ -2,6 +2,7 @@ import { PropertyInfo } from '../property_management/src/model/property.info.mod
 import { DataSourceProvider } from '../property_management/src/model/dataSourceProvider.model';
 import { ThirdPartyReservationService } from '../wincloud/src/service/reservationService';
 import { QuotusPMSReservationService } from '../quotusPMS/src/services/reservation.service';
+import { config } from '../config/env.variable';
 
 /**
  * PMS Orchestrator - Routes reservations to appropriate PMS based on property configuration
@@ -21,50 +22,94 @@ export class PMSOrchestrator {
         throw new Error(`Property not found: ${propertyId}`);
       }
 
+      // Step 2: Handle properties without data source (backward compatibility)
       if (!property.dataSource) {
-        throw new Error(`Property ${propertyId} does not have a data source configured`);
+        console.log('⚠️ Property does not have a data source configured. Using default behavior (Wincloud).');
+        const wincloudService = new ThirdPartyReservationService();
+        return await wincloudService.processThirdPartyReservation(reservationData);
       }
 
       const dataSource = property.dataSource as any;
       console.log('Property data source:', dataSource.name, '- Type:', dataSource.type);
 
-      // Step 2: Route to appropriate PMS based on data source
+      // Step 3: Route to appropriate PMS based on data source
       if (dataSource.type === 'Internal') {
         console.log('Property uses Internal system - no external PMS integration needed');
-        // Handle internal reservation processing
-        // For now, just log and return
-        return `INTERNAL-${reservationData.reservationId || Date.now()}`;
+        // For internal reservations, just return a local reservation ID
+        return `INTERNAL-${reservationData.reservationId || reservationData.bookingDetails?.reservationId || Date.now()}`;
       }
 
-      if (dataSource.name === 'Wincloud') {
-        console.log('Routing to Wincloud PMS (XML-based)');
-        const wincloudService = new ThirdPartyReservationService();
-        return await wincloudService.processThirdPartyReservation(reservationData);
+      if (dataSource.type === 'CM') {
+        console.log('Property uses Channel Manager - not yet implemented');
+        throw new Error('Channel Manager integration is not yet implemented');
       }
 
-      if (dataSource.name === 'QuotusPMS') {
-        console.log('Routing to QuotusPMS (JSON-based)');
-        const quotusPMSService = new QuotusPMSReservationService(dataSource.apiEndpoint);
-        
-        // Transform data if needed for QuotusPMS format
-        const quotusReservationInput = {
-          propertyId,
-          bookingDetails: reservationData.bookingDetails,
-          guests: reservationData.guests || [],
-          rooms: reservationData.rooms || reservationData.roomAssociations || [],
-          payment: reservationData.payment,
-          additionalNotes: reservationData.additionalNotes,
-        };
+      // Handle External PMS integrations
+      if (dataSource.type === 'PMS' || dataSource.name === 'Wincloud' || dataSource.name === 'QuotusPMS') {
+        if (dataSource.name === 'Wincloud') {
+          console.log('Routing to Wincloud PMS (XML-based)');
+          const wincloudService = new ThirdPartyReservationService();
+          return await wincloudService.processThirdPartyReservation(reservationData);
+        }
 
-        return await quotusPMSService.processReservation(quotusReservationInput);
+        if (dataSource.name === 'QuotusPMS') {
+          console.log('Routing to QuotusPMS (JSON-based)');
+          
+          // Get API endpoint and token from data source or config
+          const apiEndpoint = dataSource.apiEndpoint || config.pmsIntegration?.quotusPmsApiUrl;
+          const accessToken = config.pmsIntegration?.quotusPmsToken;
+
+          if (!apiEndpoint) {
+            throw new Error('QuotusPMS API endpoint not configured');
+          }
+
+          if (!accessToken) {
+            console.warn('⚠️ QuotusPMS access token not configured');
+          }
+
+          const quotusPMSService = new QuotusPMSReservationService(apiEndpoint, accessToken);
+          
+          // Transform data for QuotusPMS format
+          const quotusReservationInput = this.transformToQuotusPMSFormat(propertyId, reservationData);
+
+          return await quotusPMSService.processReservation(quotusReservationInput);
+        }
       }
 
       // If PMS type is not recognized
-      throw new Error(`Unsupported PMS type: ${dataSource.name}`);
+      throw new Error(`Unsupported PMS type: ${dataSource.name} (type: ${dataSource.type})`);
     } catch (error: any) {
       console.error('PMSOrchestrator Error:', error);
       throw new Error(`Failed to process reservation: ${error.message}`);
     }
+  }
+
+  /**
+   * Transform reservation data to QuotusPMS format
+   */
+  private static transformToQuotusPMSFormat(propertyId: string, reservationData: any): any {
+    const bookingDetails = reservationData.bookingDetails || reservationData;
+    
+    return {
+      propertyId,
+      bookingDetails: {
+        checkInDate: bookingDetails.checkInDate,
+        checkOutDate: bookingDetails.checkOutDate,
+        reservationId: bookingDetails.reservationId,
+        userId: bookingDetails.userId,
+      },
+      guests: reservationData.guests || [],
+      rooms: reservationData.rooms || reservationData.roomAssociations || [],
+      payment: reservationData.payment || {
+        totalAmount: bookingDetails.roomTotalPrice || 0,
+        paidAmount: bookingDetails.paidAmount || 0,
+        discountedAmount: bookingDetails.discountedAmount || 0,
+        currencyCode: bookingDetails.currencyCode || 'INR',
+        paymentMethod: bookingDetails.paymentMethod || 'none',
+        paymentNote: bookingDetails.paymentNote || null,
+      },
+      additionalNotes: reservationData.additionalNotes || bookingDetails.additionalNotes,
+    };
   }
 
   /**
@@ -88,6 +133,19 @@ export class PMSOrchestrator {
     } catch (error: any) {
       console.error('Error getting PMS config:', error);
       return null;
+    }
+  }
+
+  /**
+   * Check if property requires external PMS integration
+   */
+  static async requiresExternalPMS(propertyId: string): Promise<boolean> {
+    try {
+      const config = await this.getPropertyPMSConfig(propertyId);
+      return config ? config.type === 'PMS' && config.isActive : false;
+    } catch (error: any) {
+      console.error('Error checking PMS requirement:', error);
+      return false;
     }
   }
 }

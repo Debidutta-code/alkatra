@@ -4,19 +4,23 @@ import { IQuotusPMSReservation } from '../interfaces/reservation.interface';
 export class QuotusPMSApiClient {
   private client: AxiosInstance;
   private apiEndpoint: string;
+  private accessToken: string;
 
-  constructor(apiEndpoint?: string) {
+  constructor(apiEndpoint?: string, accessToken?: string) {
     this.apiEndpoint = apiEndpoint || process.env.QUOTUS_PMS_API || 'http://localhost:9000/api/reservations';
+    this.accessToken = accessToken || process.env.QUOTUS_PMS_TOKEN || '';
     
     this.client = axios.create({
       baseURL: this.apiEndpoint,
       timeout: 30000, // 30 seconds
       headers: {
         'Content-Type': 'application/json',
+        'x-partner-access-token': this.accessToken,
       },
     });
 
     console.log('QuotusPMS API Client initialized with endpoint:', this.apiEndpoint);
+    console.log('Authentication token configured:', this.accessToken ? 'Yes' : 'No');
   }
 
   /**
@@ -50,16 +54,21 @@ export class QuotusPMSApiClient {
     }
   }
 
-  /**
+    /**
    * Update API endpoint dynamically
    */
-  setApiEndpoint(endpoint: string): void {
+  setApiEndpoint(endpoint: string, accessToken?: string): void {
     this.apiEndpoint = endpoint;
+    if (accessToken) {
+      this.accessToken = accessToken;
+    }
+    
     this.client = axios.create({
       baseURL: endpoint,
       timeout: 30000,
       headers: {
         'Content-Type': 'application/json',
+        'x-partner-access-token': this.accessToken,
       },
     });
     console.log('QuotusPMS API endpoint updated to:', endpoint);
