@@ -106,8 +106,7 @@ export class ARIRepository {
       startDate.setHours(0, 0, 0, 0);
       
       const endDate = new Date(data.date);
-      endDate.setDate(endDate.getDate() + 1);
-      endDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
 
       // Create the filter to find existing rate plan
       const filter = {
@@ -170,8 +169,7 @@ export class ARIRepository {
       startDate.setHours(0, 0, 0, 0);
       
       const endDate = new Date(data.date);
-      endDate.setDate(endDate.getDate() + 1);
-      endDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
 
       // Create the filter to find existing rate plan
       const filter = {
@@ -221,7 +219,7 @@ export class ARIRepository {
       startDate.setHours(0, 0, 0, 0);
 
       const endDate = new Date(data.date);
-      endDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
 
       const filter = {
         hotelCode: data.hotelCode,
