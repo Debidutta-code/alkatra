@@ -3,6 +3,49 @@ import { format } from '../utils/dateUtils';
 import Cookies from 'js-cookie';
 import { fetchRatePlans, getAllRatePlans, modifyRatePlans, updateSellStatus } from "../API"
 
+/**
+ * Fetch initial data from QuotusPMS Partner API
+ */
+export const fetchInitialDataFromQuotusPMS = async (
+  propertyCode: string,
+  startDate: Date,
+  endDate: Date
+): Promise<any> => {
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Authentication token not found');
+    }
+
+    console.log("next public base url:", process.env.NEXT_PUBLIC_BACKEND_URL);
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/ari/fetch-initial-data`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        propertyCode,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Failed to fetch initial data: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error: any) {
+    console.error('Error fetching initial data from QuotusPMS:', error);
+    throw error;
+  }
+};
+
 export const filterData = (
   data: RatePlanInterFace[],
   dateRange: DateRange | undefined,

@@ -457,8 +457,8 @@ class RoomRentCalculationService {
   }
 
   /**
-   * Helper method to calculate day-by-day rates
-   */
+ * Helper method to calculate day-by-day rates
+ */
   private static calculateDayByDayRates(
     inventory: any[],
     noOfAdults: number,
@@ -469,42 +469,76 @@ class RoomRentCalculationService {
     endDate: Date
   ): any {
 
+    console.log('=== calculateDayByDayRates START ===');
+    console.log({
+      inventory,
+      noOfAdults,
+      noOfChildren,
+      noOfRooms,
+      numberOfNights,
+      startDate,
+      endDate
+    });
+
     try {
       const dailyBreakdown: any[] = [];
       let totalAmount = 0;
       let totalBaseAmount = 0;
       let totalAdditionalCharges = 0;
 
+      console.log('Initial totals', {
+        totalAmount,
+        totalBaseAmount,
+        totalAdditionalCharges
+      });
+
       // Generate stay dates (exclude checkout day)
       const currentDate = new Date(startDate);
       const stayDates: Date[] = [];
 
+      console.log('Generating stay dates...');
+
       while (currentDate < endDate) {
         stayDates.push(new Date(currentDate));
+        console.log('Added stay date:', currentDate);
         currentDate.setDate(currentDate.getDate() + 1);
       }
 
+      console.log('Final stayDates:', stayDates);
+
       for (const date of stayDates) {
         const dayOfWeek = this.getDayOfWeek(date);
+
+        console.log('--- Processing date ---');
+        console.log({ date, dayOfWeek });
 
         let bestRateForDay: any = null;
         let lowestAmountForDay = Infinity;
         let applicableRatesCount = 0;
 
         for (const item of inventory) {
+          console.log('Checking inventory item:', item);
+
           if (!item.rate) {
             console.log('No rate found for inventory item');
             continue;
           }
 
           const rate = item.rate;
-          const isApplicable = this.isRateApplicableForDate(rate, date, dayOfWeek);
+          console.log('Rate found:', rate);
 
-          if (!isApplicable) {
-            continue;
-          }
+          // const isApplicable = this.isRateApplicableForDate(rate, date, dayOfWeek);
+          // console.log('Is rate applicable?', {
+          //   ratePlanCode: rate.ratePlanCode,
+          //   isApplicable
+          // });
+
+          // if (!isApplicable) {
+          //   continue;
+          // }
 
           applicableRatesCount++;
+          console.log('Applicable rates count:', applicableRatesCount);
 
           const rateCalculation = this.calculateSingleRateAmountForOneDay(
             rate,
@@ -513,7 +547,12 @@ class RoomRentCalculationService {
             noOfRooms
           );
 
-          if (rateCalculation.success && rateCalculation.totalAmountForDay < lowestAmountForDay) {
+          console.log('Rate calculation result:', rateCalculation);
+
+          if (
+            rateCalculation.success &&
+            rateCalculation.totalAmountForDay < lowestAmountForDay
+          ) {
             lowestAmountForDay = rateCalculation.totalAmountForDay;
             bestRateForDay = {
               ...rateCalculation,
@@ -521,19 +560,22 @@ class RoomRentCalculationService {
               currencyCode: rate.currencyCode,
               date: date
             };
+
+            console.log('🔥 New best rate selected:', bestRateForDay);
           }
         }
 
+        console.log('Applicable rates total:', applicableRatesCount);
+
         if (!bestRateForDay) {
-          console.log(`ERROR: No suitable rates found for ${date.toDateString()}`);
+          console.error(`ERROR: No suitable rates found for ${date.toDateString()}`);
           return {
             success: false,
             message: `No suitable rates found for the date: ${date.toDateString()}`
           };
         }
 
-
-        dailyBreakdown.push({
+        const dailyEntry = {
           date: date.toDateString(),
           dayOfWeek,
           ratePlanCode: bestRateForDay.ratePlanCode,
@@ -544,22 +586,42 @@ class RoomRentCalculationService {
           currencyCode: bestRateForDay.currencyCode,
           childrenChargesBreakdown: bestRateForDay.childrenChargesBreakdown,
           detailedBreakdown: bestRateForDay.breakdown
-        });
+        };
 
+        console.log('Daily breakdown entry:', dailyEntry);
+
+        dailyBreakdown.push(dailyEntry);
 
         totalAmount += bestRateForDay.totalAmountForDay;
         totalBaseAmount += bestRateForDay.baseRatePerRoom * noOfRooms;
         totalAdditionalCharges += bestRateForDay.additionalGuestCharges * noOfRooms;
+
+        console.log('Updated totals:', {
+          totalAmount,
+          totalBaseAmount,
+          totalAdditionalCharges
+        });
       }
 
-      const averageBaseRate = numberOfNights > 0 ? totalBaseAmount / numberOfNights / noOfRooms : 0;
+      const averageBaseRate =
+        numberOfNights > 0 ? totalBaseAmount / numberOfNights / noOfRooms : 0;
+
+      console.log('Final calculations:', {
+        totalAmount,
+        totalBaseAmount,
+        totalAdditionalCharges,
+        averageBaseRate,
+        numberOfNights
+      });
+
+      console.log('=== calculateDayByDayRates SUCCESS ===');
 
       return {
         success: true,
         data: {
           totalAmount,
           averageBaseRate,
-          totalAdditionalCharges: totalAdditionalCharges,
+          totalAdditionalCharges,
           breakdown: {
             totalBaseAmount,
             totalAdditionalCharges,
@@ -572,51 +634,79 @@ class RoomRentCalculationService {
       };
 
     } catch (error) {
-      console.error('Error in calculateDayByDayRates:', error);
+      console.error('❌ Error in calculateDayByDayRates:', error);
       return {
         success: false,
-        message: "Error calculating day-by-day rates"
+        message: 'Error calculating day-by-day rates'
       };
     }
   }
+
 
   private static getDayOfWeek(date: Date): string {
     const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
     return days[date.getDay()];
   }
 
-  private static isRateApplicableForDate(rate: any, date: Date, dayOfWeek: string): boolean {
-    // Normalize dates to compare only the date part (ignore time)
-    const rateStartDate = new Date(rate.startDate);
-    const checkDate = new Date(date);
+  // private static isRateApplicableForDate(
+  //   rate: any,
+  //   date: Date,
+  //   dayOfWeek: string
+  // ): boolean {
 
-    // Set all times to start of day for accurate comparison
-    rateStartDate.setHours(0, 0, 0, 0);
-    checkDate.setHours(0, 0, 0, 0);
+  //   console.log('=== isRateApplicableForDate START ===');
+  //   console.log({
+  //     rate,
+  //     inputDate: date,
+  //     dayOfWeek
+  //   });
 
+  //   // Normalize dates to compare only the date part (ignore time)
+  //   const rateStartDate = new Date(rate.startDate);
+  //   const checkDate = new Date(date);
 
+  //   rateStartDate.setHours(0, 0, 0, 0);
+  //   checkDate.setHours(0, 0, 0, 0);
 
-    // Only check if the rate's start date matches the query date (ignore end date)
-    if (checkDate.getTime() !== rateStartDate.getTime()) {
-      // console.log(`  Date check: FAILED - Rate start date doesn't match query date`);
-      return false;
-    }
-    // console.log(`  Date check: PASSED - Rate start date matches query date`);
+  //   console.log('Normalized dates:', {
+  //     rateStartDate,
+  //     checkDate
+  //   });
 
-    // Check if the rate applies to this day of the week
-    if (rate.days && typeof rate.days === 'object') {
-      const dayApplicable = rate.days[dayOfWeek];
+  //   // Check if the rate's start date matches the query date
+  //   if (checkDate.getTime() !== rateStartDate.getTime()) {
+  //     console.log('❌ Date check FAILED', {
+  //       expected: rateStartDate.toDateString(),
+  //       received: checkDate.toDateString()
+  //     });
+  //     return false;
+  //   }
 
+  //   console.log('✅ Date check PASSED');
 
-      if (dayApplicable === false) {
-        // console.log(`  Day of week check: FAILED`);
-        return false;
-      }
-    }
-    // console.log(`  Day of week check: PASSED`);
+  //   // Check if the rate applies to this day of the week
+  //   if (rate.days && typeof rate.days === 'object') {
+  //     const dayApplicable = rate.days[dayOfWeek];
 
-    return true;
-  }
+  //     console.log('Day-of-week config:', {
+  //       daysConfig: rate.days,
+  //       dayOfWeek,
+  //       dayApplicable
+  //     });
+
+  //     if (dayApplicable === false) {
+  //       console.log('❌ Day-of-week check FAILED');
+  //       return false;
+  //     }
+  //   } else {
+  //     console.log('No day-of-week restriction found');
+  //   }
+
+  //   console.log('✅ Day-of-week check PASSED');
+  //   console.log('=== isRateApplicableForDate RESULT: TRUE ===');
+
+  //   return true;
+  // }
 
   private static calculateSingleRateAmountForOneDay(
     rate: any,

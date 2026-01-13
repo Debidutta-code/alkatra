@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Filters } from './components/Filters';
 import { RatePlanTable } from './components/RatePlanTable';
 import { SaveButton } from './components/SaveButton';
-import { filterData, saveData, ratePlanServices, getAllRatePlanServices, bulkUpdateSellStatus } from './services/dataService';
+import { filterData, saveData, ratePlanServices, getAllRatePlanServices, bulkUpdateSellStatus, fetchInitialDataFromQuotusPMS } from './services/dataService';
 import { RatePlanInterFace, DateRange, paginationTypes, modifiedRatePlanInterface, modifiedSellStatusInterface } from './types';
 import toast, { Toaster } from 'react-hot-toast';
 import Pagination from "./components/Pagination"
@@ -12,8 +12,9 @@ import { useSidebar } from '@src/components/ui/sidebar';
 import { cn } from '@src/lib/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@src/components/ui/button';
-import { CheckCircle, Plus, XCircle } from "lucide-react";
+import { CheckCircle, Plus, XCircle, Download } from "lucide-react";
 import { BulkSellModal } from './components/BulkSellModal';
+import { FetchInitialDataModal } from './components/FetchInitialDataModal';
 
 const MapRatePlanPage: React.FC = () => {
   const [data, setData] = useState<RatePlanInterFace[]>([]);
@@ -52,6 +53,7 @@ const MapRatePlanPage: React.FC = () => {
   const [originalData, setOriginalData] = useState<RatePlanInterFace[]>([]);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [bulkAction, setBulkAction] = useState<'start' | 'stop'>('stop');
+  const [isFetchModalOpen, setIsFetchModalOpen] = useState(false);
   const getHotelCode = (): string | null => {
     const propertyCodeFromUrl = searchParams.get('propertyCode');
     if (propertyCodeFromUrl) {
@@ -259,6 +261,36 @@ const MapRatePlanPage: React.FC = () => {
   // Check if there are any unsaved changes
   const hasUnsavedChanges = modifiedValues.length > 0 || modifiedSellStatus.length > 0;
 
+  // Handle fetch initial data
+  const handleFetchInitialData = async (startDate: Date, endDate: Date) => {
+    try {
+      const hotelCode = getHotelCode();
+      if (!hotelCode) {
+        toast.error('Property code not found. Please navigate from the property page.');
+        return;
+      }
+
+      toast.loading('Fetching initial data from QuotusPMS...', { id: 'fetch-initial' });
+
+      const result = await fetchInitialDataFromQuotusPMS(hotelCode, startDate, endDate);
+
+      if (result.success) {
+        toast.success(
+          `Successfully fetched data! ${result.data.datesProcessed.length} dates, ${result.data.inventoryRecordsProcessed} inventory records, ${result.data.ratePlansProcessed} rate plans`,
+          { id: 'fetch-initial', duration: 5000 }
+        );
+
+        // Refresh the rate plan data
+        await fetchRatePlans();
+      } else {
+        toast.error(result.message || 'Failed to fetch initial data', { id: 'fetch-initial' });
+      }
+    } catch (error: any) {
+      console.error('Error fetching initial data:', error);
+      toast.error(error.message || 'Failed to fetch initial data from QuotusPMS', { id: 'fetch-initial' });
+    }
+  };
+
   return (
     <div
       className={cn(
@@ -338,18 +370,28 @@ const MapRatePlanPage: React.FC = () => {
         />
 
         <div className="flex justify-between items-center mt-4 px-6">
-          {/* LEFT: Create Button */}
-          <Button
-            onClick={() => router.push('/app/rate-plan/create-rate-plan')}
-            variant="default"
-            className="flex items-center gap-2 bg-tripswift-blue hover:bg-tripswift-dark-blue text-white px-4 py-2 rounded-md text-sm font-medium shadow-md hover:shadow-lg transition-all"
-          >
-            <Plus className="h-4 w-4" />
-            Create Rate Plan
-          </Button>
+          {/* Left side: Create + Fetch buttons */}
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={() => router.push('/app/rate-plan/create-rate-plan')}
+              className="flex items-center gap-2 bg-tripswift-blue hover:bg-tripswift-dark-blue text-white px-5 py-2 text-sm font-medium shadow-md hover:shadow-lg transition-all"
+            >
+              <Plus className="h-4 w-4" />
+              Create Rate Plan
+            </Button>
 
-          {/* RIGHT: Save Button (existing) */}
-          <div className="flex items-center space-x-2">
+            <Button
+              onClick={() => setIsFetchModalOpen(true)}
+              variant="outline"
+              className="flex items-center gap-2 border-blue-600 text-blue-600 hover:bg-blue-50 hover:text-blue-700 px-5 py-2 text-sm font-medium shadow-md hover:shadow-lg transition-all"
+            >
+              <Download className="h-4 w-4" />
+              Fetch Initial Data
+            </Button>
+          </div>
+
+          {/* Right side: Save button */}
+          <div>
             <SaveButton
               isLoading={isLoading}
               handleSave={handleSave}
@@ -357,6 +399,12 @@ const MapRatePlanPage: React.FC = () => {
             />
           </div>
         </div>
+
+        <FetchInitialDataModal
+          isOpen={isFetchModalOpen}
+          onClose={() => setIsFetchModalOpen(false)}
+          onConfirm={handleFetchInitialData}
+        />
 
         <RatePlanTable
           filteredData={filteredData}

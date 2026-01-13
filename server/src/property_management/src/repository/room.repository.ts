@@ -30,14 +30,16 @@ export class RoomRepository {
             hotelCode,
             invTypeCode: { $in: roomTypes },
             'availability.startDate': {
-                $gte: startDate,
-                $lte: endDate
+                $gte: startDate
             },
-            'availability.count': { $gte: numberOfRooms },
-            $or: [
-                { status: "open" },
-                { status: { $exists: false } }
-            ]
+            'availability.endDate': {
+                $lt: endDate
+            },
+            'availability.count': { $gte: numberOfRooms }
+            // $or: [
+            //     { status: "open" },
+            //     { status: { $exists: false } }
+            // ]
         });
     }
 
@@ -105,10 +107,14 @@ export class RoomRepository {
      * Get basic room information
      */
     async getRoomsByPropertyAndTypes(propertyInfoId: string, availableRoomTypes: string[]) {
-        return Room.find({
+        // console.log("Fetching rooms for property:", propertyInfoId, "with types:", availableRoomTypes);
+        const room = await Room.find({
             propertyInfo_id: new mongoose.Types.ObjectId(propertyInfoId),
             room_type: { $in: availableRoomTypes }
         });
+
+        // console.log(`Found ${room} for property ${propertyInfoId} with specified types.`);
+        return room;
     }
 
     /**
@@ -116,39 +122,41 @@ export class RoomRepository {
     */
     async getRateInfoForRooms(hotelCode: string, roomTypes: string[], startDate: Date, endDate: Date) {
 
-        const datePairs = [];
-        let currentDate = new Date(startDate);
+        // const datePairs = [];
+        // let currentDate = new Date(startDate);
 
-        while (currentDate < endDate) {
-            const nextDate = new Date(currentDate);
-            nextDate.setDate(currentDate.getDate() + 1);
+        // while (currentDate < endDate) {
+        //     const nextDate = new Date(currentDate);
+        //     nextDate.setDate(currentDate.getDate() + 1);
 
-            datePairs.push({
-                startDate: new Date(currentDate),
-                endDate: nextDate
-            });
+        //     datePairs.push({
+        //         startDate: new Date(currentDate),
+        //         endDate: nextDate
+        //     });
 
-            currentDate = nextDate;
-        }
-
-
-        const requiredStartDates = datePairs.map(pair => pair.startDate);
+        //     currentDate = nextDate;
+        // }
 
 
+        // const requiredStartDates = datePairs.map(pair => pair.startDate);
+
+        console.log("Fetching rates for hotelCode:", hotelCode, "roomTypes:", roomTypes, "from", startDate, "to", endDate);
         const rates = await RateAmountDateWise.find({
             hotelCode: hotelCode,
             invTypeCode: { $in: roomTypes },
-            startDate: { $in: requiredStartDates }
+            startDate: { $gte: "2026-01-12T18:30:00.000+00:00" },
+            endDate: { $lte: "2026-01-12T18:29:59.999+00:00" }
         }).sort({ startDate: 1 });
 
+        console.log("Fetched Rates:", rates);
 
-        const foundStartDates = new Set(rates.map(rate => rate.startDate.toISOString()));
-        const missingDates = requiredStartDates.filter(date => !foundStartDates.has(date.toISOString()));
+        // const foundStartDates = new Set(rates.map(rate => rate.startDate.toISOString()));
+        // const missingDates = requiredStartDates.filter(date => !foundStartDates.has(date.toISOString()));
 
-        if (missingDates.length > 0) {
-            const missingDatesStr = missingDates.map(d => d.toISOString().split("T")[0]).join(", ");
-            throw new Error(`Missing rate data for the following dates: ${missingDatesStr}`);
-        }
+        // if (missingDates.length > 0) {
+        //     const missingDatesStr = missingDates.map(d => d.toISOString().split("T")[0]).join(", ");
+        //     throw new Error(`Missing rate data for the following dates: ${missingDatesStr}`);
+        // }
 
         return rates;
     }
@@ -158,12 +166,12 @@ export class RoomRepository {
     */
     async getInventoryInfoForRooms(hotelCode: string, roomTypes: string[], startDate: Date, endDate: Date) {
 
-        const dateList: Date[] = [];
-        let currentDate = new Date(startDate);
-        while (currentDate <= endDate) {
-            dateList.push(new Date(currentDate));
-            currentDate.setDate(currentDate.getDate() + 1);
-        }
+        // const dateList: Date[] = [];
+        // let currentDate = new Date(startDate);
+        // while (currentDate <= endDate) {
+        //     dateList.push(new Date(currentDate));
+        //     currentDate.setDate(currentDate.getDate() + 1);
+        // }
 
         const start = new Date(startDate);
         const end = new Date(endDate);
@@ -174,7 +182,9 @@ export class RoomRepository {
                 $match: {
                     hotelCode: hotelCode,
                     invTypeCode: { $in: roomTypes },
-                    "availability.startDate": { $in: dateList },
+                    // "availability.startDate": { $in: dateList },
+                    "availability.startDate": { $gte: startDate },
+                    "availability.endDate": { $lt: endDate }
                 }
             },
             {
@@ -209,9 +219,11 @@ export class RoomRepository {
 
     async getRoomsWithRates(propertyInfoId: string, availableRoomTypes: string[], hotelCode: string, startDate: Date, endDate: Date) {
 
+        console.log("availableRoomTypes:", availableRoomTypes);
         // Step 1: Get basic room data
         const rooms = await this.getRoomsByPropertyAndTypes(propertyInfoId, availableRoomTypes);
 
+        // console.log("Fetched Rooms:", rooms);
         if (!rooms.length) {
             return [];
         }

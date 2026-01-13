@@ -32,6 +32,12 @@ router.get(
 // ARI (Availability, Rates, Inventory) Routes
 // ========================================
 
+// Fetch initial data from QuotusPMS Partner API
+router.post(
+  '/fetch-initial-data',
+  ariController.fetchInitialData.bind(ariController)
+);
+
 // Webhook endpoint for QuotusPMS to push ARI data
 router.post(
   '/ari',

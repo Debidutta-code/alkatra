@@ -183,7 +183,7 @@ export class RoomService {
         // ✅ Build required date list in YYYY-MM-DD format
         const requiredDates: string[] = [];
         let current = new Date(startDate);
-        while (current <= endDate) {
+        while (current < endDate) {
             requiredDates.push(current.toISOString().split("T")[0]);
             current.setDate(current.getDate() + 1);
         }
@@ -220,6 +220,9 @@ export class RoomService {
                 availableRoomTypes.push(roomType);
             }
         }
+
+        console.log("Available Room Types:", availableRoomTypes);
+        console.log("Unavailable Room Types:", unavailableRoomTypes);
 
         if (availableRoomTypes.length === 0) {
             const errorMessage = unavailableRoomTypes

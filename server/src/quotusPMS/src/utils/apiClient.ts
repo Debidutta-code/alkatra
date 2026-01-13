@@ -7,7 +7,7 @@ export class QuotusPMSApiClient {
   private accessToken: string;
 
   constructor(apiEndpoint?: string, accessToken?: string) {
-    this.apiEndpoint = apiEndpoint || process.env.QUOTUS_PMS_API || 'http://localhost:9000/api/reservations';
+    this.apiEndpoint = apiEndpoint || process.env.QUOTUS_PMS_API || 'http://localhost:8080/api/v1';
     this.accessToken = accessToken || process.env.QUOTUS_PMS_TOKEN || '';
     
     this.client = axios.create({
@@ -23,7 +23,7 @@ export class QuotusPMSApiClient {
     console.log('Authentication token configured:', this.accessToken ? 'Yes' : 'No');
   }
 
-  /**
+    /**
    * Send reservation to QuotusPMS
    */
   async sendReservation(reservation: IQuotusPMSReservation): Promise<any> {
@@ -50,6 +50,51 @@ export class QuotusPMSApiClient {
         // Error in request setup
         console.error('Error setting up request to QuotusPMS:', error.message);
         throw new Error(`Failed to send reservation to QuotusPMS: ${error.message}`);
+      }
+    }
+  }
+
+  /**
+   * Fetch initial ARI data from QuotusPMS Partner API
+   */
+  async fetchInitialData(propertyCode: string, startDate: string, endDate: string): Promise<any> {
+    try {
+      console.log('========================================');
+      console.log('📥 Fetching Initial Data from QuotusPMS');
+      console.log('========================================');
+      console.log('Property Code:', propertyCode);
+      console.log('Date Range:', startDate, 'to', endDate);
+
+      // Call the partner API endpoint
+      const response: AxiosResponse = await this.client.get('/property-partner/initial-data', {
+        params: {
+          propertyCode,
+          startDate,
+          endDate
+        }
+      });
+
+      console.log('✅ Initial Data Retrieved Successfully');
+      console.log('Response Status:', response.status);
+      console.log('Data Summary:');
+      console.log('- Rates:', response.data?.data?.rates?.length || 0);
+      console.log('- Rate Plans:', response.data?.data?.rateplan?.length || 0);
+      console.log('- Charges:', response.data?.data?.charges?.length || 0);
+      console.log('========================================');
+
+      return response.data;
+    } catch (error: any) {
+      if (error.response) {
+        console.error('QuotusPMS API Error Response:', error.response.status, error.response.data);
+        throw new Error(
+          `QuotusPMS API Error: ${error.response.status} - ${error.response.data?.message || 'Unknown error'}`
+        );
+      } else if (error.request) {
+        console.error('No response from QuotusPMS:', error.request);
+        throw new Error('No response received from QuotusPMS API');
+      } else {
+        console.error('Error fetching initial data:', error.message);
+        throw new Error(`Failed to fetch initial data: ${error.message}`);
       }
     }
   }

@@ -78,7 +78,7 @@ export class ARIController {
     }
   }
 
-  /**
+    /**
    * Get ARI data for a property (for debugging/testing)
    * GET /api/v1/quotus-pms/ari/:propertyCode
    */
@@ -106,6 +106,75 @@ export class ARIController {
       res.status(500).json({
         success: false,
         message: 'Failed to retrieve ARI data',
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Fetch initial data from QuotusPMS Partner API
+   * POST /api/v1/quotus-pms/fetch-initial-data
+   */
+  async fetchInitialData(req: Request, res: Response): Promise<void> {
+    try {
+      console.log('========================================');
+      console.log('📥 Fetch Initial Data Request Received');
+      console.log('========================================');
+
+      const { propertyCode, startDate, endDate } = req.body;
+
+      // Validate required fields
+      if (!propertyCode || !startDate || !endDate) {
+        res.status(400).json({
+          success: false,
+          message: 'Missing required fields',
+          error: 'propertyCode, startDate, and endDate are required'
+        });
+        return;
+      }
+
+      console.log('Property Code:', propertyCode);
+      console.log('Start Date:', startDate);
+      console.log('End Date:', endDate);
+
+      // Fetch and store initial data
+      const result = await this.service.fetchAndStoreInitialData(propertyCode, startDate, endDate);
+
+      if (result.success) {
+        console.log('✅ Initial Data Fetch Successful');
+        console.log('- Dates Processed:', result.datesProcessed?.length || 0);
+        console.log('- Rate Plans Processed:', result.ratePlansProcessed || 0);
+        console.log('- Inventory Records:', result.inventoryRecordsProcessed || 0);
+        console.log('========================================');
+
+        res.status(200).json({
+          success: true,
+          message: result.message,
+          data: {
+            propertyCode: result.propertyCode,
+            datesProcessed: result.datesProcessed,
+            ratePlansProcessed: result.ratePlansProcessed,
+            inventoryRecordsProcessed: result.inventoryRecordsProcessed
+          }
+        });
+      } else {
+        console.log('❌ Initial Data Fetch Failed');
+        console.log('Errors:', result.errors);
+        console.log('========================================');
+
+        res.status(400).json({
+          success: false,
+          message: result.message,
+          errors: result.errors
+        });
+      }
+    } catch (error: any) {
+      console.error('❌ Fetch Initial Data Controller Error:', error);
+      console.log('========================================');
+
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error while fetching initial data',
         error: error.message
       });
     }

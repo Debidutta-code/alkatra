@@ -19,6 +19,7 @@ import googleAuth from "../customer_authentication/src/api/routes/googleAuthRout
 import appleAuth from "../customer_authentication/src/api/routes/appleAuthRoute";
 import analytics from "../role_based/src/routes/analytics.route";
 import customerReview from "../review_system/route/review.route";
+import AriRoutesQuotusPMS from "../quotusPMS/src/api/routes";
 
 // Referral system routes
 import { ReferralRouter } from "../referral_system/routes";
@@ -73,6 +74,9 @@ export async function initializeExpressRoutes({ app }: { app: Express }) {
 
   // Customer Review 
   app.use("/api/v1/review", customerReview);
+
+  // ARI Route for External PMS
+  app.use('/api/v1/ari', AriRoutesQuotusPMS);
 
 
   app.all("*", (req: Request, _res: Response, next: NextFunction) => {

@@ -39,7 +39,7 @@ export class QuotusPMSReservationController {
 
       if (!reservationInput.guests || reservationInput.guests.length === 0) {
         res.status(400).json({ 
-          error: 'At least one guest is required',
+          error: 'At least one guest is required.........',
           success: false 
         });
         return;

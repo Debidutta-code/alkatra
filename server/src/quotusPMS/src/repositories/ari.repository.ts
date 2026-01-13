@@ -14,6 +14,35 @@ interface RatePlanData {
   dataSource: string;
 }
 
+interface RatePlanDetailedData {
+  hotelCode: string;
+  hotelName: string;
+  invTypeCode: string;
+  ratePlanCode: string;
+  ratePlanName: string;
+  date: Date;
+  currencyCode: string;
+  baseByGuestAmts: Array<{
+    amountBeforeTax: number;
+    numberOfGuests: number;
+  }>;
+  additionalGuestAmounts: Array<{
+    ageQualifyingCode: string;
+    amount: number;
+  }>;
+  days: {
+    mon: boolean;
+    tue: boolean;
+    wed: boolean;
+    thu: boolean;
+    fri: boolean;
+    sat: boolean;
+    sun: boolean;
+  };
+  dataSource: string;
+  restrictions: any;
+}
+
 interface InventoryData {
   hotelCode: string;
   hotelName: string;
@@ -68,7 +97,7 @@ export class ARIRepository {
     }
   }
 
-  /**
+    /**
    * Upsert rate plan data (update if exists, insert if new)
    */
   async upsertRatePlan(data: RatePlanData): Promise<void> {
@@ -128,6 +157,56 @@ export class ARIRepository {
     } catch (error: any) {
       console.error('Error upserting rate plan:', error);
       throw new Error(`Failed to upsert rate plan: ${error.message}`);
+    }
+  }
+
+  /**
+   * Upsert detailed rate plan data with full pricing information
+   */
+  async upsertRatePlanDetailed(data: RatePlanDetailedData): Promise<void> {
+    try {
+      const startDate = new Date(data.date);
+      startDate.setHours(0, 0, 0, 0);
+      
+      const endDate = new Date(data.date);
+      endDate.setHours(23, 59, 59, 999);
+
+      // Create the filter to find existing rate plan
+      const filter = {
+        hotelCode: data.hotelCode,
+        invTypeCode: data.invTypeCode,
+        ratePlanCode: data.ratePlanCode,
+        startDate: startDate,
+        endDate: endDate
+      };
+
+      // Prepare update data
+      const updateData = {
+        hotelCode: data.hotelCode,
+        hotelName: data.hotelName,
+        invTypeCode: data.invTypeCode,
+        ratePlanCode: data.ratePlanCode,
+        startDate: startDate,
+        endDate: endDate,
+        currencyCode: data.currencyCode,
+        baseByGuestAmts: data.baseByGuestAmts,
+        additionalGuestAmounts: data.additionalGuestAmounts,
+        days: data.days,
+        dataSource: data.dataSource,
+        restrictions: data.restrictions || {}
+      };
+
+      // Upsert: update if exists, insert if not
+      await RateAmount.findOneAndUpdate(
+        filter,
+        { $set: updateData },
+        { upsert: true, new: true }
+      );
+
+      console.log(`      ✅ Detailed rate plan upserted: ${data.ratePlanCode}`);
+    } catch (error: any) {
+      console.error('Error upserting detailed rate plan:', error);
+      throw new Error(`Failed to upsert detailed rate plan: ${error.message}`);
     }
   }
 

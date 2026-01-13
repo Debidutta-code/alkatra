@@ -69,7 +69,7 @@ export class QuotusPMSFormatter {
 
     // Validate guests
     if (!reservation.Guests || reservation.Guests.length === 0) {
-      errors.push('At least one guest is required');
+      errors.push('At least one guest is required#########');
     } else {
       reservation.Guests.forEach((guest, index) => {
         if (!guest.firstName || !guest.lastName) {

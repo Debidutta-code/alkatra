@@ -301,6 +301,7 @@ const getRoomsByPropertyId = catchAsync(async (req: Request, res: Response, next
 
 const getRoomsByPropertyId2 = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const { startDate, endDate, hotelCode } = req.body;
+  // console.log(`Start Date: ${startDate}, End Date: ${endDate}, Hotel Code: ${hotelCode}`);
   const propertyInfoId = req.params.id;
   const numberOfRooms = parseInt(req.query.numberOfRooms as string);
 
