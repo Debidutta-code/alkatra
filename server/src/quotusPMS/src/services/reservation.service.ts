@@ -23,9 +23,12 @@ export class QuotusPMSReservationService {
       console.log(input)
       console.log('Processing QuotusPMS reservation...');
       console.log('Property ID:', input.propertyId);
-      console.log('Reservation ID:', input.bookingDetails.reservationId);
+      // console.log('Reservation ID:', input.bookingDetails.reservationId);
 
-      
+      const propertyCode = await this.repository.getPropertyCode(input.propertyId);
+      if (!propertyCode) {
+        throw new Error('Invalid property ID: Property code not found');
+      }
 
       // Step 1: Format reservation data
       const reservation: IQuotusPMSReservation = this.formatter.formatReservation(input);
@@ -45,7 +48,7 @@ export class QuotusPMSReservationService {
       let status: 'pending' | 'confirmed' | 'failed' = 'pending';
 
       try {
-        pmsResponse = await this.apiClient.sendReservation(reservation);
+        pmsResponse = await this.apiClient.sendReservation(reservation, propertyCode);
         status = 'confirmed';
         console.log('Successfully sent to QuotusPMS');
       } catch (apiError: any) {
@@ -60,7 +63,7 @@ export class QuotusPMSReservationService {
       // Step 5: Save to database
       await this.repository.createReservation(
         input.propertyId,
-        input.bookingDetails.reservationId,
+        pmsResponse.data.reservationId,
         reservation,
         requestPayload,
         responsePayload,

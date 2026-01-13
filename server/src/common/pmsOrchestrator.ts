@@ -15,6 +15,8 @@ export class PMSOrchestrator {
     try {
       console.log('PMSOrchestrator: Processing reservation for property:', reservationData);
 
+      console.log("property id is ************ ", propertyId);
+
       // Step 1: Get property information
       const property = await PropertyInfo.findById(propertyId).populate('dataSource');
       
@@ -56,7 +58,7 @@ export class PMSOrchestrator {
           console.log('Routing to QuotusPMS (JSON-based)');
           
           // Get API endpoint and token from data source or config
-          const apiEndpoint = dataSource.apiEndpoint || config.pmsIntegration?.quotusPmsApiUrl;
+          const apiEndpoint = config.pmsIntegration?.quotusPmsApiUrl;
           const accessToken = config.pmsIntegration?.quotusPmsToken;
 
           if (!apiEndpoint) {

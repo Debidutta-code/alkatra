@@ -1,5 +1,6 @@
 import { QuotusPMSReservation, QuotusPMSReservationDocument } from '../models/reservation.model';
 import { IQuotusPMSReservation } from '../interfaces/reservation.interface';
+import { PropertyInfo } from '../../../property_management/src/model';
 
 export class QuotusPMSReservationRepository {
   /**
@@ -76,6 +77,18 @@ export class QuotusPMSReservationRepository {
     } catch (error: any) {
       console.error('Error updating reservation status:', error);
       throw new Error(`Failed to update reservation: ${error.message}`);
+    }
+  }
+
+  async getPropertyCode(
+    propertyId: string
+  ): Promise<string | null> {
+    try {
+      const propertyInfo = await PropertyInfo.findOne({ property_code: propertyId });
+      return propertyInfo ? propertyInfo.property_code.toString() : null;
+    } catch (error: any) {
+      console.error('Error getting property code for reservation:', error);
+      throw new Error(`Failed to get property code: ${error.message}`);
     }
   }
 }

@@ -144,8 +144,7 @@ export class RoomRepository {
         const rates = await RateAmountDateWise.find({
             hotelCode: hotelCode,
             invTypeCode: { $in: roomTypes },
-            startDate: { $gte: "2026-01-12T18:30:00.000+00:00" },
-            endDate: { $lte: "2026-01-12T18:29:59.999+00:00" }
+            startDate: { $gte: startDate, $lt: endDate },
         }).sort({ startDate: 1 });
 
         console.log("Fetched Rates:", rates);
