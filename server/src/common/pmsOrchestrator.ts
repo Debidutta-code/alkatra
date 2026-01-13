@@ -13,7 +13,7 @@ export class PMSOrchestrator {
    */
   static async processReservation(propertyId: string, reservationData: any): Promise<string> {
     try {
-      console.log('PMSOrchestrator: Processing reservation for property:', propertyId);
+      console.log('PMSOrchestrator: Processing reservation for property:', reservationData);
 
       // Step 1: Get property information
       const property = await PropertyInfo.findById(propertyId).populate('dataSource');
@@ -70,8 +70,9 @@ export class PMSOrchestrator {
           const quotusPMSService = new QuotusPMSReservationService(apiEndpoint, accessToken);
           
           // Transform data for QuotusPMS format
+          console.log('Transforming data for QuotusPMS format...', reservationData);
           const quotusReservationInput = this.transformToQuotusPMSFormat(propertyId, reservationData);
-
+          console.log('QuotusPMS reservation input: 74', quotusReservationInput);
           return await quotusPMSService.processReservation(quotusReservationInput);
         }
       }
@@ -84,32 +85,135 @@ export class PMSOrchestrator {
     }
   }
 
-  /**
-   * Transform reservation data to QuotusPMS format
-   */
   private static transformToQuotusPMSFormat(propertyId: string, reservationData: any): any {
-    const bookingDetails = reservationData.bookingDetails || reservationData;
+    console.log('🔍 Raw reservationData received:', JSON.stringify(reservationData, null, 2));
     
-    return {
-      propertyId,
-      bookingDetails: {
-        checkInDate: bookingDetails.checkInDate,
-        checkOutDate: bookingDetails.checkOutDate,
-        reservationId: bookingDetails.reservationId,
-        userId: bookingDetails.userId,
-      },
-      guests: reservationData.guests || [],
-      rooms: reservationData.rooms || reservationData.roomAssociations || [],
-      payment: reservationData.payment || {
-        totalAmount: bookingDetails.roomTotalPrice || 0,
-        paidAmount: bookingDetails.paidAmount || 0,
-        discountedAmount: bookingDetails.discountedAmount || 0,
-        currencyCode: bookingDetails.currencyCode || 'INR',
-        paymentMethod: bookingDetails.paymentMethod || 'none',
-        paymentNote: bookingDetails.paymentNote || null,
-      },
-      additionalNotes: reservationData.additionalNotes || bookingDetails.additionalNotes,
-    };
+    // Check if data is in bookingDetails structure (from existing system)
+    const bookingDetails = reservationData.bookingDetails || {};
+    const isNestedStructure = !!reservationData.bookingDetails;
+    
+    // Extract guests - from bookingDetails.guests or top-level Guests
+    const guestsArray = isNestedStructure 
+      ? (bookingDetails.guests || [])
+      : (reservationData.Guests || reservationData.guests || []);
+    
+    // Get email and phone from bookingDetails or first adult guest
+    const primaryEmail = isNestedStructure 
+      ? bookingDetails.email 
+      : guestsArray.find((g: any) => g.userType === 'adult')?.email || '';
+    
+    const primaryPhone = isNestedStructure 
+      ? bookingDetails.phone 
+      : guestsArray.find((g: any) => g.userType === 'adult')?.phoneNumber || '';
+    
+    console.log('👥 Extracted guests:', guestsArray.length);
+    
+    // Transform to output format
+    const result: any = {};
+    
+    // Extract dates
+    if (isNestedStructure) {
+      if (bookingDetails.checkInDate) result.from = new Date(bookingDetails.checkInDate).toISOString();
+      if (bookingDetails.checkOutDate) result.to = new Date(bookingDetails.checkOutDate).toISOString();
+    } else {
+      if (reservationData.from) result.from = reservationData.from;
+      if (reservationData.to) result.to = reservationData.to;
+    }
+    
+    if (reservationData.bookedAt) result.bookedAt = reservationData.bookedAt;
+    
+    // Payment info
+    const totalAmount = isNestedStructure 
+      ? bookingDetails.roomTotalPrice 
+      : reservationData.totalAmount;
+    
+    const paidAmount = isNestedStructure 
+      ? bookingDetails.paidAmount 
+      : reservationData.paidAmount;
+    
+    const discountedAmount = isNestedStructure 
+      ? bookingDetails.discountedAmount 
+      : reservationData.discountedAmount;
+    
+    if (totalAmount !== undefined) result.totalAmount = totalAmount;
+    if (paidAmount !== undefined) result.paidAmount = paidAmount;
+    if (discountedAmount !== undefined) result.discountedAmount = discountedAmount;
+    
+    const paymentNote = isNestedStructure 
+      ? bookingDetails.paymentNote 
+      : reservationData.paymentNote;
+    if (paymentNote) result.paymentNote = paymentNote;
+    
+    const currencyCode = isNestedStructure 
+      ? bookingDetails.currencyCode 
+      : reservationData.currencyCode;
+    if (currencyCode) result.currencyCode = currencyCode;
+    
+    const paymentMethod = isNestedStructure 
+      ? bookingDetails.paymentMethod 
+      : reservationData.paymentMethod;
+    if (paymentMethod) result.paymentMethod = paymentMethod;
+    
+    // Map guests with email for each
+    result.Guests = guestsArray.map((guest: any) => {
+      const mappedGuest: any = {};
+      if (guest.firstName) mappedGuest.firstName = guest.firstName;
+      if (guest.lastName) mappedGuest.lastName = guest.lastName;
+      
+      // Use individual guest email if exists, otherwise use primary email
+      mappedGuest.email = guest.email || primaryEmail;
+      
+      if (guest.phoneNumber) mappedGuest.phoneNumber = guest.phoneNumber;
+      if (guest.userType || guest.type) mappedGuest.userType = guest.userType || guest.type;
+      if (guest.country) mappedGuest.country = guest.country;
+      if (guest.address) mappedGuest.address = guest.address;
+      if (guest.city) mappedGuest.city = guest.city;
+      if (guest.state) mappedGuest.state = guest.state;
+      if (guest.zipCode) mappedGuest.zipCode = guest.zipCode;
+      if (guest.identityCardType) mappedGuest.identityCardType = guest.identityCardType;
+      if (guest.identityCardNumber) mappedGuest.identityCardNumber = guest.identityCardNumber;
+      return mappedGuest;
+    });
+    
+    // Map rooms
+    if (isNestedStructure) {
+      // Build room from bookingDetails
+      const room: any = {};
+      if (bookingDetails.roomTypeCode) room.roomCode = bookingDetails.roomTypeCode;
+      if (bookingDetails.ratePlanCode) room.ratePlanCode = bookingDetails.ratePlanCode;
+      if (bookingDetails.numberOfRooms !== undefined) room.noOfRooms = bookingDetails.numberOfRooms;
+      
+      // Calculate occupancy from ageCodeSummary if available
+      const ageCodeSummary = reservationData.ageCodeSummary || {};
+      if (ageCodeSummary['10'] !== undefined) room.noOfAdults = ageCodeSummary['10'];
+      if (ageCodeSummary['8'] !== undefined) room.noOfChildren = ageCodeSummary['8'];
+      if (ageCodeSummary['7'] !== undefined) room.noOfInfants = ageCodeSummary['7'];
+      
+      result.Rooms = [room];
+    } else {
+      // Use existing Rooms array
+      const roomsArray = reservationData.Rooms || reservationData.rooms || [];
+      result.Rooms = roomsArray.map((room: any) => {
+        const mappedRoom: any = {};
+        if (room.roomCode) mappedRoom.roomCode = room.roomCode;
+        if (room.roomName) mappedRoom.roomName = room.roomName;
+        if (room.ratePlanCode) mappedRoom.ratePlanCode = room.ratePlanCode;
+        if (room.ratePlanName) mappedRoom.ratePlanName = room.ratePlanName;
+        if (room.noOfRooms !== undefined) mappedRoom.noOfRooms = room.noOfRooms;
+        if (room.noOfAdults !== undefined) mappedRoom.noOfAdults = room.noOfAdults;
+        if (room.noOfChildren !== undefined) mappedRoom.noOfChildren = room.noOfChildren;
+        if (room.noOfInfants !== undefined) mappedRoom.noOfInfants = room.noOfInfants;
+        return mappedRoom;
+      });
+    }
+    
+    const additionalNotes = isNestedStructure 
+      ? bookingDetails.additionalNotes 
+      : reservationData.additionalNotes;
+    if (additionalNotes) result.additionalNotes = additionalNotes;
+    
+    console.log('✅ Transformed result:', JSON.stringify(result, null, 2));
+    return result;
   }
 
   /**

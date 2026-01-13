@@ -55,7 +55,7 @@ export class QuotusPMSFormatter {
    */
   validateReservation(reservation: IQuotusPMSReservation): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
-
+    console.log('Validating reservation:', reservation);
     // Validate dates
     if (!(reservation.from instanceof Date) || isNaN(reservation.from.getTime())) {
       errors.push('Invalid check-in date');

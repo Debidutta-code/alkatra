@@ -20,13 +20,14 @@ export class QuotusPMSReservationService {
    */
   async processReservation(input: IReservationInput): Promise<string> {
     try {
+      console.log(input)
       console.log('Processing QuotusPMS reservation...');
       console.log('Property ID:', input.propertyId);
       console.log('Reservation ID:', input.bookingDetails.reservationId);
 
       // Step 1: Format reservation data
       const reservation: IQuotusPMSReservation = this.formatter.formatReservation(input);
-
+      console.log("Data for validation:", reservation);
       // Step 2: Validate reservation data
       const validation = this.formatter.validateReservation(reservation);
       if (!validation.valid) {

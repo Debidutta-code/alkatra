@@ -7,8 +7,8 @@ export class QuotusPMSApiClient {
   private accessToken: string;
 
   constructor(apiEndpoint?: string, accessToken?: string) {
-    this.apiEndpoint = apiEndpoint || process.env.QUOTUS_PMS_API || 'http://localhost:8080/api/v1';
-    this.accessToken = accessToken || process.env.QUOTUS_PMS_TOKEN || '';
+    this.apiEndpoint = apiEndpoint || process.env.PMS_URL || 'http://localhost:8080/api/v1';
+    this.accessToken = accessToken || process.env.QUOTUS_PMS_TOKEN || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFsaGF6akBnbWFpbC5jb20iLCJwYXJ0bmVyQ29kZSI6IlBBUlRORVItMTc2ODIwMTE1NjAzNCIsImlhdCI6MTc2ODIwMTE1Nn0.sz5YQKih-L9Vnl6NbOMCGo_fR6pT9t6ao557Qet4dX0';
     
     this.client = axios.create({
       baseURL: this.apiEndpoint,
@@ -31,7 +31,7 @@ export class QuotusPMSApiClient {
       console.log('Sending reservation to QuotusPMS:', this.apiEndpoint);
       console.log('Reservation data:', JSON.stringify(reservation, null, 2));
 
-      const response: AxiosResponse = await this.client.post('', reservation);
+      const response: AxiosResponse = await this.client.post(process.env.PMS_URL, reservation);
 
       console.log('QuotusPMS Response:', response.status, response.data);
       return response.data;

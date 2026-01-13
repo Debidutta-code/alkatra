@@ -76,6 +76,7 @@ export class QuotusPMSReservationController {
       }
 
       // Process reservation
+      console.log('Processing reservation in controller:', reservationInput);
       const reservationId = await this.service.processReservation(reservationInput);
 
       res.status(201).json({

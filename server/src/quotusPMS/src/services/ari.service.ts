@@ -50,18 +50,18 @@ export class ARIService {
         if (typeof item.available !== 'number') {
           errors.push(`inventory[${index}]: available must be a number`);
         }
-        if (!item.rates || !Array.isArray(item.rates)) {
-          errors.push(`inventory[${index}]: rates array is required`);
-        } else {
-          item.rates.forEach((rate, rateIndex) => {
-            if (!rate.ratePlanCode) {
-              errors.push(`inventory[${index}].rates[${rateIndex}]: ratePlanCode is required`);
-            }
-            if (typeof rate.baseRate !== 'number') {
-              errors.push(`inventory[${index}].rates[${rateIndex}]: baseRate must be a number`);
-            }
-          });
-        }
+        // if (!item.rates || !Array.isArray(item.rates)) {
+        //   errors.push(`inventory[${index}]: rates array is required`);
+        // } else {
+        //   item.rates.forEach((rate, rateIndex) => {
+        //     if (!rate.ratePlanCode) {
+        //       errors.push(`inventory[${index}].rates[${rateIndex}]: ratePlanCode is required`);
+        //     }
+        //     if (typeof rate.baseRate !== 'number') {
+        //       errors.push(`inventory[${index}].rates[${rateIndex}]: baseRate must be a number`);
+        //     }
+        //   });
+        // }
       });
     }
 
