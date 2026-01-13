@@ -20,7 +20,7 @@ export class QuotusPMSReservationService {
    */
   async processReservation(input: IReservationInput): Promise<string> {
     try {
-      console.log(input)
+      console.log('📥 Input received in QuotusPMS service:', JSON.stringify(input, null, 2));
       console.log('Processing QuotusPMS reservation...');
       console.log('Property ID:', input.propertyId);
       // console.log('Reservation ID:', input.bookingDetails.reservationId);
@@ -31,7 +31,42 @@ export class QuotusPMSReservationService {
       }
 
       // Step 1: Format reservation data
-      const reservation: IQuotusPMSReservation = this.formatter.formatReservation(input);
+      console.log('🔄 About to call formatter.formatReservation with input:', {
+        propertyId: input.propertyId,
+        hasBookingDetails: !!input.bookingDetails,
+        hasRooms: !!input.rooms,
+        roomsCount: input.rooms?.length,
+        hasGuests: !!(input.bookingDetails as any).guests,
+        guestsCount: (input.bookingDetails as any).guests?.length,
+        reservationId: input.bookingDetails?.reservationId
+      });
+      
+      // Temporary: Log the exact structure the formatter will receive
+      console.log('📋 Full input structure:');
+      console.log('  - input.propertyId:', input.propertyId);
+      console.log('  - input.bookingDetails:', typeof input.bookingDetails);
+      console.log('  - input.rooms:', Array.isArray(input.rooms), input.rooms?.length);
+      console.log('  - input.ageCodeSummary:', "10");
+      
+      let reservation: IQuotusPMSReservation;
+      try {
+        reservation = this.formatter.formatReservation(input);
+      } catch (formatError: any) {
+        console.error('❌ Formatter error details:', formatError);
+        console.error('Stack:', formatError.stack);
+        console.error('Error message:', formatError.message);
+        console.error('Input keys:', Object.keys(input));
+        console.error('BookingDetails keys:', Object.keys(input.bookingDetails));
+        console.error('Input at time of error:', JSON.stringify(input, null, 2));
+        
+        // Try to identify which field is undefined
+        console.error('Checking fields:');
+        console.error('  - input.bookingDetails.guests:', input.bookingDetails ? (input.bookingDetails as any).guests : 'bookingDetails is undefined');
+        console.error('  - input.rooms:', input.rooms);
+        
+        throw formatError;
+      }
+      
       console.log("Data for validation:", reservation);
       // Step 2: Validate reservation data
       const validation = this.formatter.validateReservation(reservation);

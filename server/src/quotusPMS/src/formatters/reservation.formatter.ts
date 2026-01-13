@@ -5,12 +5,15 @@ export class QuotusPMSFormatter {
    * Convert internal reservation input to QuotusPMS format
    */
   formatReservation(input: IReservationInput): IQuotusPMSReservation {
+    // Extract guests from bookingDetails.guests or root level guests (for backward compatibility)
+    const guestsSource = (input.bookingDetails as any)?.guests || input.guests || [];
+    
     // Format guests
-    const guests: IGuest[] = input.guests.map((guest) => ({
+    const guests: IGuest[] = guestsSource.map((guest) => ({
       firstName: guest.firstName,
       lastName: guest.lastName,
-      email: guest.email || null,
-      phoneNumber: guest.phone || null,
+      email: guest.email || (guest as any).phoneNumber || null,
+      phoneNumber: (guest as any).phoneNumber || (guest as any).phone || null,
       userType: guest.userType,
       address: guest.address || null,
       city: guest.city || null,
@@ -19,17 +22,29 @@ export class QuotusPMSFormatter {
       zipCode: guest.zipCode || null,
     }));
 
+    // Extract rooms from input.rooms
+    const roomsSource = input.rooms || [];
+    
     // Format rooms
-    const rooms: IRoom[] = input.rooms.map((room) => ({
-      noOfRooms: room.numberOfRooms,
-      ratePlanCode: room.ratePlanCode,
-      roomCode: room.roomTypeCode,
-      roomName: room.roomTypeName,
-      ratePlanName: room.ratePlanName,
-      noOfAdults: room.numberOfAdults,
-      noOfChildren: room.numberOfChildren,
-      noOfInfants: room.numberOfInfants,
+    const rooms: IRoom[] = roomsSource.map((room) => ({
+      noOfRooms: (room as any).noOfRooms || (room as any).numberOfRooms || 1,
+      ratePlanCode: room.ratePlanCode || '',
+      roomCode: (room as any).roomCode || (room as any).roomTypeCode || '',
+      roomName: (room as any).roomName || (room as any).roomTypeName || '',
+      ratePlanName: room.ratePlanName || '',
+      noOfAdults: (room as any).noOfAdults || (room as any).numberOfAdults || 0,
+      noOfChildren: (room as any).noOfChildren || (room as any).numberOfChildren || 0,
+      noOfInfants: (room as any).noOfInfants || (room as any).numberOfInfants || 0,
     }));
+
+    // Extract payment info from bookingDetails or payment object (for backward compatibility)
+    const totalAmount = (input.bookingDetails as any)?.roomTotalPrice || input.payment?.totalAmount || 0;
+    const paidAmount = (input.bookingDetails as any)?.paidAmount || input.payment?.paidAmount || 0;
+    const discountedAmount = (input.bookingDetails as any)?.discountedAmount || input.payment?.discountedAmount || 0;
+    const currencyCode = (input.bookingDetails as any)?.currencyCode || input.payment?.currencyCode || 'INR';
+    const paymentMethod = (input.bookingDetails as any)?.paymentMethod || input.payment?.paymentMethod || 'none';
+    const paymentNote = (input.bookingDetails as any)?.paymentNote || input.payment?.paymentNote || null;
+    const additionalNotes = (input.bookingDetails as any)?.additionalNotes || input.additionalNotes || null;
 
     // Create QuotusPMS reservation object
     const reservation: IQuotusPMSReservation = {
@@ -37,14 +52,14 @@ export class QuotusPMSFormatter {
       to: new Date(input.bookingDetails.checkOutDate),
       Guests: guests,
       bookedAt: new Date(),
-      totalAmount: input.payment.totalAmount,
-      paidAmount: input.payment.paidAmount,
-      discountedAmount: input.payment.discountedAmount,
-      paymentNote: input.payment.paymentNote || null,
-      currencyCode: input.payment.currencyCode,
-      paymentMethod: input.payment.paymentMethod,
+      totalAmount,
+      paidAmount,
+      discountedAmount,
+      paymentNote,
+      currencyCode: currencyCode as any,
+      paymentMethod: paymentMethod as any,
       Rooms: rooms,
-      additionalNotes: input.additionalNotes || null,
+      additionalNotes,
     };
 
     return reservation;
