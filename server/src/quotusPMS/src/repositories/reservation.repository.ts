@@ -80,12 +80,18 @@ export class QuotusPMSReservationRepository {
     }
   }
 
-  async getPropertyCode(
-    propertyId: string
-  ): Promise<string | null> {
+  async getPropertyCode(propertyId: string): Promise<string | null> {
     try {
-      const propertyInfo = await PropertyInfo.findOne({ property_code: propertyId });
-      return propertyInfo ? propertyInfo.property_code.toString() : null;
+      // ✅ FIX: Search by MongoDB _id, not by property_code
+      const propertyInfo = await PropertyInfo.findById(propertyId);
+
+      if (!propertyInfo) {
+        console.error(`Property not found for ID: ${propertyId}`);
+        return null;
+      }
+
+      console.log(`Found property: ${propertyInfo.property_name}, code: ${propertyInfo.property_code}`);
+      return propertyInfo.property_code.toString();
     } catch (error: any) {
       console.error('Error getting property code for reservation:', error);
       throw new Error(`Failed to get property code: ${error.message}`);

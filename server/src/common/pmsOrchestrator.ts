@@ -19,7 +19,7 @@ export class PMSOrchestrator {
 
       // Step 1: Get property information
       const property = await PropertyInfo.findById(propertyId).populate('dataSource');
-      
+
       if (!property) {
         throw new Error(`Property not found: ${propertyId}`);
       }
@@ -56,7 +56,7 @@ export class PMSOrchestrator {
 
         if (dataSource.name === 'QuotusPMS') {
           console.log('Routing to QuotusPMS (JSON-based)');
-          
+
           // Get API endpoint and token from data source or config
           const apiEndpoint = config.pmsIntegration?.quotusPmsApiUrl;
           const accessToken = config.pmsIntegration?.quotusPmsToken;
@@ -70,7 +70,7 @@ export class PMSOrchestrator {
           }
 
           const quotusPMSService = new QuotusPMSReservationService(apiEndpoint, accessToken);
-          
+
           // Transform data for QuotusPMS format
           console.log('Transforming data for QuotusPMS format...', reservationData);
           const quotusReservationInput = this.transformToQuotusPMSFormat(propertyId, reservationData);
@@ -89,30 +89,33 @@ export class PMSOrchestrator {
 
   private static transformToQuotusPMSFormat(propertyId: string, reservationData: any): any {
     console.log('🔍 Raw reservationData received:', JSON.stringify(reservationData, null, 2));
-    
+    console.log('🔑 PropertyId received in transformer:', propertyId); // Added debug log
+
     // Check if data is in bookingDetails structure (from existing system)
     const bookingDetails = reservationData.bookingDetails || {};
     const isNestedStructure = !!reservationData.bookingDetails;
-    
+
     // Extract guests - from bookingDetails.guests or top-level Guests
-    const guestsArray = isNestedStructure 
+    const guestsArray = isNestedStructure
       ? (bookingDetails.guests || [])
       : (reservationData.Guests || reservationData.guests || []);
-    
+
     // Get email and phone from bookingDetails or first adult guest
-    const primaryEmail = isNestedStructure 
-      ? bookingDetails.email 
+    const primaryEmail = isNestedStructure
+      ? bookingDetails.email
       : guestsArray.find((g: any) => g.userType === 'adult')?.email || '';
-    
-    const primaryPhone = isNestedStructure 
-      ? bookingDetails.phone 
+
+    const primaryPhone = isNestedStructure
+      ? bookingDetails.phone
       : guestsArray.find((g: any) => g.userType === 'adult')?.phoneNumber || '';
-    
+
     console.log('👥 Extracted guests:', guestsArray.length);
-    
-    // Transform to output format
-    const result: any = {};
-    
+
+    // Transform to output format - START WITH PROPERTY ID
+    const result: any = {
+      propertyId: propertyId  // ✅ CRITICAL: Add propertyId first
+    };
+
     // Extract dates
     if (isNestedStructure) {
       if (bookingDetails.checkInDate) result.from = new Date(bookingDetails.checkInDate).toISOString();
@@ -121,50 +124,50 @@ export class PMSOrchestrator {
       if (reservationData.from) result.from = reservationData.from;
       if (reservationData.to) result.to = reservationData.to;
     }
-    
+
     if (reservationData.bookedAt) result.bookedAt = reservationData.bookedAt;
-    
+
     // Payment info
-    const totalAmount = isNestedStructure 
-      ? bookingDetails.roomTotalPrice 
+    const totalAmount = isNestedStructure
+      ? bookingDetails.roomTotalPrice
       : reservationData.totalAmount;
-    
-    const paidAmount = isNestedStructure 
-      ? bookingDetails.paidAmount 
+
+    const paidAmount = isNestedStructure
+      ? bookingDetails.paidAmount
       : reservationData.paidAmount;
-    
-    const discountedAmount = isNestedStructure 
-      ? bookingDetails.discountedAmount 
+
+    const discountedAmount = isNestedStructure
+      ? bookingDetails.discountedAmount
       : reservationData.discountedAmount;
-    
+
     if (totalAmount !== undefined) result.totalAmount = totalAmount;
     if (paidAmount !== undefined) result.paidAmount = paidAmount;
     if (discountedAmount !== undefined) result.discountedAmount = discountedAmount;
-    
-    const paymentNote = isNestedStructure 
-      ? bookingDetails.paymentNote 
+
+    const paymentNote = isNestedStructure
+      ? bookingDetails.paymentNote
       : reservationData.paymentNote;
     if (paymentNote) result.paymentNote = paymentNote;
-    
-    const currencyCode = isNestedStructure 
-      ? bookingDetails.currencyCode 
+
+    const currencyCode = isNestedStructure
+      ? bookingDetails.currencyCode
       : reservationData.currencyCode;
     if (currencyCode) result.currencyCode = currencyCode;
-    
-    const paymentMethod = isNestedStructure 
-      ? bookingDetails.paymentMethod 
+
+    const paymentMethod = isNestedStructure
+      ? bookingDetails.paymentMethod
       : reservationData.paymentMethod;
     if (paymentMethod) result.paymentMethod = paymentMethod;
-    
+
     // Map guests with email for each
     result.Guests = guestsArray.map((guest: any) => {
       const mappedGuest: any = {};
       if (guest.firstName) mappedGuest.firstName = guest.firstName;
       if (guest.lastName) mappedGuest.lastName = guest.lastName;
-      
+
       // Use individual guest email if exists, otherwise use primary email
       mappedGuest.email = guest.email || primaryEmail;
-      
+
       if (guest.phoneNumber) mappedGuest.phoneNumber = guest.phoneNumber;
       if (guest.userType || guest.type) mappedGuest.userType = guest.userType || guest.type;
       if (guest.country) mappedGuest.country = guest.country;
@@ -176,7 +179,7 @@ export class PMSOrchestrator {
       if (guest.identityCardNumber) mappedGuest.identityCardNumber = guest.identityCardNumber;
       return mappedGuest;
     });
-    
+
     // Map rooms
     if (isNestedStructure) {
       // Build room from bookingDetails
@@ -184,13 +187,13 @@ export class PMSOrchestrator {
       if (bookingDetails.roomTypeCode) room.roomCode = bookingDetails.roomTypeCode;
       if (bookingDetails.ratePlanCode) room.ratePlanCode = bookingDetails.ratePlanCode;
       if (bookingDetails.numberOfRooms !== undefined) room.noOfRooms = bookingDetails.numberOfRooms;
-      
+
       // Calculate occupancy from ageCodeSummary if available
       const ageCodeSummary = reservationData.ageCodeSummary || {};
       if (ageCodeSummary['10'] !== undefined) room.noOfAdults = ageCodeSummary['10'];
       if (ageCodeSummary['8'] !== undefined) room.noOfChildren = ageCodeSummary['8'];
       if (ageCodeSummary['7'] !== undefined) room.noOfInfants = ageCodeSummary['7'];
-      
+
       result.Rooms = [room];
     } else {
       // Use existing Rooms array
@@ -208,13 +211,14 @@ export class PMSOrchestrator {
         return mappedRoom;
       });
     }
-    
-    const additionalNotes = isNestedStructure 
-      ? bookingDetails.additionalNotes 
+
+    const additionalNotes = isNestedStructure
+      ? bookingDetails.additionalNotes
       : reservationData.additionalNotes;
     if (additionalNotes) result.additionalNotes = additionalNotes;
-    
+
     console.log('✅ Transformed result:', JSON.stringify(result, null, 2));
+    console.log('🔑 Verify propertyId in result:', result.propertyId); // Added debug log
     return result;
   }
 
@@ -224,7 +228,7 @@ export class PMSOrchestrator {
   static async getPropertyPMSConfig(propertyId: string) {
     try {
       const property = await PropertyInfo.findById(propertyId).populate('dataSource');
-      
+
       if (!property || !property.dataSource) {
         return null;
       }

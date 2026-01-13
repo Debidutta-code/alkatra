@@ -77,7 +77,7 @@ export const config = {
     // PMS Integration
     pmsIntegration: {
         wincloudApiUrl: env.WINCLOUD_TEST_API as string,
-        quotusPmsApiUrl: env.QUOTUS_PMS_API as string,
+        quotusPmsApiUrl: env.PMS_URL as string,
         quotusPmsToken: env.QUOTUS_PMS_TOKEN as string,
     }
     

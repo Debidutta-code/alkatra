@@ -20,6 +20,8 @@ export class QuotusPMSReservationController {
       console.log('QuotusPMS Controller - Received reservation request');
       console.log('Request body:', JSON.stringify(reservationInput, null, 2));
 
+      console.log("property id in controller is ********** ", reservationInput.propertyId);
+
       // Validate required fields
       if (!reservationInput.propertyId) {
         res.status(400).json({ 
