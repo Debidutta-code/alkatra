@@ -25,6 +25,8 @@ export class QuotusPMSReservationService {
       console.log('Property ID:', input.propertyId);
       console.log('Reservation ID:', input.bookingDetails.reservationId);
 
+      
+
       // Step 1: Format reservation data
       const reservation: IQuotusPMSReservation = this.formatter.formatReservation(input);
       console.log("Data for validation:", reservation);
