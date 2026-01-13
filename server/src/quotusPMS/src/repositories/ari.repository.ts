@@ -97,16 +97,17 @@ export class ARIRepository {
     }
   }
 
-    /**
-   * Upsert rate plan data (update if exists, insert if new)
-   */
-  async upsertRatePlan(data: RatePlanData): Promise<void> {
+  /**
+ * Upsert rate plan data (update if exists, insert if new)
+ */
+    async upsertRatePlan(data: RatePlanData): Promise<void> {
     try {
       const startDate = new Date(data.date);
       startDate.setHours(0, 0, 0, 0);
       
       const endDate = new Date(data.date);
-      endDate.setHours(23, 59, 59, 999);
+      endDate.setDate(endDate.getDate() + 1);
+      endDate.setHours(0, 0, 0, 0);
 
       // Create the filter to find existing rate plan
       const filter = {
@@ -169,7 +170,8 @@ export class ARIRepository {
       startDate.setHours(0, 0, 0, 0);
       
       const endDate = new Date(data.date);
-      endDate.setHours(23, 59, 59, 999);
+      endDate.setDate(endDate.getDate() + 1);
+      endDate.setHours(0, 0, 0, 0);
 
       // Create the filter to find existing rate plan
       const filter = {
@@ -217,9 +219,9 @@ export class ARIRepository {
     try {
       const startDate = new Date(data.date);
       startDate.setHours(0, 0, 0, 0);
-      
+
       const endDate = new Date(data.date);
-      endDate.setHours(23, 59, 59, 999);
+      endDate.setHours(0, 0, 0, 0);
 
       const filter = {
         hotelCode: data.hotelCode,
