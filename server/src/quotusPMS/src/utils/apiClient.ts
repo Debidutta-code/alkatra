@@ -32,7 +32,7 @@ export class QuotusPMSApiClient {
       console.log('Reservation data:', JSON.stringify(reservation, null, 2));
 
       const response: AxiosResponse = await axios.post(
-        `${this.apiEndpoint}/partners/reservations/${propertyCode}`,
+        `${this.apiEndpoint}${propertyCode}`,
         reservation,
         {
           headers: {

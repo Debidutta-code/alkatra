@@ -219,7 +219,7 @@ export class ARIRepository {
       startDate.setHours(0, 0, 0, 0);
 
       const endDate = new Date(data.date);
-      endDate.setHours(23, 59, 59, 999);
+      endDate.setHours(0, 0, 0, 0);
 
       const filter = {
         hotelCode: data.hotelCode,

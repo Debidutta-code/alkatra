@@ -15,6 +15,8 @@ export class PMSOrchestrator {
     try {
       console.log('PMSOrchestrator: Processing reservation for property:', reservationData);
 
+      console.log("propertyid in pms orchestrator:", propertyId);
+      
       // Step 1: Get property information
       const property = await PropertyInfo.findById(propertyId).populate('dataSource');
       
