@@ -2,7 +2,7 @@ import { QuotusPMSFormatter } from '../formatters/reservation.formatter';
 import { QuotusPMSReservationRepository } from '../repositories/reservation.repository';
 import { QuotusPMSApiClient } from '../utils/apiClient';
 import { IReservationInput, IQuotusPMSReservation } from '../interfaces/reservation.interface';
-
+import { PropertyInfo } from '../../../property_management/src/model';
 export class QuotusPMSReservationService {
   private formatter: QuotusPMSFormatter;
   private repository: QuotusPMSReservationRepository;
@@ -81,7 +81,7 @@ export class QuotusPMSReservationService {
       // Step 4: Send to QuotusPMS
       let pmsResponse: any;
       let status: 'pending' | 'confirmed' | 'failed' = 'pending';
-
+      const propertyInfo = await PropertyInfo.findById(input.propertyId);
       try {
         pmsResponse = await this.apiClient.sendReservation(reservation, propertyCode);
         status = 'confirmed';

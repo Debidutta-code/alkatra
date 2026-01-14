@@ -13,7 +13,7 @@ export class QuotusPMSFormatter {
       firstName: guest.firstName,
       lastName: guest.lastName,
       email: guest.email || (guest as any).phoneNumber || null,
-      phoneNumber: (guest as any).phoneNumber || (guest as any).phone || null,
+      phoneNumber: "1111111111",
       userType: guest.userType,
       address: guest.address || null,
       city: guest.city || null,
