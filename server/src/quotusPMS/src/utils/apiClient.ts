@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { IQuotusPMSReservation } from '../interfaces/reservation.interface';
+import { IQuotusPMSAmendRequest, IQuotusPMSAmendResponse } from '../interfaces/amend.interface';
 
 export class QuotusPMSApiClient {
   private client: AxiosInstance;
@@ -104,6 +105,43 @@ export class QuotusPMSApiClient {
       } else {
         console.error('Error fetching initial data:', error.message);
         throw new Error(`Failed to fetch initial data: ${error.message}`);
+      }
+    }
+  }
+
+   /**
+   * Amend/Update reservation in QuotusPMS
+   */
+  async amendReservation(amendRequest: IQuotusPMSAmendRequest): Promise<IQuotusPMSAmendResponse> {
+    try {
+      console.log('Sending amendment request to QuotusPMS');
+      console.log('Amendment data:', JSON.stringify(amendRequest, null, 2));
+
+      const response: AxiosResponse = await axios.post(
+        `${this.apiEndpoint}amend`,
+        amendRequest,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-partner-access-token': this.accessToken,
+          },
+        }
+      );
+
+      console.log('QuotusPMS Amendment Response:', response.status, response.data);
+      return response.data;
+    } catch (error: any) {
+      if (error.response) {
+        console.error('QuotusPMS Amendment API Error Response:', error.response.status, error.response.data);
+        throw new Error(
+          `QuotusPMS Amendment API Error: ${error.response.status} - ${JSON.stringify(error.response.data)}`
+        );
+      } else if (error.request) {
+        console.error('No response from QuotusPMS for amendment:', error.request);
+        throw new Error('No response received from QuotusPMS Amendment API');
+      } else {
+        console.error('Error setting up amendment request to QuotusPMS:', error.message);
+        throw new Error(`Failed to send amendment to QuotusPMS: ${error.message}`);
       }
     }
   }

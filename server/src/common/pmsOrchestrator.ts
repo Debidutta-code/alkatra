@@ -337,7 +337,7 @@ export class PMSOrchestrator {
    */
   static async processAmendReservation(propertyId: string, amendReservationData: any): Promise<string> {
     try {
-      console.log('PMSOrchestrator: Processing amend reservation for property:', propertyId);
+      console.log('PMSOrchestrator: Processing amendment for property:', amendReservationData);
 
       // Step 1: Get property information
       const property = await PropertyInfo.findById(propertyId).populate('dataSource');
@@ -363,15 +363,37 @@ export class PMSOrchestrator {
         return await this.processInternalAmendment(amendReservationData);
       }
 
-      // For external PMS (Wincloud, QuotusPMS, etc.), use their amend services
-      if (dataSource.type === 'PMS' || dataSource.name === 'Wincloud') {
-        console.log('Routing amend to external PMS');
-        const { ThirdPartyAmendReservationService } = await import('../wincloud/src/service/amendReservationService');
-        const wincloudAmendService = new ThirdPartyAmendReservationService();
-        return await wincloudAmendService.processAmendReservation(amendReservationData);
+            // For external PMS (Wincloud, QuotusPMS, etc.), use their amend services
+      if (dataSource.type === 'PMS' || dataSource.name === 'Wincloud' || dataSource.name === 'QuotusPMS') {
+        if (dataSource.name === 'Wincloud') {
+          console.log('Routing amend to Wincloud PMS');
+          const { ThirdPartyAmendReservationService } = await import('../wincloud/src/service/amendReservationService');
+          const wincloudAmendService = new ThirdPartyAmendReservationService();
+          return await wincloudAmendService.processAmendReservation(amendReservationData);
+        }
+
+        if (dataSource.name === 'QuotusPMS') {
+          console.log('Routing amend to QuotusPMS');
+          
+          // Get API endpoint and token from data source or config
+          const apiEndpoint = dataSource.apiEndpoint || config.pmsIntegration?.quotusPmsApiUrl;
+          const accessToken = config.pmsIntegration?.quotusPmsToken;
+
+          if (!apiEndpoint) {
+            throw new Error('QuotusPMS API endpoint not configured');
+          }
+
+          if (!accessToken) {
+            console.warn('⚠️ QuotusPMS access token not configured');
+          }
+
+          const { QuotusPMSAmendService } = await import('../quotusPMS/src/services/amend.service');
+          const quotusPMSAmendService = new QuotusPMSAmendService(apiEndpoint, accessToken);
+          
+          return await quotusPMSAmendService.processAmendReservation(propertyId, amendReservationData);
+        }
       }
 
-      // QuotusPMS and other PMS types would be handled here
       throw new Error(`Amendment not yet supported for PMS type: ${dataSource.name}`);
     } catch (error: any) {
       console.error('PMSOrchestrator Amend Error:', error);

@@ -222,6 +222,8 @@ export class AmendBookingService {
    */
   async amendReservationWithThirdParty(amendReservationInput: AmendReservationInput): Promise<void> {
     try {
+
+      console.log("amendreservationInput data is: ", amendReservationInput);
       // Get property ID from hotel code
       const property = await PropertyInfo.findOne({ property_code: amendReservationInput.bookingDetails.hotelCode });
       
