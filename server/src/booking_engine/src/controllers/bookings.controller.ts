@@ -1637,6 +1637,8 @@ const getBookingQuery = async (query: any, skip: number, limit: number) => {
     ThirdPartyBooking.find(query).skip(skip).limit(limit).sort({ createdAt: -1 }),
     ThirdPartyBooking.countDocuments(query),
   ]);
+
+  console.log("Booking details fetched in booking controller:", bookingDetails);
   return { bookingDetails, count };
 };
 
@@ -1689,7 +1691,11 @@ export const getBookingDetailsForExtranet = CatchAsyncError(async (req: CustomRe
         throw new Error('No properties found for the hotel manager');
       }
 
+      console.log("Properties found for hotel manager:", properties);
+
       const propertyCodes = properties.map(property => property.property_code);
+
+      console.log("Property codes for hotel manager:", propertyCodes);
       const result = await getBookingQuery({ hotelCode: { $in: propertyCodes } }, skip, limit);
       bookingDetails = result.bookingDetails;
       count = result.count;

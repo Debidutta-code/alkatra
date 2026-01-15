@@ -60,7 +60,7 @@ interface IReservationLog extends Document {
 const guestDetailsSchema = new Schema<IGuestDetails>({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    dob: {type: String, required: true},
+    dob: {type: String, required: false},
 });
 
 const thirdPartyBookingSchema = new Schema<IThirdPartyBooking>({

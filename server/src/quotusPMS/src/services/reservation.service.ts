@@ -3,6 +3,7 @@ import { QuotusPMSReservationRepository } from '../repositories/reservation.repo
 import { QuotusPMSApiClient } from '../utils/apiClient';
 import { IReservationInput, IQuotusPMSReservation } from '../interfaces/reservation.interface';
 import { PropertyInfo } from '../../../property_management/src/model';
+import { ThirdPartyBooking } from '../../../wincloud/src/model/reservationModel';
 export class QuotusPMSReservationService {
   private formatter: QuotusPMSFormatter;
   private repository: QuotusPMSReservationRepository;
@@ -18,104 +19,107 @@ export class QuotusPMSReservationService {
   /**
    * Process reservation and send to QuotusPMS
    */
+  // reservation.service.ts
+
   async processReservation(input: IReservationInput): Promise<string> {
     try {
-      console.log('📥 Input received in QuotusPMS service:', JSON.stringify(input, null, 2));
-      console.log('Processing QuotusPMS reservation...');
-      console.log('Property ID:', input.propertyId);
-      // console.log('Reservation ID:', input.bookingDetails.reservationId);
-
       const propertyCode = await this.repository.getPropertyCode(input.propertyId);
       if (!propertyCode) {
         throw new Error('Invalid property ID: Property code not found');
       }
 
-      // Step 1: Format reservation data
-      console.log('🔄 About to call formatter.formatReservation with input:', {
-        propertyId: input.propertyId,
-        hasBookingDetails: !!input.bookingDetails,
-        hasRooms: !!input.rooms,
-        roomsCount: input.rooms?.length,
-        hasGuests: !!(input.bookingDetails as any).guests,
-        guestsCount: (input.bookingDetails as any).guests?.length,
-        reservationId: input.bookingDetails?.reservationId
-      });
-      
-      // Temporary: Log the exact structure the formatter will receive
-      console.log('📋 Full input structure:');
-      console.log('  - input.propertyId:', input.propertyId);
-      console.log('  - input.bookingDetails:', typeof input.bookingDetails);
-      console.log('  - input.rooms:', Array.isArray(input.rooms), input.rooms?.length);
-      console.log('  - input.ageCodeSummary:', "10");
-      
-      let reservation: IQuotusPMSReservation;
-      try {
-        reservation = this.formatter.formatReservation(input);
-      } catch (formatError: any) {
-        console.error('❌ Formatter error details:', formatError);
-        console.error('Stack:', formatError.stack);
-        console.error('Error message:', formatError.message);
-        console.error('Input keys:', Object.keys(input));
-        console.error('BookingDetails keys:', Object.keys(input.bookingDetails));
-        console.error('Input at time of error:', JSON.stringify(input, null, 2));
-        
-        // Try to identify which field is undefined
-        console.error('Checking fields:');
-        console.error('  - input.bookingDetails.guests:', input.bookingDetails ? (input.bookingDetails as any).guests : 'bookingDetails is undefined');
-        console.error('  - input.rooms:', input.rooms);
-        
-        throw formatError;
-      }
-      
-      console.log("Data for validation:", reservation);
-      // Step 2: Validate reservation data
-      const validation = this.formatter.validateReservation(reservation);
+      console.log("input data for formatting inside procress reservation is: ", input);
+      console.log("----------------")
+      console.log("----------------")
+
+      // Format & validate for QuotusPMS
+      const quotusReservation = this.formatter.formatReservation(input);
+
+      const validation = this.formatter.validateReservation(quotusReservation);
       if (!validation.valid) {
         throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
       }
 
-      // Step 3: Prepare JSON payload
-      const requestPayload = JSON.stringify(reservation, null, 2);
-      console.log('Request payload prepared');
+      let apiResponse: any = null;
+      let wincloudStatus: string = 'Pending';
+      let quotusReservationId: string | null = null;
 
-      // Step 4: Send to QuotusPMS
-      let pmsResponse: any;
-      let status: 'pending' | 'confirmed' | 'failed' = 'pending';
-      const propertyInfo = await PropertyInfo.findById(input.propertyId);
+      // Try to send to QuotusPMS
       try {
-        pmsResponse = await this.apiClient.sendReservation(reservation, propertyCode);
-        status = 'confirmed';
-        console.log('Successfully sent to QuotusPMS');
+        apiResponse = await this.apiClient.sendReservation(quotusReservation, propertyCode);
+        wincloudStatus = 'Confirmed';
+
+        // Try to get external reservation ID if Quotus returns it
+        quotusReservationId = apiResponse?.reservationId
+          ?? apiResponse?.id
+          ?? apiResponse?.data?.reservationId
+          ?? null;
+
+        console.log('Reservation successfully sent to QuotusPMS');
       } catch (apiError: any) {
         console.error('Failed to send to QuotusPMS:', apiError.message);
-        pmsResponse = { error: apiError.message };
-        status = 'failed';
-        // Don't throw here, we still want to save the record
+        apiResponse = { error: apiError.message };
+        wincloudStatus = 'Pending';  // ← or 'Failed' if you want to distinguish
+        // You can decide: throw here or continue and save as pending
       }
 
-      const responsePayload = JSON.stringify(pmsResponse, null, 2);
+      // ─────────────────────────────────────────────────────────────
+      //              ALWAYS save to WincloudReservation
+      // ─────────────────────────────────────────────────────────────
+      const guestDetails = input.bookingDetails.guests?.map(guest => ({
+        firstName: guest.firstName || '',
+        lastName: guest.lastName || '',
+        dob: guest.dob || "1900-01-01"
+      })) || [];
 
-      // Step 5: Save to database
-      await this.repository.createReservation(
-        input.propertyId,
-        pmsResponse.data.reservationId,
-        reservation,
-        requestPayload,
-        responsePayload,
-        status
-      );
+      const numberOfRooms = quotusReservation.Rooms.reduce((sum, r) => sum + (r.noOfRooms || 1), 0);
 
-      console.log('Reservation saved to database with status:', status);
+      await ThirdPartyBooking.create({
+        provider: "web",
+        reservationId: input.bookingDetails.reservationId,
+        paymentMethod: quotusReservation.paymentMethod || "none",
+        hotelCode: propertyCode,
+        hotelName: (await PropertyInfo.findById(input.propertyId))?.property_name || "Unknown Hotel",
+        ratePlanCode: quotusReservation.Rooms[0]?.ratePlanCode || "",
+        roomTypeCode: quotusReservation.Rooms[0]?.roomCode || "",
+        checkInDate: quotusReservation.from,
+        checkOutDate: quotusReservation.to,
+        guestDetails,
+        email: quotusReservation.Guests[0]?.email || "",
+        phone: quotusReservation.Guests[0]?.phoneNumber || "",
+        ageCodeSummary: this.buildAgeCodeSummary(quotusReservation.Rooms),
+        numberOfRooms,
+        totalAmount: quotusReservation.totalAmount,
+        currencyCode: quotusReservation.currencyCode,
+        userId: input.bookingDetails.userId || "system",
+        status: wincloudStatus,
+        thirdPartyReservationIdType8: quotusReservationId,   // ← external ID if available
+        // Optional: you can add error field if you extend schema
+        // errorMessage: apiResponse?.error ? apiResponse.error : undefined,
+      });
 
-      if (status === 'failed') {
-        throw new Error('Failed to send reservation to QuotusPMS');
+      console.log(`Reservation saved to WincloudReservation with status: ${wincloudStatus}`);
+
+      if (wincloudStatus === 'Pending') {  // means Quotus failed
+        throw new Error('Failed to send reservation to QuotusPMS (saved as Pending)');
       }
 
       return input.bookingDetails.reservationId;
+
     } catch (error: any) {
-      console.error('Service Error:', error);
-      throw new Error(`Failed to process reservation: ${error.message}`);
+      console.error('Reservation processing failed:', error);
+      throw error;
     }
+  }
+
+  // Simple helper
+  private buildAgeCodeSummary(rooms: any[]): Record<string, number> {
+    const map: Record<string, number> = {};
+    for (const room of rooms) {
+      const key = `${room.noOfAdults || 0}a_${room.noOfChildren || 0}c_${room.noOfInfants || 0}i`;
+      map[key] = (map[key] || 0) + (room.noOfRooms || 1);
+    }
+    return map;
   }
 
   /**

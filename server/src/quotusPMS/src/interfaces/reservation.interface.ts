@@ -53,6 +53,7 @@ export interface IQuotusPMSReservation {
 export interface IReservationInput {
   propertyId: string;
   bookingDetails: {
+    guests: any;
     checkInDate: string;
     checkOutDate: string;
     reservationId: string;
