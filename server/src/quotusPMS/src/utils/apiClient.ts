@@ -117,7 +117,7 @@ export class QuotusPMSApiClient {
       console.log('Sending amendment request to QuotusPMS');
       console.log('Amendment data:', JSON.stringify(amendRequest, null, 2));
 
-      const response: AxiosResponse = await axios.post(
+      const response: AxiosResponse = await axios.put(
         `${this.apiEndpoint}amend`,
         amendRequest,
         {
