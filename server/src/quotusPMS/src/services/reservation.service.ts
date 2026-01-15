@@ -4,6 +4,7 @@ import { QuotusPMSApiClient } from '../utils/apiClient';
 import { IReservationInput, IQuotusPMSReservation } from '../interfaces/reservation.interface';
 import { PropertyInfo } from '../../../property_management/src/model';
 import { ThirdPartyBooking } from '../../../wincloud/src/model/reservationModel';
+import api from '../../../property_management/src/api';
 export class QuotusPMSReservationService {
   private formatter: QuotusPMSFormatter;
   private repository: QuotusPMSReservationRepository;
@@ -76,7 +77,7 @@ export class QuotusPMSReservationService {
 
       await ThirdPartyBooking.create({
         provider: "web",
-        reservationId: input.bookingDetails.reservationId,
+        reservationId: apiResponse?.data?.bookingCode,
         paymentMethod: quotusReservation.paymentMethod || "none",
         hotelCode: propertyCode,
         hotelName: (await PropertyInfo.findById(input.propertyId))?.property_name || "Unknown Hotel",

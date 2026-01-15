@@ -221,8 +221,24 @@ export class AmendBookingService {
    * Used in : updateBooking
    */
   async amendReservationWithThirdParty(amendReservationInput: AmendReservationInput): Promise<void> {
-    const thirdPartyService = new ThirdPartyAmendReservationService();
-    await thirdPartyService.processAmendReservation(amendReservationInput);
+    try {
+      // Get property ID from hotel code
+      const property = await PropertyInfo.findOne({ property_code: amendReservationInput.bookingDetails.hotelCode });
+      
+      if (!property) {
+        throw new Error(`Property not found with code: ${amendReservationInput.bookingDetails.hotelCode}`);
+      }
+
+      const propertyId = property._id.toString();
+      console.log(`Property found for amendment: ${property.property_name} (ID: ${propertyId})`);
+
+      // Use PMSOrchestrator to route amendment to appropriate PMS
+      await PMSOrchestrator.processAmendReservation(propertyId, amendReservationInput);
+      console.log('✅ Amendment successfully processed through PMS Orchestrator');
+    } catch (error: any) {
+      console.error('❌ Failed to amend reservation:', error.message);
+      throw new Error(`Failed to send to third-party API: ${error.message}`);
+    }
   }
 
   /**
