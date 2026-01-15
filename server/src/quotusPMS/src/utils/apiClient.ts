@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { IQuotusPMSReservation } from '../interfaces/reservation.interface';
 import { IQuotusPMSAmendRequest, IQuotusPMSAmendResponse } from '../interfaces/amend.interface';
+import { IQuotusPMSCancelRequest, IQuotusPMSCancelResponse } from '../interfaces/cancel.interface';
 
 export class QuotusPMSApiClient {
   private client: AxiosInstance;
@@ -142,6 +143,43 @@ export class QuotusPMSApiClient {
       } else {
         console.error('Error setting up amendment request to QuotusPMS:', error.message);
         throw new Error(`Failed to send amendment to QuotusPMS: ${error.message}`);
+      }
+    }
+  }
+
+    /**
+   * Cancel/Delete reservation in QuotusPMS
+   */
+  async cancelReservation(cancelRequest: IQuotusPMSCancelRequest): Promise<IQuotusPMSCancelResponse> {
+    try {
+      console.log('Sending cancellation request to QuotusPMS');
+      console.log('Cancellation data:', JSON.stringify(cancelRequest, null, 2));
+
+      const response: AxiosResponse = await axios.put(
+        `${this.apiEndpoint}cancel`,
+        cancelRequest,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-partner-access-token': this.accessToken,
+          },
+        }
+      );
+
+      console.log('QuotusPMS Cancellation Response:', response.status, response.data);
+      return response.data;
+    } catch (error: any) {
+      if (error.response) {
+        console.error('QuotusPMS Cancellation API Error Response:', error.response.status, error.response.data);
+        throw new Error(
+          `QuotusPMS Cancellation API Error: ${error.response.status} - ${JSON.stringify(error.response.data)}`
+        );
+      } else if (error.request) {
+        console.error('No response from QuotusPMS for cancellation:', error.request);
+        throw new Error('No response received from QuotusPMS Cancellation API');
+      } else {
+        console.error('Error setting up cancellation request to QuotusPMS:', error.message);
+        throw new Error(`Failed to send cancellation to QuotusPMS: ${error.message}`);
       }
     }
   }

@@ -418,7 +418,7 @@ export class PMSOrchestrator {
         throw new Error('Reservation not found');
       }
 
-      // Step 2: Validate check-in date
+            // Step 2: Validate check-in date
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const checkInDate = new Date(reservation.checkInDate);
@@ -452,6 +452,138 @@ export class PMSOrchestrator {
     } catch (error: any) {
       console.error('Error processing internal amendment:', error);
       throw new Error(`Failed to process internal amendment: ${error.message}`);
+    }
+  }
+
+  /**
+   * Process cancellation of reservations by routing to appropriate PMS
+   */
+  static async processCancelReservation(propertyId: string, cancelReservationData: any): Promise<string> {
+    try {
+      console.log('PMSOrchestrator: Processing cancellation for property:', cancelReservationData);
+
+      // Step 1: Get property information
+      const property = await PropertyInfo.findById(propertyId).populate('dataSource');
+
+      if (!property) {
+        throw new Error(`Property not found: ${propertyId}`);
+      }
+
+      // Step 2: Handle properties without data source (backward compatibility)
+      if (!property.dataSource) {
+        console.log('⚠️ Property does not have a data source configured. Using default behavior (Wincloud).');
+        const { ThirdPartyCancelReservationService } = await import('../wincloud/src/service/cancelReservationService');
+        const wincloudCancelService = new ThirdPartyCancelReservationService();
+        return await wincloudCancelService.processCancelReservation(cancelReservationData);
+      }
+
+      const dataSource = property.dataSource as any;
+      console.log('Property data source for cancel:', dataSource.name, '- Type:', dataSource.type);
+
+      // Step 3: Route to appropriate PMS based on data source
+      if (dataSource.type === 'Internal') {
+        console.log('Property uses Internal system - processing internal cancellation');
+        return await this.processInternalCancellation(cancelReservationData);
+      }
+
+      // For external PMS (Wincloud, QuotusPMS, etc.), use their cancel services
+      if (dataSource.type === 'PMS' || dataSource.name === 'Wincloud' || dataSource.name === 'QuotusPMS') {
+        if (dataSource.name === 'Wincloud') {
+          console.log('Routing cancel to Wincloud PMS');
+          const { ThirdPartyCancelReservationService } = await import('../wincloud/src/service/cancelReservationService');
+          const wincloudCancelService = new ThirdPartyCancelReservationService();
+          return await wincloudCancelService.processCancelReservation(cancelReservationData);
+        }
+
+        if (dataSource.name === 'QuotusPMS') {
+          console.log('Routing cancel to QuotusPMS');
+          
+          // Get API endpoint and token from data source or config
+          const apiEndpoint = dataSource.apiEndpoint || config.pmsIntegration?.quotusPmsApiUrl;
+          const accessToken = config.pmsIntegration?.quotusPmsToken;
+
+          if (!apiEndpoint) {
+            throw new Error('QuotusPMS API endpoint not configured');
+          }
+
+          if (!accessToken) {
+            console.warn('⚠️ QuotusPMS access token not configured');
+          }
+
+          const { QuotusPMSCancelService } = await import('../quotusPMS/src/services/cancel.service');
+          const quotusPMSCancelService = new QuotusPMSCancelService(apiEndpoint, accessToken);
+          
+          return await quotusPMSCancelService.processCancelReservation(propertyId, cancelReservationData);
+        }
+      }
+
+      throw new Error(`Cancellation not yet supported for PMS type: ${dataSource.name}`);
+    } catch (error: any) {
+      console.error('PMSOrchestrator Cancel Error:', error);
+      throw new Error(`Failed to process cancellation: ${error.message}`);
+    }
+  }
+
+  /**
+   * Process internal reservation cancellations - updates in ThirdPartyBooking database without external API calls
+   */
+  private static async processInternalCancellation(data: any): Promise<string> {
+    try {
+      console.log('Processing internal cancellation - updating database');
+
+      const { ThirdPartyBooking } = await import('../wincloud/src/model/reservationModel');
+      const { ThirdPartyCancelReservationRepository } = await import('../wincloud/src/repository/cancelReservationRepository');
+
+      // Step 1: Check if reservation exists
+      const reservation = await ThirdPartyBooking.findOne({ reservationId: data.reservationId });
+      if (!reservation) {
+        throw new Error('Reservation not found');
+      }
+
+      // Step 2: Validate check-in date
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const checkInDate = new Date(reservation.checkInDate);
+      checkInDate.setHours(0, 0, 0, 0);
+
+      if (today >= checkInDate) {
+        throw new Error("Can't cancel reservation. Your check-in date already passed.");
+      }
+
+      // Step 3: Prepare cancellation data
+      const cancelReservationData = {
+        reservationId: data.reservationId,
+        hotelCode: reservation.hotelCode || data.hotelCode,
+        hotelName: reservation.hotelName || data.hotelName,
+        firstName: data.firstName || reservation.guestDetails?.[0]?.firstName || '',
+        lastName: data.lastName || reservation.guestDetails?.[0]?.lastName || '',
+        checkInDate: new Date(reservation.checkInDate).toISOString().split('T')[0],
+        checkOutDate: new Date(reservation.checkOutDate).toISOString().split('T')[0],
+        status: 'Cancelled'
+      };
+
+      console.log('Processed internal cancellation data:', cancelReservationData);
+
+      // Step 4: Save the cancellation
+      const repository = new ThirdPartyCancelReservationRepository();
+
+      // For internal cancellations, create JSON representation
+      const jsonRepresentation = JSON.stringify(cancelReservationData, null, 2);
+      const internalResponse = JSON.stringify({
+        status: 'Cancelled',
+        message: 'Internal cancellation processed successfully',
+        timestamp: new Date().toISOString(),
+        source: 'Internal'
+      }, null, 2);
+
+      await repository.createCancelReservation(cancelReservationData, jsonRepresentation, internalResponse);
+
+      console.log('Internal cancellation saved successfully for reservation:', data.reservationId);
+      return data.reservationId;
+
+    } catch (error: any) {
+      console.error('Error processing internal cancellation:', error);
+      throw new Error(`Failed to process internal cancellation: ${error.message}`);
     }
   }
 }

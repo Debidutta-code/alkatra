@@ -25,6 +25,7 @@ import { Promocode } from "../../../property_management/src/model";
 import couponModel from "../../../coupon_management/model/couponModel";
 import { PromoCodeService } from "../../../property_management/src/service";
 import { validateCouponCode } from "../../../coupon_management/services/couponService";
+import { PMSOrchestrator } from '../../../common/pmsOrchestrator';
 
 
 
@@ -1031,8 +1032,17 @@ export const cancelThirdPartyReservation = CatchAsyncError(
       };
 
       try {
-        const thirdPartyService = new ThirdPartyCancelReservationService();
-        const result = await thirdPartyService.processCancelReservation(cancelReservationInput);
+        // Get property ID from hotelCode
+        const property = await PropertyInfo.findOne({ property_code: hotelCode });
+        if (!property) {
+          return res.status(404).json({ message: `Property not found with code: ${hotelCode}` });
+        }
+
+        // Use PMSOrchestrator to route cancellation to appropriate PMS
+        const result = await PMSOrchestrator.processCancelReservation(
+          property._id.toString(),
+          cancelReservationInput
+        );
         await increaseRoomsAfterBookingCancelled(res, hotelCode, existingReservation.roomTypeCode, existingReservation.numberOfRooms, [checkInDate, checkOutDate]);
 
         const htmlContent = `<!DOCTYPE html>

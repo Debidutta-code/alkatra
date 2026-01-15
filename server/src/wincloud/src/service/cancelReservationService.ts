@@ -44,8 +44,6 @@ export class ThirdPartyCancelReservationService {
         checkOutDate: reservationData.checkOutDate,
       });
 
-      console.log('📤 XML to be sent:\n', xml);
-
       const apiClient = new ApiClient();
       const apiResponse = await apiClient.sendToThirdParty(xml);
 
